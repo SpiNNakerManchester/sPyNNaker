@@ -13,9 +13,7 @@
 #include <string.h>
 #include <debug.h>
 
-#ifdef SYNAPSE_BENCHMARK
- uint32_t num_plastic_pre_synaptic_events;
-#endif  // SYNAPSE_BENCHMARK
+uint32_t num_plastic_pre_synaptic_events = 0;
 
 //---------------------------------------
 // Macros
@@ -76,7 +74,8 @@ static inline final_state_t _plasticity_update_synapse(
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
     // Get the post-synaptic window of events to be processed
-    const uint32_t window_begin_time = delayed_last_pre_time - delay_dendritic;
+    const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
+        (delayed_last_pre_time - delay_dendritic) : 0;
     const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
@@ -222,9 +221,7 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
 
-#ifdef SYNAPSE_BENCHMARK
     num_plastic_pre_synaptic_events += plastic_synapse;
-#endif  // SYNAPSE_BENCHMARK
 
     // Get event history from synaptic row
     pre_event_history_t *event_history = _plastic_event_history(
@@ -302,9 +299,5 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
-#ifdef SYNAPSE_BENCHMARK
     return num_plastic_pre_synaptic_events;
-#else
-    return 0;
-#endif  // SYNAPSE_BENCHMARK
 }

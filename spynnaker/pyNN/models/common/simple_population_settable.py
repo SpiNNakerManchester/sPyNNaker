@@ -27,5 +27,4 @@ class SimplePopulationSettable(AbstractPopulationSettable):
         if hasattr(self, key):
             setattr(self, key, value)
         else:
-            raise Exception("Type {} does not have parameter {}"
-                            .format(self._model_name, key))
+            raise Exception("Parameter {} not found".format(key))

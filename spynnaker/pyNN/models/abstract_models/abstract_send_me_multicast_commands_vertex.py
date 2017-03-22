@@ -1,6 +1,5 @@
 from six import add_metaclass
 from abc import ABCMeta
-from abc import abstractmethod
 
 
 @add_metaclass(ABCMeta)
@@ -14,15 +13,10 @@ class AbstractSendMeMulticastCommandsVertex(object):
 
         :param commands: The commands that the vertex expects to be transmitted
         :type commands: iterable of \
-                    py:class:`pacman.utility.multicastcommand.MultiCastCommand`
-        :raise None: does not raise any known exceptions
+                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
         """
         self._commands = commands
 
     @property
     def commands(self):
         return self._commands
-
-    @abstractmethod
-    def recieves_multicast_commands(self):
-        pass

@@ -56,6 +56,13 @@ class AllToAllConnector(AbstractConnector):
         return self._get_delay_maximum(
             self._delays, self._n_pre_neurons * self._n_post_neurons)
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        connection_slices = self._connection_slices(
+            pre_vertex_slice, post_vertex_slice)
+        return self._get_delay_variance(self._delays, connection_slices)
+
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -157,3 +164,6 @@ class AllToAllConnector(AbstractConnector):
             self._delays, n_connections, connection_slices)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "AllToAllConnector()"

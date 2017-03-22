@@ -1,0 +1,48 @@
+language: python
+matrix:
+  include:
+    - python: "2.7"
+    - pytest
+
+virtualenv:
+  system_site_packages: true
+
+env:
+  - READTHEDOCS=True
+
+cache: pip
+
+before_install:
+  - pip install --upgrade pip setuptools wheel
+  - pip install --only-binary=numpy,scipy numpy scipy
+  # SpiNNakerManchester internal dependencies; development mode
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
+
+install:
+  - pip install -r requirements-test.txt
+  - pip install -r doc/doc_requirements.txt
+  - python ./setup.py install
+
+before_script:
+  - echo '[Machine]' > ~/.spynnaker.cfg
+  - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
+  - echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
+  - echo '[Database]' >> ~/.spynnaker.cfg
+  - echo '[Simulation]' >> ~/.spynnaker.cfg
+  - echo '[Buffers]' >> ~/.spynnaker.cfg
+
+script:
+  - py.test unittests
+  - flake8 examples spynnaker pyNN-spiNNaker-src
+  - flake8 unittests
+  # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
+  # - flake8 integration_tests
+  - cd doc/source
+  - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
+  - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
+  - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia

@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 class GsynRecorder(object):
 
-    def __init__(self, machine_time_step):
-        self._machine_time_step = machine_time_step
+    def __init__(self):
         self._record_gsyn = False
 
     @property
@@ -40,23 +39,24 @@ class GsynRecorder(object):
             return 0
         return n_neurons * 8
 
-    def get_gsyn(self, label, buffer_manager, region, state_region,
-                 placements, graph_mapper, partitionable_vertex):
+    def get_gsyn(
+            self, label, buffer_manager, region, placements, graph_mapper,
+            application_vertex, machine_time_step):
 
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
         data = list()
         missing_str = ""
 
         progress_bar = ProgressBar(
-            len(subvertices), "Getting conductance for {}".format(label))
-        for subvertex in subvertices:
+            len(vertices), "Getting conductance for {}".format(label))
+        for vertex in vertices:
 
-            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            placement = placements.get_placement_of_subvertex(subvertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
+            placement = placements.get_placement_of_vertex(vertex)
 
             x = placement.x
             y = placement.y
@@ -65,7 +65,7 @@ class GsynRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, data_missing =\
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()

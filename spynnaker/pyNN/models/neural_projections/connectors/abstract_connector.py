@@ -7,9 +7,13 @@ from pyNN.random import NumpyRNG
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spynnaker.pyNN.utilities import utility_calls
+import logging
 import numpy
 import math
 import re
+
+# global objects
+logger = logging.getLogger(__name__)
 
 
 @add_metaclass(ABCMeta)
@@ -86,6 +90,27 @@ class AbstractConnector(object):
     def get_delay_maximum(self):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded
+        """
+
+    @staticmethod
+    def _get_delay_variance(delays, connection_slices):
+        """ Get the variance of the delays
+        """
+        if isinstance(delays, RandomDistribution):
+            return utility_calls.get_variance(delays)
+        elif numpy.isscalar(delays):
+            return 0.0
+        elif hasattr(delays, "__getitem__"):
+            return numpy.var([
+                delays[connection_slice]
+                for connection_slice in connection_slices])
+        raise Exception("Unrecognised delay format")
+
+    @abstractmethod
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        """ Get the variance of the delays for this connection
         """
 
     @staticmethod
@@ -263,7 +288,9 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if numpy.amin(weights) < 0 < numpy.amax(weights):
+            if len(weights) == 0:
+                logger.warning("No connection in " + str(self))
+            elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
                     " in projection {}->{}".format(

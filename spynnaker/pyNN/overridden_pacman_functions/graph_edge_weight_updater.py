@@ -12,23 +12,24 @@ class GraphEdgeWeightUpdater(object):
     """ Removes graph edges that aren't required
     """
 
-    def __call__(self, subgraph, graph_mapper):
+    def __call__(self, machine_graph, graph_mapper):
         """
-        :param subgraph: the subgraph whose edges are to be updated
-        :param graph_mapper: the graph mapper between partitionable and \
-                partitioned graphs.
+        :param machine_graph: the machine_graph whose edges are to be updated
+        :param graph_mapper: the graph mapper between graphs
         """
 
         # create progress bar
         progress_bar = ProgressBar(
-            len(subgraph.subedges), "Updating edge weights")
+            machine_graph.n_outgoing_edge_partitions,
+            "Updating edge weights")
 
-        # start checking subedges to decide which ones need pruning....
-        for subedge in subgraph.subedges:
-            if isinstance(subedge, AbstractWeightUpdatable):
-                subedge.update_weight(graph_mapper)
+        # start checking edges to decide which ones need pruning....
+        for partition in machine_graph.outgoing_edge_partitions:
+            for edge in partition.edges:
+                if isinstance(edge, AbstractWeightUpdatable):
+                    edge.update_weight(graph_mapper)
             progress_bar.update()
         progress_bar.end()
 
         # return nothing
-        return {'subgraph': subgraph}
+        return machine_graph

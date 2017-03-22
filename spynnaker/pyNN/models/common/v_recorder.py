@@ -9,9 +9,8 @@ logger = logging.getLogger(__name__)
 
 class VRecorder(object):
 
-    def __init__(self, machine_time_step):
+    def __init__(self):
         self._record_v = False
-        self._machine_time_step = machine_time_step
 
     @property
     def record_v(self):
@@ -38,25 +37,25 @@ class VRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_v(self, label, buffer_manager, region, state_region, placements,
-              graph_mapper, partitionable_vertex):
+    def get_v(self, label, buffer_manager, region, placements,
+              graph_mapper, application_vertex, machine_time_step):
 
-        subvertices = \
-            graph_mapper.get_subvertices_from_vertex(partitionable_vertex)
+        vertices = \
+            graph_mapper.get_machine_vertices(application_vertex)
 
-        ms_per_tick = self._machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / 1000.0
 
         data = list()
         missing_str = ""
 
         progress_bar = \
-            ProgressBar(len(subvertices),
+            ProgressBar(len(vertices),
                         "Getting membrane voltage for {}".format(label))
 
-        for subvertex in subvertices:
+        for vertex in vertices:
 
-            vertex_slice = graph_mapper.get_subvertex_slice(subvertex)
-            placement = placements.get_placement_of_subvertex(subvertex)
+            vertex_slice = graph_mapper.get_slice(vertex)
+            placement = placements.get_placement_of_vertex(vertex)
 
             x = placement.x
             y = placement.y
@@ -65,7 +64,7 @@ class VRecorder(object):
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data =\
                 buffer_manager.get_data_for_vertex(
-                    placement, region, state_region)
+                    placement, region)
             if missing_data:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()

@@ -1,4 +1,4 @@
-from pacman.model.constraints.abstract_constraints.abstract_constraint\
+from pacman.model.constraints.abstract_constraint\
     import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
@@ -42,7 +42,6 @@ class Population(object):
         a spatial structure
     :param string label:
         a label identifying the Population
-    :returns a list of vertexes and edges
     """
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
@@ -51,7 +50,7 @@ class Population(object):
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
-        # Create a partitionable_graph vertex for the population and add it
+        # Create a graph vertex for the population and add it
         # to PACMAN
         cell_label = label
         if label is None:
@@ -66,8 +65,6 @@ class Population(object):
         # set spinnaker targeted parameters
         internal_cellparams['label'] = cell_label
         internal_cellparams['n_neurons'] = size
-        internal_cellparams['machine_time_step'] = spinnaker.machine_time_step
-        internal_cellparams['timescale_factor'] = spinnaker.timescale_factor
 
         # create population vertex.
         self._vertex = cellclass(**internal_cellparams)
@@ -84,7 +81,7 @@ class Population(object):
             self._structure = None
 
         self._spinnaker._add_population(self)
-        self._spinnaker.add_partitionable_vertex(self._vertex)
+        self._spinnaker.add_application_vertex(self._vertex)
 
         # initialise common stuff
         self._size = size
@@ -127,7 +124,6 @@ class Population(object):
     @property
     def default_parameters(self):
         """ The default parameters of the vertex from this population
-        :return:
         """
         return self._vertex.default_parameters
 
@@ -188,7 +184,7 @@ class Population(object):
 
         spikes = self._vertex.get_spikes(
             self._spinnaker.placements, self._spinnaker.graph_mapper,
-            self._spinnaker.buffer_manager)
+            self._spinnaker.buffer_manager, self._spinnaker.machine_time_step)
 
         return spikes
 
@@ -197,7 +193,7 @@ class Population(object):
         """
         spikes = self.getSpikes(True, gather)
         n_spikes = {}
-        counts = numpy.bincount(spikes[:, 0].astype(dtype="uint32"),
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self._vertex.n_atoms)
         for i in range(self._vertex.n_atoms):
             n_spikes[i] = counts[i]
@@ -206,13 +202,12 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time and synaptic
+        Return a 3-column numpy array containing cell ids, time and synaptic\
         conductances for recorded cells.
-        :param gather:
-            not used - inserted to match PyNN specs
+
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
 
@@ -238,19 +233,18 @@ class Population(object):
 
         return self._vertex.get_gsyn(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
+            self._spinnaker.machine_time_step)
 
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and V_m for
+        Return a 3-column numpy array containing cell ids, time, and V_m for\
         recorded cells.
 
-        :param gather:
-            not used - inserted to match PyNN specs
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
         if isinstance(self._vertex, AbstractVRecordable):
@@ -275,7 +269,8 @@ class Population(object):
 
         return self._vertex.get_v(
             self._spinnaker.no_machine_time_steps, self._spinnaker.placements,
-            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager)
+            self._spinnaker.graph_mapper, self._spinnaker.buffer_manager,
+            self._spinnaker.machine_time_step)
 
     def id_to_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -310,6 +305,7 @@ class Population(object):
     def is_local(cell_id):
         """ Determine whether the cell with the given ID exists on the local \
             MPI node.
+
         :param cell_id:
         """
 
@@ -393,7 +389,7 @@ class Population(object):
         """ Set initial membrane potentials for all the cells in the\
             population to random values.
 
-        :param `pyNN.random.RandomDistribution` distribution:
+        :param `pyNN.random.RandomDistribution` distribution:\
             the distribution used to draw random values.
 
         """
@@ -477,6 +473,7 @@ class Population(object):
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
         """ Write spike time information from the population to a given file.
+
         :param filename: the absolute file path for where the spikes are to\
                     be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -502,6 +499,7 @@ class Population(object):
 
     def print_gsyn(self, filename, gather=True):
         """ Write conductance information from the population to a given file.
+
         :param filename: the absolute file path for where the gsyn are to be\
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -527,6 +525,7 @@ class Population(object):
     def print_v(self, filename, gather=True):
         """ Write membrane potential information from the population to a\
             given file.
+
         :param filename: the absolute file path for where the voltage are to\
                      be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -563,6 +562,7 @@ class Population(object):
     def sample(self, n, rng=None):
         """ Return a random selection of neurons from a population in the form\
             of a population view
+
         :param n: the number of neurons to sample
         :param rng: the random number generator to use.
         """
@@ -572,6 +572,7 @@ class Population(object):
 
     def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
+
             :param file: the file to write the positions to.
         """
         file_handle = open(file, "w")
@@ -588,6 +589,7 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
+
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
@@ -623,7 +625,7 @@ class Population(object):
     # NONE PYNN API CALL
     def set_constraint(self, constraint):
         """ Apply a constraint to a population that restricts the processor\
-            onto which its sub-populations will be placed.
+            onto which its atoms will be placed.
         """
         if isinstance(constraint, AbstractConstraint):
             self._vertex.add_constraint(constraint)
@@ -682,13 +684,13 @@ class Population(object):
     @property
     def size(self):
         """ The number of neurons in the population
-        :return:
         """
         return self._vertex.n_atoms
 
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
             value_array, which must have the same dimensions as the Population.
+
         :param parametername: the name of the parameter
         :param value_array: the array of values which must have the correct\
                 number of elements.
