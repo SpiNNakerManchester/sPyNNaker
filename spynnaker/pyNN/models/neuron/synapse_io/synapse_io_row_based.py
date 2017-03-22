@@ -1,6 +1,8 @@
 import numpy
 import math
 
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics import \
+    AbstractPlasticSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
     import AbstractSynapseDynamics
 from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
@@ -289,8 +291,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         dynamics = synapse_info.synapse_dynamics
         connections = list()
-        try:
-
+        if isinstance(dynamics, AbstractStaticSynapseDynamics) \
+                or isinstance(dynamics.super, AbstractStaticSynapseDynamics):
             # Read static data
             if row_data is not None and len(row_data) > 0:
                 ff_size, ff_data = self._get_static_data(row_data, dynamics)
@@ -322,9 +324,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delayed_connections["source"] += pre_vertex_slice.lo_atom
                 delayed_connections["delay"] += connection_min_delay
                 connections.append(delayed_connections)
-
-        except:
-
+        else:
             # Read plastic data
             if row_data is not None:
                 pp_size, pp_data, fp_size, fp_data = self._get_plastic_data(
