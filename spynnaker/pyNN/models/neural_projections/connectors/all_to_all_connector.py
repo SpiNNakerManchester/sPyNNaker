@@ -174,6 +174,9 @@ class AllToAllConnector(AbstractConnector):
         block["synapse_type"] = synapse_type
         return block
 
+    def __repr__(self):
+        return "AllToAllConnector()"
+
     @property
     def allow_self_connections(self):
         return self._allow_self_connections

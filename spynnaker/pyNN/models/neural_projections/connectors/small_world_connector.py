@@ -23,6 +23,7 @@ class SmallWorldConnector(AbstractConnector):
         post_positions = self._post_population.positions
         distances = self._space.distances(
             pre_positions, post_positions, False)
+        self._degree = degree
         self._mask = (distances < degree).as_type(float)
         self._n_connections = numpy.sum(self._mask)
 
@@ -115,3 +116,7 @@ class SmallWorldConnector(AbstractConnector):
             post_vertex_slice.lo_atom)
 
         return block
+
+    def __repr__(self):
+        return "SmallWorldConnector(degree={}, rewiring={})".format(
+            self._degree, self._rewiring)

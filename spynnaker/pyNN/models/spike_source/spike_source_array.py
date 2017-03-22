@@ -150,7 +150,6 @@ class SpikeSourceArray(
     @property
     def spike_times(self):
         """ The spike times of the spike source array
-        :return:
         """
         return self.send_buffer_times
 
@@ -158,8 +157,7 @@ class SpikeSourceArray(
     def spike_times(self, spike_times):
         """ Set the spike source array's spike times. Not an extend, but an\
             actual change
-        :param spike_times:
-        :return:
+
         """
         self.send_buffer_times = spike_times
 

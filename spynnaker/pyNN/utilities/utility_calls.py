@@ -31,7 +31,7 @@ def convert_param_to_numpy(param, no_atoms):
 
     :param param: the param to convert
     :param no_atoms: the number of atoms available for conversion of param
-    :return the converted param in whatever format it was given
+    :return numpy.array: the converted param in whatever format it was given
     """
     if RandomDistribution is None:
         raise exceptions.ConfigurationException(
@@ -75,7 +75,7 @@ def read_in_data_from_file(
     :param min_atom: min neuron id to which neurons to read in
     :param max_atom: max neuron id to which neurons to read in
     :param min_time: min time slot to read neurons values of.
-    :param max_time:max time slot to read neurons values of.
+    :param max_time: max time slot to read neurons values of.
     :return: a numpy array of (time stamp, atom id, data value)
     """
     times = list()
@@ -114,7 +114,7 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
     :param min_atom: min neuron id to which neurons to read in
     :param max_atom: max neuron id to which neurons to read in
     :param min_time: min time slot to read neurons values of.
-    :param max_time:max time slot to read neurons values of.
+    :param max_time: max time slot to read neurons values of.
     :param split_value: the pattern to split by
     :return:\
         a numpy array with max_atom elements each of which is a list of\

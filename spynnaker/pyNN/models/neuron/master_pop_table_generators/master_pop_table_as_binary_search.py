@@ -57,7 +57,7 @@ class _MasterPopEntry(object):
     @property
     def addresses_and_row_lengths(self):
         """
-        :return: the memory address that this master pop entry points at
+        :return: the memory address that this master pop entry points at\
         (synaptic matrix)
         """
         return self._addresses_and_row_lengths
@@ -134,12 +134,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = len(in_edges)
+        n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
+            n_vertices += 1
 
         # Multiply by 2 to get an upper bound
         return (
@@ -171,7 +172,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param spec: the dsg writer
         :param master_population_table_region: the region in memory that the\
                 master pop table will be written in
-        :return:
+        :rtype: None
         """
         self._entries = dict()
         self._n_addresses = 0
@@ -187,9 +188,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
         :param master_pop_table_region: the region id for the master pop
-        :param is_single: flag that states if the entry is a direct entry for
-        a single row.
-        :return: None
+        :param is_single: flag that states if the entry is a direct entry for\
+                a single row.
+        :rtype: None
         """
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
@@ -205,10 +206,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added
+
         :param spec: the writer for the dsg
         :param master_pop_table_region: the region to which the master pop\
                 resides in
-        :return: None
+        :rtype: None
         """
 
         spec.switch_write_focus(region=master_pop_table_region)
@@ -309,7 +311,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """ searches the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
-        :return the entry for this given key
+        :return: the entry for this given key
         :rtype: _MasterPopEntry
         """
         imin = 0
@@ -329,6 +331,5 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def get_edge_constraints(self):
         """ Returns any constraints placed on the edges because of having this\
             master pop table implemented in the cores.
-        :return:
         """
         return list()

@@ -10,16 +10,16 @@ import math
 # NOTE: Do NOT delete these to fix PEP8 issues
 
 # noinspection PyUnresolvedReferences
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport
+from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport
+from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport
+from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport # noqa: F401,E501
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
         # d is apparently unused, but is in fact expected by d_expression
         # so is used when eval is called
-        d = self._space.distances(  # @UnusedVariable
+        d = self._space.distances(  # @UnusedVariable # noqa: F841
             pre_positions, post_positions, expand_distances)
         self._probs = eval(self._d_expression)
 
@@ -163,6 +163,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         block["synapse_type"] = synapse_type
         return block
 
+    def __repr__(self):
+        return "DistanceDependentProbabilityConnector({})".format(
+            self._d_expression)
+
     @property
     def allow_self_connections(self):
         return self._allow_self_connections
@@ -178,3 +182,4 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @d_expression.setter
     def d_expression(self, new_value):
         self._d_expression = new_value
+

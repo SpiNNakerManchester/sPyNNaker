@@ -153,3 +153,6 @@ class OneToOneConnector(AbstractConnector):
             self._delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "OneToOneConnector()"

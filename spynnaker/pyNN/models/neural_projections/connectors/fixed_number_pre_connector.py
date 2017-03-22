@@ -147,3 +147,6 @@ class FixedNumberPreConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "FixedNumberPreConnector({})".format(self._n_pre)

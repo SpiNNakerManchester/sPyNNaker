@@ -2,6 +2,7 @@
 from pacman.model.graphs.application.impl.application_edge import \
     ApplicationEdge
 
+# common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
@@ -9,6 +10,7 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder import \
     ExecutableFinder
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 
+# local front end imports
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models \
@@ -17,6 +19,8 @@ from spynnaker.pyNN.models.abstract_models \
 from spynnaker.pyNN.models.abstract_models \
     .abstract_vertex_with_dependent_vertices \
     import AbstractVertexWithEdgeToDependentVertices
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 import logging
 import os
@@ -48,6 +52,16 @@ class SpiNNakerCommon(SpinnakerMainInterface):
                 config, user_extra_algorithm_xml_path,
                 user_extra_mapping_inputs,
                 user_extra_algorithms_pre_run)
+
+        if extra_mapping_algorithms is None:
+            extra_mapping_algorithms = list()
+        if extra_load_algorithms is None:
+            extra_load_algorithms = list()
+        if config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
         SpinnakerMainInterface.__init__(
             self, config, graph_label=graph_label,
@@ -139,53 +153,66 @@ class SpiNNakerCommon(SpinnakerMainInterface):
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
-        self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
         # deal with params allowed via the setup options
         if timestep is not None:
-            # convert into milliseconds from microseconds
-            timestep *= 1000
-            self._machine_time_step = timestep
 
-        if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
+            # convert from milliseconds into microseconds
+            try:
+                if timestep <= 0:
+                    raise InvalidParameterType(
+                        "invalid timestamp {}: must greater than zero".format(
+                            timestep))
+                timestep *= 1000.0
+                timestep = math.ceil(timestep)
+            except (TypeError, AttributeError):
+                raise InvalidParameterType(
+                    "timestamp parameter must numerical")
+            self._machine_time_step = timestep
+        else:
+            self._machine_time_step = config.getint(
+                "Machine", "machineTimeStep")
+
+        if (min_delay is not None and
+                float(min_delay * 1000) < self._machine_time_step):
             raise common_exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
-                "current machine time step"
-                    .format(constants.MIN_SUPPORTED_DELAY * timestep))
+                "current machine time step".format(
+                    constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
 
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extension_max_supported_delay = \
-            constants.MAX_DELAY_BLOCKS \
-            * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+        delay_extension_max_supported_delay = (
+            constants.MAX_DELAY_BLOCKS *
+            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
 
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
 
-        if max_delay is not None \
-                and float(max_delay * 1000) > \
-                                max_delay_tics_supported * timestep:
+        if (max_delay is not None and
+                float(max_delay * 1000.0) >
+                (max_delay_tics_supported * self._machine_time_step)):
             raise common_exceptions.ConfigurationException(
-                "PACMAN does not support max delays above {} ms with the "
-                "current machine time step".format(0.144 * timestep))
-
+                "Pacman does not support max delays above {} ms with the "
+                "current machine time step".format(
+                    0.144 * self._machine_time_step))
         if min_delay is not None:
             self._min_supported_delay = min_delay
         else:
-            self._min_supported_delay = timestep / 1000.0
+            self._min_supported_delay = self._machine_time_step / 1000.0
 
         if max_delay is not None:
             self._max_supported_delay = max_delay
         else:
-            self._max_supported_delay = (max_delay_tics_supported *
-                                         (timestep / 1000.0))
+            self._max_supported_delay = (
+                max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
                     config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
-            if timestep * self._time_scale_factor < 1000:
+            if self._machine_time_step * self._time_scale_factor < 1000:
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
                     logger.warn(
@@ -267,11 +294,6 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         return self._time_scale_factor
 
     def add_application_vertex(self, vertex_to_add):
-        """
-
-        :param vertex_to_add:
-        :return:
-        """
         if isinstance(vertex_to_add, CommandSender):
             self._command_sender = vertex_to_add
 
@@ -333,8 +355,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         return len(unique_keys)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True,
-             extract_iobuf=True):
+             clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -346,20 +367,13 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
-        :return: None
+        :rtype: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags,
-            extract_provenance_data, extract_iobuf)
+            self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
         """ Run the model created

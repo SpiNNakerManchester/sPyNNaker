@@ -22,8 +22,7 @@ from pacman.model.resources.dtcm_resource import DTCMResource
 from pacman.model.resources.resource_container import ResourceContainer
 from pacman.model.resources.sdram_resource import SDRAMResource
 
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
+# front end common imports
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models \
@@ -31,6 +30,8 @@ from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
+from spinn_front_end_common.utilities.utility_objs.executable_start_type \
+    import ExecutableStartType
 from spinn_front_end_common.abstract_models.\
     abstract_provides_incoming_partition_constraints import \
     AbstractProvidesIncomingPartitionConstraints
@@ -88,10 +89,9 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 @add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractBinaryUsesSimulationRun,
-        AbstractSpikeRecordable, AbstractVRecordable,
-        AbstractGSynExcitatoryRecordable, AbstractContainsUnits,
-        AbstractGSynInhibitoryRecordable,
+        AbstractHasAssociatedBinary, AbstractSpikeRecordable,
+        AbstractVRecordable, AbstractGSynExcitatoryRecordable,
+        AbstractContainsUnits, AbstractGSynInhibitoryRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -536,6 +536,10 @@ class AbstractPopulationVertex(
         return (binary_title + self._synapse_manager.vertex_executable_suffix +
                 binary_extension)
 
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
+
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
         return self._spike_recorder.record
@@ -704,6 +708,7 @@ class AbstractPopulationVertex(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         """ Gets the constraints for partitions going out of this vertex
+
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """

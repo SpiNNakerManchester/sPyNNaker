@@ -232,6 +232,10 @@ class FromListConnector(AbstractConnector):
         block["synapse_type"] = synapse_type
         return block
 
+    def __repr__(self):
+        return "FromListConnector(n_connections={})".format(
+            len(self._conn_list))
+
     @property
     def conn_list(self):
         return self._conn_list
