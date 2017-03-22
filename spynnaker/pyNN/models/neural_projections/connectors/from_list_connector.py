@@ -30,7 +30,7 @@ class FromListConnector(AbstractConnector):
         """
         Creates a new FromListConnector.
         """
-        AbstractConnector.__init__(self, safe, None, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
         if conn_list is None or len(conn_list) == 0:
             raise exceptions.InvalidParameterType(
                 "The connection list for the FromListConnector must contain"

@@ -261,3 +261,15 @@ class PyNNProjectionCommon(object):
         else:
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
+
+    def __repr__(self):
+        return "projection {}".format(self._projection_edge.label)
+
+    def size(self, gather=True):
+        """ Return the total number of connections.
+         - only local connections, if gather is False,
+         - all connections, if gather is True (default)
+        """
+        # TODO
+        raise NotImplementedError
+

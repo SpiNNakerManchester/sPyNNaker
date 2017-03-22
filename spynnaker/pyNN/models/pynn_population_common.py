@@ -1,3 +1,6 @@
+from pacman.model.constraints.abstract_constraint import AbstractConstraint
+from pacman.model.constraints.placer_constraints.placer_chip_and_core_constraint import \
+    PlacerChipAndCoreConstraint
 from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_front_end_common.utilities import exceptions
@@ -9,6 +12,8 @@ from spynnaker.pyNN.models.abstract_models.\
 from spynnaker.pyNN.models.abstract_models.\
     abstract_population_settable import \
     AbstractPopulationSettable
+from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import \
+    InputTypeConductance
 from spynnaker.pyNN.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -165,4 +170,145 @@ class PyNNPopulationCommon(object):
                     variable))
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
+        self._change_requires_mapping = True
+
+    def __add__(self, other):
+        """ Merges populations
+        """
+        # TODO: Make this add the neurons from another population to this one
+        raise NotImplementedError
+
+    def all(self):
+        """ Iterator over cell ids on all nodes.
+        """
+        # TODO: Return the cells when we have such a thing
+        raise NotImplementedError
+
+    @property
+    def conductance_based(self):
+        """ True if the population uses conductance inputs
+        """
+        return isinstance(self._vertex.input_type, InputTypeConductance)
+
+    def __getitem__(self, index_or_slice):
+        # TODO: Used to get a single cell - not yet supported
+        raise NotImplementedError
+
+    def id_to_index(self, cell_id):
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population).
+        """
+
+        # TODO: Need __getitem__
+        raise NotImplementedError
+
+    def id_to_local_index(self, cell_id):
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population), counting only cells on the local\
+            MPI node.
+        """
+        # TODO: Need __getitem__
+        raise NotImplementedError
+
+    def inject(self, current_source):
+        """ Connect a current source to all cells in the Population.
+        """
+
+        # TODO:
+        raise NotImplementedError
+
+    def __iter__(self):
+        """ Iterate over local cells
+        """
+
+        # TODO:
+        raise NotImplementedError
+
+    def __len__(self):
+        """ Get the total number of cells in the population.
+        """
+        return self._size
+
+    @property
+    def label(self):
+        """ The label of the population
+        """
+        return self._vertex.label
+
+    @label.setter
+    def label(self, new_value):
+        self._vertex.label = new_value
+
+    @property
+    def local_size(self):
+        """ The number of local cells
+        """
+
+        # Doesn't make much sense on SpiNNaker
+        return self._size
+
+    def can_record(self, variable):
+        """ Determine whether `variable` can be recorded from this population.
+        """
+
+        # TODO: Needs a more precise recording mechanism (coming soon)
+        raise NotImplementedError
+
+    # NONE PYNN API CALL
+    def set_constraint(self, constraint):
+        """ Apply a constraint to a population that restricts the processor\
+            onto which its atoms will be placed.
+        """
+        if isinstance(constraint, AbstractConstraint):
+            self._vertex.add_constraint(constraint)
+        else:
+            raise exceptions.ConfigurationException(
+                "the constraint entered is not a recognised constraint")
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
+    # NONE PYNN API CALL
+    def add_placement_constraint(self, x, y, p=None):
+        """ Add a placement constraint
+
+        :param x: The x-coordinate of the placement constraint
+        :type x: int
+        :param y: The y-coordinate of the placement constraint
+        :type y: int
+        :param p: The processor id of the placement constraint (optional)
+        :type p: int
+        """
+        self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
+    # NONE PYNN API CALL
+    def set_mapping_constraint(self, constraint_dict):
+        """ Add a placement constraint - for backwards compatibility
+
+        :param constraint_dict: A dictionary containing "x", "y" and\
+                    optionally "p" as keys, and ints as values
+        :type constraint_dict: dict of str->int
+        """
+        self.add_placement_constraint(**constraint_dict)
+
+        # state that something has changed in the population,
+        self._change_requires_mapping = True
+
+    # NONE PYNN API CALL
+    def set_model_based_max_atoms_per_core(self, new_value):
+        """ Supports the setting of each models max atoms per core parameter
+
+        :param new_value: the new value for the max atoms per core.
+        """
+        if hasattr(self._vertex, "set_model_max_atoms_per_core"):
+            self._vertex.set_model_max_atoms_per_core(new_value)
+        else:
+            raise exceptions.ConfigurationException(
+                "This population does not support its max_atoms_per_core "
+                "variable being adjusted by the end user")
+
+        # state that something has changed in the population,
         self._change_requires_mapping = True
