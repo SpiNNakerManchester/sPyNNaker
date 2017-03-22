@@ -1,6 +1,8 @@
 import math
 import numpy
 
+from spynnaker.pyNN.models.abstract_models.abstract_population_settable import \
+    AbstractPopulationSettable
 from spynnaker.pyNN.models.neuron.synapse_dynamics\
     .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
@@ -11,7 +13,8 @@ TIME_STAMP_BYTES = 4
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
-class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsSTDP(
+        AbstractPlasticSynapseDynamics, AbstractPopulationSettable):
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
@@ -36,6 +39,22 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         if voltage_dependence is not None:
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
+
+
+    def get_value(self, key):
+        """ Get a property
+        """
+        pass
+
+
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        """
+        pass
+
 
     @property
     def weight_dependence(self):
