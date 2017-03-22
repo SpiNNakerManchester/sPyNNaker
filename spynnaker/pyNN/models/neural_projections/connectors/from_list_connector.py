@@ -80,8 +80,12 @@ class FromListConnector(AbstractConnector):
 
         # build other data element conn list (with source and destination)
         other_conn_list = None
+        other_element_column_names = list()
+        for element in element_index:
+            other_element_column_names.append(column_names[element])
         if len(element_index) != 0:
             other_conn_list = conn_list[:, element_index]
+            other_conn_list.dtype.names = other_element_column_names
 
         # hand over splitted data
         return source_destination_conn_list, weights, delays, other_conn_list
