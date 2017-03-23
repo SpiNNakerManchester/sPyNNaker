@@ -33,8 +33,8 @@ ifndef NEURON_MODEL_H
     $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
 endif
 
-ifndef INPUT_TYPE_H
-    $(error INPUT_TYPE_H is not set.  Please select an input type header file)
+ifndef INPUT_TYPE_CLASS
+    $(error INPUT_TYPE_CLASS is not set.  Please select an input type class)
 endif
 
 ifndef THRESHOLD_TYPE_H
@@ -73,6 +73,11 @@ SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
                         $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
                         $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
                         $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+INPUT_TYPE_HEADERS = $(SOURCE_DIR)/neuron/input_types/core_input_type.h \
+	$(SOURCE_DIR)/neuron/input_types/input_type_conductance.h \
+	$(SOURCE_DIR)/neuron/input_types/input_type_current.h \
+	$(SOURCE_DIR)/neuron/input_types/input_type.h
 
 ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)             
     STDP += $(SYNAPSE_DYNAMICS) \
@@ -121,11 +126,11 @@ $(NEURON_MODEL_O): $(NEURON_MODEL)
 	        $(CFLAGS) -o $@ $<
 
 $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
+                             $(SYNAPSE_TYPE_H) $(INPUT_TYPE_HEADERS)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
 	      -include $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
+	      -DINPUT_TYPE_CLASS=$(INPUT_TYPE_CLASS) \
 	      -include $(THRESHOLD_TYPE_H) \
 	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
