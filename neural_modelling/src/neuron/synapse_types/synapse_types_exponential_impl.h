@@ -31,7 +31,7 @@ typedef struct synapse_param_t {
     decay_t inh_init;
 } synapse_param_t;
 
-#include "synapse_types.h"
+#include "synapse_types_interface.h"
 
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,

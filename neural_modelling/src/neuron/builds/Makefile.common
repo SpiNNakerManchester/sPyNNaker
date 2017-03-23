@@ -19,6 +19,14 @@ endif
 #POPULATION_TABLE_IMPL := fixed
 POPULATION_TABLE_IMPL := binary_search
 
+ifndef SOURCE_DIR
+	$(error SOURCE_DIR must be set for this makefile to work.)
+endif
+
+ifndef BUILD_DIR
+	$(error BUILD_DIR must be set for this makefile to work.)
+endif
+
 ifndef ADDITIONAL_INPUT_H
     ADDITIONAL_INPUT_H = $(SOURCE_DIR)/neuron/additional_inputs/additional_input_none_impl.h
 endif
@@ -129,3 +137,23 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
 	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+
+$(BUILD_DIR)input_type.h: $(SOURCE_DIR)/neuron/input_types/input_type.tmpl Makefile
+	@echo Creating $@ from $<
+	@sed 's!INPUT_TYPE_H!$(INPUT_TYPE_H)!g' $< > $@
+
+$(BUILD_DIR)neuron_model.h: $(SOURCE_DIR)/neuron/models/neuron_model.tmpl Makefile
+	@echo Creating $@ from $<
+	@sed 's!NEURON_MODEL_H!$(NEURON_MODEL_H)!g' $< > $@
+
+$(BUILD_DIR)threshold_type.h: $(SOURCE_DIR)/neuron/threshold_types/threshold_type.tmpl Makefile
+	@echo Creating $@ from $<
+	@sed 's!THRESHOLD_TYPE_H!$(THRESHOLD_TYPE_H)!g' $< > $@
+
+$(BUILD_DIR)synapse_type.h: $(SOURCE_DIR)/neuron/synapse_types/synapse_type.tmpl Makefile
+	@echo Creating $@ from $<
+	@sed 's!SYNAPSE_TYPE_H!$(SYNAPSE_TYPE_H)!g' $< > $@
+
+$(BUILD_DIR)additional_input.h: $(SOURCE_DIR)/neuron/additional_inputs/additional_input.tmpl Makefile
+	@echo Creating $@ from $<
+	@sed 's!ADDITIONAL_INPUT_H!$(ADDITIONAL_INPUT_H)!g' $< > $@

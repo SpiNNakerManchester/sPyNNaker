@@ -5,11 +5,11 @@
  */
 
 #include "neuron.h"
-#include "models/neuron_model.h"
-#include "input_types/input_type.h"
-#include "additional_inputs/additional_input.h"
-#include "threshold_types/threshold_type.h"
-#include "synapse_types/synapse_types.h"
+#include "build/neuron_model.h"
+#include "build/input_type.h"
+#include "build/additional_input.h"
+#include "build/threshold_type.h"
+#include "build/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "recording.h"

@@ -33,7 +33,7 @@ typedef struct synapse_param_t {
     decay_t inh_init;
 } synapse_param_t;
 
-#include "synapse_types.h"
+#include "synapse_types_interface.h"
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.

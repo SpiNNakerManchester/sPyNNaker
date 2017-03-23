@@ -1,7 +1,7 @@
 #ifndef _ADDITIONAL_INPUT_TYPE_NONE_H_
 #define _ADDITIONAL_INPUT_TYPE_NONE_H_
 
-#include "additional_input.h"
+#include "additional_input_interface.h"
 
 typedef struct additional_input_t {
 } additional_input_t;

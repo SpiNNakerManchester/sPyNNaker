@@ -1,7 +1,7 @@
 #ifndef _NEURON_MODEL_LIF_CURR_IMPL_H_
 #define _NEURON_MODEL_LIF_CURR_IMPL_H_
 
-#include "neuron_model.h"
+#include "neuron_model_interface.h"
 
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
@@ -39,4 +39,3 @@ typedef struct global_neuron_params_t {
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_IMPL_H_
-

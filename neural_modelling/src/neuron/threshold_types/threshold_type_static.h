@@ -1,7 +1,7 @@
 #ifndef _THRESHOLD_TYPE_STATIC_H_
 #define _THRESHOLD_TYPE_STATIC_H_
 
-#include "threshold_type.h"
+#include "threshold_type_interface.h"
 
 typedef struct threshold_type_t {
 

@@ -36,8 +36,8 @@
  * interface for all types of synapses shaping functions.
  */
 
-#ifndef _SYNAPSE_TYPES_H_
-#define _SYNAPSE_TYPES_H_
+#ifndef _SYNAPSE_TYPES_INTERFACE_
+#define _SYNAPSE_TYPES_INTERFACE_
 
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
@@ -119,4 +119,4 @@ static void synapse_types_print_parameters(synapse_param_t *parameters);
 static void synapse_types_print_input(
         input_t *input_buffers,  index_t neuron_index);
 
-#endif // _SYNAPSE_TYPES_H_
+#endif // _SYNAPSE_TYPES_INTERFACE_
