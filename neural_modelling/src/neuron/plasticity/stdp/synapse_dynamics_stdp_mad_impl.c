@@ -367,7 +367,7 @@ static inline plastic_synapse_t _weight_conversion(uint32_t weight){
 }
 
 static inline control_t _control_conversion(uint32_t id, uint32_t delay){
-    control_t new_control = ((delay & SYNAPSE_AXONAL_DELAY_MASK) << SYNAPSE_TYPE_INDEX_BITS);
+    control_t new_control = ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
     new_control |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
     return new_control;
 }

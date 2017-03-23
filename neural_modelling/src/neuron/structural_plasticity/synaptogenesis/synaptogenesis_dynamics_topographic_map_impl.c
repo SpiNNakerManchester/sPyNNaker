@@ -30,6 +30,7 @@
 bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
 bool (*remove_neuron)(uint32_t, address_t);
 bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t);
+int (*number_of_connections_in_row)(address_t);
 
 
 //---------------------------------------
@@ -170,10 +171,12 @@ address_t synaptogenesis_dynamics_initialise(
         search_for_neuron = &find_plastic_neuron_with_id;
         remove_neuron = &remove_plastic_neuron_at_offset;
         add_neuron = &add_plastic_neuron_with_id;
+        number_of_connections_in_row = &synapse_row_num_plastic_controls;
     #else
         search_for_neuron = &find_static_neuron_with_id;
         remove_neuron = &remove_static_neuron_at_offset;
         add_neuron = &add_static_neuron_with_id;
+        number_of_connections_in_row = &synapse_row_num_fixed_synapses;
     #endif
 
 
@@ -255,25 +258,14 @@ void synaptic_row_restructure(uint dma_id){
     if (dma_id != rewiring_dma_buffer.dma_id)
         log_error("Servicing invalid synaptic row!");
 
+
     uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
-    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
-    uint num_static = synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row));
+//    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
+//    uint num_static = synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row));
+    uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
+
     // Is the row zero in length?
-    bool zero_elements = num_plastic == 0 && num_static == 0;
-
-
-    bool zero_double_check=false;
-    if (zero_elements)
-        zero_double_check = plastic_size <= 1;
-
-    if (zero_double_check){
-        log_error("What are you doing here?!");
-        log_info("plastic size %d -- num fixed %d -- num controls %d ",
-            plastic_size,
-            synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row)),
-            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
-        }
-
+    bool zero_elements = number_of_connections == 0;
     // Does the neuron exist in the row?
     bool search_hit = search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
 
@@ -283,8 +275,8 @@ void synaptic_row_restructure(uint dma_id){
         synaptogenesis_dynamics_elimination_rule();
         // TODO check status of operation and save provenance (statistics)
     }
-    else if(!search_hit && !zero_double_check &&
-            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row))<rewiring_data.s_max){
+    else if(!search_hit &&
+            number_of_connections<rewiring_data.s_max){
 
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
@@ -326,7 +318,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
         log_info("\t| HIT @ %d id %d. Number of controls=%d",
             current_state.sp_data.offset,
             current_state.post_syn_id,
-            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
@@ -346,7 +338,7 @@ bool synaptogenesis_dynamics_formation_rule(){
         log_info("\t| MISS @ %d id %d. Number of controls=%d",
             current_state.sp_data.offset,
             current_state.post_syn_id,
-            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
