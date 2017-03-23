@@ -1,6 +1,9 @@
 import numpy
 import math
 
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics import \
     AbstractPlasticSynapseDynamics
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
@@ -9,6 +12,9 @@ from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
     import AbstractConnector
 from spynnaker.pyNN.models.neuron.synapse_dynamics\
     .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+    AbstractSynapseDynamicsStructural
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
     import AbstractSynapseIO
 
@@ -109,7 +115,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
-        try:
+        if isinstance(synapse_dynamics, SynapseDynamicsStatic) or \
+            (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+             isinstance(synapse_dynamics.super, SynapseDynamicsStatic)):
 
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -121,7 +129,9 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-        except:
+        elif isinstance(synapse_dynamics, SynapseDynamicsSTDP)or \
+            (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+             isinstance(synapse_dynamics.super, SynapseDynamicsSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -291,8 +301,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         dynamics = synapse_info.synapse_dynamics
         connections = list()
-        if isinstance(dynamics, AbstractStaticSynapseDynamics) \
-                or isinstance(dynamics.super, AbstractStaticSynapseDynamics):
+        if isinstance(dynamics, SynapseDynamicsStatic) \
+                or (isinstance(dynamics, SynapseDynamicsStructural)
+                    and isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             # Read static data
             if row_data is not None and len(row_data) > 0:
                 ff_size, ff_data = self._get_static_data(row_data, dynamics)

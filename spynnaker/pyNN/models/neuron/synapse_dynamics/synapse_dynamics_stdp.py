@@ -184,9 +184,10 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
-                np.pad(row,
-                       np.clip(self._pad_to_length - (row.size // no_bytes_per_connection), 0, None),
-                       mode='constant').view(dtype="uint8")
+                np.concatenate((row,
+                               np.zeros(
+                                   np.clip(no_bytes_per_connection * self._pad_to_length - row.size, 0, None)).astype(dtype="uint8"))
+                               ).view(dtype="uint8")
             )
 
         return padded_rows

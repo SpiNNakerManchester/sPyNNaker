@@ -2,10 +2,12 @@ import numpy as np
 
 from data_specification.enums.data_type import DataType
 
-from spynnaker.pyNN import ProjectionApplicationEdge
+
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics \
     import AbstractPlasticSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+    AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
     import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
@@ -13,12 +15,13 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
 from spynnaker.pyNN.utilities import constants
 
 
-class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1, s_max=32,
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4, seed=None):
 
+        AbstractSynapseDynamicsStructural.__init__(self)
         self._f_rew = f_rew  # Hz
         self._p_rew = 1. / self._f_rew  # ms
         self._weight = weight
@@ -40,7 +43,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
                                              mad=stdp_model._mad,
                                              pad_to_length=self._s_max)
         else:
-            self.super = SynapseDynamicsStatic()
+            self.super = SynapseDynamicsStatic(pad_to_length=self._s_max)
 
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
@@ -164,6 +167,7 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         total_size = structure_size + initial_size
         pop_size = 0
         # approximate the size of the pop -> subpop table
+        from spynnaker.pyNN import ProjectionApplicationEdge
         if in_edges is not None and isinstance(in_edges[0], ProjectionApplicationEdge):
             # Approximation gets computed here based on number of afferent edges
             # How many afferent application vertices?
@@ -230,6 +234,8 @@ class SynapseDynamicsStructural(AbstractPlasticSynapseDynamics):
         return self.super.get_n_static_words_per_row(ff_size)
 
     def is_same_as(self, synapse_dynamics):
+        if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            return False
         return (
             self._f_rew == synapse_dynamics._f_rew and
             self._s_max == synapse_dynamics._s_max and
