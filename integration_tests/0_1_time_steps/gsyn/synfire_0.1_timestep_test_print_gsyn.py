@@ -9,7 +9,6 @@ import spynnaker.pyNN as p
 import os
 import unittest
 
-
 class TestPrintGsyn(unittest.TestCase):
     """
     tests the printing of get gsyn given a simulation

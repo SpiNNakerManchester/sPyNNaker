@@ -1,25 +1,45 @@
+import unittest
+
 import spynnaker.pyNN as sim
+import spynnaker.plot_utils as plot_utils
 
-sim.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
+def do_run():
+    sim.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
 
-simtime = 1000
+    simtime = 1000
 
-pg_pop1 = sim.Population(2, sim.SpikeSourcePoisson,
-                         {'rate': 10.0, 'start':0,
-                          'duration':simtime}, label="pg_pop1")
-pg_pop2 = sim.Population(2, sim.SpikeSourcePoisson,
-                         {'rate': 10.0, 'start':0,
-                          'duration':simtime}, label="pg_pop2")
+    pg_pop1 = sim.Population(2, sim.SpikeSourcePoisson,
+                             {'rate': 10.0, 'start':0,
+                              'duration':simtime}, label="pg_pop1")
+    pg_pop2 = sim.Population(2, sim.SpikeSourcePoisson,
+                             {'rate': 10.0, 'start':0,
+                              'duration':simtime}, label="pg_pop2")
 
-pg_pop1.record()
-pg_pop2.record()
+    pg_pop1.record()
+    pg_pop2.record()
 
-sim.run(simtime)
+    sim.run(simtime)
 
-spikes1 = pg_pop1.getSpikes(compatible_output=True)
-spikes2 = pg_pop2.getSpikes(compatible_output=True)
+    spikes1 = pg_pop1.getSpikes(compatible_output=True)
+    spikes2 = pg_pop2.getSpikes(compatible_output=True)
 
-print spikes1
-print spikes2
+    sim.end()
 
-sim.end()
+    return (spikes1, spikes2)
+
+
+class TestPoisson(unittest.TestCase):
+
+    def test_run(self):
+        (spikes1, spikes2) = do_run()
+        # print len(spikes1)
+        # print len(spikes1)
+        # plot_utils.plot_spikes(spikes1, spikes2)
+        self.assertLess(10, len(spikes1))
+        self.assertGreater(25, len(spikes1))
+        self.assertLess(10, len(spikes2))
+        self.assertGreater(25, len(spikes2))
+
+if __name__ == '__main__':
+    (spikes1, spikes2) = do_run()
+    plot_utils.plot_spikes(spikes1, spikes2)

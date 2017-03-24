@@ -1,95 +1,91 @@
 """
 Synfirechain-like example
 """
-import spynnaker.pyNN as p
-import pylab
-import numpy
+try:
+    import pyNN.spiNNaker as p
+except Exception as e:
+    import spynnaker.pyNN as p
 
-p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 200  # number of neurons in each population
-p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
+import unittest
 
-runtime = 1000
-cell_params_lif = {'cm': 0.25,
-                   'i_offset': 0.0,
-                   'tau_m': 20.0,
-                   'tau_refrac': 2.0,
-                   'tau_syn_E': 5.0,
-                   'tau_syn_I': 5.0,
-                   'v_reset': -70.0,
-                   'v_rest': -65.0,
-                   'v_thresh': -50.0
-                   }
+import spynnaker.plot_utils as plot_utils
+import spynnaker.spike_checker as spike_checker
 
-populations = list()
-projections = list()
+def do_run(nNeurons):
+    p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+    nNeurons = 200  # number of neurons in each population
+    p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 
-weight_to_spike = 2.0
-delay = 17
+    runtime = 1000
+    cell_params_lif = {'cm': 0.25,
+                       'i_offset': 0.0,
+                       'tau_m': 20.0,
+                       'tau_refrac': 2.0,
+                       'tau_syn_E': 5.0,
+                       'tau_syn_I': 5.0,
+                       'v_reset': -70.0,
+                       'v_rest': -65.0,
+                       'v_thresh': -50.0
+                       }
 
-loopConnections = list()
-for i in range(0, nNeurons):
-    singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
-    loopConnections.append(singleConnection)
+    populations = list()
+    projections = list()
 
-injectionConnection = [(0, 0, weight_to_spike, 1)]
-spikeArray = {'spike_times': [[1050, 1060, 1500,1700, 1900, 2200]]}
-populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
-                   label='pop_1'))
-populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
-                   label='inputSpikes_1'))
+    weight_to_spike = 2.0
+    delay = 17
 
-projections.append(p.Projection(populations[0], populations[0],
-                   p.FromListConnector(loopConnections)))
-projections.append(p.Projection(populations[1], populations[0],
-                   p.FromListConnector(injectionConnection)))
+    loopConnections = list()
+    for i in range(0, nNeurons):
+        singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
+        loopConnections.append(singleConnection)
 
-populations[0].record_v()
-populations[0].record_gsyn()
-populations[0].record()
+    injectionConnection = [(0, 0, weight_to_spike, 1)]
+    spikeArray = {'spike_times': [[1050, 1060, 1500, 1700, 1900, 2200]]}
+    populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+                       label='pop_1'))
+    populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
+                       label='inputSpikes_1'))
 
-p.run(runtime)
-p.run(runtime)
-p.run(runtime)
+    projections.append(p.Projection(populations[0], populations[0],
+                       p.FromListConnector(loopConnections)))
+    projections.append(p.Projection(populations[1], populations[0],
+                       p.FromListConnector(injectionConnection)))
 
-v = populations[0].get_v(compatible_output=True)
-gsyn = populations[0].get_gsyn(compatible_output=True)
-spikes = populations[0].getSpikes(compatible_output=True)
+    populations[0].record_v()
+    populations[0].record_gsyn()
+    populations[0].record()
+
+    p.run(runtime)
+    p.run(runtime)
+    p.run(runtime)
+
+    v = populations[0].get_v(compatible_output=True)
+    gsyn = populations[0].get_gsyn(compatible_output=True)
+    spikes = populations[0].getSpikes(compatible_output=True)
+
+    p.end()
+
+    return (v, gsyn, spikes)
 
 
-if spikes is not None:
-    print spikes
-    pylab.figure()
-    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('spikes')
-    pylab.title('spikes')
-    pylab.show()
-else:
-    print "No spikes received"
+class Synfire3Run(unittest.TestCase):
 
-# Make some graphs
+    def test_run(self):
+        nNeurons = 200  # number of neurons in each population
+        (v, gsyn, spikes) = do_run(nNeurons)
+        # print len(spikes)
+        # plot_utils.plot_spikes(spikes)
+        # plot_utils.heat_plot(v, title="v")
+        # plot_utils.heat_plot(gsyn, title="gysn")
+        self.assertEquals(454, len(spikes))
+        spike_checker.synfire_multiple_lines_spike_checker(spikes, nNeurons, 6)
 
-if v is not None:
-    ticks = len(v) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('v')
-    pylab.title('v')
-    for pos in range(0, nNeurons, 20):
-        v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in v_for_neuron])
-    pylab.show()
-
-if gsyn is not None:
-    ticks = len(gsyn) / nNeurons
-    pylab.figure()
-    pylab.xlabel('Time/ms')
-    pylab.ylabel('gsyn')
-    pylab.title('gsyn')
-    for pos in range(0, nNeurons, 20):
-        gsyn_for_neuron = gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[2] for i in gsyn_for_neuron])
-    pylab.show()
-
-p.end()
+if __name__ == '__main__':
+    nNeurons = 200  # number of neurons in each population
+    (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = do_run(nNeurons)
+    nNeurons = 200  # number of neurons in each population
+    (v, gsyn, spikes) = do_run(nNeurons)
+    print len(spikes)
+    plot_utils.plot_spikes(spikes)
+    plot_utils.heat_plot(v, title="v")
+    plot_utils.heat_plot(gsyn, title="gysn")

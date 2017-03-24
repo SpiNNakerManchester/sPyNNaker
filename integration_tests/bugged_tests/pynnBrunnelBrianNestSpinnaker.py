@@ -1,7 +1,7 @@
 import pynnBrunnelPlot as pblt
 
 simulator_Name = 'spiNNaker'
-exec('import pyNN.%s as pynn'%simulator_Name)
+# BROKEN! exec('import pyNN.%s as pynn'%simulator_Name)
 
 import pylab as plt
 import numpy as np
@@ -75,6 +75,7 @@ def poisson_generator(rate, rng,t_start=0.0, t_stop=1000.0,array=True,debug=Fals
     else:
         return [round(x) for x in spikes]
 
+"""BROKEN
 # Total number of neurons
 Neurons = 3000
 sim_time = 1000.0
@@ -253,3 +254,4 @@ if v_esp is not None:
 
 plt.show()
 
+"""

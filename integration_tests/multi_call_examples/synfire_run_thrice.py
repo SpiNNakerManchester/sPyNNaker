@@ -1,18 +1,16 @@
 """
 Synfirechain-like example
 """
-import unittest
 try:
     import pyNN.spiNNaker as p
 except Exception as e:
     import spynnaker.pyNN as p
 
-
-def do_run():
+def do_run(nNeurons):
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-    nNeurons = 200  # number of neurons in each population
     p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 
+    runtime = 1000
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
                        'tau_m': 20.0,
@@ -47,14 +45,28 @@ def do_run():
     projections.append(p.Projection(populations[1], populations[0],
                        p.FromListConnector(injectionConnection)))
 
-    p.run(5000)
+    populations[0].record_v()
+    populations[0].record_gsyn()
+    populations[0].record()
+
+    p.run(runtime)
+
+    v1 = populations[0].get_v(compatible_output=True)
+    gsyn1 = populations[0].get_gsyn(compatible_output=True)
+    spikes1 = populations[0].getSpikes(compatible_output=True)
+
+    p.run(runtime)
+
+    v2 = populations[0].get_v(compatible_output=True)
+    gsyn2 = populations[0].get_gsyn(compatible_output=True)
+    spikes2 = populations[0].getSpikes(compatible_output=True)
+
+    p.run(runtime)
+
+    v3 = populations[0].get_v(compatible_output=True)
+    gsyn3 = populations[0].get_gsyn(compatible_output=True)
+    spikes3 = populations[0].getSpikes(compatible_output=True)
+
     p.end()
 
-
-class SynfireIfCurrExp(unittest.TestCase):
-
-    def test_run(self):
-        do_run()
-
-if __name__ == '__main__':
-    do_run()
+    return (v1, gsyn1, spikes1, v2, gsyn2, spikes2, v3, gsyn3, spikes3)

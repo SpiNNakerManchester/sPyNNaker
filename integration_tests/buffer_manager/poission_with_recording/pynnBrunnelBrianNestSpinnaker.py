@@ -1,11 +1,15 @@
-simulator_Name = 'spiNNaker'
-#exec('import pyNN.%s as pynn' % simulator_Name)
+# exec('import pyNN.%s as pynn' % simulator_Name)
 import spynnaker.pyNN as pynn
 
 import pylab as plt
 import numpy as np
 import pynnBrunnelPlot as pblt
+
+import unittest
+
 from pyNN.random import NumpyRNG, RandomDistribution
+
+simulator_Name = 'spiNNaker'
 
 
 def poisson_generator(rate, rng, t_start=0.0, t_stop=1000.0, array=True,
@@ -74,138 +78,159 @@ def poisson_generator(rate, rng, t_start=0.0, t_stop=1000.0, array=True,
     else:
         return [round(x) for x in spikes]
 
-# Total number of neurons
-Neurons = 3000
-sim_time = 1000.0
-g = 5.0
-eta = 2.0
-delay = 2.0
-epsilon = 0.1
 
-tau_m = 20.0  # ms (20ms will give a FR of 20hz)
-tau_ref = 2.0
-v_reset = 10.0
-V_th = 20.0
-v_rest = 0.0
-tauSyn = 1.0
+def do_run(Neurons, sim_time):
+    g = 5.0
+    eta = 2.0
+    delay = 2.0
+    epsilon = 0.1
 
-N_E = int(round(Neurons * 0.8))
-N_I = int(round(Neurons * 0.2))
+    tau_m = 20.0  # ms (20ms will give a FR of 20hz)
+    tau_ref = 2.0
+    v_reset = 10.0
+    V_th = 20.0
+    v_rest = 0.0
+    tauSyn = 1.0
 
-C_E = N_E * 0.1
-C_I = N_I * 0.1
+    N_E = int(round(Neurons * 0.8))
+    N_I = int(round(Neurons * 0.2))
 
-# Excitatory and inhibitory weights
-J_E = 0.1
-J_I = -g * J_E
+    C_E = N_E * 0.1
+    C_I = N_I * 0.1
 
-# The firing rate of a neuron in the external pop
-# is the product of eta time the threshold rate
-# the steady state firing rate which is
-# needed to bring a neuron to threshold.
-nu_ex = eta * V_th / (J_E * C_E * tau_m)
+    # Excitatory and inhibitory weights
+    J_E = 0.1
+    J_I = -g * J_E
 
-# population rate of the whole external population.
-# With CE neurons the pop rate is simply the product
-# nu_ex*C_E  the factor 1000.0 changes the units from
-# spikes per ms to spikes per second.
-p_rate = 1000.0 * nu_ex * C_E
-print "Rate is: %f HZ" % (p_rate / 1000)
+    # The firing rate of a neuron in the external pop
+    # is the product of eta time the threshold rate
+    # the steady state firing rate which is
+    # needed to bring a neuron to threshold.
+    nu_ex = eta * V_th / (J_E * C_E * tau_m)
 
-# Neural Parameters
-pynn.setup(timestep=1.0, min_delay=1.0, max_delay=16.0)
+    # population rate of the whole external population.
+    # With CE neurons the pop rate is simply the product
+    # nu_ex*C_E  the factor 1000.0 changes the units from
+    # spikes per ms to spikes per second.
+    p_rate = 1000.0 * nu_ex * C_E
+    print "Rate is: %f HZ" % (p_rate / 1000)
 
-if simulator_Name == "spiNNaker":
+    # Neural Parameters
+    pynn.setup(timestep=1.0, min_delay=1.0, max_delay=16.0)
 
-    # Makes it easy to scale up the number of cores
-    pynn.set_number_of_neurons_per_core("IF_curr_exp", 100)
-    pynn.set_number_of_neurons_per_core("SpikeSourcePoisson", 100)
+    if simulator_Name == "spiNNaker":
 
-rng = NumpyRNG(seed=1)
+        # Makes it easy to scale up the number of cores
+        pynn.set_number_of_neurons_per_core("IF_curr_exp", 100)
+        pynn.set_number_of_neurons_per_core("SpikeSourcePoisson", 100)
 
-v_distr_exc = RandomDistribution('uniform', [-10.0, 0.0], rng)
-v_distr_inh = RandomDistribution('uniform', [-10.0, 0.0], rng)
+    rng = NumpyRNG(seed=1)
 
-exc_cell_params = {
-    'cm': 1.0,  # pf
-    'tau_m': tau_m,
-    'tau_refrac': tau_ref,
-    'v_rest': v_rest,
-    'v_reset': v_reset,
-    'v_thresh': V_th,
-    'tau_syn_E': tauSyn,
-    'tau_syn_I': tauSyn,
-    'i_offset': 0.9
-}
+    v_distr_exc = RandomDistribution('uniform', [-10.0, 0.0], rng)
+    v_distr_inh = RandomDistribution('uniform', [-10.0, 0.0], rng)
 
-inh_cell_params = {
-    'cm': 1.0,  # pf
-    'tau_m': tau_m,
-    'tau_refrac': tau_ref,
-    'v_rest': v_rest,
-    'v_reset': v_reset,
-    'v_thresh': V_th,
-    'tau_syn_E': tauSyn,
-    'tau_syn_I': tauSyn,
-    'i_offset': 0.9
-}
+    exc_cell_params = {
+        'cm': 1.0,  # pf
+        'tau_m': tau_m,
+        'tau_refrac': tau_ref,
+        'v_rest': v_rest,
+        'v_reset': v_reset,
+        'v_thresh': V_th,
+        'tau_syn_E': tauSyn,
+        'tau_syn_I': tauSyn,
+        'i_offset': 0.9
+    }
 
-# Set-up pynn Populations
-E_pop = pynn.Population(N_E, pynn.IF_curr_exp, exc_cell_params, label="E_pop")
+    inh_cell_params = {
+        'cm': 1.0,  # pf
+        'tau_m': tau_m,
+        'tau_refrac': tau_ref,
+        'v_rest': v_rest,
+        'v_reset': v_reset,
+        'v_thresh': V_th,
+        'tau_syn_E': tauSyn,
+        'tau_syn_I': tauSyn,
+        'i_offset': 0.9
+    }
 
-I_pop = pynn.Population(N_I, pynn.IF_curr_exp, inh_cell_params, label="I_pop")
+    # Set-up pynn Populations
+    E_pop = pynn.Population(N_E, pynn.IF_curr_exp, exc_cell_params, label="E_pop")
 
-Poiss_ext_E = pynn.Population(N_E, pynn.SpikeSourcePoisson, {'rate': 10.0},
-                              label="Poisson_pop_E")
-Poiss_ext_I = pynn.Population(N_I, pynn.SpikeSourcePoisson, {'rate': 10.0},
-                              label="Poisson_pop_I")
+    I_pop = pynn.Population(N_I, pynn.IF_curr_exp, inh_cell_params, label="I_pop")
 
-# Connectors
-E_conn = pynn.FixedProbabilityConnector(epsilon, weights=J_E, delays=delay)
-I_conn = pynn.FixedProbabilityConnector(epsilon, weights=J_I, delays=delay)
+    Poiss_ext_E = pynn.Population(N_E, pynn.SpikeSourcePoisson, {'rate': 10.0},
+                                  label="Poisson_pop_E")
+    Poiss_ext_I = pynn.Population(N_I, pynn.SpikeSourcePoisson, {'rate': 10.0},
+                                  label="Poisson_pop_I")
 
-# Use random delays for the external noise and
-# set the inital membrance voltage below the resting potential
-# to avoid the overshoot of activity in the beginning of the simulation
-rng = NumpyRNG(seed=1)
-delay_distr = RandomDistribution('uniform', [1.0, 16.0], rng=rng)
-Ext_conn = pynn.OneToOneConnector(weights=J_E * 10, delays=delay_distr)
+    # Connectors
+    E_conn = pynn.FixedProbabilityConnector(epsilon, weights=J_E, delays=delay)
+    I_conn = pynn.FixedProbabilityConnector(epsilon, weights=J_I, delays=delay)
 
-uniformDistr = RandomDistribution('uniform', [-10, 0], rng)
-E_pop.initialize('v', uniformDistr)
-I_pop.initialize('v', uniformDistr)
+    # Use random delays for the external noise and
+    # set the inital membrance voltage below the resting potential
+    # to avoid the overshoot of activity in the beginning of the simulation
+    rng = NumpyRNG(seed=1)
+    delay_distr = RandomDistribution('uniform', [1.0, 16.0], rng=rng)
+    Ext_conn = pynn.OneToOneConnector(weights=J_E * 10, delays=delay_distr)
 
-# Projections
-E_E = pynn.Projection(E_pop, E_pop, E_conn, target="excitatory")
-I_E = pynn.Projection(I_pop, E_pop, I_conn, target="inhibitory")
-E_I = pynn.Projection(E_pop, I_pop, E_conn, target="excitatory")
-I_I = pynn.Projection(I_pop, I_pop, I_conn, target="inhibitory")
+    uniformDistr = RandomDistribution('uniform', [-10, 0], rng)
+    E_pop.initialize('v', uniformDistr)
+    I_pop.initialize('v', uniformDistr)
 
-Ext_E = pynn.Projection(Poiss_ext_E, E_pop, Ext_conn, target="excitatory")
-Ext_I = pynn.Projection(Poiss_ext_I, I_pop, Ext_conn, target="excitatory")
+    # Projections
+    E_E = pynn.Projection(E_pop, E_pop, E_conn, target="excitatory")
+    I_E = pynn.Projection(I_pop, E_pop, I_conn, target="inhibitory")
+    E_I = pynn.Projection(E_pop, I_pop, E_conn, target="excitatory")
+    I_I = pynn.Projection(I_pop, I_pop, I_conn, target="inhibitory")
 
-# Record stuff
-E_pop.record()
-Poiss_ext_E.record()
+    Ext_E = pynn.Projection(Poiss_ext_E, E_pop, Ext_conn, target="excitatory")
+    Ext_I = pynn.Projection(Poiss_ext_I, I_pop, Ext_conn, target="excitatory")
 
-pynn.run(sim_time)
+    # Record stuff
+    E_pop.record()
+    Poiss_ext_E.record()
 
-esp = None
-isp = None
-pe = None
-pi = None
-v_esp = None
+    pynn.run(sim_time)
 
-esp = E_pop.getSpikes(compatible_output=True)
-s = Poiss_ext_E.getSpikes(compatible_output=True)
+    esp = None
+    isp = None
+    pe = None
+    pi = None
+    v_esp = None
 
-if esp is not None:
-    ts_ext = [x[1] for x in esp]
-    ids_ext = [x[0] for x in esp]
-    pblt._make_plot(
-        ts_ext, ts_ext, ids_ext, ids_ext, len(ts_ext) > 0, 5.0, False,
-        'Raster Plot of the excitatory population in %s' % simulator_Name,
-        'Simulation Time (ms)', total_time=sim_time, n_neurons=N_E)
+    esp = E_pop.getSpikes(compatible_output=True)
+    s = Poiss_ext_E.getSpikes(compatible_output=True)
 
-    plt.show()
-pynn.end()
+    pynn.end()
+
+    return (esp, s, N_E)
+
+def plot(esp, sim_time, N_E):
+    if esp is not None:
+        ts_ext = [x[1] for x in esp]
+        ids_ext = [x[0] for x in esp]
+        title = 'Raster Plot of the excitatory population in %s' \
+                % simulator_Name,
+        pblt._make_plot(ts_ext, ts_ext, ids_ext, ids_ext,
+                        len(ts_ext) > 0, 5.0, False, title,
+                        'Simulation Time (ms)', total_time=sim_time,
+                        n_neurons=N_E)
+
+        plt.show()
+
+
+class PynnBrunnelBrianNestSpinnaker(unittest.TestCase):
+
+    def test_run(self):
+        Neurons = 3000  # number of neurons in each population
+        sim_time = 1000.0
+        (esp, s, N_E) = do_run(Neurons, sim_time)
+        # plot(esp, sim_time, N_E)
+
+if __name__ == '__main__':
+    sim_time = 1000.0
+    Neurons = 3000  # number of neurons in each population
+    (esp, s, N_E) = do_run(Neurons)
+    plot(esp, sim_time, N_E)
+
