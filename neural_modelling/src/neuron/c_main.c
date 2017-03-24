@@ -14,6 +14,7 @@
  *
  */
 
+#include "build/synapse_type.h"
 #include "../common/in_spikes.h"
 #include "neuron.h"
 #include "synapses.h"

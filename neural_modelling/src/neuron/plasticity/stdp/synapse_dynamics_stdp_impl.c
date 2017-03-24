@@ -8,8 +8,8 @@
 #include "../common/pre_events.h"
 #include "../common/post_events.h"
 
-#include "weight_dependence/weight.h"
-#include "timing_dependence/timing.h"
+#include "build/weight.h"
+#include "build/timing.h"
 #include <string.h>
 #include <debug.h>
 

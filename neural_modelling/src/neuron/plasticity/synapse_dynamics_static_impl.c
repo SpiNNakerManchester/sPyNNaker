@@ -1,3 +1,4 @@
+#include "build/synapse_type.h"
 #include "synapse_dynamics.h"
 #include <debug.h>
 

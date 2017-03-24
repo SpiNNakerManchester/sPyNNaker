@@ -8,7 +8,7 @@ typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
 #include "../synapse_structure/synapse_structure_weight_impl.h"
-#include "timing.h"
+#include "timing_interface.h"
 #include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc

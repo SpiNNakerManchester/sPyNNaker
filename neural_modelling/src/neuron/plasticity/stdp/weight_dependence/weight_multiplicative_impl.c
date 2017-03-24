@@ -1,3 +1,4 @@
+#include "build/synapse_type.h"
 #include "weight_multiplicative_impl.h"
 
 //---------------------------------------

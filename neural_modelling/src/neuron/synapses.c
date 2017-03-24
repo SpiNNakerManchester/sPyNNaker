@@ -1,6 +1,6 @@
+#include "build/synapse_type.h"
 #include "synapses.h"
 #include "spike_processing.h"
-#include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 #include <spin1_api.h>

@@ -1,3 +1,4 @@
+#include "build/synapse_type.h"
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "synapse_row.h"

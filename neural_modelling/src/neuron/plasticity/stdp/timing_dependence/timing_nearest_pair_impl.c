@@ -1,3 +1,5 @@
+#include "build/synapse_type.h"
+#include "build/weight.h"
 #include "timing_nearest_pair_impl.h"
 
 //---------------------------------------

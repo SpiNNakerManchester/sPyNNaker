@@ -87,73 +87,97 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
             $(SOURCE_DIR)/neuron/plasticity/common/post_events.c
 endif
 
+# ---------------------------------------------------------------------
+
 include ../../../Makefile.common
 
+# ---------------------------------------------------------------------
+
 define synapse_type_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
+$$(call build_dir, $(1)): $(1) \
+		$$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
-	        $$(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
+	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(SYNAPSE_DEBUG) \
+	        $$(CFLAGS) -o $$@ $$<
 endef
 
 define stdp_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
-                               $$(WEIGHT_DEPENDENCE_H) $$(TIMING_DEPENDENCE_H)
+$$(call build_dir, $(1)): $(1) \
+		$$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H) \
+        $$(BUILD_DIR)weight.h $$(WEIGHT_DEPENDENCE_H) \
+        $$(BUILD_DIR)timing.h $$(TIMING_DEPENDENCE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
-	      $$(CFLAGS) \
-	      -include $$(SYNAPSE_TYPE_H) \
-	      -include $$(WEIGHT_DEPENDENCE_H) \
-	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
+	      $$(CFLAGS) -o $$@ $$<
 endef
 
 $(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
 $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 
-$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) \
+		$(BUILD_DIR)synapse_type.h $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $@ $<
+	        -o $@ $<
 
-$(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
-                        $(WEIGHT_DEPENDENCE_H)
+$(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) \
+		$(BUILD_DIR)synapse_type.h $(SYNAPSE_TYPE_H) \
+		$(BUILD_DIR)weight.h $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H)\
-	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+	        -o $@ $<
 
 $(NEURON_MODEL_O): $(NEURON_MODEL)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(NEURON_DEBUG) \
 	        $(CFLAGS) -o $@ $<
 
-$(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
+$(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c \
+		$(BUILD_DIR)threshold_type.h $(THRESHOLD_TYPE_H) \
+		$(BUILD_DIR)neuron_model.h $(NEURON_MODEL_H) \
+		$(BUILD_DIR)synapse_type.h $(SYNAPSE_TYPE_H) \
+		$(BUILD_DIR)additional_input.h $(ADDITIONAL_INPUT_H) \
+		$(BUILD_DIR)input_type.h $(INPUT_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
-	      -include $(NEURON_MODEL_H) \
-	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
-	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+	      -o $@ $<
+
+# ---------------------------------------------------------------------
+# Convert the filenames for interface implementations into actual
+# includeable files.
+# ---------------------------------------------------------------------
+
+$(BUILD_DIR)additional_input.h: $(SOURCE_DIR)/neuron/additional_inputs/additional_input.tmpl Makefile
+	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
+	@sed 's!ADDITIONAL_INPUT_H!$(ADDITIONAL_INPUT_H)!g' $< > $@
 
 $(BUILD_DIR)input_type.h: $(SOURCE_DIR)/neuron/input_types/input_type.tmpl Makefile
 	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
 	@sed 's!INPUT_TYPE_H!$(INPUT_TYPE_H)!g' $< > $@
 
 $(BUILD_DIR)neuron_model.h: $(SOURCE_DIR)/neuron/models/neuron_model.tmpl Makefile
 	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
 	@sed 's!NEURON_MODEL_H!$(NEURON_MODEL_H)!g' $< > $@
-
-$(BUILD_DIR)threshold_type.h: $(SOURCE_DIR)/neuron/threshold_types/threshold_type.tmpl Makefile
-	@echo Creating $@ from $<
-	@sed 's!THRESHOLD_TYPE_H!$(THRESHOLD_TYPE_H)!g' $< > $@
 
 $(BUILD_DIR)synapse_type.h: $(SOURCE_DIR)/neuron/synapse_types/synapse_type.tmpl Makefile
 	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
 	@sed 's!SYNAPSE_TYPE_H!$(SYNAPSE_TYPE_H)!g' $< > $@
 
-$(BUILD_DIR)additional_input.h: $(SOURCE_DIR)/neuron/additional_inputs/additional_input.tmpl Makefile
+$(BUILD_DIR)threshold_type.h: $(SOURCE_DIR)/neuron/threshold_types/threshold_type.tmpl Makefile
 	@echo Creating $@ from $<
-	@sed 's!ADDITIONAL_INPUT_H!$(ADDITIONAL_INPUT_H)!g' $< > $@
+	@-mkdir -p $(dir $@)
+	@sed 's!THRESHOLD_TYPE_H!$(THRESHOLD_TYPE_H)!g' $< > $@
+
+$(BUILD_DIR)timing.h: $(SOURCE_DIR)/neuron/stdp/timing_dependence/timing.tmpl Makefile
+	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
+	@sed 's!TIMING_DEPENDENCE_H!$(TIMING_DEPENDENCE_H)!g' $< > $@
+
+$(BUILD_DIR)weight.h: $(SOURCE_DIR)/neuron/stdp/weight_dependence/weight.tmpl Makefile
+	@echo Creating $@ from $<
+	@-mkdir -p $(dir $@)
+	@sed 's!WEIGHT_DEPENDENCE_H!$(WEIGHT_DEPENDENCE_H)!g' $< > $@

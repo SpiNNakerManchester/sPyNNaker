@@ -1,3 +1,4 @@
+#include "build/synapse_type.h"
 #include "weight_additive_two_term_impl.h"
 
 //---------------------------------------

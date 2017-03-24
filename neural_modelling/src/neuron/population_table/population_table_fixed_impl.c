@@ -1,3 +1,4 @@
+#include "build/synapse_type.h"
 #include "population_table.h"
 #include "../synapse_row.h"
 #include <debug.h>
