@@ -6,6 +6,8 @@ from collections import defaultdict
 from scipy import special
 
 import numpy
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
+
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pyNN.random import RandomDistribution
@@ -788,14 +790,13 @@ class SynapticManager(object):
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        # Easier to beg forgiveness than to ask permission
-        try:
+        if isinstance(self._synapse_dynamics, SynapseDynamicsStructural):
             self._synapse_dynamics.write_parameters(
                 spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 machine_time_step, weight_scales, application_graph=application_graph, machine_graph=machine_graph,
                 app_vertex=application_vertex, post_slice=post_vertex_slice, machine_vertex=machine_vertex,
                 graph_mapper=graph_mapper, routing_info=routing_info)
-        except TypeError:
+        else:
             self._synapse_dynamics.write_parameters(
                 spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 machine_time_step, weight_scales)
