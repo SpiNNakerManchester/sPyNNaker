@@ -6,7 +6,7 @@ try:
 except Exception as e:
     import spynnaker.pyNN as p
 
-def do_run(nNeurons, number_of_runs=1, reset=False):
+def do_run(nNeurons, number_of_runs=1, reset=False, spike_times=[[0]]):
     """
 
     :param nNeurons: Number of Neurons in chain
@@ -15,6 +15,8 @@ def do_run(nNeurons, number_of_runs=1, reset=False):
     :type number_of_runs: int
     :param reset: if True will call reset before the additional runs
     :type reset: bool
+    :param spike_times: times the inputer sends in spikes
+    :type spike_times: matrix of int
     :return (v, gsyn, spikes)
         v: Volage after last run
         gysn: gysn after last run
@@ -47,7 +49,7 @@ def do_run(nNeurons, number_of_runs=1, reset=False):
         loopConnections.append(singleConnection)
 
     injectionConnection = [(0, 0, weight_to_spike, 1)]
-    spikeArray = {'spike_times': [[0]]}
+    spikeArray = {'spike_times': spike_times}
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                        label='pop_1'))
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
