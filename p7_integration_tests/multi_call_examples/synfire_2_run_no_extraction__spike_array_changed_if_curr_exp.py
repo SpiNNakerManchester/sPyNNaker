@@ -6,7 +6,7 @@ import unittest
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 
-import synfire_run_twice as synfire_run_twice
+import p7_integration_tests.scripts.synfire_run_twice as synfire_run_twice
 
 class Synfire2RunNoExtractionSpikeArrayChanged(unittest.TestCase):
     def test_run(self):

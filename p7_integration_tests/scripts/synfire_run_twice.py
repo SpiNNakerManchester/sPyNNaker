@@ -6,11 +6,6 @@ try:
 except Exception as e:
     import spynnaker.pyNN as p
 
-import unittest
-
-import spynnaker.plot_utils as plot_utils
-import spynnaker.spike_checker as spike_checker
-
 
 def do_run(nNeurons, second_run_multiple=1, reset=False, new_pop=False,
            modify_spike_array=False, extract_after_first=True):
