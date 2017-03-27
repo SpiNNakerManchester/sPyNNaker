@@ -22,7 +22,7 @@ before_install:
   - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
   - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
   - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
-  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
 
 install:
   - pip install -r requirements-test.txt
