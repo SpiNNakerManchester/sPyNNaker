@@ -26,7 +26,6 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install -r doc/doc_requirements.txt
   - python ./setup.py install
 
 before_script:
