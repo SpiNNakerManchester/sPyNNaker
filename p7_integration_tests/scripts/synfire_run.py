@@ -8,6 +8,7 @@ except Exception as e:
 
 
 def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
+           neurons_per_core=10,
            record=True, record_v=True, record_gsyn=True):
     """
 
@@ -19,6 +20,8 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
     :type spike_times: matrix of int
     :param delay: time delay in the single connectors in the spike chain
     :type delay: int
+    :param neurons_per_core: Number of neurons per core
+    :type neurons_per_core: int
     :param record: If True will aks for spikes to be recorded
     :type record: bool
     :param record_v: If True will aks for voltage to be recorded
@@ -31,7 +34,7 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
         spikes: spikes after last run (if requested else None)
     """
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-    p.set_number_of_neurons_per_core("IF_curr_exp", 10)
+    p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,

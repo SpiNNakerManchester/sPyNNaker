@@ -6,7 +6,7 @@ import numpy
 
 import spynnaker.pyNN as p
 
-def do_run(nNeurons, n_pops, neurons_per_core=None):
+def do_run(nNeurons, n_pops, neurons_per_core):
     """
 
     :param nNeurons: Number of Neurons in chain
