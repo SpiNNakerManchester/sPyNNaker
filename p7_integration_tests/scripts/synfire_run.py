@@ -5,10 +5,14 @@ try:
     import pyNN.spiNNaker as p
 except Exception as e:
     import spynnaker.pyNN as p
+# This is a constraint that really knows about SpiNNaker...
+from pacman.model.constraints.placer_constraints\
+    .placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
 
 
 def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
-           neurons_per_core=10,
+           neurons_per_core=10, placer_constraint=False,
            record=True, record_v=True, record_gsyn=True):
     """
 
@@ -22,6 +26,9 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
     :type delay: int
     :param neurons_per_core: Number of neurons per core
     :type neurons_per_core: int
+    :param placer_constraint: if True added a
+        PlacerRadialPlacementFromChipConstraint to populations[0]
+    :type placer_constraint: bool
     :param record: If True will aks for spikes to be recorded
     :type record: bool
     :param record_v: If True will aks for voltage to be recorded
@@ -61,6 +68,9 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
     spikeArray = {'spike_times': spike_times}
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                        label='pop_1'))
+    if placer_constraint:
+        populations[0].set_constraint(PlacerRadialPlacementFromChipConstraint(3, 3))
+
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                        label='inputSpikes_1'))
 
