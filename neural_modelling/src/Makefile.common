@@ -3,12 +3,11 @@ ifndef SPINN_DIRS
     $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
 endif
 
-MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_DIR := $(dir $(MAKEFILE_PATH))
+CURRENT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SOURCE_DIR := $(abspath $(CURRENT_DIR))
 SOURCE_DIRS += $(SOURCE_DIR)
 ifndef APP_OUTPUT_DIR
     APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
 endif
 
-include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+include $(SOURCE_DIR)/SpiNNFEC.mk

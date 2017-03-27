@@ -9,7 +9,7 @@
 #include "build/input_type.h"
 #include "build/additional_input.h"
 #include "build/threshold_type.h"
-#include "build/synapse_types.h"
+#include "build/synapse_type.h"
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "recording.h"

@@ -19,14 +19,6 @@ endif
 #POPULATION_TABLE_IMPL := fixed
 POPULATION_TABLE_IMPL := binary_search
 
-ifndef SOURCE_DIR
-	$(error SOURCE_DIR must be set for this makefile to work.)
-endif
-
-ifndef BUILD_DIR
-	$(error BUILD_DIR must be set for this makefile to work.)
-endif
-
 ifndef ADDITIONAL_INPUT_H
     ADDITIONAL_INPUT_H = $(SOURCE_DIR)/neuron/additional_inputs/additional_input_none_impl.h
 endif
@@ -91,13 +83,23 @@ endif
 
 include ../../../Makefile.common
 
+ifndef SOURCE_DIR
+    $(error SOURCE_DIR must be set for this makefile to work.)
+endif
+
+ifndef BUILD_DIR
+    $(error BUILD_DIR must be set for this makefile to work.)
+endif
+
 # ---------------------------------------------------------------------
+
+CFLAGS += -I$(abspath $(BUILD_DIR)..)
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) \
 		$$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(SYNAPSE_DEBUG) \
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) -o $$@ $$<
 endef
 
@@ -107,7 +109,7 @@ $$(call build_dir, $(1)): $(1) \
         $$(BUILD_DIR)weight.h $$(WEIGHT_DEPENDENCE_H) \
         $$(BUILD_DIR)timing.h $$(TIMING_DEPENDENCE_H)
 	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) -o $$@ $$<
 endef
 
@@ -117,19 +119,19 @@ $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) \
 		$(BUILD_DIR)synapse_type.h $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -o $@ $<
+	$(CC) -D__FILENAME__=\"$(notdir $<)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) \
+			$(CFLAGS) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) \
 		$(BUILD_DIR)synapse_type.h $(SYNAPSE_TYPE_H) \
 		$(BUILD_DIR)weight.h $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -o $@ $<
+	$(CC) -D__FILENAME__=\"$(notdir $<)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) \
+			$(CFLAGS) -o $@ $<
 
 $(NEURON_MODEL_O): $(NEURON_MODEL)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(NEURON_DEBUG) \
+	$(CC) -D__FILENAME__=\"$(notdir $<)\" -DLOG_LEVEL=$(NEURON_DEBUG) \
 	        $(CFLAGS) -o $@ $<
 
 $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c \
@@ -139,7 +141,7 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c \
 		$(BUILD_DIR)additional_input.h $(ADDITIONAL_INPUT_H) \
 		$(BUILD_DIR)input_type.h $(INPUT_TYPE_H)
 	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
+	$(CC) -D__FILENAME__=\"$(notdir $<)\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
 	      -o $@ $<
 
 # ---------------------------------------------------------------------
