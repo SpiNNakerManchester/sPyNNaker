@@ -13,18 +13,15 @@ TIME_STAMP_BYTES = 4
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
-class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractPopulationSettable):
+class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
-            voltage_dependence=None,
-            dendritic_delay_fraction=1.0, mad=True):
+            voltage_dependence=None, dendritic_delay_fraction=1.0):
         AbstractPlasticSynapseDynamics.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
-        self._mad = mad
 
         if (self._dendritic_delay_fraction < 0.5 or
                 self._dendritic_delay_fraction > 1.0):
@@ -40,22 +37,6 @@ class SynapseDynamicsSTDP(
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
 
-
-    def get_value(self, key):
-        """ Get a property
-        """
-        pass
-
-
-    def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
-        pass
-
-
     @property
     def weight_dependence(self):
         return self._weight_dependence
@@ -68,6 +49,10 @@ class SynapseDynamicsSTDP(
     def dendritic_delay_fraction(self):
         return self._dendritic_delay_fraction
 
+    @dendritic_delay_fraction.setter
+    def dendritic_delay_fraction(self, new_value):
+        self._dendritic_delay_fraction = new_value
+
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
@@ -77,14 +62,13 @@ class SynapseDynamicsSTDP(
             self._weight_dependence.is_same_as(
                 synapse_dynamics._weight_dependence) and
             (self._dendritic_delay_fraction ==
-             synapse_dynamics._dendritic_delay_fraction) and
-            (self._mad == synapse_dynamics._mad))
+             synapse_dynamics._dendritic_delay_fraction))
 
     def are_weights_signed(self):
         return False
 
     def get_vertex_executable_suffix(self):
-        name = "_stdp_mad" if self._mad else "_stdp"
+        name = "_stdp_mad"
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name
@@ -117,20 +101,10 @@ class SynapseDynamicsSTDP(
     def _n_header_bytes(self):
 
         n_bytes = 0
-        if self._mad:
-
-            # If we're using MAD, the header contains a single timestamp and
-            # pre-trace
-            n_bytes = (
-                TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
-        else:
-
-            # Otherwise, headers consist of a counter followed by
-            # NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
-            n_bytes = (
-                4 + (NUM_PRE_SYNAPTIC_EVENTS *
-                     (TIME_STAMP_BYTES +
-                      self.timing_dependence.pre_trace_n_bytes)))
+        # If we're using MAD, the header contains a single timestamp and
+        # pre-trace
+        n_bytes = (
+            TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of words

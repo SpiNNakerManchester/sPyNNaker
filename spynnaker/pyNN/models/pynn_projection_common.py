@@ -32,6 +32,11 @@ class PyNNProjectionCommon(object):
             target, pre_synaptic_population, post_synaptic_population,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
 
+        # set the plasticity dynamics for the post pop (allows plastic stuff
+        #  when needed)
+        post_synaptic_population._get_vertex.synapse_dynamics = \
+            synapse_dynamics_stdp
+
         # spinnaker control
         self._spinnaker_control = spinnaker_control
 
@@ -261,6 +266,32 @@ class PyNNProjectionCommon(object):
         else:
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
+
+    def get(self, parameter, format, gather):
+        """ supports getting things from a projection
+
+        :param parameter: the parameter, "weights, delays, plastic param"
+        :param format: "list" or "array".
+        :param gather: supposedly if True, get connection information from \
+            all MPI nodes, otherwise only from connections that exist in \
+            this node.
+        :return: the returns param
+        """
+
+        # do the gather check before trying to get data
+        if not gather:
+            common_exceptions.ConfigurationException(
+                "the gather param has no meaning for spinnaker when set to "
+                "false")
+
+        # try for each possible parameters
+        if parameter == "weight":
+            return self._get_synaptic_data(format == 'list', "weights")
+        if parameter == "delay":
+            return self._get_synaptic_data(format == 'list', "delays")
+        else:
+            self._synapse_information.synapse_dynamics.get(
+                parameter, format, gather)
 
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)

@@ -5,9 +5,11 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     .synapse_structure_weight_only import SynapseStructureWeightOnly
-
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
+    timing_dependence_spike_pair import TimingDependenceSpikePair
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 LOOKUP_TAU_PLUS_SIZE = 256
@@ -16,7 +18,7 @@ LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
 
 
-class TimingDependenceSpikePair(AbstractTimingDependence):
+class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0):
         AbstractTimingDependence.__init__(self)
@@ -37,26 +39,22 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
-    @property
-    def nearest(self):
-        return self._nearest
-
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
-        return ((self.tau_plus == timing_dependence.tau_plus) and
-                (self.tau_minus == timing_dependence.tau_minus))
+        return ((self._tau_plus == timing_dependence._tau_plus) and
+                (self._tau_minus == timing_dependence._tau_minus))
 
     @property
     def vertex_executable_suffix(self):
-        return "pair"
+        return "nearest_pair"
 
     @property
     def pre_trace_n_bytes(self):
 
         # Pair rule requires no pre-synaptic trace when only the nearest
         # Neighbours are considered and, a single 16-bit R1 trace
-        return 2
+        return 0
 
     def get_parameters_sdram_usage_in_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)

@@ -12,7 +12,8 @@ from spinn_front_end_common.utility_models.command_sender import CommandSender
 
 # local front end imports
 from spynnaker.pyNN import overridden_pacman_functions
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN import model_binaries
+
 from spynnaker.pyNN.models.abstract_models \
     .abstract_send_me_multicast_commands_vertex \
     import AbstractSendMeMulticastCommandsVertex
@@ -29,16 +30,16 @@ import math
 # global objects
 logger = logging.getLogger(__name__)
 
-executable_finder = ExecutableFinder()
-
 
 class SpiNNakerCommon(SpinnakerMainInterface):
     """ main interface for neural code
 
     """
 
+    _EXECUTABLE_FINDER = ExecutableFinder()
+
     def __init__(
-            self, config, graph_label, executable_finder,
+            self, config, graph_label,
             database_socket_addresses, n_chips_required, timestep, max_delay,
             min_delay, hostname, user_extra_algorithm_xml_path=None,
             user_extra_mapping_inputs=None, user_extra_algorithms_pre_run=None,
@@ -63,9 +64,13 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
+        # add model binaries
+        self._EXECUTABLE_FINDER.add_path(
+            os.path.dirname(model_binaries.__file__))
+
         SpinnakerMainInterface.__init__(
             self, config, graph_label=graph_label,
-            executable_finder=executable_finder,
+            executable_finder=SpiNNakerCommon._EXECUTABLE_FINDER,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
@@ -95,6 +100,13 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             host_name=hostname, max_delay=max_delay, min_delay=min_delay,
             time_step=timestep, config=config,
             time_scale_factor=time_scale_factor)
+
+    @staticmethod
+    def register_binary_search_path(search_path):
+        """ Registers an additional binary search path for executables
+            :param search_path: absolute search path for binaries
+            """
+        SpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
 
     @staticmethod
     def get_extra_parameters_for_main_interface(

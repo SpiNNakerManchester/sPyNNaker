@@ -64,7 +64,7 @@ class AbstractConnector(object):
         """
         self._weights = weights
         self._delays = delays
-        self._check_parameters(weights, delays, allow_lists=False)
+        self._check_parameters(weights, delays)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -93,8 +93,8 @@ class AbstractConnector(object):
         """ Check the types of the weights and delays are supported; lists can\
             be disallowed if desired
         """
-        self._check_parameter(weights, "weights")
-        self._check_parameter(delays, "delays")
+        self._check_parameter(weights, "weights", allow_lists)
+        self._check_parameter(delays, "delays", allow_lists)
 
     @staticmethod
     def _get_delay_maximum(delays, n_connections):
@@ -104,8 +104,13 @@ class AbstractConnector(object):
         if isinstance(delays, RandomDistribution):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
-            if delays.boundaries is not None:
-                return min(max(delays.boundaries), max_estimated_delay)
+            if hasattr(delays, "boundaries"):
+                if delays.boundaries is not None:
+                    return min(max(delays.boundaries), max_estimated_delay)
+            elif isinstance(delays.parameters, dict):
+                if "max" in delays.parameters:
+                    return delays.parameters['max']
+
             return max_estimated_delay
         elif numpy.isscalar(delays):
             return delays
