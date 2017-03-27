@@ -4,7 +4,6 @@ def synfire_spike_checker(spikes, nNeurons):
     sorted = spikes[spikes[:,1].argsort()]
     num = 0
     for row in sorted:
-        print row, num
         if num != round(row[0]):
             numpy.savetxt("spikes.csv", sorted, fmt=['%d', '%d'], delimiter=',')
             raise Exception("Unexpected spike at time " + str(row[1]))
