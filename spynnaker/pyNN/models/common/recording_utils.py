@@ -1,5 +1,5 @@
 from spinn_front_end_common.utilities import helpful_functions
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import MemReadException
 
 import struct
 import logging
@@ -35,7 +35,7 @@ def get_data(transceiver, placement, region, region_size):
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - _RECORDING_COUNT_SIZE
     if number_of_bytes_written > expected_size:
-        raise exceptions.MemReadException(
+        raise MemReadException(
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
 

@@ -1,3 +1,4 @@
+from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
@@ -11,11 +12,11 @@ import numpy
 
 class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
-    def __init__(self, n_neurons, machine_time_step, v_init, v_rest, tau_m, cm,
-                 i_offset, v_reset, tau_refrac):
+    def __init__(
+            self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
+            tau_refrac):
         NeuronModelLeakyIntegrate.__init__(
-            self, n_neurons, machine_time_step, v_init, v_rest, tau_m, cm,
-            i_offset)
+            self, n_neurons, v_init, v_rest, tau_m, cm, i_offset)
         self._v_reset = utility_calls.convert_param_to_numpy(
             v_reset, n_neurons)
         self._tau_refrac = utility_calls.convert_param_to_numpy(
@@ -42,16 +43,16 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
     def get_n_neural_parameters(self):
         return NeuronModelLeakyIntegrate.get_n_neural_parameters(self) + 3
 
-    @property
-    def _tau_refrac_timesteps(self):
+    def _tau_refrac_timesteps(self, machine_time_step):
         return numpy.ceil(self._tau_refrac /
-                          (self._machine_time_step / 1000.0))
+                          (machine_time_step / 1000.0))
 
-    def get_neural_parameters(self):
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    def get_neural_parameters(self, machine_time_step):
         params = NeuronModelLeakyIntegrate.get_neural_parameters(self)
         params.extend([
 
-            # countdown to end of next refractory period [timesteps]
+            # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
             NeuronParameter(0, DataType.INT32),
 
@@ -61,7 +62,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
             # refractory time of neuron [timesteps]
             # int32_t  T_refract;
-            NeuronParameter(self._tau_refrac_timesteps, DataType.INT32)
+            NeuronParameter(
+                self._tau_refrac_timesteps(machine_time_step), DataType.INT32)
         ])
         return params
 

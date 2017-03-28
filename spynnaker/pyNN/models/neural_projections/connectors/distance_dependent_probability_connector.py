@@ -12,16 +12,16 @@ import math
 # NOTE: Do NOT delete these to fix PEP8 issues
 
 # noinspection PyUnresolvedReferences
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport
+from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport
+from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport # noqa: F401,E501
 
 # noinspection PyUnresolvedReferences
-from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport
+from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport # noqa: F401,E501
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
         # d is apparently unused, but is in fact expected by d_expression
         # so is used when eval is called
-        d = self._space.distances(  # @UnusedVariable
+        d = self._space.distances(  # @UnusedVariable # noqa: F841
             pre_positions, post_positions, expand_distances)
         self._probs = eval(self._d_expression)
 
@@ -87,6 +87,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
+
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
         max_prob = numpy.amax(
@@ -118,9 +123,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
-            pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
@@ -171,3 +173,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "DistanceDependentProbabilityConnector({})".format(
+            self._d_expression)

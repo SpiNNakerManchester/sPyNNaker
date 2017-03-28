@@ -7,10 +7,10 @@ except ImportError:
 
 import os
 
-__version__ = "2016.001"
+__version__ = "3.0.0"
+
 
 class CustomInstall(install):
-
     def initialize_options(self):
         install.initialize_options(self)
         self._spinnaker_dir = None
@@ -30,13 +30,13 @@ class CustomInstall(install):
             spinn_file.write("__version__ = \"{}\"\n".format(__version__))
             spinn_file.close()
             print "Created", self._spinnaker_init
-
         install.run(self)
 
     def get_outputs(self):
         outputs = install.get_outputs(self)
         outputs.append(self._spinnaker_init)
         return outputs
+
 
 setup(
     name="pyNN-spiNNaker",
@@ -45,6 +45,5 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=[],
     install_requires=['pyNN >= 0.7, < 0.8',
-                      'sPyNNaker == 2016.001'],
-    cmdclass={'install': CustomInstall}
-)
+                      'sPyNNaker >= 3.0.0, < 4.0.0'],
+    cmdclass={'install': CustomInstall})

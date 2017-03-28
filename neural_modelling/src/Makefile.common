@@ -11,4 +11,4 @@ ifndef APP_OUTPUT_DIR
     APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
 endif
 
-include $(SPINN_DIRS)/make_lib/Makefile.SpiNNFrontEndCommon
+include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon

@@ -51,6 +51,13 @@ class FixedNumberPreConnector(AbstractConnector):
         return self._get_delay_maximum(
             self._delays, self._n_pre * self._n_post_neurons)
 
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        if not self._is_connected(pre_vertex_slice):
+            return 0.0
+        return self._get_delay_variance(self._delays, None)
+
     def _get_pre_neurons(self):
         if self._pre_neurons is None:
             self._pre_neurons = numpy.random.choice(
@@ -78,11 +85,9 @@ class FixedNumberPreConnector(AbstractConnector):
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
 
-        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre * self._n_post_neurons,
-            len(pre_neurons) * post_vertex_slice.n_atoms, None,
-            min_delay, max_delay)
+            post_vertex_slice.n_atoms, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
@@ -96,8 +101,6 @@ class FixedNumberPreConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         if not self._is_connected(pre_vertex_slice):
             return 0.0
-        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
-        n_connections = len(pre_neurons) * post_vertex_slice.n_atoms
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
@@ -161,3 +164,6 @@ class FixedNumberPreConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "FixedNumberPreConnector({})".format(self._n_pre)
