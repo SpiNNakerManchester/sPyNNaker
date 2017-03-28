@@ -1,3 +1,4 @@
 -r requirements.txt
 flake8
 pytest-timeout
+sphinx==1.5.3

@@ -1,4 +1,4 @@
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
@@ -14,7 +14,7 @@ class IFFacetsConductancePopulation(AbstractPopulationVertex):
             incoming_spike_buffer_size=None, constraints=None, label=None,
             g_leak=40.0, tau_syn_E=30.0, tau_syn_I=30.0, v_thresh=-55.0,
             v_rest=-65.0, e_rev_I=-80, v_reset=-80.0, v_init=None):
-        raise exceptions.SpynnakerException(
+        raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 
     @staticmethod
