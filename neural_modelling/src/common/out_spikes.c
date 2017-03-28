@@ -3,8 +3,8 @@
  *  \brief the implementation of the out_spikes.h interface.
  */
 
-#include "out_spikes.h"
-#include "recording.h"
+#include "common/out_spikes.h"
+#include <recording.h>
 
 #include <debug.h>
 

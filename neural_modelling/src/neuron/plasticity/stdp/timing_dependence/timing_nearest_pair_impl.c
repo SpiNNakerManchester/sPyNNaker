@@ -1,6 +1,8 @@
-#include "build/synapse_type.h"
-#include "build/weight.h"
-#include "timing_nearest_pair_impl.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+#include "weight.h"
+
+#include "neuron/plasticity/stdp/timing_dependence/timing_nearest_pair_impl.h"
 
 //---------------------------------------
 // Globals

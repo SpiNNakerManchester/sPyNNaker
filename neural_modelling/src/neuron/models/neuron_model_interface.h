@@ -6,7 +6,7 @@
 #ifndef _NEURON_MODEL_INTERFACE_
 #define _NEURON_MODEL_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 
 //! Forward declaration of neuron type (creates a definition for a pointer to a
 //   Neuron parameter struct

@@ -39,8 +39,8 @@
 #ifndef _SYNAPSE_TYPES_INTERFACE_
 #define _SYNAPSE_TYPES_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_row.h"
+#include "common/neuron-typedefs.h"
+#include "neuron/synapse_row.h"
 
 //! \brief helper method which returns the buffer index to which a given type
 //! of synapses are stored for a given neuron being simulated by the model.

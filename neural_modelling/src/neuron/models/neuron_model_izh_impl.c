@@ -1,4 +1,4 @@
-#include "neuron_model_izh_impl.h"
+#include "neuron/models/neuron_model_izh_impl.h"
 
 #include <debug.h>
 

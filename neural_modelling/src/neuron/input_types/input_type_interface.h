@@ -1,7 +1,7 @@
 #ifndef _INPUT_TYPE_INTERFACE_
 #define _INPUT_TYPE_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 
 //! Forward declaration of the input type pointer
 typedef struct input_type_t* input_type_pointer_t;

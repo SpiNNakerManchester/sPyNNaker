@@ -35,7 +35,7 @@
 #ifndef _OUT_SPIKES_H_
 #define _OUT_SPIKES_H_
 
-#include "neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 
 #include <bit_field.h>
 

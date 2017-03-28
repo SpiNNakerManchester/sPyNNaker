@@ -2,6 +2,7 @@
 #define _SYNAPSES_H_
 
 #include "../common/neuron-typedefs.h"
+#include "build/synapse_type.h"
 #include "synapse_row.h"
 
 // Get the index of the ring buffer for a given timestep, synapse type and

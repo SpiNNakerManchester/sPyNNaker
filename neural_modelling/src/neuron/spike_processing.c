@@ -1,9 +1,11 @@
-#include "build/synapse_type.h"
-#include "spike_processing.h"
-#include "population_table/population_table.h"
-#include "synapse_row.h"
-#include "synapses.h"
-#include "../common/in_spikes.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "neuron/spike_processing.h"
+#include "neuron/population_table/population_table.h"
+#include "neuron/synapse_row.h"
+#include "neuron/synapses.h"
+#include "common/in_spikes.h"
 #include <spin1_api.h>
 #include <debug.h>
 

@@ -13,7 +13,7 @@
 #define __NEURON_TYPEDEFS_H__
 
 #include <common-typedefs.h>
-#include "maths-util.h"
+#include "common/maths-util.h"
 
 // Determine the type of a spike
 /*

@@ -18,7 +18,7 @@
 #define SYNAPSE_TYPE_BITS 2
 #define SYNAPSE_TYPE_COUNT 3
 
-#include "../decay.h"
+#include "neuron/decay.h"
 #include <debug.h>
 
 //---------------------------------------
@@ -33,7 +33,7 @@ typedef struct synapse_param_t {
     decay_t inh_init;
 } synapse_param_t;
 
-#include "synapse_types_interface.h"
+#include "neuron/synapse_types/synapse_types_interface.h"
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.

@@ -1,4 +1,6 @@
+// sPyNNaker class definitions
 #include "build/synapse_type.h"
+
 #include "synapses.h"
 #include "spike_processing.h"
 #include "plasticity/synapse_dynamics.h"

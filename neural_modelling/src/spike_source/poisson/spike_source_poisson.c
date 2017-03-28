@@ -5,7 +5,7 @@
  *
  */
 
-#include "../../common/maths-util.h"
+#include "neuron/common/maths-util.h"
 
 #include <bit_field.h>
 #include <data_specification.h>

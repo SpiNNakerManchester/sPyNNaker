@@ -1,15 +1,18 @@
 // Spinn_common includes
 #include "static-assert.h"
 
+// sPyNNaker class definitions
+#include "synapse_type.h"
+#include "weight.h"
+#include "timing.h"
+
 // sPyNNaker neural modelling includes
-#include "../../synapses.h"
+#include "neuron/synapses.h"
 
 // Plasticity common includes
-#include "../common/pre_events.h"
-#include "../common/post_events.h"
+#include "neuron/plasticity/common/pre_events.h"
+#include "neuron/plasticity/common/post_events.h"
 
-#include "build/weight.h"
-#include "build/timing.h"
 #include <string.h>
 #include <debug.h>
 

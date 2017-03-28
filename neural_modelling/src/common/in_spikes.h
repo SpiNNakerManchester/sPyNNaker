@@ -1,7 +1,7 @@
 #ifndef _IN_SPIKES_H_
 #define _IN_SPIKES_H_
 
-#include "neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 #include <circular_buffer.h>
 
 static circular_buffer buffer;

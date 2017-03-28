@@ -1,6 +1,8 @@
-#include "build/synapse_type.h"
-#include "build/weight.h"
-#include "timing_pfister_triplet_impl.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+#include "weight.h"
+
+#include "neuron/plasticity/stdp/timing_dependence/timing_pfister_triplet_impl.h"
 
 //---------------------------------------
 // Globals

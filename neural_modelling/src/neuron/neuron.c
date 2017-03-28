@@ -4,12 +4,14 @@
  *
  */
 
-#include "neuron.h"
+// sPyNNaker class definitions
 #include "build/neuron_model.h"
 #include "build/input_type.h"
 #include "build/additional_input.h"
 #include "build/threshold_type.h"
 #include "build/synapse_type.h"
+
+#include "neuron.h"
 #include "plasticity/synapse_dynamics.h"
 #include "../common/out_spikes.h"
 #include "recording.h"

@@ -1,7 +1,7 @@
 #ifndef _NEURON_MODEL_IZH_CURR_IMPL_H_
 #define _NEURON_MODEL_IZH_CURR_IMPL_H_
 
-#include "neuron_model_interface.h"
+#include "neuron/models/neuron_model_interface.h"
 
 typedef struct neuron_t {
 

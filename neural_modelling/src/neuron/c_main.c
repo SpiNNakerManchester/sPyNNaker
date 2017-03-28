@@ -14,13 +14,15 @@
  *
  */
 
-#include "build/synapse_type.h"
-#include "../common/in_spikes.h"
-#include "neuron.h"
-#include "synapses.h"
-#include "spike_processing.h"
-#include "population_table/population_table.h"
-#include "plasticity/synapse_dynamics.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "common/in_spikes.h"
+#include "neuron/neuron.h"
+#include "neuron/synapses.h"
+#include "neuron/spike_processing.h"
+#include "neuron/population_table/population_table.h"
+#include "neuron/plasticity/synapse_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>
