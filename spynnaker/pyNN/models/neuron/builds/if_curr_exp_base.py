@@ -65,7 +65,6 @@ class IFCurrExpBase(AbstractPopulationVertex):
             self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
             max_atoms_per_core=IFCurrExpBase._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
-            config=globals_variables.get_simulator().config,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_curr_exp", neuron_model=neuron_model,

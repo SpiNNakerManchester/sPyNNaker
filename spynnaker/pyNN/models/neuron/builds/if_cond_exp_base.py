@@ -71,8 +71,7 @@ class IFCondExpBase(AbstractPopulationVertex):
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_cond_exp", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints,
-            config=globals_variables.get_simulator().config)
+            threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

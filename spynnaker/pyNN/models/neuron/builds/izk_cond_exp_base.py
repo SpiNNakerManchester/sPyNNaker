@@ -67,7 +67,6 @@ class IzkCondExpBase(AbstractPopulationVertex):
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IZK_cond_exp", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            config=globals_variables.get_simulator().config,
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod

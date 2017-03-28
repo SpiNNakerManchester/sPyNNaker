@@ -75,15 +75,28 @@ class PyNNPopulationCommon(object):
             self._vertex.mark_no_changes()
 
     @staticmethod
-    def create_label(label):
-        # Create a graph vertex for the population and add it
-        # to PACMAN
-        cell_label = label
-        if label is None:
+    def create_label(model_label, pop_level_label):
+        """ helper method for choosing a label from model and poplevels.
+
+        :param model_label: the model level label
+        :param pop_level_label: the pop level label
+        :return: the new model level label
+        """
+        cell_label = None
+        if model_label is None and pop_level_label is None:
             cell_label = "Population {}".format(
                 globals_variables.get_simulator().none_labelled_vertex_count)
             globals_variables.get_simulator(). \
                 increment_none_labelled_vertex_count()
+        elif model_label is None and pop_level_label is not None:
+            cell_label = pop_level_label
+        elif model_label is not None and pop_level_label is None:
+            cell_label = model_label
+        elif model_label is not None and pop_level_label is not None:
+            raise exceptions.ConfigurationException(
+                "Don't know which label to use. please fix and try again")
+
+
         return cell_label
 
     def get(self, parameter_name, gather=False):

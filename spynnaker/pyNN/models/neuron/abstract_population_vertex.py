@@ -71,6 +71,7 @@ from spynnaker.pyNN.models.neuron.population_machine_vertex \
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 
@@ -120,7 +121,7 @@ class AbstractPopulationVertex(
             self, n_neurons, binary, label, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             model_name, neuron_model, input_type, synapse_type, threshold_type,
-            config, additional_input=None, constraints=None):
+            additional_input=None, constraints=None):
 
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
@@ -143,6 +144,10 @@ class AbstractPopulationVertex(
 
         # buffer data
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
+
+        # get config from simulator
+        config = globals_variables.get_simulator().config
+
         if incoming_spike_buffer_size is None:
             self._incoming_spike_buffer_size = config.getint(
                 "Simulation", "incoming_spike_buffer_size")
