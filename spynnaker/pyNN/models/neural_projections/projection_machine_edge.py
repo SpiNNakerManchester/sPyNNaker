@@ -5,6 +5,8 @@ from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.interface.provenance\
     .abstract_provides_local_provenance_data \
     import AbstractProvidesLocalProvenanceData
+from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+    import OneToOneConnector
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
 from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
@@ -32,31 +34,16 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-        pre_vertex = graph_mapper.get_application_vertex(
-            self.pre_vertex)
-        pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self.pre_vertex)
-        pre_vertex_slice = graph_mapper.get_slice(
-            self.pre_vertex)
-        pre_slices = graph_mapper.get_slices(pre_vertex)
-        post_vertex = graph_mapper.get_application_vertex(
-            self.post_vertex)
-        post_slice_index = graph_mapper.get_machine_vertex_index(
-            self.post_vertex)
-        post_vertex_slice = graph_mapper.get_slice(
-            self.post_vertex)
-        post_slices = graph_mapper.get_slices(post_vertex)
-
-        n_connections = 0
+        # Filter one-to-one connections that are out of range
         for synapse_info in self._synapse_information:
-            n_connections += synapse_info.connector.\
-                get_n_connections_to_post_vertex_maximum(
-                    pre_slices, pre_slice_index, post_slices,
-                    post_slice_index, pre_vertex_slice, post_vertex_slice)
-            if n_connections > 0:
-                return False
-
-        return n_connections == 0
+            if isinstance(synapse_info.connector, OneToOneConnector):
+                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                if pre_hi < post_lo or pre_lo > post_hi:
+                    return True
+        return False
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
