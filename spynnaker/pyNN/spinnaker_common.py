@@ -39,7 +39,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
     _EXECUTABLE_FINDER = ExecutableFinder()
 
     def __init__(
-            self, config, graph_label,
+            self, config, graph_label, config_default_name,
             database_socket_addresses, n_chips_required, timestep, max_delay,
             min_delay, hostname, user_extra_algorithm_xml_path=None,
             user_extra_mapping_inputs=None, user_extra_algorithms_pre_run=None,
@@ -47,6 +47,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             extra_mapping_algorithms=None, extra_load_algorithms=None):
 
         # get common data items
+
         extra_algorithm_xml_path, extra_mapping_inputs, \
         extra_algorithms_pre_run = \
             self.get_extra_parameters_for_main_interface(
@@ -69,7 +70,8 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             os.path.dirname(model_binaries.__file__))
 
         SpinnakerMainInterface.__init__(
-            self, config, graph_label=graph_label,
+            self, config, config_default_name=config_default_name,
+            graph_label=graph_label,
             executable_finder=SpiNNakerCommon._EXECUTABLE_FINDER,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
@@ -248,7 +250,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
                         "override this behaviour (at your own risk), please "
                         "add violate_1ms_wall_clock_restriction = True to "
                         "the [Mode] section of your .{} file".format(
-                            config.get_default_name()))
+                            self._config_default_name))
         else:
             if time_scale_factor is not None:
                 self._time_scale_factor = time_scale_factor
@@ -262,9 +264,9 @@ class SpiNNakerCommon(SpinnakerMainInterface):
                         "to automatically slow the simulation down from "
                         "real time by a factor of {}. To remove this "
                         "automatic behaviour, please enter a "
-                        "timescaleFactor value in your .{}"
-                            .format(self._time_scale_factor,
-                                    config.get_default_name()))
+                        "timescaleFactor value in your .{}".format(
+                            self._time_scale_factor,
+                            self._config_default_name))
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
