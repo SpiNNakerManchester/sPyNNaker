@@ -17,7 +17,7 @@ endif
 
 define define-build-code
 $$(BUILD_DIR)%.o: $1/%.c
-	-mkdir -p $$(dir $$@)
+	@-mkdir -p $$(dir $$@)
 	$$(CC) $$(CFLAGS) -D__FILENAME__=\"$$(notdir $$<)\" -o $$@ $$<
 endef
 
