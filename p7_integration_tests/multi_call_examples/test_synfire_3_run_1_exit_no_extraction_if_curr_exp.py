@@ -6,15 +6,15 @@ import unittest
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 
-import p7_integration_tests.scripts.synfire_run_multiple as \
-    synfire_run_multiple
+import p7_integration_tests.scripts.synfire_run as synfire_run
 
 
-class Synfire2RunNoExtraction(unittest.TestCase):
+class Synfire3Rrun1ExitNoExtractionIfCurrExp(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run_multiple.do_run(nNeurons,  number_of_runs=3,
-                                              spike_times=[[0, 1050, 2200]])
+        results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050, 2200]],
+                                     runtimes=[1000, 1000, 1000], reset=False,
+                                     extract_between_runs=False)
         (v, gsyn, spikes) = results
         self.assertEquals(303, len(spikes))
         spike_checker.synfire_multiple_lines_spike_checker(spikes, nNeurons, 3)
@@ -22,8 +22,9 @@ class Synfire2RunNoExtraction(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run_multiple.do_run(nNeurons,  number_of_runs=3,
-                                          spike_times=[[0, 1050, 2200]])
+    results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050, 2200]],
+                                 runtimes=[1000, 1000, 1000], reset=False,
+                                 extract_between_runs=False)
     (v, gsyn, spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)

@@ -12,17 +12,19 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 class Synfire2RunExtractionIfCurrExpLower(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons, runtimes=[1000,500])
+        results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                     runtimes=[1000,500], reset=False)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
-        self.assertEquals(79, len(spikes2))
+        self.assertEquals(103, len(spikes2))
         spike_checker.synfire_spike_checker(spikes1, nNeurons)
-        spike_checker.synfire_spike_checker(spikes2, nNeurons)
+        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons, 2)
 
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtimes=[1000, 500])
+    results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                 runtimes=[1000, 500], reset=False)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)
     print len(spikes2)

@@ -12,8 +12,9 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 class Synfire1RunReset1RunNo_extraction_if_curr_exp(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons, runtimes=[1000, 1000],
-                                     reset=True, new_pop=True)
+        results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                     runtimes=[1000, 1000], reset=True,
+                                     new_pop=True)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
         self.assertEquals(53, len(spikes2))
@@ -23,7 +24,8 @@ class Synfire1RunReset1RunNo_extraction_if_curr_exp(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtimes=[1000, 1000], reset=True,
+    results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                 runtimes=[1000, 1000], reset=True,
                                  new_pop=True)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)

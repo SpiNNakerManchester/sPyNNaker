@@ -2,6 +2,9 @@
 Synfirechain-like example
 """
 #!/usr/bin/python
+nNeurons = 20 # number of neurons in each population
+
+
 import pylab
 
 import spynnaker.pyNN as p

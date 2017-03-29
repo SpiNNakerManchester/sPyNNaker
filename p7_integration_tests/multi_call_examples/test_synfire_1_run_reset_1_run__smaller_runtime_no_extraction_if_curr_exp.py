@@ -1,24 +1,19 @@
 """
 Synfirechain-like example
 """
-try:
-    import pyNN.spiNNaker as p
-except Exception as e:
-    import spynnaker.pyNN as p
-
 import unittest
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 
+import p7_integration_tests.scripts.synfire_run as synfire_run
 
-import synfire_run_twice as synfire_run_twice
 
-class Synfire1RunReset1RunLargertRuntimeNo_extraction_if_curr_exp(unittest.TestCase):
+class Synfire1RunReset1RunSmallerRuntimeNoExtraction(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run_twice.do_run(nNeurons, second_run_multiple=2,
-                                           reset=True)
+        results = synfire_run.do_run(nNeurons, runtimes=[1000, 500],
+                                     reset=True)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         # print len(spikes1)
         # print len(spikes2)
@@ -28,14 +23,14 @@ class Synfire1RunReset1RunLargertRuntimeNo_extraction_if_curr_exp(unittest.TestC
         # plot_utils.heat_plot(v2, title="v2")
         # plot_utils.heat_plot(gsyn2, title="gysn2")
         self.assertEquals(53, len(spikes1))
-        self.assertEquals(156, len(spikes2))
+        self.assertEquals(27, len(spikes2))
         spike_checker.synfire_spike_checker(spikes1, nNeurons)
-        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons, 2)
+        spike_checker.synfire_spike_checker(spikes2, nNeurons)
 
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run_twice.do_run(nNeurons, second_run_multiple=2,
+    results = synfire_run_twice.do_run(nNeurons, second_run_multiple=0.5,
                                        reset=True)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)

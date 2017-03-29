@@ -13,7 +13,8 @@ class Synfire2RunNewPopIfCurrExpLower(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         try:
-            results = synfire_run.do_run(nNeurons, runtimes=[1000, 1000],
+            results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                         runtimes=[1000, 1000], reset=False,
                                          new_pop=True)
         except NotImplementedError:
             # This is the current behavior but would not be wrong if changed.
@@ -22,4 +23,6 @@ class Synfire2RunNewPopIfCurrExpLower(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtimes=[1000, 1000], new_pop=True)
+    results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                 runtimes=[1000, 1000], reset=False,
+                                 new_pop=True)
