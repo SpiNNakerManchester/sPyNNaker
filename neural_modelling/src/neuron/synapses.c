@@ -1,9 +1,9 @@
 // sPyNNaker class definitions
-#include "build/synapse_type.h"
+#include "synapse_type.h"
 
-#include "synapses.h"
-#include "spike_processing.h"
-#include "plasticity/synapse_dynamics.h"
+#include "neuron/synapses.h"
+#include "neuron/spike_processing.h"
+#include "neuron/plasticity/synapse_dynamics.h"
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>

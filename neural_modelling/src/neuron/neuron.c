@@ -5,15 +5,15 @@
  */
 
 // sPyNNaker class definitions
-#include "build/neuron_model.h"
-#include "build/input_type.h"
-#include "build/additional_input.h"
-#include "build/threshold_type.h"
-#include "build/synapse_type.h"
+#include "neuron_model.h"
+#include "input_type.h"
+#include "additional_input.h"
+#include "threshold_type.h"
+#include "synapse_type.h"
 
-#include "neuron.h"
-#include "plasticity/synapse_dynamics.h"
-#include "../common/out_spikes.h"
+#include "neuron/neuron.h"
+#include "neuron/plasticity/synapse_dynamics.h"
+#include "common/out_spikes.h"
 #include "recording.h"
 #include <debug.h>
 #include <string.h>
