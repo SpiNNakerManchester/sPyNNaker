@@ -1,5 +1,5 @@
 APP = $(notdir $(CURDIR))
-BUILD_DIR = $(CURDIR)/build/
+BUILD_DIR = build/
 
 NEURON_MODEL = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.c
 NEURON_MODEL_H = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.h

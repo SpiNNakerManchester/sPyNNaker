@@ -29,6 +29,7 @@ endif
 POPULATION_TABLE_IMPL := binary_search
 
 NEURON_MODEL_O = $(call build_dir, $(NEURON_MODEL))
+NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 ifdef WEIGHT_DEPENDENCE
     WEIGHT_DEPENDENCE_O = $(call build_dir, $(WEIGHT_DEPENDENCE))
 endif
@@ -41,7 +42,6 @@ endif
 
 # ---------------------------------------------------------------------
 
-VPATH += $(SOURCE_DIR)/common:$(SOURCE_DIR)/neuron:$(abspath $(BUILD_DIR))
 CFLAGS += -I$(abspath $(BUILD_DIR)) -I$(abspath $(SOURCE_DIR))
 
 SOURCES = \
@@ -56,8 +56,6 @@ SOURCES = \
 	$(WEIGHT_DEPENDENCE) \
 	$(TIMING_DEPENDENCE) \
 	$(OTHER_SOURCES)
-
-NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 
 # These next three variables are used to set up build rules, but do not
 # determine what files are actually required for the build.
@@ -102,59 +100,51 @@ include ../../../Makefile.common
 ifndef SOURCE_DIR
     $(error SOURCE_DIR must be set for this makefile to work.)
 endif
-
 ifndef BUILD_DIR
     $(error BUILD_DIR must be set for this makefile to work.)
 endif
 
 # ---------------------------------------------------------------------
 
-$(BUILD_DIR)%.o: $(SOURCE_DIR)/%.c
+vpath %.h $(SOURCE_DIR):$(BUILD_DIR)
+vpath %.tmpl $(SOURCE_DIR)/neuron
 
-define target
-$$(BUILD_DIR)$(notdir $(1:.c=.o))
-endef
-
-define build_rule
-$(call target, $(1)): $(1)
+define synapse_build
+$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
+		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H)
 	@-$$(MKDIR) $$(dir $$@)
 	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
 		$$(CFLAGS) -o $$@ $$<
 endef
 
-define synapse_depend
-$$(call target, $(1)): $(1) \
-		build/synapse_type.h $$(SYNAPSE_TYPE_H)
+define plasticity_build
+$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
+		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H) \
+        $(BUILD_DIR)weight.h $$(WEIGHT_DEPENDENCE_H) \
+        $(BUILD_DIR)timing.h $$(TIMING_DEPENDENCE_H)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
+		$$(CFLAGS) -o $$@ $$<
 endef
 
-define stdp_depend
-$$(call target, $(1)): $(1) \
-		build/synapse_type.h $$(SYNAPSE_TYPE_H) \
-        build/weight.h $$(WEIGHT_DEPENDENCE_H) \
-        build/timing.h $$(TIMING_DEPENDENCE_H)
+define neuron_build
+$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
+		$(BUILD_DIR)threshold_type.h $$(THRESHOLD_TYPE_H) \
+		$(BUILD_DIR)neuron_model.h $$(NEURON_MODEL_H) \
+		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H) \
+		$(BUILD_DIR)additional_input.h $$(ADDITIONAL_INPUT_H) \
+		$(BUILD_DIR)input_type.h $$(INPUT_TYPE_H)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
+		$$(CFLAGS) -o $$@ $$<
 endef
 
-define neuron_depend
-$$(call target, $(1)): $(1) \
-		build/threshold_type.h $(THRESHOLD_TYPE_H) \
-		build/neuron_model.h $(NEURON_MODEL_H) \
-		build/synapse_type.h $(SYNAPSE_TYPE_H) \
-		build/additional_input.h $(ADDITIONAL_INPUT_H) \
-		build/input_type.h $(INPUT_TYPE_H)
-endef
-
-$(foreach obj, $(SYNAPSE_TYPE_SOURCES), \
-	$(eval $(call build_rule,$(strip $(obj)),$(SYNAPSE_DEBUG))))
 $(foreach obj,$(SYNAPSE_TYPE_SOURCES), \
-	$(eval $(call synapse_depend,$(strip $(obj)))))
+	$(eval $(call synapse_build, $(obj), $(SYNAPSE_DEBUG))))
 $(foreach obj,$(STDP), \
-	$(eval $(call stdp_depend, $(obj))))
-$(foreach obj, $(STDP), \
-	$(eval $(call build_rule, $(obj), $(PLASTIC_DEBUG))))
+	$(eval $(call plasticity_build, $(obj), $(PLASTIC_DEBUG))))
 $(foreach obj, $(NEURON_CORE), \
-	$(eval $(call neuron_depend, $(obj))))
-$(foreach obj, $(NEURON_CORE), \
-	$(eval $(call build_rule, $(obj), $(NEURON_DEBUG))))
+	$(eval $(call neuron_build, $(obj), $(NEURON_DEBUG))))
 
 # ---------------------------------------------------------------------
 # Convert the filenames for interface implementations into actual
