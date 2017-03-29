@@ -5,6 +5,10 @@ Synfirechain-like example
 
 import unittest
 
+from pacman.model.constraints.placer_constraints\
+    .placer_radial_placement_from_chip_constraint \
+    import PlacerRadialPlacementFromChipConstraint
+
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 
@@ -15,7 +19,9 @@ class Synfire200n10pc2chipsWithNoDelaysSpikeRecording(unittest.TestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
+        constraint = PlacerRadialPlacementFromChipConstraint(3, 3)
         results = synfire_run.do_run(nNeurons,  delay=1, neurons_per_core=10,
+                                     constraint=constraint,
                                      record_v=False, record_gsyn=False)
         (v, gsyn, spikes) = results
         self.assertEquals(333, len(spikes))
@@ -24,7 +30,9 @@ class Synfire200n10pc2chipsWithNoDelaysSpikeRecording(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, delay=1, record_v=False,
+    constraint = PlacerRadialPlacementFromChipConstraint(3, 3)
+    results = synfire_run.do_run(nNeurons, delay=1, neurons_per_core=10,
+                                 constraint=constraint, record_v=False,
                                  record_gsyn=False)
     (v, gsyn, spikes) = results
     print len(spikes)

@@ -12,7 +12,7 @@ from pacman.model.constraints.placer_constraints\
 
 
 def do_run(nNeurons, spike_times=[[0]], delay=17,
-           neurons_per_core=10, placer_constraint=False, spike_times_list=None,
+           neurons_per_core=10, constraint=None, spike_times_list=None,
            runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
            record=True, record_v=True, record_gsyn=True):
     """
@@ -27,11 +27,11 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
     :type spike_times: list of matrix of int times the inputer sends in spikes
     :param delay: time delay in the single connectors in the spike chain
     :type delay: int
-    :param neurons_per_core: Number of neurons per core
-    :type neurons_per_core: int
-    :param placer_constraint: if True added a
-        PlacerRadialPlacementFromChipConstraint to populations[0]
-    :type placer_constraint: bool
+    :param neurons_per_core: Number of neurons per core.
+        If set to None no  set_number_of_neurons_per_core call will be made
+    :type neurons_per_core: int or None
+    :param constraint: A Constraint to be place on populations[0]
+    :type constraint: AbstractConstraint
     :param runtimes: times for each run
     :type runtimes: list of int
     :param reset: if True will call reset after each run except the last
@@ -53,7 +53,8 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
         spikes: spikes after last run (if requested else None)
     """
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-    p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
+    if neurons_per_core is not None:
+        p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
@@ -86,8 +87,7 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
 
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                        label='pop_1'))
-    if placer_constraint:
-        constraint = PlacerRadialPlacementFromChipConstraint(3, 3)
+    if constraint is not None:
         populations[0].set_constraint(constraint)
 
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,

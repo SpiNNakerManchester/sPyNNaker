@@ -1,6 +1,8 @@
 import unittest
 
 class MyTestCase(unittest.TestCase):
+    @unittest.skip("skipping test tests_for_param_vertex_retrieval_from_board\
+        .v.synfire_200n_100pc_with_delays_v_recording.")
     def test_something(self):
         #!/usr/bin/python
         import pylab
