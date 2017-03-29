@@ -15,8 +15,6 @@ def do_run(nNeurons, second_run_multiple=1, reset=False, new_pop=False,
     :type  nNeurons: int
     :param second_run_multiple: Factor to adjust second run time
     :type second_run_multiple: float
-    :param reset: if True will call reset before the second run
-    :type reset: bool
     :param new_pop: If True will add a new population before the second run
     :type new_pop: bool
     :param modify_spike_array: If True will use a different spike array on the
