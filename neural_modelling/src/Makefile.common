@@ -11,3 +11,8 @@ ifndef APP_OUTPUT_DIR
 endif
 
 include $(SOURCE_DIR)/SpiNNFEC.mk
+
+# No main build rules from upstream makefiles
+$(BUILD_DIR)%.o: %.c
+
+.PHONY: all clean

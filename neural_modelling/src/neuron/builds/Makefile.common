@@ -42,8 +42,7 @@ endif
 # ---------------------------------------------------------------------
 
 VPATH += $(SOURCE_DIR)/common:$(SOURCE_DIR)/neuron:$(abspath $(BUILD_DIR))
-CFLAGS += -I$(abspath $(BUILD_DIR)..) -I$(abspath $(BUILD_DIR)) \
-	-I$(abspath $(SOURCE_DIR))
+CFLAGS += -I$(abspath $(BUILD_DIR)) -I$(abspath $(SOURCE_DIR))
 
 SOURCES = \
 	$(SOURCE_DIR)/common/out_spikes.c \
@@ -76,7 +75,8 @@ STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*/*.c)
 
 NEURON_CORE += $(NEURON_MODEL) \
 	$(SOURCE_DIR)/neuron/neuron.c \
-	$(SOURCE_DIR)/common/out_spikes.c
+	$(SOURCE_DIR)/common/out_spikes.c \
+	$(BUILD_DIR)%_build.c
 
 # ---------------------------------------------------------------------
 
@@ -109,27 +109,33 @@ endif
 
 # ---------------------------------------------------------------------
 
+$(BUILD_DIR)%.o: $(SOURCE_DIR)/%.c
+
+define target
+$$(BUILD_DIR)$(notdir $(1:.c=.o))
+endef
+
 define build_rule
-$$(call build_dir, $(1)): $(1)
-	@-mkdir -p $$(dir $$@)
+$(call target, $(1)): $(1)
+	@-$$(MKDIR) $$(dir $$@)
 	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
 		$$(CFLAGS) -o $$@ $$<
 endef
 
 define synapse_depend
-$$(call build_dir, $(1)): $(1) \
+$$(call target, $(1)): $(1) \
 		build/synapse_type.h $$(SYNAPSE_TYPE_H)
 endef
 
 define stdp_depend
-$$(call build_dir, $(1)): $(1) \
+$$(call target, $(1)): $(1) \
 		build/synapse_type.h $$(SYNAPSE_TYPE_H) \
         build/weight.h $$(WEIGHT_DEPENDENCE_H) \
         build/timing.h $$(TIMING_DEPENDENCE_H)
 endef
 
 define neuron_depend
-$$(call build_dir, $(1)): $(1) \
+$$(call target, $(1)): $(1) \
 		build/threshold_type.h $(THRESHOLD_TYPE_H) \
 		build/neuron_model.h $(NEURON_MODEL_H) \
 		build/synapse_type.h $(SYNAPSE_TYPE_H) \
@@ -138,10 +144,10 @@ $$(call build_dir, $(1)): $(1) \
 endef
 
 $(foreach obj, $(SYNAPSE_TYPE_SOURCES), \
-	$(eval $(call synapse_depend, $(obj))))
-$(foreach obj, $(SYNAPSE_TYPE_SOURCES), \
-	$(eval $(call build_rule, $(obj), $(SYNAPSE_DEBUG))))
-$(foreach obj, $(STDP), \
+	$(eval $(call build_rule,$(strip $(obj)),$(SYNAPSE_DEBUG))))
+$(foreach obj,$(SYNAPSE_TYPE_SOURCES), \
+	$(eval $(call synapse_depend,$(strip $(obj)))))
+$(foreach obj,$(STDP), \
 	$(eval $(call stdp_depend, $(obj))))
 $(foreach obj, $(STDP), \
 	$(eval $(call build_rule, $(obj), $(PLASTIC_DEBUG))))
@@ -156,9 +162,9 @@ $(foreach obj, $(NEURON_CORE), \
 # ---------------------------------------------------------------------
 
 define template_rule
-build/$$(notdir $(1)).h: $(1).tmpl Makefile
+$(BUILD_DIR)$$(notdir $(1)).h: $(1).tmpl Makefile
 	@echo Instantiating class for $$(notdir $(1)) from '$$$$'$(2)
-	@-mkdir -p $$(dir $$@)
+	@-$$(MKDIR) $$(dir $$@)
 	@sed 's!$(2)!$$($(2))!g' $$< > $$@
 endef
 

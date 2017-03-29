@@ -16,8 +16,9 @@ ifndef BUILD_DIR
 endif
 
 define define-build-code
-$$(BUILD_DIR)%.o: $1/%.c
-	@-mkdir -p $$(dir $$@)
+$(call build_dir,$1/%.c): $1/%.c
+	@-$$(MKDIR) $$(dir $$@)
+	@echo "DEFINE_BUILD_CODE $$<"
 	$$(CC) $$(CFLAGS) -D__FILENAME__=\"$$(notdir $$<)\" -o $$@ $$<
 endef
 
@@ -26,14 +27,12 @@ $(firstword $(abspath $(strip $(foreach dir, $(sort $(SOURCE_DIRS)), $(findstrin
 endef
 
 define build_dir
-$(patsubst $(call source_dir, $(1))/%.c,$(BUILD_DIR)%.o,$(1))
+$$(BUILD_DIR)$$(patsubst %.c,%.o,$$(notdir $(1)))
 endef
 
 # Convert the objs into the correct format to work here
-OBJS := $(abspath $(SOURCES))
-$(foreach dir, $(sort $(SOURCE_DIRS)), $(eval OBJS := $(OBJS:$(abspath $(dir))/%.c=$(BUILD_DIR)%.o)))
 $(foreach dir, $(sort $(SOURCE_DIRS)), $(eval $(call define-build-code,$(dir))))
-OBJECTS += $(OBJS)
+OBJECTS += $(addprefix $(BUILD_DIR),$(notdir $(SOURCES:.c=.o)))
 
 ifdef SPINN_COMMON
     CFLAGS += -I$(SPINN_COMMON)/include
