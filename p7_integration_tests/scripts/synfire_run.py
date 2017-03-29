@@ -11,17 +11,20 @@ from pacman.model.constraints.placer_constraints\
     import PlacerRadialPlacementFromChipConstraint
 
 
-def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
-           neurons_per_core=10, placer_constraint=False,
+def do_run(nNeurons, spike_times=[[0]], delay=17,
+           neurons_per_core=10, placer_constraint=False, spike_times_list=None,
+           runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
            record=True, record_v=True, record_gsyn=True):
     """
 
     :param nNeurons: Number of Neurons in chain
     :type  nNeurons: int
-    :param runtime: time for the run
-    :type runtime: int
     :param spike_times: times the inputer sends in spikes
-    :type spike_times: matrix of int
+    :type spike_times: matrix of int times the inputer sends in spikes
+    :param spike_times_list: list of times the inputer sends in spikes
+        - must be the same length as  runtimes
+        - If set the spike_time parameter is ignored
+    :type spike_times: list of matrix of int times the inputer sends in spikes
     :param delay: time delay in the single connectors in the spike chain
     :type delay: int
     :param neurons_per_core: Number of neurons per core
@@ -29,6 +32,15 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
     :param placer_constraint: if True added a
         PlacerRadialPlacementFromChipConstraint to populations[0]
     :type placer_constraint: bool
+    :param runtimes: times for each run
+    :type runtimes: list of int
+    :param reset: if True will call reset after each run except the last
+    :type reset: bool
+    :param extract_between_runs: If True reads V, gysn and spikes
+        between each run.
+    :type extract_between_runs: bool
+    :param new_pop: If True will add a new population before the second run
+    :type new_pop: bool
     :param record: If True will aks for spikes to be recorded
     :type record: bool
     :param record_v: If True will aks for voltage to be recorded
@@ -65,11 +77,18 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
         loopConnections.append(singleConnection)
 
     injectionConnection = [(0, 0, weight_to_spike, 1)]
-    spikeArray = {'spike_times': spike_times}
+
+    run_count = 0
+    if spike_times_list is None:
+        spikeArray = {'spike_times': spike_times}
+    else:
+        spikeArray = {'spike_times': spike_times_list[run_count]}
+
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                        label='pop_1'))
     if placer_constraint:
-        populations[0].set_constraint(PlacerRadialPlacementFromChipConstraint(3, 3))
+        constraint = PlacerRadialPlacementFromChipConstraint(3, 3)
+        populations[0].set_constraint(constraint)
 
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                        label='inputSpikes_1'))
@@ -86,21 +105,50 @@ def do_run(nNeurons, runtime=1000, spike_times=[[0]], delay=17,
     if record:
         populations[0].record()
 
-    p.run(runtime)
+    results = ()
 
+    for runtime in runtimes[:-1]:
+        p.run(runtime)
+        run_count += 1
+
+        if extract_between_runs:
+            results += get_data(populations[0], record, record_v, record_gsyn)
+
+        if new_pop:
+            populations.append(
+                p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+                             label='pop_2'))
+            injectionConnection = [(nNeurons - 1, 0, weight_to_spike, 1)]
+            new_proj = p.Projection(populations[0], populations[2],
+                                    p.FromListConnector(injectionConnection))
+            projections.append(new_proj)
+
+        if spike_times_list is not None:
+            populations[1].tset("spike_times", spike_times_list[run_count])
+
+        if reset:
+            p.reset()
+
+    p.run(runtimes[-1])
+    results += get_data(populations[0], record, record_v, record_gsyn)
+
+    p.end()
+
+    return results
+
+
+def get_data(population, record=True, record_v=True, record_gsyn=True):
     if record_v:
-        v = populations[0].get_v(compatible_output=True)
+        v = population.get_v(compatible_output=True)
     else:
         v = None
     if record_gsyn:
-        gsyn = populations[0].get_gsyn(compatible_output=True)
+        gsyn = population.get_gsyn(compatible_output=True)
     else:
         gsyn = None
     if record:
-        spikes = populations[0].getSpikes(compatible_output=True)
+        spikes = population.getSpikes(compatible_output=True)
     else:
         spikes = None
-
-    p.end()
 
     return (v, gsyn, spikes)

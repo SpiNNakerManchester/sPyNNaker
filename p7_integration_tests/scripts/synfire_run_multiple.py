@@ -6,6 +6,7 @@ try:
 except Exception as e:
     import spynnaker.pyNN as p
 
+
 def do_run(nNeurons, number_of_runs=1, reset=False, spike_times=[[0]]):
     """
 
@@ -66,7 +67,7 @@ def do_run(nNeurons, number_of_runs=1, reset=False, spike_times=[[0]]):
 
     for i in range(number_of_runs):
         p.run(runtime)
-        if reset and i < number_of_runs -1:
+        if reset and i < number_of_runs - 1:
             p.reset()
 
     v = populations[0].get_v(compatible_output=True)
