@@ -22,6 +22,9 @@ endif
 ifndef SYNAPSE_DYNAMICS
     $(error SYNAPSE_DYNAMICS is not set.  Please select a synapse dynamics implementation)
 endif
+ifndef BUILD_DIR
+    BUILD_DIR=build/
+endif
 
 # ---------------------------------------------------------------------
 
@@ -42,7 +45,7 @@ endif
 
 # ---------------------------------------------------------------------
 
-CFLAGS += -I$(abspath $(BUILD_DIR)) -I$(abspath $(SOURCE_DIR))
+CFLAGS += -I$(abspath build) -I$(abspath $(SOURCE_DIR))
 
 SOURCES = \
 	$(SOURCE_DIR)/common/out_spikes.c \
@@ -74,7 +77,7 @@ STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*/*.c)
 NEURON_CORE += $(NEURON_MODEL) \
 	$(SOURCE_DIR)/neuron/neuron.c \
 	$(SOURCE_DIR)/common/out_spikes.c \
-	$(BUILD_DIR)%_build.c
+	build/%_build.c
 
 # ---------------------------------------------------------------------
 
@@ -100,40 +103,35 @@ include ../../../Makefile.common
 ifndef SOURCE_DIR
     $(error SOURCE_DIR must be set for this makefile to work.)
 endif
-ifndef BUILD_DIR
-    $(error BUILD_DIR must be set for this makefile to work.)
-endif
 
 # ---------------------------------------------------------------------
 
-vpath %.h $(SOURCE_DIR):$(BUILD_DIR)
+vpath %.h $(SOURCE_DIR):build
 vpath %.tmpl $(SOURCE_DIR)/neuron
 
+SYNAPSE_DEP = build/synapse_type.h $(SYNAPSE_TYPE_H)
 define synapse_build
-$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
-		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H)
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP)
 	@-$$(MKDIR) $$(dir $$@)
 	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
 		$$(CFLAGS) -o $$@ $$<
 endef
 
+PLASTIC_DEP = build/weight.h $(WEIGHT_DEPENDENCE_H) \
+			  build/timing.h $(TIMING_DEPENDENCE_H)
 define plasticity_build
-$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
-		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H) \
-        $(BUILD_DIR)weight.h $$(WEIGHT_DEPENDENCE_H) \
-        $(BUILD_DIR)timing.h $$(TIMING_DEPENDENCE_H)
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP) $(PLASTIC_DEP)
 	@-$$(MKDIR) $$(dir $$@)
 	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
 		$$(CFLAGS) -o $$@ $$<
 endef
 
+NEURON_DEP = build/threshold_type.h	  $(THRESHOLD_TYPE_H) \
+			 build/neuron_model.h	  $(NEURON_MODEL_H) \
+			 build/additional_input.h $(ADDITIONAL_INPUT_H) \
+			 build/input_type.h		  $(INPUT_TYPE_H)
 define neuron_build
-$$(BUILD_DIR)$(notdir $(1:.c=.o)): $(1) \
-		$(BUILD_DIR)threshold_type.h $$(THRESHOLD_TYPE_H) \
-		$(BUILD_DIR)neuron_model.h $$(NEURON_MODEL_H) \
-		$(BUILD_DIR)synapse_type.h $$(SYNAPSE_TYPE_H) \
-		$(BUILD_DIR)additional_input.h $$(ADDITIONAL_INPUT_H) \
-		$(BUILD_DIR)input_type.h $$(INPUT_TYPE_H)
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP) $(NEURON_DEP)
 	@-$$(MKDIR) $$(dir $$@)
 	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
 		$$(CFLAGS) -o $$@ $$<
@@ -151,11 +149,12 @@ $(foreach obj, $(NEURON_CORE), \
 # includeable files.
 # ---------------------------------------------------------------------
 
+REPLACER=python $(abspath $(SOURCE_DIR)/../utils/replace.py)
 define template_rule
-$(BUILD_DIR)$$(notdir $(1)).h: $(1).tmpl Makefile
-	@echo Instantiating class for $$(notdir $(1)) from '$$$$'$(2)
+build/$$(notdir $(1)).h: $(1).tmpl Makefile
 	@-$$(MKDIR) $$(dir $$@)
-	@sed 's!$(2)!$$($(2))!g' $$< > $$@
+	@echo replace $(2) in $(1).tmpl making $$@
+	@$$(REPLACER) $(2) $$($(2)) $$< $$@
 endef
 
 $(eval $(call template_rule,additional_inputs/additional_input,ADDITIONAL_INPUT_H))
