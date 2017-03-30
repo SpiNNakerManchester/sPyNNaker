@@ -139,8 +139,9 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
         axes[1].set_title("Output spikes")
         axes[1].set_xlim((0, self.simtime))
 
-        numpy.save("spinnaker_voltages.npy", s_pop_voltages)
-        numpy.save("nest_voltages.npy", n_pop_voltages)
+        if __name__ == '__main__':
+            numpy.save("spinnaker_voltages.npy", s_pop_voltages)
+            numpy.save("nest_voltages.npy", n_pop_voltages)
 
         self.plot_trace(s_pop_voltages, axes[2], "SpiNNaker", "red")
         self.plot_trace(n_pop_voltages, axes[2], "NEST", "blue")
@@ -151,4 +152,5 @@ class TestIfCurExpSingleNeuron(unittest.TestCase):
         axes[2].legend()
         axes[2].set_xlim((0, self.simtime))
 
-        pylab.show()
+        if __name__ == '__main__':
+            pylab.show()

@@ -11,14 +11,18 @@ from pacman.model.constraints.placer_constraints\
     import PlacerRadialPlacementFromChipConstraint
 
 
-def do_run(nNeurons, spike_times=[[0]], delay=17,
+def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
            neurons_per_core=10, constraint=None, spike_times_list=None,
            runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
-           record=True, record_v=True, record_gsyn=True, get_weights=False):
+           record=True, spike_path=None, record_v=True, v_path=None, record_gsyn=True, gsyn_path=None, get_weights=False, end_before_print=False):
     """
 
     :param nNeurons: Number of Neurons in chain
     :type  nNeurons: int
+    :param timestep: timestep value to be used in p.setup
+    :type timestep: float
+    :param max_delay: max_delay value to be used in p.setup
+    :tpye max_delay: float
     :param spike_times: times the inputer sends in spikes
     :type spike_times: matrix of int times the inputer sends in spikes
     :param spike_times_list: list of times the inputer sends in spikes
@@ -26,7 +30,7 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
         - If set the spike_time parameter is ignored
     :type spike_times: list of matrix of int times the inputer sends in spikes
     :param delay: time delay in the single connectors in the spike chain
-    :type delay: int
+    :type delay: float
     :param neurons_per_core: Number of neurons per core.
         If set to None no  set_number_of_neurons_per_core call will be made
     :type neurons_per_core: int or None
@@ -43,12 +47,23 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
     :type new_pop: bool
     :param record: If True will aks for spikes to be recorded
     :type record: bool
+    :param spike_path: The path to print(write) the last spike data too
+    :type spike_path: str or None
     :param record_v: If True will aks for voltage to be recorded
     :type record_v: bool
+    :param v_path: The path to print(write) the last v data too
+    :type v_path: str or None
     :param record_gsyn: If True will aks for gsyn to be recorded
-    :type record_gsun: bool
+    :type record_gsyn: bool
+    :param gsyn_path: The path to print(write) the last gsyn data too
+    :type gsyn_path: str or None
     :param get_weights: If True set will add a weight value to the return
     :type get_weights: bool
+    :param end_before_print: If True will call end() before running the \
+        optional print commands.
+        Note: end will always be called twoce even if no print path provided
+        WARNING: This is expected to cause an Exception \
+            if a print path is provided
     :return (v, gsyn, spikes, weights .....)
         v: Volage after last or each run (if requested else None)
         gysn: gysn after last or each run (if requested else None)
@@ -57,7 +72,7 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
 
         All three/four values will repeated once per run is requested
     """
-    p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
+    p.setup(timestep=timestep, min_delay=1.0, max_delay=max_delay)
     if neurons_per_core is not None:
         p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
@@ -103,12 +118,12 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
     projections.append(p.Projection(populations[1], populations[0],
                        p.FromListConnector(injectionConnection)))
 
-    if record_v:
-        populations[0].record_v()
-    if record_gsyn:
-        populations[0].record_gsyn()
-    if record:
+    if record or spike_path is not None:
         populations[0].record()
+    if record_v or v_path is not None:
+        populations[0].record_v()
+    if record_gsyn or gsyn_path is not None:
+        populations[0].record_gsyn()
 
     results = ()
 
@@ -142,6 +157,19 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
     if get_weights:
         results += (projections[0].getWeights(), )
 
+    if end_before_print:
+        if v_path is not None or spike_path is not None or \
+            gsyn_path is not None:
+            print "NOTICE! end is being called before print.. commands " \
+                  "which could cause an exception"
+        p.end()
+
+    if v_path is not None:
+        populations[0].print_v(v_path)
+    if spike_path is not None:
+        populations[0].printSpikes(spike_path)
+    if gsyn_path is not None:
+        populations[0].print_gsyn(gsyn_path)
     p.end()
 
     return results
