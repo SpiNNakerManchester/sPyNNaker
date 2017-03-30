@@ -52,7 +52,7 @@ def heat_plot(data, ylabel=None, title=None):
     plt.show()
 
 
-def plot_spikes(spikes, spikes2=None, spikes3=None):
+def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     """
 
     :param spikes: Numpy array of spikes
@@ -102,7 +102,7 @@ def plot_spikes(spikes, spikes2=None, spikes3=None):
     if found:
         plt.xlabel("Time (ms)")
         plt.ylabel("Neuron ID")
-        plt.title("spikes")
+        plt.title(title)
         timeDiff = (maxTime - minTime) * 0.05
         minTime = minTime - timeDiff
         maxTime = maxTime + timeDiff
