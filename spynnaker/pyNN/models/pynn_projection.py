@@ -178,10 +178,15 @@ class Projection(object):
                 pacman.model.graph.application.abstract_application_vertex
         :return: None or the edge going to these vertices.
         """
-        graph_edges = self._spinnaker.application_graph.edges
+
+        # Find edges ending at the postsynaptic vertex
+        graph_edges = \
+            self._spinnaker.application_graph.get_edges_ending_at_vertex(
+                postsynaptic_vertex)
+
+        # Search the edges for any that start at the presynaptic vertex
         for edge in graph_edges:
-            if ((edge.pre_vertex == presynaptic_vertex) and
-                    (edge.post_vertex == postsynaptic_vertex)):
+            if edge.pre_vertex == presynaptic_vertex:
                 return edge
         return None
 
