@@ -32,7 +32,7 @@ endif
 POPULATION_TABLE_IMPL := binary_search
 
 NEURON_MODEL_O = $(call build_dir, $(NEURON_MODEL))
-NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
+NEURON_O = $(call build_dir, neuron/neuron.c)
 ifdef WEIGHT_DEPENDENCE
     WEIGHT_DEPENDENCE_O = $(call build_dir, $(WEIGHT_DEPENDENCE))
 endif
@@ -40,7 +40,7 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
 endif
 ifndef ADDITIONAL_INPUT_H
-    ADDITIONAL_INPUT_H = $(SOURCE_DIR)/neuron/additional_inputs/additional_input_none_impl.h
+    ADDITIONAL_INPUT_H = neuron/additional_inputs/additional_input_none_impl.h
 endif
 
 # ---------------------------------------------------------------------
@@ -48,12 +48,12 @@ endif
 CFLAGS += -I$(abspath build) -I$(abspath $(SOURCE_DIR))
 
 SOURCES = \
-	$(SOURCE_DIR)/common/out_spikes.c \
-	$(SOURCE_DIR)/neuron/c_main.c \
-	$(SOURCE_DIR)/neuron/synapses.c \
-	$(SOURCE_DIR)/neuron/neuron.c \
-	$(SOURCE_DIR)/neuron/spike_processing.c \
-	$(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+	common/out_spikes.c \
+	neuron/c_main.c \
+	neuron/synapses.c \
+	neuron/neuron.c \
+	neuron/spike_processing.c \
+	neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
 	$(NEURON_MODEL) \
 	$(SYNAPSE_DYNAMICS) \
 	$(WEIGHT_DEPENDENCE) \
@@ -64,19 +64,19 @@ SOURCES = \
 # determine what files are actually required for the build.
 
 SYNAPSE_TYPE_SOURCES += \
-    $(SOURCE_DIR)/neuron/c_main.c \
-    $(SOURCE_DIR)/neuron/synapses.c \
-    $(SOURCE_DIR)/neuron/spike_processing.c \
-    $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
-    $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
-    $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+    neuron/c_main.c \
+    neuron/synapses.c \
+    neuron/spike_processing.c \
+    neuron/population_table/population_table_fixed_impl.c \
+    neuron/population_table/population_table_binary_search_impl.c \
+    neuron/plasticity/synapse_dynamics_static_impl.c
 
 STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*.c)
 STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*/*.c)
 
 NEURON_CORE += $(NEURON_MODEL) \
-	$(SOURCE_DIR)/neuron/neuron.c \
-	$(SOURCE_DIR)/common/out_spikes.c \
+	neuron/neuron.c \
+	common/out_spikes.c \
 	build/%_build.c
 
 # ---------------------------------------------------------------------
@@ -107,6 +107,7 @@ endif
 # ---------------------------------------------------------------------
 
 vpath %.h $(SOURCE_DIR):build
+vpath %.c $(SOURCE_DIR)
 vpath %.tmpl $(SOURCE_DIR)/neuron
 
 SYNAPSE_DEP = build/synapse_type.h $(SYNAPSE_TYPE_H)
