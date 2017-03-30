@@ -8,7 +8,6 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
-from spynnaker.pyNN.utilities import globals_variables
 
 _IZK_THRESHOLD = 30.0
 

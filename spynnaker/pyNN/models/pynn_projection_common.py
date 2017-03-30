@@ -285,11 +285,10 @@ class PyNNProjectionCommon(object):
                 "false")
 
         # try for each possible parameters
-        if parameter == "weight":
-            return self._get_synaptic_data(format == 'list', "weights")
-        if parameter == "delay":
-            return self._get_synaptic_data(format == 'list', "delays")
+        if parameter in {"weight", "delay", "source", "target"}:
+            return self._get_synaptic_data(format == 'list', parameter)
         else:
+            # make equal to n connections
             self._synapse_information.synapse_dynamics.get(
                 parameter, format, gather)
 

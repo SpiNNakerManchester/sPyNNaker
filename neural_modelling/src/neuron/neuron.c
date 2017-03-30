@@ -49,8 +49,8 @@ static uint32_t n_neurons;
 //! The recording flags
 static uint32_t recording_flags;
 
-//! The input buffers - from synapses.c
-static input_t *input_buffers;
+// The synapse shaping parameters
+static synapse_param_t *neuron_synapse_shaping_params;
 
 //! storage for neuron state with timestamp
 static timed_state_t *voltages;
@@ -243,8 +243,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
-void neuron_set_input_buffers(input_t *input_buffers_value) {
-    input_buffers = input_buffers_value;
+void neuron_set_neuron_synapse_shaping_params(
+        synapse_param_t *neuron_synapse_shaping_params_value) {
+    neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
 
 //! \executes all the updates to neural parameters when a given timer period
@@ -280,10 +281,12 @@ void neuron_do_timestep_update(timer_t time) {
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
         input_t exc_input_value = input_type_get_input_value(
-            synapse_types_get_excitatory_input(input_buffers, neuron_index),
+            synapse_types_get_excitatory_input(
+                &(neuron_synapse_shaping_params[neuron_index])),
             input_type);
         input_t inh_input_value = input_type_get_input_value(
-            synapse_types_get_inhibitory_input(input_buffers, neuron_index),
+            synapse_types_get_inhibitory_input(
+                &(neuron_synapse_shaping_params[neuron_index])),
             input_type);
         input_t exc_input = input_type_convert_excitatory_input_to_current(
             exc_input_value, input_type, voltage);

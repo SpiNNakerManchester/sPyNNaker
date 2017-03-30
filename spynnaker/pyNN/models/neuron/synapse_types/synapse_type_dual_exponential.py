@@ -16,7 +16,8 @@ from data_specification.enums.data_type import DataType
 class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
-                 tau_syn_I, initial_input_exc, initial_input_inh):
+                 tau_syn_I, initial_input_exc, initial_input_exc2,
+                 initial_input_inh):
         AbstractSynapseType.__init__(self)
         AbstractContainsUnits.__init__(
             self, {'tau_syn_E': "mV", 'tau_syn_E2': "mV", 'tau_syn_I': 'mV',
@@ -30,6 +31,8 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             tau_syn_I, n_neurons)
         self._initial_input_exc = utility_calls.convert_param_to_numpy(
             initial_input_exc, n_neurons)
+        self._initial_input_exc2 = utility_calls.convert_param_to_numpy(
+            initial_input_exc2, n_neurons)
         self._initial_input_inh = utility_calls.convert_param_to_numpy(
             initial_input_inh, n_neurons)
 
@@ -76,6 +79,14 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
     def isyn_inh(self, new_value):
         self._initial_input_inh = new_value
 
+    @property
+    def isyn_exc2(self):
+        return self._initial_input_exc2
+
+    @isyn_exc2.setter
+    def isyn_exc2(self, new_value):
+        self._initial_input_exc2 = new_value
+
     def get_n_synapse_types(self):
         return 3
 
@@ -92,7 +103,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
         return "excitatory", "excitatory2", "inhibitory"
 
     def get_n_synapse_type_parameters(self):
-        return 8
+        return 9
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
@@ -111,6 +122,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             NeuronParameter(i_decay, DataType.UINT32),
             NeuronParameter(i_init, DataType.UINT32),
             NeuronParameter(self._initial_input_exc, DataType.S1615),
+            NeuronParameter(self._initial_input_exc2, DataType.S1615),
             NeuronParameter(self._initial_input_inh, DataType.S1615)
         ]
 
