@@ -14,7 +14,7 @@ from pacman.model.constraints.placer_constraints\
 def do_run(nNeurons, spike_times=[[0]], delay=17,
            neurons_per_core=10, constraint=None, spike_times_list=None,
            runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
-           record=True, record_v=True, record_gsyn=True):
+           record=True, record_v=True, record_gsyn=True, get_weights=False):
     """
 
     :param nNeurons: Number of Neurons in chain
@@ -47,10 +47,15 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
     :type record_v: bool
     :param record_gsyn: If True will aks for gsyn to be recorded
     :type record_gsun: bool
-    :return (v, gsyn, spikes)
-        v: Volage after last run (if requested else None)
-        gysn: gysn after last run (if requested else None)
-        spikes: spikes after last run (if requested else None)
+    :param get_weights: If True set will add a weight value to the return
+    :type get_weights: bool
+    :return (v, gsyn, spikes, weights .....)
+        v: Volage after last or each run (if requested else None)
+        gysn: gysn after last or each run (if requested else None)
+        spikes: spikes after last or each run (if requested else None)
+        weights: weights after last or each run (if requested else skipped)
+
+        All three/four values will repeated once per run is requested
     """
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
     if neurons_per_core is not None:
@@ -112,7 +117,9 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
         run_count += 1
 
         if extract_between_runs:
-            results += get_data(populations[0], record, record_v, record_gsyn)
+            results += _get_data(populations[0], record, record_v, record_gsyn)
+            if get_weights:
+                results += (projections[0].getWeights(), )
 
         if new_pop:
             populations.append(
@@ -130,14 +137,17 @@ def do_run(nNeurons, spike_times=[[0]], delay=17,
             p.reset()
 
     p.run(runtimes[-1])
-    results += get_data(populations[0], record, record_v, record_gsyn)
+
+    results += _get_data(populations[0], record, record_v, record_gsyn)
+    if get_weights:
+        results += (projections[0].getWeights(), )
 
     p.end()
 
     return results
 
 
-def get_data(population, record=True, record_v=True, record_gsyn=True):
+def _get_data(population, record, record_v, record_gsyn):
     if record_v:
         v = population.get_v(compatible_output=True)
     else:
