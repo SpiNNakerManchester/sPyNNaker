@@ -22,6 +22,7 @@ from spynnaker.pyNN.utilities import constants
 
 import logging
 import math
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -142,8 +143,11 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping):
+        if ((isinstance(self._projection_edge, AbstractChangableAfterRun) and
+                self._projection_edge.requires_mapping) or
+            (isinstance(self._synapse_information.synapse_dynamics,
+                        AbstractChangableAfterRun) and
+                self._synapse_information.synapse_dynamics.requires_mapping)):
             return True
         return False
 
@@ -288,9 +292,13 @@ class PyNNProjectionCommon(object):
         if parameter in {"weight", "delay", "source", "target"}:
             return self._get_synaptic_data(format == 'list', parameter)
         else:
-            # make equal to n connections
-            self._synapse_information.synapse_dynamics.get(
-                parameter, format, gather)
+            # get the n_connections and the parameter and then expand to
+            # correct size
+            size = len(self._get_synaptic_data(format == 'list', 'source'))
+            data = numpy.empty(size)
+            data.fill(self._synapse_information.synapse_dynamics.get_value(
+                parameter))
+            return data
 
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)

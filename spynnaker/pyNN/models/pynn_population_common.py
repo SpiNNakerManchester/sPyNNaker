@@ -95,8 +95,6 @@ class PyNNPopulationCommon(object):
         elif model_label is not None and pop_level_label is not None:
             raise exceptions.ConfigurationException(
                 "Don't know which label to use. please fix and try again")
-
-
         return cell_label
 
     def get(self, parameter_name, gather=False):
