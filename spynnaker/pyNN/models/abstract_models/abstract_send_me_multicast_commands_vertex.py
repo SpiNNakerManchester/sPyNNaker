@@ -1,6 +1,7 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import abstractproperty
 
 
 @add_metaclass(AbstractBase)
@@ -9,15 +10,10 @@ class AbstractSendMeMulticastCommandsVertex(object):
         at fixed points in the simulation
     """
 
-    def __init__(self, commands):
-        """
+    __slots__ = ()
 
-        :param commands: The commands that the vertex expects to be transmitted
-        :type commands: iterable of \
-                    py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
-        """
-        self._commands = commands
-
-    @property
+    @abstractproperty
     def commands(self):
-        return self._commands
+        """ The commands to be sent
+        """
+        pass
