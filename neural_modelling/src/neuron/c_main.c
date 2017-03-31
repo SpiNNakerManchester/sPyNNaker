@@ -76,13 +76,11 @@ static uint32_t infinite_run;
 static uint32_t recording_flags = 0;
 
 //! \brief Initialises the recording parts of the model
+//! \param[in] recording_address: the address in sdram where to store
+//! recordings
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(){
-    address_t address = data_specification_get_data_address();
-    address_t recording_region = data_specification_get_region(
-        RECORDING_REGION, address);
-
-    bool success = recording_initialize(recording_region, &recording_flags);
+static bool initialise_recording(address_t recording_address){
+    bool success = recording_initialize(recording_address, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }
@@ -127,7 +125,8 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // setup recording region
-    if (!initialise_recording()){
+    if (!initialise_recording(
+            data_specification_get_region(RECORDING_REGION, address))){
         return false;
     }
 
@@ -180,8 +179,19 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
+//! \brief the function to call when resuming a simulation
+//! return None
 void resume_callback() {
     recording_reset();
+
+    // try reloading neuron parameters
+    address_t address = data_specification_get_data_address();
+    if(!neuron_reload_neuron_parameters(
+            data_specification_get_region(
+                NEURON_PARAMS_REGION, address))){
+        log_error("failed to reload the neuron parameters.");
+        rt_error(RTE_SWERR);
+    }
 }
 
 //! \brief Timer interrupt callback
@@ -202,6 +212,11 @@ void timer_callback(uint timer_count, uint unused) {
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
         log_info("Completed a run");
+
+        // rewrite neuron params to sdram for reading out if needed
+        address_t address = data_specification_get_data_address();
+        neuron_store_neuron_parameters(
+            data_specification_get_region(NEURON_PARAMS_REGION, address));
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);

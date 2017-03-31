@@ -18,8 +18,6 @@ from spynnaker.pyNN.models.neural_projections.projection_application_edge \
 from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
     import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -157,14 +155,11 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping):
-            return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractChangableAfterRun):
-            self._projection_edge.mark_no_changes()
+        # Does Nothing currently
+        pass
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ Searches though the graph's edges to locate any\
