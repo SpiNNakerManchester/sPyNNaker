@@ -2,19 +2,14 @@
 # pacman imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
+from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.decorators.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common.slice import Slice
-from pacman.model.graphs.application.impl.application_vertex \
-    import ApplicationVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
+from pacman.model.resources import ResourceContainer, SDRAMResource
 
 # front end common imports
 from spinn_front_end_common.abstract_models. \
@@ -66,8 +61,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 
 
-from abc import ABCMeta
-from six import add_metaclass
 import logging
 import os
 import random
@@ -86,7 +79,6 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 
-@add_metaclass(ABCMeta)
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
@@ -592,7 +584,7 @@ class AbstractPopulationVertex(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self._label, buffer_manager, self.SPIKE_RECORDING_REGION,
+            self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractVRecordable.is_recording_v)
@@ -608,7 +600,7 @@ class AbstractPopulationVertex(
     def get_v(self, n_machine_time_steps, placements, graph_mapper,
               buffer_manager, machine_time_step):
         return self._v_recorder.get_v(
-            self._label, buffer_manager, self.V_RECORDING_REGION,
+            self.label, buffer_manager, self.V_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractGSynRecordable.is_recording_gsyn)
@@ -625,7 +617,7 @@ class AbstractPopulationVertex(
             self, n_machine_time_steps, placements, graph_mapper,
             buffer_manager, machine_time_step):
         return self._gsyn_recorder.get_gsyn(
-            self._label, buffer_manager, self.GSYN_RECORDING_REGION,
+            self.label, buffer_manager, self.GSYN_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractPopulationInitializable.initialize)
@@ -799,7 +791,7 @@ class AbstractPopulationVertex(
         return [KeyAllocatorContiguousRangeContraint()]
 
     def __str__(self):
-        return "{} with {} atoms".format(self._label, self.n_atoms)
+        return "{} with {} atoms".format(self.label, self.n_atoms)
 
     def __repr__(self):
         return self.__str__()

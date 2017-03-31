@@ -1,14 +1,16 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 from spynnaker.pyNN.utilities import utility_calls
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractNeuronModel(object):
     """ Represents a neuron model
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def get_n_neural_parameters(self):

@@ -1,7 +1,6 @@
 from pacman.model.decorators.overrides import overrides
 from spinn_front_end_common.utilities import helpful_functions
-from pacman.model.graphs.machine.impl.machine_vertex \
-    import MachineVertex
+from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models.abstract_recordable \
     import AbstractRecordable
 from spinn_front_end_common.interface.provenance\
@@ -29,9 +28,6 @@ class SpikeSourcePoissonMachineVertex(
             self, resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, constraints=None, label=None):
         MachineVertex.__init__(self, label, constraints=constraints)
-        ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
-            0)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
         self._resources = resources_required
@@ -42,6 +38,17 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources
+
+    @property
+    @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
+    def _provenance_region_id(self):
+        return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
+
+    @property
+    @overrides(
+        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    def _n_additional_data_items(self):
+        return 0
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):

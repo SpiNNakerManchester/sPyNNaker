@@ -3,9 +3,8 @@
 import struct
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
+from pacman.model.graphs.application import ApplicationVertex
 
-from pacman.model.graphs.application.abstract_application_vertex import \
-    AbstractApplicationVertex
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge \
@@ -106,7 +105,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # Get the number of atoms per core incoming
                 max_atoms = sys.maxint
                 edge_pre_vertex = in_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, AbstractApplicationVertex) and
+                if (isinstance(edge_pre_vertex, ApplicationVertex) and
                         isinstance(
                             edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
 
