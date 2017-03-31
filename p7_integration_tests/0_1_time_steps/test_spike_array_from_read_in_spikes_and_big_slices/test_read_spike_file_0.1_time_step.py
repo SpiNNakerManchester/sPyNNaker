@@ -95,5 +95,6 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         self.assertLess(430, len(spikes))
         self.assertGreater(460, len(spikes))
 
+
 if __name__ == '__main__':
     unittest.main()

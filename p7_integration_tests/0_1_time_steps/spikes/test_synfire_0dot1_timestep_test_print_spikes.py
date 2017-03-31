@@ -66,7 +66,7 @@ class TestPrintSpikes(unittest.TestCase):
 
         current_file_path = os.path.dirname(os.path.abspath(__file__))
         current_file_path = os.path.join(current_file_path, "spikes.data")
-        spike_file = populations[0].printSpikes(current_file_path)
+        populations[0].printSpikes(current_file_path)
 
         read_in_spikes = p.utility_calls.read_spikes_from_file(
             current_file_path, min_atom=0, max_atom=n_neurons,
@@ -78,6 +78,7 @@ class TestPrintSpikes(unittest.TestCase):
                              round(read_element[0], 1))
             self.assertEqual(round(spike_element[1], 1),
                              round(read_element[1], 1))
+
 
 if __name__ == '__main__':
     unittest.main()

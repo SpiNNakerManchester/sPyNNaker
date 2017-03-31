@@ -1,7 +1,6 @@
 """
 Synfirechain-like example
 """
-import spynnaker.pyNN as p
 import unittest
 import os
 import p7_integration_tests.scripts.synfire_run as synfire_run
@@ -20,7 +19,8 @@ class TestMallocKeyAllocatorWithSynfire(unittest.TestCase):
         """
         n_neurons = 20  # number of neurons in each population
         current_file_path = os.path.dirname(os.path.abspath(__file__))
-        current_spike_file_path = os.path.join(current_file_path, "spikes.data")
+        current_spike_file_path = os.path.join(current_file_path,
+                                               "spikes.data")
         current_v_file_path = os.path.join(current_file_path, "v.data")
         current_gsyn_file_path = os.path.join(current_file_path, "gsyn.data")
         results = synfire_run.do_run(n_neurons, max_delay=14, timestep=0.1,

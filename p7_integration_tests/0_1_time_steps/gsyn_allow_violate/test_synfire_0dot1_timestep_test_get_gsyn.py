@@ -2,7 +2,6 @@
 Synfirechain-like example
 """
 # general imports
-import os
 import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.plot_utils as plot_utils

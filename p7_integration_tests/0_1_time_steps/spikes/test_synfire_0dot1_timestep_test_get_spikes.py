@@ -1,7 +1,6 @@
 """
 Synfirechain-like example
 """
-#import pyNN.spiNNaker as p
 import spynnaker.pyNN as p
 import unittest
 
@@ -98,6 +97,7 @@ class TestGetSpikesAt0_1msTimeStep(unittest.TestCase):
                                    delta=0.4)
             self.assertAlmostEqual(spike_element[1], read_element[1],
                                    delta=0.4)
+
 
 if __name__ == '__main__':
     unittest.main()

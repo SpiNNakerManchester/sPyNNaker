@@ -1,14 +1,7 @@
 """
 Synfirechain-like example
 """
-
-# spynnaker imports
-import spynnaker.pyNN as p
-
 # general imports
-import os
-import unittest
-
 import os
 import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
@@ -52,4 +45,3 @@ if __name__ == '__main__':
     plot_utils.heat_plot(gsyn)
     gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)
     os.remove(gsyn_path)
-

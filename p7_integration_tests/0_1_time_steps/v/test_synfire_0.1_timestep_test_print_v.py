@@ -7,6 +7,7 @@ import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
+
 class TestPrintVoltage(unittest.TestCase):
     """
     tests the printing of print v given a simulation
