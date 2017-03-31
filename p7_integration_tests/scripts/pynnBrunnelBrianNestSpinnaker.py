@@ -1,12 +1,5 @@
-# exec('import pyNN.%s as pynn' % simulator_Name)
 import spynnaker.pyNN as pynn
-
-import pylab as plt
 import numpy as np
-import pynnBrunnelPlot as pblt
-
-import unittest
-
 from pyNN.random import NumpyRNG, RandomDistribution
 
 simulator_Name = 'spiNNaker'
@@ -79,7 +72,16 @@ def poisson_generator(rate, rng, t_start=0.0, t_stop=1000.0, array=True,
         return [round(x) for x in spikes]
 
 
-def do_run(Neurons, sim_time):
+def do_run(Neurons, sim_time, record):
+    """
+
+    :param Neurons: Number of Neurons
+    :type Neurons: int
+    :param sim_time: times for run
+    :type sim_time: int
+    :param record: If True will aks for spikes to be recorded
+    :type record: bool
+    """
     g = 5.0
     eta = 2.0
     delay = 2.0
@@ -154,9 +156,11 @@ def do_run(Neurons, sim_time):
     }
 
     # Set-up pynn Populations
-    E_pop = pynn.Population(N_E, pynn.IF_curr_exp, exc_cell_params, label="E_pop")
+    E_pop = pynn.Population(N_E, pynn.IF_curr_exp, exc_cell_params,
+                            label="E_pop")
 
-    I_pop = pynn.Population(N_I, pynn.IF_curr_exp, inh_cell_params, label="I_pop")
+    I_pop = pynn.Population(N_I, pynn.IF_curr_exp, inh_cell_params,
+                            label="I_pop")
 
     Poiss_ext_E = pynn.Population(N_E, pynn.SpikeSourcePoisson, {'rate': 10.0},
                                   label="Poisson_pop_E")
@@ -188,49 +192,23 @@ def do_run(Neurons, sim_time):
     Ext_I = pynn.Projection(Poiss_ext_I, I_pop, Ext_conn, target="excitatory")
 
     # Record stuff
-    E_pop.record()
-    Poiss_ext_E.record()
+    if record:
+        E_pop.record()
+        Poiss_ext_E.record()
 
     pynn.run(sim_time)
 
     esp = None
+    s = None
     isp = None
     pe = None
     pi = None
     v_esp = None
 
-    esp = E_pop.getSpikes(compatible_output=True)
-    s = Poiss_ext_E.getSpikes(compatible_output=True)
+    if record:
+        esp = E_pop.getSpikes(compatible_output=True)
+        s = Poiss_ext_E.getSpikes(compatible_output=True)
 
     pynn.end()
 
     return (esp, s, N_E)
-
-def plot(esp, sim_time, N_E):
-    if esp is not None:
-        ts_ext = [x[1] for x in esp]
-        ids_ext = [x[0] for x in esp]
-        title = 'Raster Plot of the excitatory population in %s' \
-                % simulator_Name,
-        pblt._make_plot(ts_ext, ts_ext, ids_ext, ids_ext,
-                        len(ts_ext) > 0, 5.0, False, title,
-                        'Simulation Time (ms)', total_time=sim_time,
-                        n_neurons=N_E)
-
-        plt.show()
-
-
-class PynnBrunnelBrianNestSpinnaker(unittest.TestCase):
-
-    def test_run(self):
-        Neurons = 3000  # number of neurons in each population
-        sim_time = 1000.0
-        (esp, s, N_E) = do_run(Neurons, sim_time)
-        # plot(esp, sim_time, N_E)
-
-if __name__ == '__main__':
-    sim_time = 1000.0
-    Neurons = 3000  # number of neurons in each population
-    (esp, s, N_E) = do_run(Neurons)
-    plot(esp, sim_time, N_E)
-

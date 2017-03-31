@@ -79,18 +79,20 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
 
         spikes = populations[1].getSpikes(compatible_output=True)
 
-        if spikes is not None:
-            print spikes
-            pylab.figure()
-            pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
-            pylab.xlabel('Time/ms')
-            pylab.ylabel('spikes')
-            pylab.title('spikes')
-            pylab.show()
-        else:
-            print "No spikes received"
+        if __name__ == '__main__':
+            if spikes is not None:
+                print spikes
+                pylab.figure()
+                pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
+                pylab.xlabel('Time/ms')
+                pylab.ylabel('spikes')
+                pylab.title('spikes')
+                pylab.show()
+            else:
+                print "No spikes received"
 
         p.end()
+
 
 if __name__ == '__main__':
     unittest.main()

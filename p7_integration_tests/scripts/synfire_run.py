@@ -5,14 +5,16 @@ try:
     import pyNN.spiNNaker as p
 except Exception as e:
     import spynnaker.pyNN as p
-# This is a constraint that really knows about SpiNNaker...
-from pacman.model.constraints.placer_constraints\
-    .placer_radial_placement_from_chip_constraint \
-    import PlacerRadialPlacementFromChipConstraint
+from spynnaker.pyNN.models.neuron.builds.if_curr_exp \
+    import IFCurrExp as IF_curr_exp
+
+CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
+                   'tau_refrac': 2.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
+                   'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -50.0}
 
 
-def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
-           neurons_per_core=10, constraint=None, spike_times_list=None,
+def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], spike_times_list=None, weight_to_spike=2.0, delay=17,
+           neurons_per_core=10, cellclass=IF_curr_exp, constraint=None, cell_params_lif=CELL_PARAMS_LIF,
            runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
            record=True, spike_path=None, record_v=True, v_path=None, record_gsyn=True, gsyn_path=None, get_weights=False, end_before_print=False):
     """
@@ -29,6 +31,9 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
         - must be the same length as  runtimes
         - If set the spike_time parameter is ignored
     :type spike_times: list of matrix of int times the inputer sends in spikes
+    :param weight_to_spike: weight for the OneToOne Connector
+        Not used by any test at the moment
+    :type weight_to_spike: float
     :param delay: time delay in the single connectors in the spike chain
     :type delay: float
     :param neurons_per_core: Number of neurons per core.
@@ -36,6 +41,13 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
     :type neurons_per_core: int or None
     :param constraint: A Constraint to be place on populations[0]
     :type constraint: AbstractConstraint
+    :param cellclass: class to be used for the main population
+        Not used by any test at the moment
+    :type cellclass: AbstractPopulationVertex
+    :param cell_params_lif: values for the main population
+        Not used by any test at the moment
+        Note: the values must match what is expected by the cellclass
+    :type cell_params_lif: dict
     :param runtimes: times for each run
     :type runtimes: list of int
     :param reset: if True will call reset after each run except the last
@@ -76,21 +88,9 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
     if neurons_per_core is not None:
         p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
-    cell_params_lif = {'cm': 0.25,
-                       'i_offset': 0.0,
-                       'tau_m': 20.0,
-                       'tau_refrac': 2.0,
-                       'tau_syn_E': 5.0,
-                       'tau_syn_I': 5.0,
-                       'v_reset': -70.0,
-                       'v_rest': -65.0,
-                       'v_thresh': -50.0
-                       }
 
     populations = list()
     projections = list()
-
-    weight_to_spike = 2.0
 
     loopConnections = list()
     for i in range(0, nNeurons):
@@ -105,7 +105,7 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
     else:
         spikeArray = {'spike_times': spike_times_list[run_count]}
 
-    populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+    populations.append(p.Population(nNeurons, cellclass, cell_params_lif,
                        label='pop_1'))
     if constraint is not None:
         populations[0].set_constraint(constraint)
@@ -138,7 +138,7 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
 
         if new_pop:
             populations.append(
-                p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+                p.Population(nNeurons, cellclass, cell_params_lif,
                              label='pop_2'))
             injectionConnection = [(nNeurons - 1, 0, weight_to_spike, 1)]
             new_proj = p.Projection(populations[0], populations[2],
@@ -159,7 +159,7 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], delay=17,
 
     if end_before_print:
         if v_path is not None or spike_path is not None or \
-            gsyn_path is not None:
+                gsyn_path is not None:
             print "NOTICE! end is being called before print.. commands " \
                   "which could cause an exception"
         p.end()

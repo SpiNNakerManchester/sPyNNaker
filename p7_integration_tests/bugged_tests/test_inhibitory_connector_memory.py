@@ -4,33 +4,32 @@ import unittest
 import spynnaker.pyNN as p
 import numpy, pylab
 
+
 class TestInhibitoryProjection(unittest.TestCase):
 
     def test_inhibitory_connector_memory(self):
         p.setup(timestep=0.1, min_delay=1, max_delay=10.0)
         weight_to_spike = 10
         delay = 1
-        cell_params_lif = {
-            'cm'        : 0.25,
-            'i_offset'  : 0.0,
-            'tau_m'     : 20.0,
-            'tau_refrac': 1.0,
-            'tau_syn_E' : 5.0,
-            'tau_syn_I' : 8.0,
-            'v_reset'   : -70.0,
-            'v_rest'    : -65.0,
-            'v_thresh'  : -50.0
-                     }
-        spike_array = {'spike_times':[0]}
-        mem_access = {'spike_times':[10]}
+        cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
+                           'tau_refrac': 2.0, 'tau_syn_E': 5.0,
+                           'tau_syn_I': 5.0, 'v_reset': -70.0, 'v_rest': -65.0,
+                           'v_thresh': -50.0}
+        spike_array = {'spike_times': [0]}
+        mem_access = {'spike_times': [10]}
 
-        p_initial_spike = p.Population(1,p.SpikeSourceArray,spike_array,label="Initial spike pop")
-        p_mem = p.Population(1,p.IF_curr_exp, cell_params_lif, label="Memory")
-        p_out = p.Population(1,p.IF_curr_exp, cell_params_lif, label="Output")
-        p_bridge = p.Population(1,p.IF_curr_exp, cell_params_lif, label="Bridge")
-        p_inhibitor = p.Population(1,p.IF_curr_exp, cell_params_lif, label="Inhibitor")
-        p_access = p.Population(1,p.SpikeSourceArray, mem_access, label="Access memory spike pop")
-
+        p_initial_spike = p.Population(1, p.SpikeSourceArray, spike_array,
+                                       label="Initial spike pop")
+        p_mem = p.Population(1, p.IF_curr_exp, cell_params_lif,
+                             label="Memory")
+        p_out = p.Population(1, p.IF_curr_exp, cell_params_lif,
+                             label="Output")
+        p_bridge = p.Population(1, p.IF_curr_exp, cell_params_lif,
+                                label="Bridge")
+        p_inhibitor = p.Population(1, p.IF_curr_exp, cell_params_lif,
+                                   label="Inhibitor")
+        p_access = p.Population(1, p.SpikeSourceArray, mem_access,
+                                label="Access memory spike pop")
 
         p_out.record()
         p_mem.record()
@@ -38,14 +37,24 @@ class TestInhibitoryProjection(unittest.TestCase):
         p_initial_spike.record()
         p_access.record()
 
+        pr_initial_spike1 = p.Projection(p_initial_spike, p_mem,
+                                         p.OneToOneConnector(weight_to_spike,
+                                                             delay))
+        pr_initial_spike2 = p.Projection(p_initial_spike, p_inhibitor,
+                                         p.OneToOneConnector(weight_to_spike,
+                                                             delay))
 
-        pr_initial_spike1 = p.Projection(p_initial_spike,p_mem,p.OneToOneConnector(weight_to_spike,delay))
-        pr_initial_spike2 = p.Projection(p_initial_spike,p_inhibitor,p.OneToOneConnector(weight_to_spike,delay))
+        pr_mem_access = p.Projection(p_access, p_inhibitor,
+                                     p.OneToOneConnector(weight_to_spike,
+                                                         delay),
+                                     target= 'inhibitory')
 
-        pr_mem_access = p.Projection(p_access,p_inhibitor,p.OneToOneConnector(weight_to_spike,delay), target= 'inhibitory')
-
-        pr_inhibitor_self = p.Projection(p_inhibitor,p_inhibitor,p.OneToOneConnector(weight_to_spike,delay))
-        pr_inhibitor_bridge = p.Projection(p_inhibitor,p_bridge,p.OneToOneConnector(weight_to_spike,delay), target= 'inhibitory')
+        pr_inhibitor_self = p.Projection(p_inhibitor, p_inhibitor,
+                                         p.OneToOneConnector(weight_to_spike,
+                                                             delay))
+        pr_inhibitor_bridge = p.Projection(p_inhibitor, p_bridge,
+                                           p.OneToOneConnector(weight_to_spike,
+                                                               delay), target= 'inhibitory')
 
         pr_mem_self = p.Projection(p_mem,p_mem,p.OneToOneConnector(weight_to_spike,delay))
         pr_mem_bridge = p.Projection(p_mem,p_bridge,p.OneToOneConnector(weight_to_spike,delay))

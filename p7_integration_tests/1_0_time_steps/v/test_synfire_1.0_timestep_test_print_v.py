@@ -1,7 +1,8 @@
 """
 Synfirechain-like example
 """
-# general imports
+
+# spynnaker imports
 import os
 import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
@@ -12,7 +13,7 @@ runtime = 500
 current_file_path = os.path.dirname(os.path.abspath(__file__))
 current_v_file_path = os.path.join(current_file_path, "v.data2")
 max_delay = 14
-timestep = 0.1
+timestep = 1
 neurons_per_core = n_neurons/2
 delay = 1.7
 

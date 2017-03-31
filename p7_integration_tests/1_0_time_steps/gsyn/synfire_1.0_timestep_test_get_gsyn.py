@@ -2,86 +2,45 @@
 Synfirechain-like example
 """
 
-# spynnaker imports
-import spynnaker.pyNN as p
-
-# general imports
-import os
 import unittest
+
+import p7_integration_tests.scripts.synfire_run as synfire_run
+import spynnaker.plot_utils as plot_utils
+import spynnaker.spike_checker as spike_checker
+import spynnaker.gsyn_tools as gsyn_tools
+
+n_neurons = 10  # number of neurons in each population
+max_delay = 14.4
+timestep = 1
+neurons_per_core = n_neurons/2
+delay = 1.7
+runtime = 50
 
 
 class TestGetGsyn(unittest.TestCase):
     """
     tests the printing of get gsyn given a simulation
     """
-
     def test_get_gsyn(self):
-        """
-        test that tests the getting of gsyn from a pre determined recording
-        :return:
-        """
-        p.setup(timestep=1, min_delay=1.0, max_delay=14.40)
-        n_neurons = 10  # number of neurons in each population
-        runtime = 50
-        p.set_number_of_neurons_per_core("IF_curr_exp", n_neurons / 2)
+        results = synfire_run.do_run(n_neurons, max_delay=max_delay,
+                                     timestep=timestep,
+                                     neurons_per_core=neurons_per_core,
+                                     delay=delay,
+                                     runtimes=[runtime])
+        (v, gsyn, spikes) = results
+        self.assertEquals(12, len(spikes))
+        spike_checker.synfire_spike_checker(spikes, n_neurons)
+        gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)
 
-        cell_params_lif = {'cm': 0.25,
-                           'i_offset': 0.0,
-                           'tau_m': 20.0,
-                           'tau_refrac': 2.0,
-                           'tau_syn_E': 5.0,
-                           'tau_syn_I': 5.0,
-                           'v_reset': -70.0,
-                           'v_rest': -65.0,
-                           'v_thresh': -50.0
-                           }
-
-        populations = list()
-        projections = list()
-
-        weight_to_spike = 2.0
-        delay = 1.7
-
-        loop_connections = list()
-        for i in range(0, n_neurons):
-            single_connection = (i, ((i + 1) % n_neurons), weight_to_spike,
-                                 delay)
-            loop_connections.append(single_connection)
-
-        injection_connection = [(0, 0, weight_to_spike, 1)]
-        spike_array = {'spike_times': [[0]]}
-        populations.append(p.Population(n_neurons, p.IF_curr_exp,
-                                        cell_params_lif,
-                           label='pop_1'))
-        populations.append(p.Population(1, p.SpikeSourceArray, spike_array,
-                           label='inputSpikes_1'))
-
-        projections.append(p.Projection(populations[0], populations[0],
-                           p.FromListConnector(loop_connections)))
-        projections.append(p.Projection(populations[1], populations[0],
-                           p.FromListConnector(injection_connection)))
-
-        populations[0].record_v()
-        populations[0].record_gsyn()
-        populations[0].record()
-
-        p.run(runtime)
-
-        gsyn = populations[0].get_gsyn(compatible_output=True)
-        current_file_path = os.path.dirname(os.path.abspath(__file__))
-        current_file_path = os.path.join(current_file_path, "gsyn.data")
-        pre_recorded_data = p.utility_calls.read_in_data_from_file(
-            current_file_path, 0, n_neurons, 0, runtime)
-
-        p.end()
-
-        for spike_element, read_element in zip(gsyn, pre_recorded_data):
-            self.assertEqual(round(spike_element[0], 1),
-                             round(read_element[0], 1))
-            self.assertEqual(round(spike_element[1], 1),
-                             round(read_element[1], 1))
-            self.assertEqual(round(spike_element[2], 1),
-                             round(read_element[2], 1))
 
 if __name__ == '__main__':
-    unittest.main()
+    results = synfire_run.do_run(n_neurons, max_delay=max_delay,
+                                 timestep=timestep,
+                                 neurons_per_core=neurons_per_core, delay=delay,
+                                 runtimes=[runtime])
+    (v, gsyn, spikes) = results
+    print len(spikes)
+    plot_utils.plot_spikes(spikes)
+    plot_utils.heat_plot(v)
+    plot_utils.heat_plot(gsyn)
+    gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)

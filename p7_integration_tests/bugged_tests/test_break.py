@@ -31,7 +31,7 @@ def do_run():
 
     spike_sourceE = p.Population(1, p.SpikeSourceArray,
                                  {'spike_times':
-                                      [[i for i in range(5, 105, 10)], ]},
+                                     [[i for i in range(5, 105, 10)], ]},
                                  label='spike_sourceE')
 
     p.Projection(spike_sourceE, ifcell,
@@ -40,7 +40,7 @@ def do_run():
     if breakMe:
         p.Projection(spike_sourceE, ifcell,
                      p.OneToOneConnector(weights=1, delays=2),
-                                         target='excitatory')
+                     target='excitatory')
 
     ifcell.record_v()
     ifcell.record_gsyn()
@@ -65,6 +65,7 @@ def plot(recorded_v, recorded_gsyn):
 
     pylab.show()
 
+
 class Break(unittest.TestCase):
     def test_synfire_1_run_no_extraction_if_curr_exp_low_sdram(self):
         (v, gsyn) = do_run()
@@ -73,5 +74,4 @@ class Break(unittest.TestCase):
 if __name__ == '__main__':
     (v, gsyn) = do_run()
     plot(v, gsyn)
-
 
