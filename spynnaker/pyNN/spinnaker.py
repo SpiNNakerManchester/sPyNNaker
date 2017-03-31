@@ -199,13 +199,17 @@ class Spinnaker(SpinnakerMainInterface):
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
         """
-        changed = False
+        changed = SpinnakerMainInterface._detect_if_graph_has_changed(
+            self, reset_flags)
+
+        # Additionally check populations for changes
         for population in self._populations:
             if population.requires_mapping:
                 changed = True
             if reset_flags:
                 population.mark_no_changes()
 
+        # Additionally check projections for changes
         for projection in self._projections:
             if projection.requires_mapping:
                 changed = True

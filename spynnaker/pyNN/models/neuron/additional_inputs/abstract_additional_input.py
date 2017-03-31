@@ -26,6 +26,14 @@ class AbstractAdditionalInput(object):
         """
 
     @abstractmethod
+    def get_parameter_types(self):
+        """ Get the types of the parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        """
+
+    @abstractmethod
     def get_n_cpu_cycles_per_neuron(self):
         """ Get the number of CPU cycles executed by\
             additional_input_get_input_value_as_current and\
@@ -47,3 +55,16 @@ class AbstractAdditionalInput(object):
         :rtype: int
         """
         return self.get_n_parameters() * 4
+
+    def set_parameters(self, parameters, vertex_slice):
+        """ Set the parameters for a given subset of neurons.
+
+            To be overridden only when there is a changing variable to
+            extract
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_neural_parameters
+        :param vertex_slice: The neurons to which the parameters apply
+        """
+        pass

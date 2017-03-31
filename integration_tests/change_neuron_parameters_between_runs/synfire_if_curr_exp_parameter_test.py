@@ -1,32 +1,32 @@
-#!/usr/bin/python
 """
 Synfirechain-like example
 """
+try:
+    import pyNN.spiNNaker as p
+except Exception as e:
+    import spynnaker.pyNN as p
 import pylab
-import spynnaker.pyNN as p
-
 
 p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 nNeurons = 200  # number of neurons in each population
 p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
 
-
-cell_params_lif = {
-    'cm': 0.25,        # nF
-    'i_offset': 0.0,
-    'tau_m': 20.0,
-    'tau_refrac': 2.0,
-    'tau_syn_E': 5.0,
-    'tau_syn_I': 5.0,
-    'v_reset': -70.0,
-    'v_rest': -65.0,
-    'v_thresh': -50.0}
+cell_params_lif = {'cm': 0.25,
+                   'i_offset': 0.0,
+                   'tau_m': 20.0,
+                   'tau_refrac': 2.0,
+                   'tau_syn_E': 5.0,
+                   'tau_syn_I': 5.0,
+                   'v_reset': -70.0,
+                   'v_rest': -65.0,
+                   'v_thresh': -50.0
+                   }
 
 populations = list()
 projections = list()
 
 weight_to_spike = 2.0
-delay = 3
+delay = 17
 
 loopConnections = list()
 for i in range(0, nNeurons):
@@ -49,7 +49,11 @@ populations[0].record_v()
 populations[0].record_gsyn()
 populations[0].record()
 
-p.run(100)
+p.run(5000)
+
+populations[0].set('i_offset', 30)
+
+p.run(5000)
 
 v = None
 gsyn = None
@@ -80,8 +84,7 @@ if v is not None:
     pylab.title('v')
     for pos in range(0, nNeurons, 20):
         v_for_neuron = v[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[1] for i in v_for_neuron],
-                   [i[2] for i in v_for_neuron])
+        pylab.plot([i[2] for i in v_for_neuron])
     pylab.show()
 
 if gsyn is not None:
@@ -92,8 +95,7 @@ if gsyn is not None:
     pylab.title('gsyn')
     for pos in range(0, nNeurons, 20):
         gsyn_for_neuron = gsyn[pos * ticks: (pos + 1) * ticks]
-        pylab.plot([i[1] for i in gsyn_for_neuron],
-                   [i[2] for i in gsyn_for_neuron])
+        pylab.plot([i[2] for i in gsyn_for_neuron])
     pylab.show()
 
-p.end(stop_on_board=False)
+p.end()
