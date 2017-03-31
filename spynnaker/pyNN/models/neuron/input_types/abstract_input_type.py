@@ -35,6 +35,14 @@ class AbstractInputType(object):
         """
 
     @abstractmethod
+    def get_input_type_parameter_types(self):
+        """ Get the types of the input type parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        """
+
+    @abstractmethod
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         """ Get the number of CPU cycles executed by\
             input_type_get_input_value once per synapse, \
@@ -57,3 +65,14 @@ class AbstractInputType(object):
         :rtype: int
         """
         return self.get_n_input_type_parameters() * 4
+
+    def set_input_type_parameters(self, parameters, vertex_slice):
+        """ Sets the input type parameters.  Override if there are any\
+            variables that change.
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_input_type_parameters
+        :param vertex_slice: The neurons to which the parameters apply
+        """
+        pass

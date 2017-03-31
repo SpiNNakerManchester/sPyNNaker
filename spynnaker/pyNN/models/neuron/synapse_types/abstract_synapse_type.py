@@ -53,6 +53,14 @@ class AbstractSynapseType(object):
         """
 
     @abstractmethod
+    def get_synapse_type_parameter_types(self):
+        """ Get the types of the synapse parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        """
+
+    @abstractmethod
     def get_n_cpu_cycles_per_neuron(self):
         """ Get the total number of CPU cycles executed by\
             synapse_types_shape_input, synapse_types_add_neuron_input,\
@@ -86,3 +94,14 @@ class AbstractSynapseType(object):
         :rtype: int
         """
         return self.get_n_synapse_type_parameters() * 4
+
+    def set_synapse_type_parameters(self, parameters, vertex_slice):
+        """ Sets any synapse type parameters.  Override if there are changing\
+            variables in the synapse type parameters
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_synapse_type_parameters
+        :param vertex_slice: The neurons to which the parameters apply
+        """
+        pass
