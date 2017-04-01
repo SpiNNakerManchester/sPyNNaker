@@ -8,8 +8,7 @@ class SimplePopulationSettable(AbstractPopulationSettable):
         Population i.e. no properties are hidden
     """
 
-    def __init__(self):
-        AbstractPopulationSettable.__init__(self)
+    __slots__ = ()
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):

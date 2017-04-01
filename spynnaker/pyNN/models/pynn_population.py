@@ -1,7 +1,6 @@
-from pacman.model.constraints.abstract_constraint\
-    import AbstractConstraint
+from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+    import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\

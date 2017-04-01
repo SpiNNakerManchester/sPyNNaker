@@ -1,5 +1,4 @@
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses \
