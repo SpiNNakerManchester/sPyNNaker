@@ -1,10 +1,11 @@
-from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractproperty
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection
     """
