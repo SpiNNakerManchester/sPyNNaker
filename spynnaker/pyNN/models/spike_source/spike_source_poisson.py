@@ -2,7 +2,6 @@ import scipy.stats
 import logging
 import math
 import random
-import scipy.stats
 import numpy
 from enum import Enum
 
