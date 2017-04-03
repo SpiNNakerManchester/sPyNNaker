@@ -12,6 +12,7 @@ import p7_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
 class Synfire6300n10pop30pc18chipsNoDelaysSpikeRrecording(unittest.TestCase):
 
+    # SpinnmanException: 10 cores have reached an error state CPUState.RUN_TIME_EXCEPTION:
     def test_run(self):
         nNeurons = 630  # number of neurons in each population
         results = synfire_npop_run.do_run(nNeurons, n_pops=10,

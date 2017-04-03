@@ -16,7 +16,7 @@ class Synfire1RunReset1RunLargertRuntimeNoExtraction(unittest.TestCase):
                                      reset=True)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
-        self.assertEquals(156, len(spikes2))
+        self.assertEquals(106, len(spikes2))
         spike_checker.synfire_spike_checker(spikes1, nNeurons)
         spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons,
                                                            2)

@@ -80,7 +80,7 @@ class MwhPopulationSynfire(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
-        self.assertEquals(20, len(spikes))
+        self.assertEquals(596, len(spikes))
 
 
 if __name__ == '__main__':

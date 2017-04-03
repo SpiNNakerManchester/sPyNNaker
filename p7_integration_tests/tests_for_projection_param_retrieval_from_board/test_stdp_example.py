@@ -228,6 +228,8 @@ def do_run():
 
 class stdp_example(unittest.TestCase):
 
+    @unittest.skip("Skipping tests_for_projection_param_retrieval_from_board/"
+                   "test_stdp_example.py")
     def test_run(self):
         (weights, pre_spikes, post_spikes) = do_run()
         self.assertLess(140, len(pre_spikes))

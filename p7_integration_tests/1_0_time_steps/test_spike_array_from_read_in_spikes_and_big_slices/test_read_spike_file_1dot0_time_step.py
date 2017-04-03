@@ -6,6 +6,7 @@ Synfirechain-like example
 import spynnaker.pyNN as p
 
 # general imports
+import os
 import pylab
 import unittest
 
@@ -62,6 +63,8 @@ class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
         weight_to_spike = 0.035
         delay = 17
 
+        current_file_path = os.path.dirname(os.path.abspath(__file__))
+        spike_file = os.path.join(current_file_path, 'spike_times')
         spikes = read_spikefile('test.spikes', n_neurons)
         print spikes
         spike_array = {'spike_times': spikes}

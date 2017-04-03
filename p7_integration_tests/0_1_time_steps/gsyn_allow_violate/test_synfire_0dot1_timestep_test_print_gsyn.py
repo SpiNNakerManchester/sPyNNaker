@@ -31,7 +31,7 @@ class TestPrintGsyn(unittest.TestCase):
                                      delay=delay,
                                      runtimes=[runtime], gsyn_path=gsyn_path)
         (v, gsyn, spikes) = results
-        self.assertEquals(56, len(spikes))
+        self.assertEquals(119, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
         gsyn_tools.check_path_gysn(gsyn_path, n_neurons, runtime, gsyn)
         os.remove(gsyn_path)

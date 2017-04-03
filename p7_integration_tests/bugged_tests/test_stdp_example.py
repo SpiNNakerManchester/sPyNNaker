@@ -198,6 +198,8 @@ def do_run():
 
 
 class StdpExample(unittest.TestCase):
+
+    @unittest.skip("Skipping bugged_tests/test_stdp_example.py")
     def test_run(self):
         (pre_spikes, post_spikes) = do_run()
         self.assertLess(130, len(pre_spikes))
