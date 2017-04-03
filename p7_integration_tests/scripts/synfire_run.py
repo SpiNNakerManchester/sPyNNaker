@@ -88,7 +88,6 @@ def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], spike_times
     if neurons_per_core is not None:
         p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
-
     populations = list()
     projections = list()
 

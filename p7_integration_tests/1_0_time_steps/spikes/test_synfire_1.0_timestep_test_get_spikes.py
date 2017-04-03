@@ -1,7 +1,6 @@
 """
 Synfirechain-like example
 """
-import spynnaker.pyNN as p
 import unittest
 
 import p7_integration_tests.scripts.synfire_run as synfire_run
@@ -30,7 +29,7 @@ class TestGetSpikesAt0_1msTimeStep(unittest.TestCase):
         (v, gsyn, spikes) = results
         pre_recorded_spikes = [[0, 3], [1, 7], [2, 11], [3, 15], [4, 19],
                                [5, 23], [6, 27], [7, 31], [8, 35], [9, 39],
-                               [10, 43], [11, 47], [12, 51], [13, 55], 
+                               [10, 43], [11, 47], [12, 51], [13, 55],
                                [14, 59], [15, 63], [16, 67], [17, 71],
                                [18, 75], [19, 79], [20, 83], [21, 87],
                                [22, 91], [23, 95], [24, 99], [25, 103],
@@ -58,7 +57,7 @@ class TestGetSpikesAt0_1msTimeStep(unittest.TestCase):
                                [110, 443], [111, 447], [112, 451], [113, 455],
                                [114, 459], [115, 463], [116, 467], [117, 471],
                                [118, 475], [119, 479], [120, 483], [121, 487],
-                               [122, 491], [123, 495], [124, 499],]
+                               [122, 491], [123, 495], [124, 499]]
 
         for spike_element, read_element in zip(spikes, pre_recorded_spikes):
             self.assertEqual(spike_element[0], read_element[0])
@@ -68,4 +67,3 @@ class TestGetSpikesAt0_1msTimeStep(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

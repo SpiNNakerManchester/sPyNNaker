@@ -1,5 +1,6 @@
 import pylab as plt
-import pynnBrunnelPlot as pblt
+import p7_integration_tests.buffer_manager.poission_with_recording.\
+    pynnBrunnelPlot as pblt
 
 import unittest
 
@@ -28,6 +29,7 @@ class PynnBrunnelBrianNestSpinnaker(unittest.TestCase):
 
     def test_run(self):
         (esp, s, N_E) = script.do_run(Neurons, sim_time, True)
+
 
 if __name__ == '__main__':
     (esp, s, N_E) = script.do_run(Neurons, sim_time, True)

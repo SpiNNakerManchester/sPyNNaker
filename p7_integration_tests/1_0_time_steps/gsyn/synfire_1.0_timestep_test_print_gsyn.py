@@ -18,7 +18,7 @@ neurons_per_core = n_neurons/2
 delay = 1.7
 runtime = 50
 gsyn_path = os.path.dirname(os.path.abspath(__file__))
-gsyn_path = os.path.join(gsyn_path, "gsyn.data")
+gsyn_path = os.path.join(gsyn_path, "gsyn.data2")
 
 
 class TestPrintGsyn(unittest.TestCase):
@@ -42,7 +42,8 @@ class TestPrintGsyn(unittest.TestCase):
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, max_delay=max_delay,
                                  timestep=timestep,
-                                 neurons_per_core=neurons_per_core, delay=delay,
+                                 neurons_per_core=neurons_per_core,
+                                 delay=delay,
                                  runtimes=[runtime], gsyn_path=gsyn_path)
     (v, gsyn, spikes) = results
     print len(spikes)
@@ -50,4 +51,4 @@ if __name__ == '__main__':
     plot_utils.heat_plot(v)
     plot_utils.heat_plot(gsyn)
     gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)
-    #os.remove(gsyn_path)
+    # os.remove(gsyn_path)

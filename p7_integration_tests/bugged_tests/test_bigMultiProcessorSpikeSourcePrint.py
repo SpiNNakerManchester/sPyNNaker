@@ -22,19 +22,7 @@ def do_run(nNeurons):
                        }
 
     spike_list = {'spike_times': [float(x) for x in range(0, 599, 50)]}
-    # p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
     p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
-
-    # p.set_number_of_neurons_per_core("SpikeSourceArray", 256) #FAILS
-    # nNeurons = (256*3)-2 # number of neurons in each population #FAIL
-    # p.set_number_of_neurons_per_core("SpikeSourceArray", 6) # works
-    # nNeurons = 18 # number of neurons in each population # works
-    # p.set_number_of_neurons_per_core("SpikeSourceArray", 200) #FAILS
-    # nNeurons = (600) # number of neurons in each population #FAIL
-    # p.set_number_of_neurons_per_core("SpikeSourceArray", 150) #FAILS
-    # nNeurons = (600) # number of neurons in each population #FAIL
-    # p.set_number_of_neurons_per_core("SpikeSourceArray", 100) #FAILS
-    # nNeurons = (600) # number of neurons in each population #FAIL
 
     p.set_number_of_neurons_per_core("SpikeSourceArray", 100)  # FAILS
 
@@ -64,9 +52,9 @@ class BigMultiProcessorSpikeSourcePrint(unittest.TestCase):
     def test_run_(self):
         nNeurons = 600  # number of neurons in each population
         spikes = do_run(nNeurons)
-        # plot_utils.plot_spikes(spikes)
         self.assertGreater(len(spikes), 7100)
         self.assertLess(len(spikes), 7300)
+
 
 if __name__ == '__main__':
     nNeurons = 600  # number of neurons in each population

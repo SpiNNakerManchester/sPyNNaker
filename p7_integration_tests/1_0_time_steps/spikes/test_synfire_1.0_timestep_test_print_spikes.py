@@ -34,7 +34,6 @@ class TestPrintSpikes(unittest.TestCase):
         read_in_spikes = utility_calls.read_spikes_from_file(
             current_file_path, min_atom=0, max_atom=n_neurons,
             min_time=0, max_time=500)
-        p.end()
 
         for spike_element, read_element in zip(spikes, read_in_spikes):
             self.assertEqual(round(spike_element[0], 1),

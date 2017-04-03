@@ -1,4 +1,3 @@
-__author__ = 'stokesa6'
 import spynnaker.pyNN as p
 
 import unittest
@@ -6,11 +5,13 @@ import unittest
 from pyNN.random import RandomDistribution, NumpyRNG
 import spynnaker.plot_utils as plot_utils
 
+__author__ = 'stokesa6'
+
+
 def do_run(nNeurons):
 
-    p.setup(timestep=1.0, min_delay = 1.0, max_delay = 32.0)
+    p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
 
-    neuron_model = p.IF_curr_exp(nNeurons, 1000.0, 1.0, 30, 5)
     p.set_number_of_neurons_per_core("IF_curr_exp", 100)
 
     cm = list()
@@ -23,6 +24,11 @@ def do_run(nNeurons):
     v_rest = list()
     v_thresh = list()
 
+    cell_params_lif = {'cm': cm, 'i_offset': i_off, 'tau_m': tau_m,
+                       'tau_refrac': tau_re, 'tau_syn_E': tau_syn_e,
+                       'tau_syn_I': tau_syn_i, 'v_reset': v_reset,
+                       'v_rest': v_rest, 'v_thresh': v_thresh}
+
     for atom in range(0, nNeurons):
         cm.append(0.25)
         i_off.append(0.0)
@@ -34,24 +40,18 @@ def do_run(nNeurons):
         v_rest.append(-65.0)
         v_thresh.append(-64.4)
 
-    gbar_na_distr = RandomDistribution('normal', (20.0, 2.0), rng=NumpyRNG(seed=85524))
+    gbar_na_distr = RandomDistribution('normal', (20.0, 2.0),
+                                       rng=NumpyRNG(seed=85524))
 
-    cell_params_lif = {'cm'          : cm, # nF
-                         'i_offset'  : i_off,
-                         'tau_m'     : tau_m,
-                         'tau_refrac': tau_re,
-                         'tau_syn_E' : tau_syn_e,
-                         'tau_syn_I' : tau_syn_i,
-                         'v_reset'   : v_reset,
-                         'v_rest'    : v_rest,
-                         'v_thresh'  : v_thresh
-                       }
+    cell_params_lif = {'cm': cm, 'i_offset': i_off, 'tau_m': tau_m,
+                       'tau_refrac': tau_re, 'tau_syn_E': tau_syn_e,
+                       'tau_syn_I': tau_syn_i, 'v_reset': v_reset,
+                       'v_rest': v_rest, 'v_thresh': v_thresh}
 
     populations = list()
     projections = list()
 
     weight_to_spike = 2
-    #delay = 3.1
     delay = 1
 
     connections = list()
@@ -61,8 +61,10 @@ def do_run(nNeurons):
 
     injectionConnection = [(0, 0, weight_to_spike, delay)]
     spikeArray = {'spike_times': [[0]]}
-    populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif, label='pop_1'))
-    populations.append(p.Population(1, p.SpikeSourceArray, spikeArray, label='inputSpikes_1'))
+    populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+                                    label='pop_1'))
+    populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
+                                    label='inputSpikes_1'))
 
     populations[0].set('cm', 0.25)
     populations[0].set('cm', cm)
@@ -75,11 +77,10 @@ def do_run(nNeurons):
     populations[0].set('i_offset', gbar_na_distr)
     populations[0].set('i_offset', i_off)
 
-
-    #populations[0].set_mapping_constraint({"x": 1, "y": 0})
-
-    projections.append(p.Projection(populations[0], populations[0], p.FromListConnector(connections)))
-    projections.append(p.Projection(populations[1], populations[0], p.FromListConnector(injectionConnection)))
+    projections.append(p.Projection(populations[0], populations[0],
+                                    p.FromListConnector(connections)))
+    projections.append(p.Projection(populations[1], populations[0],
+                                    p.FromListConnector(injectionConnection)))
 
     populations[0].record_v()
     populations[0].record_gsyn()
@@ -102,18 +103,14 @@ class ParamsSetAsList(unittest.TestCase):
     def test_run(self):
         nNeurons = 225  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
-        plot_utils.plot_spikes(spikes)
-        plot_utils.heat_plot(v, title="v")
-        plot_utils.heat_plot(gsyn, title="gysn")
-        print len(spikes)
-        #self.assertLess(9500, len(spikes))
-        #self.assertGreater(9800, len(spikes))
+        # self.assertLess(9500, len(spikes))
+        # self.assertGreater(9800, len(spikes))
 
 
 if __name__ == '__main__':
     nNeurons = 225  # number of neurons in each population
     (v, gsyn, spikes) = do_run(nNeurons)
+    print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.line_plot(v, title="v")
     plot_utils.heat_plot(gsyn, title="gsyn")
-

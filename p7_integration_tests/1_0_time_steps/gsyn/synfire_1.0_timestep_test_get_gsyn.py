@@ -36,7 +36,8 @@ class TestGetGsyn(unittest.TestCase):
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, max_delay=max_delay,
                                  timestep=timestep,
-                                 neurons_per_core=neurons_per_core, delay=delay,
+                                 neurons_per_core=neurons_per_core,
+                                 delay=delay,
                                  runtimes=[runtime])
     (v, gsyn, spikes) = results
     print len(spikes)

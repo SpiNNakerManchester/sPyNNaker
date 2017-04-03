@@ -11,5 +11,6 @@ class PynnBrunnelBrianNestSpinnaker(unittest.TestCase):
     def test_run(self):
         (esp, s, N_E) = script.do_run(Neurons, sim_time, False)
 
+
 if __name__ == '__main__':
     (esp, s, N_E) = script.do_run(Neurons, sim_time, False)

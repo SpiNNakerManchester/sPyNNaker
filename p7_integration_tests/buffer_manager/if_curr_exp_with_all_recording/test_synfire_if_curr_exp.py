@@ -1,11 +1,6 @@
 """
 Synfirechain-like example
 """
-try:
-    import pyNN.spiNNaker as p
-except Exception as e:
-    import spynnaker.pyNN as p
-
 import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.plot_utils as plot_utils
@@ -26,6 +21,7 @@ class SynfireIfCurrExp(unittest.TestCase):
         print len(spikes)
         self.assertEquals(263, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
+
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
