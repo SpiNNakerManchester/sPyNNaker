@@ -5,11 +5,11 @@ import spynnaker.pyNN as p
 import pylab
 import unittest
 
+
 def do_run(nNeurons):
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
 
     p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons / 2)
-
 
     cell_params_lif = {'cm': 0.25,
                        'i_offset': 0.0,
@@ -25,18 +25,17 @@ def do_run(nNeurons):
     p.set_number_of_neurons_per_core("IF_cond_exp", nNeurons / 2)
 
     cell_params_cond = {'cm': 0.25,
-                       'i_offset': 0.0,
-                       'tau_m': 20.0,
-                       'tau_refrac': 2.0,
-                       'tau_syn_E': 5.0,
-                       'tau_syn_I': 5.0,
-                       'v_reset': -70.0,
-                       'v_rest': -65.0,
-                       'v_thresh': -50.0,
-                       'e_rev_E': 0.,
-                       'e_rev_I': -80.
-                       }
-
+                        'i_offset': 0.0,
+                        'tau_m': 20.0,
+                        'tau_refrac': 2.0,
+                        'tau_syn_E': 5.0,
+                        'tau_syn_I': 5.0,
+                        'v_reset': -70.0,
+                        'v_rest': -65.0,
+                        'v_thresh': -50.0,
+                        'e_rev_E': 0.,
+                        'e_rev_I': -80.
+                        }
 
     populations = list()
     projections = list()
@@ -58,7 +57,6 @@ def do_run(nNeurons):
                                     label='pop_curr'))
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
                                     label='inputSpikes_2'))
-
 
     populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
                                     label='sink_pop'))
@@ -85,21 +83,23 @@ def do_run(nNeurons):
     cond_gsyn = populations[0].get_gsyn(compatible_output=True)
     cond_spikes = populations[0].getSpikes(compatible_output=True)
 
-
     curr_v = populations[2].get_v(compatible_output=True)
     curr_gsyn = populations[2].get_gsyn(compatible_output=True)
     curr_spikes = populations[2].getSpikes(compatible_output=True)
 
-    return (cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn, curr_spikes)
-
     p.end()
 
-def plot(nNeurons, cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn, curr_spikes):
+    return (cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn, curr_spikes)
+
+
+def plot(nNeurons, cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn,
+         curr_spikes):
     # plot curr spikes
     if len(curr_spikes) != 0:
         print "curr spikes are {}".format(curr_spikes)
         pylab.figure()
-        pylab.plot([i[1] for i in curr_spikes], [i[0] for i in curr_spikes], ".")
+        pylab.plot([i[1] for i in curr_spikes],
+                   [i[0] for i in curr_spikes], ".")
         pylab.xlabel('Time/ms')
         pylab.ylabel('spikes')
         pylab.title('curr spikes')
@@ -111,7 +111,8 @@ def plot(nNeurons, cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn, curr_spike
     if len(cond_spikes) != 0:
         print "cond spikes are {}".format(cond_spikes)
         pylab.figure()
-        pylab.plot([i[1] for i in cond_spikes], [i[0] for i in cond_spikes], ".")
+        pylab.plot([i[1] for i in cond_spikes],
+                   [i[0] for i in cond_spikes], ".")
         pylab.xlabel('Time/ms')
         pylab.ylabel('spikes')
         pylab.title('cond spikes')
@@ -184,6 +185,7 @@ class CondVsCurrent(unittest.TestCase):
         (cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn, curr_spikes) = \
             results
         # spike lengths are 1 and zero whcih looks wrong so not asserted!
+
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population

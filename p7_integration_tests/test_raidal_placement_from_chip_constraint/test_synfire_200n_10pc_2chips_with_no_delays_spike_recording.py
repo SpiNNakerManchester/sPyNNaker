@@ -38,4 +38,3 @@ if __name__ == '__main__':
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     # v and gysn are None
-

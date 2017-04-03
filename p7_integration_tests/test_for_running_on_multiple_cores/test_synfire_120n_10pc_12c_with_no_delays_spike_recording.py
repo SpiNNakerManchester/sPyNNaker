@@ -1,7 +1,7 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
 import unittest
 
 import spynnaker.plot_utils as plot_utils

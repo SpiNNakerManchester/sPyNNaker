@@ -3,8 +3,9 @@
 
 import spynnaker.pyNN as p
 
-from pylab import *
+import pylab as pylab
 import unittest
+
 
 def do_run():
     p.setup(timestep=1.0, min_delay=1.0, max_delay=1.0)
@@ -23,8 +24,8 @@ def do_run():
                            {'spike_times': [120., 140., 160.]})
     # setup excitatory and inhibitory connections
     listcon = p.FromListConnector([(0, 0, 0.01, 1.0)])
-    exc_pro = p.Projection(exc_pop, if_pop, listcon, target='excitatory')
-    inh_pro = p.Projection(inh_pop, if_pop, listcon, target='inhibitory')
+    p.Projection(exc_pop, if_pop, listcon, target='excitatory')
+    p.Projection(inh_pop, if_pop, listcon, target='inhibitory')
     # setup recorder
     if_pop.record_v()
     p.run(200.)
@@ -39,8 +40,9 @@ class TestSynapesExcitVsInhib(unittest.TestCase):
     def test_run(self):
         do_run()
 
+
 if __name__ == '__main__':
     V = do_run()
-    plot(V[:, 1], V[:, 2], '.', label=p.__name__)
-    legend()
-    show()
+    pylab.plot(V[:, 1], V[:, 2], '.', label=p.__name__)
+    pylab.legend()
+    pylab.show()

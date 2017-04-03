@@ -13,10 +13,14 @@ CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
                    'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -50.0}
 
 
-def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]], spike_times_list=None, weight_to_spike=2.0, delay=17,
-           neurons_per_core=10, cellclass=IF_curr_exp, constraint=None, cell_params_lif=CELL_PARAMS_LIF,
-           runtimes=[1000], reset=False, extract_between_runs=True, new_pop=False,
-           record=True, spike_path=None, record_v=True, v_path=None, record_gsyn=True, gsyn_path=None, get_weights=False, end_before_print=False):
+def do_run(nNeurons, timestep=1, max_delay=144.0, spike_times=[[0]],
+           spike_times_list=None, weight_to_spike=2.0, delay=17,
+           neurons_per_core=10, cellclass=IF_curr_exp, constraint=None,
+           cell_params_lif=CELL_PARAMS_LIF, runtimes=[1000], reset=False,
+           extract_between_runs=True, new_pop=False,
+           record=True, spike_path=None, record_v=True, v_path=None,
+           record_gsyn=True, gsyn_path=None,
+           get_weights=False, end_before_print=False):
     """
 
     :param nNeurons: Number of Neurons in chain

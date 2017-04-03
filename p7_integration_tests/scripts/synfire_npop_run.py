@@ -1,10 +1,11 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
 import numpy
 
 import spynnaker.pyNN as p
+
 
 def do_run(nNeurons, n_pops, neurons_per_core):
     """
@@ -19,17 +20,9 @@ def do_run(nNeurons, n_pops, neurons_per_core):
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
     p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons)
 
-
-    cell_params_lif = {'cm'        : 0.25, # nF
-                         'i_offset'  : 0.0,
-                         'tau_m'     : 20.0,
-                         'tau_refrac': 2.0,
-                         'tau_syn_E' : 5.0,
-                         'tau_syn_I' : 5.0,
-                         'v_reset'   : -70.0,
-                         'v_rest'    : -65.0,
-                         'v_thresh'  : -50.0
-                         }
+    cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
+                       'tau_refrac': 2.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
+                       'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -50.0}
 
     populations = list()
     projections = list()
@@ -42,7 +35,6 @@ def do_run(nNeurons, n_pops, neurons_per_core):
         singleConnection = (i, i + 1, weight_to_spike, delay)
         connections.append(singleConnection)
 
-
     pop_jump_connection = [(nNeurons - 1, 0, weight_to_spike, 1)]
 
     injectionConnection = [(0, 0, weight_to_spike, 1)]
@@ -50,7 +42,8 @@ def do_run(nNeurons, n_pops, neurons_per_core):
     spikeArray = {'spike_times': [[0]]}
 
     for i in range(0, n_pops):
-        populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+        populations.append(p.Population(nNeurons, p.IF_curr_exp,
+                                        cell_params_lif,
                                         label='pop_{}'.format(i)))
 
     populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
@@ -59,8 +52,10 @@ def do_run(nNeurons, n_pops, neurons_per_core):
     for i in range(0, n_pops):
         projections.append(p.Projection(populations[i], populations[i],
                                         p.FromListConnector(connections)))
-        projections.append(p.Projection(populations[i], populations[((i + 1) % n_pops)],
-                                        p.FromListConnector(pop_jump_connection)))
+        connector = p.FromListConnector(pop_jump_connection)
+        projections.append(p.Projection(populations[i],
+                                        populations[((i + 1) % n_pops)],
+                                        connector))
 
     projections.append(p.Projection(populations[n_pops], populations[0],
                                     p.FromListConnector(injectionConnection)))

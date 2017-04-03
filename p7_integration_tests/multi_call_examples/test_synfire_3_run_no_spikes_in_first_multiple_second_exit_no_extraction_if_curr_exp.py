@@ -11,10 +11,11 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 
 SPIKE_TIMES = [[1050, 1060, 1500, 1700, 1900, 2200]]
 
+
 class Synfire3RunNoSpikesInFirstExitNoExtractionIfCurrExp(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons, spike_times=SPIKE_TIMES ,
+        results = synfire_run.do_run(nNeurons, spike_times=SPIKE_TIMES,
                                      runtimes=[1000, 1000, 1000], reset=False,
                                      extract_between_runs=False)
         (v, gsyn, spikes) = results
@@ -32,5 +33,3 @@ if __name__ == '__main__':
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v, title="v")
     plot_utils.heat_plot(gsyn, title="gysn")
-
-

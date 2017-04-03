@@ -13,19 +13,9 @@ def do_run():
 
     # Population parameters
     model = p.IF_curr_exp
-    cell_params = {'cm': 0.25,  # nF
-                   'i_offset': 0.0,
-                   'tau_m': 10.0,
-                   'tau_refrac': 2.0,
-                   'tau_syn_E' : 2.5,
-                   'tau_syn_I' : 2.5,
-                   'v_reset'   : -70.0,
-                   'v_rest'    : -65.0,
-                   'v_thresh'  : -55.4}
-    # Other simulation parameters
-    e_rate = 200
-    in_rate = 350
-
+    cell_params = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 10.0,
+                   'tau_refrac': 2.0, 'tau_syn_E': 2.5, 'tau_syn_I': 2.5,
+                   'v_reset': -70.0, 'v_rest': -65.0, 'v_thresh': -55.4}
 
     delta_t = 10
     time_between_pairs = 150
@@ -34,11 +24,9 @@ def do_run():
     num_post_pairs = 10
     pop_size = 1
 
-
     pairing_start_time = (num_pre_pairs * time_between_pairs) + delta_t
     pairing_end_time = pairing_start_time + (num_pairs * time_between_pairs)
     sim_time = pairing_end_time + (num_post_pairs * time_between_pairs)
-
 
     # +-------------------------------------------------------------------+
     # | Creation of neuron populations                                    |
@@ -47,15 +35,20 @@ def do_run():
     pre_pop = p.Population(pop_size, model, cell_params)
     post_pop = p.Population(pop_size, model, cell_params)
 
-
     # Stimulating populations
-    pre_stim = p.Population(pop_size, p.SpikeSourceArray, {'spike_times': [[i for i in range(0, sim_time, time_between_pairs)],]})
-    post_stim = p.Population(pop_size, p.SpikeSourceArray, {'spike_times': [[i for i in range(pairing_start_time, pairing_end_time, time_between_pairs)],]})
+    spike_times = [[i for i in range(0, sim_time, time_between_pairs)], ]
+    pre_stim = p.Population(pop_size, p.SpikeSourceArray,
+                            {'spike_times': spike_times})
+    spike_times = [[i for i in range(pairing_start_time, pairing_end_time,
+                                     time_between_pairs)], ]
+    post_stim = p.Population(pop_size, p.SpikeSourceArray,
+                             {'spike_times': spike_times})
 
     # +-------------------------------------------------------------------+
     # | Creation of connections                                           |
     # +-------------------------------------------------------------------+
-    # Connection type between noise poisson generator and excitatory populations
+    # Connection type between noise poisson generator and
+    # excitatory populations
     ee_connector = p.OneToOneConnector(weights=2)
 
     p.Projection(pre_stim, pre_pop, ee_connector, target='excitatory')
@@ -63,9 +56,9 @@ def do_run():
 
     # Plastic Connections between pre_pop and post_pop
     stdp_model = p.STDPMechanism(
-      timing_dependence = p.SpikePairRule(tau_plus = 20.0, tau_minus = 50.0),
-      weight_dependence = p.AdditiveWeightDependence(w_min = 0, w_max = 1, A_plus=0.02, A_minus = 0.02)
-    )
+      timing_dependence=p.SpikePairRule(tau_plus=20.0, tau_minus=50.0),
+      weight_dependence=p.AdditiveWeightDependence(w_min=0, w_max=1,
+                                                   A_plus=0.02, A_minus=0.02))
 
     p.Projection(pre_pop, post_pop, p.OneToOneConnector(),
                  synapse_dynamics=p.SynapseDynamics(slow=stdp_model))
@@ -108,6 +101,3 @@ if __name__ == '__main__':
     print len(post_spikes)
     plot_utils.plot_spikes(pre_spikes, title="pre-synaptic")
     plot_utils.plot_spikes(post_spikes, title="post-synaptic")
-
-
-

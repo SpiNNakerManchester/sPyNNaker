@@ -98,7 +98,6 @@ def do_run(Neurons, sim_time, record):
     N_I = int(round(Neurons * 0.2))
 
     C_E = N_E * 0.1
-    C_I = N_I * 0.1
 
     # Excitatory and inhibitory weights
     J_E = 0.1
@@ -128,8 +127,8 @@ def do_run(Neurons, sim_time, record):
 
     rng = NumpyRNG(seed=1)
 
-    v_distr_exc = RandomDistribution('uniform', [-10.0, 0.0], rng)
-    v_distr_inh = RandomDistribution('uniform', [-10.0, 0.0], rng)
+    RandomDistribution('uniform', [-10.0, 0.0], rng)
+    RandomDistribution('uniform', [-10.0, 0.0], rng)
 
     exc_cell_params = {
         'cm': 1.0,  # pf
@@ -183,13 +182,13 @@ def do_run(Neurons, sim_time, record):
     I_pop.initialize('v', uniformDistr)
 
     # Projections
-    E_E = pynn.Projection(E_pop, E_pop, E_conn, target="excitatory")
-    I_E = pynn.Projection(I_pop, E_pop, I_conn, target="inhibitory")
-    E_I = pynn.Projection(E_pop, I_pop, E_conn, target="excitatory")
-    I_I = pynn.Projection(I_pop, I_pop, I_conn, target="inhibitory")
+    pynn.Projection(E_pop, E_pop, E_conn, target="excitatory")
+    pynn.Projection(I_pop, E_pop, I_conn, target="inhibitory")
+    pynn.Projection(E_pop, I_pop, E_conn, target="excitatory")
+    pynn.Projection(I_pop, I_pop, I_conn, target="inhibitory")
 
-    Ext_E = pynn.Projection(Poiss_ext_E, E_pop, Ext_conn, target="excitatory")
-    Ext_I = pynn.Projection(Poiss_ext_I, I_pop, Ext_conn, target="excitatory")
+    pynn.Projection(Poiss_ext_E, E_pop, Ext_conn, target="excitatory")
+    pynn.Projection(Poiss_ext_I, I_pop, Ext_conn, target="excitatory")
 
     # Record stuff
     if record:
@@ -200,10 +199,6 @@ def do_run(Neurons, sim_time, record):
 
     esp = None
     s = None
-    isp = None
-    pe = None
-    pi = None
-    v_esp = None
 
     if record:
         esp = E_pop.getSpikes(compatible_output=True)

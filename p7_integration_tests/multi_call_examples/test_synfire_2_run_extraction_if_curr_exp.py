@@ -18,7 +18,8 @@ class Synfire2RunExtractionIfCurrExp(unittest.TestCase):
         self.assertEquals(53, len(spikes1))
         self.assertEquals(156, len(spikes2))
         spike_checker.synfire_spike_checker(spikes1, nNeurons)
-        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons, 2)
+        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons,
+                                                           2)
 
 
 if __name__ == '__main__':

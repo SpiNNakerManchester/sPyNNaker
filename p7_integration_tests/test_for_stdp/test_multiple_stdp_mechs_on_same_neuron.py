@@ -1,8 +1,7 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
-import pylab
 import unittest
 
 import spynnaker.pyNN as p
@@ -16,18 +15,12 @@ class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
 
     def run_multiple_stdp_mechs_on_same_neuron(self):
         p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-        nNeurons = 200 # number of neurons in each population
+        nNeurons = 200  # number of neurons in each population
 
-        cell_params_lif = {'cm'        : 0.25, # nF
-                             'i_offset'  : 0.0,
-                             'tau_m'     : 20.0,
-                             'tau_refrac': 2.0,
-                             'tau_syn_E' : 5.0,
-                             'tau_syn_I' : 5.0,
-                             'v_reset'   : -70.0,
-                             'v_rest'    : -65.0,
-                             'v_thresh'  : -50.0
-                             }
+        cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
+                           'tau_refrac': 2.0, 'tau_syn_E': 5.0,
+                           'tau_syn_I': 5.0, 'v_reset': -70.0, 'v_rest': -65.0,
+                           'v_thresh': -50.0}
 
         populations = list()
         projections = list()
@@ -37,7 +30,8 @@ class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
 
         connections = list()
         for i in range(0, nNeurons):
-            singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
+            singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike,
+                                delay)
             connections.append(singleConnection)
 
         # Plastic Connection between pre_pop and post_pop
@@ -67,7 +61,6 @@ class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
             mad=True
         )
 
-
         injectionConnection = [(0, 0, weight_to_spike, 1)]
         spikeArray1 = {'spike_times': [[0]]}
         spikeArray2 = {'spike_times': [[25]]}
@@ -78,7 +71,8 @@ class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
         spikeArray7 = {'spike_times': [[150]]}
         spikeArray8 = {'spike_times': [[175]]}
 
-        populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
+        populations.append(p.Population(nNeurons, p.IF_curr_exp,
+                                        cell_params_lif,
                                         label='pop_1'))
         populations.append(p.Population(1, p.SpikeSourceArray, spikeArray1,
                                         label='inputSpikes_1'))
@@ -99,26 +93,30 @@ class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
 
         projections.append(p.Projection(populations[0], populations[0],
                                         p.FromListConnector(connections)))
-        projections.append(p.Projection(populations[1], populations[0],
-                                        p.FromListConnector(injectionConnection)))
-        projections.append(p.Projection(populations[2], populations[0],
-                                        p.FromListConnector(injectionConnection),
-                                        synapse_dynamics=
-                                        p.SynapseDynamics(slow=stdp_model1)))
+        pop = p.Projection(populations[1], populations[0],
+                           p.FromListConnector(injectionConnection))
+        projections.append(pop)
+        synapse_dynamics = p.SynapseDynamics(slow=stdp_model1)
+        pop = p.Projection(populations[2], populations[0],
+                           p.FromListConnector(injectionConnection),
+                           synapse_dynamics=synapse_dynamics)
+        projections.append(pop)
         # This is expected to raise a SynapticConfigurationException
-        projections.append(p.Projection(populations[3], populations[0],
-                                        p.FromListConnector(injectionConnection),
-                                        synapse_dynamics=
-                                        p.SynapseDynamics(slow=stdp_model2)))
-        projections.append(p.Projection(populations[4], populations[0],
-                                        p.FromListConnector(injectionConnection),
-                                        synapse_dynamics=
-                                        p.SynapseDynamics(slow=stdp_model3)))
+        synapse_dynamics = p.SynapseDynamics(slow=stdp_model2)
+        pop = p.Projection(populations[3], populations[0],
+                           p.FromListConnector(injectionConnection),
+                           synapse_dynamics=synapse_dynamics)
+        projections.append(pop)
+        synapse_dynamics = p.SynapseDynamics(slow=stdp_model3)
+        pop = p.Projection(populations[4], populations[0],
+                           p.FromListConnector(injectionConnection),
+                           synapse_dynamics=synapse_dynamics)
+        projections.append(pop)
 
     def test_test_multiple_stdp_mechs_on_same_neuron(self):
         with self.assertRaises(SynapticConfigurationException):
             self.run_multiple_stdp_mechs_on_same_neuron()
 
+
 if __name__ == '__main__':
     unittest.main()
-

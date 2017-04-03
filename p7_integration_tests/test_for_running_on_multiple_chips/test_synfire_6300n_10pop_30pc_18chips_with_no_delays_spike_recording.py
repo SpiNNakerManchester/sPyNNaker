@@ -1,7 +1,7 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
 import unittest
 
 import spynnaker.plot_utils as plot_utils
@@ -10,7 +10,7 @@ import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
 
-class Synfire6300n10pop30pc18chipsWithNoDelaysSpikeRrecording(unittest.TestCase):
+class Synfire6300n10pop30pc18chipsNoDelaysSpikeRrecording(unittest.TestCase):
 
     def test_run(self):
         nNeurons = 630  # number of neurons in each population
@@ -27,4 +27,3 @@ if __name__ == '__main__':
     spikes = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
-

@@ -8,6 +8,7 @@ import spynnaker.spike_checker as spike_checker
 
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
+
 class Synfire2RunExtractionIfCurrExpHigher(unittest.TestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
@@ -17,8 +18,8 @@ class Synfire2RunExtractionIfCurrExpHigher(unittest.TestCase):
         self.assertEquals(53, len(spikes1))
         self.assertEquals(261, len(spikes2))
         spike_checker.synfire_spike_checker(spikes1, nNeurons)
-        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons, 2)
-
+        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons,
+                                                           2)
 
 
 if __name__ == '__main__':

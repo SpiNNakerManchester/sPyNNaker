@@ -1,7 +1,7 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
 
 import unittest
 
@@ -24,10 +24,9 @@ class Synfire1600n10pc10chipsWithNoDelaysSpikeRecording(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 1600  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtime=5000, record_v=False,
+    results = synfire_run.do_run(nNeurons, runtimes=[5000], record_v=False,
                                  record_gsyn=False)
     (v, gsyn, spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     # v and gysn are None
-
