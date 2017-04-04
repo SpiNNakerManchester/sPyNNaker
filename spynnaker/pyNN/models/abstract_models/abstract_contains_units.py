@@ -1,9 +1,6 @@
 from spynnaker.pyNN import exceptions
-from six import add_metaclass
-from abc import ABCMeta
 
 
-@add_metaclass(ABCMeta)
 class AbstractContainsUnits(object):
     def __init__(self, units):
         self._units = units

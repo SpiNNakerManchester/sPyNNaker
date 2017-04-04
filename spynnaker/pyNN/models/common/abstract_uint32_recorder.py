@@ -1,6 +1,3 @@
-from six import add_metaclass
-from abc import ABCMeta
-
 import numpy
 import logging
 
@@ -9,7 +6,6 @@ from spinn_machine.utilities.progress_bar import ProgressBar
 logger = logging.getLogger(__name__)
 
 
-@add_metaclass(ABCMeta)
 class AbstractUInt32Recorder(object):
     N_BYTES_PER_NEURON = 4
     N_CPU_CYCLES_PER_NEURON = 8
