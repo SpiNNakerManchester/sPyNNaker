@@ -3,6 +3,8 @@
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utility_models.command_sender import CommandSender
+from pacman.model.graphs.application.application_edge import ApplicationEdge
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
@@ -91,7 +93,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
         SpinnakerMainInterface.__init__(
-            self, config, config_default_name=config_default_name,
+            self, config,
             graph_label=graph_label,
             executable_finder=SpiNNakerCommon._EXECUTABLE_FINDER,
             database_socket_addresses=database_socket_addresses,
@@ -106,6 +108,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         # timing parameters
         self._min_supported_delay = None
         self._max_supported_delay = None
+        self._config_default_name = config_default_name
 
         # set up machine targeted data
         self._set_up_timings(
