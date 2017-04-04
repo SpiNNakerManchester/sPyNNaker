@@ -1,11 +1,13 @@
 import numpy
 
+
 def synfire_spike_checker(spikes, nNeurons):
-    sorted = spikes[spikes[:,1].argsort()]
+    sorted = spikes[spikes[:, 1].argsort()]
     num = 0
     for row in sorted:
         if num != round(row[0]):
-            numpy.savetxt("spikes.csv", sorted, fmt=['%d', '%d'], delimiter=',')
+            numpy.savetxt("spikes.csv", sorted, fmt=['%d', '%d'],
+                          delimiter=',')
             raise Exception("Unexpected spike at time " + str(row[1]))
         num += 1
         if num >= nNeurons:
