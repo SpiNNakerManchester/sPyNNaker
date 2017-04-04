@@ -3,11 +3,11 @@ from spinn_utilities.progress_bar import ProgressBar
 # pacman imports
 from pacman.model.graphs.application.impl.application_edge \
     import ApplicationEdge
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 from pacman.model.graphs.common.graph_mapper import GraphMapper
+from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
 
 # spynnaker imports
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
@@ -85,6 +85,6 @@ class GraphEdgeFilter(object):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
             return False
-
-        raise exceptions.FilterableException(
-            "cannot figure out if edge {} is prunable or not".format(edge))
+        else:
+            raise FilterableException(
+                "cannot figure out if edge {} is prunable or not".format(edge))

@@ -1,9 +1,9 @@
-# general imports
 from six import add_metaclass
-from abc import ABCMeta
+
+from spinn_utilities.abstract_base import AbstractBase
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractVertexWithEdgeToDependentVertices(object):
     """ A vertex with a dependent vertices, which should be connected to this\
         vertex by an edge directly to each of them
@@ -14,9 +14,6 @@ class AbstractVertexWithEdgeToDependentVertices(object):
 
         :param dependent_vertices: The vertex which this vertex depends upon
         :type dependent_vertices: iterable of vertices
-        :return: None
-        :rtype: None
-        :raise None: this method does not raise any known exception
         """
         self._dependent_vertices = dependent_vertices
         self._edge_partition_identifier = edge_partition_identifier
@@ -24,7 +21,6 @@ class AbstractVertexWithEdgeToDependentVertices(object):
     @property
     def dependent_vertices(self):
         """ Return the vertices which this vertex depends upon
-        :return:
         """
         return self._dependent_vertices
 

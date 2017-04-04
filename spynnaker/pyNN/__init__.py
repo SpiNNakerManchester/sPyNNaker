@@ -144,12 +144,9 @@ __all__ = [
 
 
 def register_binary_search_path(search_path):
-    """
-    :param search_path:
-    Registers an additional binary search path for
-        for executables
+    """ Registers an additional binary search path for executables
 
-    absolute search path for binaries
+    :param search_path: absolute search path for binaries
     """
     __exec_finder.add_path(search_path)
 
@@ -227,14 +224,16 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
         given simulator but not by others.
 
     :param machine: A SpiNNaker machine used to run the simulation.
-    :param timestep:
+    :param timestep: The timestep in milleseconds.\
+       Value will be rounded up to whole microseconds.\
+       Set to None to use the value from the config file
+    :rtype: float or None
     :param min_delay:
     :param max_delay:
     :param machine:
     :param database_socket_addresses:
     :param n_chips_required: The number of chips required for the simulation
     :param extra_params:
-    :return:
     """
     global _spinnaker
     global _binary_search_paths
@@ -248,9 +247,9 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
             __version__, __version_name__, __version_month__, __version_year__,
             parent_dir))
 
-    if len(extra_params) > 1:
-        logger.warn("Extra params has been applied to the setup command which "
-                    "we do not consider")
+    if len(extra_params) > 0:
+        logger.warn("Extra params {} have been applied to the setup "
+                    "command which we do not consider".format(extra_params))
     _spinnaker = __Spinnaker(
         host_name=machine, timestep=timestep, min_delay=min_delay,
         max_delay=max_delay,
@@ -263,8 +262,7 @@ def setup(timestep=0.1, min_delay=None, max_delay=None, machine=None,
 def set_number_of_neurons_per_core(neuron_type, max_permitted):
     """ Sets a ceiling on the number of neurons of a given type that can be\
         placed on a single core.
-    :param neuron_type:
-    :param max_permitted:
+
     """
     if not __inspect.isclass(neuron_type):
         if neuron_type not in globals():
@@ -279,10 +277,6 @@ def set_number_of_neurons_per_core(neuron_type, max_permitted):
 def register_database_notification_request(hostname, notify_port, ack_port):
     """ Adds a socket system which is registered with the notification protocol
 
-    :param hostname:
-    :param notify_port:
-    :param ack_report:
-    :return:
     """
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
@@ -294,15 +288,6 @@ def register_database_notification_request(hostname, notify_port, ack_port):
 
 # noinspection PyPep8Naming
 def Population(size, cellclass, cellparams, structure=None, label=None):
-    """
-
-    :param size:
-    :param cellclass:
-    :param cellparams:
-    :param structure:
-    :param label:
-    :return:
-    """
     global _spinnaker
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
@@ -316,18 +301,6 @@ def Population(size, cellclass, cellparams, structure=None, label=None):
 def Projection(presynaptic_population, postsynaptic_population,
                connector, source=None, target='excitatory',
                synapse_dynamics=None, label=None, rng=None):
-    """
-
-    :param presynaptic_population:
-    :param postsynaptic_population:
-    :param connector:
-    :param source:
-    :param target:
-    :param synapse_dynamics:
-    :param label:
-    :param rng:
-    :return:
-    """
     global _spinnaker
     if _spinnaker is None:
         raise front_end_common_exceptions.ConfigurationException(
@@ -340,8 +313,7 @@ def Projection(presynaptic_population, postsynaptic_population,
 
 def NativeRNG(seed_value):
     """ Fixes the random number generator's seed
-    :param seed_value:
-    :return:
+
     """
     __numpy.random.seed(seed_value)
 
@@ -349,7 +321,6 @@ def NativeRNG(seed_value):
 def get_current_time():
     """
     returns the machine time step defined in setup
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -390,7 +361,6 @@ def connect(source, target, weight=0.0, delay=None, synapse_type="excitatory",
 
 def get_time_step():
     """ The timestep requested
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -402,7 +372,6 @@ def get_time_step():
 
 def get_min_delay():
     """ The minimum allowed synaptic delay.
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:
@@ -414,7 +383,6 @@ def get_min_delay():
 
 def get_max_delay():
     """ The maximum allowed synaptic delay.
-    :return:
     """
     global _spinnaker
     if _spinnaker is None:

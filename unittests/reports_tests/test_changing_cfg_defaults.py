@@ -38,8 +38,7 @@ class TestCFGs(unittest.TestCase):
         self.assertIn('reports', os.listdir(current_path))
 
     def test_set_up_main_objects(self):
-        spinn = Spinnaker(timestep=1, min_delay=1, max_delay=10)
-        self.assertEqual(spinn._app_id, conf.config.getint("Machine", "appID"))
+        Spinnaker(timestep=1, min_delay=1, max_delay=10)
 
 
 if __name__ == '__main__':

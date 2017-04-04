@@ -76,22 +76,25 @@ class SpikeRecorder(object):
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
-            split_record = numpy.array_split(raw_data, [1, 1], 1)
-            record_time = split_record[0] * float(ms_per_tick)
-            spikes = split_record[2].byteswap().view("uint8")
-            bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                (-1, 32))).reshape((-1, n_bytes * 8))
-            time_indices, indices = numpy.where(bits == 1)
-            times = record_time[time_indices].reshape((-1))
-            indices = indices + lo_atom
-            spike_ids.append(indices)
-            spike_times.append(times)
+            if len(raw_data) > 0:
+                split_record = numpy.array_split(raw_data, [1, 1], 1)
+                record_time = split_record[0] * float(ms_per_tick)
+                spikes = split_record[2].byteswap().view("uint8")
+                bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
+                    (-1, 32))).reshape((-1, n_bytes * 8))
+                time_indices, indices = numpy.where(bits == 1)
+                times = record_time[time_indices].reshape((-1))
+                indices = indices + lo_atom
+                spike_ids.append(indices)
+                spike_times.append(times)
 
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
 
+        if len(spike_ids) == 0:
+            return numpy.zeros((0, 2), dtype="float")
         spike_ids = numpy.hstack(spike_ids)
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]

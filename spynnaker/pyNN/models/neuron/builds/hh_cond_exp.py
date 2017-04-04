@@ -1,4 +1,4 @@
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
@@ -16,7 +16,7 @@ class HHCondExp(AbstractPopulationVertex):
             i_offset=0.0, g_leak=0.01, e_rev_E=0.0, gbar_Na=20.0,
             e_rev_leak=-65.0, e_rev_I=-80, e_rev_K=-90.0, v_offset=-63,
             v_init=None):
-        raise exceptions.SpynnakerException(
+        raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 
     @staticmethod

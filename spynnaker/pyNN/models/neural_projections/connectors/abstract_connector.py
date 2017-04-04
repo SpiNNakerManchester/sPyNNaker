@@ -1,11 +1,10 @@
-from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
 
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -15,7 +14,8 @@ import re
 # global objects
 logger = logging.getLogger(__name__)
 
-@add_metaclass(ABCMeta)
+
+@add_metaclass(AbstractBase)
 class AbstractConnector(object):
     """ Abstract class which PyNN Connectors extend
     """
@@ -23,6 +23,8 @@ class AbstractConnector(object):
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
+
+    __slots__ = ()
 
     def __init__(self, safe=True, space=None, verbose=False):
         self._safe = safe
@@ -287,15 +289,14 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if len(weights) ==0:
+            if len(weights) == 0:
                 logger.warning("No connection in " + str(self))
-            else:
-                if numpy.amin(weights) < 0 < numpy.amax(weights):
-                    raise Exception(
-                        "Weights must be either all positive or all negative"
-                        " in projection {}->{}".format(
-                            self._pre_population.label,
-                            self._post_population.label))
+            elif numpy.amin(weights) < 0 < numpy.amax(weights):
+                raise Exception(
+                    "Weights must be either all positive or all negative"
+                    " in projection {}->{}".format(
+                        self._pre_population.label,
+                        self._post_population.label))
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):

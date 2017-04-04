@@ -2,7 +2,7 @@ import logging
 import os
 
 from spinn_utilities.progress_bar import ProgressBar
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
 
@@ -17,7 +17,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         try:
             import graphviz  # @UnresolvedImport
         except:
-            raise exceptions.SpynnakerException(
+            raise SpynnakerException(
                 "graphviz is required to use this report.  Please install"
                 " graphviz if you want to use this report.")
         return graphviz.Digraph(comment=label)
@@ -27,9 +27,9 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
 
         :param report_folder: the report folder to put figure into
         :param application_graph: the app graph
-        :param connection_holder: the set of connection holders
-        :return: None
+        :rtype: None
         """
+
         # create holders for data
         vertex_holders = dict()
         dot_diagram = self._get_diagram(
