@@ -19,7 +19,7 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_v(self, state=True):
+    def set_recording_v(self, new_state=True):
         """ Sets v to being recorded
         """
 
