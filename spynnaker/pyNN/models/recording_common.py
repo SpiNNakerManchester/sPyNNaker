@@ -14,7 +14,6 @@ from spynnaker.pyNN.utilities import globals_variables
 
 from collections import defaultdict
 import itertools
-from bitarray import bitarray
 import numpy
 import logging
 
@@ -42,7 +41,7 @@ class RecordingCommon(object):
             'gsyn_inh': None,
             'v': None}
 
-        # Create default dictionary of population-size bitarrays
+        # Create default dictionary of population-size filters
         self._indices_to_record = self._create_full_filter_list(0)
 
     def _record(self, variable, new_ids, sampling_interval, to_file):
@@ -336,10 +335,10 @@ class RecordingCommon(object):
             globals_variables.get_simulator().machine_time_step)
 
     def _create_full_filter_list(self, filter_value):
-        # Create default dictionary of population-size bitarrays
+        # Create default dictionary of population-size boolean arrays
         return defaultdict(
-            lambda: bitarray(itertools.repeat(
-                filter_value, self._population.size), endian="little"))
+            lambda: numpy.repeat(filter_value, self._population.size).astype(
+                "bool"))
 
     def _reset(self):
         self._population._vertex.set_recording_gsyn_excitatory(False)

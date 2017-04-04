@@ -11,7 +11,7 @@ if os.environ.get('READTHEDOCS', None) == 'True':
 else:
     install_requires = [
         'SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-        'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six', 'bitarray']
+        'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
