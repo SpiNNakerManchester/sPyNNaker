@@ -1,10 +1,9 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge \
-    import ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.common.graph_mapper import GraphMapper
-from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
+from pacman.model.graphs.machine import MachineGraph
 
 # spynnaker imports
 from spynnaker.pyNN.exceptions import FilterableException
