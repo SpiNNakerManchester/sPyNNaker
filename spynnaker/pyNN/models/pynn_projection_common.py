@@ -1,24 +1,22 @@
-from pacman.model.constraints.partitioner_constraints. \
-    partitioner_same_size_as_vertex_constraint import \
-    PartitionerSameSizeAsVertexConstraint
-from spinn_front_end_common.abstract_models. \
-    abstract_changable_after_run import AbstractChangableAfterRun
-from spinn_front_end_common.utilities import exceptions as common_exceptions
-from spinn_machine.utilities.progress_bar import ProgressBar
+from pacman.model.constraints.partitioner_constraints \
+    import PartitionerSameSizeAsVertexConstraint
 
-from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
-    import DelayAfferentApplicationEdge
+from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
+    import DelayedApplicationEdge
+from spynnaker.pyNN.models.neural_projections.synapse_information \
+    import SynapseInformation
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
-
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neural_projections.projection_application_edge \
     import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neural_projections. \
-    delayed_application_edge import DelayedApplicationEdge
-from spynnaker.pyNN.models.neural_projections.synapse_information import \
-    SynapseInformation
+from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
+    import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spynnaker.pyNN.utilities import constants
+
+from spinn_front_end_common.utilities import exceptions as common_exceptions
+
+from spinn_machine.utilities.progress_bar import ProgressBar
 
 import logging
 import math
@@ -32,19 +30,8 @@ class PyNNProjectionCommon(object):
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
-
-        # set the plasticity dynamics for the post pop (allows plastic stuff
-        #  when needed)
-        post_synaptic_population._get_vertex.synapse_dynamics = \
-            synapse_dynamics_stdp
-
-        # spinnaker control
         self._spinnaker_control = spinnaker_control
-
-        # graph data
         self._projection_edge = None
-
-        # control flags
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
 
@@ -55,6 +42,11 @@ class PyNNProjectionCommon(object):
             raise common_exceptions.ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
+
+        # set the plasticity dynamics for the post pop (allows plastic stuff
+        #  when needed)
+        post_synaptic_population._get_vertex.synapse_dynamics = \
+            synapse_dynamics_stdp
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
@@ -75,10 +67,10 @@ class PyNNProjectionCommon(object):
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
-                .get_maximum_delay_supported_in_ms(machine_time_step)
+            .get_maximum_delay_supported_in_ms(machine_time_step)
 
         if max_delay > (post_vertex_max_supported_delay_ms +
-                            delay_extension_max_supported_delay):
+                        delay_extension_max_supported_delay):
             raise common_exceptions.ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
@@ -143,65 +135,11 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
-        if ((isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping) or
-            (isinstance(self._synapse_information.synapse_dynamics,
-                        AbstractChangableAfterRun) and
-                self._synapse_information.synapse_dynamics.requires_mapping)):
-            return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractChangableAfterRun):
-            self._projection_edge.mark_no_changes()
-
-    def _get_synaptic_data(self, as_list, data_to_get):
-
-        post_vertex = self._projection_edge.post_vertex
-        pre_vertex = self._projection_edge.pre_vertex
-
-        # If in virtual board mode, the connection data should be set
-        if self._virtual_connection_list is not None:
-            post_vertex = self._projection_edge.post_vertex
-            pre_vertex = self._projection_edge.pre_vertex
-            return ConnectionHolder(
-                data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
-                self._virtual_connection_list)
-
-        connection_holder = ConnectionHolder(
-            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
-
-        # If we haven't run, add the holder to get connections, and return it
-        if not self._spinnaker_control.has_ran:
-            post_vertex.add_pre_run_connection_holder(
-                connection_holder, self._projection_edge,
-                self._synapse_information)
-            return connection_holder
-
-        # Otherwise, get the connections now
-        graph_mapper = self._spinnaker_control.graph_mapper
-        placements = self._spinnaker_control.placements
-        transceiver = self._spinnaker_control.transceiver
-        routing_infos = self._spinnaker_control.routing_infos
-        machine_time_step = self._spinnaker_control.machine_time_step
-        edges = graph_mapper.get_machine_edges(
-            self._projection_edge)
-        progress = ProgressBar(
-            len(edges),
-            "Getting {}s for projection between {} and {}".format(
-                data_to_get, pre_vertex.label, post_vertex.label))
-        for edge in edges:
-            placement = placements.get_placement_of_vertex(
-                edge.post_vertex)
-            connections = post_vertex.get_connections_from_machine(
-                transceiver, placement, edge, graph_mapper, routing_infos,
-                self._synapse_information, machine_time_step)
-            if connections is not None:
-                connection_holder.add_connections(connections)
-            progress.update()
-        progress.end()
-        connection_holder.finish()
-        return connection_holder
+        # Does Nothing currently
+        pass
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -271,7 +209,66 @@ class PyNNProjectionCommon(object):
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
 
-    def get(self, parameter, format, gather):
+    def _get_synaptic_data(self, as_list, data_to_get):
+
+        post_vertex = self._projection_edge.post_vertex
+        pre_vertex = self._projection_edge.pre_vertex
+
+        # If in virtual board mode, the connection data should be set
+        if self._virtual_connection_list is not None:
+            post_vertex = self._projection_edge.post_vertex
+            pre_vertex = self._projection_edge.pre_vertex
+            return ConnectionHolder(
+                data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
+                self._virtual_connection_list)
+
+        connection_holder = ConnectionHolder(
+            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
+
+        # If we haven't run, add the holder to get connections, and return it
+        if not self._spinnaker_control.has_ran:
+            post_vertex.add_pre_run_connection_holder(
+                connection_holder, self._projection_edge,
+                self._synapse_information)
+            return connection_holder
+
+        # Otherwise, get the connections now
+        graph_mapper = self._spinnaker_control.graph_mapper
+        placements = self._spinnaker_control.placements
+        transceiver = self._spinnaker_control.transceiver
+        routing_infos = self._spinnaker_control.routing_infos
+        machine_time_step = self._spinnaker_control.machine_time_step
+        edges = graph_mapper.get_machine_edges(
+            self._projection_edge)
+        progress = ProgressBar(
+            len(edges),
+            "Getting {}s for projection between {} and {}".format(
+                data_to_get, pre_vertex.label, post_vertex.label))
+        for edge in edges:
+            placement = placements.get_placement_of_vertex(
+                edge.post_vertex)
+            connections = post_vertex.get_connections_from_machine(
+                transceiver, placement, edge, graph_mapper, routing_infos,
+                self._synapse_information, machine_time_step)
+            if connections is not None:
+                connection_holder.add_connections(connections)
+            progress.update()
+        progress.end()
+        connection_holder.finish()
+        return connection_holder
+
+    def __repr__(self):
+        return "projection {}".format(self._projection_edge.label)
+
+    def size(self, gather=True):
+        """ Return the total number of connections.
+         - only local connections, if gather is False,
+         - all connections, if gather is True (default)
+        """
+        # TODO
+        raise NotImplementedError
+
+    def get(self, parameter, format, gather):  # @ReservedAssignment
         """ supports getting things from a projection
 
         :param parameter: the parameter, "weights, delays, plastic param"
@@ -299,15 +296,3 @@ class PyNNProjectionCommon(object):
             data.fill(self._synapse_information.synapse_dynamics.get_value(
                 parameter))
             return data
-
-    def __repr__(self):
-        return "projection {}".format(self._projection_edge.label)
-
-    def size(self, gather=True):
-        """ Return the total number of connections.
-         - only local connections, if gather is False,
-         - all connections, if gather is True (default)
-        """
-        # TODO
-        raise NotImplementedError
-

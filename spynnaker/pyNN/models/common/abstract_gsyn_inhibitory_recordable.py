@@ -1,9 +1,9 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractGSynInhibitoryRecordable(object):
     """ Indicates that conductance can be recorded from this object
     """

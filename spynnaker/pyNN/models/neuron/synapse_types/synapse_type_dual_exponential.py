@@ -12,6 +12,31 @@ from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
 
+from enum import Enum
+
+
+class _DUAL_EXP_TYPES(Enum):
+
+    E_DECAY = (1, DataType.UINT32)
+    E_INIT = (2, DataType.UINT32)
+    E2_DECAY = (3, DataType.UINT32)
+    E2_INIT = (4, DataType.UINT32)
+    I_DECAY = (5, DataType.UINT32)
+    I_INIT = (6, DataType.UINT32)
+    INITIAL_EXC = (7, DataType.S1615)
+    INITIAL_EXC2 = (8, DataType.S1615)
+    INITIAL_INH = (9, DataType.S1615)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
+
 
 class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
@@ -115,16 +140,25 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             self._tau_syn_I, machine_time_step)
 
         return [
-            NeuronParameter(e_decay, DataType.UINT32),
-            NeuronParameter(e_init, DataType.UINT32),
-            NeuronParameter(e_decay2, DataType.UINT32),
-            NeuronParameter(e_init2, DataType.UINT32),
-            NeuronParameter(i_decay, DataType.UINT32),
-            NeuronParameter(i_init, DataType.UINT32),
-            NeuronParameter(self._initial_input_exc, DataType.S1615),
-            NeuronParameter(self._initial_input_exc2, DataType.S1615),
-            NeuronParameter(self._initial_input_inh, DataType.S1615)
+            NeuronParameter(e_decay, _DUAL_EXP_TYPES.E_DECAY.data_type),
+            NeuronParameter(e_init, _DUAL_EXP_TYPES.E_INIT.data_type),
+            NeuronParameter(e_decay2, _DUAL_EXP_TYPES.E2_DECAY.data_type),
+            NeuronParameter(e_init2, _DUAL_EXP_TYPES.E2_INIT.data_type),
+            NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
+            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
+            NeuronParameter(
+                self._initial_input_exc,
+                _DUAL_EXP_TYPES.INITIAL_EXC.data_type),
+            NeuronParameter(
+                self._initial_input_exc2,
+                _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
+            NeuronParameter(
+                self._initial_input_inh,
+                _DUAL_EXP_TYPES.INITIAL_INH.data_type)
         ]
+
+    def get_synapse_type_parameter_types(self):
+        return [item.data_type for item in _DUAL_EXP_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self):
 

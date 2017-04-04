@@ -1,19 +1,17 @@
 import math
+import scipy.stats  # @UnresolvedImport
 import struct
 import sys
 from collections import defaultdict
+from scipy import special  # @UnresolvedImport
 
 import numpy
-import scipy.stats
-from scipy import special
-
-from data_specification.enums.data_type import DataType
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
-from pacman.model.graphs.application.abstract_application_vertex\
-    import AbstractApplicationVertex
-from pacman.model.graphs.common.slice import Slice
 from spinn_front_end_common.utilities import helpful_functions
+from data_specification.enums.data_type import DataType
+from pacman.model.graphs.common.slice import Slice
+
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
@@ -222,15 +220,12 @@ class SynapticManager(object):
                 # this will not be correct if the SDRAM usage is high!
                 # TODO: Can be removed once we move to population-based keys
                 n_atoms_per_machine_vertex = sys.maxint
-                if (isinstance(
-                        in_edge.pre_vertex, AbstractApplicationVertex) and
-                        isinstance(
-                            in_edge.pre_vertex, AbstractHasGlobalMaxAtoms)):
-
+                if isinstance(in_edge.pre_vertex, AbstractHasGlobalMaxAtoms):
                     n_atoms_per_machine_vertex = \
                         in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_machine_vertex:
                     n_atoms_per_machine_vertex = in_edge.pre_vertex.n_atoms
+
                 pre_slices = [Slice(
                     lo_atom, min(
                         in_edge.pre_vertex.n_atoms,
@@ -918,3 +913,41 @@ class SynapticManager(object):
     # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_partition_constraints(self):
         return self._population_table_type.get_edge_constraints()
+
+    def read_parameters_from_machine(
+            self, transceiver, placement, vertex_slice):
+        # locate sdram address to where the synapse parameters are stored
+        synapse_region_sdram_address = \
+            helpful_functions.locate_memory_region_for_placement(
+                placement,
+                constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+                transceiver)
+
+        # get size of synapse params
+        size_of_region = (
+            self._synapse_type.get_sdram_usage_per_neuron_in_bytes() *
+            vertex_slice.n_atoms)
+
+        # get data from the machine
+        byte_array = transceiver.read_memory(
+            placement.x, placement.y, synapse_region_sdram_address,
+            size_of_region)
+
+        synapse_params, _ = utility_calls.translate_parameters(
+            self._synapse_type.get_synapse_type_parameter_types(),
+            byte_array, 0, vertex_slice)
+        self._synapse_type.set_synapse_type_parameters(
+            synapse_params, vertex_slice)
+
+    def regenerate_data_specification(
+            self, spec, placement, machine_time_step, time_scale_factor,
+            vertex_slice):
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            size=self._get_synapse_params_size(vertex_slice),
+            label='SynapseParams')
+        spec.switch_write_focus(
+            region=constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+        utility_calls.write_parameters_per_neuron(
+            spec, vertex_slice,
+            self._synapse_type.get_synapse_type_parameters())

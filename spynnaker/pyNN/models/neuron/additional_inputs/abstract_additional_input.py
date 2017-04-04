@@ -1,12 +1,14 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractAdditionalInput(object):
     """ Represents a possible additional independent input for a model
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def get_n_parameters(self):
@@ -23,6 +25,14 @@ class AbstractAdditionalInput(object):
         :return: An array of parameters
         :rtype: array of\
                 :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+        """
+
+    @abstractmethod
+    def get_parameter_types(self):
+        """ Get the types of the parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
         """
 
     @abstractmethod
@@ -47,3 +57,16 @@ class AbstractAdditionalInput(object):
         :rtype: int
         """
         return self.get_n_parameters() * 4
+
+    def set_parameters(self, parameters, vertex_slice):
+        """ Set the parameters for a given subset of neurons.
+
+            To be overridden only when there is a changing variable to
+            extract
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_neural_parameters
+        :param vertex_slice: The neurons to which the parameters apply
+        """
+        pass

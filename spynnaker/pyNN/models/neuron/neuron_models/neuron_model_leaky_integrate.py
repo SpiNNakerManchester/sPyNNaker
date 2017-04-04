@@ -1,4 +1,5 @@
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
@@ -10,6 +11,26 @@ from spynnaker.pyNN.utilities import utility_calls
 from data_specification.enums.data_type import DataType
 
 import numpy
+from enum import Enum
+
+
+class _IF_TYPES(Enum):
+
+    V_INIT = (1, DataType.S1615)
+    V_REST = (2, DataType.S1615)
+    R_MEMBRANE = (3, DataType.S1615)
+    EXP_TC = (4, DataType.S1615)
+    I_OFFSET = (5, DataType.S1615)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
 
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
@@ -28,7 +49,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
             i_offset, n_neurons)
 
         if v_init is None:
-            self._v_init = v_rest
+            self._v_init = self._v_rest
 
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(
@@ -86,41 +107,59 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         return numpy.exp(float(-machine_time_step) /
                          (1000.0 * self._tau_m))
 
+    @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return 5
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_neural_parameters,
+               additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
         return [
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._v_init, DataType.S1615),
+            NeuronParameter(self._v_init, _IF_TYPES.V_INIT.data_type),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
-            NeuronParameter(self._v_rest, DataType.S1615),
+            NeuronParameter(self._v_rest, _IF_TYPES.V_REST.data_type),
 
             # membrane resistance [MOhm]
             # REAL     R_membrane;
-            NeuronParameter(self._r_membrane, DataType.S1615),
+            NeuronParameter(self._r_membrane, _IF_TYPES.R_MEMBRANE.data_type),
 
             # 'fixed' computation parameter - time constant multiplier for
             # closed-form solution
             # exp( -(machine time step in ms)/(R * C) ) [.]
             # REAL     exp_TC;
-            NeuronParameter(self._exp_tc(machine_time_step), DataType.S1615),
+            NeuronParameter(
+                self._exp_tc(machine_time_step), _IF_TYPES.EXP_TC.data_type),
 
             # offset current [nA]
             # REAL     I_offset;
-            NeuronParameter(self._i_offset, DataType.S1615)
+            NeuronParameter(self._i_offset, _IF_TYPES.I_OFFSET.data_type)
         ]
 
+    @overrides(AbstractNeuronModel.get_neural_parameter_types)
+    def get_neural_parameter_types(self):
+        return [item.data_type for item in _IF_TYPES]
+
+    @overrides(AbstractNeuronModel.get_n_global_parameters)
     def get_n_global_parameters(self):
         return 0
 
+    @overrides(AbstractNeuronModel.get_global_parameters)
     def get_global_parameters(self):
         return []
+
+    @overrides(AbstractNeuronModel.get_global_parameter_types)
+    def get_global_parameter_types(self):
+        return []
+
+    @overrides(AbstractNeuronModel.set_neural_parameters)
+    def set_neural_parameters(self, neural_parameters, vertex_slice):
+        self._v_init[vertex_slice.as_slice] = neural_parameters[0]
 
     def get_n_cpu_cycles_per_neuron(self):
 

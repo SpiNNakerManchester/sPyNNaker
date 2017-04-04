@@ -1,12 +1,14 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractSpikeRecordable(object):
     """ Indicates that spikes can be recorded from this object
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def is_recording_spikes(self):

@@ -21,5 +21,8 @@ class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return []
 
+    def get_input_type_parameter_types(self):
+        return []
+
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 0
