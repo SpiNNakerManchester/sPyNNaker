@@ -1,12 +1,12 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 
-class Synfire2RunNewPopIfCurrExpLower(unittest.TestCase):
+class Synfire2RunNewPopIfCurrExpLower(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         try:

@@ -1,9 +1,7 @@
 """
 Synfirechain-like example
 """
-
-import unittest
-
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -17,7 +15,7 @@ delay = 1.7
 runtime = 50
 
 
-class TestGetGsyn(unittest.TestCase):
+class TestGetGsyn(BaseTestCase):
     """
     tests the printing of get gsyn given a simulation
     """

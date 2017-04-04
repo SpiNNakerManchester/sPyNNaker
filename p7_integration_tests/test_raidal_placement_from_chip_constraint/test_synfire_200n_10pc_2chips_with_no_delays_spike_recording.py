@@ -3,7 +3,7 @@
 Synfirechain-like example
 """
 
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 from pacman.model.constraints.placer_constraints\
     .placer_radial_placement_from_chip_constraint \
@@ -15,7 +15,7 @@ import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 
-class Synfire200n10pc2chipsWithNoDelaysSpikeRecording(unittest.TestCase):
+class Synfire200n10pc2chipsWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population

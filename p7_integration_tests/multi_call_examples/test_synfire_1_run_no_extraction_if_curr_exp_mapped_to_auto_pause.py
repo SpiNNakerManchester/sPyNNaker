@@ -1,7 +1,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_run as synfire_run
@@ -11,7 +11,7 @@ neurons_per_core = n_neurons / 2
 runtimes = [526, 526, 526, 526, 526, 370]
 extract_between_runs=False
 
-class Synfire1RunNoExtractionIfCurrExpMappedToAutoPause(unittest.TestCase):
+class Synfire1RunNoExtractionIfCurrExpMappedToAutoPause(BaseTestCase):
 
     def test_run(self):
         results = synfire_run.do_run(n_neurons,

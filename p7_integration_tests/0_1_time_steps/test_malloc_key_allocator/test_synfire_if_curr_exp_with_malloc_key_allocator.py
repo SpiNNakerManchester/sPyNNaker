@@ -1,13 +1,13 @@
 """
 Synfirechain-like example
 """
-import unittest
 import os
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 
-class TestMallocKeyAllocatorWithSynfire(unittest.TestCase):
+class TestMallocKeyAllocatorWithSynfire(BaseTestCase):
     """
     tests the printing of print v given a simulation
     """

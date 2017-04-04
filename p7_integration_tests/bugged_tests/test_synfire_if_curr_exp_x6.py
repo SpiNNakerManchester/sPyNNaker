@@ -3,7 +3,7 @@
 Synfirechain-like example with 6 chains
 """
 
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.pyNN as p
 
 
@@ -46,7 +46,7 @@ def do_run(nNeurons):
     p.end()
 
 
-class SynfireIfCurrx6(unittest.TestCase):
+class SynfireIfCurrx6(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population

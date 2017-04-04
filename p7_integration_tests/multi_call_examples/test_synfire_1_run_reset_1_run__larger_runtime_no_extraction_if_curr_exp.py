@@ -1,19 +1,26 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
 
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
+nNeurons = 200  # number of neurons in each population
+spike_times = [[0, 1050]]
+neurons_per_core = nNeurons/2
+runtimes = [1000, 2000]
+reset = True
 
-class Synfire1RunReset1RunLargertRuntimeNoExtraction(unittest.TestCase):
+
+class Synfire1RunReset1RunLargertRuntimeNoExtraction(BaseTestCase):
     def test_run(self):
-        nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons, runtimes=[1000, 2000],
-                                     reset=True)
+        results = synfire_run.do_run(nNeurons, spike_times=spike_times,
+                                     neurons_per_core=neurons_per_core,
+                                     runtimes=runtimes,
+                                     reset=reset)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
         self.assertEquals(106, len(spikes2))
@@ -24,7 +31,9 @@ class Synfire1RunReset1RunLargertRuntimeNoExtraction(unittest.TestCase):
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtimes=[1000, 2000], reset=True)
+    results = synfire_run.do_run(nNeurons, spike_times=spike_times,
+                                 neurons_per_core=neurons_per_core,
+                                 runtimes=runtimes, reset=reset)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)
     print len(spikes2)

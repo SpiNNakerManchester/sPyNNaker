@@ -2,6 +2,7 @@
 Synfirechain-like example
 """
 import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 n_neurons = 200  # number of neurons in each population
@@ -9,7 +10,7 @@ runtimes = [5000]
 neurons_per_core = n_neurons / 2
 
 
-class SynfireIfCurrExp(unittest.TestCase):
+class SynfireIfCurrExp(BaseTestCase):
 
     @unittest.skip("skipping test_buffer_manager/if_curr_exp_live_buiffer/"
                    "SynfireIfCurrExp")

@@ -1,4 +1,4 @@
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as sim
 import spynnaker.plot_utils as plot_utils
@@ -29,7 +29,7 @@ def do_run():
     return (spikes1, spikes2)
 
 
-class TestPoisson(unittest.TestCase):
+class TestPoisson(BaseTestCase):
 
     def test_run(self):
         (spikes1, spikes2) = do_run()

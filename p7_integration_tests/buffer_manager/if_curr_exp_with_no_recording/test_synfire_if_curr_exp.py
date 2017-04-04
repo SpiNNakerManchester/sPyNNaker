@@ -1,7 +1,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 n_neurons = 200  # number of neurons in each population
@@ -12,7 +12,7 @@ record_v = False
 record_gsyn = False
 
 
-class SynfireIfCurrExp(unittest.TestCase):
+class SynfireIfCurrExp(BaseTestCase):
 
     def test_run(self):
         results = synfire_run.do_run(n_neurons,

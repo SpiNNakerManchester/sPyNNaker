@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import spynnaker.pyNN as p
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 
@@ -32,7 +32,7 @@ def do_run(nNeurons):
     return (v, gsyn, spikes)
 
 
-class OnePopLifExample(unittest.TestCase):
+class OnePopLifExample(BaseTestCase):
     def test_run(self):
         nNeurons = 255  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)

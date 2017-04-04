@@ -3,6 +3,7 @@ Synfirechain-like example
 """
 import os
 import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
@@ -16,7 +17,7 @@ current_file_path = os.path.dirname(os.path.abspath(__file__))
 current_file_path = os.path.join(current_file_path, "spikes.data")
 
 
-class TestPrintSpikes(unittest.TestCase):
+class TestPrintSpikes(BaseTestCase):
     """
     tests the printing of get spikes given a simulation
     """

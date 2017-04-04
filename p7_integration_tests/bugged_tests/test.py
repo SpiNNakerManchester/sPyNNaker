@@ -2,7 +2,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as p
 import spynnaker.plot_utils as plot_utils
@@ -46,7 +46,7 @@ def do_run(nNeurons):
     return (v1, gsyn1, v2, gsyn2, spikes1, spikes2)
 
 
-class ATest(unittest.TestCase):
+class ATest(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population

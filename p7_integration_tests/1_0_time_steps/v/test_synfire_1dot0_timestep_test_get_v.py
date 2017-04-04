@@ -2,6 +2,7 @@
 Synfirechain-like example
 """
 # spynnaker imports
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
@@ -17,7 +18,7 @@ neurons_per_core = n_neurons/2
 delay = 1.7
 
 
-class TestGetVoltage(unittest.TestCase):
+class TestGetVoltage(BaseTestCase):
     """
     tests the printing of get v given a simulation
     """

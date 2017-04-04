@@ -1,5 +1,5 @@
 import spynnaker.pyNN as p
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.plot_utils as plot_utils
 
 
@@ -85,7 +85,7 @@ def do_run():
     return (pre_spikes, post_spikes)
 
 
-class stdp_example(unittest.TestCase):
+class stdp_example(BaseTestCase):
 
     def test_run(self):
         (pre_spikes, post_spikes) = do_run()

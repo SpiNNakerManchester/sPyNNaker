@@ -2,7 +2,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -14,7 +14,7 @@ delay = 1
 neurons_per_core = 50
 
 
-class Synfire200n50pc4cWithNoDelaysSpikeRecording(unittest.TestCase):
+class Synfire200n50pc4cWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
         results = synfire_run.do_run(nNeurons, delay=delay,

@@ -14,16 +14,15 @@ August 2006
 
 $Id:VAbenchmarks.py 5 2007-04-16 15:01:24Z davison $
 """
-
-# import os
 import socket
 import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.pyNN as p
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
 
 
-class TestVABenchmarkSpikes(unittest.TestCase):
+class TestVABenchmarkSpikes(BaseTestCase):
     """
     tests the va benchmark spikes
     """
@@ -173,3 +172,7 @@ class TestVABenchmarkSpikes(unittest.TestCase):
         #                         round(read_element[0], 1))
         #        self.assertEqual(round(spike_element[1], 1),
         #                         round(read_element[1], 1))
+
+
+if __name__ == '__main__':
+    unittest.main()

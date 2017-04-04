@@ -1,4 +1,4 @@
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as sim
 
@@ -82,7 +82,7 @@ def do_run():
     return (pre_spikes, post_spikes)
 
 
-class SynfireIfCurrExp(unittest.TestCase):
+class SynfireIfCurrExp(BaseTestCase):
 
     def test_run(self):
         do_run()

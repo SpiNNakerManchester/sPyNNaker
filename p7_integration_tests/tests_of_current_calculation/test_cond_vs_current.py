@@ -3,7 +3,7 @@ Synfirechain-like example
 """
 import spynnaker.pyNN as p
 import pylab
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 
 def do_run(nNeurons):
@@ -177,7 +177,7 @@ def plot(nNeurons, cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn,
         print "no cond gsyn received"
 
 
-class CondVsCurrent(unittest.TestCase):
+class CondVsCurrent(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population

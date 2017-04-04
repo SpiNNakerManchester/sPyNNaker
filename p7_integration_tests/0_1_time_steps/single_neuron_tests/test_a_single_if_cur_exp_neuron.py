@@ -6,7 +6,7 @@ test that a single neuron of if cur exp works as expected
 import collections
 import numpy
 import pylab
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.pyNN as p
 
 # Cell parameters
@@ -21,7 +21,7 @@ cell_params = {'cm': 0.25,
                'v_thresh': -40.0}
 
 
-class TestIfCurExpSingleNeuron(unittest.TestCase):
+class TestIfCurExpSingleNeuron(BaseTestCase):
     """
     tests the get spikes given a simulation at 0.1 ms time steps
     """

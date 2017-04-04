@@ -2,7 +2,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -10,9 +10,8 @@ import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
 
-class Synfire6300n10pop30pc18chipsNoDelaysSpikeRrecording(unittest.TestCase):
+class Synfire6300n10pop30pc18chipsNoDelaysSpikeRrecording(BaseTestCase):
 
-    # SpinnmanException: 10 cores have reached an error state CPUState.RUN_TIME_EXCEPTION:
     def test_run(self):
         nNeurons = 630  # number of neurons in each population
         results = synfire_npop_run.do_run(nNeurons, n_pops=10,

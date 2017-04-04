@@ -8,7 +8,7 @@ import spynnaker.pyNN as p
 # general imports
 import os
 import pylab
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 
 def read_spikefile(file_name, n_neurons):
@@ -30,7 +30,7 @@ def read_spikefile(file_name, n_neurons):
     return spike_array
 
 
-class TestReadingSpikeArrayDataAndBigSlices(unittest.TestCase):
+class TestReadingSpikeArrayDataAndBigSlices(BaseTestCase):
     """
     tests the printing of print v given a simulation
     """

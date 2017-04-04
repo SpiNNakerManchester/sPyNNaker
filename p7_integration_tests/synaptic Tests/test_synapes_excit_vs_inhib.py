@@ -4,7 +4,7 @@
 import spynnaker.pyNN as p
 
 import pylab as pylab
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 
 def do_run():
@@ -36,7 +36,7 @@ def do_run():
     return V
 
 
-class TestSynapesExcitVsInhib(unittest.TestCase):
+class TestSynapesExcitVsInhib(BaseTestCase):
     def test_run(self):
         do_run()
 

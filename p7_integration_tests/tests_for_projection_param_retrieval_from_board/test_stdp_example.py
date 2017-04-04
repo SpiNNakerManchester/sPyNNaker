@@ -34,7 +34,7 @@ April 2013
 import spynnaker.pyNN as p
 import unittest
 import spynnaker.plot_utils as plot_utils
-
+from p7_integration_tests.base_test_case import BaseTestCase
 
 def do_run():
     # SpiNNaker setup
@@ -226,7 +226,7 @@ def do_run():
 # pylab.show()
 
 
-class stdp_example(unittest.TestCase):
+class stdp_example(BaseTestCase):
 
     @unittest.skip("Skipping tests_for_projection_param_retrieval_from_board/"
                    "test_stdp_example.py")

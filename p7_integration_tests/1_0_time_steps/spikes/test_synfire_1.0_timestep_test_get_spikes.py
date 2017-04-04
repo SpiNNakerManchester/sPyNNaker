@@ -2,7 +2,7 @@
 Synfirechain-like example
 """
 import unittest
-
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 n_neurons = 200
@@ -13,7 +13,7 @@ neurons_per_core = n_neurons / 2
 runtime = 500
 
 
-class TestGetSpikesAt0_1msTimeStep(unittest.TestCase):
+class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
     """
     tests the get spikes given a simulation at 0.1 ms time steps
     """

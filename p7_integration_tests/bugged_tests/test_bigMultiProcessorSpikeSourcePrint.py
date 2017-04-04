@@ -4,7 +4,7 @@ Synfirechain-like example
 # !/usr/bin/python
 import spynnaker.pyNN as p
 
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 
@@ -47,7 +47,7 @@ def do_run(nNeurons):
     return spikes
 
 
-class BigMultiProcessorSpikeSourcePrint(unittest.TestCase):
+class BigMultiProcessorSpikeSourcePrint(BaseTestCase):
 
     def test_run_(self):
         nNeurons = 600  # number of neurons in each population

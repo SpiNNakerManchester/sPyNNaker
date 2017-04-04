@@ -2,7 +2,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.plot_utils as plot_utils
@@ -13,7 +13,7 @@ neurons_per_core = n_neurons / 2
 runtime = 5000
 
 
-class SynfireIfCurrExp(unittest.TestCase):
+class SynfireIfCurrExp(BaseTestCase):
 
     def test_run(self):
         results = synfire_run.do_run(n_neurons,

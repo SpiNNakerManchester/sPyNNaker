@@ -3,7 +3,7 @@
 Synfirechain-like example
 """
 import spynnaker.pyNN as p
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 
@@ -51,7 +51,7 @@ def do_run(nNeurons):
     return (v, gsyn, spikes)
 
 
-class ParamsSetAsList(unittest.TestCase):
+class ParamsSetAsList(BaseTestCase):
 
     # @unittest.skip("skipping test_bugged_tests/params_set_as_list")
     def test_run(self):

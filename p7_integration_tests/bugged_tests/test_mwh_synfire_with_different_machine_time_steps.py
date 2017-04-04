@@ -4,10 +4,10 @@ Synfirechain-like example
 """
 
 import spynnaker.pyNN as p
-
-import unittest
-
 import spynnaker.plot_utils as plot_utils
+
+from p7_integration_tests.base_test_case import BaseTestCase
+
 
 
 def do_run(nNeurons):
@@ -53,7 +53,7 @@ def do_run(nNeurons):
     return (v, spikes)
 
 
-class MwhSynfireWithDifferentMachineTimeSteps(unittest.TestCase):
+class MwhSynfireWithDifferentMachineTimeSteps(BaseTestCase):
 
     def test_run(self):
         nNeurons = 3  # number of neurons in each population

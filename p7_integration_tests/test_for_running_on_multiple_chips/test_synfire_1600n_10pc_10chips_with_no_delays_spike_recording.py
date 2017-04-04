@@ -3,7 +3,7 @@
 Synfirechain-like example
 """
 
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -11,7 +11,7 @@ import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 
-class Synfire1600n10pc10chipsWithNoDelaysSpikeRecording(unittest.TestCase):
+class Synfire1600n10pc10chipsWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
         nNeurons = 1600  # number of neurons in each population

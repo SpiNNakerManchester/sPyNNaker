@@ -35,6 +35,8 @@ import unittest
 import spynnaker.pyNN as sim
 import spynnaker.plot_utils as plot_utils
 
+from p7_integration_tests.base_test_case import BaseTestCase
+
 
 def do_run():
     # SpiNNaker setup
@@ -197,7 +199,7 @@ def do_run():
     return (pre_spikes, post_spikes)
 
 
-class StdpExample(unittest.TestCase):
+class StdpExample(BaseTestCase):
 
     @unittest.skip("Skipping bugged_tests/test_stdp_example.py")
     def test_run(self):

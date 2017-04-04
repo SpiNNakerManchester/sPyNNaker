@@ -4,7 +4,7 @@ Synfirechain-like example
 
 # spynnaker imports
 import os
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -21,7 +21,7 @@ gsyn_path = os.path.dirname(os.path.abspath(__file__))
 gsyn_path = os.path.join(gsyn_path, "gsyn.data2")
 
 
-class TestPrintGsyn(unittest.TestCase):
+class TestPrintGsyn(BaseTestCase):
     """
     tests the printing of get gsyn given a simulation
     """

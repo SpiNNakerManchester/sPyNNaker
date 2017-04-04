@@ -3,7 +3,7 @@
 Synfirechain-like example
 """
 import numpy
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as p
 import spynnaker.plot_utils as plot_utils
@@ -62,13 +62,14 @@ def do_run(nNeurons):
     return (v, gsyn, spikes)
 
 
-class SynfireIfCurrExpRandom(unittest.TestCase):
+class SynfireIfCurrExpRandom(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
+        # 401
         self.assertLess(300, len(spikes))
-        self.assertGreater(400, len(spikes))
+        self.assertGreater(450, len(spikes))
         spike_checker.synfire_spike_checker(spikes, nNeurons)
 
 

@@ -1,7 +1,7 @@
 """
 Synfirechain-like example
 """
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
 import spynnaker.spike_checker as spike_checker
@@ -9,7 +9,7 @@ import spynnaker.spike_checker as spike_checker
 import p7_integration_tests.scripts.synfire_run as synfire_run
 
 
-class Synfire2RunNoExtractionSpikeArrayChanged(unittest.TestCase):
+class Synfire2RunNoExtractionSpikeArrayChanged(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         results = synfire_run.do_run(nNeurons,

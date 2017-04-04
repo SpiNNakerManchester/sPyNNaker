@@ -5,10 +5,11 @@ Synfirechain-like example
 import unittest
 
 import spynnaker.pyNN as p
+from p7_integration_tests.base_test_case import BaseTestCase
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
-class TestMultipleStdpMechsOnSameNeuron(unittest.TestCase):
+class TestMultipleStdpMechsOnSameNeuron(BaseTestCase):
     """
     tests the get spikes given a simulation at 0.1 ms time steps
     """

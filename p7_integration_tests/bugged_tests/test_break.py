@@ -14,7 +14,7 @@ May 2006
 $Id: IF_cond_exp.py 917 2011-01-31 15:23:34Z apdavison $
 """
 import pylab
-import unittest
+from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as p
 
@@ -66,7 +66,7 @@ def plot(recorded_v, recorded_gsyn):
     pylab.show()
 
 
-class Break(unittest.TestCase):
+class Break(BaseTestCase):
     def test_synfire_1_run_no_extraction_if_curr_exp_low_sdram(self):
         (v, gsyn) = do_run()
         # plot(v, gsyn)

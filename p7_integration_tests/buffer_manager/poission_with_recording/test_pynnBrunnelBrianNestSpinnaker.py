@@ -2,8 +2,7 @@ import pylab as plt
 import p7_integration_tests.buffer_manager.poission_with_recording.\
     pynnBrunnelPlot as pblt
 
-import unittest
-
+from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.pynnBrunnelBrianNestSpinnaker as script
 
 Neurons = 3000  # number of neurons in each population
@@ -25,7 +24,7 @@ def plot(esp, sim_time, N_E):
         plt.show()
 
 
-class PynnBrunnelBrianNestSpinnaker(unittest.TestCase):
+class PynnBrunnelBrianNestSpinnaker(BaseTestCase):
 
     def test_run(self):
         (esp, s, N_E) = script.do_run(Neurons, sim_time, True)
