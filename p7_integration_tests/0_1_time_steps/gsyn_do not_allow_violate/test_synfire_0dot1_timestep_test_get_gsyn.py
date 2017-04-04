@@ -4,10 +4,12 @@ Synfirechain-like example
 # general imports
 import unittest
 import p7_integration_tests.scripts.synfire_run as synfire_run
+from p7_integration_tests.base_test_case import BaseTestCase
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
-class TestGsyn(unittest.TestCase):
+class TestGsyn(BaseTestCase):
     """
     tests the printing of get gsyn given a simulation
     """
