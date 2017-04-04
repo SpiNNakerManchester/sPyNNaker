@@ -13,7 +13,6 @@ from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import \
 from spynnaker.pyNN.utilities import globals_variables
 
 from collections import defaultdict
-import itertools
 import numpy
 import logging
 
