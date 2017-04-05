@@ -1,14 +1,30 @@
 # Imports
 import numpy as np
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+    matplotlib_missing = False
+except Exception as e:
+    matplotlib_missing = True
 
 
-def line_plot(data, title=None):
+
+def _precheck(data, title):
     if data is None or len(data) == 0:
         if title is None:
             print "NO Data"
         else:
             print "NO data for " + title
+        return False
+    if matplotlib_missing:
+        if title is None:
+            print "matplotlib not installed skipping plotting"
+        else:
+            print "matplotlib not installed skipping plotting for " + title
+        return False
+
+
+def line_plot(data, title=None):
+    if not _precheck(data, title):
         return
     print ("Setting up line graph")
     neurons = np.unique(data[:, 0])
@@ -30,11 +46,7 @@ def line_plot(data, title=None):
 
 
 def heat_plot(data, ylabel=None, title=None):
-    if data is None or len(data) == 0:
-        if title is None:
-            print "NO Data"
-        else:
-            print "NO data for " + title
+    if not _precheck(data, title):
         return
     print "Setting up heat graph"
     neurons = data[:, 0].astype(int)
@@ -59,6 +71,8 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     :param spikes2: Optional: Numport array of spikes
     :param spikes3: Optional: Numport array of spikes
     """
+    if not _precheck("mock data", title):
+        return
     found = False
     minTime = None
     maxTime = None
@@ -116,5 +130,3 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
 if __name__ == "__main__":
     spikes = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spikes)
-    import spynnaker.spike_checker as spike_checker
-    spike_checker.synfire_multiple_lines_spike_checker(spikes, 200, 5)

@@ -7,12 +7,10 @@ exec(open("spynnaker/pyNN/_version.py").read())
 if os.environ.get('READTHEDOCS', None) == 'True':
     # scipy must be added in config.py as a mock
     install_requires = ['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                        'pyNN >= 0.7, < 0.8', 'numpy', 'lxml', 'six',
-                        'matplotlib']
+                        'pyNN >= 0.7, < 0.8', 'numpy', 'lxml', 'six']
 else:
     install_requires = ['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                        'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six',
-                        'matplotlib']
+                        'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"

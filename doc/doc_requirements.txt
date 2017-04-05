@@ -1,7 +1,6 @@
 six
 enum34
 lxml
-matplotlib
 -e git+https://github.com/SpiNNakerManchester/SpiNNUtils.git@master#egg=spinn_utilities
 -e git+https://github.com/SpiNNakerManchester/SpiNNMachine.git@master#egg=SpiNNMachine
 -e git+https://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master#egg=spinn_storage_handlers
