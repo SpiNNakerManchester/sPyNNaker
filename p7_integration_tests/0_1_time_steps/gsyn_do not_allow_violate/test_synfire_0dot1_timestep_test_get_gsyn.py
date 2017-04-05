@@ -6,8 +6,6 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 from p7_integration_tests.base_test_case import BaseTestCase
 
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinnman.exceptions import SpinnmanTimeoutException
-from unittest import SkipTest
 
 
 class TestGsyn(BaseTestCase):

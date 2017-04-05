@@ -11,6 +11,7 @@ neurons_per_core = n_neurons / 2
 runtimes = [526, 526, 526, 526, 526, 370]
 extract_between_runs = False
 
+
 class Synfire1RunNoExtractionIfCurrExpMappedToAutoPause(BaseTestCase):
 
     def test_run(self):

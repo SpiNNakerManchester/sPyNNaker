@@ -20,6 +20,8 @@ from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.pyNN as p
 from pyNN.random import NumpyRNG, RandomDistribution
 from pyNN.utility import Timer
+from spinnman.exceptions import SpinnmanTimeoutException
+from unittest import SkipTest
 
 
 class TestVABenchmarkSpikes(BaseTestCase):
@@ -33,13 +35,14 @@ class TestVABenchmarkSpikes(BaseTestCase):
 
             timer = Timer()
 
-            # === Define parameters ==============================================
+            # === Define parameters =========================================
 
             rngseed = 98766987
             parallel_safe = True
 
             n = 1500  # number of cells
-            r_ei = 4.0   # number of excitatory cells:number of inhibitory cells
+            # number of excitatory cells:number of inhibitory cells
+            r_ei = 4.0
             pconn = 0.02  # connection probability
 
             dt = 0.1        # (ms) simulation timestep
@@ -66,7 +69,7 @@ class TestVABenchmarkSpikes(BaseTestCase):
             e_rev_exc = 0.     # (mV)
             e_rev_inh = -80.   # (mV)
 
-            # === Calculate derived parameters ===================================
+            # === Calculate derived parameters ===============================
 
             area *= 1e-8                     # convert to cm²
             cm *= area * 1000                  # convert to nF
@@ -86,7 +89,7 @@ class TestVABenchmarkSpikes(BaseTestCase):
             assert w_exc > 0
             assert w_inh < 0
 
-            # === Build the network ==============================================
+            # === Build the network ==========================================
 
             p.setup(timestep=dt, min_delay=delay, max_delay=delay)
 
@@ -160,7 +163,8 @@ class TestVABenchmarkSpikes(BaseTestCase):
             p.end()
 
             # current_file_path = os.path.dirname(os.path.abspath(__file__))
-            # current_file_path = os.path.join(current_file_path, "spikes.data")
+            # current_file_path = os.path.join(current_file_path,
+            #                                  "spikes.data")
             # exc_cells.printSpikes(current_file_path)
             # pre_recorded_spikes = p.utility_calls.read_spikes_from_file(
             #    current_file_path, 0, n_exc, 0, tstop)

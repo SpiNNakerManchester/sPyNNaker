@@ -72,7 +72,8 @@ class TestReadingSpikeArrayDataAndBigSlices(BaseTestCase):
             spike_array = {'spike_times': spikes}
 
             populations.append(p.Population(
-                n_neurons, p.SpikeSourceArray, spike_array, label='inputSpikes_1'))
+                n_neurons, p.SpikeSourceArray, spike_array,
+                label='inputSpikes_1'))
             populations.append(p.Population(
                 n_neurons, p.IF_cond_exp, cell_params_lif, label='pop_1'))
             projections.append(p.Projection(
@@ -88,7 +89,8 @@ class TestReadingSpikeArrayDataAndBigSlices(BaseTestCase):
                 if spikes is not None:
                     print spikes
                     pylab.figure()
-                    pylab.plot([i[1] for i in spikes], [i[0] for i in spikes], ".")
+                    pylab.plot([i[1] for i in spikes],
+                               [i[0] for i in spikes], ".")
                     pylab.xlabel('Time/ms')
                     pylab.ylabel('spikes')
                     pylab.title('spikes')

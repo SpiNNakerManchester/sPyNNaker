@@ -5,7 +5,6 @@ Synfirechain-like example
 from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.plot_utils as plot_utils
-import spynnaker.spike_checker as spike_checker
 
 import p7_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
