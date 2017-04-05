@@ -118,4 +118,3 @@ if __name__ == "__main__":
     plot_spikes(spikes)
     import spynnaker.spike_checker as spike_checker
     spike_checker.synfire_multiple_lines_spike_checker(spikes, 200, 5)
-
