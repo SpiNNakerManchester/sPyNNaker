@@ -17,7 +17,7 @@ else:
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
 data_extensions = {".aplx", ".xml"}
-config_extensions = {".cfg",".template"}
+config_extensions = {".cfg", ".template"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []
