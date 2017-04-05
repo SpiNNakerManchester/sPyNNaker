@@ -70,7 +70,7 @@ class GsynRecorder(object):
 
         # for buffering output info is taken form the buffer manager
         neuron_param_region_data_pointer, data_missing =\
-                buffer_manager.get_data_for_vertex(placement, region)
+            buffer_manager.get_data_for_vertex(placement, region)
         if data_missing:
             x = placement.x
             y = placement.y

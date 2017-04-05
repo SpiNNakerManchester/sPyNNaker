@@ -41,7 +41,7 @@ class EIEIOSpikeRecorder(object):
         ms_per_tick = machine_time_step / 1000.0
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(vertices,
-                                   "Getting spikes for {}".format(label))
+                               "Getting spikes for {}".format(label))
 
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
