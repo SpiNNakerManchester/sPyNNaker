@@ -6,6 +6,8 @@ import unittest
 from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
+from spinnman.exceptions import SpinnmanTimeoutException
+from unittest import SkipTest
 
 n_neurons = 20
 timestep = 0.1
@@ -23,24 +25,29 @@ class TestPrintSpikes(BaseTestCase):
     """
 
     @unittest.skip("skipping test /0_1_time_steps/spikes/"
-                   "test_synfire_0dot1_timestep_test_print_spikes.py")
+                   "test_synfire_0dot1_timestep_test_print_spikes.py"
+                   "utility_calls.read_spikes_from_file BROKEN")
     def test_print_spikes(self):
-        results = synfire_run.do_run(n_neurons, timestep=timestep,
-                                     max_delay=max_delay, delay=delay,
-                                     neurons_per_core=neurons_per_core,
-                                     runtimes=[runtime],
-                                     spike_path=current_file_path)
-        (v, gsyn, spikes) = results
+        try:
+            results = synfire_run.do_run(n_neurons, timestep=timestep,
+                                         max_delay=max_delay, delay=delay,
+                                         neurons_per_core=neurons_per_core,
+                                         runtimes=[runtime],
+                                         spike_path=current_file_path)
+            (v, gsyn, spikes) = results
 
-        read_in_spikes = utility_calls.read_spikes_from_file(
-            current_file_path, min_atom=0, max_atom=n_neurons,
-            min_time=0, max_time=500)
+            read_in_spikes = utility_calls.read_spikes_from_file(
+                current_file_path, min_atom=0, max_atom=n_neurons,
+                min_time=0, max_time=500)
 
-        for spike_element, read_element in zip(spikes, read_in_spikes):
-            self.assertEqual(round(spike_element[0], 1),
-                             round(read_element[0], 1))
-            self.assertEqual(round(spike_element[1], 1),
-                             round(read_element[1], 1))
+            for spike_element, read_element in zip(spikes, read_in_spikes):
+                self.assertEqual(round(spike_element[0], 1),
+                                 round(read_element[0], 1))
+                self.assertEqual(round(spike_element[1], 1),
+                                 round(read_element[1], 1))
+        except SpinnmanTimeoutException as ex:
+            # System intentional overload so may error
+            raise SkipTest(ex)
 
 
 if __name__ == '__main__':

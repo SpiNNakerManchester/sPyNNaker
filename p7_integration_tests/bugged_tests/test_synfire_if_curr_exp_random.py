@@ -67,9 +67,6 @@ class SynfireIfCurrExpRandom(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
-        # 401
-        self.assertLess(300, len(spikes))
-        self.assertGreater(450, len(spikes))
         spike_checker.synfire_spike_checker(spikes, nNeurons)
 
 

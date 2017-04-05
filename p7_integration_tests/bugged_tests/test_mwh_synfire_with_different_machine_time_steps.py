@@ -9,7 +9,6 @@ import spynnaker.plot_utils as plot_utils
 from p7_integration_tests.base_test_case import BaseTestCase
 
 
-
 def do_run(nNeurons):
 
     p.setup(timestep=0.1, min_delay=1.0, max_delay=7.5)

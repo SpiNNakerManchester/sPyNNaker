@@ -36,6 +36,7 @@ import unittest
 import spynnaker.plot_utils as plot_utils
 from p7_integration_tests.base_test_case import BaseTestCase
 
+
 def do_run():
     # SpiNNaker setup
     p.setup(timestep=1.0, min_delay=1.0, max_delay=10.0)

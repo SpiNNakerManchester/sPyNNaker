@@ -80,7 +80,8 @@ class MwhPopulationSynfire(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         (v, gsyn, spikes) = do_run(nNeurons)
-        self.assertEquals(596, len(spikes))
+        self.assertLess(580, len(spikes))
+        self.assertGreater(620, len(spikes))
 
 
 if __name__ == '__main__':

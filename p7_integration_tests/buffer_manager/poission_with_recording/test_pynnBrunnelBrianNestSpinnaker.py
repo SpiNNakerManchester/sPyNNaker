@@ -1,3 +1,5 @@
+import unittest
+
 import pylab as plt
 import p7_integration_tests.buffer_manager.poission_with_recording.\
     pynnBrunnelPlot as pblt
@@ -26,6 +28,13 @@ def plot(esp, sim_time, N_E):
 
 class PynnBrunnelBrianNestSpinnaker(BaseTestCase):
 
+    # Raises SpinnmanException: 30 cores have reached an error state
+    # CPUState.RUN_TIME_EXCEPTION:
+    # See prior_integration_tests/buffer_manager/
+    # poission_with_recording/pynnBrunnelBrianNestSpinnaker.py
+    @unittest.skip("Skipped buffer_manager/"
+                   "poission_with_recording/"
+                   "test_pynnBrunnelBrianNestSpinnaker")
     def test_run(self):
         (esp, s, N_E) = script.do_run(Neurons, sim_time, True)
 

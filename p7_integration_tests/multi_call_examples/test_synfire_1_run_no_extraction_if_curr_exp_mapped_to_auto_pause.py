@@ -9,7 +9,7 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 n_neurons = 200  # number of neurons in each population
 neurons_per_core = n_neurons / 2
 runtimes = [526, 526, 526, 526, 526, 370]
-extract_between_runs=False
+extract_between_runs = False
 
 class Synfire1RunNoExtractionIfCurrExpMappedToAutoPause(BaseTestCase):
 

@@ -7,7 +7,7 @@ import numpy
 import spynnaker.pyNN as p
 
 
-def do_run(nNeurons, n_pops, neurons_per_core):
+def do_run(nNeurons, n_pops, neurons_per_core, runtime=25000):
     """
 
     :param nNeurons: Number of Neurons in chain
@@ -18,7 +18,7 @@ def do_run(nNeurons, n_pops, neurons_per_core):
     :type neurons_per_core: int
     """
     p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-    p.set_number_of_neurons_per_core("IF_curr_exp", nNeurons)
+    p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
     cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
                        'tau_refrac': 2.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
@@ -63,7 +63,7 @@ def do_run(nNeurons, n_pops, neurons_per_core):
     for pop_index in range(0, n_pops):
         populations[pop_index].record()
 
-    p.run(25000)
+    p.run(runtime)
 
     total_spikes = None
     total_spikes = populations[0].getSpikes(compatible_output=True)
