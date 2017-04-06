@@ -31,7 +31,7 @@ before_script:
   - echo '[Database]' >> ~/.spynnaker.cfg
   - echo '[Simulation]' >> ~/.spynnaker.cfg
   - echo '[Buffers]' >> ~/.spynnaker.cfg
-  export PYTHONPATH=$PYTHONPATH:$(pwd)
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 script:
   - py.test unittests
