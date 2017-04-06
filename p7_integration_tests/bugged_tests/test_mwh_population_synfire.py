@@ -5,12 +5,14 @@ Synfirechain-like example
 import spynnaker.pyNN as p
 from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.plot_utils as plot_utils
+from spinnman.exceptions import SpinnmanTimeoutException
+from unittest import SkipTest
 
 
-def do_run(nNeurons):
+def do_run(nNeurons, neurons_per_core):
 
     p.setup(timestep=1.0, min_delay=1.0, max_delay=32.0)
-    p.set_number_of_neurons_per_core("IF_curr_exp", 256)
+    p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
 
     nPopulations = 62
     cell_params_lif = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
@@ -77,16 +79,28 @@ def do_run(nNeurons):
 
 
 class MwhPopulationSynfire(BaseTestCase):
-    def test_run(self):
+    def test_run_heavy(self):
+        try:
+            nNeurons = 200  # number of neurons in each population
+            neurons_per_core = 256
+            (v, gsyn, spikes) = do_run(nNeurons, neurons_per_core)
+            self.assertLess(580, len(spikes))
+            self.assertGreater(620, len(spikes))
+        except SpinnmanTimeoutException as ex:
+            raise SkipTest(ex)
+
+    def test_run_light(self):
         nNeurons = 200  # number of neurons in each population
-        (v, gsyn, spikes) = do_run(nNeurons)
+        neurons_per_core = 50
+        (v, gsyn, spikes) = do_run(nNeurons, neurons_per_core)
         self.assertLess(580, len(spikes))
         self.assertGreater(620, len(spikes))
 
 
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
-    (v, gsyn, spikes) = do_run(nNeurons)
+    neurons_per_core = 256
+    (v, gsyn, spikes) = do_run(nNeurons, neurons_per_core)
     plot_utils.plot_spikes(spikes)
     plot_utils.line_plot(v, title="v")
     plot_utils.heat_plot(gsyn, title="gsyn")
