@@ -32,7 +32,7 @@ def read_spikefile(file_name, n_neurons):
     return spike_array
 
 
-def do_run(self):
+def do_run():
     """
     test that tests the printing of v from a pre determined recording
     :return:
@@ -86,7 +86,7 @@ def do_run(self):
     return spikes
 
 
-def plot(self, spikes):
+def plot(spikes):
     """
     test that tests the printing of v from a pre determined recording
     :return:

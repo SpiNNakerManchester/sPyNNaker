@@ -167,8 +167,8 @@ class TestIfCurExpSingleNeuron(BaseTestCase):
         results = do_run()
         (noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
          n_pop_voltages) = results
-        self.assertLess(4, len(s_pop_spikes))
-        self.assertGreater(12, len(s_pop_spikes))
+        self.assertLess(2, len(s_pop_spikes))
+        self.assertGreater(15, len(s_pop_spikes))
         self.assetEquals(len(s_pop_spikes), len(n_pop_spikes))
 
 
