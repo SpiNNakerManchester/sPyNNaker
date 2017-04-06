@@ -2,7 +2,6 @@
     Some plotting functions I stole from the pyNest library :)
 '''
 import numpy
-import pylab
 
 
 def _histogram(a, bins=10, plot_range=None, normed=False):
@@ -50,6 +49,7 @@ def _make_plot(ts, ts1, gids, neurons, hist, hist_binwidth, grayscale, title,
     Generic plotting routine that constructs a raster plot along with
     an optional histogram (common part in all routines above)
     """
+    import pylab  # deferred so unittest are not dependent on it
 
     pylab.figure()
 

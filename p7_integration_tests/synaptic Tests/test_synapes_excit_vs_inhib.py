@@ -3,7 +3,6 @@
 
 import spynnaker.pyNN as p
 
-import pylab as pylab
 from p7_integration_tests.base_test_case import BaseTestCase
 
 
@@ -43,6 +42,7 @@ class TestSynapesExcitVsInhib(BaseTestCase):
 
 if __name__ == '__main__':
     V = do_run()
+    import pylab  # deferred so unittest are not dependent on it
     pylab.plot(V[:, 1], V[:, 2], '.', label=p.__name__)
     pylab.legend()
     pylab.show()

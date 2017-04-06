@@ -13,7 +13,6 @@ May 2006
 
 $Id: IF_cond_exp.py 917 2011-01-31 15:23:34Z apdavison $
 """
-import pylab
 from p7_integration_tests.base_test_case import BaseTestCase
 
 import spynnaker.pyNN as p
@@ -56,6 +55,7 @@ def do_run():
 
 
 def plot(recorded_v, recorded_gsyn):
+    import pylab  # deferred so unittest are not dependent on it
     f = pylab.figure()
     f.add_subplot(211)
     pylab.plot([i[2] for i in recorded_v])

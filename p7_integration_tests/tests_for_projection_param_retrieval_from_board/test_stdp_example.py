@@ -189,43 +189,6 @@ def do_run():
 
     return (weights, pre_spikes, post_spikes)
 
-# Dump data
-# pre_pop.printSpikes("results/stdp_pre.spikes")
-# post_pop.printSpikes("results/stdp_post.spikes")
-# pre_pop.print_v("results/stdp_pre.v")
-# post_pop.print_v("results/stdp_post.v")
-
-# End simulation on SpiNNaker
-
-# Function to draw a "nice" raster plot
-# def plot_spikes(file):
-#    nt_spikes = nt.load(file, 's')
-#    nt_spikes = nt_spikes.convert("(id,time)")
-#    spikes_t = [t for i,t in nt_spikes]
-#    spikes_id = [i for i,t in nt_spikes]
-#    pylab.plot(spikes_t, spikes_id, '.')
-
-# Make some graphs
-# pylab.figure()
-# plot_spikes('results/stdp_pre.spikes')
-# pylab.title('Presynaptic population spikes')
-
-# pylab.figure()
-# plot_spikes('results/stdp_post.spikes')
-# pylab.title('Postsynaptic population spikes')
-
-# v = nt.load('results/stdp_pre.v', 'v')
-# v.plot(2)
-# pylab.title('potentials of presynaptic population')
-
-# pylab.figure()
-# v = nt.load('results/stdp_post.v', 'v')
-# vm = v.mean()
-# pylab.plot(v.time_axis(), vm)
-# pylab.title('Mean potential of postsynaptic population')
-
-# pylab.show()
-
 
 class stdp_example(BaseTestCase):
 

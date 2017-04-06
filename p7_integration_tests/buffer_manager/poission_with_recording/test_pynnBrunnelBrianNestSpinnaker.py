@@ -1,6 +1,5 @@
 import unittest
 
-import pylab as plt
 import p7_integration_tests.buffer_manager.poission_with_recording.\
     pynnBrunnelPlot as pblt
 
@@ -13,6 +12,7 @@ simulator_Name = 'spiNNaker'
 
 
 def plot(esp, sim_time, N_E):
+    import pylab  # deferred so unittest are not dependent on it
     if esp is not None:
         ts_ext = [x[1] for x in esp]
         ids_ext = [x[0] for x in esp]
@@ -23,7 +23,7 @@ def plot(esp, sim_time, N_E):
                         'Simulation Time (ms)', total_time=sim_time,
                         n_neurons=N_E)
 
-        plt.show()
+        pylab.show()
 
 
 class PynnBrunnelBrianNestSpinnaker(BaseTestCase):

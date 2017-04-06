@@ -2,7 +2,6 @@
 Synfirechain-like example
 """
 import spynnaker.pyNN as p
-import pylab
 from p7_integration_tests.base_test_case import BaseTestCase
 
 
@@ -94,6 +93,8 @@ def do_run(nNeurons):
 
 def plot(nNeurons, cond_v, cond_gsyn, cond_spikes, curr_v, curr_gsyn,
          curr_spikes):
+    import pylab  # deferred so unittest are not dependent on it
+
     # plot curr spikes
     if len(curr_spikes) != 0:
         print "curr spikes are {}".format(curr_spikes)
