@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
                            log, log10, modf, power, sin, sinh, sqrt, tan, tanh,
-                           maximum, minimum, e, pi)
+                           maximum, minimum, e=e, pi=pi)
 
 
 class DistanceDependentProbabilityConnector(AbstractConnector):

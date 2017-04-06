@@ -19,7 +19,7 @@ _expr_context = SafeEval(
     numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
     numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
     numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
-    numpy.maximum, numpy.minimum, numpy.e, numpy.pi)
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 @add_metaclass(AbstractBase)
