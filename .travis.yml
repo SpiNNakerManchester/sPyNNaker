@@ -38,6 +38,7 @@ before_script:
 
 script:
   - py.test unittests
+  - py.test p7_integration_tests
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   - flake8 p7_integration_tests
