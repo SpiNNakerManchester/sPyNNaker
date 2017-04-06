@@ -36,9 +36,6 @@ before_script:
 script:
   - py.test unittests
   - py.test --tb=long p7_integration_tests
-  - if [ "x${TRAVIS_EVENT_TYPE}" = "xcron" ]; then
-      py.test p7_integration_tests;
-    fi
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   - flake8 p7_integration_tests
