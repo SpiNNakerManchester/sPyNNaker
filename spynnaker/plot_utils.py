@@ -7,7 +7,6 @@ except Exception as e:
     matplotlib_missing = True
 
 
-
 def _precheck(data, title):
     if data is None or len(data) == 0:
         if title is None:
