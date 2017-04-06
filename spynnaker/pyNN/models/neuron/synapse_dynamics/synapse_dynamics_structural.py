@@ -34,7 +34,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
 
-        self.fudge_factor = 1.3
+        self.fudge_factor = 1.5
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
@@ -138,7 +138,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             # Population header(s)
             spec.write_value(data=len(subpopulation_list), data_type=DataType.INT32)
-            spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]), data_type=DataType.INT32)
+            spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0, data_type=DataType.INT32)
             words_written = 0
             for subpopulation_info in subpopulation_list:
                 # Subpopulation information (i.e. key and number of atoms)
