@@ -1,7 +1,7 @@
 #ifndef _INPUT_TYPE_CONDUCTANCE_H_
 #define _INPUT_TYPE_CONDUCTANCE_H_
 
-#include "input_type.h"
+#include "core_input_type.h"
 
 typedef struct input_type_t {
 
