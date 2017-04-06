@@ -1,5 +1,4 @@
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
@@ -18,8 +17,6 @@ from spynnaker.pyNN.models.neural_projections.projection_application_edge \
 from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
     import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -157,14 +154,11 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping):
-            return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractChangableAfterRun):
-            self._projection_edge.mark_no_changes()
+        # Does Nothing currently
+        pass
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -178,10 +172,15 @@ class Projection(object):
                 pacman.model.graph.application.abstract_application_vertex
         :return: None or the edge going to these vertices.
         """
-        graph_edges = self._spinnaker.application_graph.edges
+
+        # Find edges ending at the postsynaptic vertex
+        graph_edges = \
+            self._spinnaker.application_graph.get_edges_ending_at_vertex(
+                postsynaptic_vertex)
+
+        # Search the edges for any that start at the presynaptic vertex
         for edge in graph_edges:
-            if ((edge.pre_vertex == presynaptic_vertex) and
-                    (edge.post_vertex == postsynaptic_vertex)):
+            if edge.pre_vertex == presynaptic_vertex:
                 return edge
         return None
 
@@ -255,6 +254,7 @@ class Projection(object):
                            gather=True):
         """ Get parameters of the dynamic synapses for all connections in this\
             Projection.
+
         :param parameter_name:
         :param list_format:
         :param gather:
@@ -321,6 +321,7 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be
         given.
+
         :param format: the type of format to be returned (only support "list")
         :param gather: gather the weights from stuff. currently has no meaning\
                 in spinnaker when set to false. Therefore is always true

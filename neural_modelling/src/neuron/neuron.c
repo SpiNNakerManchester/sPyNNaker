@@ -108,6 +108,55 @@ static inline void _print_neuron_parameters() {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief does the memory copy for the neuron parameters
+//! \param[in] address: the address where the neuron parameters are stored
+//! in SDRAM
+//! \return bool which is true if the mem copy's worked, false otherwise
+bool _neuron_load_neuron_parameters(address_t address){
+    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+
+    log_info("loading neuron global parameters");
+    memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
+    next += sizeof(global_neuron_params_t) / 4;
+
+    log_info("loading neuron local parameters");
+    memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
+    next += (n_neurons * sizeof(neuron_t)) / 4;
+
+    log_info("loading input type parameters");
+    memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
+    next += (n_neurons * sizeof(input_type_t)) / 4;
+
+    log_info("loading additional input type parameters");
+    memcpy(additional_input_array, &address[next],
+           n_neurons * sizeof(additional_input_t));
+    next += (n_neurons * sizeof(additional_input_t)) / 4;
+
+    log_info("loading threshold type parameters");
+    memcpy(threshold_type_array, &address[next],
+           n_neurons * sizeof(threshold_type_t));
+
+    neuron_model_set_global_neuron_params(global_parameters);
+
+    return true;
+}
+
+//! \brief interface for reloading neuron parameters as needed
+//! \param[in] address: the address where the neuron parameters are stored
+//! in SDRAM
+//! \return bool which is true if the reload of the neuron parameters was
+//! successful or not
+bool neuron_reload_neuron_parameters(address_t address){
+    log_info("neuron_reloading_neuron_parameters: starting");
+    if (!_neuron_load_neuron_parameters(address)){
+        return false;
+    }
+
+    // for debug purposes, print the neuron parameters
+    _print_neuron_parameters();
+    return true;
+}
+
 //! \brief Set up the neuron models
 //! \param[in] address the absolute address in SDRAM for the start of the
 //!            NEURON_PARAMS data region in SDRAM
@@ -146,9 +195,14 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+    // log message for debug purposes
+    log_info(
+        "\t neurons = %u, spike buffer size = %u, params size = %u,"
+        "input type size = %u, threshold size = %u", n_neurons,
+        *incoming_spike_buffer_size, sizeof(neuron_t),
+        sizeof(input_type_t), sizeof(threshold_type_t));
 
-    // Read the global parameter details
+    // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t) > 0) {
         global_parameters = (global_neuron_params_t *) spin1_malloc(
             sizeof(global_neuron_params_t));
@@ -157,26 +211,15 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
                       "- Out of DTCM");
             return false;
         }
-        memcpy(global_parameters, &address[next],
-               sizeof(global_neuron_params_t));
-        next += sizeof(global_neuron_params_t) / 4;
     }
 
-    log_info(
-        "\t neurons = %u, spike buffer size = %u, params size = %u,"
-        "input type size = %u, threshold size = %u", n_neurons,
-        *incoming_spike_buffer_size, sizeof(neuron_t),
-        sizeof(input_type_t), sizeof(threshold_type_t));
-
-    // Allocate DTCM for neuron array and copy block of data
+    // Allocate DTCM for neuron array
     if (sizeof(neuron_t) != 0) {
         neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
         if (neuron_array == NULL) {
             log_error("Unable to allocate neuron array - Out of DTCM");
             return false;
         }
-        memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
-        next += (n_neurons * sizeof(neuron_t)) / 4;
     }
 
     // Allocate DTCM for input type array and copy block of data
@@ -187,9 +230,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
             log_error("Unable to allocate input type array - Out of DTCM");
             return false;
         }
-        memcpy(input_type_array, &address[next],
-               n_neurons * sizeof(input_type_t));
-        next += (n_neurons * sizeof(input_type_t)) / 4;
     }
 
     // Allocate DTCM for additional input array and copy block of data
@@ -201,9 +241,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
                       " - Out of DTCM");
             return false;
         }
-        memcpy(additional_input_array, &address[next],
-               n_neurons * sizeof(additional_input_t));
-        next += (n_neurons * sizeof(additional_input_t)) / 4;
     }
 
     // Allocate DTCM for threshold type array and copy block of data
@@ -214,17 +251,17 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
             log_error("Unable to allocate threshold type array - Out of DTCM");
             return false;
         }
-        memcpy(threshold_type_array, &address[next],
-               n_neurons * sizeof(threshold_type_t));
+    }
+
+    // load the data into the allocated DTCM spaces.
+    if (!_neuron_load_neuron_parameters(address)){
+        return false;
     }
 
     // Set up the out spikes array
     if (!out_spikes_initialize(n_neurons)) {
         return false;
     }
-
-    // Set up the neuron model
-    neuron_model_set_global_neuron_params(global_parameters);
 
     recording_flags = recording_flags_param;
 
@@ -236,6 +273,35 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     _print_neuron_parameters();
 
     return true;
+}
+
+//! \brief stores neuron parameter back into sdram
+//! \param[in] address: the address in sdram to start the store
+void neuron_store_neuron_parameters(address_t address){
+
+    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+
+
+    log_info("writing neuron global parameters");
+    memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
+    next += sizeof(global_neuron_params_t) / 4;
+
+    log_info("writing neuron local parameters");
+    memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
+    next += (n_neurons * sizeof(neuron_t)) / 4;
+
+    log_info("writing input type parameters");
+    memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
+    next += (n_neurons * sizeof(input_type_t)) / 4;
+
+    log_info("writing additional input type parameters");
+    memcpy(&address[next], additional_input_array,
+           n_neurons * sizeof(additional_input_t));
+    next += (n_neurons * sizeof(additional_input_t)) / 4;
+
+    log_info("writing threshold type parameters");
+    memcpy(&address[next], threshold_type_array,
+           n_neurons * sizeof(threshold_type_t));
 }
 
 //! \setter for the internal input buffers

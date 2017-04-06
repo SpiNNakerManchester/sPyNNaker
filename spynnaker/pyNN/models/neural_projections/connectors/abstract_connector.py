@@ -1,11 +1,10 @@
-from abc import ABCMeta
 from six import add_metaclass
-from abc import abstractmethod
 from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
 
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -23,7 +22,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, numpy.e, numpy.pi)
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractConnector(object):
     """ Abstract class which PyNN Connectors extend
     """
@@ -31,6 +30,8 @@ class AbstractConnector(object):
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
+
+    __slots__ = ()
 
     def __init__(self, safe=True, space=None, verbose=False):
         self._safe = safe

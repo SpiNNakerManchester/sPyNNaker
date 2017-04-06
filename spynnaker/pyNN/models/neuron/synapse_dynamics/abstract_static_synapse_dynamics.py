@@ -1,16 +1,18 @@
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
     import AbstractSynapseDynamics
 
-from abc import abstractmethod
 from six import add_metaclass
-from abc import ABCMeta
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
     """
     AbstractStaticSynapseDynamics: dynamics which don't change over time.
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def get_n_words_for_static_connections(self, n_connections):
