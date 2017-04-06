@@ -1,9 +1,9 @@
-# general imports
 from six import add_metaclass
-from abc import ABCMeta
+
+from spinn_utilities.abstract_base import AbstractBase
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractVertexWithEdgeToDependentVertices(object):
     """ A vertex with a dependent vertices, which should be connected to this\
         vertex by an edge directly to each of them

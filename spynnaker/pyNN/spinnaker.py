@@ -1,7 +1,6 @@
 
 # pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
@@ -211,13 +210,17 @@ class Spinnaker(SpinnakerMainInterface):
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
         """
-        changed = False
+        changed = SpinnakerMainInterface._detect_if_graph_has_changed(
+            self, reset_flags)
+
+        # Additionally check populations for changes
         for population in self._populations:
             if population.requires_mapping:
                 changed = True
             if reset_flags:
                 population.mark_no_changes()
 
+        # Additionally check projections for changes
         for projection in self._projections:
             if projection.requires_mapping:
                 changed = True

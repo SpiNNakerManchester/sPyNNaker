@@ -7,7 +7,7 @@ from spinn_front_end_common.interface.provenance\
     import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
+from pacman.model.graphs.machine import MachineEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
