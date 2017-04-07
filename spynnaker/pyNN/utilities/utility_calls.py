@@ -184,7 +184,7 @@ def read_in_data_from_file(
     return result
 
 
-def read_spikes_from_filex(file_path, min_atom, max_atom, min_time, max_time,
+def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
                           split_value="\t"):
     """ Read spikes from a file formatted as:
         <time>\t<neuron id>
@@ -230,52 +230,6 @@ def read_spikes_from_filex(file_path, min_atom, max_atom, min_time, max_time,
             result[neuron_id] = list()
     return result
 
-
-def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
-                          min_time=0, max_time=float('inf'), split_value="\t"):
-    """ Read spikes from a file formatted as:
-        <time>\t<neuron id>
-
-    :param file_path: absolute path to a file containing spike values
-    :param min_atom: min neuron id to which neurons to read in
-    :param max_atom: max neuron id to which neurons to read in
-    :param min_time: min time slot to read neurons values of.
-    :param max_time: max time slot to read neurons values of.
-    :param split_value: the pattern to split by
-    :return:\
-        a numpy array with max_atom elements each of which is a list of\
-        spike times.
-    """
-    with open(file_path, 'r') as fsource:
-            read_data = fsource.readlines()
-
-    data = dict()
-    max_atom_found = 0
-    for line in read_data:
-        if not line.startswith('#'):
-            values = line.split(split_value)
-            time = float(eval(values[0]))
-            neuron_id = int(eval(values[1]))
-            if ((min_atom is None or min_atom <= neuron_id) and
-                    (max_atom is None or neuron_id < max_atom) and
-                    (min_time is None or min_time <= time) and
-                    (max_time is None or time < max_time)):
-                if neuron_id not in data:
-                    data[neuron_id] = list()
-                data[neuron_id].append(time)
-                if max_atom is None and neuron_id > max_atom_found:
-                    max_atom_found = neuron_id
-
-    if max_atom is None:
-        result = numpy.ndarray(shape=max_atom_found, dtype=object)
-    else:
-        result = numpy.ndarray(shape=max_atom, dtype=object)
-    for neuron_id in range(0, max_atom):
-        if neuron_id in data:
-            result[neuron_id] = data[neuron_id]
-        else:
-            result[neuron_id] = list()
-    return result
 
 # Converts between a distribution name, and the appropriate scipy stats for\
 # that distribution
