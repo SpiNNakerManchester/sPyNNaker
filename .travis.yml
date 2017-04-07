@@ -22,7 +22,9 @@ before_install:
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
-  - python ./p7_integration_tests/setup.py install
+  - if [ "x${TRAVIS_EVENT_TYPE}" = "xcron" ]; then
+      python ./p7_integration_tests/setup.py install
+    fi
 
 before_script:
   - echo '[Machine]' > ~/.spynnaker.cfg
@@ -35,7 +37,9 @@ before_script:
 
 script:
   - py.test unittests
-  - py.test --tb=native p7_integration_tests
+  - if [ "x${TRAVIS_EVENT_TYPE}" = "xcron" ]; then
+      py.test --tb=native p7_integration_tests;
+    fi
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   - flake8 p7_integration_tests
