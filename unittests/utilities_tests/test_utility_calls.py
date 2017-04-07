@@ -28,19 +28,6 @@ class TestUtilityCalls(unittest.TestCase):
         else:
             raise AssertionError("Directory was not created")
 
-    def test_read_spikes_from_file(self):
-        csv_spikes = numpy.loadtxt("spikes.csv", delimiter=',')
-        utils_spikes = utility_calls.read_spikes_from_file(
-            "spikes.data", min_atom=0, max_atom=20,
-            min_time=0, max_time=500)
-
-        for csv_element, utils_element in zip(csv_spikes, utils_spikes):
-            self.assertEqual(round(csv_element[0], 1),
-                             round(utils_element[0], 1))
-            self.assertEqual(round(csv_element[1], 1),
-                             round(utils_element[1], 1))
-
-
     @unittest.skip("Not implemented")
     def test_is_conductance(self):
         self.assertEqual(True, False, "NotImplementedError")
