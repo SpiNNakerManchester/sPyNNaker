@@ -1,14 +1,9 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+python:
+  - "2.7"
 
 virtualenv:
   system_site_packages: true
-
-env:
-  - READTHEDOCS=True
 
 cache: pip
 
@@ -38,6 +33,9 @@ before_script:
 
 script:
   - py.test unittests
+  - if [ "x${TRAVIS_EVENT_TYPE}" = "xcron" ]; then
+      py.test p7_integration_tests;
+    fi
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   - flake8 p7_integration_tests
