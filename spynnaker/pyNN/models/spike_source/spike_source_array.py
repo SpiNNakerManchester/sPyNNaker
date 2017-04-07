@@ -23,6 +23,8 @@ from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models.impl\
+    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 
 # general imports
@@ -34,7 +36,8 @@ logger = logging.getLogger(__name__)
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        ProvidesKeyToAtomMappingImpl):
     """ Model for play back of spikes
     """
 
@@ -81,6 +84,7 @@ class SpikeSourceArray(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder()
