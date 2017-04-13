@@ -1,6 +1,5 @@
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neural_projections.delayed_machine_edge \
-    import DelayedMachineEdge
+from spynnaker.pyNN.models.neural_projections import DelayedMachineEdge
 from pacman.model.graphs.application import ApplicationEdge
 
 

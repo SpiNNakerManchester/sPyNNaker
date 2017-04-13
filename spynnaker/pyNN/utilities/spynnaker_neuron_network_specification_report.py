@@ -3,8 +3,7 @@ import os
 
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = logging.getLogger(__name__)
 

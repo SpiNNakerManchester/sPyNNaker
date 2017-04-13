@@ -1,22 +1,16 @@
 from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
-from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
-    import DelayedApplicationEdge
 
-from spynnaker.pyNN.models.neural_projections.synapse_information \
-    import SynapseInformation
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
-    import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.neural_projections \
+    import DelayedApplicationEdge, SynapseInformation
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
-    import DelayAfferentApplicationEdge
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
+from spynnaker.pyNN.models.neural_projections \
+    import ProjectionApplicationEdge, DelayAfferentApplicationEdge
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -49,7 +43,7 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
 
         if not isinstance(postsynaptic_population._get_vertex,
-                          AbstractPopulationVertex):
+                          AbstractAcceptsIncomingSynapses):
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
@@ -66,8 +60,8 @@ class Projection(object):
             synapse_dynamics_stdp = SynapseDynamicsStatic()
         else:
             synapse_dynamics_stdp = synapse_dynamics.slow
-        postsynaptic_population._get_vertex.synapse_dynamics = \
-            synapse_dynamics_stdp
+        postsynaptic_population._get_vertex.set_synapse_dynamics(
+            synapse_dynamics_stdp)
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(

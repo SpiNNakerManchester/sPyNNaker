@@ -1,6 +1,5 @@
 from pyNN.random import RandomDistribution
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 
 import numpy
 import logging

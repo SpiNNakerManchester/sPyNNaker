@@ -1,12 +1,8 @@
 
-# pacman imports
-from pacman.model.graphs.application import ApplicationEdge
-
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
-from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
@@ -16,12 +12,6 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
-    import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
-    import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -52,7 +42,6 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
-        self._command_sender = None
         self._edge_count = 0
 
         # the number of edges that are associated with commands being sent to
@@ -241,66 +230,6 @@ class Spinnaker(SpinnakerMainInterface):
         """ The maximum supported delay based in milliseconds
         """
         return self._max_supported_delay
-
-    def add_application_vertex(self, vertex_to_add):
-        if isinstance(vertex_to_add, CommandSender):
-            self._command_sender = vertex_to_add
-
-        self._application_graph.add_vertex(vertex_to_add)
-
-        if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
-
-            # if there's no command sender yet, build one
-            if self._command_sender is None:
-                self._command_sender = CommandSender(
-                    "auto_added_command_sender", None)
-                self.add_application_vertex(self._command_sender)
-
-            # Count the number of unique keys
-            n_partitions = self._count_unique_keys(vertex_to_add.commands)
-
-            # build the number of edges accordingly and then add them to the
-            # graph.
-            partitions = list()
-            for _ in range(0, n_partitions):
-                edge = ApplicationEdge(self._command_sender, vertex_to_add)
-                partition_id = "COMMANDS{}".format(self._command_edge_count)
-
-                # add to the command count, so that each set of commands is in
-                # its own partition
-                self._command_edge_count += 1
-
-                # add edge with new partition id to graph
-                self.add_application_edge(edge, partition_id)
-
-                # locate the partition object for the edge we just added
-                partition = self._application_graph.\
-                    get_outgoing_edge_partition_starting_at_vertex(
-                        self._command_sender, partition_id)
-
-                # store the partition for the command sender to use for its
-                # key map
-                partitions.append(partition)
-
-            # allow the command sender to create key to partition map
-            self._command_sender.add_commands(
-                vertex_to_add.commands, partitions)
-
-        # add any dependent edges and vertices if needed
-        if isinstance(vertex_to_add,
-                      AbstractVertexWithEdgeToDependentVertices):
-            for dependant_vertex in vertex_to_add.dependent_vertices:
-                self.add_application_vertex(dependant_vertex)
-                dependant_edge = ApplicationEdge(
-                    pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
-                self.add_application_edge(
-                    dependant_edge,
-                    vertex_to_add.
-                    edge_partition_identifier_for_dependent_edge)
-
-    def _count_unique_keys(self, commands):
-        unique_keys = {command.key for command in commands}
-        return len(unique_keys)
 
     def create_population(self, size, cellclass, cellparams, structure, label):
         return Population(

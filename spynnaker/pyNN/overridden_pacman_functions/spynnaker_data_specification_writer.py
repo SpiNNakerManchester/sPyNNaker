@@ -4,8 +4,7 @@ from spinn_front_end_common.interface.interface_functions.\
     front_end_common_graph_data_specification_writer import \
     FrontEndCommonGraphDataSpecificationWriter
 
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 
 
 class SpynnakerDataSpecificationWriter(

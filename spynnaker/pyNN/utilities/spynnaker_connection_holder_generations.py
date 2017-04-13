@@ -1,8 +1,7 @@
 import logging
 from spinn_utilities.progress_bar import ProgressBar
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = logging.getLogger(__name__)
 

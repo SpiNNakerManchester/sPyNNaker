@@ -1,9 +1,7 @@
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
-    import AbstractInputType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_input_type import AbstractInputType
 
 from enum import Enum
 

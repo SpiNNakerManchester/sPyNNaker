@@ -7,8 +7,7 @@ from pacman.model.graphs.machine import MachineGraph
 
 # spynnaker imports
 from spynnaker.pyNN.exceptions import FilterableException
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
-    import AbstractFilterableEdge
+from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 import logging
 logger = logging.getLogger(__name__)

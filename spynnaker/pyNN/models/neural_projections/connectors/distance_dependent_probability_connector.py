@@ -1,8 +1,7 @@
 from pyNN.space import Space
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 from spinn_utilities.safe_eval import SafeEval
 
 import logging

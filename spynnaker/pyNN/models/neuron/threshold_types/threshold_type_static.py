@@ -1,10 +1,8 @@
 from pacman.model.decorators.overrides import overrides
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type \
-    import AbstractThresholdType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_threshold_type import AbstractThresholdType
 
 from data_specification.enums.data_type import DataType
 

@@ -3,20 +3,12 @@ from pacman.model.constraints.placer_constraints\
     import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
-    import AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
-    import AbstractPopulationInitializable
-from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
-    import InputTypeConductance
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
-    import AbstractGSynRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable \
-    import AbstractVRecordable
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractReadParametersBeforeSet, AbstractPopulationSettable, \
+    AbstractPopulationInitializable
+from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
+from spynnaker.pyNN.models.common \
+    import AbstractSpikeRecordable, AbstractGSynRecordable, AbstractVRecordable
 
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \

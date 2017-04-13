@@ -1,6 +1,5 @@
 # pacman imports
-from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
-    import AbstractWeightUpdatable
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 from spinn_utilities.progress_bar import ProgressBar
 

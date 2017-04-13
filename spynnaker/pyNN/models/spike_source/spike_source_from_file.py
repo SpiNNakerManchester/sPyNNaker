@@ -1,7 +1,6 @@
 
 # spynnaker imports
-from spynnaker.pyNN.models.spike_source.spike_source_array import \
-    SpikeSourceArray
+from spynnaker.pyNN.models.spike_source import SpikeSourceArray
 from spynnaker.pyNN import utility_calls
 
 # general imports
