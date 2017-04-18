@@ -1,3 +1,10 @@
+import scipy.stats
+import logging
+import math
+import random
+import numpy
+from enum import Enum
+
 from data_specification.enums.data_type import DataType
 
 from pacman.executor.injection_decorator import inject_items
@@ -27,6 +34,8 @@ from spinn_front_end_common.utilities import constants as \
 from spinn_front_end_common.abstract_models\
     .abstract_rewrites_data_specification \
     import AbstractRewritesDataSpecification
+from spinn_front_end_common.abstract_models.impl\
+    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
@@ -44,14 +53,6 @@ from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
-
-
-import logging
-import math
-import random
-import scipy.stats
-import numpy
-from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -106,9 +107,12 @@ class SpikeSourcePoisson(
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-        AbstractRewritesDataSpecification, SimplePopulationSettable):
+        AbstractRewritesDataSpecification, SimplePopulationSettable,
+        ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
+
+    _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
@@ -129,6 +133,7 @@ class SpikeSourcePoisson(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         SimplePopulationSettable.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         # atoms params
         self._n_atoms = n_neurons

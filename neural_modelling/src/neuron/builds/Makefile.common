@@ -1,3 +1,11 @@
+# If NEURAL_MODELLING_DIRS is not defined, this is an error!
+ifndef NEURAL_MODELLING_DIRS
+    $(error NEURAL_MODELLING_DIRS is not set.  Please define NEURAL_MODELLING_DIRS (possibly by running "source setup" in the sPyNNaker folder))
+endif
+
+include $(NEURAL_MODELLING_DIRS)/src/Makefile.paths
+include $(NEURAL_MODELLING_DIRS)/src/neuron/builds/Makefile.neural_build
+
 # ==================== GENERAL VARIABLES YOU MAY SET ====================
 #
 # EXTRA_SOURCE_DIRS - Colon-separated list of extra directories to search for
