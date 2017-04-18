@@ -22,8 +22,6 @@ class TestPrintSpikes(BaseTestCase):
     tests the printing of get spikes given a simulation
     """
 
-    @unittest.skip("skipping test /0_1_time_steps/spikes/"
-                   "test_synfire_0dot1_timestep_test_print_spikes.py")
     def test_print_spikes(self):
         results = synfire_run.do_run(n_neurons, timestep=timestep,
                                      max_delay=max_delay, delay=delay,

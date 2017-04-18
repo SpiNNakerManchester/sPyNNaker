@@ -29,7 +29,9 @@ class TestUtilityCalls(unittest.TestCase):
             raise AssertionError("Directory was not created")
 
     def test_read_spikes_from_file(self):
-        csv_spikes = numpy.loadtxt("spikes.csv", delimiter=',')
+        csv_file = os.path.join(os.path.dirname(__file__),
+                                "spikes.csv")
+        csv_spikes = numpy.loadtxt(csv_file, delimiter=',')
         utils_spikes = utility_calls.read_spikes_from_file(
             "spikes.data", min_atom=0, max_atom=20,
             min_time=0, max_time=500)
