@@ -21,9 +21,9 @@ class Synfire2RunNoExtraction(BaseTestCase):
         results = synfire_run.do_run(n_neurons,
                                      neurons_per_core=neurons_per_core,
                                      spike_times=spike_times,
-                                     runtimes=runtimes, reset=reset,
+                                     run_times=runtimes, reset=reset,
                                      extract_between_runs=extract_between_runs)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertEquals(454, len(spikes))
         spike_checker.synfire_multiple_lines_spike_checker(spikes, n_neurons,
                                                            6)
@@ -31,10 +31,10 @@ class Synfire2RunNoExtraction(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                                 spike_times=spike_times, runtimes=runtimes,
+                                 spike_times=spike_times, run_times=runtimes,
                                  reset=reset,
                                  extract_between_runs=extract_between_runs)
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v, title="v")

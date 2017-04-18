@@ -18,8 +18,8 @@ class SynfireIfCurrExp(BaseTestCase):
     def test_run(self):
         results = synfire_run.do_run(n_neurons,
                                      neurons_per_core=neurons_per_core,
-                                     runtimes=[runtime])
-        (v, gsyn, spikes) = results
+                                     run_times=[runtime])
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertLess(240, len(spikes))
         self.assertGreater(290, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
@@ -27,8 +27,8 @@ class SynfireIfCurrExp(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                                 runtimes=[runtime])
-    (v, gsyn, spikes) = results
+                                 run_times=[runtime])
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v, title="v")

@@ -55,7 +55,7 @@ def heat_plot(data, ylabel=None, title=None):
     info_array[:] = np.nan
     info_array[neurons, times] = info
     plt.xlabel("Time (ms)")
-    plt.ylabel("Neuron")
+    plt.ylabel(ylabel)
     if title is not None:
         plt.title(title)
     plt.imshow(info_array, cmap='hot', interpolation='bilinear', aspect='auto')

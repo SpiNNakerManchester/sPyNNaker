@@ -29,12 +29,12 @@ class TestPrintSpikes(BaseTestCase):
                    "utility_calls.read_spikes_from_file BROKEN")
     def test_print_spikes(self):
         try:
-            results = synfire_run.do_run(n_neurons, timestep=timestep,
+            results = synfire_run.do_run(n_neurons, time_step=timestep,
                                          max_delay=max_delay, delay=delay,
                                          neurons_per_core=neurons_per_core,
-                                         runtimes=[runtime],
+                                         run_times=[runtime],
                                          spike_path=current_file_path)
-            (v, gsyn, spikes) = results
+            (v, gsyn, spikes, inpur_spikes) = results
 
             read_in_spikes = utility_calls.read_spikes_from_file(
                 current_file_path, min_atom=0, max_atom=n_neurons,

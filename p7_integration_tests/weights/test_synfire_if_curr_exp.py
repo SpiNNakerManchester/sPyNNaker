@@ -13,8 +13,8 @@ class SynfireIfCurr_exp(BaseTestCase):
 
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons,  neurons_per_core=10, delay=17,
-                                     runtimes=[5000], get_weights=True)
+        results = synfire_run.do_run(nNeurons, neurons_per_core=10, delay=17,
+                                     run_times=[5000], get_weights=True)
         (v, gsyn, spikes, weights) = results
         self.assertEquals(263, len(spikes))
         self.assertEquals(200, len(weights))
@@ -24,7 +24,7 @@ class SynfireIfCurr_exp(BaseTestCase):
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     results = synfire_run.do_run(nNeurons, neurons_per_core=10, delay=17,
-                                 runtimes=[5000], get_weights=True)
+                                 run_times=[5000], get_weights=True)
     (v, gsyn, spikes, weights) = results
     print len(spikes)
     print len(weights)

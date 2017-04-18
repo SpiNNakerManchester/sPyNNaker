@@ -30,12 +30,12 @@ class TestPrintVoltage(BaseTestCase):
         :return:
         """
         results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                     timestep=timestep,
+                                     time_step=timestep,
                                      neurons_per_core=neurons_per_core,
                                      delay=delay,
-                                     runtimes=[runtime],
+                                     run_times=[runtime],
                                      v_path=current_v_file_path)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         read_in_v_values = utility_calls.read_in_data_from_file(
             current_v_file_path, 0, n_neurons, 0, runtime)
 

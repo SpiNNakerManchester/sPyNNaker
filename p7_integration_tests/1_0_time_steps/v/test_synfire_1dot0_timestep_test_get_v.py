@@ -29,11 +29,11 @@ class TestGetVoltage(BaseTestCase):
         :return:
         """
         results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                     timestep=timestep,
+                                     time_step=timestep,
                                      neurons_per_core=neurons_per_core,
                                      delay=delay,
-                                     runtimes=[runtime])
-        (v, gsyn, spikes) = results
+                                     run_times=[runtime])
+        (v, gsyn, spikes, inpur_spikes) = results
 
         current_file_path = os.path.dirname(os.path.abspath(__file__))
         current_file_path = os.path.join(current_file_path, "v.data")

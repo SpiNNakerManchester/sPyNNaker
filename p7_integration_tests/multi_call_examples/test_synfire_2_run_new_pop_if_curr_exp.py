@@ -11,7 +11,7 @@ class Synfire2RunNewPopIfCurrExpLower(BaseTestCase):
         nNeurons = 200  # number of neurons in each population
         try:
             results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
-                                         runtimes=[1000, 1000], reset=False,
+                                         run_times=[1000, 1000], reset=False,
                                          new_pop=True)
             (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         except NotImplementedError:
@@ -22,5 +22,5 @@ class Synfire2RunNewPopIfCurrExpLower(BaseTestCase):
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
-                                 runtimes=[1000, 1000], reset=False,
+                                 run_times=[1000, 1000], reset=False,
                                  new_pop=True)

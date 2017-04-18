@@ -29,12 +29,12 @@ class TestPrintGsyn(BaseTestCase):
     def test_get_gsyn(self):
         try:
             results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                         timestep=timestep,
+                                         time_step=timestep,
                                          neurons_per_core=neurons_per_core,
                                          delay=delay,
-                                         runtimes=[runtime],
+                                         run_times=[runtime],
                                          gsyn_path=gsyn_path)
-            (v, gsyn, spikes) = results
+            (v, gsyn, spikes, inpur_spikes) = results
             # no check of spikes length as the system overloads
             spike_checker.synfire_spike_checker(spikes, n_neurons)
             # compaes to own printout so ok
@@ -47,11 +47,11 @@ class TestPrintGsyn(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                 timestep=timestep,
+                                 time_step=timestep,
                                  neurons_per_core=neurons_per_core,
                                  delay=delay,
-                                 runtimes=[runtime], gsyn_path=gsyn_path)
-    (v, gsyn, spikes) = results
+                                 run_times=[runtime], gsyn_path=gsyn_path)
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v)

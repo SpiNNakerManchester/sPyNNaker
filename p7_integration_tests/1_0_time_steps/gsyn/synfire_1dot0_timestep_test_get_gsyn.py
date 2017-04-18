@@ -21,11 +21,11 @@ class TestGetGsyn(BaseTestCase):
     """
     def test_get_gsyn(self):
         results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                     timestep=timestep,
+                                     time_step=timestep,
                                      neurons_per_core=neurons_per_core,
                                      delay=delay,
-                                     runtimes=[runtime])
-        (v, gsyn, spikes) = results
+                                     run_times=[runtime])
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertEquals(12, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
         gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)
@@ -33,11 +33,11 @@ class TestGetGsyn(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                 timestep=timestep,
+                                 time_step=timestep,
                                  neurons_per_core=neurons_per_core,
                                  delay=delay,
-                                 runtimes=[runtime])
-    (v, gsyn, spikes) = results
+                                 run_times=[runtime])
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v)

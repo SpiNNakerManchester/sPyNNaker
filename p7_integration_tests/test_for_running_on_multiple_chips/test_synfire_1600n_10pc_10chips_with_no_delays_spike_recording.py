@@ -15,18 +15,18 @@ class Synfire1600n10pc10chipsWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
         nNeurons = 1600  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons, runtimes=[5000],
+        results = synfire_run.do_run(nNeurons, run_times=[5000],
                                      record_v=False, record_gsyn=False)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertEquals(263, len(spikes))
         spike_checker.synfire_spike_checker(spikes, nNeurons)
 
 
 if __name__ == '__main__':
     nNeurons = 1600  # number of neurons in each population
-    results = synfire_run.do_run(nNeurons, runtimes=[5000], record_v=False,
+    results = synfire_run.do_run(nNeurons, run_times=[5000], record_v=False,
                                  record_gsyn=False)
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     # v and gysn are None

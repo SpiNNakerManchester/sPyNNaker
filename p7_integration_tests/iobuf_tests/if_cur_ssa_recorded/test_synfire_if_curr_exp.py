@@ -17,13 +17,13 @@ class SynfireIfCurrExp(BaseTestCase):
     def test_run(self):
         results = synfire_run.do_run(n_neurons,
                                      neurons_per_core=neurons_per_core,
-                                     runtimes=runtimes, record=False,
+                                     run_times=runtimes, record=False,
                                      record_v=False, record_gsyn=False)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
 
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                                 runtimes=runtimes, record=False,
+                                 run_times=runtimes, record=False,
                                  record_v=False, record_gsyn=False)
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results

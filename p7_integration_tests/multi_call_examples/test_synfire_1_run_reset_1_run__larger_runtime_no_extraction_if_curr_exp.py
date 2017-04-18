@@ -17,10 +17,9 @@ reset = True
 
 class Synfire1RunReset1RunLargertRuntimeNoExtraction(BaseTestCase):
     def test_run(self):
-        results = synfire_run.do_run(nNeurons, spike_times=spike_times,
-                                     neurons_per_core=neurons_per_core,
-                                     runtimes=runtimes,
-                                     reset=reset)
+        results = synfire_run.do_run(
+            nNeurons, spike_times=spike_times, reset=reset, run_times=runtimes,
+            neurons_per_core=neurons_per_core)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
         self.assertEquals(156, len(spikes2))
@@ -32,7 +31,7 @@ class Synfire1RunReset1RunLargertRuntimeNoExtraction(BaseTestCase):
 if __name__ == '__main__':
     results = synfire_run.do_run(nNeurons, spike_times=spike_times,
                                  neurons_per_core=neurons_per_core,
-                                 runtimes=runtimes, reset=reset)
+                                 run_times=runtimes, reset=reset)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)
     print len(spikes2)

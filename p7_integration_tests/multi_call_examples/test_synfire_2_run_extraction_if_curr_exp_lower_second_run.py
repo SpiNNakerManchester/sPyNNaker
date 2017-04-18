@@ -13,7 +13,7 @@ class Synfire2RunExtractionIfCurrExpLower(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
         results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
-                                     runtimes=[1000, 500], reset=False)
+                                     run_times=[1000, 500], reset=False)
         (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
         self.assertEquals(53, len(spikes1))
         self.assertEquals(103, len(spikes2))
@@ -25,7 +25,7 @@ class Synfire2RunExtractionIfCurrExpLower(BaseTestCase):
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
-                                 runtimes=[1000, 500], reset=False)
+                                 run_times=[1000, 500], reset=False)
     (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
     print len(spikes1)
     print len(spikes2)

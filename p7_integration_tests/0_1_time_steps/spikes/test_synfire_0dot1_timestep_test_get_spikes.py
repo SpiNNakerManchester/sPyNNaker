@@ -26,11 +26,11 @@ class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
         test for get spikes
         """
         try:
-            results = synfire_run.do_run(n_neurons, timestep=timestep,
+            results = synfire_run.do_run(n_neurons, time_step=timestep,
                                          max_delay=max_delay, delay=delay,
                                          neurons_per_core=neurons_per_core,
-                                         runtimes=[runtime])
-            (v, gsyn, spikes) = results
+                                         run_times=[runtime])
+            (v, gsyn, spikes, inpur_spikes) = results
             # Eact spike checking removed as system may oervload
             spike_checker.synfire_spike_checker(spikes, n_neurons)
         # System intentional overload so may error

@@ -22,11 +22,11 @@ class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
         test for get spikes
         """
 
-        results = synfire_run.do_run(n_neurons, timestep=timestep,
+        results = synfire_run.do_run(n_neurons, time_step=timestep,
                                      max_delay=max_delay, delay=delay,
                                      neurons_per_core=neurons_per_core,
-                                     runtimes=[runtime])
-        (v, gsyn, spikes) = results
+                                     run_times=[runtime])
+        (v, gsyn, spikes, inpur_spikes) = results
         pre_recorded_spikes = [[0, 3], [1, 7], [2, 11], [3, 15], [4, 19],
                                [5, 23], [6, 27], [7, 31], [8, 35], [9, 39],
                                [10, 43], [11, 47], [12, 51], [13, 55],

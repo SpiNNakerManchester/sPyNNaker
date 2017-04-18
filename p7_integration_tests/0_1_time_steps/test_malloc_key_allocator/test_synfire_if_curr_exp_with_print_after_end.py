@@ -31,14 +31,14 @@ class TestMallocKeyAllocatorWithSynfire(BaseTestCase):
             current_v_file_path = os.path.join(current_file_path, "v.data")
             current_gsyn_file_path = os.path.join(current_file_path,
                                                   "gsyn.data")
-            results = synfire_run.do_run(n_neurons, max_delay=14, timestep=0.1,
+            results = synfire_run.do_run(n_neurons, max_delay=14, time_step=0.1,
                                          neurons_per_core=1, delay=1.7,
-                                         runtimes=[50],
+                                         run_times=[50],
                                          spike_path=current_spike_file_path,
                                          gsyn_path=current_gsyn_file_path,
                                          v_path=current_v_file_path,
                                          end_before_print=True)
-            (v, gsyn, spikes) = results
+            (v, gsyn, spikes, inpur_spikes) = results
             # read_in_spikes = utility_calls.read_spikes_from_file(
             #    current_spike_file_path, 0, n_neurons, 0, 5000)
             read_in_v = utility_calls.read_in_data_from_file(

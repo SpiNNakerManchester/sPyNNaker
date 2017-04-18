@@ -20,9 +20,9 @@ class SynfireIfCurrExp(BaseTestCase):
     def test_run(self):
         results = synfire_run.do_run(n_neurons,
                                      neurons_per_core=neurons_per_core,
-                                     runtimes=runtimes, record=False,
+                                     run_times=runtimes, record=False,
                                      record_v=False, record_gsyn=False)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertEquals(158, len(spikes))
         spike_checker.synfire_spike_checker(spikes, n_neurons)
         print len(spikes)
@@ -33,9 +33,9 @@ class SynfireIfCurrExp(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                                 runtimes=runtimes, record=False,
+                                 run_times=runtimes, record=False,
                                  record_v=False, record_gsyn=False)
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results
     plot_utils.plot_spikes(spikes)
     plot_utils.line_plot(v, title="v")
     plot_utils.heat_plot(gsyn, title="gsyn")

@@ -25,10 +25,10 @@ class TestGetVoltage(BaseTestCase):
             n_neurons = 200  # number of neurons in each population
             runtime = 500
             results = synfire_run.do_run(n_neurons, max_delay=14.4,
-                                         timestep=0.1,
+                                         time_step=0.1,
                                          neurons_per_core=10, delay=1.7,
-                                         runtimes=[runtime])
-            (v, gsyn, spikes) = results
+                                         run_times=[runtime])
+            (v, gsyn, spikes, inpur_spikes) = results
             # Exact v check removed as system overloads
         # System intentional overload so may error
         except SpinnmanTimeoutException as ex:

@@ -12,11 +12,11 @@ import p7_integration_tests.scripts.synfire_run as synfire_run
 class Synfire2RunResetFileWriteIssue(BaseTestCase):
     def test_run(self):
         nNeurons = 200  # number of neurons in each population
-        results = synfire_run.do_run(nNeurons,  spike_times=[[0, 1050]],
-                                     runtimes=[1000, 1000],
+        results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
+                                     run_times=[1000, 1000],
                                      extract_between_runs=False, reset=True,
                                      new_pop=True)
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertEquals(53, len(spikes))
         spike_checker.synfire_spike_checker(spikes, nNeurons)
 
@@ -24,10 +24,10 @@ class Synfire2RunResetFileWriteIssue(BaseTestCase):
 if __name__ == '__main__':
     nNeurons = 200  # number of neurons in each population
     results = synfire_run.do_run(nNeurons, spike_times=[[0, 1050]],
-                                 runtimes=[1000, 1000],
+                                 run_times=[1000, 1000],
                                  extract_between_runs=False, reset=True,
                                  new_pop=True)
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v, title="v")

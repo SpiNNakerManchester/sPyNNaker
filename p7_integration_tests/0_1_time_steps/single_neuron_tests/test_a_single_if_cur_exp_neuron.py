@@ -9,6 +9,9 @@ from p7_integration_tests.base_test_case import BaseTestCase
 import spynnaker.pyNN as p
 
 # Cell parameters
+from p7_integration_tests.scripts import synfire_run
+from spynnaker.pyNN import SpikeSourcePoisson
+
 cell_params = {'cm': 0.25,
                'i_offset': 0.0,
                'tau_m': 20.0,
@@ -23,51 +26,7 @@ simtime = 4000
 noise_rate = 200
 
 
-def poisson_generator(rate, t_start, t_stop):
-    """
-    Generate poisson noise of given rate between start and stop times
-    :param rate:
-    :param t_start:
-    :param t_stop:
-    :return:
-    """
-    n = (t_stop - t_start) / 1000.0 * rate
-    number = numpy.ceil(n + 3 * numpy.sqrt(n))
-    if number < 100:
-        number = min(5 + numpy.ceil(2 * n), 100)
-
-    if number > 0:
-        isi = numpy.random.exponential(1.0 / rate, number) * 1000.0
-        if number > 1:
-            spikes = numpy.add.accumulate(isi)
-        else:
-            spikes = isi
-    else:
-        spikes = numpy.array([])
-
-    spikes += t_start
-    i = numpy.searchsorted(spikes, t_stop)
-
-    extra_spikes = []
-    if len(spikes) == i:
-        # ISI buf overrun
-
-        t_last = (spikes[-1] +
-                  numpy.random.exponential(1.0 / rate, 1)[0] * 1000.0)
-
-        while t_last < t_stop:
-            extra_spikes.append(t_last)
-            t_last += numpy.random.exponential(1.0 / rate, 1)[0] * 1000.0
-
-            spikes = numpy.concatenate((spikes, extra_spikes))
-    else:
-        spikes = numpy.resize(spikes, (i,))
-
-    # Return spike times, rounded to millisecond boundaries
-    return [round(x) for x in spikes]
-
-
-def simulate(spinnaker, input_spike_times):
+def simulate(input_spike_times):
 
     rng = p.NumpyRNG(seed=28375)
     v_init = p.RandomDistribution('uniform', [-60, -40], rng)
@@ -114,23 +73,21 @@ def plot_raster(trace, axis, offset, label, colour):
 
 
 def do_run():
-    # Generate poisson noise
-    # **YUCK** remove duplicates as SpiNNaker implementation of spike
-    # source array can only send one spike/neuron/ms
-    noise_spike_times = poisson_generator(noise_rate, 0, simtime)
-    noise_spike_times = list(
-        collections.OrderedDict.fromkeys(noise_spike_times))
 
     # Simulate using both simulators
-    s_pop_voltages, s_pop_spikes = simulate(True, noise_spike_times)
-    n_pop_voltages, n_pop_spikes = simulate(False, noise_spike_times)
+    results = synfire_run.do_run(
+        n_neurons=1, input_class=SpikeSourcePoisson, rate=noise_rate,
+        start_time=0, duration=simtime, use_loop_connections=False,
+        cell_params=cell_params, run_times=[simtime], record=True,
+        record_v=True, randomise_v_init=True, record_input_spikes=True,
+        weight_to_spike=0.4)
 
-    return (noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
-            n_pop_voltages)
+    s_pop_voltages, _, s_pop_spikes, noise_spike_times = results
+
+    return noise_spike_times, s_pop_spikes, s_pop_voltages
 
 
-def plot(noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
-         n_pop_voltages):
+def plot(noise_spike_times, s_pop_spikes, s_pop_voltages):
     import pylab  # deferred so unittest are not dependent on it
 
     _, axes = pylab.subplots(3, sharex=True)
@@ -140,15 +97,12 @@ def plot(noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
     axes[0].set_xlim((0, simtime))
 
     plot_raster(s_pop_spikes, axes[1], 0, "SpiNNaker", "red")
-    plot_raster(n_pop_spikes, axes[1], 1, "NEST", "blue")
     axes[1].set_title("Output spikes")
     axes[1].set_xlim((0, simtime))
 
     numpy.save("spinnaker_voltages.npy", s_pop_voltages)
-    numpy.save("nest_voltages.npy", n_pop_voltages)
 
     plot_trace(s_pop_voltages, axes[2], "SpiNNaker", "red")
-    plot_trace(n_pop_voltages, axes[2], "NEST", "blue")
     axes[2].set_title("Membrane voltage")
     axes[2].set_ylabel("Voltage/mV")
     axes[2].set_ylim((-70, -35))
@@ -165,18 +119,13 @@ class TestIfCurExpSingleNeuron(BaseTestCase):
     """
     def test_single_neuron(self):
         results = do_run()
-        (noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
-         n_pop_voltages) = results
+        (noise_spike_times, s_pop_spikes, s_pop_voltages) = results
         self.assertLess(2, len(s_pop_spikes))
         self.assertGreater(15, len(s_pop_spikes))
-        self.assertEquals(len(s_pop_spikes), len(n_pop_spikes))
 
 
 if __name__ == '__main__':
     results = do_run()
-    (noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
-     n_pop_voltages) = results
+    (noise_spike_times, s_pop_spikes,  s_pop_voltages) = results
     print len(s_pop_spikes)
-    print len(n_pop_spikes)
-    plot(noise_spike_times, s_pop_spikes, n_pop_spikes, s_pop_voltages,
-         n_pop_voltages)
+    plot(noise_spike_times, s_pop_spikes, s_pop_voltages)

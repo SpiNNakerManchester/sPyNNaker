@@ -18,14 +18,14 @@ class TestGsyn(BaseTestCase):
         runtime = 50
         with self.assertRaises(ConfigurationException):
             results = synfire_run.do_run(n_neurons, max_delay=14.4,
-                                         timestep=0.1, neurons_per_core=5,
-                                         delay=1.7, runtimes=[runtime])
+                                         time_step=0.1, neurons_per_core=5,
+                                         delay=1.7, run_times=[runtime])
             print results
 
 
 if __name__ == '__main__':
     n_neurons = 10  # number of neurons in each population
     runtime = 50
-    results = synfire_run.do_run(n_neurons, max_delay=14.4, timestep=0.1,
+    results = synfire_run.do_run(n_neurons, max_delay=14.4, time_step=0.1,
                                  neurons_per_core=5, delay=1.7,
-                                 runtimes=[runtime])
+                                 run_times=[runtime])

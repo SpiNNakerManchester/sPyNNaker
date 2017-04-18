@@ -17,11 +17,11 @@ class SynfireIfCurrExp(BaseTestCase):
     def test_run(self):
         results = synfire_run.do_run(n_neurons,
                                      neurons_per_core=neurons_per_core,
-                                     runtimes=[runtime], record=record,
+                                     run_times=[runtime], record=record,
                                      record_v=record_v,
                                      record_gsyn=record_gsyn,
                                      )
-        (v, gsyn, spikes) = results
+        (v, gsyn, spikes, inpur_spikes) = results
         self.assertIsNone(v)
         self.assertIsNone(gsyn)
         self.assertIsNone(spikes)
@@ -29,6 +29,6 @@ class SynfireIfCurrExp(BaseTestCase):
 
 if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                                 runtimes=[runtime], record=record,
+                                 run_times=[runtime], record=record,
                                  record_v=record_v, record_gsyn=record_gsyn, )
-    (v, gsyn, spikes) = results
+    (v, gsyn, spikes, inpur_spikes) = results
