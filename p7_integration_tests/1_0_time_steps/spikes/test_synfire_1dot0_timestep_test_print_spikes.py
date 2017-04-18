@@ -6,7 +6,6 @@ import unittest
 from p7_integration_tests.base_test_case import BaseTestCase
 import p7_integration_tests.scripts.synfire_run as synfire_run
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
-import numpy
 
 n_neurons = 20
 timestep = 1
@@ -23,8 +22,6 @@ class TestPrintSpikes(BaseTestCase):
     tests the printing of get spikes given a simulation
     """
 
-    # @unittest.skip("skipping test /0_1_time_steps/spikes/"
-    #               "test_synfire_0dot1_timestep_test_print_spikes.py")
     def test_print_spikes(self):
         results = synfire_run.do_run(n_neurons, time_step=timestep,
                                      max_delay=max_delay, delay=delay,
@@ -33,25 +30,10 @@ class TestPrintSpikes(BaseTestCase):
                                      spike_path=current_file_path)
         (v, gsyn, spikes, inpur_spikes) = results
 
-        numpy.savetxt("spikes.csv", spikes, fmt=['%d', '%d'],
-                      delimiter=',')
-
         read_in_spikes = utility_calls.read_spikes_from_file(
             current_file_path, min_atom=0, max_atom=n_neurons,
             min_time=0, max_time=500)
 
-        print spikes[0]
-        print "#"
-        print read_in_spikes[0]
-        print "..."
-        print spikes.size
-        print read_in_spikes.size
-        print "..."
-        print spikes.dtype
-        print read_in_spikes.dtype
-        print "..."
-        print spikes.ndim
-        print read_in_spikes.dtype
         for spike_element, read_element in zip(spikes, read_in_spikes):
             self.assertEqual(round(spike_element[0], 1),
                              round(read_element[0], 1))
