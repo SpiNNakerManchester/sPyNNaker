@@ -36,6 +36,8 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.abstract_models\
     .abstract_rewrites_data_specification\
     import AbstractRewritesDataSpecification
+from spinn_front_end_common.abstract_models.impl\
+    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -55,11 +57,12 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
+from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses\
+    import AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
-
 
 import logging
 import os
@@ -87,7 +90,8 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet):
+        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -120,6 +124,8 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
+        AbstractAcceptsIncomingSynapses.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -263,10 +269,6 @@ class AbstractPopulationVertex(
 
         # return machine vertex
         return vertex
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self._synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         per_neuron_cycles = (
@@ -631,10 +633,6 @@ class AbstractPopulationVertex(
         self._change_requires_neuron_parameters_reload = True
 
     @property
-    def synapse_type(self):
-        return self._synapse_manager.synapse_type
-
-    @property
     def input_type(self):
         return self._input_type
 
@@ -754,8 +752,7 @@ class AbstractPopulationVertex(
     def synapse_dynamics(self):
         return self._synapse_manager.synapse_dynamics
 
-    @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics):
         self._synapse_manager.synapse_dynamics = synapse_dynamics
 
     def add_pre_run_connection_holder(
@@ -769,6 +766,14 @@ class AbstractPopulationVertex(
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step)
+
+    @property
+    def synapse_type(self):
+        return self._synapse_manager.synapse_type
+
+    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        return self._synapse_manager.get_maximum_delay_supported_in_ms(
+            machine_time_step)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
