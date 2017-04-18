@@ -42,7 +42,8 @@ from spinn_front_end_common.utilities.utility_objs.executable_start_type \
 
 from spynnaker.pyNN.models.common import \
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonMachineVertex
+from .spike_source_poisson_machine_vertex \
+    import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.conf import config

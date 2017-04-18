@@ -40,8 +40,8 @@ from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 # spynnaker imports
-from spynnaker.pyNN.models.neuron \
-    import PopulationMachineVertex, SynapticManager
+from .synaptic_manager import SynapticManager
+from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,\
