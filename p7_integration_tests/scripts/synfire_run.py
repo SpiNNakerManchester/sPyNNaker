@@ -37,7 +37,7 @@ class TestRun(object):
             use_loop_connections=True, get_weights=False,
             end_before_print=False, randomise_v_init=False):
         """
-    
+
         :param n_neurons: Number of Neurons in chain
         :type  n_neurons: int
         :param time_step: time step value to be used in p.setup
@@ -102,21 +102,22 @@ class TestRun(object):
         :type get_weights: bool
         :param end_before_print: If True will call end() before running the \
             optional print commands.
-            Note: end will always be called twoce even if no print path provided
+            Note: end will always be called twice even if no print path
+            provided
             WARNING: This is expected to cause an Exception \
-                if a print path is provided
+                if spike_path, v_path or gsyn_path provided
         :type end_before_print: bool
         :param randomise_v_init: randomises the v_init of the output pop.
         :type randomise_v_init: bool
-        :param use_loop_connections: True will put looping connections in. false \
-                wont
-        :type end_before_print: bool
+        :param use_loop_connections: True will put looping connections in.
+            falswont
+        :type use_loop_connections: bool
         :return (v, gsyn, spikes, weights .....)
             v: Voltage after last or each run (if requested else None)
             gysn: gysn after last or each run (if requested else None)
             spikes: spikes after last or each run (if requested else None)
             weights: weights after last or each run (if requested else skipped)
-    
+
             All three/four values will repeated once per run is requested
         """
 
@@ -164,7 +165,7 @@ class TestRun(object):
         else:
             populations.append(p.Population(
                 1, input_class,
-                {'rate':rate, 'start':start_time, 'duration': duration},
+                {'rate': rate, 'start': start_time, 'duration': duration},
                 label='inputSSP_1'))
 
         # handle projections

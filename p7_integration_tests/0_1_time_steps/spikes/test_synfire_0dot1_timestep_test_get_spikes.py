@@ -4,7 +4,7 @@ Synfirechain-like example
 import unittest
 
 from p7_integration_tests.base_test_case import BaseTestCase
-import p7_integration_tests.scripts.synfire_run as synfire_run
+from p7_integration_tests.scripts.synfire_run import TestRun
 import spynnaker.spike_checker as spike_checker
 from spinnman.exceptions import SpinnmanTimeoutException
 from unittest import SkipTest
@@ -15,6 +15,7 @@ max_delay = 14.40
 delay = 1.7
 neurons_per_core = n_neurons/2
 runtime = 500
+synfire_run = TestRun()
 
 
 class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
@@ -26,11 +27,11 @@ class TestGetSpikesAt0_1msTimeStep(BaseTestCase):
         test for get spikes
         """
         try:
-            results = synfire_run.do_run(n_neurons, time_step=timestep,
-                                         max_delay=max_delay, delay=delay,
-                                         neurons_per_core=neurons_per_core,
-                                         run_times=[runtime])
-            (v, gsyn, spikes, inpur_spikes) = results
+            synfire_run.do_run(n_neurons, time_step=timestep,
+                               max_delay=max_delay, delay=delay,
+                               neurons_per_core=neurons_per_core,
+                               run_times=[runtime])
+            spikes = synfire_run.get_output_pop_spikes()
             # Eact spike checking removed as system may oervload
             spike_checker.synfire_spike_checker(spikes, n_neurons)
         # System intentional overload so may error

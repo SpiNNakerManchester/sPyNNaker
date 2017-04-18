@@ -6,7 +6,7 @@ Synfirechain-like example
 import os
 import unittest
 from p7_integration_tests.base_test_case import BaseTestCase
-import p7_integration_tests.scripts.synfire_run as synfire_run
+from p7_integration_tests.scripts.synfire_run import TestRun
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 n_neurons = 200  # number of neurons in each population
@@ -17,6 +17,7 @@ max_delay = 14
 timestep = 1
 neurons_per_core = n_neurons/2
 delay = 1.7
+synfire_run = TestRun()
 
 
 class TestPrintVoltage(BaseTestCase):
@@ -29,13 +30,11 @@ class TestPrintVoltage(BaseTestCase):
         test that tests the printing of v from a pre determined recording
         :return:
         """
-        results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                     time_step=timestep,
-                                     neurons_per_core=neurons_per_core,
-                                     delay=delay,
-                                     run_times=[runtime],
-                                     v_path=current_v_file_path)
-        (v, gsyn, spikes, inpur_spikes) = results
+        synfire_run.do_run(n_neurons, max_delay=max_delay, time_step=timestep,
+                           neurons_per_core=neurons_per_core, delay=delay,
+                           run_times=[runtime], v_path=current_v_file_path)
+        v = synfire_run.get_output_pop_voltage()
+
         read_in_v_values = utility_calls.read_in_data_from_file(
             current_v_file_path, 0, n_neurons, 0, runtime)
 

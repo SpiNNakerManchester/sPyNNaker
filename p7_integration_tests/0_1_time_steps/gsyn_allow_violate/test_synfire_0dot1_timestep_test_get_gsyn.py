@@ -39,12 +39,12 @@ if __name__ == '__main__':
     synfire_run.do_run(
         n_neurons, max_delay=14.4, time_step=0.1, neurons_per_core=5,
         delay=1.7, run_times=[runtime])
-
-    g_syn = synfire_run.get_output_pop_gsyn()
+    gsyn = synfire_run.get_output_pop_gsyn()
     v = synfire_run.get_output_pop_voltage()
     spikes = synfire_run.get_output_pop_spikes()
+
     print len(spikes)
     plot_utils.plot_spikes(spikes)
     plot_utils.heat_plot(v)
-    plot_utils.heat_plot(g_syn)
-    gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, g_syn)
+    plot_utils.heat_plot(gsyn)
+    gsyn_tools.check_sister_gysn(__file__, n_neurons, runtime, gsyn)

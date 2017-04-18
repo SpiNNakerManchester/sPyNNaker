@@ -3,7 +3,7 @@ Synfirechain-like example
 """
 # spynnaker imports
 from p7_integration_tests.base_test_case import BaseTestCase
-import p7_integration_tests.scripts.synfire_run as synfire_run
+from p7_integration_tests.scripts.synfire_run import TestRun
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 # general imports
@@ -16,6 +16,7 @@ max_delay = 14.4
 timestep = 1
 neurons_per_core = n_neurons/2
 delay = 1.7
+synfire_run = TestRun()
 
 
 class TestGetVoltage(BaseTestCase):
@@ -28,12 +29,10 @@ class TestGetVoltage(BaseTestCase):
         test that tests the getting of v from a pre determined recording
         :return:
         """
-        results = synfire_run.do_run(n_neurons, max_delay=max_delay,
-                                     time_step=timestep,
-                                     neurons_per_core=neurons_per_core,
-                                     delay=delay,
-                                     run_times=[runtime])
-        (v, gsyn, spikes, inpur_spikes) = results
+        synfire_run.do_run(n_neurons, max_delay=max_delay, time_step=timestep,
+                           neurons_per_core=neurons_per_core, delay=delay,
+                           run_times=[runtime])
+        v = synfire_run.get_output_pop_voltage()
 
         current_file_path = os.path.dirname(os.path.abspath(__file__))
         current_file_path = os.path.join(current_file_path, "v.data")
