@@ -140,9 +140,13 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
-        AbstractContainsUnits.__init__(
-            self, {'spikes': 'spikes', 'v': 'mV', 'gsyn_exc': "uS",
-                   'gsyn_inh': "uS"})
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            'spikes': 'spikes',
+            'v': 'mV',
+            'gsyn_exc': "uS",
+            'gsyn_inh': "uS"}
 
         self._binary = binary
         self._n_atoms = n_neurons
@@ -897,8 +901,8 @@ class AbstractPopulationVertex(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
 
-    @overrides(AbstractContainsUnits.units)
-    def units(self, variable):
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
         # search the model components for the variable
         for obj in [self._neuron_model, self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
@@ -907,7 +911,12 @@ class AbstractPopulationVertex(
                     isinstance(obj, AbstractContainsUnits)):
                 return obj.unit(variable)
         # if not in the components, must be within myself, so call my own units
-        return AbstractContainsUnits.units(self, variable)
+        if variable in self._units:
+            return self._units[variable]
+        else:
+            raise InvalidParameterType(
+                "The parameter {} does not exist in this input "
+                "conductance component".format(variable))
 
     def describe(self):
         """

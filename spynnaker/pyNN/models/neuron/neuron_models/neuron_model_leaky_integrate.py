@@ -37,9 +37,16 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
         AbstractNeuronModel.__init__(self)
-        AbstractContainsUnits.__init__(
-            self, {'v_init': 'mV', 'v_rest': 'mV', 'tau_m': 'ms', 'cm': 'nF',
-                   'i_offset': 'nA'})
+        AbstractContainsUnits.__init__(self)
+
+
+        self._units = {
+            'v_init': 'mV',
+            'v_rest': 'mV',
+            'tau_m': 'ms',
+            'cm': 'nF',
+            'i_offset': 'nA'}
+
         self._n_neurons = n_neurons
         self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
         self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
@@ -165,3 +172,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
         # A bit of a guess
         return 80
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

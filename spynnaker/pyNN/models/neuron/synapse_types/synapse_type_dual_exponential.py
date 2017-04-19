@@ -1,4 +1,5 @@
 from pacman.executor.injection_decorator import inject_items
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
@@ -44,9 +45,15 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
                  tau_syn_I, initial_input_exc, initial_input_exc2,
                  initial_input_inh):
         AbstractSynapseType.__init__(self)
-        AbstractContainsUnits.__init__(
-            self, {'tau_syn_E': "mV", 'tau_syn_E2': "mV", 'tau_syn_I': 'mV',
-                   'gsyn_exc': "uS", 'gsyn_inh': "uS"})
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            'tau_syn_E': "mV",
+            'tau_syn_E2': "mV",
+            'tau_syn_I': 'mV',
+            'gsyn_exc': "uS",
+            'gsyn_inh': "uS"}
+
         self._n_neurons = n_neurons
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)
@@ -164,3 +171,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
         # A guess
         return 100
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

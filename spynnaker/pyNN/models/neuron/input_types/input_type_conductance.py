@@ -1,4 +1,5 @@
 from data_specification.enums.data_type import DataType
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
@@ -31,8 +32,12 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
         AbstractInputType.__init__(self)
-        AbstractContainsUnits.__init__(
-            self, {"e_rev_I": "mV", "e_rev_E": "mV"})
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            "e_rev_I": "mV",
+            "e_rev_E": "mV"}
+
         self._n_neurons = n_neurons
         self._e_rev_E = utility_calls.convert_param_to_numpy(
             e_rev_E, n_neurons)
@@ -76,3 +81,7 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
 
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

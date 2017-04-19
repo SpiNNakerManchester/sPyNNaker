@@ -34,7 +34,10 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, v_thresh):
         AbstractThresholdType.__init__(self)
-        AbstractContainsUnits.__init__(self, {'v_thresh': "mV"})
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {'v_thresh': "mV"}
+
         self._n_neurons = n_neurons
         self._v_thresh = utility_calls.convert_param_to_numpy(
             v_thresh, n_neurons)
@@ -66,3 +69,7 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
 
         # Just a comparison, but 2 just in case!
         return 2
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]
