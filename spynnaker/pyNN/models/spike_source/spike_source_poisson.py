@@ -722,5 +722,11 @@ class SpikeSourcePoisson(
     def get_outgoing_partition_constraints(self, partition):
         return [KeyAllocatorContiguousRangeContraint()]
 
-    def get_spikes_recording_region_id(self):
-        return self.SPIKE_RECORDING_REGION_ID
+    @overrides(AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID)

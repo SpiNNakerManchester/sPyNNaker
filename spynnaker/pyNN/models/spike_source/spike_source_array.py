@@ -186,8 +186,15 @@ class SpikeSourceArray(
                 else 0,
             machine_time_step)
 
-    def get_spikes_recording_region_id(self):
-        return self.SPIKE_RECORDING_REGION_ID
+    @overrides(AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
+
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

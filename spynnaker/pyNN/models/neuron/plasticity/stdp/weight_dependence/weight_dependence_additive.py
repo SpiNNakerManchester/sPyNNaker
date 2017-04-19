@@ -1,13 +1,17 @@
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus import \
+    AbstractHasAPlusAMinus
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
     .abstract_weight_dependence import AbstractWeightDependence
 
 
-class WeightDependenceAdditive(AbstractWeightDependence):
+class WeightDependenceAdditive(
+        AbstractWeightDependence, AbstractHasAPlusAMinus):
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
         AbstractWeightDependence.__init__(self)
+        AbstractHasAPlusAMinus.__init__(self)
         self._w_min = w_min
         self._w_max = w_max
 

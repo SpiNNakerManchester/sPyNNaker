@@ -129,7 +129,7 @@ class PyNNPopulationCommon(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if self._spinnaker.has_ran and not isinstance(
+        if globals_variables.get_simulator().has_ran and not isinstance(
                 self._vertex, AbstractChangableAfterRun):
             raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
@@ -197,7 +197,7 @@ class PyNNPopulationCommon(object):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if self._spinnaker.has_ran and not isinstance(
+        if globals_variables.get_simulator().has_ran and not isinstance(
                 self._vertex, AbstractChangableAfterRun):
             raise Exception(
                 "This population does not support changes to settings after"
@@ -228,14 +228,14 @@ class PyNNPopulationCommon(object):
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        if (self._spinnaker.has_ran and not self._spinnaker.has_reset_last and
+        if (globals_variables.get_simulator().has_ran and not
+            globals_variables.get_simulator().has_reset_last and
                 isinstance(self._vertex, AbstractReadParametersBeforeSet) and
                 not self._has_read_neuron_parameters_this_run):
 
             # locate machine vertices from the application vertices
-            machine_vertices = \
-                self._spinnaker.graph_mapper.get_machine_vertices(
-                    self._vertex)
+            machine_vertices = globals_variables.get_simulator().graph_mapper\
+                .get_machine_vertices(self._vertex)
 
             # go through each machine vertex and read the neuron parameters
             # it contains
@@ -243,12 +243,13 @@ class PyNNPopulationCommon(object):
 
                 # tell the core to rewrite neuron params back to the
                 # sdram space.
-                placement = self._spinnaker.placements.\
+                placement = globals_variables.get_simulator().placements.\
                     get_placement_of_vertex(machine_vertex)
 
                 self._vertex.read_parameters_from_machine(
-                    self._spinnaker.transceiver, placement,
-                    self._spinnaker.graph_mapper.get_slice(machine_vertex))
+                    globals_variables.get_simulator().transceiver, placement,
+                    globals_variables.get_simulator().graph_mapper.get_slice(
+                        machine_vertex))
 
             self._has_read_neuron_parameters_this_run = True
 
@@ -366,4 +367,4 @@ class PyNNPopulationCommon(object):
         :return: the units in string form
         """
         if isinstance(self._vertex, AbstractContainsUnits):
-            return self._vertex.units(parameter_name)
+            return self._vertex.get_units(parameter_name)
