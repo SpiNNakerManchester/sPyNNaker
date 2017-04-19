@@ -61,11 +61,8 @@ $(info ---------------------------------------------------------------------)
 $(info Build configuration: $(CURDIR)/Makefile)
 $(info )
 
-# If NEURAL_MODELLING_DIRS is not defined, this is an error!
 ifndef NEURAL_MODELLING_DIRS
-    $(error NEURAL_MODELLING_DIRS is not set.  Please define\
-    	NEURAL_MODELLING_DIRS (possibly by running "source setup" in the\
-    	sPyNNaker folder))
+    NEURAL_MODELLING_DIRS := $(abspath $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/../../..)
 endif
 
 include $(NEURAL_MODELLING_DIRS)/src/paths.mk
