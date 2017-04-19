@@ -11,12 +11,6 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
 # local front end imports
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
-    import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
-    import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -51,7 +45,6 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         # pynn population objects
         self._populations = list()
         self._projections = list()
-        self._command_sender = None
         self._edge_count = 0
 
         # the number of edges that are associated with commands being sent to

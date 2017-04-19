@@ -31,7 +31,7 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
         if ext in data_extensions:
             package = "{}{}".format(
                 main_package, dirname[start:].replace(os.sep, '.'))
-            package_data[package].append("*.{}".format(ext))
+            package_data[package].append("*{}".format(ext))
             break
         if ext in config_extensions:
             package = "{}{}".format(
