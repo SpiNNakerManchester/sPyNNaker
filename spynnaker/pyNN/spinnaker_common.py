@@ -1,5 +1,9 @@
 
 # common front end imports
+from spinn_front_end_common.abstract_models.abstract_send_me_multicast_commands_vertex import \
+    AbstractSendMeMulticastCommandsVertex
+from spinn_front_end_common.abstract_models.abstract_vertex_with_dependent_vertices import \
+    AbstractVertexWithEdgeToDependentVertices
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions

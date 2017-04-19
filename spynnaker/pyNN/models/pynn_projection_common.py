@@ -1,6 +1,8 @@
 from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
 
+from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses \
+    import AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.synapse_information \
@@ -25,7 +27,16 @@ import numpy
 logger = logging.getLogger(__name__)
 
 
+# noinspection PyProtectedMember
 class PyNNProjectionCommon(object):
+    """ A container for all the connections of a given type (same synapse type\
+            and plasticity mechanisms) between two populations, together with\
+            methods to set parameters of those connections, including of\
+            plasticity mechanisms.
+        """
+
+    # noinspection PyUnusedLocal
+
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
@@ -34,6 +45,13 @@ class PyNNProjectionCommon(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+
+        if not isinstance(post_synaptic_population._get_vertex,
+                          AbstractAcceptsIncomingSynapses):
+
+            raise common_exceptions.ConfigurationException(
+                "postsynaptic population is not designed to receive"
+                " synaptic projections")
 
         # sort out synapse type
         synapse_type = post_synaptic_population._get_vertex \
@@ -45,8 +63,8 @@ class PyNNProjectionCommon(object):
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
-        post_synaptic_population._get_vertex.synapse_dynamics = \
-            synapse_dynamics_stdp
+        post_synaptic_population._get_vertex.set_synapse_dynamics(
+            synapse_dynamics_stdp)
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
@@ -153,10 +171,14 @@ class PyNNProjectionCommon(object):
                 pacman.model.graph.application.abstract_application_vertex
         :return: None or the edge going to these vertices.
         """
-        graph_edges = self._spinnaker_control.application_graph.edges
+
+        # Find edges ending at the postsynaptic vertex
+        graph_edges = self._spinnaker_control.application_graph.\
+            get_edges_ending_at_vertex(post_synaptic_vertex)
+
+        # Search the edges for any that start at the presynaptic vertex
         for edge in graph_edges:
-            if ((edge.pre_vertex == pre_synaptic_vertex) and
-                    (edge.post_vertex == post_synaptic_vertex)):
+            if edge.pre_vertex == pre_synaptic_vertex:
                 return edge
         return None
 
