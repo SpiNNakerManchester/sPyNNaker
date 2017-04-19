@@ -78,7 +78,7 @@ class AbstractConnector(object):
             self._rng = NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
 
-    def _check_parameter(self, values, name, allow_lists=True):
+    def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported
         """
         if (not numpy.isscalar(values) and

@@ -26,8 +26,6 @@ class AllToAllConnector(AbstractConnector):
         self._weights = None
         self._delays = None
 
-
-
     def set_weights_and_delays(self, weights, delays):
         """ sets the weights and delays as needed
 
