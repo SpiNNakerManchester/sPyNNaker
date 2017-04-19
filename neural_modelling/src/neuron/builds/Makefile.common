@@ -4,7 +4,7 @@ ifndef NEURAL_MODELLING_DIRS
 endif
 
 include $(NEURAL_MODELLING_DIRS)/src/Makefile.paths
-include $(NEURAL_MODELLING_DIRS)/src/neuron/builds/Makefile.neural_build
+include $(NEURAL_MODELLING_DIRS)/src/neuron/builds/neural_build.mk
 
 # ==================== GENERAL VARIABLES YOU MAY SET ====================
 #
@@ -174,7 +174,8 @@ endif
 
 # ---------------------------------------------------------------------
 
-include ../../../Makefile.common
+# No main build rules from upstream makefiles
+$(BUILD_DIR)%.o: %.c
 
 ifndef SOURCE_DIR
     $(error SOURCE_DIR must be set for this makefile to work.)
@@ -250,3 +251,5 @@ $(eval $(call template_rule,synapse_types/synapse_type,SYNAPSE_TYPE_H))
 $(eval $(call template_rule,threshold_types/threshold_type,THRESHOLD_TYPE_H))
 $(eval $(call template_rule,plasticity/stdp/timing_dependence/timing,TIMING_DEPENDENCE_H))
 $(eval $(call template_rule,plasticity/stdp/weight_dependence/weight,WEIGHT_DEPENDENCE_H))
+
+.PHONY: all clean
