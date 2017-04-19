@@ -17,26 +17,27 @@ synfire_run = TestRun()
 
 class Synfire1RunReset1RunLargertRuntimeNoExtraction(BaseTestCase):
     def test_run(self):
-        results = synfire_run.do_run(
-            nNeurons, spike_times=spike_times, reset=reset, run_times=runtimes,
-            neurons_per_core=neurons_per_core)
-        (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
-        self.assertEquals(53, len(spikes1))
-        self.assertEquals(156, len(spikes2))
-        spike_checker.synfire_spike_checker(spikes1, nNeurons)
-        spike_checker.synfire_multiple_lines_spike_checker(spikes2, nNeurons,
+        synfire_run.do_run(nNeurons, spike_times=spike_times, reset=reset,
+            run_times=runtimes, neurons_per_core=neurons_per_core)
+        spikes = synfire_run.get_output_pop_spikes()
+
+        self.assertEquals(53, len(spikes[0]))
+        self.assertEquals(156, len(spikes[1]))
+        spike_checker.synfire_spike_checker(spikes[0], nNeurons)
+        spike_checker.synfire_multiple_lines_spike_checker(spikes[1], nNeurons,
                                                            2)
 
 
 if __name__ == '__main__':
-    results = synfire_run.do_run(nNeurons, spike_times=spike_times,
-                                 neurons_per_core=neurons_per_core,
-                                 run_times=runtimes, reset=reset)
-    (v1, gsyn1, spikes1, v2, gsyn2, spikes2) = results
-    print len(spikes1)
-    print len(spikes2)
-    plot_utils.plot_spikes(spikes1, spikes2)
-    plot_utils.heat_plot(v1, title="v1")
-    plot_utils.heat_plot(gsyn1, title="gysn1")
-    plot_utils.heat_plot(v2, title="v2")
-    plot_utils.heat_plot(gsyn2, title="gysn2")
+    synfire_run.do_run(nNeurons, spike_times=spike_times, reset=reset,
+                       run_times=runtimes, neurons_per_core=neurons_per_core)
+    gsyn = synfire_run.get_output_pop_gsyn()
+    v = synfire_run.get_output_pop_voltage()
+    spikes = synfire_run.get_output_pop_spikes()
+    print len(spikes[0])
+    print len(spikes[1])
+    plot_utils.plot_spikes(spikes)
+    plot_utils.heat_plot(v[0], title="v1")
+    plot_utils.heat_plot(gsyn[0], title="gysn1")
+    plot_utils.heat_plot(v[1], title="v2")
+    plot_utils.heat_plot(gsyn[1], title="gysn2")
