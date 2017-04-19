@@ -22,10 +22,14 @@ class AbstractGSynExcitatoryRecordable(object):
         """
 
     @abstractmethod
-    def get_gsyn_excitatory_recording_region_id(self):
-        """ returns the recording region id for gsyn excitatory recording
+    def clear_gsyn_excitatory_recording(
+            self, buffer_manager, placements, graph_mapper):
+        """ clears the recorded data from the object
 
-        :return:
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :rtype: None
         """
 
     @abstractmethod

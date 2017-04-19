@@ -852,23 +852,50 @@ class AbstractPopulationVertex(
         """
         return [KeyAllocatorContiguousRangeContraint()]
 
-    @overrides(AbstractGSynInhibitoryRecordable.
-               get_gsyn_inhibitory_recording_region_id)
-    def get_gsyn_inhibitory_recording_region_id(self):
-        return self.GSYN_INHIBITORY_RECORDING_REGION
+    @overrides(
+        AbstractGSynExcitatoryRecordable.clear_gsyn_excitatory_recording)
+    def clear_gsyn_excitatory_recording(
+            self, buffer_manager, placements, graph_mapper):
+        self._clear_recording_region(
+            buffer_manager, placements, graph_mapper,
+            AbstractPopulationVertex.GSYN_EXCITATORY_RECORDING_REGION)
 
-    @overrides(AbstractVRecordable.get_v_recording_region_id)
-    def get_v_recording_region_id(self):
-        return self.V_RECORDING_REGION
+    @overrides(
+        AbstractGSynInhibitoryRecordable.clear_gsyn_inhibitory_recording)
+    def clear_gsyn_inhibitory_recording(
+            self, buffer_manager, placements, graph_mapper):
+        self._clear_recording_region(
+            buffer_manager, placements, graph_mapper,
+            AbstractPopulationVertex.GSYN_INHIBITORY_RECORDING_REGION)
 
-    @overrides(AbstractGSynExcitatoryRecordable.
-               get_gsyn_excitatory_recording_region_id)
-    def get_gsyn_excitatory_recording_region_id(self):
-        return self.GSYN_EXCITATORY_RECORDING_REGION
+    @overrides(AbstractVRecordable.clear_v_recording)
+    def clear_v_recording(self, buffer_manager, placements, graph_mapper):
+        self._clear_recording_region(
+            buffer_manager, placements, graph_mapper,
+            AbstractPopulationVertex.V_RECORDING_REGION)
 
-    @overrides(AbstractSpikeRecordable.get_spikes_recording_region_id)
-    def get_spikes_recording_region_id(self):
-        return self.SPIKE_RECORDING_REGION
+    @overrides(AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        self._clear_recording_region(
+            buffer_manager, placements, graph_mapper,
+            AbstractPopulationVertex.SPIKE_RECORDING_REGION)
+
+    def _clear_recording_region(
+            self, buffer_manager, placements, graph_mapper,
+            recording_region_id):
+        """ clears a recorded data region from the buffer manager
+        
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :param recording_region_id: the recorded region id for clearing
+        :rtype: None 
+        """
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p, recording_region_id)
 
     @overrides(AbstractContainsUnits.units)
     def units(self, variable):

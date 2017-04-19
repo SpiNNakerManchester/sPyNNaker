@@ -17,15 +17,19 @@ class AbstractGSynInhibitoryRecordable(object):
         """
 
     @abstractmethod
-    def get_gsyn_inhibitory_recording_region_id(self):
-        """ returns the recording region id for gsyn inhibitory recording
-
-        :return:
+    def set_recording_gsyn_inhibitory(self, new_state=True):
+        """ Sets gsyn to being recorded
         """
 
     @abstractmethod
-    def set_recording_gsyn_inhibitory(self, new_state=True):
-        """ Sets gsyn to being recorded
+    def clear_gsyn_inhibitory_recording(
+            self, buffer_manager, placements, graph_mapper):
+        """ clears the recorded data from the object
+        
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :rtype: None
         """
 
     @abstractmethod

@@ -24,10 +24,13 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes_recording_region_id(self):
-        """ returns the recording region id for spikes recording
-
-        :return:
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        """ clears the recorded data from the object
+        
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :rtype: None
         """
 
     @abstractmethod
