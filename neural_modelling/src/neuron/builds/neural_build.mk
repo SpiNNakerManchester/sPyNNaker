@@ -24,13 +24,10 @@ endif
 ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
 endif
-ifndef ADDITIONAL_INPUT_H
-    ADDITIONAL_INPUT_H = neuron/additional_inputs/additional_input_none_impl.h
-endif
 
 # ---------------------------------------------------------------------
 
-CFLAGS += -I$(abspath build) -I$(abspath $(SOURCE_DIR))
+CFLAGS += -I$(abspath $(BUILD_DIR)) -I$(abspath $(SOURCE_DIR))
 CFLAGS += $(patsubst %,-I%,$(subst :, ,$(EXTRA_SOURCE_DIRS)))
 
 SOURCES = \
@@ -39,7 +36,7 @@ SOURCES = \
 	neuron/synapses.c \
 	neuron/neuron.c \
 	neuron/spike_processing.c \
-	neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+	$(POPULATION_TABLE) \
 	$(NEURON_MODEL) \
 	$(SYNAPSE_DYNAMICS) \
 	$(WEIGHT_DEPENDENCE) \

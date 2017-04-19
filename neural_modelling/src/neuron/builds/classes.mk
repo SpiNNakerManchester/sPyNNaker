@@ -27,8 +27,14 @@ ifneq ($(notdir $(SYNAPSE_DYNAMICS)),synapse_dynamics_static_impl.c)
     endif
 endif
 
-#POPULATION_TABLE_IMPL := fixed
-POPULATION_TABLE_IMPL := binary_search
+#POPULATION_TABLE_TYPE := fixed
+POPULATION_TABLE_TYPE := binary_search
+
+POPULATION_TABLE = neuron/population_table/population_table_$(POPULATION_TABLE_TYPE)_impl.c
+
+ifndef ADDITIONAL_INPUT_H
+    ADDITIONAL_INPUT_H = neuron/additional_inputs/additional_input_none_impl.h
+endif
 
 # ---------------------------------------------------------------------
 # Convert the filenames for interface implementations into actual
