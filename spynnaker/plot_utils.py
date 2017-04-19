@@ -1,5 +1,7 @@
 # Imports
 import numpy as np
+import sys
+
 try:
     import matplotlib.pyplot as plt
     matplotlib_missing = False
@@ -20,6 +22,7 @@ def _precheck(data, title):
         else:
             print "matplotlib not installed skipping plotting for " + title
         return False
+    return True
 
 
 def line_plot(data, title=None):
@@ -63,6 +66,16 @@ def heat_plot(data, ylabel=None, title=None):
     plt.show()
 
 
+def get_colour():
+    yield "b."
+    yield "g."
+    yield "r."
+    yield "c."
+    yield "m."
+    yield "y."
+    yield "k."
+
+
 def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     """
 
@@ -70,62 +83,45 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     :param spikes2: Optional: Numport array of spikes
     :param spikes3: Optional: Numport array of spikes
     """
-    if not _precheck("mock data", title):
+    if not _precheck(spikes, title):
         return
-    found = False
-    minTime = None
-    maxTime = None
-    minSpike = None
-    maxSpike = None
-    spike_time = [i[1] for i in spikes]
-    spike_id = [i[0] for i in spikes]
-    if len(spike_time) == 0:
-        print "No spikes detected"
-    else:
-        found = True
-        minTime = min(spike_time)
-        maxTime = max(spike_time)
-        minSpike = min(spike_id)
-        maxSpike = max(spike_id)
-        plt.plot(spike_time, spike_id, "b.",)
-    if spikes2 is not None:
-        spike_time = [i[1] for i in spikes2]
-        spike_id = [i[0] for i in spikes2]
-        if len(spike_time) == 0:
-            print "No spikes detected in second spike data"
-        else:
-            found = True
-            minTime = min(minTime, min(spike_time))
-            maxTime = max(maxTime, max(spike_time))
-            minSpike = min(minSpike, min(spike_id))
-            maxSpike = max(maxSpike, max(spike_id))
-            plt.plot(spike_time, spike_id, "r.", )
-    if spikes3 is not None:
-        spike_time = [i[1] for i in spikes3]
-        spike_id = [i[0] for i in spikes3]
-        if len(spike_time) == 0:
-            print "No spikes detected in third spike data"
-        else:
-            found = True
-            minTime = min(minTime, min(spike_time))
-            maxTime = max(maxTime, max(spike_time))
-            minSpike = min(minSpike, min(spike_id))
-            maxSpike = max(maxSpike, max(spike_id))
-            plt.plot(spike_time, spike_id, "g.", )
-    if found:
-        plt.xlabel("Time (ms)")
-        plt.ylabel("Neuron ID")
-        plt.title(title)
-        timeDiff = (maxTime - minTime) * 0.05
-        minTime = minTime - timeDiff
-        maxTime = maxTime + timeDiff
-        spikeDiff = (maxSpike - minSpike) * 0.05
-        minSpike = minSpike - spikeDiff
-        maxSpike = maxSpike + spikeDiff
-        plt.axis([minTime, maxTime, minSpike, maxSpike])
-        plt.show()
 
+    if isinstance(spikes, np.ndarray):
+        spikes = [spikes]
 
+    colours = get_colour()
+
+    minTime = sys.maxint
+    maxTime = 0
+    minSpike = sys.maxint
+    maxSpike = 0
+
+    print "Plotiing {} set of sapikes".format(len(spikes))
+    for single_spikes in spikes:
+        spike_time = [i[1] for i in single_spikes]
+        spike_id = [i[0] for i in single_spikes]
+        minTime = min(minTime, min(spike_time))
+        maxTime = max(maxTime, max(spike_time))
+        minSpike = min(minSpike, min(spike_id))
+        maxSpike = max(maxSpike, max(spike_id))
+        plt.plot(spike_time, spike_id, colours.next(), )
+    plt.xlabel("Time (ms)")
+    plt.ylabel("Neuron ID")
+    plt.title(title)
+    timeDiff = (maxTime - minTime) * 0.05
+    minTime = minTime - timeDiff
+    maxTime = maxTime + timeDiff
+    spikeDiff = (maxSpike - minSpike) * 0.05
+    minSpike = minSpike - spikeDiff
+    maxSpike = maxSpike + spikeDiff
+    plt.axis([minTime, maxTime, minSpike, maxSpike])
+    plt.show()
+
+# This is code for manual testing.
 if __name__ == "__main__":
     spikes = np.loadtxt("spikes.csv", delimiter=',')
     plot_spikes(spikes)
+    double = np.loadtxt("spikes.csv", delimiter=',')
+    for i in range(len(double)):
+        double[i][0] = double[i][0] + 5
+    plot_spikes([spikes, double])
