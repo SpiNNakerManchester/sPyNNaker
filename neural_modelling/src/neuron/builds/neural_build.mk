@@ -1,136 +1,143 @@
-# If SPINN_DIRS is not defined, this is an error!
+# ---------------------------------------------------------------------
+# Sanity checks! Need both SPINN_DIRS and SOURCE_DIR to be set
+
 ifndef SPINN_DIRS
-    $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
+    $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by\
+    	running "source setup" in the spinnaker package folder))
 endif
+ifndef SOURCE_DIR
+    $(error SOURCE_DIR is not set.  Please include paths.mk in your main\
+    	Makefile.)
+endif
+
+# ---------------------------------------------------------------------
+
+ifndef BUILD_DIR
+    BUILD_DIR=build/
+endif
+
+NEURON_MODEL_O = $(call build_dir, $(NEURON_MODEL))
+NEURON_O = $(call build_dir, neuron/neuron.c)
+ifdef WEIGHT_DEPENDENCE
+    WEIGHT_DEPENDENCE_O = $(call build_dir, $(WEIGHT_DEPENDENCE))
+endif
+ifdef TIMING_DEPENDENCE
+    TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
+endif
+ifndef ADDITIONAL_INPUT_H
+    ADDITIONAL_INPUT_H = neuron/additional_inputs/additional_input_none_impl.h
+endif
+
+# ---------------------------------------------------------------------
+
+CFLAGS += -I$(abspath build) -I$(abspath $(SOURCE_DIR))
+CFLAGS += $(patsubst %,-I%,$(subst :, ,$(EXTRA_SOURCE_DIRS)))
+
+SOURCES = \
+	common/out_spikes.c \
+	neuron/c_main.c \
+	neuron/synapses.c \
+	neuron/neuron.c \
+	neuron/spike_processing.c \
+	neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+	$(NEURON_MODEL) \
+	$(SYNAPSE_DYNAMICS) \
+	$(WEIGHT_DEPENDENCE) \
+	$(TIMING_DEPENDENCE) \
+	$(OTHER_SOURCES)
+
+# These next three variables are used to set up build rules, but do not
+# determine what files are actually required for the build.
+
+SYNAPSE_TYPE_SOURCES += \
+    neuron/c_main.c \
+    neuron/synapses.c \
+    neuron/spike_processing.c \
+    neuron/population_table/population_table_fixed_impl.c \
+    neuron/population_table/population_table_binary_search_impl.c \
+    neuron/plasticity/synapse_dynamics_static_impl.c
+
+STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*.c)
+STDP += $(wildcard $(SOURCE_DIR)/neuron/plasticity/*/*/*.c)
+
+NEURON_CORE += $(NEURON_MODEL) \
+	neuron/neuron.c \
+	common/out_spikes.c \
+	build/%_build.c
+
+# ---------------------------------------------------------------------
+
+vpath %.h $(SOURCE_DIR):build:$(EXTRA_SOURCE_DIRS)
+vpath %.c $(SOURCE_DIR):$(EXTRA_SOURCE_DIRS)
+vpath %.tmpl $(SOURCE_DIR)/neuron
+
+include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+
+# No main build rules from upstream makefiles
+$(BUILD_DIR)%.o: %.c
+
+# ---------------------------------------------------------------------
 
 ifeq ($(SPYNNAKER_DEBUG), DEBUG)
     NEURON_DEBUG = LOG_DEBUG
     SYNAPSE_DEBUG = LOG_DEBUG
     PLASTIC_DEBUG = LOG_DEBUG
 endif
-
 ifndef NEURON_DEBUG
     NEURON_DEBUG = LOG_INFO
 endif
-
 ifndef SYNAPSE_DEBUG
     SYNAPSE_DEBUG = LOG_INFO
 endif
-
 ifndef PLASTIC_DEBUG
     PLASTIC_DEBUG = LOG_INFO
 endif
 
-#POPULATION_TABLE_IMPL := fixed
-POPULATION_TABLE_IMPL := binary_search
+SYNAPSE_DEP = build/synapse_type.h	   $(SYNAPSE_TYPE_H)
+PLASTIC_DEP = build/weight.h		   $(WEIGHT_DEPENDENCE_H) \
+			  build/timing.h		   $(TIMING_DEPENDENCE_H)
+NEURON_DEP =  build/threshold_type.h   $(THRESHOLD_TYPE_H) \
+			  build/neuron_model.h	   $(NEURON_MODEL_H) \
+			  build/additional_input.h $(ADDITIONAL_INPUT_H) \
+			  build/input_type.h	   $(INPUT_TYPE_H)
 
-ifndef ADDITIONAL_INPUT_H
-    ADDITIONAL_INPUT_H = $(SOURCE_DIR)/neuron/additional_inputs/additional_input_none_impl.h
-endif
+# ---------------------------------------------------------------------
 
-ifndef NEURON_MODEL
-    $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
-else
-    NEURON_MODEL_O = $(call build_dir, $(NEURON_MODEL))
-endif
-
-ifndef NEURON_MODEL_H
-    $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
-endif
-
-ifndef INPUT_TYPE_H
-    $(error INPUT_TYPE_H is not set.  Please select an input type header file)
-endif
-
-ifndef THRESHOLD_TYPE_H
-    $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
-endif
-
-ifndef SYNAPSE_TYPE_H
-    $(error SYNAPSE_TYPE_H is not set.  Please select a synapse type header file)
-endif
-
-ifndef SYNAPSE_DYNAMICS
-    $(error SYNAPSE_DYNAMICS is not set.  Please select a synapse dynamics implementation)
-endif
-
-ifdef WEIGHT_DEPENDENCE
-    WEIGHT_DEPENDENCE_O = $(call build_dir, $(WEIGHT_DEPENDENCE))
-endif
-
-ifdef TIMING_DEPENDENCE
-    TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
-endif
-
-NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
-
-SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
-          $(SOURCE_DIR)/neuron/c_main.c \
-          $(SOURCE_DIR)/neuron/synapses.c  $(SOURCE_DIR)/neuron/neuron.c \
-	      $(SOURCE_DIR)/neuron/spike_processing.c \
-	      $(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES)
-
-SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
-                        $(SOURCE_DIR)/neuron/synapses.c \
-                        $(SOURCE_DIR)/neuron/spike_processing.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
-                        $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
-
-ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)             
-    STDP += $(SYNAPSE_DYNAMICS) \
-            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c
-endif
-
-include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
-
-define synapse_type_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
-	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
-	        $$(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
+define synapse_build_rule
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
+		$$(CFLAGS) -o $$@ $$<
 endef
 
-define stdp_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
-                               $$(WEIGHT_DEPENDENCE_H) $$(TIMING_DEPENDENCE_H)
-	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
-	      $$(CFLAGS) \
-	      -include $$(SYNAPSE_TYPE_H) \
-	      -include $$(WEIGHT_DEPENDENCE_H) \
-	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
+define plasticity_build_rule
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP) $(PLASTIC_DEP)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
+		$$(CFLAGS) -o $$@ $$<
 endef
 
-$(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
-$(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
+define neuron_build_rule
+build/$(notdir $(1:.c=.o)): $(1) $(SYNAPSE_DEP) $(NEURON_DEP)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" -DLOG_LEVEL=$$(strip $(2)) \
+		$$(CFLAGS) -o $$@ $$<
+endef
 
-$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
-	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $@ $<
+define basic_build_rule
+build/$(notdir $(1:.c=.o)): $(1)
+	@-$$(MKDIR) $$(dir $$@)
+	$$(CC) -D__FILENAME__=\"$$(notdir $$<)\" \
+		$$(if $(2), -DLOG_LEVEL=$$(strip $(2))) $$(CFLAGS) -o $$@ $$<
+endef
 
-$(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
-                        $(WEIGHT_DEPENDENCE_H)
-	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H)\
-	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+$(foreach file, $(SYNAPSE_TYPE_SOURCES), \
+	$(eval $(call synapse_build_rule, $(file), $(SYNAPSE_DEBUG))))
+$(foreach file, $(STDP), \
+	$(eval $(call plasticity_build_rule, $(file), $(PLASTIC_DEBUG))))
+$(foreach file, $(NEURON_CORE), \
+	$(eval $(call neuron_build_rule, $(file), $(NEURON_DEBUG))))
+$(foreach file, $(OTHER_SOURCES), \
+	$(eval $(call basic_build_rule, $(file))))
 
-$(NEURON_MODEL_O): $(NEURON_MODEL)
-	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(NEURON_DEBUG) \
-	        $(CFLAGS) -o $@ $<
-
-$(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
-	-mkdir -p $(dir $@)
-	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
-	      -include $(NEURON_MODEL_H) \
-	      -include $(SYNAPSE_TYPE_H) \
-	      -include $(INPUT_TYPE_H) \
-	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+.PHONY: all clean
