@@ -18,11 +18,13 @@ CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
 
 class TestRun(object):
 
+    # Changed April 19
     def __init__(self):
-        self._recorded_v = None
-        self._recorded_spikes = None
-        self._recorded_gsyn = None
-        self._input_spikes_recorded = None
+        self._recorded_v = []
+        self._recorded_spikes = []
+        self._recorded_gsyn = []
+        self._input_spikes_recorded = []
+        self._weights = []
 
     def do_run(
             self, n_neurons, time_step=1, max_delay=144.0,
@@ -196,8 +198,9 @@ class TestRun(object):
                 self._get_data(
                     populations[0], populations[1], record, record_v,
                     record_gsyn, record_input_spikes)
+                # Changed April 19
                 if get_weights:
-                    results += (projections[0].getWeights(), )
+                    self._weights.append(projections[0].getWeights())
 
             if new_pop:
                 populations.append(
@@ -220,8 +223,9 @@ class TestRun(object):
         self._get_data(
             populations[0], populations[1], record, record_v, record_gsyn,
             record_input_spikes)
+        # Changed April 19
         if get_weights:
-            results += (projections[0].getWeights(), )
+            self._weights.append(projections[0].getWeights())
 
         if end_before_print:
             if v_path is not None or spike_path is not None or \
@@ -240,50 +244,98 @@ class TestRun(object):
 
         return results
 
+    # Changed April 19
     def get_output_pop_gsyn(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._recorded_gsyn) == 0:
+            return None
+        if len(self._recorded_gsyn) == 1:
+            return self._recorded_gsyn[0]
         return self._recorded_gsyn
 
+    # Changed April 19
     def get_output_pop_voltage(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._recorded_v) == 0:
+            return None
+        if len(self._recorded_v) == 1:
+            return self._recorded_v[0]
         return self._recorded_v
 
+    # Changed April 19
     def get_output_pop_spikes(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._recorded_spikes) == 0:
+            return None
+        if len(self._recorded_spikes) == 1:
+            return self._recorded_spikes[0]
         return self._recorded_spikes
 
+    # Changed April 19
     def get_spike_source_spikes(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._input_spikes_recorded) == 0:
+            return None
+        if len(self._input_spikes_recorded) == 1:
+            return self._input_spikes_recorded[0]
         return self._input_spikes_recorded
 
+    # Changed April 19
+    def get_weights(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._weights) == 0:
+            return None
+        if len(self._weights) == 1:
+            return self._weights[0]
+        return self._weights
+
+    # Changed April 19
     def _get_data(
             self, output_population, input_population, record, record_v,
             record_gsyn, input_pop_record_spikes):
 
         if record_v:
-            if self._recorded_v is None:
-                self._recorded_v = output_population.get_v(
-                    compatible_output=True)
-            else:
-                self._recorded_v += output_population.get_v(
-                    compatible_output=True)
+            self._recorded_v.append(output_population.get_v(
+                compatible_output=True))
 
         if record_gsyn:
-            if self._recorded_gsyn is None:
-                self._recorded_gsyn = output_population.get_gsyn(
-                    compatible_output=True)
-            else:
-                self._recorded_gsyn += output_population.get_gsyn(
-                    compatible_output=True)
+            self._recorded_gsyn.append(output_population.get_gsyn(
+                compatible_output=True))
 
         if record:
-            if self._recorded_spikes is None:
-                self._recorded_spikes = output_population.getSpikes(
-                    compatible_output=True)
-            else:
-                self._recorded_spikes += output_population.getSpikes(
-                    compatible_output=True)
+            self._recorded_spikes.append(output_population.getSpikes(
+                compatible_output=True))
 
         if input_pop_record_spikes:
-            if self._input_spikes_recorded is None:
-                self._input_spikes_recorded = input_population.getSpikes(
-                    compatible_output=True)
-            else:
-                self._input_spikes_recorded += input_population.getSpikes(
-                    compatible_output=True)
+            self._input_spikes_recorded.append(input_population.getSpikes(
+                compatible_output=True))
