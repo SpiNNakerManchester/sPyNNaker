@@ -1,17 +1,21 @@
 import spynnaker.pyNN as sim
 
-## TODO christian make test worthy
+from p7_integration_tests.base_test_case import BaseTestCase
 
 
-sim.setup()
+class SSPNeuronClassNoEdgeTest(BaseTestCase):
 
-p1 = sim.Population(3, sim.SpikeSourcePoisson, {"rate": 100})
-p2 = sim.Population(3, sim.SpikeSourceArray, {"spike_times":  [[10.0], [20.0], [30.0]]})
-p3 = sim.Population(4, sim.IF_cond_exp, {})
+    def test_tun(self):
+        sim.setup()
 
-sim.Projection(p2, p3, sim.FromListConnector([
-    (0, 0, 0.1, 1.0), (1, 1, 0.1, 1.0), (2, 2, 0.1, 1.0)]))
+        p1 = sim.Population(3, sim.SpikeSourcePoisson, {"rate": 100})
+        p2 = sim.Population(3, sim.SpikeSourceArray,
+                            {"spike_times": [[10.0], [20.0], [30.0]]})
+        p3 = sim.Population(4, sim.IF_cond_exp, {})
 
-sim.run(100.0)
+        sim.Projection(p2, p3, sim.FromListConnector([
+            (0, 0, 0.1, 1.0), (1, 1, 0.1, 1.0), (2, 2, 0.1, 1.0)]))
 
-sim.end()
+        sim.run(100.0)
+
+        sim.end()

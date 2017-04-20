@@ -18,7 +18,6 @@ CELL_PARAMS_LIF = {'cm': 0.25, 'i_offset': 0.0, 'tau_m': 20.0,
 
 class TestRun(object):
 
-    # Changed April 19
     def __init__(self):
         self._recorded_v = []
         self._recorded_spikes = []
@@ -29,13 +28,14 @@ class TestRun(object):
     def do_run(
             self, n_neurons, time_step=1, max_delay=144.0,
             input_class=SpikeSourceArray, spike_times=None, rate=None,
-            start_time=None, duration=None,
-            spike_times_list=None, weight_to_spike=2.0, delay=17,
+            start_time=None, duration=None, spike_times_list=None,
+            placement_constraint=None, weight_to_spike=2.0, delay=17,
             neurons_per_core=10, cell_class=IF_curr_exp, constraint=None,
             cell_params=CELL_PARAMS_LIF, run_times=None, reset=False,
             extract_between_runs=True, new_pop=False,
-            record_input_spikes=False, record=True, spike_path=None,
-            record_v=True, v_path=None, record_gsyn=True, gsyn_path=None,
+            record_input_spikes=False, record=True, get_spikes=None,
+            spike_path=None, record_v=True, get_v=None, v_path=None,
+            record_gsyn=True, get_gsyn=None, gsyn_path=None,
             use_loop_connections=True, get_weights=False,
             end_before_print=False, randomise_v_init=False):
         """
@@ -59,9 +59,13 @@ class TestRun(object):
         :param spike_times_list: list of times the SSA sends in spikes
             - must be the same length as  run times
             - If set the spike_time parameter is ignored
-        :type spike_times: list of matrix of int times the SSA sends in spikes
-        :param weight_to_spike: weight for the OneToOne Connector
-            Not used by any test at the moment
+        # Changed April 19
+        :type spike_times_list: list of matrix of
+            int times the SSA sends in spikes
+        # Changed April 19
+        :param placement_constraint: x, y and p values to add a
+            placement_constraint to population[0]
+        :type (int, int, int)
         :type weight_to_spike: float
         :param delay: time delay in the single connectors in the spike chain
         :type delay: float
@@ -90,14 +94,26 @@ class TestRun(object):
         :type record_input_spikes: bool
         :param record: If True will aks for spikes to be recorded
         :type record: bool
+        :param get_spikes: If set overrides the normal behaviour
+            of getting spikes if and only if record is True.
+            If left None the value of record is used.
+        :type get_spikes: bool
         :param spike_path: The path to print(write) the last spike data too
         :type spike_path: str or None
         :param record_v: If True will aks for voltage to be recorded
         :type record_v: bool
+        :param get_v: If set overrides the normal behaviour
+            of getting v if and only if record_v is True.
+            If left None the value of record_v is used.
+        :type get_v: bool
         :param v_path: The path to print(write) the last v data too
         :type v_path: str or None
         :param record_gsyn: If True will aks for gsyn to be recorded
         :type record_gsyn: bool
+        :param get_gsyn: If set overrides the normal behaviour
+            of getting gsyn if and only if record_gsyn is True.
+            If left None the value of record_gsyn is used.
+        :type get_v: bool
         :param gsyn_path: The path to print(write) the last gsyn data too
         :type gsyn_path: str or None
         :param get_weights: If True set will add a weight value to the return
@@ -129,6 +145,15 @@ class TestRun(object):
         if spike_times is None:
             spike_times = [[0]]
 
+        if get_spikes is None:
+            get_spikes = record
+
+        if get_v is None:
+            get_v = record_v
+
+        if get_gsyn is None:
+            get_gsyn = record_gsyn
+
         p.setup(timestep=time_step, min_delay=1.0, max_delay=max_delay)
         if neurons_per_core is not None:
             p.set_number_of_neurons_per_core("IF_curr_exp", neurons_per_core)
@@ -152,6 +177,10 @@ class TestRun(object):
 
         populations.append(p.Population(
             n_neurons, cell_class, cell_params, label='pop_1'))
+
+        if placement_constraint is not None:
+            (x, y, proc) = placement_constraint
+            populations[0].add_placement_constraint(x=x, y=y, p=proc)
 
         if randomise_v_init:
             rng = p.NumpyRNG(seed=28375)
@@ -196,8 +225,8 @@ class TestRun(object):
 
             if extract_between_runs:
                 self._get_data(
-                    populations[0], populations[1], record, record_v,
-                    record_gsyn, record_input_spikes)
+                    populations[0], populations[1], get_spikes, getv,
+                    get_gsyn, record_input_spikes)
                 # Changed April 19
                 if get_weights:
                     self._weights.append(projections[0].getWeights())
@@ -221,7 +250,7 @@ class TestRun(object):
         p.run(run_times[-1])
 
         self._get_data(
-            populations[0], populations[1], record, record_v, record_gsyn,
+            populations[0], populations[1], get_spikes, get_v, get_gsyn,
             record_input_spikes)
         # Changed April 19
         if get_weights:
@@ -244,7 +273,6 @@ class TestRun(object):
 
         return results
 
-    # Changed April 19
     def get_output_pop_gsyn(self):
         """
 
@@ -259,7 +287,6 @@ class TestRun(object):
             return self._recorded_gsyn[0]
         return self._recorded_gsyn
 
-    # Changed April 19
     def get_output_pop_voltage(self):
         """
 
@@ -274,7 +301,6 @@ class TestRun(object):
             return self._recorded_v[0]
         return self._recorded_v
 
-    # Changed April 19
     def get_output_pop_spikes(self):
         """
 
@@ -289,7 +315,6 @@ class TestRun(object):
             return self._recorded_spikes[0]
         return self._recorded_spikes
 
-    # Changed April 19
     def get_spike_source_spikes(self):
         """
 
@@ -304,7 +329,6 @@ class TestRun(object):
             return self._input_spikes_recorded[0]
         return self._input_spikes_recorded
 
-    # Changed April 19
     def get_weights(self):
         """
 
@@ -319,20 +343,19 @@ class TestRun(object):
             return self._weights[0]
         return self._weights
 
-    # Changed April 19
     def _get_data(
-            self, output_population, input_population, record, record_v,
-            record_gsyn, input_pop_record_spikes):
+            self, output_population, input_population, get_spikes, get_v,
+            get_gsyn, input_pop_record_spikes):
 
-        if record_v:
+        if get_v:
             self._recorded_v.append(output_population.get_v(
                 compatible_output=True))
 
-        if record_gsyn:
+        if get_gsyn:
             self._recorded_gsyn.append(output_population.get_gsyn(
                 compatible_output=True))
 
-        if record:
+        if get_spikes:
             self._recorded_spikes.append(output_population.getSpikes(
                 compatible_output=True))
 
