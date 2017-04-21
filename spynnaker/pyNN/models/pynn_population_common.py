@@ -19,6 +19,9 @@ from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 
+import logging
+logger = logging.getLogger(__file__)
+
 
 class PyNNPopulationCommon(object):
     def __init__(
@@ -356,8 +359,9 @@ class PyNNPopulationCommon(object):
         elif model_label is not None and pop_level_label is None:
             cell_label = model_label
         elif model_label is not None and pop_level_label is not None:
-            raise exceptions.ConfigurationException(
-                "Don't know which label to use. please fix and try again")
+            cell_label = pop_level_label
+            logger.warn("Don't know which label to use. Will use pop "
+                        "label and carry on")
         return cell_label
 
     def _get_variable_unit(self, parameter_name):
