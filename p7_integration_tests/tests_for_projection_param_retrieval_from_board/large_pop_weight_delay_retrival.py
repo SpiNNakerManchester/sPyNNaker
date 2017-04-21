@@ -27,9 +27,9 @@ def do_run():
     populations.append(
         p.Population(n_neurons, p.IF_curr_exp, cell_params_lif, label='pop_2'))
 
+    connectors = p.AllToAllConnector(weights=weight_to_spike, delays=delay)
     projections.append(p.Projection(populations[0], populations[1],
-                                    p.AllToAllConnector(weights=weight_to_spike,
-                                                        delays=delay)))
+                                    connectors))
 
     delays = []
     weights = []
@@ -59,6 +59,7 @@ class LargePopWeightDelayRetrival(BaseTestCase):
         self.assertEquals(n_neurons * n_neurons, len(delays[0]))
         self.assertEquals(n_neurons * n_neurons, len(delays[1]))
         self.assertTrue(numpy.allclose(delays[0], delays[1]))
+
 
 if __name__ == '__main__':
     (delays, weights) = do_run()

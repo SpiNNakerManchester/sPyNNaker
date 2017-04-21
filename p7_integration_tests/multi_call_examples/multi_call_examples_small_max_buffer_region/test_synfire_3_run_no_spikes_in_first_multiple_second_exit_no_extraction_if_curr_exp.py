@@ -30,8 +30,8 @@ class Synfire2RunNoExtraction(BaseTestCase):
 
 if __name__ == '__main__':
     synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
-                       spike_times=spike_times, run_times=runtimes, reset=reset,
-                       extract_between_runs=extract_between_runs)
+                       spike_times=spike_times, run_times=runtimes,
+                       reset=reset, extract_between_runs=extract_between_runs)
     gsyn = synfire_run.get_output_pop_gsyn()
     v = synfire_run.get_output_pop_voltage()
     spikes = synfire_run.get_output_pop_spikes()

@@ -28,6 +28,8 @@ if __name__ == '__main__':
     results = synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                                  run_times=[runtime])
     spikes = synfire_run.get_output_pop_spikes()
+    v = synfire_run.get_output_pop_voltage()
+    gsyn = synfire_run.get_output_pop_gsyn()
 
     print len(spikes)
     plot_utils.plot_spikes(spikes)

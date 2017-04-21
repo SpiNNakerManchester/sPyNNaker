@@ -117,6 +117,7 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     plt.axis([minTime, maxTime, minSpike, maxSpike])
     plt.show()
 
+
 # This is code for manual testing.
 if __name__ == "__main__":
     spikes = np.loadtxt("spikes.csv", delimiter=',')

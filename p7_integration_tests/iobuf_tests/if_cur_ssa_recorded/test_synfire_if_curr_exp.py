@@ -10,6 +10,7 @@ runtimes = [5000]
 neurons_per_core = n_neurons / 2
 synfire_run = TestRun()
 
+
 class SynfireIfCurrExp(BaseTestCase):
 
     @unittest.skip("skipping test_buffer_manager/if_curr_exp_live_buiffer/"

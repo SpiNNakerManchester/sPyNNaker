@@ -6,8 +6,6 @@ import numpy
 
 from p7_integration_tests.base_test_case import BaseTestCase
 from p7_integration_tests.scripts.synfire_run import TestRun
-import spynnaker.plot_utils as plot_utils
-import spynnaker.spike_checker as spike_checker
 
 n_neurons = 20  # number of neurons in each population
 runtimes = [0, 100]  # The zero uis to read data before a run
@@ -37,6 +35,7 @@ class SynfireProjectionOnSameChip(BaseTestCase):
         self.assertEquals(n_neurons, len(delays[0]))
         self.assertEquals(n_neurons, len(delays[1]))
         self.assertTrue(numpy.allclose(delays[0], delays[1]))
+
 
 if __name__ == '__main__':
     synfire_run = TestRun()

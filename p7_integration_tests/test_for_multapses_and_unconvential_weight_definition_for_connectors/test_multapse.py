@@ -3,6 +3,7 @@ import unittest
 import spynnaker.pyNN as p
 from p7_integration_tests.base_test_case import BaseTestCase
 
+
 def do_run():
     p.setup(timestep=1.0)
     input_pop = p.Population(1, p.SpikeSourceArray,

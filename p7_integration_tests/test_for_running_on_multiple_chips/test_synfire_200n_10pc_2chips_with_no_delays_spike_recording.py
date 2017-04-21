@@ -16,7 +16,8 @@ synfire_run = TestRun()
 class Synfire200n10pc2chipsWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
-        synfire_run.do_run(nNeurons, record_v=record_v, record_gsyn=record_gsyn)
+        synfire_run.do_run(nNeurons, record_v=record_v,
+                           record_gsyn=record_gsyn)
         spikes = synfire_run.get_output_pop_spikes()
 
         self.assertEquals(53, len(spikes))

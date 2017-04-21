@@ -17,6 +17,7 @@ class SynfireIfCurrExp(BaseTestCase):
                            run_times=[runtime], record=False, record_v=False,
                            record_gsyn=False)
 
+
 if __name__ == '__main__':
     synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                        run_times=[runtime], record=False, record_v=False,

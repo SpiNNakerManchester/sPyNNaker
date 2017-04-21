@@ -10,8 +10,8 @@ class SSANeuronClassNoEdgeTest(BaseTestCase):
     def test_tun(self):
         sim.setup()
 
-        p1 = sim.Population(3, sim.SpikeSourceArray,
-                            {"spike_times": [1.0, 2.0, 3.0]})
+        sim.Population(3, sim.SpikeSourceArray,
+                       {"spike_times": [1.0, 2.0, 3.0]})
         p2 = sim.Population(3, sim.SpikeSourceArray,
                             {"spike_times": [[10.0], [20.0], [30.0]]})
         p3 = sim.Population(4, sim.IF_cond_exp, {})

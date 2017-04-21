@@ -17,8 +17,6 @@ class Synfire2RunExtractionIfCurrExp(BaseTestCase):
     def test_run(self):
         synfire_run.do_run(nNeurons, spike_times=spike_times,
                            run_times=run_times, reset=False)
-        gsyn = synfire_run.get_output_pop_gsyn()
-        v = synfire_run.get_output_pop_voltage()
         spikes = synfire_run.get_output_pop_spikes()
 
         self.assertEquals(53, len(spikes[0]))

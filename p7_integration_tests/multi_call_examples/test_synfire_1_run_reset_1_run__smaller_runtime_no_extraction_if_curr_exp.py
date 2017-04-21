@@ -15,8 +15,6 @@ synfire_run = TestRun()
 class Synfire1RunReset1RunSmallerRuntimeNoExtraction(BaseTestCase):
     def test_run(self):
         synfire_run.do_run(nNeurons, run_times=run_times, reset=reset)
-        gsyn = synfire_run.get_output_pop_gsyn()
-        v = synfire_run.get_output_pop_voltage()
         spikes = synfire_run.get_output_pop_spikes()
         self.assertEquals(53, len(spikes[0]))
         self.assertEquals(27, len(spikes[1]))

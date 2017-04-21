@@ -36,4 +36,3 @@ if __name__ == '__main__':
                        delay=delay, run_times=[runtime], record=record,
                        get_spikes=get_spikes, record_gsyn=record_gsyn,
                        get_gsyn=get_gsyn)
-

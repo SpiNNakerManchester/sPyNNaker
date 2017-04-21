@@ -19,7 +19,8 @@ class Synfire200n20pc10cWithNoDelaysSpikeRecording(BaseTestCase):
 
     def test_run(self):
         synfire_run.do_run(nNeurons, delay=delay,
-                           neurons_per_core=neurons_per_core, record_v=record_v,
+                           neurons_per_core=neurons_per_core,
+                           record_v=record_v,
                            record_gsyn=record_gsyn)
         spikes = synfire_run.get_output_pop_spikes()
 
@@ -28,7 +29,8 @@ class Synfire200n20pc10cWithNoDelaysSpikeRecording(BaseTestCase):
 
 
 if __name__ == '__main__':
-    synfire_run.do_run(nNeurons, delay=delay, neurons_per_core=neurons_per_core,
+    synfire_run.do_run(nNeurons, delay=delay,
+                       neurons_per_core=neurons_per_core,
                        record_v=record_v, record_gsyn=record_gsyn)
     spikes = synfire_run.get_output_pop_spikes()
 

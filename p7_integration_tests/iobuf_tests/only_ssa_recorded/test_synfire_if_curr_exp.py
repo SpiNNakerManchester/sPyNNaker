@@ -9,6 +9,7 @@ runtime = 5000
 neurons_per_core = n_neurons / 2
 synfire_run = TestRun()
 
+
 class SynfireIfCurrExp(BaseTestCase):
 
     def test_run(self):

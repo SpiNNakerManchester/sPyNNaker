@@ -35,4 +35,3 @@ if __name__ == '__main__':
     synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
                        delay=delay, run_times=[runtime], record=record,
                        get_spikes=get_spikes, record_v=record_v, get_v=get_v)
-
