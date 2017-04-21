@@ -24,6 +24,7 @@ class TestRun(object):
         self._recorded_gsyn = []
         self._input_spikes_recorded = []
         self._weights = []
+        self._delays = []
 
     def do_run(
             self, n_neurons, time_step=1, max_delay=144.0,
@@ -36,7 +37,7 @@ class TestRun(object):
             record_input_spikes=False, record=True, get_spikes=None,
             spike_path=None, record_v=True, get_v=None, v_path=None,
             record_gsyn=True, get_gsyn=None, gsyn_path=None,
-            use_loop_connections=True, get_weights=False,
+            use_loop_connections=True, get_weights=False, get_delays=False,
             end_before_print=False, randomise_v_init=False):
         """
 
@@ -59,10 +60,8 @@ class TestRun(object):
         :param spike_times_list: list of times the SSA sends in spikes
             - must be the same length as  run times
             - If set the spike_time parameter is ignored
-        # Changed April 19
         :type spike_times_list: list of matrix of
             int times the SSA sends in spikes
-        # Changed April 19
         :param placement_constraint: x, y and p values to add a
             placement_constraint to population[0]
         :type (int, int, int)
@@ -81,7 +80,8 @@ class TestRun(object):
             Not used by any test at the moment
             Note: the values must match what is expected by the cellclass
         :type cell_params: dict
-        :param run_times: times for each run
+        :param run_times: times for each run.
+            A zero will skip run but trigger reset and get date ext as set
         :type run_times: list of int
         :param reset: if True will call reset after each run except the last
         :type reset: bool
@@ -116,8 +116,10 @@ class TestRun(object):
         :type get_v: bool
         :param gsyn_path: The path to print(write) the last gsyn data too
         :type gsyn_path: str or None
-        :param get_weights: If True set will add a weight value to the return
+        :param get_weights: If True weights will be gotten
         :type get_weights: bool
+        :param get_delays: If True delays will be gotten
+        :type get_delays: bool
         :param end_before_print: If True will call end() before running the \
             optional print commands.
             Note: end will always be called twice even if no print path
@@ -130,13 +132,6 @@ class TestRun(object):
         :param use_loop_connections: True will put looping connections in.
             falswont
         :type use_loop_connections: bool
-        :return (v, gsyn, spikes, weights .....)
-            v: Voltage after last or each run (if requested else None)
-            gysn: gysn after last or each run (if requested else None)
-            spikes: spikes after last or each run (if requested else None)
-            weights: weights after last or each run (if requested else skipped)
-
-            All three/four values will repeated once per run is requested
         """
 
         if run_times is None:
@@ -220,16 +215,19 @@ class TestRun(object):
         results = ()
 
         for runtime in run_times[:-1]:
-            p.run(runtime)
+            # This looks strange but is to allow getting data before run
+            if runtime > 0:
+                p.run(runtime)
             run_count += 1
 
             if extract_between_runs:
                 self._get_data(
-                    populations[0], populations[1], get_spikes, getv,
+                    populations[0], populations[1], get_spikes, get_v,
                     get_gsyn, record_input_spikes)
-                # Changed April 19
                 if get_weights:
                     self._weights.append(projections[0].getWeights())
+                if get_delays:
+                    self._delays.append(projections[0].getDelays())
 
             if new_pop:
                 populations.append(
@@ -252,9 +250,10 @@ class TestRun(object):
         self._get_data(
             populations[0], populations[1], get_spikes, get_v, get_gsyn,
             record_input_spikes)
-        # Changed April 19
         if get_weights:
             self._weights.append(projections[0].getWeights())
+        if get_delays:
+            self._delays.append(projections[0].getDelays())
 
         if end_before_print:
             if v_path is not None or spike_path is not None or \
@@ -342,6 +341,20 @@ class TestRun(object):
         if len(self._weights) == 1:
             return self._weights[0]
         return self._weights
+
+    def get_delay(self):
+        """
+
+        ;return if not recorded returns None
+            if recorded once returns a numpy array
+            if recorded more than once returns a list of numpy arrays
+        :rtype: None, nparray or list of nparray
+        """
+        if len(self._delays) == 0:
+            return None
+        if len(self._delays) == 1:
+            return self._delays[0]
+        return self._delays
 
     def _get_data(
             self, output_population, input_population, get_spikes, get_v,

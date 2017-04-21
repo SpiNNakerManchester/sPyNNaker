@@ -1,66 +1,57 @@
+#!/usr/bin/python
 """
 Synfirechain-like example
 """
-#!/usr/bin/python
-import pylab
+import numpy
 
-import spynnaker.pyNN as p
+from p7_integration_tests.base_test_case import BaseTestCase
+from p7_integration_tests.scripts.synfire_run import TestRun
+import spynnaker.plot_utils as plot_utils
+import spynnaker.spike_checker as spike_checker
 
-# todo christian needs to fix into intergration test
-
-p.setup(timestep=1.0, min_delay=1.0, max_delay=144.0)
-nNeurons = 20  # number of neurons in each population
-
-cell_params_lif = {'cm': 0.25,  # nF
-                   'i_offset': 0.0,
-                   'tau_m': 20.0,
-                   'tau_refrac': 2.0,
-                   'tau_syn_E': 5.0,
-                   'tau_syn_I': 5.0,
-                   'v_reset': -70.0,
-                   'v_rest': -65.0,
-                   'v_thresh': -50.0}
-
-populations = list()
-projections = list()
-
+n_neurons = 20  # number of neurons in each population
+runtimes = [0, 100]  # The zero uis to read data before a run
+neurons_per_core = None
 weight_to_spike = 1.0
 delay = 1
-connections = list()
-for i in range(0, nNeurons):
-    singleConnection = (i, ((i + 1) % nNeurons), weight_to_spike, delay)
-    connections.append(singleConnection)
+placement_constraint = (0, 0, 9)
+get_weights = True
+get_delays = True
 
-injectionConnection = [(0, 0, weight_to_spike, 1)]
-spikeArray = {'spike_times': [[0]]}
-populations.append(p.Population(nNeurons, p.IF_curr_exp, cell_params_lif,
-                                label='pop_1'))
-populations[0].add_placement_constraint(x=0, y=0, p=9)
-populations.append(p.Population(1, p.SpikeSourceArray, spikeArray,
-                                label='inputSpikes_1'))
 
-projections.append(p.Projection(populations[0], populations[0],
-                                p.FromListConnector(connections)))
-projections.append(p.Projection(populations[1], populations[0],
-                                p.FromListConnector(injectionConnection)))
-print "before"
-delays = projections[0].getDelays()
-weights = projections[0].getWeights()
+class SynfireProjectionOnSameChip(BaseTestCase):
 
-p.run(100)
+    def test_get_before_and_after(self):
+        synfire_run = TestRun()
+        synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
+                           weight_to_spike=weight_to_spike, delay=delay,
+                           placement_constraint=placement_constraint,
+                           run_times=runtimes, get_weights=get_weights,
+                           get_delays=get_delays)
+        weights = synfire_run.get_weights()
+        self.assertEquals(n_neurons, len(weights[0]))
+        self.assertEquals(n_neurons, len(weights[1]))
+        self.assertTrue(numpy.allclose(weights[0], weights[1]))
 
-print delays
-print weights
+        delays = synfire_run .get_delay()
+        self.assertEquals(n_neurons, len(delays[0]))
+        self.assertEquals(n_neurons, len(delays[1]))
+        self.assertTrue(numpy.allclose(delays[0], delays[1]))
 
-print "after"
-delays = projections[0].getDelays()
-weights = projections[0].getWeights()
-
-print delays
-print weights
-
-v = None
-gsyn = None
-spikes = None
-
-p.end()
+if __name__ == '__main__':
+    synfire_run = TestRun()
+    synfire_run.do_run(n_neurons, neurons_per_core=neurons_per_core,
+                       weight_to_spike=weight_to_spike, delay=delay,
+                       placement_constraint=placement_constraint,
+                       run_times=runtimes, get_weights=get_weights,
+                       get_delays=get_delays)
+    weights = synfire_run.get_weights()
+    delays = synfire_run.get_delay()
+    print weights[0]
+    print weights[1]
+    print len(weights[0])
+    print len(weights[1])
+    print delays[0]
+    print delays[1]
+    print len(delays[0])
+    print len(delays[1])
