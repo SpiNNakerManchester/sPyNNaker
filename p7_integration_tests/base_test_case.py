@@ -14,3 +14,11 @@ class BaseTestCase(unittest.TestCase):
         os.chdir(path)
         config = conf.load_config()
         Spinnaker._set_config(config)
+
+    def assert_logs_error(self, log_records, sub_message):
+        for record in log_records:
+            if record.levelname == 'ERROR':
+                if sub_message in record.msg:
+                    return
+        msg = "\"{}\" not found in any ERROR logs".format(sub_message)
+        raise self.failureException(msg)

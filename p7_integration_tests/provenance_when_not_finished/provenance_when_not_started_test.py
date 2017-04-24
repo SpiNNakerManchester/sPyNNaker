@@ -1,6 +1,6 @@
 import spynnaker.pyNN as p
 from testfixtures import LogCapture
-from p7_integration_tests.log_checking_test_base import LogCheckingBaseTestCase
+from p7_integration_tests.base_test_case import BaseTestCase
 
 
 def do_run():
@@ -24,7 +24,7 @@ def do_run():
     p.end()
 
 
-class ProvenanceWhenNotStartedTest(LogCheckingBaseTestCase):
+class ProvenanceWhenNotStartedTest(BaseTestCase):
     def test_error(self):
         with LogCapture() as l:
             try:
