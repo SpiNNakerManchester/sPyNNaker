@@ -9,7 +9,7 @@ from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
 from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
     import AbstractWeightUpdatable
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
+from pacman.model.graphs.machine import MachineEdge
 from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 

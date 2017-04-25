@@ -2,8 +2,8 @@
 import unittest
 import spynnaker.pyNN as pyNN
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from pacman.model.constraints.placer_constraints.\
-    placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+from pacman.model.constraints.placer_constraints \
+    import PlacerChipAndCoreConstraint
 
 populations = list()
 cell_params_lif = {'cm': 0.25,
