@@ -28,19 +28,16 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
     none_pynn_default_parameters = {'v_init': None}
 
     def __init__(
-            self, n_neurons, spikes_per_second=
-            AbstractPopulationVertex.none_pynn_default_parameters[
-                'spikes_per_second'],
-            ring_buffer_sigma=
-            AbstractPopulationVertex.none_pynn_default_parameters[
-                'ring_buffer_sigma'],
-            incoming_spike_buffer_size=
-            AbstractPopulationVertex.none_pynn_default_parameters[
-                'incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
-                'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
-                'label'],
+            self, n_neurons, spikes_per_second=AbstractPopulationVertex.
+            none_pynn_default_parameters['spikes_per_second'],
+            ring_buffer_sigma=AbstractPopulationVertex.
+            none_pynn_default_parameters['ring_buffer_sigma'],
+            incoming_spike_buffer_size=AbstractPopulationVertex.
+            none_pynn_default_parameters['incoming_spike_buffer_size'],
+            constraints=AbstractPopulationVertex.
+            none_pynn_default_parameters['constraints'],
+            label=AbstractPopulationVertex.
+            none_pynn_default_parameters['label'],
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
@@ -66,8 +63,8 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_exp_dual.aplx",
             label=label,
-            max_atoms_per_core=
-            IFCurrDualExpBase._model_based_max_atoms_per_core,
+            max_atoms_per_core=IFCurrDualExpBase.
+            _model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,

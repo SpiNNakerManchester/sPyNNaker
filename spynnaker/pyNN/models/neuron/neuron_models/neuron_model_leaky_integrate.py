@@ -39,7 +39,6 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
 
-
         self._units = {
             'v_init': 'mV',
             'v_rest': 'mV',

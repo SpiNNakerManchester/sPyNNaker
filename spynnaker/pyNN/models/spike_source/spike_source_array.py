@@ -56,6 +56,10 @@ class SpikeSourceArray(
 
     SPIKE_RECORDING_REGION_ID = 0
 
+    # Needed to get long names past pep8
+    DEFAULT1 = none_pynn_default_parameters[
+        'max_on_chip_memory_usage_for_spikes_in_bytes']
+
     def __init__(
             self, n_neurons,
             spike_times=default_parameters['spike_times'],
@@ -63,11 +67,9 @@ class SpikeSourceArray(
             tag=none_pynn_default_parameters['tag'],
             ip_address=none_pynn_default_parameters['ip_address'],
             board_address=none_pynn_default_parameters['board_address'],
-            max_on_chip_memory_usage_for_spikes_in_bytes=
-            none_pynn_default_parameters[
-                'max_on_chip_memory_usage_for_spikes_in_bytes'],
-            space_before_notification=
-            none_pynn_default_parameters['space_before_notification'],
+            max_on_chip_memory_usage_for_spikes_in_bytes=DEFAULT1,
+            space_before_notification=none_pynn_default_parameters[
+                'space_before_notification'],
             constraints=none_pynn_default_parameters['constraints'],
             label=none_pynn_default_parameters['label'],
             spike_recorder_buffer_size=none_pynn_default_parameters[
@@ -198,7 +200,6 @@ class SpikeSourceArray(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
-
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):

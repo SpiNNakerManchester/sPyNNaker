@@ -51,7 +51,7 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
         AbstractSynapseType.__init__(self)
         AbstractContainsUnits.__init__(self)
 
-        self_units = {
+        self._units = {
             'tau_syn_E': "mV",
             'tau_syn_I': 'mV',
             'gsyn_exc': "uS",

@@ -6,7 +6,7 @@ from spinn_utilities.abstract_base import \
 
 @add_metaclass(AbstractBase)
 class AbstractWeightDependence(object):
-    
+
     __slots__ = ()
 
     def __init__(self):

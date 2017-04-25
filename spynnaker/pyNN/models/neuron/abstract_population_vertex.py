@@ -893,12 +893,12 @@ class AbstractPopulationVertex(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):
         """ clears a recorded data region from the buffer manager
-        
+
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
         :param recording_region_id: the recorded region id for clearing
-        :rtype: None 
+        :rtype: None
         """
         machine_vertices = graph_mapper.get_machine_vertices(self)
         for machine_vertex in machine_vertices:

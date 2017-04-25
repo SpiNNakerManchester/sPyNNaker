@@ -182,4 +182,3 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @d_expression.setter
     def d_expression(self, new_value):
         self._d_expression = new_value
-

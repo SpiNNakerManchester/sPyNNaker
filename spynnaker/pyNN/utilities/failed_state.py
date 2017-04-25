@@ -1,7 +1,6 @@
 from spinn_front_end_common.utilities import exceptions
 
 
-
 class FailedState(object):
 
     def __init__(self):

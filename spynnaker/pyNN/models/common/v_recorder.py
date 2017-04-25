@@ -1,8 +1,5 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
-
 from spynnaker.pyNN.models.common import recording_utils
 
-import numpy
 import logging
 
 from spynnaker.pyNN.models.common.abstract_uint32_recorder import \
