@@ -1,11 +1,11 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-__slots__ = ()
-
 
 @add_metaclass(AbstractBase)
 class AbstractContainsUnits(object):
+
+    __slots__ = ()
 
     def __init__(self):
         pass
