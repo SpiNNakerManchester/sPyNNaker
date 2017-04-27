@@ -1,5 +1,4 @@
 SpiNNFrontEndCommon >= 1!4.0.0a1, < 1!5.0.0
-pyNN >= 0.7, < 0.8
 numpy
 scipy
 lxml
