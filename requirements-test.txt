@@ -2,3 +2,5 @@
 flake8
 pytest-timeout
 sphinx==1.5.3
+# We need a pynn to test against so pick one (should work against pyNN 0.7 and pyNN 0.8)
+pyNN >= 0.7, < 0.8
