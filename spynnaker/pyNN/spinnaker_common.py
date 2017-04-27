@@ -20,14 +20,13 @@ import os
 
 # global objects
 logger = logging.getLogger(__name__)
+executable_finder = ExecutableFinder()
 
 
 class SpiNNakerCommon(SpinnakerMainInterface):
     """ main interface for neural code
 
     """
-
-    _EXECUTABLE_FINDER = ExecutableFinder()
 
     def __init__(
             self, config, graph_label, config_default_name,
@@ -38,8 +37,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
             extra_mapping_algorithms=None, extra_load_algorithms=None):
 
         # add model binaries
-        self._EXECUTABLE_FINDER.add_path(
-            os.path.dirname(model_binaries.__file__))
+        executable_finder.add_path(os.path.dirname(model_binaries.__file__))
 
         # pynn population objects
         self._populations = list()
@@ -87,7 +85,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         SpinnakerMainInterface.__init__(
             self, config,
             graph_label=graph_label,
-            executable_finder=SpiNNakerCommon._EXECUTABLE_FINDER,
+            executable_finder=executable_finder,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
