@@ -12,6 +12,7 @@ from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.simulator_interface import SimulatorInterface
 
 # general imports
 import logging
@@ -22,7 +23,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class SpiNNakerCommon(SpinnakerMainInterface):
+class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
     """ main interface for neural code
 
     """

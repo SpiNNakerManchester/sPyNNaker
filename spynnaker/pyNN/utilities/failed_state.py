@@ -1,7 +1,8 @@
 from spinn_front_end_common.utilities import exceptions
+from spynnaker.pyNN.simulator_interface import SimulatorInterface
 
 
-class FailedState(object):
+class FailedState(SimulatorInterface):
 
     def __init__(self):
         pass
