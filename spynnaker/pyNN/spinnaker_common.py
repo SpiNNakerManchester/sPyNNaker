@@ -1,7 +1,7 @@
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
-    SpinnakerMainInterface
+     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
@@ -12,7 +12,7 @@ from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.simulator_interface import SimulatorInterface
+# from spynnaker.pyNN.simulator_interface import SimulatorInterface
 
 # general imports
 import logging
@@ -23,7 +23,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
+class SpiNNakerCommon(SpinnakerMainInterface):
     """ main interface for neural code
 
     """
