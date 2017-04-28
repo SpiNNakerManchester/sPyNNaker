@@ -87,7 +87,7 @@ class SpiNNakerCommon(SpinnakerMainInterface):
         SpinnakerMainInterface.__init__(
             self, config,
             graph_label=graph_label,
-            executable_finder=SpiNNakerCommon._EXECUTABLE_FINDER,
+            executable_finder=self._EXECUTABLE_FINDER,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
