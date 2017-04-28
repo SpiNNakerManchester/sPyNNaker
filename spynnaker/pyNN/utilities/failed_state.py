@@ -7,6 +7,61 @@ class FailedState(SimulatorInterface):
     def __init__(self):
         pass
 
+    @property
+    def graph_mapper(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def has_reset_last(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def has_ran(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def increment_none_labelled_vertex_count(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def placements(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def machine_time_step(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def max_supported_delay(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def min_supported_delay(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def none_labelled_vertex_count(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def transceiver(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    @property
+    def use_virtual_board(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
     @staticmethod
     def run(simtime, callbacks=None):
         raise exceptions.ConfigurationException(
@@ -99,6 +154,32 @@ class FailedState(SimulatorInterface):
     def min_delay():
         raise exceptions.ConfigurationException(
             "You cannot call min_delay until you have called setup. durrrr!")
+
+    @staticmethod
+    def _add_socket_address(self, x):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+
+    def create_population(self, size, cellclass, cellparams, structure,
+                         label):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    def create_projection(self, presynaptic_population,
+                          postsynaptic_population, connector, source,
+                          target, synapse_dynamics, label, rng):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+    def get_current_time(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
+
+
+    def get_distribution_to_stats(self):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
 
     @staticmethod
     def is_a_pynn_random(thing):

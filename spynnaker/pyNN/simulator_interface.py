@@ -1,19 +1,61 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.abstract_base import abstractproperty
 from spinn_utilities.abstract_base import abstractmethod
+
 
 @add_metaclass(AbstractBase)
 class SimulatorInterface(object):
 
     __slots__ = ()
 
-    @abstractmethod
-    def run(self, simtime, callbacks=None):
+    @abstractproperty
+    def graph_mapper(self):
+        pass
+
+    @abstractproperty
+    def has_reset_last(self):
+        pass
+
+    @abstractproperty
+    def has_ran(self):
+        pass
+
+    @abstractproperty
+    def increment_none_labelled_vertex_count(self):
+        pass
+
+    @abstractproperty
+    def placements(self):
+        pass
+
+    @abstractproperty
+    def machine_time_step(self):
+        pass
+
+    @abstractproperty
+    def max_supported_delay(self):
+        pass
+
+    @abstractproperty
+    def min_supported_delay(self):
+        pass
+
+    @abstractproperty
+    def none_labelled_vertex_count(self):
+        pass
+
+    @abstractproperty
+    def transceiver(self):
+        pass
+
+    @abstractproperty
+    def use_virtual_board(self):
         pass
 
     @abstractmethod
-    def exit(self):
+    def run(self, simtime, callbacks=None):
         pass
 
     @abstractmethod
@@ -25,11 +67,22 @@ class SimulatorInterface(object):
         pass
 
     @abstractmethod
-    def run_until(self, time_point, callbacks=None):
+    def get_current_time(self):
         pass
 
     @abstractmethod
-    def run_for(self, simtime, callbacks=None):
+    def _add_socket_address(self, x):
+        pass
+
+    @abstractmethod
+    def create_population(self, size, cellclass, cellparams, structure,
+                          label):
+        pass
+
+    @abstractmethod
+    def create_projection(self, presynaptic_population,
+                          postsynaptic_population, connector, source,
+                          target, synapse_dynamics, label, rng):
         pass
 
     @abstractmethod
@@ -37,45 +90,7 @@ class SimulatorInterface(object):
         pass
 
     @abstractmethod
-    def get_time_step(self):
-        pass
-
-    @abstractmethod
-    def get_min_delay(self):
-        pass
-
-    @abstractmethod
-    def get_max_delay(self):
-        pass
-
-    @abstractmethod
-    def num_processes(self):
-        pass
-
-    @abstractmethod
-    def rank(self):
-        pass
-
-    @abstractmethod
-    def initialize(self, cells, **initial_values):
-        pass
-
-    @abstractmethod
-    def create(self, cellclass, cellparams=None, n=1):
-        pass
-
-    @abstractmethod
-    def connect(self, pre, post, weight=0.0, delay=None, receptor_type=None,
-                p=1, rng=None):
-        pass
-
-    @abstractmethod
-    def record(self, variables, source, filename, sampling_interval=None,
-               annotations=None):
-        pass
-
-    @abstractmethod
-    def min_delay(self):
+    def get_distribution_to_stats(self):
         pass
 
     @abstractmethod
