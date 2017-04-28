@@ -116,4 +116,5 @@ class FailedState(object):
 
     @staticmethod
     def get_pynn_NumpyRNG():
-        return NumpyRNG()
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")
