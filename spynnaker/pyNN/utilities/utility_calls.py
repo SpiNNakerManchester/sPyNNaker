@@ -1,8 +1,6 @@
 """
 utility class containing simple helper methods
 """
-from pyNN.random import RandomDistribution
-
 from spynnaker.pyNN.utilities import globals_variables
 
 from spinn_front_end_common.utilities import exceptions
@@ -36,8 +34,7 @@ def convert_param_to_numpy(param, no_atoms):
     """
 
     # Deal with random distributions by generating values
-    if isinstance(param, RandomDistribution):
-
+    if globals_variables.get_simulator().is_a_pynn_random(param):
         if no_atoms > 1:
             return numpy.asarray(param.next(n=no_atoms), dtype="float")
 

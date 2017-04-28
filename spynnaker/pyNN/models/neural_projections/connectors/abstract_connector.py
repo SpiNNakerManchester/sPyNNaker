@@ -1,10 +1,10 @@
 from six import add_metaclass
-from pyNN.random import RandomDistribution
 from pyNN.random import NumpyRNG
 
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -82,7 +82,8 @@ class AbstractConnector(object):
         """ Check that the types of the values is supported
         """
         if (not numpy.isscalar(values) and
-                not isinstance(values, RandomDistribution) and
+                not (globals_variables.get_simulator().
+                             is_a_pynn_random(values)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
@@ -102,7 +103,7 @@ class AbstractConnector(object):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
             if hasattr(delays, "boundaries"):
@@ -129,7 +130,7 @@ class AbstractConnector(object):
     def _get_delay_variance(delays, connection_slices):
         """ Get the variance of the delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             return utility_calls.get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
@@ -154,7 +155,7 @@ class AbstractConnector(object):
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
@@ -201,7 +202,7 @@ class AbstractConnector(object):
     def _get_weight_mean(weights, connection_slices):
         """ Get the mean of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -222,7 +223,7 @@ class AbstractConnector(object):
     def _get_weight_maximum(weights, n_connections, connection_slices):
         """ Get the maximum of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -256,7 +257,7 @@ class AbstractConnector(object):
     def _get_weight_variance(weights, connection_slices):
         """ Get the variance of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             return utility_calls.get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
@@ -286,7 +287,7 @@ class AbstractConnector(object):
         return False
 
     def _generate_values(self, values, n_connections, connection_slices):
-        if isinstance(values, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(values):
             if n_connections == 1:
                 return numpy.array([values.next(n_connections)])
             return values.next(n_connections)
@@ -367,7 +368,7 @@ class AbstractConnector(object):
 
         # Only certain types of random distributions are supported for\
         # generation on the machine
-        if isinstance(values, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(values):
             return values.name in (
                 "uniform", "uniform_int", "poisson", "normal", "exponential")
 

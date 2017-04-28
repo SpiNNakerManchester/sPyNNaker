@@ -98,3 +98,18 @@ class FailedState(object):
     def min_delay():
         raise exceptions.ConfigurationException(
             "You cannot call min_delay until you have called setup. durrrr!")
+
+    @staticmethod
+    def is_a_pynn_random(thing):
+        """
+        Checks if the thing is a pynn random
+
+        The exact definition of a pynn random can or could change between
+        pynn versions so can only be checked against a specific pynn version
+
+        :param thing: any object
+        :return: True if this object is a pynn random
+        :trype: bol
+        """
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")

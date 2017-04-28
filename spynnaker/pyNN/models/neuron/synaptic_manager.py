@@ -466,10 +466,8 @@ class SynapticManager(object):
                         spikes_per_second = app_edge.pre_vertex.rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
-                        elif isinstance(
-                                spikes_per_second,
-                                globals_variables.get_simulator().
-                                get_random_distribution()):
+                        elif globals_variables.get_simulator().\
+                                is_a_pynn_random(spikes_per_second):
                             spikes_per_second = \
                                 utility_calls.get_maximum_probable_value(
                                     spikes_per_second,
