@@ -82,7 +82,7 @@ class AbstractConnector(object):
         """
         if (not numpy.isscalar(values) and
                 not (globals_variables.get_simulator().
-                             is_a_pynn_random(values)) and
+                     is_a_pynn_random(values)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):

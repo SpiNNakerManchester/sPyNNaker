@@ -59,5 +59,6 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         interface.stop(turn_off_machine=False, clear_routing_tables=False,
                        clear_tags=False)
 
+
 if __name__ == "__main__":
     unittest.main()
