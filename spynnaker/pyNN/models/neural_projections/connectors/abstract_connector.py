@@ -1,5 +1,4 @@
 from six import add_metaclass
-from pyNN.random import NumpyRNG
 
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
@@ -75,7 +74,7 @@ class AbstractConnector(object):
         self._n_post_neurons = post_population.size
         self._rng = rng
         if self._rng is None:
-            self._rng = NumpyRNG()
+            self._rng = globals_variables.get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
