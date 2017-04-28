@@ -59,12 +59,5 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         interface.stop(turn_off_machine=False, clear_routing_tables=False,
                        clear_tags=False)
 
-    @unittest.skip("defaultApplicationDataFilePath=TEMP BROKEN!")
-    def test_temp_defaultApplicationDataFilePath(self):
-        config = self.default_config()
-        config.set("Reports", "defaultApplicationDataFilePath", value="TEMP")
-        SpinnakerMainInterface(config, ExecutableFinder())
-
-
 if __name__ == "__main__":
     unittest.main()
