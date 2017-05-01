@@ -58,7 +58,6 @@ typedef struct
 
 post_event_history_t *post_event_history;
 uint32_t weight_update_constant_component;
-int16_t last_dopamine_level = 0;
 uint32_t last_dopamine_spike_time = 0;
 weight_state_t weight_state;
 
@@ -67,20 +66,20 @@ weight_state_t weight_state;
 // Dopamine trace is a simple decaying trace similarly implemented as pre and
 // post trace.
 static inline post_trace_t add_dopamine_spike(
-        uint32_t time, int16_t concentration) {
+        uint32_t time, int16_t concentration, int16_t* last_dopamine_level) {
 
     // Get time since last dopamine spike
     uint32_t delta_time = time - last_dopamine_spike_time;
 
     // Apply exponential decay to get the current value
-    int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_dopamine_level,
+    int32_t decayed_trace = STDP_FIXED_MUL_16X16(*last_dopamine_level,
             DECAY_LOOKUP_TAU_D(delta_time));
 
     // Increase dopamine level due to new spike
     int16_t new_trace = decayed_trace + concentration;
 
     last_dopamine_spike_time = time;
-    last_dopamine_level = new_trace;
+    *last_dopamine_level = new_trace;
 
     // Return decayed dopamine trace
     return (post_trace_t) { .stdp_post_trace = 0, .dopamine = new_trace };
@@ -111,7 +110,7 @@ static inline void correlation_apply_post_spike(
 
     // Evaluate weight function
     uint32_t weight_change = STDP_FIXED_MUL_16X16(
-            STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
+            STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_trace,
                 previous_state -> eligibility_trace),
             STDP_FIXED_MUL_16X16(weight_update_constant_component,
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
@@ -167,7 +166,7 @@ static inline void correlation_apply_pre_spike(
 
     // Evaluate weight function
     uint32_t weight_change = STDP_FIXED_MUL_16X16(
-            STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_level,
+            STDP_FIXED_MUL_16X16(post_event_history -> last_neuromodulator_trace,
                 previous_state -> eligibility_trace),
             STDP_FIXED_MUL_16X16(weight_update_constant_component,
         STDP_FIXED_MUL_16X16(decay_eligibility_trace, decay_dopamine_trace)
@@ -242,7 +241,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
             last_non_dopamine_spike_time = delayed_post_time;
         }
         else {
-            post_event_history -> last_neuromodulator_level =
+            post_event_history -> last_neuromodulator_trace =
                 post_window.next_trace -> dopamine;
             post_event_history -> last_dopamine_spike_time = delayed_post_time;
         }
@@ -336,7 +335,7 @@ void synapse_dynamics_process_neuromodulator_event(
 
     // Update neuromodulator level reaching this post synaptic neuron
     post_events_add(time, history, add_dopamine_spike(time,
-        concentration));
+        concentration, &(history -> neuromodulator_level)));
 }
 
 //---------------------------------------
