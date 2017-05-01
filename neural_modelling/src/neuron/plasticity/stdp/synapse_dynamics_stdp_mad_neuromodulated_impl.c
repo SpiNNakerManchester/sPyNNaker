@@ -124,7 +124,6 @@ static inline void correlation_apply_post_spike(
                                   MAX(previous_state -> weight,
                                   weight_state.weight_region->min_weight));
 
-
     // Update eligibility trace if this spike is non-dopamine spike
     if (trace.dopamine == 0) {
         // Decay eligibility trace
@@ -176,10 +175,13 @@ static inline void correlation_apply_pre_spike(
 
     previous_state -> weight += weight_change;
 
-    // Saturate weight
-    previous_state -> weight= MIN(weight_state.weight_region->max_weight,
-                                  MAX(previous_state -> weight,
-                                  weight_state.weight_region->min_weight));
+    if (previous_state -> weight & 0x8000)
+        previous_state -> weight = 0;
+    else
+        // Saturate weight
+        previous_state -> weight= MIN(weight_state.weight_region->max_weight,
+                                      MAX(previous_state -> weight,
+                                      weight_state.weight_region->min_weight));
 
     // Update eligibility trace if this spike is non-dopamine spike
     if (last_post_trace.dopamine == 0) {
