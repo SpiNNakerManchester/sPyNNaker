@@ -3,16 +3,25 @@ from setuptools import setup
 from collections import defaultdict
 from spynnaker.pyNN._version import __version__
 
-exec(open("spynnaker/pyNN/_version.py").read())
+__version__ = None
+exec(open("spynnaker/_version.py").read())
+assert __version__
 
 if os.environ.get('READTHEDOCS', None) == 'True':
     # scipy must be added in config.py as a mock
-    install_requires = ['SpiNNFrontEndCommon >= 1!4.0.0a1, < 1!5.0.0',
+    install_requires = ['SpiNNUtilities >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNMan >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNaker_PACMAN >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNaker_DataSpecification >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNFrontEndCommon >= 1!4.0.0a5, < 1!5.0.0',
                         'numpy', 'lxml', 'six']
 else:
-    install_requires = [
-        'SpiNNFrontEndCommon >= 1!4.0.0a1, < 1!5.0.0',
-        'numpy', 'scipy', 'lxml', 'six']
+    install_requires = ['SpiNNUtilities >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNMan >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNaker_PACMAN >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNaker_DataSpecification >= 1!4.0.0a5, < 1!5.0.0',
+                        'SpiNNFrontEndCommon >= 1!4.0.0a5, < 1!5.0.0',
+                        'numpy', 'scipy', 'lxml', 'six']
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
