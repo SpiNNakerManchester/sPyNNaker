@@ -4,4 +4,3 @@ scipy
 lxml
 six
 
-# WARNING: This module depends on pyNN but the exact version should not be declared at this point
