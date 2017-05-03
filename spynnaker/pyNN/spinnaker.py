@@ -1,13 +1,8 @@
 
-# pacman imports
-from pacman.model.graphs.application.impl.application_edge import \
-    ApplicationEdge
-
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
     SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
-from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
@@ -17,13 +12,8 @@ from spynnaker.pyNN.models.pynn_projection import Projection
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN import model_binaries
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_send_me_multicast_commands_vertex \
-    import AbstractSendMeMulticastCommandsVertex
-from spynnaker.pyNN.models.abstract_models\
-    .abstract_vertex_with_dependent_vertices \
-    import AbstractVertexWithEdgeToDependentVertices
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 # general imports
 import logging
@@ -52,7 +42,6 @@ class Spinnaker(SpinnakerMainInterface):
         # population holders
         self._populations = list()
         self._projections = list()
-        self._command_sender = None
         self._edge_count = 0
 
         # the number of edges that are associated with commands being sent to
@@ -71,7 +60,16 @@ class Spinnaker(SpinnakerMainInterface):
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
 
+        extra_mapping_algorithms = list()
+        extra_load_algorithms = list()
         extra_algorithms_pre_run = list()
+
+        if config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
+
         if config.getboolean("Reports", "ReportsEnabled"):
             if config.getboolean("Reports", "writeSynapticReport"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
@@ -82,6 +80,8 @@ class Spinnaker(SpinnakerMainInterface):
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             extra_mapping_inputs=extra_mapping_inputs,
+            extra_mapping_algorithms=extra_mapping_algorithms,
+            extra_load_algorithms=extra_load_algorithms,
             n_chips_required=n_chips_required,
             extra_pre_run_algorithms=extra_algorithms_pre_run)
 
@@ -102,52 +102,66 @@ class Spinnaker(SpinnakerMainInterface):
                     .format(self._machine_time_step))
 
     def _set_up_timings(self, timestep, min_delay, max_delay):
-        self._machine_time_step = config.getint("Machine", "machineTimeStep")
 
         # deal with params allowed via the setup options
         if timestep is not None:
 
-            # convert into milliseconds from microseconds
-            timestep *= 1000
+            # convert from milliseconds into microseconds
+            try:
+                if timestep <= 0:
+                    raise InvalidParameterType(
+                        "invalid timestamp {}: must greater than zero".format(
+                            timestep))
+                timestep *= 1000.0
+                timestep = math.ceil(timestep)
+            except (TypeError, AttributeError):
+                raise InvalidParameterType(
+                    "timestamp parameter must numerical")
             self._machine_time_step = timestep
+        else:
+            self._machine_time_step = config.getint(
+                "Machine", "machineTimeStep")
 
-        if min_delay is not None and float(min_delay * 1000) < 1.0 * timestep:
+        if (min_delay is not None and
+                float(min_delay * 1000) < self._machine_time_step):
             raise common_exceptions.ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
-                "current machine time step"
-                .format(constants.MIN_SUPPORTED_DELAY * timestep))
+                "current machine time step".format(
+                    constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
 
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
-        delay_extension_max_supported_delay = \
-            constants.MAX_DELAY_BLOCKS \
-            * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK
+        delay_extension_max_supported_delay = (
+            constants.MAX_DELAY_BLOCKS *
+            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
 
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
 
-        if max_delay is not None\
-           and float(max_delay * 1000) > max_delay_tics_supported * timestep:
+        if (max_delay is not None and
+                float(max_delay * 1000.0) >
+                (max_delay_tics_supported * self._machine_time_step)):
             raise common_exceptions.ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
-                "current machine time step".format(0.144 * timestep))
+                "current machine time step".format(
+                    0.144 * self._machine_time_step))
         if min_delay is not None:
             self._min_supported_delay = min_delay
         else:
-            self._min_supported_delay = timestep / 1000.0
+            self._min_supported_delay = self._machine_time_step / 1000.0
 
         if max_delay is not None:
             self._max_supported_delay = max_delay
         else:
-            self._max_supported_delay = (max_delay_tics_supported *
-                                         (timestep / 1000.0))
+            self._max_supported_delay = (
+                max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
                 config.get("Machine", "timeScaleFactor") != "None"):
             self._time_scale_factor = \
                 config.getint("Machine", "timeScaleFactor")
-            if timestep * self._time_scale_factor < 1000:
+            if self._machine_time_step * self._time_scale_factor < 1000:
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
                     logger.warn(
@@ -172,8 +186,8 @@ class Spinnaker(SpinnakerMainInterface):
                         "add violate_1ms_wall_clock_restriction = True to the "
                         "[Mode] section of your .spynnaker.cfg file")
         else:
-            self._time_scale_factor = max(1,
-                                          math.ceil(1000.0 / float(timestep)))
+            self._time_scale_factor = max(
+                1, math.ceil(1000.0 / self._machine_time_step))
             if self._time_scale_factor > 1:
                 logger.warn("A timestep was entered that has forced sPyNNaker "
                             "to automatically slow the simulation down from "
@@ -185,13 +199,17 @@ class Spinnaker(SpinnakerMainInterface):
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
         """
-        changed = False
+        changed = SpinnakerMainInterface._detect_if_graph_has_changed(
+            self, reset_flags)
+
+        # Additionally check populations for changes
         for population in self._populations:
             if population.requires_mapping:
                 changed = True
             if reset_flags:
                 population.mark_no_changes()
 
+        # Additionally check projections for changes
         for projection in self._projections:
             if projection.requires_mapping:
                 changed = True
@@ -212,81 +230,7 @@ class Spinnaker(SpinnakerMainInterface):
         """
         return self._max_supported_delay
 
-    def add_application_vertex(self, vertex_to_add):
-        """
-
-        :param vertex_to_add:
-        :return:
-        """
-        if isinstance(vertex_to_add, CommandSender):
-            self._command_sender = vertex_to_add
-
-        self._application_graph.add_vertex(vertex_to_add)
-
-        if isinstance(vertex_to_add, AbstractSendMeMulticastCommandsVertex):
-
-            # if there's no command sender yet, build one
-            if self._command_sender is None:
-                self._command_sender = CommandSender(
-                    "auto_added_command_sender", None)
-                self.add_application_vertex(self._command_sender)
-
-            # Count the number of unique keys
-            n_partitions = self._count_unique_keys(vertex_to_add.commands)
-
-            # build the number of edges accordingly and then add them to the
-            # graph.
-            partitions = list()
-            for _ in range(0, n_partitions):
-                edge = ApplicationEdge(self._command_sender, vertex_to_add)
-                partition_id = "COMMANDS{}".format(self._command_edge_count)
-
-                # add to the command count, so that each set of commands is in
-                # its own partition
-                self._command_edge_count += 1
-
-                # add edge with new partition id to graph
-                self.add_application_edge(edge, partition_id)
-
-                # locate the partition object for the edge we just added
-                partition = self._application_graph.\
-                    get_outgoing_edge_partition_starting_at_vertex(
-                        self._command_sender, partition_id)
-
-                # store the partition for the command sender to use for its
-                # key map
-                partitions.append(partition)
-
-            # allow the command sender to create key to partition map
-            self._command_sender.add_commands(
-                vertex_to_add.commands, partitions)
-
-        # add any dependent edges and vertices if needed
-        if isinstance(vertex_to_add,
-                      AbstractVertexWithEdgeToDependentVertices):
-            for dependant_vertex in vertex_to_add.dependent_vertices:
-                self.add_application_vertex(dependant_vertex)
-                dependant_edge = ApplicationEdge(
-                    pre_vertex=vertex_to_add, post_vertex=dependant_vertex)
-                self.add_application_edge(
-                    dependant_edge,
-                    vertex_to_add.
-                    edge_partition_identifier_for_dependent_edge)
-
-    def _count_unique_keys(self, commands):
-        unique_keys = {command.key for command in commands}
-        return len(unique_keys)
-
     def create_population(self, size, cellclass, cellparams, structure, label):
-        """
-
-        :param size:
-        :param cellclass:
-        :param cellparams:
-        :param structure:
-        :param label:
-        :return:
-        """
         return Population(
             size=size, cellclass=cellclass, cellparams=cellparams,
             structure=structure, label=label, spinnaker=self)
@@ -314,7 +258,7 @@ class Spinnaker(SpinnakerMainInterface):
         :param synapse_dynamics: plasticity object
         :param label: human readable version of the projection
         :param rng: the random number generator to use on this projection
-        :return:
+        :return Projection:
         """
         if label is None:
             label = "Projection {}".format(self._edge_count)
@@ -329,8 +273,7 @@ class Spinnaker(SpinnakerMainInterface):
             user_max_delay=self.max_supported_delay)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
-             clear_tags=None, extract_provenance_data=True,
-             extract_iobuf=True):
+             clear_tags=None):
         """
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
@@ -342,20 +285,13 @@ class Spinnaker(SpinnakerMainInterface):
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
         :type clear_tags: boolean
-        :param extract_provenance_data: informs the tools if it should \
-            try to extract provenance data.
-        :type extract_provenance_data: bool
-        :param extract_iobuf: tells the tools if it should try to \
-            extract iobuf
-        :type extract_iobuf: bool
-        :return: None
+        :rtype: None
         """
         for population in self._populations:
             population._end()
 
         SpinnakerMainInterface.stop(
-            self, turn_off_machine, clear_routing_tables, clear_tags,
-            extract_provenance_data, extract_iobuf)
+            self, turn_off_machine, clear_routing_tables, clear_tags)
 
     def run(self, run_time):
         """ Run the model created

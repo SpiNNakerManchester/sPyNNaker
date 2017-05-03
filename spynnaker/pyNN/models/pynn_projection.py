@@ -1,15 +1,14 @@
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
+from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
+
+from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses \
+    import AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.neural_projections.delayed_application_edge \
     import DelayedApplicationEdge
-
 from spynnaker.pyNN.models.neural_projections.synapse_information \
     import SynapseInformation
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
     import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
     import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
@@ -18,8 +17,6 @@ from spynnaker.pyNN.models.neural_projections.projection_application_edge \
 from spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge \
     import DelayAfferentApplicationEdge
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
 
 from spinn_front_end_common.utilities import exceptions
 
@@ -52,7 +49,7 @@ class Projection(object):
         self._has_retrieved_synaptic_list_from_machine = False
 
         if not isinstance(postsynaptic_population._get_vertex,
-                          AbstractPopulationVertex):
+                          AbstractAcceptsIncomingSynapses):
 
             raise exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
@@ -70,8 +67,8 @@ class Projection(object):
             synapse_dynamics_stdp = SynapseDynamicsStatic()
         else:
             synapse_dynamics_stdp = synapse_dynamics.slow
-        postsynaptic_population._get_vertex.synapse_dynamics = \
-            synapse_dynamics_stdp
+        postsynaptic_population._get_vertex.set_synapse_dynamics(
+            synapse_dynamics_stdp)
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
@@ -157,14 +154,11 @@ class Projection(object):
 
     @property
     def requires_mapping(self):
-        if (isinstance(self._projection_edge, AbstractChangableAfterRun) and
-                self._projection_edge.requires_mapping):
-            return True
         return False
 
     def mark_no_changes(self):
-        if isinstance(self._projection_edge, AbstractChangableAfterRun):
-            self._projection_edge.mark_no_changes()
+        # Does Nothing currently
+        pass
 
     def _find_existing_edge(self, presynaptic_vertex, postsynaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -260,6 +254,7 @@ class Projection(object):
                            gather=True):
         """ Get parameters of the dynamic synapses for all connections in this\
             Projection.
+
         :param parameter_name:
         :param list_format:
         :param gather:
@@ -326,6 +321,7 @@ class Projection(object):
         non-existent connections). Note that for the array format, if there is
         more than connection between two cells, the summed weight will be
         given.
+
         :param format: the type of format to be returned (only support "list")
         :param gather: gather the weights from stuff. currently has no meaning\
                 in spinnaker when set to false. Therefore is always true

@@ -1,9 +1,10 @@
-from pacman.model.constraints.abstract_constraint\
-    import AbstractConstraint
+from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
-    .placer_chip_and_core_constraint import PlacerChipAndCoreConstraint
+    import PlacerChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+    import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
     import AbstractPopulationSettable
 from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
@@ -42,7 +43,6 @@ class Population(object):
         a spatial structure
     :param string label:
         a label identifying the Population
-    :returns a list of vertexes and edges
     """
 
     def __init__(self, size, cellclass, cellparams, spinnaker, label,
@@ -92,17 +92,15 @@ class Population(object):
 
         # parameter
         self._change_requires_mapping = True
+        self._has_read_neuron_parameters_this_run = False
 
     @property
     def requires_mapping(self):
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            return self._vertex.requires_mapping
         return self._change_requires_mapping
 
     def mark_no_changes(self):
         self._change_requires_mapping = False
-        if isinstance(self._vertex, AbstractChangableAfterRun):
-            self._vertex.mark_no_changes()
+        self._has_read_neuron_parameters_this_run = False
 
     def __add__(self, other):
         """ Merges populations
@@ -125,7 +123,6 @@ class Population(object):
     @property
     def default_parameters(self):
         """ The default parameters of the vertex from this population
-        :return:
         """
         return self._vertex.default_parameters
 
@@ -204,13 +201,12 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_gsyn(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time and synaptic
+        Return a 3-column numpy array containing cell ids, time and synaptic\
         conductances for recorded cells.
-        :param gather:
-            not used - inserted to match PyNN specs
+
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
 
@@ -242,14 +238,12 @@ class Population(object):
     # noinspection PyUnusedLocal
     def get_v(self, gather=True, compatible_output=False):
         """
-        Return a 3-column numpy array containing cell ids, time, and V_m for
+        Return a 3-column numpy array containing cell ids, time, and V_m for\
         recorded cells.
 
-        :param gather:
-            not used - inserted to match PyNN specs
+        :param gather: not used - inserted to match PyNN specs
         :type gather: bool
-        :param compatible_output:
-            not used - inserted to match PyNN specs
+        :param compatible_output: not used - inserted to match PyNN specs
         :type compatible_output: bool
         """
         if isinstance(self._vertex, AbstractVRecordable):
@@ -302,14 +296,17 @@ class Population(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
+        if self._spinnaker.has_ran and not isinstance(
+                self._vertex, AbstractChangableAfterRun):
+            raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
-        self._change_requires_mapping = True
 
     @staticmethod
     def is_local(cell_id):
         """ Determine whether the cell with the given ID exists on the local \
             MPI node.
+
         :param cell_id:
         """
 
@@ -393,12 +390,11 @@ class Population(object):
         """ Set initial membrane potentials for all the cells in the\
             population to random values.
 
-        :param `pyNN.random.RandomDistribution` distribution:
+        :param `pyNN.random.RandomDistribution` distribution:\
             the distribution used to draw random values.
 
         """
         self.initialize('v', distribution)
-        self._change_requires_mapping = True
 
     def record(self, to_file=None):
         """ Record spikes from all cells in the Population.
@@ -408,16 +404,19 @@ class Population(object):
 
         if not isinstance(self._vertex, AbstractSpikeRecordable):
             raise Exception(
-                "This population does not support the recording of spikes!")
+                "This population does not support the recording of spikes")
 
         # Tell the vertex to record spikes
-        self._vertex.set_recording_spikes()
+        if not self._vertex.is_recording_spikes():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_spikes()
 
         # set the file to store the spikes in once retrieved
         self._record_spike_file = to_file
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     def record_gsyn(self, to_file=None):
         """ Record the synaptic conductance for all cells in the Population.
@@ -427,16 +426,22 @@ class Population(object):
         if not isinstance(self._vertex, AbstractGSynRecordable):
             raise Exception(
                 "This population does not support the recording of gsyn")
+
         if not isinstance(self._vertex.input_type, InputTypeConductance):
             logger.warn(
                 "You are trying to record the conductance from a model which "
                 "does not use conductance input.  You will receive "
                 "current measurements instead.")
-        self._vertex.set_recording_gsyn()
-        self._record_gsyn_file = to_file
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
+        if not self._vertex.is_recording_gsyn():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_gsyn()
+
+        self._record_gsyn_file = to_file
 
     def record_v(self, to_file=None):
         """ Record the membrane potential for all cells in the Population.
@@ -447,11 +452,15 @@ class Population(object):
             raise Exception(
                 "This population does not support the recording of v")
 
-        self._vertex.set_recording_v()
-        self._record_v_file = to_file
+        if not self._vertex.is_recording_v():
+            if self._spinnaker.has_ran and not isinstance(
+                    self._vertex, AbstractChangableAfterRun):
+                raise Exception(
+                    "This population does not support changes to settings"
+                    " after run has been called")
+            self._vertex.set_recording_v()
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
+        self._record_v_file = to_file
 
     @property
     def positions(self):
@@ -463,6 +472,7 @@ class Population(object):
                                  "for an unstructured population")
             self._positions = self._structure.generate_positions(
                 self._vertex.n_atoms)
+            self._change_requires_mapping = True
         return self._positions
 
     @positions.setter
@@ -470,13 +480,12 @@ class Population(object):
         """ Sets all the positions in the population.
         """
         self._positions = positions
-
-        # state that something has changed in the population,
         self._change_requires_mapping = True
 
     # noinspection PyPep8Naming
     def printSpikes(self, filename, gather=True):
         """ Write spike time information from the population to a given file.
+
         :param filename: the absolute file path for where the spikes are to\
                     be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -502,6 +511,7 @@ class Population(object):
 
     def print_gsyn(self, filename, gather=True):
         """ Write conductance information from the population to a given file.
+
         :param filename: the absolute file path for where the gsyn are to be\
                     printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -527,6 +537,7 @@ class Population(object):
     def print_v(self, filename, gather=True):
         """ Write membrane potential information from the population to a\
             given file.
+
         :param filename: the absolute file path for where the voltage are to\
                      be printed in
         :param gather: Supported from the PyNN language, but ignored here
@@ -557,12 +568,10 @@ class Population(object):
         """
         self.set(parametername, rand_distr)
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
-
     def sample(self, n, rng=None):
         """ Return a random selection of neurons from a population in the form\
             of a population view
+
         :param n: the number of neurons to sample
         :param rng: the random number generator to use.
         """
@@ -572,6 +581,7 @@ class Population(object):
 
     def save_positions(self, file):  # @ReservedAssignment
         """ Save positions to file.
+
             :param file: the file to write the positions to.
         """
         file_handle = open(file, "w")
@@ -588,6 +598,7 @@ class Population(object):
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
+
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
@@ -595,24 +606,60 @@ class Population(object):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
+        if self._spinnaker.has_ran and not isinstance(
+                self._vertex, AbstractChangableAfterRun):
+            raise Exception(
+                "This population does not support changes to settings after"
+                " run has been called")
+
         if type(parameter) is str:
             if value is None:
-                raise Exception("Error: No value given in set() function for "
-                                "population parameter. Exiting.")
+                raise Exception("A value (not None) must be specified")
+            self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
 
         if type(parameter) is not dict:
-                raise Exception("Error: invalid parameter type for "
-                                "set() function for population parameter."
-                                " Exiting.")
+            raise Exception(
+                "Parameter must either be the name of a single parameter to"
+                " set, or a dict of parameter: value items to set")
 
-        # Add a dictionary-structured set of new parameters to the current set:
+        # set new parameters
+        self._read_parameters_before_set()
         for (key, value) in parameter.iteritems():
             self._vertex.set_value(key, value)
 
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
+    def _read_parameters_before_set(self):
+        """ Reads parameters from the machine before "set" completes
+
+        :return: None
+        """
+
+        # If the tools have run before, and not reset, and the read
+        # hasn't already been done, read back the data
+        if (self._spinnaker.has_ran and not self._spinnaker.has_reset_last and
+                isinstance(self._vertex, AbstractReadParametersBeforeSet) and
+                not self._has_read_neuron_parameters_this_run):
+
+            # locate machine vertices from the application vertices
+            machine_vertices = \
+                self._spinnaker.graph_mapper.get_machine_vertices(
+                    self._vertex)
+
+            # go through each machine vertex and read the neuron parameters
+            # it contains
+            for machine_vertex in machine_vertices:
+
+                # tell the core to rewrite neuron params back to the
+                # sdram space.
+                placement = self._spinnaker.placements.\
+                    get_placement_of_vertex(machine_vertex)
+
+                self._vertex.read_parameters_from_machine(
+                    self._spinnaker.transceiver, placement,
+                    self._spinnaker.graph_mapper.get_slice(machine_vertex))
+
+            self._has_read_neuron_parameters_this_run = True
 
     @property
     def structure(self):
@@ -682,13 +729,13 @@ class Population(object):
     @property
     def size(self):
         """ The number of neurons in the population
-        :return:
         """
         return self._vertex.n_atoms
 
     def tset(self, parametername, value_array):
         """ 'Topographic' set. Set the value of parametername to the values in\
             value_array, which must have the same dimensions as the Population.
+
         :param parametername: the name of the parameter
         :param value_array: the array of values which must have the correct\
                 number of elements.
@@ -699,9 +746,6 @@ class Population(object):
                 "the size of the population. Please change this and try "
                 "again, or alternatively, use set()")
         self.set(parametername, value_array)
-
-        # state that something has changed in the population,
-        self._change_requires_mapping = True
 
     def _end(self):
         """ Do final steps at the end of the simulation
@@ -724,3 +768,4 @@ class Population(object):
     @_internal_delay_vertex.setter
     def _internal_delay_vertex(self, delay_vertex):
         self._delay_vertex = delay_vertex
+        self._change_requires_mapping = True

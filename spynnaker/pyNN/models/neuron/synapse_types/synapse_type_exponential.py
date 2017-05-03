@@ -8,6 +8,25 @@ from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
 from data_specification.enums.data_type import DataType
 
 import numpy
+from enum import Enum
+
+
+class _EXP_TYPES(Enum):
+
+    E_DECAY = (1, DataType.UINT32)
+    E_INIT = (2, DataType.UINT32)
+    I_DECAY = (3, DataType.UINT32)
+    I_INIT = (4, DataType.UINT32)
+
+    def __new__(cls, value, data_type):
+        obj = object.__new__(cls)
+        obj._value_ = value
+        obj._data_type = data_type
+        return obj
+
+    @property
+    def data_type(self):
+        return self._data_type
 
 
 def get_exponential_decay_and_init(tau, machine_time_step):
@@ -73,11 +92,14 @@ class SynapseTypeExponential(AbstractSynapseType):
             self._tau_syn_I, machine_time_step)
 
         return [
-            NeuronParameter(e_decay, DataType.UINT32),
-            NeuronParameter(e_init, DataType.UINT32),
-            NeuronParameter(i_decay, DataType.UINT32),
-            NeuronParameter(i_init, DataType.UINT32)
+            NeuronParameter(e_decay, _EXP_TYPES.E_DECAY.data_type),
+            NeuronParameter(e_init, _EXP_TYPES.E_INIT.data_type),
+            NeuronParameter(i_decay, _EXP_TYPES.I_DECAY.data_type),
+            NeuronParameter(i_init, _EXP_TYPES.I_INIT.data_type)
         ]
+
+    def get_synapse_type_parameter_types(self):
+        return [item.data_type for item in _EXP_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self):
 

@@ -1,16 +1,19 @@
 """
 utility class containing simple helper methods
 """
+from pyNN.random import RandomDistribution
+
 from spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl \
     import RandomStatsScipyImpl
 from spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl \
     import RandomStatsUniformImpl
-from spynnaker.pyNN.models.neural_properties.randomDistributions \
-    import RandomDistribution
+
 from spinn_front_end_common.utilities import exceptions
+
 import numpy
 import os
 import logging
+import struct
 
 from scipy.stats import binom
 
@@ -33,25 +36,32 @@ def convert_param_to_numpy(param, no_atoms):
 
     :param param: the param to convert
     :param no_atoms: the number of atoms available for conversion of param
-    :return the converted param in whatever format it was given
+    :return numpy.array: the converted param in whatever format it was given
     """
-    if RandomDistribution is None:
-        raise exceptions.ConfigurationException(
-            "Missing PyNN. Please install version 0.7.5 from "
-            "http://neuralensemble.org/PyNN/")
+
+    # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
+
         if no_atoms > 1:
             return numpy.asarray(param.next(n=no_atoms), dtype="float")
-        else:
-            return numpy.array([param.next(n=no_atoms)], dtype="float")
-    elif not hasattr(param, '__iter__'):
+
+        # numpy reduces a single valued array to a single value, so enforce
+        # that it is an array
+        return numpy.array([param.next(n=no_atoms)], dtype="float")
+
+    # Deal with a single value by exploding to multiple values
+    if not hasattr(param, '__iter__'):
         return numpy.array([param] * no_atoms, dtype="float")
-    elif len(param) != no_atoms:
-        raise exceptions.ConfigurationException("The number of params does"
-                                                " not equal with the number"
-                                                " of atoms in the vertex ")
-    else:
-        return numpy.array(param, dtype="float")
+
+    # Deal with multiple values, but not the correct number of them
+    if len(param) != no_atoms:
+
+        raise exceptions.ConfigurationException(
+            "The number of params does not equal with the number of atoms in"
+            " the vertex")
+
+    # Deal with the correct number of multiple values
+    return numpy.array(param, dtype="float")
 
 
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
@@ -68,6 +78,73 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
                              data_type=param.get_dataspec_datatype())
 
 
+def translate_parameters(types, byte_array, offset, vertex_slice):
+    """ Translate an array of data into a set of parameters
+
+    :param types: the DataType of each of the parameters to translate
+    :param byte_array: the byte array to read parameters out of
+    :param offset: where in the byte array to start reading from
+    :param vertex_slice: the map of atoms from a application vertex
+    :return: An array of arrays of parameter values, and the new offset
+    """
+
+    # If there are no parameters, return an empty list
+    if len(types) == 0:
+        return numpy.zeros((0, 0), dtype="float"), offset
+
+    # Get the single-struct format
+    struct_data_format = ""
+    for param_type in types:
+        struct_data_format += param_type.struct_encoding
+
+    # Get the struct-array format, consisting of repeating the struct
+    struct_array_format = "<" + (struct_data_format * vertex_slice.n_atoms)
+
+    # unpack the params from the byte array
+    translated_parameters = numpy.asarray(
+        struct.unpack_from(struct_array_format, byte_array, offset),
+        dtype="float")
+
+    # scale values with required scaling factor
+    scales = numpy.tile(
+        [float(param_type.scale) for param_type in types],
+        vertex_slice.n_atoms)
+    scaled_parameters = translated_parameters / scales
+
+    # sort the parameters into arrays of values, one array per parameter
+    sorted_parameters = scaled_parameters.reshape(
+        (vertex_slice.n_atoms, len(types))).swapaxes(0, 1)
+
+    # Get the size of the parameters read
+    parameter_size = sum([param_type.size for param_type in types])
+
+    return sorted_parameters, offset + (parameter_size * vertex_slice.n_atoms)
+
+
+def get_parameters_size_in_bytes(parameters):
+    """ Get the total size of a list of parameters in bytes
+
+    :param parameters: the parameters to compute the total size of
+    :return: size of all the parameters in bytes
+    :rtype: int
+    """
+    total = 0
+    for parameter in parameters:
+        total += parameter.get_dataspec_datatype().size
+    return total
+
+
+def set_slice_values(arrays, values, vertex_slice):
+    """ Set a vertex slice of atoms in a set of arrays to the given values
+
+    :param array: The array of arrays to set the values in
+    :param value: The array of arrays of values to set
+    :param vertex_slice: The slice of parameters to set
+    """
+    for i, array in enumerate(arrays):
+        array[vertex_slice.as_slice] = values[i]
+
+
 def read_in_data_from_file(
         file_path, min_atom, max_atom, min_time, max_time):
     """ Read in a file of data values where the values are in a format of:
@@ -77,7 +154,7 @@ def read_in_data_from_file(
     :param min_atom: min neuron id to which neurons to read in
     :param max_atom: max neuron id to which neurons to read in
     :param min_time: min time slot to read neurons values of.
-    :param max_time:max time slot to read neurons values of.
+    :param max_time: max time slot to read neurons values of.
     :return: a numpy array of (time stamp, atom id, data value)
     """
     times = list()
@@ -116,7 +193,7 @@ def read_spikes_from_file(file_path, min_atom, max_atom, min_time, max_time,
     :param min_atom: min neuron id to which neurons to read in
     :param max_atom: max neuron id to which neurons to read in
     :param min_time: min time slot to read neurons values of.
-    :param max_time:max time slot to read neurons values of.
+    :param max_time: max time slot to read neurons values of.
     :param split_value: the pattern to split by
     :return:\
         a numpy array with max_atom elements each of which is a list of\
