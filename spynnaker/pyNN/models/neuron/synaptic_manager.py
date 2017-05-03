@@ -104,10 +104,10 @@ class SynapticManager(object):
             pass
 
         # Otherwise, the dynamics must be equal
-        elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
-            raise exceptions.SynapticConfigurationException(
-                "Synapse dynamics must match exactly when using multiple edges"
-                "to the same population")
+        #elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
+        #    raise exceptions.SynapticConfigurationException(
+        #        "Synapse dynamics must match exactly when using multiple edges"
+        #        "to the same population")
 
     @property
     def synapse_type(self):
