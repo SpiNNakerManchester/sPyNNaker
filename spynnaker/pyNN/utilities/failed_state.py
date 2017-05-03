@@ -160,9 +160,8 @@ class FailedState(SimulatorInterface):
         raise exceptions.ConfigurationException(
             "This call depends on setup being called")
 
-
     def create_population(self, size, cellclass, cellparams, structure,
-                         label):
+                          label):
         raise exceptions.ConfigurationException(
             "This call depends on setup being called")
 
@@ -171,11 +170,6 @@ class FailedState(SimulatorInterface):
                           target, synapse_dynamics, label, rng):
         raise exceptions.ConfigurationException(
             "This call depends on setup being called")
-
-    def get_current_time(self):
-        raise exceptions.ConfigurationException(
-            "This call depends on setup being called")
-
 
     def get_distribution_to_stats(self):
         raise exceptions.ConfigurationException(

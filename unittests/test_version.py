@@ -8,6 +8,7 @@ import spinnman
 import spinn_front_end_common
 import spynnaker
 
+
 class Test(unittest.TestCase):
     """ Tests for the SCAMP version comparison
     """
@@ -20,7 +21,8 @@ class Test(unittest.TestCase):
         data_specification_parts = data_specification.__version__.split('.')
         pacman_parts = pacman.__version__.split('.')
         spinnman_parts = spinnman.__version__.split('.')
-        spinn_front_end_common_parts = spinn_front_end_common.__version__.split('.')
+        spinn_front_end_common_parts = spinn_front_end_common.__version__\
+            .split('.')
         spynnaker_parts = spynnaker.__version__.split('.')
 
         self.assertEqual(spinn_utilities_parts[0],

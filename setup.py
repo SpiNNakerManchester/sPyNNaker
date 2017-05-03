@@ -1,7 +1,6 @@
 import os
 from setuptools import setup
 from collections import defaultdict
-from spynnaker.pyNN._version import __version__
 
 __version__ = None
 exec(open("spynnaker/_version.py").read())

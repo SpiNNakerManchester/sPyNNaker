@@ -86,10 +86,6 @@ class SimulatorInterface(object):
         pass
 
     @abstractmethod
-    def get_current_time(self):
-        pass
-
-    @abstractmethod
     def get_distribution_to_stats(self):
         pass
 

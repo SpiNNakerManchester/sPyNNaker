@@ -3,6 +3,7 @@ import unittest
 from spynnaker.pyNN.utilities.failed_state import FailedState
 from spynnaker.pyNN.utilities import globals_variables
 
+
 class TestFailedState(unittest.TestCase):
 
     def test_init(self):
