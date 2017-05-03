@@ -7,8 +7,8 @@
 #include <string.h>
 
 // Compute the size of the input buffers and ring buffers
-#define INPUT_BUFFER_SIZE (1 << (SYNAPSE_TYPE_BITS + SYNAPSE_INDEX_BITS))
-#define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
+#define INPUT_BUFFER_SIZE (1 << (SYNAPSE_INPUT_TYPE_BITS + SYNAPSE_INDEX_BITS))
+#define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_INPUT_TYPE_BITS\
                                 + SYNAPSE_INDEX_BITS))
 
 // Globals required for synapse benchmarking to work.
@@ -91,7 +91,7 @@ static inline void _print_ring_buffers(uint32_t time) {
     io_printf(IO_BUF, "Ring Buffer at %u\n", time);
     io_printf(IO_BUF, "----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
-        for (uint32_t t = 0; t < SYNAPSE_TYPE_COUNT; t++) {
+        for (uint32_t t = 0; t < SYNAPSE_INPUT_TYPE_COUNT; t++) {
             const char *type_string = synapse_types_get_type_char(t);
             bool empty = true;
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
@@ -165,32 +165,52 @@ static inline void _process_fixed_synapses(
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
+        uint32_t synapse_type = synapse_row_sparse_type(synaptic_word);
 
-        // Extract components from this word
-        uint32_t delay = synapse_row_sparse_delay(synaptic_word);
-        uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-                synaptic_word);
-        uint32_t weight = synapse_row_sparse_weight(synaptic_word);
-
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-            delay + time, combined_synapse_neuron_index);
-
-        // Add weight to current ring buffer value
-        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
-
-        // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
-        // **NOTE** 0x10000 can be expressed as an ARM literal,
-        //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
-        //          to obtain this value
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-            saturation_count += 1;
+        // If synapse type has non-input synapses and this synapse
+        // connects to one pass event directly to synapse dynamics
+        if(synapse_type > 1)
+        {
+          // Dopaminergic neurons send some amount of neuromodulator
+          // concentration so this can actually be a weight as usual.
+          uint32_t concentration = synapse_row_sparse_weight(synaptic_word);
+          uint32_t index = synapse_row_sparse_index(synaptic_word);
+          // In case this is punishment synapse, invert dopamine level
+          // to cause depression.
+          if (synapse_type == 3)
+              concentration = ~concentration + 1;
+          synapse_dynamics_process_neuromodulator_event(time, concentration,
+              index);
         }
+        else
+        {
+          // Extract components from this word
+          uint32_t delay = synapse_row_sparse_delay(synaptic_word);
 
-        // Store saturated value back in ring-buffer
-        ring_buffers[ring_buffer_index] = accumulation;
+          uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
+                  synaptic_word);
+          uint32_t weight = synapse_row_sparse_weight(synaptic_word);
+
+          // Convert into ring buffer offset
+          uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+              delay + time, combined_synapse_neuron_index);
+
+          // Add weight to current ring buffer value
+          uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+
+          // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
+          // **NOTE** 0x10000 can be expressed as an ARM literal,
+          //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
+          //          to obtain this value
+          uint32_t sat_test = accumulation & 0x10000;
+          if (sat_test) {
+              accumulation = sat_test - 1;
+              saturation_count += 1;
+          }
+
+          // Store saturated value back in ring-buffer
+          ring_buffers[ring_buffer_index] = accumulation;
+        }
     }
 }
 
@@ -315,7 +335,7 @@ void synapses_do_timestep_update(timer_t time) {
 
         // Loop through all synapse types
         for (uint32_t synapse_type_index = 0;
-                synapse_type_index < SYNAPSE_TYPE_COUNT; synapse_type_index++) {
+                synapse_type_index < SYNAPSE_INPUT_TYPE_COUNT; synapse_type_index++) {
 
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron

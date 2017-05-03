@@ -5,6 +5,10 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     .synapse_structure_weight_only import SynapseStructureWeightOnly
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
+    .synapse_structure_weight_eligibility_trace import\
+    SynapseStructureWeightEligibilityTrace
+from data_specification.enums.data_type import DataType
 
 
 import logging
@@ -18,13 +22,16 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0, nearest=False):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, tau_c=1000, tau_d=200,
+                 nearest=False):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
+        self._tau_c = tau_c
+        self._tau_d = tau_d
         self._nearest = nearest
 
-        self._synapse_structure = SynapseStructureWeightOnly()
+        self._synapse_structure = SynapseStructureWeightEligibilityTrace()
 
         # provenance data
         self._tau_plus_last_entry = None
@@ -62,7 +69,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         return 0 if self._nearest else 2
 
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return 4 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) + 4
 
     @property
     def n_weight_terms(self):
@@ -82,6 +89,23 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
+
+        # Write Izhikevich model exp look up tables
+        self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self._tau_c, LOOKUP_TAU_PLUS_SIZE,
+            LOOKUP_TAU_PLUS_SHIFT)
+        self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self._tau_d, LOOKUP_TAU_PLUS_SIZE,
+            LOOKUP_TAU_PLUS_SHIFT)
+
+        # Calculate constant component in Izhikevich's model weight update
+        # function and write to SDRAM.
+        weight_update_component = 1 / (-((1.0/self._tau_c) + (1.0/self._tau_d)))
+        weight_update_component = \
+            plasticity_helpers.float_to_fixed(weight_update_component,
+                                              (1 << 11))
+        spec.write_value(data=weight_update_component,
+                         data_type=DataType.INT32)
 
     @property
     def synaptic_structure(self):
