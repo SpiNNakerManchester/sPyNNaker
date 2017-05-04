@@ -96,7 +96,7 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     minSpike = sys.maxint
     maxSpike = 0
 
-    print "Plotiing {} set of sapikes".format(len(spikes))
+    print "Plotting {} set of sapikes".format(len(spikes))
     for single_spikes in spikes:
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]
