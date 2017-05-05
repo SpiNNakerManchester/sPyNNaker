@@ -685,7 +685,7 @@ class AbstractPopulationVertex(
             buffer_manager, machine_time_step):
         return self._gsyn_inhibitory_recorder.get_gsyn_inhibitory(
             self._label, buffer_manager,
-            self.GSYN_EXCITATORY_RECORDING_REGION,
+            self.GSYN_INHIBITORY_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractPopulationInitializable.initialize)

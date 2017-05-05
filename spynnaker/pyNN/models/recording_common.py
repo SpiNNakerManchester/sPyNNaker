@@ -264,9 +264,9 @@ class RecordingCommon(object):
             globals_variables.get_simulator().machine_time_step)
 
     def _get_gsyn_excitatory(self):
-        """ get the gsyn inh values from the vertex
+        """ get the gsyn excitatory values from the vertex
 
-        :return: the gsyn inh values
+        :return: the gsyn excitatory values
         """
         if isinstance(
                 self._population._vertex, AbstractGSynExcitatoryRecordable):
