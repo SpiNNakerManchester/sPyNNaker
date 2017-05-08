@@ -202,7 +202,7 @@ class SpikeSourceArray(
                 SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=sys.maxint):
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     @staticmethod

@@ -14,7 +14,8 @@ _IZK_THRESHOLD = 30.0
 
 class IzkCurrExpBase(AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 255
+    DEFAULT_MAX_ATOMS_PER_CORE = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'a': 0.02, 'c': -65.0, 'b': 0.2, 'd': 2.0, 'i_offset': 0,
@@ -62,7 +63,7 @@ class IzkCurrExpBase(AbstractPopulationVertex):
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IzkCurrExpBase._model_based_max_atoms_per_core = new_value
 
     @staticmethod
