@@ -16,7 +16,8 @@ class IFCurrExpBase(AbstractPopulationVertex):
         current input
     """
 
-    _model_based_max_atoms_per_core = 255
+    DEFAULT_MAX_ATOMS_PER_CORE = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
@@ -68,7 +69,7 @@ class IFCurrExpBase(AbstractPopulationVertex):
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IFCurrExpBase._model_based_max_atoms_per_core = new_value
 
     @staticmethod
