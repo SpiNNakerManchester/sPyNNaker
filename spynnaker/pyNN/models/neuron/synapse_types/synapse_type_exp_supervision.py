@@ -8,7 +8,25 @@ from pacman.executor.injection_decorator import inject_items
 from data_specification.enums.data_type import DataType
 
 import numpy
+from enum import Enum
 
+
+class _EXP_TYPES(Enum):
+ 
+     E_DECAY = (1, DataType.UINT32)
+     E_INIT = (2, DataType.UINT32)
+     I_DECAY = (3, DataType.UINT32)
+     I_INIT = (4, DataType.UINT32)
+
+     def __new__(cls, value, data_type):
+         obj = object.__new__(cls)
+         obj._value_ = value
+         obj._data_type = data_type
+         return obj
+
+     @property
+     def data_type(self):
+         return self._data_type
 
 def get_exponential_decay_and_init(tau, machine_time_step):
     decay = numpy.exp(numpy.divide(-float(machine_time_step),
@@ -76,3 +94,9 @@ class ExpSupervision(AbstractSynapseType):
         # synapse_types_get_excitatory_input and
         # synapse_types_get_inhibitory_input
         return 100
+
+    def get_synapse_type_parameter_types(self):
+        return
+
+    def get_synapse_type_parameter_types(self):
+        return [item.data_type for item in _EXP_TYPES] 
