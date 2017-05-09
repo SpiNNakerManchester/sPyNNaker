@@ -193,7 +193,7 @@ static inline void correlation_apply_pre_spike(
         if (time_since_last_post > 0) {
             int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
                 last_post_trace.stdp_post_trace,
-                DECAY_LOOKUP_TAU_PLUS(time_since_last_post));
+                DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
             decayed_eligibility_trace -= decayed_r1;
         }
         previous_state -> eligibility_trace = decayed_eligibility_trace;
