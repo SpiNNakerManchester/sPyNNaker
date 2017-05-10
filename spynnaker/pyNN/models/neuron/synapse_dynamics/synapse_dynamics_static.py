@@ -103,9 +103,8 @@ class SynapseDynamicsStatic(
     def get_value(self, key):
         """ Get a property
         """
-        for obj in [self._timing_dependence, self._weight_dependence, self]:
-            if hasattr(obj, key):
-                return getattr(obj, key)
+        if hasattr(self, key):
+            return getattr(self, key)
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(self._model_name, key))
 
@@ -116,9 +115,8 @@ class SynapseDynamicsStatic(
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign
         """
-        for obj in [self._timing_dependence, self._weight_dependence, self]:
-            if hasattr(obj, key):
-                setattr(obj, key, value)
-                self._change_requires_mapping = True
+        if hasattr(self, key):
+            setattr(self, key, value)
+            self._change_requires_mapping = True
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(self._model_name, key))

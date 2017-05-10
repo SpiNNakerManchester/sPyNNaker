@@ -149,9 +149,7 @@ class SynapseDynamicsSTDP(
     @property
     def _n_header_bytes(self):
 
-        n_bytes = 0
-        # If we're using MAD, the header contains a single timestamp and
-        # pre-trace
+        # The header contains a single timestamp and pre-trace
         n_bytes = (
             TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
 

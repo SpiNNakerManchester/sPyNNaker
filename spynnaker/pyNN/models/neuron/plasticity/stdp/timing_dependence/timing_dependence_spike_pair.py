@@ -37,11 +37,6 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
-    # TODO Why a getter but no setter?
-    @property
-    def nearest(self):
-        return self._nearest
-
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
