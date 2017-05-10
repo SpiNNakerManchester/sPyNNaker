@@ -106,6 +106,25 @@ def _logging_parser(config):
     return None
 
 
+def load_config():
+    """
+    Reloads the config.
+
+    Warning until a global config exists this will not affect the config of
+    already imported modules
+
+    Will read in the config based on the current path.
+
+    Warning: Should only be used for testing as which configs will and
+    will not be effected is uncertain.
+
+    :return:
+    :rytpe RawConfigParser
+    """
+    return _load_config("spynnaker.cfg", [("Machine", _machine_spec_parser),
+                                          ("Logging", _logging_parser)])
+
+
 # Create a config, read global defaults and then read in additional files
 config = _load_config("spynnaker.cfg", [
     ("Machine", _machine_spec_parser), ("Logging", _logging_parser)])

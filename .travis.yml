@@ -1,20 +1,15 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+python:
+  - "2.7"
 
 virtualenv:
   system_site_packages: true
-
-env:
-  - READTHEDOCS=True
 
 cache: pip
 
 before_install:
   - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
+  - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
   # SpiNNakerManchester internal dependencies; development mode
   - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
   - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
@@ -27,6 +22,7 @@ before_install:
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
+  - python ./p7_integration_tests/setup.py install
 
 before_script:
   - echo '[Machine]' > ~/.spynnaker.cfg
@@ -35,13 +31,16 @@ before_script:
   - echo '[Database]' >> ~/.spynnaker.cfg
   - echo '[Simulation]' >> ~/.spynnaker.cfg
   - echo '[Buffers]' >> ~/.spynnaker.cfg
+  - export PYTHONPATH=$PYTHONPATH:$(pwd)
 
 script:
   - py.test unittests
+  - if [ "x${TRAVIS_EVENT_TYPETRAVIS_EVENT_TYPE}" = "xcron" ]; then
+      py.test --tb=native p7_integration_tests;
+    fi
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
-  # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
-  # - flake8 integration_tests
+  - flake8 p7_integration_tests
   - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
