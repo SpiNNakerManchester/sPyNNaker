@@ -18,11 +18,10 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0, nearest=False):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
-        self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -38,28 +37,22 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
-    @property
-    def nearest(self):
-        return self._nearest
-
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
-        return (
-            (self._tau_plus == timing_dependence._tau_plus) and
-            (self._tau_minus == timing_dependence._tau_minus) and
-            (self._nearest == timing_dependence._nearest))
+        return ((self.tau_plus == timing_dependence.tau_plus) and
+                (self.tau_minus == timing_dependence.tau_minus))
 
     @property
     def vertex_executable_suffix(self):
-        return "nearest_pair" if self._nearest else "pair"
+        return "pair"
 
     @property
     def pre_trace_n_bytes(self):
 
         # Pair rule requires no pre-synaptic trace when only the nearest
         # Neighbours are considered and, a single 16-bit R1 trace
-        return 0 if self._nearest else 2
+        return 2
 
     def get_parameters_sdram_usage_in_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
