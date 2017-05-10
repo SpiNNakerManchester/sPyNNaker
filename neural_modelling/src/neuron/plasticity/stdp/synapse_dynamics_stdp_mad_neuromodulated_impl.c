@@ -118,13 +118,10 @@ static inline void correlation_apply_post_spike(
 
     previous_state -> weight += weight_change;
 
-    if (previous_state -> weight & 0x8000)
-        previous_state -> weight = 0;
-    else
-        // Saturate weight
-        previous_state -> weight= MIN(weight_state.weight_region->max_weight,
-                                      MAX(previous_state -> weight,
-                                      weight_state.weight_region->min_weight));
+    // Saturate weight
+    previous_state -> weight= MIN(weight_state.weight_region->max_weight,
+                                  MAX(previous_state -> weight,
+                                  weight_state.weight_region->min_weight));
 
     // Update eligibility trace if this spike is non-dopamine spike
     if (trace.dopamine == 0) {
@@ -226,7 +223,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
     uint32_t last_non_dopamine_spike_time = delayed_last_pre_time;
-    post_trace_t last_non_dopamine_post_trace = post_window.prev_trace;
 
     while(post_window.num_events > 0) {
         const uint32_t delayed_post_time =
@@ -244,7 +240,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
         // Update previous traces and times
         if (post_window.next_trace -> dopamine == 0) {
             last_non_dopamine_spike_time = delayed_post_time;
-            last_non_dopamine_post_trace = *post_window.next_trace;
         }
         else {
             post_event_history -> last_neuromodulator_trace =
@@ -260,7 +255,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
-        last_non_dopamine_spike_time, last_non_dopamine_post_trace,
+        post_window.prev_time, post_window.prev_trace,
         last_non_dopamine_spike_time, prev_corr_time,
         current_state, post_event_history);
 
