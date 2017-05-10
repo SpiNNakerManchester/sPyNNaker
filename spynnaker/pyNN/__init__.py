@@ -37,8 +37,6 @@ from .models.neuron.builds.izk_curr_exp \
     import IzkCurrExp as IZK_curr_exp
 from .models.neuron.builds.izk_cond_exp \
     import IzkCondExp as IZK_cond_exp
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_supervision \
-    import IFCurrExpSupervision as IF_curr_exp_supervision
 
 # neural projections
 from .models.neural_projections.delay_afferent_application_edge \

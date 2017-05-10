@@ -11,14 +11,6 @@ bool synapse_dynamics_initialise(
 }
 
 //---------------------------------------
-void synapse_dynamics_process_neuromodulator_event(
-         uint32_t time, int16_t concentration, uint32_t neuron_index) {
-    use(time);
-    use(concentration);
-    use(neuron_index);
-}
-
-//---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
     use(time);
