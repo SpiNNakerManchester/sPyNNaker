@@ -1,29 +1,24 @@
 from pyNN.space import Space
 
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
+from spinn_utilities.safe_eval import SafeEval
 
 import logging
 import numpy
 import math
 
 # support for arbitrary expression for the distance dependence
-# NOTE: Do NOT delete these to fix PEP8 issues
-
-# noinspection PyUnresolvedReferences
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport # noqa: F401,E501
-
-# noinspection PyUnresolvedReferences
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport # noqa: F401,E501
-
-# noinspection PyUnresolvedReferences
-from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport # noqa: F401,E501
-
-# noinspection PyUnresolvedReferences
-from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport # noqa: F401,E501
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
+from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
+from numpy import log, log10, modf, power, sin, sinh, sqrt
+from numpy import tan, tanh, maximum, minimum, e, pi
 
 logger = logging.getLogger(__name__)
+_d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
+                           cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
+                           log, log10, modf, power, sin, sinh, sqrt, tan, tanh,
+                           maximum, minimum, e=e, pi=pi)
 
 
 class DistanceDependentProbabilityConnector(AbstractConnector):
@@ -75,11 +70,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         pre_positions = self._pre_population.positions
         post_positions = self._post_population.positions
 
-        # d is apparently unused, but is in fact expected by d_expression
-        # so is used when eval is called
-        d = self._space.distances(  # @UnusedVariable # noqa: F841
+        d = self._space.distances(
             pre_positions, post_positions, expand_distances)
-        self._probs = eval(self._d_expression)
+        self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -146,7 +139,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
         probs = self._probs[
             pre_slice_index.to_slice, post_slice_index.to_slice]
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms

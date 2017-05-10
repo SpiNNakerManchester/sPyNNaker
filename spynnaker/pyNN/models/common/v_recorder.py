@@ -1,4 +1,4 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -8,7 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 class VRecorder(object):
-
     def __init__(self):
         self._record_v = False
 
@@ -39,33 +38,26 @@ class VRecorder(object):
 
     def get_v(self, label, buffer_manager, region, placements,
               graph_mapper, application_vertex, machine_time_step):
-
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
         ms_per_tick = machine_time_step / 1000.0
-
         data = list()
         missing_str = ""
 
-        progress_bar = \
-            ProgressBar(len(vertices),
-                        "Getting membrane voltage for {}".format(label))
+        progress = ProgressBar(
+            vertices, "Getting membrane voltage for {}".format(label))
 
-        for vertex in vertices:
-
+        for vertex in progress.over(vertices):
             vertex_slice = graph_mapper.get_slice(vertex)
             placement = placements.get_placement_of_vertex(vertex)
-
-            x = placement.x
-            y = placement.y
-            p = placement.p
 
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data =\
                 buffer_manager.get_data_for_vertex(
                     placement, region)
             if missing_data:
+                x = placement.x
+                y = placement.y
+                p = placement.p
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
@@ -85,9 +77,7 @@ class VRecorder(object):
                 [record_ids, record_time, record_membrane_potential])
             part_data = numpy.reshape(part_data, [-1, 3])
             data.append(part_data)
-            progress_bar.update()
 
-        progress_bar.end()
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing membrane voltage data in region {}"
@@ -95,5 +85,4 @@ class VRecorder(object):
                     label, region, missing_str))
         data = numpy.vstack(data)
         order = numpy.lexsort((data[:, 1], data[:, 0]))
-        result = data[order]
-        return result
+        return data[order]

@@ -1,6 +1,7 @@
+import numpy
 import logging
 import os
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -16,12 +17,6 @@ class SpYNNakerSynapticMatrixReport(object):
     def __call__(self, report_folder, connection_holder, dsg_targets):
         """ converts synaptic matrix for every application edge.
         """
-
-        # Update the print options to display everything
-        import numpy
-        print_opts = numpy.get_printoptions()
-        numpy.set_printoptions(threshold=numpy.nan)
-
         if dsg_targets is None:
             raise SynapticConfigurationException(
                 "dsg targets should not be none, used as a check for "
@@ -34,40 +29,34 @@ class SpYNNakerSynapticMatrixReport(object):
             os.mkdir(top_level_folder)
 
         # create progress bar
-        progress = ProgressBar(
-            len(connection_holder.keys()),
-            "Generating synaptic matrix reports")
+        progress = ProgressBar(connection_holder.keys(),
+                               "Generating synaptic matrix reports")
 
-        # for each application edge, write matrix in new file
-        for application_edge, _ in connection_holder.keys():
+        # Update the print options to display everything
+        print_opts = numpy.get_printoptions()
+        try:
+            numpy.set_printoptions(threshold=numpy.nan)
+            # for each application edge, write matrix in new file
+            for application_edge, _ in progress.over(connection_holder.keys()):
+                # only write matrix's for edges which have matrix's
+                if isinstance(application_edge, ProjectionApplicationEdge):
+                    self._write_matrix_for_application_edge(
+                        top_level_folder, application_edge, connection_holder)
+        finally:
+            # Reset the print options
+            numpy.set_printoptions(**print_opts)
 
-            # only write matrix's for edges which have matrix's
-            if isinstance(application_edge, ProjectionApplicationEdge):
-
-                # figure new file name
-                file_name = os.path.join(
-                    top_level_folder,
-                    "synaptic_matrix_for_application_edge_{}"
-                    .format(application_edge.label))
-
-                # open writer
-                output = None
-                try:
-                    output = open(file_name, "w")
-                except IOError:
-                    logger.error("Generate_placement_reports: Can't open file"
-                                 " {} for writing.".format(file_name))
-
+    @staticmethod
+    def _write_matrix_for_application_edge(folder, edge, connection_holder):
+        # figure new file name
+        file_name = os.path.join(
+            folder,
+            "synaptic_matrix_for_application_edge_{}".format(edge.label))
+        try:
+            with open(file_name, "w") as output:
                 # write all data for all synapse_information's in same file
-                for info in application_edge.synapse_information:
-                    this_connection_holder = connection_holder[(
-                        application_edge, info)]
-                    output.write("{}".format(this_connection_holder))
-                output.flush()
-                output.close()
-
-            progress.update()
-        progress.end()
-
-        # Reset the print options
-        numpy.set_printoptions(**print_opts)
+                for info in edge.synapse_information:
+                    output.write("{}".format(connection_holder[(edge, info)]))
+        except IOError:
+            logger.error("Generate_placement_reports: Can't open file"
+                         " {} for writing.".format(file_name))

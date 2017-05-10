@@ -1,8 +1,7 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrate
 from spynnaker.pyNN.utilities import utility_calls
 

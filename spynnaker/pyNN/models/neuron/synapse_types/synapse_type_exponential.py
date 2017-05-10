@@ -1,9 +1,7 @@
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
-    import AbstractSynapseType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_synapse_type import AbstractSynapseType
 
 from data_specification.enums.data_type import DataType
 

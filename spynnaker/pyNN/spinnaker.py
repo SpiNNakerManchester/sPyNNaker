@@ -103,6 +103,7 @@ class Spinnaker(SpinnakerMainInterface):
 
     def _set_up_timings(self, timestep, min_delay, max_delay):
 
+        # TODO: does timestep work at all when it is None?
         # deal with params allowed via the setup options
         if timestep is not None:
 

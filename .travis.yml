@@ -1,15 +1,8 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
-
+python:
+  - "2.7"
 virtualenv:
   system_site_packages: true
-
-env:
-  - READTHEDOCS=True
-
 cache: pip
 
 before_install:
@@ -29,12 +22,8 @@ install:
   - python ./setup.py install
 
 before_script:
-  - echo '[Machine]' > ~/.spynnaker.cfg
-  - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
-  - echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
-  - echo '[Database]' >> ~/.spynnaker.cfg
-  - echo '[Simulation]' >> ~/.spynnaker.cfg
-  - echo '[Buffers]' >> ~/.spynnaker.cfg
+  - eval "echo \"$(cat unittests/.spynnaker.cfg.tmpl)\"" > ~/.spynnaker.cfg
+  - sed "s/${SPINNAKER_BOARD_ADDRESS}/SPINN_BOARD_ADDR/g" < ~/.spynnaker.cfg
 
 script:
   - py.test unittests

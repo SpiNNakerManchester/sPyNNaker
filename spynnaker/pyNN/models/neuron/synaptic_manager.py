@@ -10,24 +10,20 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_utilities.helpful_functions import get_valid_components
 
 from data_specification.enums.data_type import DataType
 from pacman.model.graphs.common.slice import Slice
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
-    import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
-    import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson \
-    import SpikeSourcePoisson
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import conf
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
@@ -57,7 +53,7 @@ class SynapticManager(object):
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + conf.config.get(
                 "MasterPopTable", "generator"))
-            algorithms = helpful_functions.get_valid_components(
+            algorithms = get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 

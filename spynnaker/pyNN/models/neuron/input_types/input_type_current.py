@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
-    import AbstractInputType
+from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType):

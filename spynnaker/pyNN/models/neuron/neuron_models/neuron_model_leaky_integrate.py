@@ -1,9 +1,7 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
-    import AbstractNeuronModel
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType

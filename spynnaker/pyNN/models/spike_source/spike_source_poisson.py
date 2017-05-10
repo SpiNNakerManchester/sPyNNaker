@@ -1,4 +1,4 @@
-import scipy.stats
+import scipy.stats  # @UnresolvedImport
 import logging
 import math
 import random
@@ -40,19 +40,15 @@ from spinn_front_end_common.abstract_models.impl\
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
 
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.multi_spike_recorder \
-    import MultiSpikeRecorder
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
+from spynnaker.pyNN.models.common import \
+    AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable
+from .spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
 
 logger = logging.getLogger(__name__)
 

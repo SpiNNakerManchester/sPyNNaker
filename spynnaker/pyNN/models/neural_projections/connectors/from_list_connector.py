@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 import logging
 import numpy
 

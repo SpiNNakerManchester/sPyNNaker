@@ -24,14 +24,13 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
 
-from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spinn_front_end_common.abstract_models\
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
-from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
-    import DelayExtensionMachineVertex
+from .delay_block import DelayBlock
+from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)

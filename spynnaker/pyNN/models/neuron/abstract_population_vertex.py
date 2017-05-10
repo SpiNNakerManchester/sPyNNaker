@@ -40,29 +40,18 @@ from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
 # spynnaker imports
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from .synaptic_manager import SynapticManager
+from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
-    import AbstractPopulationInitializable
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable \
-    import AbstractVRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_recordable \
-    import AbstractGSynRecordable
-from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
-from spynnaker.pyNN.models.common.v_recorder import VRecorder
-from spynnaker.pyNN.models.common.gsyn_recorder import GsynRecorder
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,\
+    AbstractPopulationSettable, AbstractReadParametersBeforeSet
+from spynnaker.pyNN.models.common \
+    import AbstractSpikeRecordable, AbstractVRecordable, AbstractGSynRecordable
+from spynnaker.pyNN.models.common \
+    import SpikeRecorder, VRecorder, GsynRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities.conf import config
-from spynnaker.pyNN.models.neuron.population_machine_vertex \
-    import PopulationMachineVertex
-from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses\
-    import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
-    import AbstractReadParametersBeforeSet
 
 import logging
 import os

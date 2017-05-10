@@ -2,12 +2,8 @@ from pacman.model.decorators.overrides import overrides
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
-from spynnaker.pyNN.models.common.eieio_spike_recorder \
-    import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import \
+    SimplePopulationSettable, EIEIOSpikeRecorder, AbstractSpikeRecordable
 from spynnaker.pyNN.utilities.conf import config
 
 

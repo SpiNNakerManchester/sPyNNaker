@@ -1,10 +1,9 @@
 import logging
 import os
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +12,15 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """
     """
 
+    def _get_diagram(self, label):
+        try:
+            import graphviz  # @UnresolvedImport
+        except:
+            raise SpynnakerException(
+                "graphviz is required to use this report.  Please install"
+                " graphviz if you want to use this report.")
+        return graphviz.Digraph(comment=label)
+
     def __call__(self, report_folder, application_graph):
         """
 
@@ -20,20 +28,14 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         :param application_graph: the app graph
         :rtype: None
         """
-        try:
-            import graphviz
-        except:
-            raise SpynnakerException(
-                "graphviz is required to use this report.  Please install"
-                " graphviz if you want to use this report.")
 
         # create holders for data
         vertex_holders = dict()
-        dot_diagram = graphviz.Digraph(
-            comment="The graph of the network in graphical form")
+        dot_diagram = self._get_diagram(
+            "The graph of the network in graphical form")
 
         # build progress bar for the vertices, edges, and rendering
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             application_graph.n_vertices +
             application_graph.n_outgoing_edge_partitions + 1,
             "generating the graphical representation of the neural network")
@@ -46,7 +48,7 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                 "{} ({} neurons)".format(vertex.label, vertex.n_atoms))
             vertex_holders[vertex] = vertex_counter
             vertex_counter += 1
-            progress_bar.update()
+            progress.update()
 
         # write edges into dot diagram
         for partition in application_graph.outgoing_edge_partitions:
@@ -63,10 +65,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
                     dot_diagram.edge(
                         "{}".format(source_vertex_id),
                         "{}".format(dest_vertex_id))
-            progress_bar.update()
+            progress.update()
 
         # write dot file and generate pdf
         file_to_output = os.path.join(report_folder, "network_graph.gv")
         dot_diagram.render(file_to_output, view=False)
-        progress_bar.update()
-        progress_bar.end()
+        progress.update()
+        progress.end()

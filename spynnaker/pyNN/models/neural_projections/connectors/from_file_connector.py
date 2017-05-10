@@ -1,6 +1,5 @@
 from pyNN.recording import files
-from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
-    import FromListConnector
+from .from_list_connector import FromListConnector
 import os
 import numpy
 

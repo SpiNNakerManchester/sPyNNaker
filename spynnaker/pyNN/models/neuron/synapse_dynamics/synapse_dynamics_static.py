@@ -1,8 +1,7 @@
 import numpy
 import math
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 
 
 class SynapseDynamicsStatic(AbstractStaticSynapseDynamics):

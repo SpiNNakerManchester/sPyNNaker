@@ -1,8 +1,7 @@
 import math
 import numpy
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
