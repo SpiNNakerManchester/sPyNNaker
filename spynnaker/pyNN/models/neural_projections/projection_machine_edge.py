@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
 
+
 class ProjectionMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
