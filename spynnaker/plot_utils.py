@@ -25,44 +25,58 @@ def _precheck(data, title):
     return True
 
 
-def line_plot(data, title=None):
-    if not _precheck(data, title):
+def line_plot(data_sets, title=None):
+    if not _precheck(data_sets, title):
         return
     print ("Setting up line graph")
-    neurons = np.unique(data[:, 0])
-    for neuron in neurons:
-        time = [i[1] for i in data if i[0] == neuron]
-        membrane_voltage = [i[2] for i in data if i[0] == neuron]
-        plt.plot(time, membrane_voltage)
-    plt.xlabel("Time (ms)")
-    plt.ylabel("Neuron")
+    if isinstance(data_sets, np.ndarray):
+        data_sets = [data_sets]
+
+    print "Setting up {} sets of line plots".format(len(data_sets))
+    (numrows, numcols) = grid(len(data_sets))
+    for index in range(len(data_sets)):
+        data = data_sets[index]
+        plt.subplot(numrows, numcols, index)
+        neurons = np.unique(data[:, 0])
+        for neuron in neurons:
+            time = [i[1] for i in data if i[0] == neuron]
+            membrane_voltage = [i[2] for i in data if i[0] == neuron]
+            plt.plot(time, membrane_voltage)
+
+        min_data = min(data[:, 2])
+        max_data = max(data[:, 2])
+        adjust = (max_data - min_data) * 0.1
+        plt.axis([min(data[:, 1]), max(data[:, 1]), min_data - adjust,
+              max_data + adjust])
     if title is not None:
         plt.title(title)
-
-    min_data = min(data[:, 2])
-    max_data = max(data[:, 2])
-    adjust = (max_data - min_data) * 0.1
-    plt.axis([min(data[:, 1]), max(data[:, 1]), min_data - adjust,
-              max_data + adjust])
     plt.show()
 
 
-def heat_plot(data, ylabel=None, title=None):
-    if not _precheck(data, title):
+def heat_plot(data_sets, ylabel=None, title=None):
+    if not _precheck(data_sets, title):
         return
-    print "Setting up heat graph"
-    neurons = data[:, 0].astype(int)
-    times = data[:, 1].astype(int)
-    info = data[:, 2]
-    info_array = np.empty((max(neurons)+1, max(times)+1))
-    info_array[:] = np.nan
-    info_array[neurons, times] = info
-    plt.xlabel("Time (ms)")
-    plt.ylabel(ylabel)
+    if isinstance(data_sets, np.ndarray):
+        data_sets = [data_sets]
+
+    print "Setting up {} sets of heat graph".format(len(data_sets))
+    (numrows, numcols) = grid(len(data_sets))
+    for index in range(len(data_sets)):
+        data = data_sets[index]
+        plt.subplot(numrows, numcols, index)
+        neurons = data[:, 0].astype(int)
+        times = data[:, 1].astype(int)
+        info = data[:, 2]
+        info_array = np.empty((max(neurons)+1, max(times)+1))
+        info_array[:] = np.nan
+        info_array[neurons, times] = info
+        plt.xlabel("Time (ms)")
+        plt.ylabel(ylabel)
+        plt.imshow(info_array, cmap='hot', interpolation='none',
+                   aspect='auto')
+        plt.colorbar()
     if title is not None:
         plt.title(title)
-    plt.imshow(info_array, cmap='hot', interpolation='bilinear', aspect='auto')
-    plt.colorbar()
     plt.show()
 
 
@@ -76,12 +90,22 @@ def get_colour():
     yield "k."
 
 
-def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
+def grid(length):
+    if length == 1:
+        return (1, 1)
+    if length == 2:
+        return (1, 2)
+    if length == 3:
+        return (1, 3)
+    if length == 4:
+        return (2, 2)
+    return (length / 3 + 1, length % 3 + 1)
+
+
+def plot_spikes(spikes, title="spikes"):
     """
 
     :param spikes: Numpy array of spikes
-    :param spikes2: Optional: Numport array of spikes
-    :param spikes3: Optional: Numport array of spikes
     """
     if not _precheck(spikes, title):
         return
@@ -96,8 +120,11 @@ def plot_spikes(spikes, spikes2=None, spikes3=None, title="spikes"):
     minSpike = sys.maxint
     maxSpike = 0
 
-    print "Plotting {} set of sapikes".format(len(spikes))
-    for single_spikes in spikes:
+    print "Plotting {} set of spikes".format(len(spikes))
+    (numrows, numcols) = grid(len(spikes))
+    for index in range(len(spikes)):
+        plt.subplot(numrows, numcols, index)
+        single_spikes = spikes[index]
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]
         minTime = min(minTime, min(spike_time))
