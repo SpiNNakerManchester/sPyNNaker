@@ -31,13 +31,13 @@ class MultapseConnector(AbstractConnector):
         """ sets the weights and delays as needed
 
         :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
+            may either be a float, a !RandomDistribution object, a list \
+            1D array with at least as many items as connections to be \
             created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-            will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler,
-        or random number generator
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            delays will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler, \
+            or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
         self._weights = weights

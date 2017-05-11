@@ -17,15 +17,15 @@ class AbstractUInt32Recorder(object):
     def get_data(
             label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step, variable):
-        """ method for reading a uint32 mapped to time and neuron ids from
+        """ method for reading a uint32 mapped to time and neuron ids from\
         the SpiNNaker machine
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
         :param region: the dsg region id used for this data
         :param placements: the placements object
-        :param graph_mapper: the mapping between application and machine
-        vertices
+        :param graph_mapper: the mapping between application and machine\
+            vertices
         :param application_vertex:
         :param machine_time_step:
         :param variable:
