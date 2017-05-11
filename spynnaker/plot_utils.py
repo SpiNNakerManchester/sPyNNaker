@@ -61,7 +61,7 @@ def heat_plot(data, ylabel=None, title=None):
     plt.ylabel(ylabel)
     if title is not None:
         plt.title(title)
-    plt.imshow(info_array, cmap='hot', interpolation='bilinear', aspect='auto')
+    plt.imshow(info_array, cmap='hot', interpolation='none', aspect='auto')
     plt.colorbar()
     plt.show()
 
