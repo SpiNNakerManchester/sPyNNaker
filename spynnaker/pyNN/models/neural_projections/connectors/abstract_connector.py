@@ -1,5 +1,5 @@
 from six import add_metaclass
-
+from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -12,6 +12,12 @@ import re
 
 # global objects
 logger = logging.getLogger(__name__)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 @add_metaclass(AbstractBase)
@@ -312,7 +318,7 @@ class AbstractConnector(object):
                 expand_distances)
 
             if isinstance(values, basestring):
-                return eval(values)
+                return _expr_context.eval(values)
             return values(d)
 
     def _generate_weights(self, values, n_connections, connection_slices):

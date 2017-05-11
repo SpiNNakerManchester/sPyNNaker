@@ -1,8 +1,7 @@
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 
-from spynnaker.pyNN.models.neural_projections.projection_machine_edge \
-    import ProjectionMachineEdge
+from .projection_machine_edge import ProjectionMachineEdge
 
 import logging
 

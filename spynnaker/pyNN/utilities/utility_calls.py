@@ -1,8 +1,8 @@
 """
 utility class containing simple helper methods
 """
+from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import globals_variables
-
 from spinn_front_end_common.utilities import exceptions
 
 import numpy
@@ -62,11 +62,7 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
         for param in parameters:
             value = param.get_value()
             if hasattr(value, "__len__"):
-                if len(value) > 1:
-                    value = value[atom]
-                else:
-                    value = value[0]
-
+                value = value[atom] if len(value) > 1 else value[0]
             spec.write_value(data=value,
                              data_type=param.get_dataspec_datatype())
 
@@ -155,20 +151,20 @@ def read_in_data_from_file(
     data_items = list()
 
     with open(file_path, 'r') as fsource:
-            read_data = fsource.readlines()
+        read_data = fsource.readlines()
 
+    evaluator = SafeEval()
     for line in read_data:
         if not line.startswith('#'):
             values = line.split("\t")
-            neuron_id = int(eval(values[1]))
-            time = float(eval(values[0]))
-            data_value = float(eval(values[2]))
+            neuron_id = int(evaluator.eval(values[1]))
+            time = float(evaluator.eval(values[0]))
+            data_value = float(evaluator.eval(values[2]))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
-
             else:
                 print "failed to enter {}:{}".format(neuron_id, time)
 
@@ -212,11 +208,12 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     with open(file_path, 'r') as fsource:
         read_data = fsource.readlines()
 
+    evaluator = SafeEval()
     for line in read_data:
         if not line.startswith('#'):
             values = line.split(split_value)
-            time = float(eval(values[0]))
-            neuron_id = float(eval(values[1]))
+            time = float(evaluator.eval(values[0]))
+            neuron_id = float(evaluator.eval(values[1]))
             if ((min_atom <= neuron_id) and
                     (neuron_id < max_atom) and
                     (min_time <= time) and

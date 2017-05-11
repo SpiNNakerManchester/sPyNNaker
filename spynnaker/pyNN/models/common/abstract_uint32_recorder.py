@@ -1,7 +1,7 @@
 import numpy
 import logging
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 logger = logging.getLogger(__name__)
 
@@ -33,18 +33,13 @@ class AbstractUInt32Recorder(object):
         """
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
-
         ms_per_tick = machine_time_step / 1000.0
-
         data = list()
         missing_str = ""
 
-        progress_bar = \
-            ProgressBar(
-                len(vertices), "Getting {} for {}".format(variable, label))
-
-        for vertex in vertices:
-
+        progress = ProgressBar(
+                vertices, "Getting {} for {}".format(variable, label))
+        for vertex in progress.over(vertices):
             vertex_slice = graph_mapper.get_slice(vertex)
             placement = placements.get_placement_of_vertex(vertex)
 
@@ -76,9 +71,7 @@ class AbstractUInt32Recorder(object):
                 [record_ids, record_time, record_membrane_potential])
             part_data = numpy.reshape(part_data, [-1, 3])
             data.append(part_data)
-            progress_bar.update()
 
-        progress_bar.end()
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing {} data in region {}"

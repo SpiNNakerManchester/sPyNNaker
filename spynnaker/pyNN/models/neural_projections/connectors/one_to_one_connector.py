@@ -1,6 +1,5 @@
 import numpy
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 
 
 class OneToOneConnector(AbstractConnector):

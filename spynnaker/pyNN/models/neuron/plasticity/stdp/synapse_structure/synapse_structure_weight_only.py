@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.\
-    abstract_synapse_structure import AbstractSynapseStructure
+from .abstract_synapse_structure import AbstractSynapseStructure
 import numpy
 
 

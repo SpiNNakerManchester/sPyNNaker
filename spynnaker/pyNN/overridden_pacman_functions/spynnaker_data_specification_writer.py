@@ -1,11 +1,10 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
     front_end_common_graph_data_specification_writer import \
     FrontEndCommonGraphDataSpecificationWriter
 
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -30,7 +29,7 @@ class SpynnakerDataSpecificationWriter(
         delay_extension_placements = list()
 
         # create a progress bar for end users
-        progress_bar = ProgressBar(len(list(placements.placements)),
+        progress_bar = ProgressBar(list(placements.placements),
                                    "Generating sPyNNaker data specifications")
         for placement in placements.placements:
             associated_vertex = graph_mapper.get_application_vertex(

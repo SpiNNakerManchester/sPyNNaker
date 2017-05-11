@@ -1,6 +1,5 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
-    import FromListConnector
+from .from_list_connector import FromListConnector
 import os
 import numpy
 from six import add_metaclass
@@ -43,7 +42,7 @@ class FromFileConnector(FromListConnector):
         return "FromFileConnector({})".format(self._file)
 
     @abstractmethod
-    def get_reader(self, file):
+    def get_reader(self, file):  # @ReservedAssignment
         """
         get a filereader object probably using the pynn methods
 

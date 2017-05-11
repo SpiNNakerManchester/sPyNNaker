@@ -1,8 +1,6 @@
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
-    AbstractContainsUnits
-from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
-    import AbstractInputType
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):

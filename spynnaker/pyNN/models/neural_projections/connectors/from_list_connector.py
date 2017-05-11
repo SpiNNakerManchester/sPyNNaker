@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.utilities import utility_calls
 import logging
@@ -246,5 +245,5 @@ class FromListConnector(AbstractConnector):
 
     def _set_data(self, new_value, name):
         for index in self._conn_list:
-            for (source, dest) in self._conn_list[index]:
+            for (source, dest) in self._conn_list[index]:  # @UnusedVariable
                 pass
