@@ -13,7 +13,7 @@ from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 import logging
 import math
@@ -255,13 +255,12 @@ class PyNNProjectionCommon(object):
         transceiver = self._spinnaker_control.transceiver
         routing_infos = self._spinnaker_control.routing_infos
         machine_time_step = self._spinnaker_control.machine_time_step
-        edges = graph_mapper.get_machine_edges(
-            self._projection_edge)
+        edges = graph_mapper.get_machine_edges(self._projection_edge)
         progress = ProgressBar(
             len(edges),
             "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
-        for edge in edges:
+        for edge in progress.over(edges):
             placement = placements.get_placement_of_vertex(
                 edge.post_vertex)
             connections = post_vertex.get_connections_from_machine(
@@ -269,8 +268,6 @@ class PyNNProjectionCommon(object):
                 self._synapse_information, machine_time_step)
             if connections is not None:
                 connection_holder.add_connections(connections)
-            progress.update()
-        progress.end()
         connection_holder.finish()
         return connection_holder
 
