@@ -20,8 +20,7 @@ logger = logging.getLogger(__file__)
 
 class PyNNPopulationCommon(object):
     def __init__(
-            self, spinnaker_control, size, vertex, structure,
-            initial_values):
+            self, spinnaker_control, size, vertex, structure, initial_values):
         if size is not None and size <= 0:
             raise exceptions.ConfigurationException(
                 "A population cannot have a negative or zero size.")
@@ -33,6 +32,20 @@ class PyNNPopulationCommon(object):
                 self._vertex.set_value(name, value)
 
         self._vertex = vertex
+        # Introspect properties of the vertex
+        self._vertex_population_settable = \
+            isinstance(self._vertex, AbstractPopulationSettable)
+        self._vertex_population_initializable = \
+            isinstance(self._vertex, AbstractPopulationInitializable)
+        self._vertex_changeable_after_run = \
+            isinstance(self._vertex, AbstractChangableAfterRun)
+        self._vertex_read_parameters_before_set = \
+            isinstance(self._vertex, AbstractReadParametersBeforeSet)
+        self._vertex_contains_units = \
+            isinstance(self._vertex, AbstractContainsUnits)
+        self._vertex_has_set_max_atoms_per_core = \
+            hasattr(self._vertex, "set_model_max_atoms_per_core")
+
         self._spinnaker_control = spinnaker_control
         self._delay_vertex = None
 
@@ -97,7 +110,7 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for every local cell in the\
             population.
         """
-        if isinstance(self._vertex, AbstractPopulationSettable):
+        if self._vertex_population_settable:
             return self._vertex.get_value(parameter_name)
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
@@ -123,12 +136,12 @@ class PyNNPopulationCommon(object):
             in this population.
 
         """
-        if not isinstance(self._vertex, AbstractPopulationInitializable):
+        if not self._vertex_population_initializable:
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if globals_variables.get_simulator().has_ran and not isinstance(
-                self._vertex, AbstractChangableAfterRun):
+        if globals_variables.get_simulator().has_ran \
+                and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
             value, self._vertex.n_atoms))
@@ -191,12 +204,12 @@ class PyNNPopulationCommon(object):
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
-        if not isinstance(self._vertex, AbstractPopulationSettable):
+        if not self._vertex_population_settable:
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if globals_variables.get_simulator().has_ran and not isinstance(
-                self._vertex, AbstractChangableAfterRun):
+        if globals_variables.get_simulator().has_ran \
+                and not self._vertex_changeable_after_run:
             raise Exception(
                 "This population does not support changes to settings after"
                 " run has been called")
@@ -226,11 +239,10 @@ class PyNNPopulationCommon(object):
 
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
-        if (globals_variables.get_simulator().has_ran and not
-            globals_variables.get_simulator().has_reset_last and
-                isinstance(self._vertex, AbstractReadParametersBeforeSet) and
-                not self._has_read_neuron_parameters_this_run):
-
+        if globals_variables.get_simulator().has_ran \
+                and not globals_variables.get_simulator().has_reset_last \
+                and self._vertex_read_parameters_before_set \
+                and not self._has_read_neuron_parameters_this_run:
             # locate machine vertices from the application vertices
             machine_vertices = globals_variables.get_simulator().graph_mapper\
                 .get_machine_vertices(self._vertex)
@@ -262,12 +274,11 @@ class PyNNPopulationCommon(object):
         """ Apply a constraint to a population that restricts the processor\
             onto which its atoms will be placed.
         """
-        if isinstance(constraint, AbstractConstraint):
-            self._vertex.add_constraint(constraint)
-        else:
+        if not isinstance(constraint, AbstractConstraint):
             raise exceptions.ConfigurationException(
                 "the constraint entered is not a recognised constraint")
 
+        self._vertex.add_constraint(constraint)
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
@@ -306,13 +317,12 @@ class PyNNPopulationCommon(object):
 
         :param new_value: the new value for the max atoms per core.
         """
-        if hasattr(self._vertex, "set_model_max_atoms_per_core"):
-            self._vertex.set_model_max_atoms_per_core(new_value)
-        else:
+        if not self._vertex_has_set_max_atoms_per_core:
             raise exceptions.ConfigurationException(
                 "This population does not support its max_atoms_per_core "
                 "variable being adjusted by the end user")
 
+        self._vertex.set_model_max_atoms_per_core(new_value)
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
@@ -365,5 +375,7 @@ class PyNNPopulationCommon(object):
         :param parameter_name: the parameter name to find the units for
         :return: the units in string form
         """
-        if isinstance(self._vertex, AbstractContainsUnits):
+        if self._vertex_contains_units:
             return self._vertex.get_units(parameter_name)
+        raise exceptions.ConfigurationException(
+            "This population does not support describing its units")

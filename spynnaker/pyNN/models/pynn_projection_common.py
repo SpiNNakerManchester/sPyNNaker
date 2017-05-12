@@ -20,6 +20,9 @@ import math
 import numpy
 
 logger = logging.getLogger(__name__)
+_delay_extension_max_supported_delay = (
+    constants.MAX_DELAY_BLOCKS * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+# The maximum delay supported by the Delay extension, in ticks.
 
 
 # noinspection PyProtectedMember
@@ -43,7 +46,6 @@ class PyNNProjectionCommon(object):
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
-
             raise common_exceptions.ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
@@ -75,15 +77,11 @@ class PyNNProjectionCommon(object):
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
-        delay_extension_max_supported_delay = (
-            constants.MAX_DELAY_BLOCKS *
-            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
             .get_maximum_delay_supported_in_ms(machine_time_step)
-
         if max_delay > (post_vertex_max_supported_delay_ms +
-                        delay_extension_max_supported_delay):
+                        _delay_extension_max_supported_delay):
             raise common_exceptions.ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
@@ -227,7 +225,6 @@ class PyNNProjectionCommon(object):
         return delay_edge
 
     def _get_synaptic_data(self, as_list, data_to_get):
-
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 
@@ -257,8 +254,7 @@ class PyNNProjectionCommon(object):
         machine_time_step = self._spinnaker_control.machine_time_step
         edges = graph_mapper.get_machine_edges(self._projection_edge)
         progress = ProgressBar(
-            len(edges),
-            "Getting {}s for projection between {} and {}".format(
+            edges, "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
         for edge in progress.over(edges):
             placement = placements.get_placement_of_vertex(
@@ -302,11 +298,11 @@ class PyNNProjectionCommon(object):
         # try for each possible parameters
         if parameter in {"weight", "delay", "source", "target"}:
             return self._get_synaptic_data(format == 'list', parameter)
-        else:
-            # get the n_connections and the parameter and then expand to
-            # correct size
-            size = len(self._get_synaptic_data(format == 'list', 'source'))
-            data = numpy.empty(size)
-            data.fill(self._synapse_information.synapse_dynamics.get_value(
-                parameter))
-            return data
+
+        # get the n_connections and the parameter and then expand to
+        # correct size
+        size = len(self._get_synaptic_data(format == 'list', 'source'))
+        data = numpy.empty(size)
+        data.fill(self._synapse_information.synapse_dynamics.get_value(
+            parameter))
+        return data
