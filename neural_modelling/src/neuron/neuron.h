@@ -34,10 +34,12 @@ bool neuron_initialise(
     address_t address, uint32_t recording_flags, uint32_t *n_neurons_value,
     uint32_t *incoming_spike_buffer_size);
 
-//! \setter for the internal input buffers
-//! \param[in] input_buffers_value the new input buffers
-//! \return None this method does not return anything.
-void neuron_set_input_buffers(input_t *input_buffers_value);
+//! \setter for the internal synapse type parameters
+//! \param[in] synapse_shaping_params_value: the new synapse shaping params
+//! \return None
+void neuron_set_neuron_synapse_shaping_params(
+        synapse_param_t *neuron_synapse_shaping_params_value);
+
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

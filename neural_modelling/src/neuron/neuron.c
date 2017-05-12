@@ -20,7 +20,8 @@
 
 #define SPIKE_RECORDING_CHANNEL 0
 #define V_RECORDING_CHANNEL 1
-#define GSYN_RECORDING_CHANNEL 2
+#define GSYN_EXCITATORY_RECORDING_CHANNEL 2
+#define GSYN_INHIBITORY_RECORDING_CHANNEL 3
 
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
@@ -50,15 +51,16 @@ static uint32_t n_neurons;
 //! The recording flags
 static uint32_t recording_flags;
 
-//! The input buffers - from synapses.c
-static input_t *input_buffers;
+// The synapse shaping parameters
+static synapse_param_t *neuron_synapse_shaping_params;
 
 //! storage for neuron state with timestamp
 static timed_state_t *voltages;
 uint32_t voltages_size;
 
 //! storage for neuron input with timestamp
-static timed_input_t *inputs;
+static timed_input_t *inputs_excitatory;
+static timed_input_t *inputs_inhibitory;
 uint32_t input_size;
 
 //! The number of clock ticks to back off before starting the timer, in an
@@ -270,7 +272,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
     voltages = (timed_state_t *) spin1_malloc(voltages_size);
     input_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
-    inputs = (timed_input_t *) spin1_malloc(input_size);
+    inputs_excitatory = (timed_input_t *) spin1_malloc(input_size);
+    inputs_inhibitory = (timed_input_t *) spin1_malloc(input_size);
 
     _print_neuron_parameters();
 
@@ -308,8 +311,9 @@ void neuron_store_neuron_parameters(address_t address){
 
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
-void neuron_set_input_buffers(input_t *input_buffers_value) {
-    input_buffers = input_buffers_value;
+void neuron_set_neuron_synapse_shaping_params(
+        synapse_param_t *neuron_synapse_shaping_params_value) {
+    neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
 
 //! \executes all the updates to neural parameters when a given timer period
@@ -345,10 +349,12 @@ void neuron_do_timestep_update(timer_t time) {
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
         input_t exc_input_value = input_type_get_input_value(
-            synapse_types_get_excitatory_input(input_buffers, neuron_index),
+            synapse_types_get_excitatory_input(
+                &(neuron_synapse_shaping_params[neuron_index])),
             input_type);
         input_t inh_input_value = input_type_get_input_value(
-            synapse_types_get_inhibitory_input(input_buffers, neuron_index),
+            synapse_types_get_inhibitory_input(
+                &(neuron_synapse_shaping_params[neuron_index])),
             input_type);
         input_t exc_input = input_type_convert_excitatory_input_to_current(
             exc_input_value, input_type, voltage);
@@ -362,8 +368,8 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        inputs->inputs[neuron_index].exc = exc_input_value;
-        inputs->inputs[neuron_index].inh = inh_input_value;
+        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
+        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
@@ -419,9 +425,18 @@ void neuron_do_timestep_update(timer_t time) {
 
     // record neuron inputs if needed
     if (recording_is_channel_enabled(
-            recording_flags, GSYN_RECORDING_CHANNEL)) {
-        inputs->time = time;
-        recording_record(GSYN_RECORDING_CHANNEL, inputs, input_size);
+            recording_flags, GSYN_EXCITATORY_RECORDING_CHANNEL)) {
+        inputs_excitatory->time = time;
+        recording_record(
+            GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, input_size);
+    }
+
+    // record neuron inputs if needed
+    if (recording_is_channel_enabled(
+            recording_flags, GSYN_INHIBITORY_RECORDING_CHANNEL)) {
+        inputs_inhibitory->time = time;
+        recording_record(
+            GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, input_size);
     }
 
     // do logging stuff if required

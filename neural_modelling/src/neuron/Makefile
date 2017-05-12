@@ -5,16 +5,9 @@ MODELS = IF_curr_exp \
          IF_curr_exp_dual \
          IF_curr_exp_stdp_pair_additive \
          IF_curr_exp_stdp_pair_multiplicative \
-         IF_curr_exp_stdp_nearest_pair_additive \
-         IF_curr_exp_stdp_nearest_pair_multiplicative \
-         IF_curr_exp_stdp_pfister_triplet_additive \
          IF_curr_exp_stdp_mad_pair_additive \
-         IF_curr_exp_stdp_mad_nearest_pair_additive \
          IF_curr_exp_stdp_mad_pair_multiplicative \
-         IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
-         IF_curr_exp_stdp_mad_pfister_triplet_additive \
-         IF_cond_exp_stdp_mad_pair_additive \
-         IF_cond_exp_stdp_mad_nearest_pair_additive
+         IF_cond_exp_stdp_mad_pair_additive
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all:

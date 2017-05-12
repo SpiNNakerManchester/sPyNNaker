@@ -77,8 +77,7 @@ typedef REAL input_t;
 
 // Input structure for recording
 typedef struct input_struct_t{
-    input_t exc;
-    input_t inh;
+    input_t input;
 } input_struct_t;
 
 // Inputs with time for recording
