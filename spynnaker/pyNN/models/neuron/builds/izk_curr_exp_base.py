@@ -65,7 +65,7 @@ class IzkCurrExpBase(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-       IzkCurrExpBase._model_based_max_atoms_per_core = new_value
+        IzkCurrExpBase._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_max_atoms_per_core():
