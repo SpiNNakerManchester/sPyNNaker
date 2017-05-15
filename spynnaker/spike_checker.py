@@ -18,6 +18,7 @@ def synfire_spike_checker(spikes, nNeurons):
         for single in spikes:
             synfire_spike_checker(single, nNeurons)
 
+
 def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
                                          wrap_around=True):
     """
@@ -57,4 +58,4 @@ def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
 if __name__ == '__main__':
     spikes = numpy.loadtxt("sorted_spikes.csv", delimiter=',')
     synfire_multiple_lines_spike_checker(spikes, 200, 10, wrap_around=False)
-    #synfire_spike_checker(spikes, 20)
+    # synfire_spike_checker(spikes, 20)

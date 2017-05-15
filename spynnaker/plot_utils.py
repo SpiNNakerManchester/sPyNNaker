@@ -47,7 +47,7 @@ def line_plot(data_sets, title=None):
         max_data = max(data[:, 2])
         adjust = (max_data - min_data) * 0.1
         plt.axis([min(data[:, 1]), max(data[:, 1]), min_data - adjust,
-              max_data + adjust])
+                  max_data + adjust])
     if title is not None:
         plt.title(title)
     plt.show()

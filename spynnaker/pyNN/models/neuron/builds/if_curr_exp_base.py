@@ -78,7 +78,7 @@ class IFCurrExpBase(AbstractPopulationVertex):
         if (new_value > TRUE_MAX_ATOMS_PER_CORE):
             logger.warning("Attempt to set_model_max_atoms_per_core reduced "
                            "from {} to {}".format(new_value,
-                                                   TRUE_MAX_ATOMS_PER_CORE))
+                                                  TRUE_MAX_ATOMS_PER_CORE))
             new_value = TRUE_MAX_ATOMS_PER_CORE
         IFCurrExpBase._model_based_max_atoms_per_core = new_value
 
