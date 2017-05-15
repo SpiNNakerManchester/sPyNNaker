@@ -209,6 +209,8 @@ class SpikeSourcePoisson(
     def _max_spikes_per_ts(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
         max_rate = numpy.amax(self._rate[vertex_slice.as_slice])
+        if max_rate == 0:
+            return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(n_machine_time_steps)),
