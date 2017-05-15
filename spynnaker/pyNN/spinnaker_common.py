@@ -108,6 +108,8 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
+        self._neurons_per_core_set = {}
+
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
 
@@ -292,6 +294,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
 
         SpinnakerMainInterface.stop(
             self, turn_off_machine, clear_routing_tables, clear_tags)
+        self.reset_number_of_neurons_per_core()
 
     def run(self, run_time):
         """ Run the model created
@@ -321,6 +324,19 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         if hasattr(neuron_type, "set_model_max_atoms_per_core"):
+            if hasattr(neuron_type, "get_max_atoms_per_core"):
+                previous = neuron_type.get_max_atoms_per_core()
+                if previous > max_permitted:
+                    logger.warning(
+                        "Attempt to increase number_of_neurons_per_core "
+                        "from {} to {} ignored".format(previous,
+                                                       max_permitted))
+                    return
             neuron_type.set_model_max_atoms_per_core(max_permitted)
+            self._neurons_per_core_set.add(neuron_type)
         else:
             raise Exception("{} is not a Vertex type".format(neuron_type))
+
+    def reset_number_of_neurons_per_core(self):
+        for neuron_type in self._neurons_per_core_set:
+            neuron_type.set_model_max_atoms_per_core()

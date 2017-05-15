@@ -8,12 +8,9 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
-import logging
 
 # global objects
-logger = logging.getLogger(__name__)
 DEFAULT_MAX_ATOMS_PER_CORE = 255
-TRUE_MAX_ATOMS_PER_CORE = 255
 _IZK_THRESHOLD = 30.0
 
 
@@ -70,11 +67,6 @@ class IzkCondExpBase(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-        if (new_value > TRUE_MAX_ATOMS_PER_CORE):
-            logger.warning("Attempt to set_model_max_atoms_per_core reduced "
-                           "from {} to {}".format(new_value,
-                                                  TRUE_MAX_ATOMS_PER_CORE))
-            new_value = TRUE_MAX_ATOMS_PER_CORE
         IzkCondExpBase._model_based_max_atoms_per_core = new_value
 
     @staticmethod
