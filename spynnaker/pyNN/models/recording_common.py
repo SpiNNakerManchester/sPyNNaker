@@ -178,10 +178,6 @@ class RecordingCommon(object):
         :return: the data
         """
 
-        if self._spinnaker_control.has_been_shutdown:
-            raise fec_excceptions.ConfigurationException(
-                "You can no longer get {} once spinnaker has been shutdown "
-                "(for exampple by calling p.end)".format(variable))
         if variable == "gsyn_exc":
             return self._get_gsyn_excitatory()
         elif variable == "gsyn_inh":

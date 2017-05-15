@@ -13,6 +13,7 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.simulator_interface import SimulatorInterface
+from spynnaker.pyNN.utilities import globals_variables
 
 # general imports
 import logging
@@ -108,7 +109,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
-        self._neurons_per_core_set = {}
+        self._neurons_per_core_set = set()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -295,6 +296,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         SpinnakerMainInterface.stop(
             self, turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
+        globals_variables.unset_simulator()
 
     def run(self, run_time):
         """ Run the model created
