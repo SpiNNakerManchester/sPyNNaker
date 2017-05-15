@@ -189,3 +189,7 @@ class FailedState(SimulatorInterface):
     def get_pynn_NumpyRNG():
         raise exceptions.ConfigurationException(
             "This call depends on setup being called")
+
+    def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
+        raise exceptions.ConfigurationException(
+            "This call depends on setup being called")

@@ -318,3 +318,9 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             :param search_path: absolute search path for binaries
             """
         SpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
+
+    def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
+        if hasattr(neuron_type, "set_model_max_atoms_per_core"):
+            neuron_type.set_model_max_atoms_per_core(max_permitted)
+        else:
+            raise Exception("{} is not a Vertex type".format(neuron_type))

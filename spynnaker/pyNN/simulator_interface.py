@@ -106,3 +106,7 @@ class SimulatorInterface(object):
     @abstractmethod
     def get_pynn_NumpyRNG(self):
         pass
+
+    @abstractmethod
+    def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
+        pass
