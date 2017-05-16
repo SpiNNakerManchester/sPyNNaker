@@ -10,7 +10,7 @@ class CommonFixedProbabilityConnector(AbstractConnector):
 
     # No __slots__ as FixedProbabilityConnector also depends on
     # Pynn's PyNNFixedProbabilityConnector
-    
+
     """
     For each pair of pre-post cells, the connection probability is constant.
 

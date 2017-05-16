@@ -24,7 +24,8 @@ class CommonWeightDependenceMultiplicative(
         return self._w_max
 
     def is_same_as(self, weight_dependence):
-        if not isinstance(weight_dependence, CommonWeightDependenceMultiplicative):
+        if not isinstance(weight_dependence,
+                          CommonWeightDependenceMultiplicative):
             return False
         return (
             (self._w_min == weight_dependence._w_min) and
