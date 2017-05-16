@@ -55,10 +55,11 @@ typedef struct {
 } pre_pop_info_table_t;
 
 typedef struct {
-    uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
+    uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom, size_ff_prob, size_lat_prob;
     REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
+    uint16_t *ff_probabilities, *lat_probabilities;
 } rewiring_data_t;
 
 rewiring_data_t rewiring_data;
@@ -157,6 +158,35 @@ address_t synaptogenesis_dynamics_initialise(
             // n_atoms
             rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index] = *sp_word++;
         }
+    }
+
+    // Read the probability vs distance tables into DTCM
+    rewiring_data.size_ff_prob = *sp_word++;
+    rewiring_data.ff_probabilities = (uint16_t*) sark_alloc(\
+        rewiring_data.size_ff_prob, sizeof(uint16_t));
+
+    uint16_t *half_word = (uint16_t*)sp_word;
+    for (index = 0; index < rewiring_data.size_ff_prob; index++) {
+
+        rewiring_data.ff_probabilities[index] = *half_word++;
+//        rewiring_data.ff_probabilities[index<<1+1] = half_word;
+    }
+//    log_info("Size of FF PROB table = %d", rewiring_data.size_ff_prob);
+//    log_info("First entry in FF PROB table = %d", rewiring_data.ff_probabilities[0]);
+//
+//    log_info("97th entry in FF PROB table = %d -- should be 6", rewiring_data.ff_probabilities[96]);
+//    log_info("End of FF PROB table = %d -- should be 1", rewiring_data.ff_probabilities[107]);
+
+    sp_word = (int32_t*) half_word;
+    rewiring_data.size_lat_prob = *sp_word++;
+
+    rewiring_data.lat_probabilities = (uint16_t*) sark_alloc(\
+        rewiring_data.size_lat_prob, sizeof(uint16_t));
+
+    half_word = (uint16_t*)sp_word;
+    for (index = 0; index < rewiring_data.size_lat_prob; index++) {
+
+        rewiring_data.lat_probabilities[index] = *half_word++;
     }
 
     // Setting up RNG
