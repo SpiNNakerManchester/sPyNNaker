@@ -6,7 +6,7 @@ import math
 import numpy
 
 
-class FixedProbabilityConnector(AbstractConnector):
+class CommonFixedProbabilityConnector(AbstractConnector):
     """
     For each pair of pre-post cells, the connection probability is constant.
 
