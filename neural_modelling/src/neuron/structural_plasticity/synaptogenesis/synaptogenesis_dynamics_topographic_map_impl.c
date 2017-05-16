@@ -43,6 +43,8 @@ int (*number_of_connections_in_row)(address_t);
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
 #define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
 
+#define MAX_SHORT 65535
+
 
 typedef struct {
     int32_t no_pre_vertices, total_no_atoms;
@@ -50,13 +52,13 @@ typedef struct {
 } subpopulation_info_t;
 
 typedef struct {
-    int32_t no_pre_pops;
+    uint32_t no_pre_pops;
     subpopulation_info_t * subpop_info;
 } pre_pop_info_table_t;
 
 typedef struct {
-    uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom, size_ff_prob, size_lat_prob;
-    REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
+    uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom,\
+        size_ff_prob, size_lat_prob, grid_x, grid_y;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
     uint16_t *ff_probabilities, *lat_probabilities;
@@ -94,6 +96,11 @@ typedef struct {
 
 current_state_t current_state;
 
+
+static int my_abs(int a){
+    return a < 0 ? -a : a;
+}
+
 //typedef struct {
 //
 //} synaptic_row_pointers_t;
@@ -117,17 +124,14 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.weight = *sp_word++;
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
-    rewiring_data.sigma_form_forward = *(REAL*)sp_word++;
-    rewiring_data.sigma_form_lateral = *(REAL*)sp_word++;
-    rewiring_data.p_form_forward = *(REAL*)sp_word++;
-    rewiring_data.p_form_lateral = *(REAL*)sp_word++;
-    rewiring_data.p_elim_dep = *(REAL*)sp_word++;
-    rewiring_data.p_elim_pot = *(REAL*)sp_word++;
 
     rewiring_data.app_no_atoms = *sp_word++;
     rewiring_data.low_atom = *sp_word++;
     rewiring_data.high_atom = *sp_word++;
     rewiring_data.machine_no_atoms = *sp_word++;
+
+    rewiring_data.grid_x = *sp_word++;
+    rewiring_data.grid_y = *sp_word++;
 
     rewiring_data.shared_seed[0] = *sp_word++;
     rewiring_data.shared_seed[1] = *sp_word++;
@@ -144,7 +148,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.pre_pop_info_table.subpop_info = (subpopulation_info_t*) sark_alloc(\
         rewiring_data.pre_pop_info_table.no_pre_pops, sizeof(subpopulation_info_t));
 
-    int32_t index;
+    uint32_t index;
     for (index = 0; index < rewiring_data.pre_pop_info_table.no_pre_pops; index ++) {
         // Read the actual number of presynaptic subpopulations
         rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices = *sp_word++;
@@ -167,15 +171,8 @@ address_t synaptogenesis_dynamics_initialise(
 
     uint16_t *half_word = (uint16_t*)sp_word;
     for (index = 0; index < rewiring_data.size_ff_prob; index++) {
-
         rewiring_data.ff_probabilities[index] = *half_word++;
-//        rewiring_data.ff_probabilities[index<<1+1] = half_word;
     }
-//    log_info("Size of FF PROB table = %d", rewiring_data.size_ff_prob);
-//    log_info("First entry in FF PROB table = %d", rewiring_data.ff_probabilities[0]);
-//
-//    log_info("97th entry in FF PROB table = %d -- should be 6", rewiring_data.ff_probabilities[96]);
-//    log_info("End of FF PROB table = %d -- should be 1", rewiring_data.ff_probabilities[107]);
 
     sp_word = (int32_t*) half_word;
     rewiring_data.size_lat_prob = *sp_word++;
@@ -290,15 +287,28 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     pre_global_id = rewiring_data.low_atom + current_state.pre_syn_id;
     post_global_id = rewiring_data.low_atom + current_state.post_syn_id;
 
-    pre_x = pre_global_id / 10;
-    pre_y = pre_global_id % 10;
+    pre_x = pre_global_id / rewiring_data.grid_x;
+    pre_y = pre_global_id % rewiring_data.grid_y;
 
-    post_x = post_global_id / 10;
-    post_y = post_global_id % 10;
+    post_x = post_global_id / rewiring_data.grid_x;
+    post_y = post_global_id % rewiring_data.grid_y;
 
-    // Without periodic boundary conditions
-    current_state.distance = abs((pre_x - post_x) + (pre_y - post_y));
+    // With periodic boundary conditions
+    uint delta_x, delta_y;
+    delta_x = my_abs(pre_x - post_x);
+    delta_y = my_abs(pre_y - post_y);
+
+    if( delta_x < rewiring_data.grid_x>>1 )
+        delta_x -= rewiring_data.grid_x;
+
+    if( delta_y < rewiring_data.grid_y>>1 )
+        delta_y -= rewiring_data.grid_y;
+
+    current_state.distance = my_abs(delta_x + delta_y);
+
 }
+
+
 
 // Might need a function for rewiring. One to be called by the timer to generate
 // a fake spike and trigger a dma callback
@@ -309,9 +319,9 @@ void synaptic_row_restructure(uint dma_id){
 
     // Check that I'm actually servicing the correct row by checking
     // the current dma id with the one I received when I made the dma request
-    if (dma_id != rewiring_dma_buffer.dma_id)
-        log_error("Servicing invalid synaptic row!");
-
+//    if (dma_id != rewiring_dma_buffer.dma_id)
+//        log_error("Servicing invalid synaptic row!");
+    use(dma_id);
 
 //    uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
 //    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
@@ -370,47 +380,56 @@ bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     // otherwise use probability 2
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("\t| HIT - pre %d post %d # controls %d distance %d",
+        log_info("\t| REMOVAL - pre %d post %d # controls %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
-            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
-            current_state.distance);
-        uint dma_id = spin1_dma_transfer(
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+        spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
         rewiring_dma_buffer.n_bytes_transferred);
-        if(!dma_id){
-            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
-            return false;
-        }
+//        if(!dma_id){
+//            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
+//            return false;
+//        }
         return true;
     }
     return false;
 }
 
 bool synaptogenesis_dynamics_formation_rule(){
-    // Distance based probability
-    int distance_squared = pow(current_state.distance,2);
-    UFRACT p = rewiring_data.p_form_forward;// * pow(UFRACT_CONST(2.718), -distance_squared/(2*rewiring_data.sigma_form_forward));
-    UFRACT r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed));
-    if ( r < p){
-        log_info("yey!");
+    // Distance based probability extracted from the appropriate LUT
+    // TODO -- Check what type of connection this is -> FF OR LAT
+    uint16_t probability;
+    uint distance_as_offset = current_state.distance * 10;
+    if( distance_as_offset > rewiring_data.size_ff_prob ){
+        log_info("\t| DIST OOB - %d", current_state.distance);
+        return false;
     }
+    probability = rewiring_data.ff_probabilities[distance_as_offset];
+    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
+
+    if (r >= probability){
+        log_info("\t| NO FORM.");
+        return false;
+    }
+
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| MISS - pre %d post %d # controls %d distance %d",
+        log_info("\t| FORMATION - pre %d post %d # controls %d distance %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             current_state.distance);
-        uint dma_id = spin1_dma_transfer(
+        // TODO -- GET RID OF REDUNDANCY
+        spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
         rewiring_dma_buffer.n_bytes_transferred);
-        if(!dma_id){
-            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
-            return false;
-        }
+//        if(!dma_id){
+//            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
+//            return false;
+//        }
         return true;
     }
     return false;
