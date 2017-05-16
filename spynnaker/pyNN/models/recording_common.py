@@ -24,7 +24,6 @@ class RecordingCommon(object):
         """ object to hold recording behaviour
 
         :param population: the population to record for
-        :param simulator: the spinnaker control class
         """
 
         self._population = population
