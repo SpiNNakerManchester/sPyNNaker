@@ -103,7 +103,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     @staticmethod
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
-            n_synapse_types, population_table, synapse_dynamics):
+            n_synapse_types, population_table, synapse_dynamics, max_atoms_per_core):
 
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
@@ -112,7 +112,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
                 connections, row_indices, n_rows, post_vertex_slice,
-                n_synapse_types)
+                n_synapse_types, max_atoms_per_core)
 
             # Blank the plastic data
             fp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -156,7 +156,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             self, synapse_info, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            n_synapse_types, weight_scales, machine_time_step):
+            n_synapse_types, weight_scales, machine_time_step, max_atoms_per_core):
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -203,7 +203,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, row_data = self._get_max_row_length_and_row_data(
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
-                population_table, synapse_info.synapse_dynamics)
+                population_table, synapse_info.synapse_dynamics, max_atoms_per_core)
 
             del undelayed_row_indices
         del undelayed_connections
@@ -233,7 +233,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_connections, delayed_row_indices,
                     pre_vertex_slice.n_atoms * n_delay_stages,
                     post_vertex_slice, n_synapse_types, population_table,
-                    synapse_info.synapse_dynamics)
+                    synapse_info.synapse_dynamics, max_atoms_per_core)
             del delayed_row_indices
         del delayed_connections
 

@@ -156,6 +156,7 @@ class AbstractPopulationVertex(
 
         self._binary = binary
         self._n_atoms = n_neurons
+        self._max_atoms_per_core = max_atoms_per_core
 
         # buffer data
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
@@ -599,7 +600,7 @@ class AbstractPopulationVertex(
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            self._input_type, machine_time_step)
+            self._input_type, machine_time_step, self._max_atoms_per_core)
 
         # End the writing of this specification:
         spec.end_specification()
