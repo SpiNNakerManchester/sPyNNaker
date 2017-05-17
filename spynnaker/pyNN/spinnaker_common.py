@@ -1,13 +1,16 @@
+from spinn_utilities.conf_loader import ConfigurationLoader
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
      SpinnakerMainInterface
 from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
 
 # local front end imports
+import spynnaker.pyNN
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
@@ -28,15 +31,22 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
 
     """
 
+    CONFIG_FILE_NAME = "spynnaker.cfg"
+
     _EXECUTABLE_FINDER = ExecutableFinder()
 
+
     def __init__(
-            self, config, graph_label, config_default_name,
+            self, graph_label,
             database_socket_addresses, n_chips_required, timestep, max_delay,
             min_delay, hostname, user_extra_algorithm_xml_path=None,
             user_extra_mapping_inputs=None, user_extra_algorithms_pre_run=None,
             time_scale_factor=None, extra_post_run_algorithms=None,
             extra_mapping_algorithms=None, extra_load_algorithms=None):
+
+        # Read config file
+        loader = ConfigurationLoader(spynnaker.pyNN, self.CONFIG_FILE_NAME)
+        config = loader.load_config()
 
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
@@ -101,9 +111,11 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         # timing parameters
         self._min_supported_delay = None
         self._max_supported_delay = None
-        self._config_default_name = config_default_name
 
         # set up machine targeted data
+        if time_scale_factor is None:
+            time_scale_factor = helpful_functions.read_config_int(config,
+                "Machine", "timeScaleFactor")
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
@@ -200,7 +212,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
                         "override this behaviour (at your own risk), please "
                         "add violate_1ms_wall_clock_restriction = True to the "
                         "[Mode] section of your .{} file".format(
-                            self._config_default_name))
+                            self.CONFIG_FILE_NAME))
         else:
             if time_scale_factor is not None:
                 self._time_scale_factor = time_scale_factor
@@ -215,7 +227,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
                         "automatic behaviour, please enter a "
                         "timescaleFactor value in your .{}".format(
                             self._time_scale_factor,
-                            self._config_default_name))
+                            self.CONFIG_FILE_NAME))
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
