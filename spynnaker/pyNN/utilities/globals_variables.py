@@ -15,3 +15,8 @@ def get_simulator():
 def set_simulator(new_simulator):
     global simulator
     simulator = new_simulator
+
+
+def unset_simulator():
+    global simulator
+    simulator = FailedState()
