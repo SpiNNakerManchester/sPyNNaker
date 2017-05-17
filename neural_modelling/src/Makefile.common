@@ -14,3 +14,10 @@ endif
 
 include $(NEURAL_MODELLING_DIRS)/src/paths.mk
 include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+
+# Cancel all rules for RCS and SCCS; *definitely* not using them!
+%: %,v
+%: RCS/%,v
+%: RCS/%
+%: s.%
+%: SCCS/s.%
