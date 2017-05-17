@@ -41,9 +41,9 @@ class SynapseDynamicsStatic(
 
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_atoms_per_core):
+            post_vertex_slice, n_synapse_types, max_feasible_atoms_per_core):
 
-        n_neuron_id_bits = int(math.ceil(math.log(max_atoms_per_core,2)))
+        n_neuron_id_bits = int(math.ceil(math.log(max_feasible_atoms_per_core,2)))
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (

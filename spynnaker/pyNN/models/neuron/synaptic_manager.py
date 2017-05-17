@@ -576,7 +576,7 @@ class SynapticManager(object):
             self, spec, post_slices, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, machine_graph, machine_time_step, max_atoms_per_core):
+            graph_mapper, machine_graph, machine_time_step, max_feasible_atoms_per_core):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -625,7 +625,7 @@ class SynapticManager(object):
                             post_slices, post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge.n_delay_stages,
                             self._population_table_type, n_synapse_types,
-                            weight_scales, machine_time_step, max_atoms_per_core)
+                            weight_scales, machine_time_step, max_feasible_atoms_per_core)
 
                     if app_edge.delay_edge is not None:
                         app_edge.delay_edge.pre_vertex.add_delays(
@@ -739,7 +739,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, input_type, machine_time_step, max_atoms_per_core):
+            graph_mapper, input_type, machine_time_step, max_feasible_atoms_per_core):
 
         # Create an index of delay keys into this vertex
         for machine_edge in \
@@ -776,7 +776,7 @@ class SynapticManager(object):
             post_vertex_slice, all_syn_block_sz, weight_scales,
             constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            routing_info, graph_mapper, machine_graph, machine_time_step, max_atoms_per_core)
+            routing_info, graph_mapper, machine_graph, machine_time_step, max_feasible_atoms_per_core)
 
         self._synapse_dynamics.write_parameters(
             spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
