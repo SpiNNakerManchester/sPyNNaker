@@ -41,15 +41,17 @@ class SynapseDynamicsStatic(
 
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_atoms_per_core):
+
+        n_neuron_id_bits = int(math.ceil(math.log(max_atoms_per_core,2)))
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
             ((connections["delay"].astype("uint32") & 0xF) <<
-             (8 + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype("uint32") << 8) |
+             (n_neuron_id_bits + n_synapse_type_bits)) |
+            (connections["synapse_type"].astype("uint32") << n_neuron_id_bits) |
             ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
