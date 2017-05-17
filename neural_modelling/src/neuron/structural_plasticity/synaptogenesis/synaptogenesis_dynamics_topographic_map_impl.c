@@ -58,7 +58,7 @@ typedef struct {
 
 typedef struct {
     uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom,\
-        size_ff_prob, size_lat_prob, grid_x, grid_y;
+        size_ff_prob, size_lat_prob, grid_x, grid_y, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
     uint16_t *ff_probabilities, *lat_probabilities;
@@ -101,11 +101,6 @@ static int my_abs(int a){
     return a < 0 ? -a : a;
 }
 
-//typedef struct {
-//
-//} synaptic_row_pointers_t;
-//synaptic_row_pointers_t synaptic_row_pointers
-
 //---------------------------------------
 // Initialisation
 //---------------------------------------
@@ -132,6 +127,9 @@ address_t synaptogenesis_dynamics_initialise(
 
     rewiring_data.grid_x = *sp_word++;
     rewiring_data.grid_y = *sp_word++;
+
+    rewiring_data.p_elim_dep = *sp_word++;
+    rewiring_data.p_elim_pot = *sp_word++;
 
     rewiring_data.shared_seed[0] = *sp_word++;
     rewiring_data.shared_seed[1] = *sp_word++;
@@ -268,14 +266,11 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     log_debug("Reading %d bytes from %d -- saved @ %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
-    rewiring_dma_buffer.dma_id = spin1_dma_transfer(
+    spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         n_bytes);
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
-    if(!rewiring_dma_buffer.dma_id){
-        log_info("DMA Queue full. Synaptic rewiring request failed!");
-    }
     // Compute the distance at this point to optimize CPU usage.
     // i.e. make use of it while servicing a DMA
 
@@ -322,10 +317,6 @@ void synaptic_row_restructure(uint dma_id){
 //    if (dma_id != rewiring_dma_buffer.dma_id)
 //        log_error("Servicing invalid synaptic row!");
     use(dma_id);
-
-//    uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
-//    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
-//    uint num_static = synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row));
     uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
 
     // Is the row zero in length?
@@ -346,28 +337,10 @@ void synaptic_row_restructure(uint dma_id){
         // TODO check status of operation and save provenance (statistics)
     }
     else {
-        log_info("No rewiring this turn");
+        log_info("\t| NO REW");
     }
 
 }
-
-
-//bool _check_element_exists(){
-//        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
-//        {
-//           log_info("NEURON STILL HERE");
-//           log_info("FOUND @ %d", current_state.sp_data.offset);
-//           return true;
-//        }
-//        else
-//           log_info("NEURON NOT FOUND!");
-//
-//        log_info("num elements %d, bytes read %d, ",
-//            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)),
-//            rewiring_dma_buffer.n_bytes_transferred);
-//
-//        return false;
-//}
 
  /*
     Formation and elimination are structurally agnostic, i.e. they don't care how
@@ -378,7 +351,17 @@ void synaptic_row_restructure(uint dma_id){
  */
 bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
+    uint r = mars_kiss64_seed(rewiring_data.local_seed);
+    if( current_state.sp_data.weight < rewiring_data.weight >> 1 && r >= rewiring_data.p_elim_dep ){
+        log_info("\t| FAIL DEP");
+        return false;
+    }
     // otherwise use probability 2
+    else if ( r >= rewiring_data.p_elim_pot ){
+        log_info("\t| FAIL POT");
+        return false;
+    }
+
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
         log_info("\t| REMOVAL - pre %d post %d # controls %d",
             current_state.pre_syn_id,
@@ -388,10 +371,6 @@ bool synaptogenesis_dynamics_elimination_rule(){
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
         rewiring_dma_buffer.n_bytes_transferred);
-//        if(!dma_id){
-//            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
-//            return false;
-//        }
         return true;
     }
     return false;
@@ -421,15 +400,10 @@ bool synaptogenesis_dynamics_formation_rule(){
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             current_state.distance);
-        // TODO -- GET RID OF REDUNDANCY
         spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
         rewiring_dma_buffer.n_bytes_transferred);
-//        if(!dma_id){
-//            log_info("DMA Queue full. Could not write back synaptic row after deletion!");
-//            return false;
-//        }
         return true;
     }
     return false;

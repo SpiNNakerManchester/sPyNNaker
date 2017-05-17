@@ -2,7 +2,6 @@ import numpy as np
 
 from data_specification.enums.data_type import DataType
 
-
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics \
     import AbstractPlasticSynapseDynamics
@@ -19,7 +18,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1, s_max=32,
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
-                 p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4, seed=None):
+                 p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4, grid=np.array([16, 16]), seed=None):
 
         AbstractSynapseDynamicsStructural.__init__(self)
         self._f_rew = f_rew  # Hz
@@ -33,8 +32,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_form_lateral = p_form_lateral
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
+        self._grid = grid
 
-        self.fudge_factor = 1.5
+        self.fudge_factor = 1.3
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
@@ -54,6 +54,25 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         # Addition information -- used for SDRAM usage
         self._actual_sdram_usage = {}
+
+        self._ff_distance_probabilities = self.generate_distance_probability_array(self._p_form_forward,
+                                                                                   self._sigma_form_forward)
+        self._lat_distance_probabilities = self.generate_distance_probability_array(self._p_form_lateral,
+                                                                                    self._sigma_form_lateral)
+
+    def generate_distance_probability_array(self, probability, sigma):
+        distances = np.asarray(np.linspace(0, 100, 1000), dtype=np.float128)
+        raw_probabilities = probability * (np.e ** (-(distances ** 2) / (2 * (sigma ** 2))))
+        quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
+        # Quantize probabilities and cast as uint16 / short
+        unfiltered_probabilities = quantised_probabilities.astype(dtype="uint16")
+        # Only return probabilities which are non-zero
+        filtered_probabilities = unfiltered_probabilities[[True if x > 0 else False for x in unfiltered_probabilities]]
+
+        if filtered_probabilities.size % 2 != 0:
+            filtered_probabilities = np.concatenate((filtered_probabilities, np.zeros(filtered_probabilities.size % 2)))
+
+        return filtered_probabilities
 
     @property
     def p_rew(self):
@@ -78,20 +97,22 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         spec.write_value(data=int(round(self._weight * weight_scales[0])), data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
-        spec.write_value(data=self._sigma_form_forward, data_type=DataType.S1615)
-        spec.write_value(data=self._sigma_form_lateral, data_type=DataType.S1615)
-        spec.write_value(data=self._p_form_forward, data_type=DataType.S1615)
-        spec.write_value(data=self._p_form_lateral, data_type=DataType.S1615)
-        spec.write_value(data=self._p_elim_dep, data_type=DataType.S1615)
-        spec.write_value(data=self._p_elim_pot, data_type=DataType.S1615)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
         # write local low, high and number of atoms
         spec.write_value(data=post_slice[0], data_type=DataType.INT32)
         spec.write_value(data=post_slice[1], data_type=DataType.INT32)
         spec.write_value(data=post_slice[2], data_type=DataType.INT32)
-        # Write the random seed (4 words), generated randomly!
 
+        # write the grid size for periodic boundary distance computation
+        spec.write_value(data=self._grid[0], data_type=DataType.INT32)
+        spec.write_value(data=self._grid[1], data_type=DataType.INT32)
+
+        # write probabilities for elimination
+        spec.write_value(data=int(self._p_elim_dep * (2 ** 32 - 1)), data_type=DataType.UINT32)
+        spec.write_value(data=int(self._p_elim_pot * (2 ** 32 - 1)), data_type=DataType.UINT32)
+
+        # write the random seed (4 words), generated randomly!
         for seed in self._seeds:
             spec.write_value(data=seed)
 
@@ -138,7 +159,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             # Population header(s)
             spec.write_value(data=len(subpopulation_list), data_type=DataType.INT32)
-            spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0, data_type=DataType.INT32)
+            spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0,
+                             data_type=DataType.INT32)
             words_written = 0
             for subpopulation_info in subpopulation_list:
                 # Subpopulation information (i.e. key and number of atoms)
@@ -148,6 +170,14 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 spec.write_value(data=subpopulation_info[1], data_type=DataType.INT32)
                 words_written += 2
             total_words_written += words_written + 4
+
+        # Now we write the probability tables for formation (feedforward and lateral)
+        spec.write_value(data=self._ff_distance_probabilities.size, data_type=DataType.INT32)
+        spec.write_array(self._ff_distance_probabilities.view(dtype=np.uint32))
+        total_words_written += self._ff_distance_probabilities.size // 2
+        spec.write_value(data=self._lat_distance_probabilities.size, data_type=DataType.INT32)
+        spec.write_array(self._lat_distance_probabilities.view(dtype=np.uint32))
+        total_words_written += self._lat_distance_probabilities.size // 2
 
         self.actual_sdram_usage[machine_vertex] = 4 * 16 + 4 * total_words_written
 
@@ -161,10 +191,12 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         return int(self.fudge_factor * (4 * (12 * len(relevant_edges))))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types, in_edges=None):
-        structure_size = 14 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
         self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         total_size = structure_size + initial_size
+        # Aproximation of the sizes of both probability vs distance tables
+        total_size += (60 * 4)
         pop_size = 0
         # approximate the size of the pop -> subpop table
         from spynnaker.pyNN import ProjectionApplicationEdge
