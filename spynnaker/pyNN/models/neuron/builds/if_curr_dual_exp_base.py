@@ -10,6 +10,9 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCurrDualExpBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with two exponentially decaying \
@@ -17,7 +20,6 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
         current input
     """
 
-    DEFAULT_MAX_ATOMS_PER_CORE = 255
     _model_based_max_atoms_per_core = 255
 
     default_parameters = {
