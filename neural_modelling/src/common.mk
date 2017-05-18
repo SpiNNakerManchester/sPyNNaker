@@ -7,7 +7,7 @@ ifndef NEURAL_MODELLING_DIRS
 endif
 
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CHECK_PATH := $(NEURAL_MODELLING_DIRS)/src/Makefile.common
+CHECK_PATH := $(NEURAL_MODELLING_DIRS)/src/common.mk
 ifneq ($(CHECK_PATH), $(MAKEFILE_PATH))
     $(error Please check NEURAL_MODELLING_DIRS as based on that this file is at $(CHECK_PATH) when it is actually at $(MAKEFILE_PATH))
 endif

@@ -11,6 +11,6 @@ include $(NEURAL_MODELLING_DIRS)/src/paths.mk
 CFLAGS += -I$(abspath $(SOURCE_DIR))
 vpath %.c $(abspath $(SOURCE_DIR)/delay_extension)
 vpath %.h $(abspath $(SOURCE_DIR))
-include $(NEURAL_MODELLING_DIRS)/src/Makefile.common
+include $(NEURAL_MODELLING_DIRS)/src/common.mk
 
 .PHONY: all clean
