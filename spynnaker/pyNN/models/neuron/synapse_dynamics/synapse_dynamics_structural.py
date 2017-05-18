@@ -61,7 +61,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                                                                                     self._sigma_form_lateral)
 
     def generate_distance_probability_array(self, probability, sigma):
-        distances = np.asarray(np.linspace(0, 100, 1000), dtype=np.float128)
+        distances = np.asarray(np.linspace(0, 100, 1000), dtype=np.float64)
         raw_probabilities = probability * (np.e ** (-(distances ** 2) / (2 * (sigma ** 2))))
         quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
         # Quantize probabilities and cast as uint16 / short
