@@ -1,11 +1,12 @@
 from spinn_front_end_common.utilities import exceptions
-from spynnaker.pyNN.simulator_interface import SimulatorInterface
+from spinn_front_end_common.utilities.failed_state import FailedState
+from spynnaker.pyNN.spynnaker_simulator_interface \
+    import SpynnakerSimulatorInterface
 
 
-class FailedState(SimulatorInterface):
+class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
 
-    def __init__(self):
-        pass
+    __slots__ = ()
 
     @property
     def graph_mapper(self):

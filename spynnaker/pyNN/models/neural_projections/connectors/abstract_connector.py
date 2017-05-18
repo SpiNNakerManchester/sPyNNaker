@@ -3,7 +3,7 @@ from six import add_metaclass
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy

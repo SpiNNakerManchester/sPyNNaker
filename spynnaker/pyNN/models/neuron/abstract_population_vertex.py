@@ -70,7 +70,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 
 import logging
 import os

@@ -1,7 +1,7 @@
 """
 utility class containing simple helper methods
 """
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 
 from spinn_front_end_common.utilities import exceptions
 

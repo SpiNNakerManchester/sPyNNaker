@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.abstract_models.abstract_population_initializable\
     import AbstractPopulationInitializable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance \
     import InputTypeConductance
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
     AbstractContainsUnits
 

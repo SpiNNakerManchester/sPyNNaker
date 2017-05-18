@@ -10,7 +10,7 @@ from spynnaker.pyNN.models.common.abstract_v_recordable import \
     AbstractVRecordable
 from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import \
     InputTypeConductance
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 
 from collections import defaultdict
 import numpy

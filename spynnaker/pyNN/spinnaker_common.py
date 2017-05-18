@@ -14,9 +14,11 @@ import spynnaker.pyNN
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
+
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.simulator_interface import SimulatorInterface
-from spynnaker.pyNN.utilities import globals_variables
+from spynnaker.pyNN.spynnaker_simulator_interface \
+    import SpynnakerSimulatorInterface
+from spinn_front_end_common.utilities import globals_variables
 
 # general imports
 import logging
@@ -27,7 +29,7 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
+class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
     """ main interface for neural code
 
     """
@@ -46,8 +48,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             extra_mapping_algorithms=None, extra_load_algorithms=None):
 
         # Read config file
-        conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
-        config = conf_loader.get_config()
+        config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
 
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
