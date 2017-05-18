@@ -1,4 +1,4 @@
-from spinn_utilities.conf_loader import ConfigurationLoader
+import spinn_utilities.conf_loader as conf_loader
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
@@ -45,8 +45,8 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             extra_mapping_algorithms=None, extra_load_algorithms=None):
 
         # Read config file
-        loader = ConfigurationLoader(spynnaker.pyNN, self.CONFIG_FILE_NAME)
-        config = loader.load_config()
+        conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
+        config = conf_loader.get_config()
 
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
