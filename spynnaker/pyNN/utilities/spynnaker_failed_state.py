@@ -172,38 +172,15 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
-    def create_population(self, size, cellclass, cellparams, structure,
-                          label):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    def create_projection(self, presynaptic_population,
-                          postsynaptic_population, connector, source,
-                          target, synapse_dynamics, label, rng):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
     def get_distribution_to_stats(self):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
-    @staticmethod
-    def is_a_pynn_random(thing):
-        """
-        Checks if the thing is a pynn random
-
-        The exact definition of a pynn random can or could change between
-        pynn versions so can only be checked against a specific pynn version
-
-        :param thing: any object
-        :return: True if this object is a pynn random
-        :trype: bol
-        """
+    def is_a_pynn_random(self, thing):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
-    @staticmethod
-    def get_pynn_NumpyRNG():
+    def get_pynn_NumpyRNG(self):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 

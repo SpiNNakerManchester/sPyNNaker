@@ -78,17 +78,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
         pass
 
     @abstractmethod
-    def create_population(self, size, cellclass, cellparams, structure,
-                          label):
-        pass
-
-    @abstractmethod
-    def create_projection(self, presynaptic_population,
-                          postsynaptic_population, connector, source,
-                          target, synapse_dynamics, label, rng):
-        pass
-
-    @abstractmethod
     def get_distribution_to_stats(self):
         pass
 
