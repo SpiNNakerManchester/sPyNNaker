@@ -152,16 +152,36 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             max_subpartitions = np.maximum(max_subpartitions, len(subpopulation_list))
+
+        # Current machine vertex key (for future checks)
+        current_key = routing_info.get_routing_info_from_pre_vertex(
+                    machine_vertex, constants.SPIKE_PARTITION_ID)
+
+        if current_key is not None:
+            current_key = current_key.first_key
+
         # Table header
         spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
 
         total_words_written = 0
         for subpopulation_list in population_to_subpopulation_information.itervalues():
             # Population header(s)
-            spec.write_value(data=len(subpopulation_list), data_type=DataType.INT32)
+            # Number of subpopulations
+            spec.write_value(data=len(subpopulation_list), data_type=DataType.UINT16)
+
+            # Custom header for commands / controls
+
+            # currently, controls = 1 if the subvertex (on the current core) is part of this population
+            try:
+                controls = 1 if current_key in np.asarray(subpopulation_list)[:, 0] else 0
+            except:
+                controls = 0
+            spec.write_value(data=controls, data_type=DataType.UINT16)
+
             spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0,
                              data_type=DataType.INT32)
             words_written = 0
+            # TODO Ensure the following values are written in ascending order of low_atom (implicit)
             for subpopulation_info in subpopulation_list:
                 # Subpopulation information (i.e. key and number of atoms)
                 # Key

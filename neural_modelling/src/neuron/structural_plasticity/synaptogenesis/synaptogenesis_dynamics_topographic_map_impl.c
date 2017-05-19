@@ -47,7 +47,8 @@ int (*number_of_connections_in_row)(address_t);
 
 
 typedef struct {
-    int32_t no_pre_vertices, total_no_atoms;
+    int16_t no_pre_vertices, sp_control;
+    int32_t total_no_atoms;
     int32_t *key_atom_info;
 } subpopulation_info_t;
 
@@ -92,6 +93,7 @@ typedef struct {
     int32_t pre_syn_id, post_syn_id, distance;
     structural_plasticity_data_t sp_data;
     uint32_t current_time;
+    int16_t current_controls;
 } current_state_t;
 
 current_state_t current_state;
@@ -147,9 +149,13 @@ address_t synaptogenesis_dynamics_initialise(
         rewiring_data.pre_pop_info_table.no_pre_pops, sizeof(subpopulation_info_t));
 
     uint32_t index;
+    uint16_t *half_word;
     for (index = 0; index < rewiring_data.pre_pop_info_table.no_pre_pops; index ++) {
         // Read the actual number of presynaptic subpopulations
-        rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices = *sp_word++;
+        half_word = (uint16_t*)sp_word;
+        rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices = *half_word++;
+        rewiring_data.pre_pop_info_table.subpop_info[index].sp_control = *half_word++;
+        sp_word = (int32_t*) half_word;
         rewiring_data.pre_pop_info_table.subpop_info[index].total_no_atoms = *sp_word++;
         rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info =  (int32_t*) sark_alloc(\
             2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices, sizeof(int32_t));
@@ -167,7 +173,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.ff_probabilities = (uint16_t*) sark_alloc(\
         rewiring_data.size_ff_prob, sizeof(uint16_t));
 
-    uint16_t *half_word = (uint16_t*)sp_word;
+    half_word = (uint16_t*)sp_word;
     for (index = 0; index < rewiring_data.size_ff_prob; index++) {
         rewiring_data.ff_probabilities[index] = *half_word++;
     }
@@ -263,6 +269,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.sdram_synaptic_row = synaptic_row_address;
     current_state.pre_syn_id = choice;
     current_state.post_syn_id = post_id;
+    current_state.current_controls = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].sp_control;
 
     log_debug("Reading %d bytes from %d -- saved @ %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
@@ -378,14 +385,18 @@ bool synaptogenesis_dynamics_elimination_rule(){
 
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
-    // TODO -- Check what type of connection this is -> FF OR LAT
     uint16_t probability;
-    uint distance_as_offset = current_state.distance * 10;
-    if( distance_as_offset > rewiring_data.size_ff_prob ){
+    uint distance_as_offset = current_state.distance << 2  + current_state.distance;
+
+    if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
+        || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
         log_info("\t| DIST OOB - %d", current_state.distance);
         return false;
     }
-    probability = rewiring_data.ff_probabilities[distance_as_offset];
+    if( current_state.current_controls == 0 )
+        probability = rewiring_data.ff_probabilities[distance_as_offset];
+    else
+        probability = rewiring_data.lat_probabilities[distance_as_offset];
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
 
     if (r >= probability){
@@ -395,11 +406,12 @@ bool synaptogenesis_dynamics_formation_rule(){
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| FORMATION - pre %d post %d # controls %d distance %d",
+        log_info("\t| FORMATION - pre %d post %d # controls %d distance %d ctrl %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
-            current_state.distance);
+            current_state.distance,
+            current_state.current_controls);
         spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
