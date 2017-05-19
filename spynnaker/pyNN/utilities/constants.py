@@ -11,8 +11,10 @@ RECORD_GSYN_BIT = 1 << 2
 RECORDING_ENTRY_BYTE_SIZE = 4
 
 
-# From neuron common-typedefs.h
-SYNAPSE_INDEX_BITS = 8
+# From neuron common-typedefs.h - this needs removing
+# SYNAPSE_INDEX_BITS = 8
+
+
 MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
 OUT_SPIKE_SIZE = (MAX_NEURON_SIZE >> 5)  # The size of each output spike line
 OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
