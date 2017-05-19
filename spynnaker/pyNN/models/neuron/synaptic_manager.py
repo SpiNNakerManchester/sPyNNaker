@@ -8,7 +8,12 @@ from scipy import special  # @UnresolvedImport
 import numpy
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
-from spinn_utilities import helpful_functions
+from spinn_utilities import helpful_functions as spinn_utils_helpful_functions
+
+from spinn_front_end_common.utilities import helpful_functions as \
+    fec_helpful_functions
+
+
 from data_specification.enums.data_type import DataType
 from pacman.model.graphs.common.slice import Slice
 
@@ -55,7 +60,7 @@ class SynapticManager(object):
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + config.get(
                 "MasterPopTable", "generator"))
-            algorithms = helpful_functions.get_valid_components(
+            algorithms = spinn_utils_helpful_functions.get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 
@@ -812,12 +817,12 @@ class SynapticManager(object):
 
         # Get the block for the connections from the pre_vertex
         master_pop_table_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
                 transceiver)
         synaptic_matrix_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 transceiver)
@@ -916,7 +921,7 @@ class SynapticManager(object):
             self, transceiver, placement, vertex_slice):
         # locate sdram address to where the synapse parameters are stored
         synapse_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
                 transceiver)
