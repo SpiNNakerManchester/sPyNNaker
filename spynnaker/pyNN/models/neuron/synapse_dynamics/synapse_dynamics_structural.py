@@ -169,7 +169,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 # n_atoms
                 spec.write_value(data=subpopulation_info[1], data_type=DataType.INT32)
                 words_written += 2
-            total_words_written += words_written + 4
+            total_words_written += words_written * 4
 
         # Now we write the probability tables for formation (feedforward and lateral)
         spec.write_value(data=self._ff_distance_probabilities.size, data_type=DataType.INT32)
