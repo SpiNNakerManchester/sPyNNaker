@@ -38,7 +38,6 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
 
     _EXECUTABLE_FINDER = ExecutableFinder()
 
-
     def __init__(
             self, graph_label,
             database_socket_addresses, n_chips_required, timestep, max_delay,
@@ -116,8 +115,8 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
 
         # set up machine targeted data
         if time_scale_factor is None:
-            time_scale_factor = helpful_functions.read_config_int(config,
-                "Machine", "timeScaleFactor")
+            func = helpful_functions.read_config_int
+            time_scale_factor = func(config, "Machine", "timeScaleFactor")
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
