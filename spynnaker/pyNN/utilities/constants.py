@@ -12,7 +12,7 @@ RECORDING_ENTRY_BYTE_SIZE = 4
 
 
 # From neuron common-typedefs.h - this needs removing
-# SYNAPSE_INDEX_BITS = 8
+SYNAPSE_INDEX_BITS = 8
 
 
 MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
