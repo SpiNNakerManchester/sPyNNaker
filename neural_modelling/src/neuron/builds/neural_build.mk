@@ -28,7 +28,7 @@ endif
 # ---------------------------------------------------------------------
 
 CFLAGS += -I$(abspath $(BUILD_DIR)) -I$(abspath $(SOURCE_DIR))
-CFLAGS += $(patsubst %,-I%,$(subst :, ,$(EXTRA_SOURCE_DIRS)))
+CFLAGS += $(patsubst %,-I%,$(subst :, ,$(EXTRA_SRC_DIR)))
 
 SOURCES = \
 	common/out_spikes.c \
