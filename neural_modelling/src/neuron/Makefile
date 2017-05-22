@@ -11,7 +11,7 @@ MODELS = IF_curr_exp \
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all:
-	@for d in $(BUILD_DIRS); do $(MAKE) -C $$d || exit $$?; done
+	@for d in $(BUILD_DIRS); do $(MAKE) -C $$d all || exit $$?; done
 
 clean:
 	@for d in $(BUILD_DIRS); do $(MAKE) -C $$d clean || exit $$?; done
