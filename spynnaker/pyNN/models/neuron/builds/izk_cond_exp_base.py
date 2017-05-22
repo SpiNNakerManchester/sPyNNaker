@@ -9,12 +9,13 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
 _IZK_THRESHOLD = 30.0
 
 
 class IzkCondExpBase(AbstractPopulationVertex):
 
-    DEFAULT_MAX_ATOMS_PER_CORE = 255
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
