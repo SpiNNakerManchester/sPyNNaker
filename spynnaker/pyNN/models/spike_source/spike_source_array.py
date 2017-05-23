@@ -16,12 +16,9 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.eieio_spike_recorder \
-    import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
+from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.utilities import globals_variables
 

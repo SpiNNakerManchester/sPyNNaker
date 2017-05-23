@@ -340,7 +340,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
         if hasattr(neuron_type, "set_model_max_atoms_per_core"):
             if hasattr(neuron_type, "get_max_atoms_per_core"):
                 previous = neuron_type.get_max_atoms_per_core()
-                if previous > max_permitted:
+                if previous < max_permitted:
                     logger.warning(
                         "Attempt to increase number_of_neurons_per_core "
                         "from {} to {} ignored".format(previous,

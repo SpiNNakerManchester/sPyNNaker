@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
-    import AbstractSynapseDynamics
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 from six import add_metaclass
 

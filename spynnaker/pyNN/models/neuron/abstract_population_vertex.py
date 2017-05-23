@@ -42,34 +42,22 @@ from spinn_front_end_common.abstract_models.impl\
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_population_initializable \
-    import AbstractPopulationInitializable
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable \
-    import AbstractVRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_excitatory_recordable import \
-    AbstractGSynExcitatoryRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_inhibitory_recordable import \
-    AbstractGSynInhibitoryRecordable
-from spynnaker.pyNN.models.common.spike_recorder import SpikeRecorder
-from spynnaker.pyNN.models.common.v_recorder import VRecorder
-from spynnaker.pyNN.models.common.gsyn_excitatory_recorder import \
-    GsynExcitatoryRecorder
-from spynnaker.pyNN.models.common.gsyn_inhibitory_recorder import \
-    GsynInhibitoryRecorder
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import AbstractVRecordable
+from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
+from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
+from spynnaker.pyNN.models.common import SpikeRecorder, VRecorder
+from spynnaker.pyNN.models.common import GsynExcitatoryRecorder
+from spynnaker.pyNN.models.common import GsynInhibitoryRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-from spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses\
-    import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
-    import AbstractReadParametersBeforeSet
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
-    AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spinn_front_end_common.utilities import globals_variables
 
 import logging
