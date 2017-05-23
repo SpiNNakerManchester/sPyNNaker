@@ -26,8 +26,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
-from spynnaker.pyNN.utilities \
-    import constants, utility_calls, globals_variables
+from spynnaker.pyNN.utilities import constants, utility_calls
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spinn_front_end_common.utilities import globals_variables
 
