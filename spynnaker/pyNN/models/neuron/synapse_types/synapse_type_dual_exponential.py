@@ -1,13 +1,10 @@
 from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
-    AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
-    import AbstractSynapseType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_synapse_type import AbstractSynapseType
 
 from spynnaker.pyNN.utilities import utility_calls
 
