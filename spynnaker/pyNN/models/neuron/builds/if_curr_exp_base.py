@@ -5,13 +5,15 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCurrExpBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
 
-    DEFAULT_MAX_ATOMS_PER_CORE = 255
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
