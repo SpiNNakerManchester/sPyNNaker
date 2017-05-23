@@ -674,6 +674,11 @@ class SynapticManager(object):
                                     rinfo.first_key_and_mask,
                                     master_pop_table_region)
                             next_block_start_address += len(row_data) * 4
+                    else:
+                        self._population_table_type\
+                            .update_master_population_table(
+                                spec, 0, 0, rinfo.first_key_and_mask,
+                                master_pop_table_region)
                     del row_data
 
                     if next_block_start_address > all_syn_block_sz:
@@ -682,10 +687,13 @@ class SynapticManager(object):
                             " {} of {} ".format(
                                 next_block_start_address, all_syn_block_sz))
 
+                    rinfo = None
+                    delay_key = (
+                        app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+                        pre_vertex_slice.hi_atom)
+                    if delay_key in self._delay_key_index:
+                        rinfo = self._delay_key_index[delay_key]
                     if len(delayed_row_data) > 0:
-                        rinfo = self._delay_key_index[
-                            (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                             pre_vertex_slice.hi_atom)]
 
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector)):
@@ -711,6 +719,11 @@ class SynapticManager(object):
                                     master_pop_table_region)
                             next_block_start_address += len(
                                 delayed_row_data) * 4
+                    elif rinfo is not None:
+                        self._population_table_type\
+                            .update_master_population_table(
+                                spec, 0, 0, rinfo.first_key_and_mask,
+                                master_pop_table_region)
                     del delayed_row_data
 
                     if next_block_start_address > all_syn_block_sz:
@@ -870,6 +883,8 @@ class SynapticManager(object):
             return None, None
 
         max_row_length, synaptic_block_offset, is_single = items[index]
+        if max_row_length == 0:
+            return None, None
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
