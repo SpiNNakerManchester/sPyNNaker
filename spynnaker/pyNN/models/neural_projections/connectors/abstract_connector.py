@@ -174,6 +174,8 @@ class AbstractConnector(object):
                 delay for delay in delays[connection_slice]
                 if min_delay <= delay <= max_delay])
                 for connection_slice in connection_slices])
+            if n_delayed == 0:
+                return 0
             n_total = sum([
                 len(delays[connection_slice])
                 for connection_slice in connection_slices])
