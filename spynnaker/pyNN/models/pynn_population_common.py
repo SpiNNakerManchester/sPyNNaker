@@ -8,8 +8,8 @@ from spynnaker.pyNN.models.abstract_models \
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
-from spinn_front_end_common.utilities import globals_variables
 
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun

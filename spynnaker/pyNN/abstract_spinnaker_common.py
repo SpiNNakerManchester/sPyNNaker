@@ -1,4 +1,6 @@
+# utils imports
 import spinn_utilities.conf_loader as conf_loader
+from spinn_utilities.abstract_base import AbstractBase
 
 # common front end imports
 from spinn_front_end_common.interface.spinnaker_main_interface import \
@@ -8,19 +10,19 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
+from spinn_front_end_common.utilities import globals_variables
 
 # local front end imports
 import spynnaker.pyNN
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
-
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.spynnaker_simulator_interface \
     import SpynnakerSimulatorInterface
-from spinn_front_end_common.utilities import globals_variables
 
 # general imports
+from six import add_metaclass
 import logging
 import math
 import os
@@ -29,7 +31,9 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
+@add_metaclass(AbstractBase)
+class AbstractSpiNNakerCommon(
+        SpinnakerMainInterface,  SpynnakerSimulatorInterface):
     """ main interface for neural code
 
     """
@@ -39,12 +43,12 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
     _EXECUTABLE_FINDER = ExecutableFinder()
 
     def __init__(
-            self, graph_label,
-            database_socket_addresses, n_chips_required, timestep, max_delay,
-            min_delay, hostname, user_extra_algorithm_xml_path=None,
-            user_extra_mapping_inputs=None, user_extra_algorithms_pre_run=None,
-            time_scale_factor=None, extra_post_run_algorithms=None,
-            extra_mapping_algorithms=None, extra_load_algorithms=None):
+            self, graph_label, database_socket_addresses, n_chips_required,
+            timestep, max_delay, min_delay, hostname,
+            user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
+            user_extra_algorithms_pre_run=None, time_scale_factor=None,
+            extra_post_run_algorithms=None, extra_mapping_algorithms=None,
+            extra_load_algorithms=None):
 
         # Read config file
         config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
@@ -115,8 +119,8 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
 
         # set up machine targeted data
         if time_scale_factor is None:
-            func = helpful_functions.read_config_int
-            time_scale_factor = func(config, "Machine", "timeScaleFactor")
+            time_scale_factor = helpful_functions.read_config_int(
+                config, "Machine", "timeScaleFactor")
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
@@ -334,7 +338,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SpynnakerSimulatorInterface):
         """ Registers an additional binary search path for executables
             :param search_path: absolute search path for binaries
             """
-        SpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
+        AbstractSpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         if hasattr(neuron_type, "set_model_max_atoms_per_core"):

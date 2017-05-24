@@ -6,17 +6,23 @@ from collections import defaultdict
 from scipy import special  # @UnresolvedImport
 import numpy
 
+# pacmna imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
-from spinn_utilities import helpful_functions as spinn_utils_helpful_functions
-
-from spinn_front_end_common.utilities import helpful_functions as \
-    fec_helpful_functions
-
-
-from data_specification.enums.data_type import DataType
 from pacman.model.graphs.common.slice import Slice
 
+# spinn utils
+from spinn_utilities import helpful_functions as spinn_utils_helpful_functions
+
+# fec
+from spinn_front_end_common.utilities import helpful_functions as \
+    fec_helpful_functions
+from spinn_front_end_common.utilities import globals_variables
+
+# dsg
+from data_specification.enums.data_type import DataType
+
+# spynnaker
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector
@@ -28,7 +34,6 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants, utility_calls
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spinn_front_end_common.utilities import globals_variables
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28

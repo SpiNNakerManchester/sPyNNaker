@@ -15,12 +15,12 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 

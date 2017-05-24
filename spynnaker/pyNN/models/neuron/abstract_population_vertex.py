@@ -38,6 +38,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import globals_variables
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -58,7 +59,6 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spinn_front_end_common.utilities import globals_variables
 
 import logging
 import os

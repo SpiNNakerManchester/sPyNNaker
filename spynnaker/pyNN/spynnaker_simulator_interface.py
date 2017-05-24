@@ -7,6 +7,8 @@ from spinn_utilities.abstract_base import abstractmethod
 from spinn_front_end_common.utilities.simulator_interface \
     import SimulatorInterface
 
+# chrsitian, remove runtime callbacks, reset stuff, stop, get_current_time,
+# might need to go down or up
 
 @add_metaclass(AbstractBase)
 class SpynnakerSimulatorInterface(SimulatorInterface):
