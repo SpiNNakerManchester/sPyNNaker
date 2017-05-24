@@ -200,26 +200,29 @@ bool population_table_get_next_address(
             is_valid = true;
         } else {
 
-            uint32_t block_address =
-                _get_address(item) + (uint32_t) synaptic_rows_base_address;
             uint32_t row_length = _get_row_length(item);
-            uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-            uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
-
-            *row_address = (address_t) (block_address + neuron_offset);
-            *n_bytes_to_transfer = stride * sizeof(uint32_t);
-            log_debug("neuron_id = %u, block_address = 0x%.8x,"
-                      "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                      last_neuron_id, block_address, row_length, *row_address,
-                      *n_bytes_to_transfer);
             if (row_length > 0) {
+
+                uint32_t block_address =
+                    _get_address(item) + (uint32_t) synaptic_rows_base_address;
+                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+                uint32_t neuron_offset =
+                    last_neuron_id * stride * sizeof(uint32_t);
+
+                *row_address = (address_t) (block_address + neuron_offset);
+                *n_bytes_to_transfer = stride * sizeof(uint32_t);
+                log_debug(
+                    "neuron_id = %u, block_address = 0x%.8x,"
+                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                    last_neuron_id, block_address, row_length, *row_address,
+                    *n_bytes_to_transfer);
                 is_valid = true;
             }
         }
 
         next_item += 1;
         items_to_go -= 1;
-    } while (!is_valid);
+    } while (!is_valid && (items_to_go > 0));
 
-    return true;
+    return is_valid;
 }
