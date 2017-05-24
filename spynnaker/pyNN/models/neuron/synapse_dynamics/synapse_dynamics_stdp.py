@@ -4,10 +4,8 @@ import numpy
 from spinn_front_end_common.abstract_models.\
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_population_settable import AbstractPopulationSettable
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from spynnaker.pyNN import exceptions
 
 # How large are the time-stamps stored with each event

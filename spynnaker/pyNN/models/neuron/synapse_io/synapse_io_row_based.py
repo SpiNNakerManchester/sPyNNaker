@@ -1,14 +1,11 @@
 import numpy
 import math
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
-    import AbstractSynapseDynamics
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
+from spynnaker.pyNN.models.neuron.synapse_dynamics \
+    import AbstractSynapseDynamics, AbstractStaticSynapseDynamics
+from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-from spynnaker.pyNN.models.neuron.synapse_io.abstract_synapse_io \
-    import AbstractSynapseIO
+from .abstract_synapse_io import AbstractSynapseIO
 
 _N_HEADER_WORDS = 3
 
