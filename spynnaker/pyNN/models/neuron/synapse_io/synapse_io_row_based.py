@@ -207,7 +207,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
-        if len(undelayed_connections) > 0:
+        if len(undelayed_connections) > 0 or \
+                isinstance(synapse_info.synapse_dynamics, SynapseDynamicsStructural):
 
             # Get which row each connection will go into
             undelayed_row_indices = (

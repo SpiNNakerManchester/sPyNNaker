@@ -356,7 +356,7 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
-            size=recording_utilities.get_recording_header_size(3))
+            size=recording_utilities.get_recording_header_size(3)) # This would be 4 (4 recording regions)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -475,7 +475,7 @@ class AbstractPopulationVertex(
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
-            self._buffer_size_before_receive, ip_tags))
+            self._buffer_size_before_receive, ip_tags)) # Somewhere here (this block) to be mod. to support the extra region
 
         # Write the neuron parameters
         self._write_neuron_parameters(

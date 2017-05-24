@@ -114,7 +114,7 @@ static int my_abs(int a){
 
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
-    log_info("Synaptogenesis (Topographic map) init.");
+    log_info("SR init.");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
@@ -197,7 +197,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_dma_buffer.row = (uint32_t*) spin1_malloc(
                 rewiring_data.s_max * sizeof(uint32_t));
     if (rewiring_dma_buffer.row == NULL) {
-        log_error("Could not initialise DMA buffers");
+//        log_error("Fail init DMA buffers");
         rt_error(RTE_SWERR);
     }
 
@@ -214,7 +214,7 @@ address_t synaptogenesis_dynamics_initialise(
     #endif
 
 
-    log_info("Synaptogenesis init complete.");
+    log_info("SR init complete.");
     return (address_t)sp_word;
 }
 
@@ -233,7 +233,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
-        log_info("Selected neuron is not my problem (%d)", post_id);
+        log_info("\t| NOTME %d", post_id);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -263,7 +263,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     size_t n_bytes;
 
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
-        log_error("Failed find synaptic row address@key %d", fake_spike);
+        log_error("FAIL@key %d", fake_spike);
+//        rt_error(RTE_SWERR);
     }
     // Saving current state
     current_state.sdram_synaptic_row = synaptic_row_address;
@@ -271,7 +272,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.post_syn_id = post_id;
     current_state.current_controls = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].sp_control;
 
-    log_debug("Reading %d bytes from %d -- saved @ %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
+    log_debug("Reading %d bytes from %d saved %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
     spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
@@ -316,7 +317,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
 void synaptic_row_restructure(uint dma_id){
-    // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
+    // If I am here, then the DMsynaptic_row_addressA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
 
     // Check that I'm actually servicing the correct row by checking
@@ -331,7 +332,6 @@ void synaptic_row_restructure(uint dma_id){
     // Does the neuron exist in the row?
     bool search_hit = search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
 
-
     if (!zero_elements && search_hit) {
 
         synaptogenesis_dynamics_elimination_rule();
@@ -343,9 +343,9 @@ void synaptic_row_restructure(uint dma_id){
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
     }
-    else {
-        log_info("\t| NO REW");
-    }
+//    else {
+//        log_info("\t| NO REW");
+//    }
 
 }
 
@@ -390,7 +390,7 @@ bool synaptogenesis_dynamics_formation_rule(){
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
-        log_info("\t| DIST OOB - %d", current_state.distance);
+        log_info("\t| OOB %d", current_state.distance);
         return false;
     }
     if( current_state.current_controls == 0 )

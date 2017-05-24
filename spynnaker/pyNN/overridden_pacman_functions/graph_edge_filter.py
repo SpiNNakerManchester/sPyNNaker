@@ -1,4 +1,6 @@
 # pacman imports
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
+
 from pacman.model.graphs.application.impl.application_edge \
     import ApplicationEdge
 from pacman.model.graphs.machine.impl.machine_graph import MachineGraph
@@ -11,6 +13,10 @@ from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
     import AbstractFilterableEdge
 
 import logging
+
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+    AbstractSynapseDynamicsStructural
+
 logger = logging.getLogger(__name__)
 
 
@@ -71,6 +77,9 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _is_filterable(edge, graph_mapper):
         app_edge = graph_mapper.get_application_edge(edge)
+        for syn_info in app_edge.synapse_information:
+            if isinstance(syn_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
+                return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
