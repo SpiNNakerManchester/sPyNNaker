@@ -648,10 +648,9 @@ class SynapticManager(object):
                             connection_holder.add_connections(connections)
                             connection_holder.finish()
 
+                    rinfo = routing_info.get_routing_info_for_edge(
+                        machine_edge)
                     if len(row_data) > 0:
-                        rinfo = routing_info.\
-                            get_routing_info_for_edge(machine_edge)
-
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector)):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
@@ -674,7 +673,7 @@ class SynapticManager(object):
                                     rinfo.first_key_and_mask,
                                     master_pop_table_region)
                             next_block_start_address += len(row_data) * 4
-                    else:
+                    elif rinfo is not None:
                         self._population_table_type\
                             .update_master_population_table(
                                 spec, 0, 0, rinfo.first_key_and_mask,
