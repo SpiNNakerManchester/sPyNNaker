@@ -3,6 +3,7 @@
 <!-- For list of supported features see: https://kitware.github.io/KWStyle/resources/features.html -->
 
 <Description>
+	<Verbose>1</Verbose>
 	<LineLength>90</LineLength>
 	<Functions>
 		<regex>[A-Za-z_]</regex>
