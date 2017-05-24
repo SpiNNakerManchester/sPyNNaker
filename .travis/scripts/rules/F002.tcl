@@ -3,7 +3,7 @@
 
 set maxDirectoryDepth [getParameter "max-directory-depth" 8]
 set maxDirnameLength [getParameter "max-dirname-length" 31]
-set maxFilenameLength [getParameter "max-filename-length" 31]
+set maxFilenameLength [getParameter "max-filename-length" 50]
 set maxPathLength [getParameter "max-path-length" 100]
 
 foreach fileName [getSourceFileNames] {
