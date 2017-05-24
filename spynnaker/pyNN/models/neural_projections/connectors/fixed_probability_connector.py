@@ -1,6 +1,5 @@
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 from spinn_front_end_common.utilities import exceptions
 import math
 import numpy

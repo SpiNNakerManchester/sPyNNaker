@@ -1,6 +1,5 @@
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 
 class IFCondAlpha(AbstractPopulationVertex):
