@@ -9,7 +9,6 @@ set rules {
     L006
 
     T001
-    T002
     T003
     T005
     T006
@@ -20,3 +19,4 @@ set rules {
     T015
     T019
 }
+# rule T002 currently disabled; too much noise.
