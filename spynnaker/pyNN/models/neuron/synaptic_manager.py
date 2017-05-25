@@ -217,7 +217,6 @@ class SynapticManager(object):
 
                 # Get an estimate of the number of pre-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
-                # TODO: Can be removed once we move to population-based keys
                 n_atoms_per_machine_vertex = sys.maxint
                 if isinstance(in_edge.pre_vertex, AbstractHasGlobalMaxAtoms):
                     n_atoms_per_machine_vertex = \
