@@ -16,27 +16,7 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     __slots__ = ()
 
     @abstractproperty
-    def graph_mapper(self):
-        pass
-
-    @abstractproperty
     def has_reset_last(self):
-        pass
-
-    @abstractproperty
-    def has_ran(self):
-        pass
-
-    @abstractproperty
-    def increment_none_labelled_vertex_count(self):
-        pass
-
-    @abstractproperty
-    def placements(self):
-        pass
-
-    @abstractproperty
-    def machine_time_step(self):
         pass
 
     @abstractproperty
@@ -52,10 +32,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
         pass
 
     @abstractproperty
-    def transceiver(self):
-        pass
-
-    @abstractproperty
     def use_virtual_board(self):
         pass
 
@@ -64,19 +40,11 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
         pass
 
     @abstractmethod
-    def stop(self):
-        pass
-
-    @abstractmethod
     def reset(self, annotations=None):
         pass
 
     @abstractmethod
     def get_current_time(self):
-        pass
-
-    @abstractmethod
-    def _add_socket_address(self, x):
         pass
 
     @abstractmethod

@@ -9,32 +9,12 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
     __slots__ = ()
 
     @property
-    def graph_mapper(self):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    @property
     def has_reset_last(self):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
     @property
-    def has_ran(self):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    @property
-    def increment_none_labelled_vertex_count(self):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    @property
     def placements(self):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    @property
-    def machine_time_step(self):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
@@ -54,17 +34,12 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
             "This call is only valid between setup and end/stop")
 
     @property
-    def transceiver(self):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
-
-    @property
     def use_virtual_board(self):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
     @staticmethod
-    def run(simtime, callbacks=None):
+    def run(simtime):
         raise exceptions.ConfigurationException(
             "This call is only valid between setup and end/stop")
 
@@ -166,11 +141,6 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState):
         raise exceptions.ConfigurationException(
             "You cannot call min_delay until you have called setup"
             "or after end/stop has been called.")
-
-    @staticmethod
-    def _add_socket_address(self, x):
-        raise exceptions.ConfigurationException(
-            "This call is only valid between setup and end/stop")
 
     def get_distribution_to_stats(self):
         raise exceptions.ConfigurationException(
