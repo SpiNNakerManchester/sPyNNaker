@@ -6,6 +6,7 @@
 
 #include "neuron.h"
 #include "models/neuron_model.h"
+#include "implementations/neuron_impl.h"
 #include "input_types/input_type.h"
 #include "additional_inputs/additional_input.h"
 #include "threshold_types/threshold_type.h"
@@ -26,6 +27,9 @@ static neuron_pointer_t neuron_array;
 
 //! Input states array
 static input_type_pointer_t input_type_array;
+
+//! Implementation array
+//static neuron_impl_pointer_t neuron_impl_array;
 
 //! Additional input array
 static additional_input_pointer_t additional_input_array;
@@ -128,6 +132,11 @@ bool _neuron_load_neuron_parameters(address_t address){
     log_info("loading input type parameters");
     memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
+
+/*    log_info("loading neuron impl parameters");
+    memcpy(neuron_impl_array, &address[next],
+    		n_neurons * sizeof(neuron_impl_t));
+    next += (n_neurons * sizeof(neuron_impl_t)) / 4;*/
 
     log_info("loading additional input type parameters");
     memcpy(additional_input_array, &address[next],
@@ -234,6 +243,16 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         }
     }
 
+/*    // Allocate DTCM for neuron impl array and copy block of data
+    if (sizeof(neuron_impl_t) != 0) {
+        neuron_impl_array = (neuron_impl_t *) spin1_malloc(
+            n_neurons * sizeof(neuron_impl_t));
+        if (neuron_impl_array == NULL) {
+            log_error("Unable to allocate neuron impl array - Out of DTCM");
+            return false;
+        }
+    }*/
+
     // Allocate DTCM for additional input array and copy block of data
     if (sizeof(additional_input_t) != 0) {
         additional_input_array = (additional_input_pointer_t) spin1_malloc(
@@ -297,6 +316,13 @@ void neuron_store_neuron_parameters(address_t address){
     memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
+/*
+    log_info("writing neuron impl parameters");
+    memcpy(&address[next], neuron_impl_array,
+    		n_neurons * sizeof(neuron_impl_t));
+    next += (n_neurons * sizeof(neuron_impl_t)) / 4;
+*/
+
     log_info("writing additional input type parameters");
     memcpy(&address[next], additional_input_array,
            n_neurons * sizeof(additional_input_t));
@@ -332,42 +358,86 @@ void neuron_do_timestep_update(timer_t time) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
-        // Get the parameters for this neuron
+        // Get the neuron itself
         neuron_pointer_t neuron = &neuron_array[neuron_index];
+
+        // Get the input_type parameters and voltage for this neuron
         input_type_pointer_t input_type = &input_type_array[neuron_index];
+
+        // Get threshold and additional input parameters for this neuron
         threshold_type_pointer_t threshold_type =
             &threshold_type_array[neuron_index];
         additional_input_pointer_t additional_input =
             &additional_input_array[neuron_index];
+
+        // Get neuron implementation parameters for this neuron
+//        neuron_impl_pointer_t neuron_impl = &neuron_impl_array[neuron_index];
+
+        // Get the voltage
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // If we should be recording potential, record this neuron parameter
         voltages->states[neuron_index] = voltage;
 
-        // Get excitatory and inhibitory input from synapses and convert it
-        // to current input
-        input_t exc_input_value = input_type_get_input_value(
-            synapse_types_get_excitatory_input(
-                &(neuron_synapse_shaping_params[neuron_index])),
-            input_type);
-        input_t inh_input_value = input_type_get_input_value(
-            synapse_types_get_inhibitory_input(
-                &(neuron_synapse_shaping_params[neuron_index])),
-            input_type);
-        input_t exc_input = input_type_convert_excitatory_input_to_current(
-            exc_input_value, input_type, voltage);
-        input_t inh_input = input_type_convert_inhibitory_input_to_current(
-            inh_input_value, input_type, voltage);
+
+        // Get the exc and inh values from the synapses
+        input_t exc_value = synapse_types_get_excitatory_input(
+        		&(neuron_synapse_shaping_params[neuron_index]));
+        input_t inh_value = synapse_types_get_inhibitory_input(
+        		&(neuron_synapse_shaping_params[neuron_index]));
+
+        // Call impl functions to obtain exc_input and inh_input
+//        input_t exc_input = neuron_impl_convert_excitatory_input_to_current(
+//        		exc_value, neuron_impl, input_type, voltage);
+//        input_t inh_input = neuron_impl_convert_inhibitory_input_to_current(
+//        		inh_value, neuron_impl, input_type, voltage);
+        input_t exc_input = neuron_impl_convert_excitatory_input_to_current(
+        		exc_value, input_type, voltage);
+        input_t inh_input = neuron_impl_convert_inhibitory_input_to_current(
+        		inh_value, input_type, voltage);
+
+//        input_t dummy_exc = neuron_impl_get_recording_excitatory_value();
+//        input_t dummy_inh = neuron_impl_get_recording_inhibitory_value();
+
+        // Call impl functions to get the input values to be recorded
+//        inputs_excitatory->inputs[neuron_index].input =
+//        		neuron_impl_get_recording_excitatory_value(neuron_impl);
+//        inputs_inhibitory->inputs[neuron_index].input =
+//        		neuron_impl_get_recording_inhibitory_value(neuron_impl);
+        inputs_excitatory->inputs[neuron_index].input =
+        		neuron_impl_get_recording_excitatory_value();
+        inputs_inhibitory->inputs[neuron_index].input =
+        		neuron_impl_get_recording_inhibitory_value();
+
+
+//        // Get excitatory and inhibitory input from synapses and convert it
+//        // to current input
+//        input_t exc_input_value = input_type_get_input_value(
+//            synapse_types_get_excitatory_input(
+//                &(neuron_synapse_shaping_params[neuron_index])),
+//            input_type);
+//        input_t inh_input_value = input_type_get_input_value(
+//            synapse_types_get_inhibitory_input(
+//                &(neuron_synapse_shaping_params[neuron_index])),
+//            input_type);
+//        input_t exc_input = input_type_convert_excitatory_input_to_current(
+//            exc_input_value, input_type, voltage);
+////        input_t inh_input = input_type_convert_inhibitory_input_to_current(
+////            inh_input_value, input_type, voltage);
+//        input_t inh_input = input_type_convert_inhibitory_input_to_current(
+//        		inh_input_value, input_type, voltage, exc_input);
+
+        // If we should be recording input, record the values
+//        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
+//        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
+//        inputs_excitatory->inputs[neuron_index].input = exc_input;
+//        inputs_inhibitory->inputs[neuron_index].input = inh_input;
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
-
-        // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
-        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(

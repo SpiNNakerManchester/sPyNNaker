@@ -1,4 +1,5 @@
 MODELS = IF_curr_exp \
+         IF_curr_exp_sEMD \
          IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
