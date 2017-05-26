@@ -370,7 +370,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
     }
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("\t| REMOVAL - pre %d post %d # controls %d",
+        log_info("\t| RM pre %d post %d # controls %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
@@ -406,7 +406,7 @@ bool synaptogenesis_dynamics_formation_rule(){
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| FORMATION - pre %d post %d # controls %d distance %d ctrl %d",
+        log_info("\t| FORM pre %d post %d # controls %d distance %d ctrl %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
