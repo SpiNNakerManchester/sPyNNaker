@@ -3,8 +3,8 @@ import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.abstract_base import AbstractBase
 
 # common front end imports
-from spinn_front_end_common.interface.spinnaker_main_interface import \
-     SpinnakerMainInterface
+from spinn_front_end_common.interface.abstract_spinnaker_base \
+    import AbstractSpinnakerBase
 from spinn_front_end_common.utilities import exceptions as common_exceptions
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models.command_sender import CommandSender
@@ -32,8 +32,7 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(AbstractBase)
-class AbstractSpiNNakerCommon(
-        SpinnakerMainInterface,  SpynnakerSimulatorInterface):
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase, SpynnakerSimulatorInterface):
     """ main interface for neural code
 
     """
@@ -50,6 +49,7 @@ class AbstractSpiNNakerCommon(
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None):
 
+        print "common init"
         # Read config file
         config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
 
@@ -100,7 +100,13 @@ class AbstractSpiNNakerCommon(
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
-        SpinnakerMainInterface.__init__(
+        # timing parameters
+        self._min_delay = None
+        self._max_delay = None
+
+        self._neurons_per_core_set = set()
+
+        AbstractSpinnakerBase.__init__(
             self, config,
             graph_label=graph_label,
             executable_finder=self._EXECUTABLE_FINDER,
@@ -113,10 +119,6 @@ class AbstractSpiNNakerCommon(
             extra_load_algorithms=extra_load_algorithms,
             extra_mapping_algorithms=extra_mapping_algorithms)
 
-        # timing parameters
-        self._min_supported_delay = None
-        self._max_supported_delay = None
-
         # set up machine targeted data
         if time_scale_factor is None:
             time_scale_factor = helpful_functions.read_config_int(
@@ -124,8 +126,6 @@ class AbstractSpiNNakerCommon(
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
-
-        self._neurons_per_core_set = set()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -181,14 +181,14 @@ class AbstractSpiNNakerCommon(
                 "current machine time step".format(
                     0.144 * self._machine_time_step))
         if min_delay is not None:
-            self._min_supported_delay = min_delay
+            self._min_delay = min_delay
         else:
-            self._min_supported_delay = self._machine_time_step / 1000.0
+            self._min_delay = self._machine_time_step / 1000.0
 
         if max_delay is not None:
-            self._max_supported_delay = max_delay
+            self._max_delay = max_delay
         else:
-            self._max_supported_delay = (
+            self._max_delay = (
                 max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
@@ -239,7 +239,7 @@ class AbstractSpiNNakerCommon(
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
         """
-        changed = SpinnakerMainInterface._detect_if_graph_has_changed(
+        changed = AbstractSpinnakerBase._detect_if_graph_has_changed(
             self, reset_flags)
 
         # Additionally check populations for changes
@@ -259,16 +259,16 @@ class AbstractSpiNNakerCommon(
         return changed
 
     @property
-    def min_supported_delay(self):
+    def min_delay(self):
         """ The minimum supported delay based in milliseconds
         """
-        return self._min_supported_delay
+        return self._min_delay
 
     @property
-    def max_supported_delay(self):
+    def max_delay(self):
         """ The maximum supported delay based in milliseconds
         """
-        return self._max_supported_delay
+        return self._max_delay
 
     def add_application_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
@@ -309,7 +309,7 @@ class AbstractSpiNNakerCommon(
         for population in self._populations:
             population._end()
 
-        SpinnakerMainInterface.stop(
+        AbstractSpinnakerBase.stop(
             self, turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator()
@@ -322,7 +322,7 @@ class AbstractSpiNNakerCommon(
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
-        SpinnakerMainInterface.run(self, run_time)
+        AbstractSpinnakerBase.run(self, run_time)
 
     @property
     def time_scale_factor(self):
