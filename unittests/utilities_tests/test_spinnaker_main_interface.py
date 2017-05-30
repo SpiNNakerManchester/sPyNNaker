@@ -57,7 +57,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
 
     def test_stop_init(self):
         interface = AbstractSpinnakerBase(self.default_config(),
-                                           ExecutableFinder())
+                                          ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)
