@@ -50,7 +50,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None):
 
-        print "common init"
         # Read config file
         config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
 
@@ -121,9 +120,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_mapping_algorithms=extra_mapping_algorithms)
 
         # set up machine targeted data
-        if time_scale_factor is None:
-            time_scale_factor = helpful_functions.read_config_int(
-                config, "Machine", "timeScaleFactor")
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
@@ -137,6 +133,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
+
+        if time_scale_factor is None:
+            time_scale_factor = helpful_functions.read_config_int(
+                config, "Machine", "timeScaleFactor")
 
         # deal with params allowed via the setup options
         if timestep is not None:
