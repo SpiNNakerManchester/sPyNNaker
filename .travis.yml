@@ -1,8 +1,12 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+dist: trusty
+language: python
+python: 2.7
+
+addons:
+  apt:
+    packages:
+      - vera++
 
 virtualenv:
   system_site_packages: true
@@ -38,6 +42,7 @@ before_script:
 
 script:
   - py.test unittests
+  - .travis/run-vera.sh neural_modelling/src --vc-report -
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
