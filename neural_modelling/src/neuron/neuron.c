@@ -379,7 +379,6 @@ void neuron_do_timestep_update(timer_t time) {
         // If we should be recording potential, record this neuron parameter
         voltages->states[neuron_index] = voltage;
 
-
         // Get the exc and inh values from the synapses
         input_t exc_value = synapse_types_get_excitatory_input(
         		&(neuron_synapse_shaping_params[neuron_index]));
@@ -387,51 +386,18 @@ void neuron_do_timestep_update(timer_t time) {
         		&(neuron_synapse_shaping_params[neuron_index]));
 
         // Call impl functions to obtain exc_input and inh_input
-//        input_t exc_input = neuron_impl_convert_excitatory_input_to_current(
-//        		exc_value, neuron_impl, input_type, voltage);
-//        input_t inh_input = neuron_impl_convert_inhibitory_input_to_current(
-//        		inh_value, neuron_impl, input_type, voltage);
+        // Note: if neuron_impl_pointer_t was working, could add to arguments
         input_t exc_input = neuron_impl_convert_excitatory_input_to_current(
         		exc_value, input_type, voltage);
         input_t inh_input = neuron_impl_convert_inhibitory_input_to_current(
         		inh_value, input_type, voltage);
 
-//        input_t dummy_exc = neuron_impl_get_recording_excitatory_value();
-//        input_t dummy_inh = neuron_impl_get_recording_inhibitory_value();
-
         // Call impl functions to get the input values to be recorded
-//        inputs_excitatory->inputs[neuron_index].input =
-//        		neuron_impl_get_recording_excitatory_value(neuron_impl);
-//        inputs_inhibitory->inputs[neuron_index].input =
-//        		neuron_impl_get_recording_inhibitory_value(neuron_impl);
+        // Note: if neuron_impl_pointer_t was working, could use as argument
         inputs_excitatory->inputs[neuron_index].input =
         		neuron_impl_get_recording_excitatory_value();
         inputs_inhibitory->inputs[neuron_index].input =
         		neuron_impl_get_recording_inhibitory_value();
-
-
-//        // Get excitatory and inhibitory input from synapses and convert it
-//        // to current input
-//        input_t exc_input_value = input_type_get_input_value(
-//            synapse_types_get_excitatory_input(
-//                &(neuron_synapse_shaping_params[neuron_index])),
-//            input_type);
-//        input_t inh_input_value = input_type_get_input_value(
-//            synapse_types_get_inhibitory_input(
-//                &(neuron_synapse_shaping_params[neuron_index])),
-//            input_type);
-//        input_t exc_input = input_type_convert_excitatory_input_to_current(
-//            exc_input_value, input_type, voltage);
-////        input_t inh_input = input_type_convert_inhibitory_input_to_current(
-////            inh_input_value, input_type, voltage);
-//        input_t inh_input = input_type_convert_inhibitory_input_to_current(
-//        		inh_input_value, input_type, voltage, exc_input);
-
-        // If we should be recording input, record the values
-//        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
-//        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
-//        inputs_excitatory->inputs[neuron_index].input = exc_input;
-//        inputs_inhibitory->inputs[neuron_index].input = inh_input;
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
