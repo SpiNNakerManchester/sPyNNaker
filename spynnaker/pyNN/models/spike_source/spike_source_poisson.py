@@ -36,7 +36,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
-
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
 
@@ -48,7 +48,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities import globals_variables
 from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \

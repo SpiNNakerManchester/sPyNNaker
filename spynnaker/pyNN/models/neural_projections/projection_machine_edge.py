@@ -1,5 +1,6 @@
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls, globals_variables
+from spynnaker.pyNN.utilities import utility_calls
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance\
     .abstract_provides_local_provenance_data \
     import AbstractProvidesLocalProvenanceData

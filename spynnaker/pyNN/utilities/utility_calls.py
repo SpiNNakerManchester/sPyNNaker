@@ -2,7 +2,7 @@
 utility class containing simple helper methods
 """
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities import exceptions
 
 import numpy
