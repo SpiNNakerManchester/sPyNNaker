@@ -39,5 +39,3 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         raise exceptions.ConfigurationException(FAILED_STATE_MSG)
-
-

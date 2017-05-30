@@ -36,7 +36,7 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     # Used at common level but depends on PyNN so individual implementations
     @abstractmethod
     def is_a_pynn_random(self, thing):
-         pass
+        pass
 
     # declared in FEC common and used in 7 and 8
     @abstractproperty
@@ -57,4 +57,3 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     @abstractmethod
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         pass
-

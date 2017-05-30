@@ -32,7 +32,8 @@ logger = logging.getLogger(__name__)
 
 
 @add_metaclass(AbstractBase)
-class AbstractSpiNNakerCommon(AbstractSpinnakerBase, SpynnakerSimulatorInterface):
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
+                              SpynnakerSimulatorInterface):
     """ main interface for neural code
 
     """
