@@ -5,12 +5,9 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
 
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neural_projections.projection_machine_edge \
-    import ProjectionMachineEdge
-from spynnaker.pyNN.models.neuron.master_pop_table_generators\
-    .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
+from spynnaker.pyNN.models.neural_projections \
+    import ProjectionApplicationEdge, ProjectionMachineEdge
+from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 # general imports
 import logging

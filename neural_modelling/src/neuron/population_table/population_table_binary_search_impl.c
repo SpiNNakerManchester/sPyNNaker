@@ -185,33 +185,44 @@ bool population_table_get_next_address(
         return false;
     }
 
-    address_and_row_length item = address_list[next_item];
+    bool is_valid = false;
+    do {
+        address_and_row_length item = address_list[next_item];
 
-    // If the row is a direct row, indicate this by specifying the
-    // n_bytes_to_transfer is 0
-    if (_is_single(item)) {
-        *row_address = (address_t) (
-            _get_direct_address(item) + (uint32_t) direct_rows_base_address +
-            (last_neuron_id * sizeof(uint32_t)));
-        *n_bytes_to_transfer = 0;
-    } else {
+        // If the row is a direct row, indicate this by specifying the
+        // n_bytes_to_transfer is 0
+        if (_is_single(item)) {
+            *row_address = (address_t) (
+                _get_direct_address(item) +
+                (uint32_t) direct_rows_base_address +
+                (last_neuron_id * sizeof(uint32_t)));
+            *n_bytes_to_transfer = 0;
+            is_valid = true;
+        } else {
 
-        uint32_t block_address =
-            _get_address(item) + (uint32_t) synaptic_rows_base_address;
-        uint32_t row_length = _get_row_length(item);
-        uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-        uint32_t neuron_offset = last_neuron_id * stride * sizeof(uint32_t);
+            uint32_t row_length = _get_row_length(item);
+            if (row_length > 0) {
 
-        *row_address = (address_t) (block_address + neuron_offset);
-        *n_bytes_to_transfer = stride * sizeof(uint32_t);
-        log_debug("neuron_id = %u, block_address = 0x%.8x,"
-                  "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                  last_neuron_id, block_address, row_length, *row_address,
-                  *n_bytes_to_transfer);
-    }
+                uint32_t block_address =
+                    _get_address(item) + (uint32_t) synaptic_rows_base_address;
+                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+                uint32_t neuron_offset =
+                    last_neuron_id * stride * sizeof(uint32_t);
 
-    next_item += 1;
-    items_to_go -= 1;
+                *row_address = (address_t) (block_address + neuron_offset);
+                *n_bytes_to_transfer = stride * sizeof(uint32_t);
+                log_debug(
+                    "neuron_id = %u, block_address = 0x%.8x,"
+                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                    last_neuron_id, block_address, row_length, *row_address,
+                    *n_bytes_to_transfer);
+                is_valid = true;
+            }
+        }
 
-    return true;
+        next_item += 1;
+        items_to_go -= 1;
+    } while (!is_valid && (items_to_go > 0));
+
+    return is_valid;
 }

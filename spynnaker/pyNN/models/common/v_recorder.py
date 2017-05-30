@@ -1,9 +1,6 @@
-from spynnaker.pyNN.models.common import recording_utils
-
 import logging
-
-from spynnaker.pyNN.models.common.abstract_uint32_recorder import \
-    AbstractUInt32Recorder
+from spynnaker.pyNN.models.common import recording_utils
+from .abstract_uint32_recorder import AbstractUInt32Recorder
 
 logger = logging.getLogger(__name__)
 
