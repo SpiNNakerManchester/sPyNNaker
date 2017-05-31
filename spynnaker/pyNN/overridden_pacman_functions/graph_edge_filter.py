@@ -77,9 +77,10 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _is_filterable(edge, graph_mapper):
         app_edge = graph_mapper.get_application_edge(edge)
-        for syn_info in app_edge.synapse_information:
-            if isinstance(syn_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
-                return False
+        if hasattr(app_edge, "synapse_information"):
+            for syn_info in app_edge.synapse_information:
+                if isinstance(syn_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
+                    return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
