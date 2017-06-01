@@ -13,6 +13,10 @@ typedef struct input_type_t* input_type_pointer_t;
 static input_t input_type_get_input_value(
     input_t value, input_type_pointer_t input_type);
 
+// ! \brief Set the multiplicator in the input_type to value based on inh input
+static void input_type_set_inhibitory_multiplicator_value(
+		input_t value, input_type_pointer_t input_type, input_t inh_input);
+
 //! \brief Converts an excitatory input into an excitatory current
 //! \param[in] exc_input The total excitatory input this timestep - note that
 //!     this will already have been scaled by input_type_get_input_value
@@ -34,7 +38,7 @@ static input_t input_type_convert_excitatory_input_to_current(
 //    state_t membrane_voltage);
 static input_t input_type_convert_inhibitory_input_to_current(
     input_t inh_input, input_type_pointer_t input_type,
-    state_t membrane_voltage, input_t exc_input);
+    state_t membrane_voltage);//, input_t exc_input);
 
 //static input_t this_is_a_new_function(input_type_pointer_t input_type);
 

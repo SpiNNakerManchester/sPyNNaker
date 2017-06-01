@@ -28,9 +28,6 @@ static neuron_pointer_t neuron_array;
 //! Input states array
 static input_type_pointer_t input_type_array;
 
-//! Implementation array
-//static neuron_impl_pointer_t neuron_impl_array;
-
 //! Additional input array
 static additional_input_pointer_t additional_input_array;
 
@@ -132,11 +129,6 @@ bool _neuron_load_neuron_parameters(address_t address){
     log_info("loading input type parameters");
     memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
-
-/*    log_info("loading neuron impl parameters");
-    memcpy(neuron_impl_array, &address[next],
-    		n_neurons * sizeof(neuron_impl_t));
-    next += (n_neurons * sizeof(neuron_impl_t)) / 4;*/
 
     log_info("loading additional input type parameters");
     memcpy(additional_input_array, &address[next],
@@ -243,16 +235,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         }
     }
 
-/*    // Allocate DTCM for neuron impl array and copy block of data
-    if (sizeof(neuron_impl_t) != 0) {
-        neuron_impl_array = (neuron_impl_t *) spin1_malloc(
-            n_neurons * sizeof(neuron_impl_t));
-        if (neuron_impl_array == NULL) {
-            log_error("Unable to allocate neuron impl array - Out of DTCM");
-            return false;
-        }
-    }*/
-
     // Allocate DTCM for additional input array and copy block of data
     if (sizeof(additional_input_t) != 0) {
         additional_input_array = (additional_input_pointer_t) spin1_malloc(
@@ -316,13 +298,6 @@ void neuron_store_neuron_parameters(address_t address){
     memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
-/*
-    log_info("writing neuron impl parameters");
-    memcpy(&address[next], neuron_impl_array,
-    		n_neurons * sizeof(neuron_impl_t));
-    next += (n_neurons * sizeof(neuron_impl_t)) / 4;
-*/
-
     log_info("writing additional input type parameters");
     memcpy(&address[next], additional_input_array,
            n_neurons * sizeof(additional_input_t));
@@ -370,9 +345,6 @@ void neuron_do_timestep_update(timer_t time) {
         additional_input_pointer_t additional_input =
             &additional_input_array[neuron_index];
 
-        // Get neuron implementation parameters for this neuron
-//        neuron_impl_pointer_t neuron_impl = &neuron_impl_array[neuron_index];
-
         // Get the voltage
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
@@ -386,14 +358,12 @@ void neuron_do_timestep_update(timer_t time) {
         		&(neuron_synapse_shaping_params[neuron_index]));
 
         // Call impl functions to obtain exc_input and inh_input
-        // Note: if neuron_impl_pointer_t was working, could add to arguments
-        input_t exc_input = neuron_impl_convert_excitatory_input_to_current(
-        		exc_value, input_type, voltage);
-        input_t inh_input = neuron_impl_convert_inhibitory_input_to_current(
-        		inh_value, input_type, voltage);
+        neuron_impl_convert_inputs_to_current(exc_value, inh_value,
+        		input_type, voltage);
+        input_t exc_input = neuron_impl_get_excitatory_input();
+        input_t inh_input = neuron_impl_get_inhibitory_input();
 
         // Call impl functions to get the input values to be recorded
-        // Note: if neuron_impl_pointer_t was working, could use as argument
         inputs_excitatory->inputs[neuron_index].input =
         		neuron_impl_get_recording_excitatory_value();
         inputs_inhibitory->inputs[neuron_index].input =

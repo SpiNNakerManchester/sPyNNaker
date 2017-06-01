@@ -12,6 +12,14 @@ static inline input_t input_type_get_input_value(
     return value;
 }
 
+static void input_type_set_inhibitory_multiplicator_value(
+		input_t value, input_type_pointer_t input_type, input_t inh_input)
+{
+	use(value);
+	use(input_type);
+	use(inh_input);
+}
+
 static inline input_t input_type_convert_excitatory_input_to_current(
         input_t exc_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
@@ -25,10 +33,9 @@ static inline input_t input_type_convert_excitatory_input_to_current(
 //        state_t membrane_voltage) {
 static inline input_t input_type_convert_inhibitory_input_to_current(
 	        input_t inh_input, input_type_pointer_t input_type,
-	        state_t membrane_voltage, input_t exc_input) {
+	        state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-    use(exc_input);
     return inh_input;
 }
 

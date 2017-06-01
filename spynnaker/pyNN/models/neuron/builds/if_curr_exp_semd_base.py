@@ -3,8 +3,8 @@ from spynnaker.pyNN.models.neuron.neuron_models\
     import NeuronModelLeakyIntegrateAndFire
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import SynapseTypeExponential
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.input_types.input_type_current_semd \
+    import InputTypeCurrentSEMD
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
@@ -22,7 +22,8 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
         'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
-        'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
+        'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0,
+        'multiplicator': 0, 'inh_input_previous': 0}
 
     none_pynn_default_parameters = {'v_init': None}
 
@@ -48,14 +49,17 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
             i_offset=default_parameters['i_offset'],
             v_init=none_pynn_default_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
-            isyn_inh=default_parameters['isyn_inh']):
+            isyn_inh=default_parameters['isyn_inh'],
+            multiplicator=default_parameters['multiplicator'],
+            inh_input_previous=default_parameters['inh_input_previous']):
 
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
             n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
-        input_type = InputTypeCurrent()
+        input_type = InputTypeCurrentSEMD(n_neurons, multiplicator,
+                                          inh_input_previous)
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(

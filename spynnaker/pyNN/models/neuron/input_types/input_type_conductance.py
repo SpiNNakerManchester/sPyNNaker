@@ -8,7 +8,7 @@ from .abstract_input_type import AbstractInputType
 from enum import Enum
 
 
-class _CONDUCTANTCE_TYPES(Enum):
+class _CONDUCTANCE_TYPES(Enum):
     E_REV_E = (1, DataType.S1615)
     E_REV_I = (2, DataType.S1615)
 
@@ -68,13 +68,13 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return [
             NeuronParameter(
-                self._e_rev_E, _CONDUCTANTCE_TYPES.E_REV_E.data_type),
+                self._e_rev_E, _CONDUCTANCE_TYPES.E_REV_E.data_type),
             NeuronParameter(
-                self._e_rev_I, _CONDUCTANTCE_TYPES.E_REV_I.data_type)
+                self._e_rev_I, _CONDUCTANCE_TYPES.E_REV_I.data_type)
         ]
 
     def get_input_type_parameter_types(self):
-        return [item.data_type for item in _CONDUCTANTCE_TYPES]
+        return [item.data_type for item in _CONDUCTANCE_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10
