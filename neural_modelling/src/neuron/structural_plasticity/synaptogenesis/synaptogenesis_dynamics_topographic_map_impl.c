@@ -233,7 +233,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
-        log_info("\t| NOTME %d", post_id);
+        log_debug("\t| NOTME %d", post_id);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -360,17 +360,17 @@ bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
     if( current_state.sp_data.weight < rewiring_data.weight >> 1 && r >= rewiring_data.p_elim_dep ){
-        log_info("\t| FAIL DEP");
+        log_debug("\t| FAIL DEP");
         return false;
     }
     // otherwise use probability 2
     else if ( r >= rewiring_data.p_elim_pot ){
-        log_info("\t| FAIL POT");
+        log_debug("\t| FAIL POT");
         return false;
     }
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("\t| RM pre %d post %d # controls %d",
+        log_debug("\t| RM pre %d post %d # controls %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
@@ -390,7 +390,7 @@ bool synaptogenesis_dynamics_formation_rule(){
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
-        log_info("\t| OOB %d", current_state.distance);
+        log_debug("\t| OOB %d", current_state.distance);
         return false;
     }
     if( current_state.current_controls == 0 )
@@ -400,13 +400,13 @@ bool synaptogenesis_dynamics_formation_rule(){
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
 
     if (r >= probability){
-        log_info("\t| NO FORM.");
+        log_debug("\t| NO FORM.");
         return false;
     }
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| FORM pre %d post %d # controls %d distance %d ctrl %d",
+        log_debug("\t| FORM pre %d post %d # controls %d distance %d ctrl %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),

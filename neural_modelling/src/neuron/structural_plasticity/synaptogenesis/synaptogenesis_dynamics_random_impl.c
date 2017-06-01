@@ -20,6 +20,7 @@
 #include "../../plasticity/synapse_dynamics.h"
 
 #include "../../../common/neuron-typedefs.h"
+#include "../../../common/maths-util.h"
 #include "../../../common/sp_structs.h"
 
 
@@ -55,7 +56,6 @@ typedef struct {
 
 typedef struct {
     uint32_t p_rew, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom;
-    REAL sigma_form_forward, sigma_form_lateral, p_form_forward, p_form_lateral, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
 } rewiring_data_t;
@@ -85,7 +85,7 @@ dma_buffer_t rewiring_dma_buffer;
 
 typedef struct {
     address_t sdram_synaptic_row;
-    int32_t pre_syn_id, post_syn_id;
+    int32_t pre_syn_id, post_syn_id, distance;
     structural_plasticity_data_t sp_data;
     uint32_t current_time;
 } current_state_t;
@@ -115,12 +115,6 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.weight = *sp_word++;
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
-    rewiring_data.sigma_form_forward = *(REAL*)sp_word++;
-    rewiring_data.sigma_form_lateral = *(REAL*)sp_word++;
-    rewiring_data.p_form_forward = *(REAL*)sp_word++;
-    rewiring_data.p_form_lateral = *(REAL*)sp_word++;
-    rewiring_data.p_elim_dep = *(REAL*)sp_word++;
-    rewiring_data.p_elim_pot = *(REAL*)sp_word++;
 
     rewiring_data.app_no_atoms = *sp_word++;
     rewiring_data.low_atom = *sp_word++;
@@ -136,6 +130,8 @@ address_t synaptogenesis_dynamics_initialise(
 
     // Need to malloc space for subpop_info, i.e. an array containing information for each pre-synaptic
     // application vertex
+    if (rewiring_data.pre_pop_info_table.no_pre_pops==0)
+        return NULL;
 
     rewiring_data.pre_pop_info_table.subpop_info = (subpopulation_info_t*) sark_alloc(\
         rewiring_data.pre_pop_info_table.no_pre_pops, sizeof(subpopulation_info_t));
@@ -184,12 +180,14 @@ address_t synaptogenesis_dynamics_initialise(
     return (address_t)sp_word;
 }
 
+//int dma_operation(int tag) {
+//
+//}
+
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] None
 //! \return None
-
-
 void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.current_time = time;
     // Randomly choose a postsynaptic (application neuron)
@@ -197,7 +195,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * rewiring_data.app_no_atoms;
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
-        log_debug("Selected neuron is not my problem (%d)", post_id);
+        log_info("Selected neuron is not my problem (%d)", post_id);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -244,6 +242,25 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     if(!rewiring_dma_buffer.dma_id){
         log_info("DMA Queue full. Synaptic rewiring request failed!");
     }
+    // Compute the distance at this point to optimize CPU usage.
+    // i.e. make use of it while servicing a DMA
+
+    // To do this I need to take the DIV and MOD of the postsyn neuron id, of the presyn neuron id
+    // Compute the distance of these 2 measures (start with Manhattan distance)
+    int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
+    // TODO |Pre computation requires querying the table with global information
+    // TODO | or see https://trello.com/c/fTM1BRh2/156-distance-based-rewiring-rules for alternative
+    pre_global_id = rewiring_data.low_atom + current_state.pre_syn_id;
+    post_global_id = rewiring_data.low_atom + current_state.post_syn_id;
+
+    pre_x = pre_global_id / 10;
+    pre_y = pre_global_id % 10;
+
+    post_x = post_global_id / 10;
+    post_y = post_global_id % 10;
+
+    // Without periodic boundary conditions
+    current_state.distance = abs((pre_x - post_x) + (pre_y - post_y));
 }
 
 // Might need a function for rewiring. One to be called by the timer to generate
@@ -259,7 +276,7 @@ void synaptic_row_restructure(uint dma_id){
         log_error("Servicing invalid synaptic row!");
 
 
-    uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
+//    uint plastic_size = synapse_row_plastic_size(rewiring_dma_buffer.row);
 //    uint num_plastic = synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row));
 //    uint num_static = synapse_row_num_fixed_synapses(synapse_row_fixed_region(rewiring_dma_buffer.row));
     uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
@@ -287,24 +304,6 @@ void synaptic_row_restructure(uint dma_id){
 
 }
 
-
-//bool _check_element_exists(){
-//        if (search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data)))
-//        {
-//           log_info("NEURON STILL HERE");
-//           log_info("FOUND @ %d", current_state.sp_data.offset);
-//           return true;
-//        }
-//        else
-//           log_info("NEURON NOT FOUND!");
-//
-//        log_info("num elements %d, bytes read %d, ",
-//            synapse_row_num_plastic_controls(synapse_row_fixed_region(rewiring_dma_buffer.row)),
-//            rewiring_dma_buffer.n_bytes_transferred);
-//
-//        return false;
-//}
-
  /*
     Formation and elimination are structurally agnostic, i.e. they don't care how
     synaptic rows are organised in physical memory.
@@ -313,12 +312,12 @@ void synaptic_row_restructure(uint dma_id){
     physically organised to be able to modify Plastic-Plastic synaptic regions.
  */
 bool synaptogenesis_dynamics_elimination_rule(){
-
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("\t| HIT @ %d id %d. Number of controls=%d",
-            current_state.sp_data.offset,
+        log_info("\t| HIT - pre %d post %d # controls %d distance %d",
+            current_state.pre_syn_id,
             current_state.post_syn_id,
-            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
+            current_state.distance);
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
@@ -335,10 +334,11 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| MISS @ %d id %d. Number of controls=%d",
-            current_state.sp_data.offset,
+        log_info("\t| MISS - pre %d post %d # controls %d distance %d",
+            current_state.pre_syn_id,
             current_state.post_syn_id,
-            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
+            current_state.distance);
         uint dma_id = spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
