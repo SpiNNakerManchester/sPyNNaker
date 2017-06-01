@@ -34,7 +34,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_elim_pot = p_elim_pot
         self._grid = grid
 
-        self.fudge_factor = 1.3
+        self.fudge_factor = 1.5
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
@@ -159,6 +159,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         if current_key is not None:
             current_key = current_key.first_key
+        else:
+            current_key = 0
 
         # Table header
         spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
@@ -172,10 +174,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             # Custom header for commands / controls
 
             # currently, controls = 1 if the subvertex (on the current core) is part of this population
-            try:
-                controls = 1 if current_key in np.asarray(subpopulation_list)[:, 0] else 0
-            except:
-                controls = 0
+            controls = 1 if current_key in np.asarray(subpopulation_list)[:, 0] else 0
             spec.write_value(data=controls, data_type=DataType.UINT16)
 
             spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0,
@@ -216,7 +215,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         total_size = structure_size + initial_size
         # Aproximation of the sizes of both probability vs distance tables
-        total_size += (60 * 4)
+        total_size += (80 * 4)
         pop_size = 0
         # approximate the size of the pop -> subpop table
         from spynnaker.pyNN import ProjectionApplicationEdge
