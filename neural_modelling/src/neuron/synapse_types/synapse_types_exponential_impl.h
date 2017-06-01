@@ -69,7 +69,7 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
 static inline void synapse_types_add_neuron_input(
-        index_t synapse_type_index, synapse_param_pointer_t parameter, 
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
     if (synapse_type_index == EXCITATORY) {
         parameter->input_buffer_excitatory_value =
