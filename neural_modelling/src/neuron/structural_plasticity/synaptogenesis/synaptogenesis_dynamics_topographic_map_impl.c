@@ -386,7 +386,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint distance_as_offset = current_state.distance << 2  + current_state.distance;
+    uint distance_as_offset = current_state.distance << 3  + current_state.distance << 1;
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
