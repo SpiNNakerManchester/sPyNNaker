@@ -394,3 +394,77 @@ uint32_t synapses_get_pre_synaptic_events() {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
+
+bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+    uint32_t weight;
+
+    // Loop through plastic synapses
+    for (; fixed_synapse > 0; fixed_synapse--) {
+        // Get next control word (auto incrementing)
+        // Check if index is the one I'm looking for
+
+        uint32_t synaptic_word = *synaptic_words++;
+        weight = synapse_row_sparse_weight(synaptic_word);
+        if (synapse_row_sparse_index(synaptic_words)==id)
+            break;
+    }
+
+    // Making assumptions explicit
+    assert( synapse_row_num_plastic_controls(fixed_region) == 0 );
+
+    if (fixed_synapse > 0){
+        sp_data -> weight = weight;
+        sp_data -> offset = synapse_row_num_fixed_synapses(fixed_region) - fixed_synapse;
+        return true;
+        }
+    else{
+        sp_data -> weight = -1;
+        sp_data -> offset = - 1;
+        return false;
+        }
+}
+
+bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+    // Delete weight at offset
+//    spin1_memcpy(&synaptic_words[offset], &synaptic_words[fixed_synapse-1], sizeof(uint32_t));
+    // Delete control word at offset
+    spin1_memcpy(&synaptic_words[offset], &synaptic_words[fixed_synapse-1], sizeof(uint32_t));
+
+    // Decrement FF
+    fixed_region[0]--;
+    return true;
+}
+
+static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
+                                            uint32_t delay){
+    uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
+    new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
+    new_synapse |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+    return new_synapse;
+}
+
+//TODO Add synapse type
+bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+    uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay);
+    // Add control word at offset
+    spin1_memcpy(& synaptic_words[fixed_synapse], &new_synapse, sizeof(uint32_t));
+    // Increment FF
+    fixed_region[0]++;
+
+    return true;
+}

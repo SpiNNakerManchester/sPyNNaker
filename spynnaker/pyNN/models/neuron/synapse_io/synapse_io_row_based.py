@@ -6,7 +6,12 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
 from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
 from .abstract_synapse_io import AbstractSynapseIO
-
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics import \
+    AbstractPlasticSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
+    import AbstractSynapseDynamics
 _N_HEADER_WORDS = 3
 
 
@@ -66,7 +71,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         dynamics = synapse_info.synapse_dynamics
         undelayed_size = 0
         delayed_size = 0
-        if isinstance(dynamics, AbstractStaticSynapseDynamics):
+        if isinstance(dynamics, AbstractStaticSynapseDynamics) or (
+            isinstance(dynamics, AbstractSynapseDynamicsStructural) and
+                    isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             undelayed_size = dynamics.get_n_words_for_static_connections(
                 max_undelayed_row_length)
             delayed_size = dynamics.get_n_words_for_static_connections(
@@ -104,7 +111,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
-        if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
+        if isinstance(synapse_dynamics, SynapseDynamicsStatic) or \
+            (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+             isinstance(synapse_dynamics.super, SynapseDynamicsStatic)):
 
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -116,7 +125,9 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-        else:
+        elif isinstance(synapse_dynamics, SynapseDynamicsSTDP)or \
+            (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+             isinstance(synapse_dynamics.super, SynapseDynamicsSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -192,7 +203,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
-        if len(undelayed_connections) > 0:
+        if len(undelayed_connections) > 0 or \
+                isinstance(synapse_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
 
             # Get which row each connection will go into
             undelayed_row_indices = (
@@ -286,8 +298,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         dynamics = synapse_info.synapse_dynamics
         connections = list()
-        if isinstance(dynamics, AbstractStaticSynapseDynamics):
-
+        if isinstance(dynamics, SynapseDynamicsStatic) \
+                or (isinstance(dynamics, AbstractSynapseDynamicsStructural)
+                    and isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             # Read static data
             if row_data is not None and len(row_data) > 0:
                 ff_size, ff_data = self._get_static_data(row_data, dynamics)

@@ -10,6 +10,10 @@ from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 import logging
+
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+    AbstractSynapseDynamicsStructural
+
 logger = logging.getLogger(__name__)
 
 
@@ -70,6 +74,10 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _is_filterable(edge, graph_mapper):
         app_edge = graph_mapper.get_application_edge(edge)
+        if hasattr(app_edge, "synapse_information"):
+            for syn_info in app_edge.synapse_information:
+                if isinstance(syn_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
+                    return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):

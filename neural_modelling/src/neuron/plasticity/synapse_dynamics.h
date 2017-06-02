@@ -3,8 +3,9 @@
 
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
+#include "../../common/sp_structs.h"
 
-bool synapse_dynamics_initialise(
+address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
     uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
@@ -26,5 +27,18 @@ void synapse_dynamics_print_plastic_synapses(
 //!        returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
+
+
+//---------------------------------------
+// Synaptic rewiring functions
+//---------------------------------------
+
+//! \brief  Searches the synaptic row for the the connection with the
+//!         specified postsynaptic id
+//! \return int32 representing the offset of the connection within the
+//!         fixed region (this can be used to when removing the connection)
+bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
+bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row);
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay);
 
 #endif // _SYNAPSE_DYNAMICS_H_

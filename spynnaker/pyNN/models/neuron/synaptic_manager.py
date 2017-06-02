@@ -6,7 +6,7 @@ from collections import defaultdict
 from scipy import special  # @UnresolvedImport
 import numpy
 
-# pacmna imports
+# pacman imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.common.slice import Slice
@@ -34,6 +34,8 @@ from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants, utility_calls
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -264,25 +266,32 @@ class SynapticManager(object):
                     n_delay_stages, self._population_table_type,
                     machine_time_step)
 
-            memory_size = self._population_table_type\
+            memory_size = self._population_table_type \
                 .get_next_allowed_address(memory_size)
             memory_size += undelayed_size
-            memory_size = self._population_table_type\
+            memory_size = self._population_table_type \
                 .get_next_allowed_address(memory_size)
             memory_size += delayed_size
         return memory_size
 
-    def _get_synapse_dynamics_parameter_size(self, vertex_slice):
+    def _get_synapse_dynamics_parameter_size(self, vertex_slice, in_edges=None):
         """ Get the size of the synapse dynamics region
         """
-        return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types())
+        # Does the size of the parameters area depend on presynaptic connections in any way?
+        try:
+            # Yes!
+            return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types(), in_edges=in_edges)
+        except TypeError:
+            # No!
+            return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types())
 
     def get_sdram_usage_in_bytes(
             self, vertex_slice, in_edges, machine_time_step):
         return (
             self._get_synapse_params_size(vertex_slice) +
-            self._get_synapse_dynamics_parameter_size(vertex_slice) +
+            self._get_synapse_dynamics_parameter_size(vertex_slice, in_edges=in_edges) +
             self._get_estimate_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
             self._population_table_type.get_master_population_table_size(
@@ -312,7 +321,8 @@ class SynapticManager(object):
                 size=all_syn_block_sz, label='SynBlocks')
 
         synapse_dynamics_sz = \
-            self._get_synapse_dynamics_parameter_size(vertex_slice)
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, machine_graph.get_edges_ending_at_vertex(machine_vertex))
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS
@@ -559,7 +569,7 @@ class SynapticManager(object):
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
-        next_block_allowed_address = self._population_table_type\
+        next_block_allowed_address = self._population_table_type \
             .get_next_allowed_address(next_block_start_address)
         if next_block_allowed_address != next_block_start_address:
 
@@ -660,7 +670,7 @@ class SynapticManager(object):
                                 synapse_info.connector, OneToOneConnector)):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
-                            self._population_table_type\
+                            self._population_table_type \
                                 .update_master_population_table(
                                     spec, next_single_start_position, 1,
                                     rinfo.first_key_and_mask,
@@ -672,7 +682,7 @@ class SynapticManager(object):
                                 next_block_start_address)
                             spec.switch_write_focus(synaptic_matrix_region)
                             spec.write_array(row_data)
-                            self._population_table_type\
+                            self._population_table_type \
                                 .update_master_population_table(
                                     spec, next_block_start_address, row_length,
                                     rinfo.first_key_and_mask,
@@ -703,7 +713,7 @@ class SynapticManager(object):
                                 synapse_info.connector, OneToOneConnector)):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
-                            self._population_table_type\
+                            self._population_table_type \
                                 .update_master_population_table(
                                     spec, next_single_start_position, 1,
                                     rinfo.first_key_and_mask,
@@ -715,7 +725,7 @@ class SynapticManager(object):
                                 next_block_start_address)
                             spec.switch_write_focus(synaptic_matrix_region)
                             spec.write_array(delayed_row_data)
-                            self._population_table_type\
+                            self._population_table_type \
                                 .update_master_population_table(
                                     spec, next_block_start_address,
                                     delayed_row_length,
@@ -794,9 +804,16 @@ class SynapticManager(object):
             constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        self._synapse_dynamics.write_parameters(
-            spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-            machine_time_step, weight_scales)
+        if isinstance(self._synapse_dynamics, SynapseDynamicsStructural):
+            self._synapse_dynamics.write_parameters(
+                spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales, application_graph=application_graph, machine_graph=machine_graph,
+                app_vertex=application_vertex, post_slice=post_vertex_slice, machine_vertex=machine_vertex,
+                graph_mapper=graph_mapper, routing_info=routing_info)
+        else:
+            self._synapse_dynamics.write_parameters(
+                spec, constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales)
 
         self._weight_scales[placement] = weight_scales
 

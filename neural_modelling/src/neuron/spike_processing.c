@@ -5,6 +5,7 @@
 #include "../common/in_spikes.h"
 #include <spin1_api.h>
 #include <debug.h>
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
@@ -12,6 +13,8 @@
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
+#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
+#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
 
 // DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -193,10 +196,8 @@ void _user_event_callback(uint unused0, uint unused1) {
 }
 
 // Called when a DMA completes
-void _dma_complete_callback(uint unused, uint tag) {
-    use(unused);
-
-    log_debug("DMA transfer complete with tag %u", tag);
+void _dma_complete_callback(uint id, uint tag) {
+    log_debug("DMA transfer complete with tag %u for id %d", tag, id);
 
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
@@ -240,6 +241,14 @@ void _dma_complete_callback(uint unused, uint tag) {
         } while (subsequent_spikes);
 
     } else if (tag == DMA_TAG_WRITE_PLASTIC_REGION) {
+
+        // Do Nothing
+
+    } else if (tag == DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
+
+        synaptic_row_restructure(id);
+
+    } else if (tag == DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING){
 
         // Do Nothing
 
