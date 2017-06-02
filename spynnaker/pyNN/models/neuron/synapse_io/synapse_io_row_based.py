@@ -77,7 +77,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         dynamics = synapse_info.synapse_dynamics
         undelayed_size = 0
         delayed_size = 0
-        if isinstance(dynamics, AbstractStaticSynapseDynamics):
+        if isinstance(dynamics, AbstractStaticSynapseDynamics) or (
+            isinstance(dynamics, AbstractSynapseDynamicsStructural) and
+                    isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             undelayed_size = dynamics.get_n_words_for_static_connections(
                 max_undelayed_row_length)
             delayed_size = dynamics.get_n_words_for_static_connections(
@@ -208,7 +210,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
         if len(undelayed_connections) > 0 or \
-                isinstance(synapse_info.synapse_dynamics, SynapseDynamicsStructural):
+                isinstance(synapse_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
 
             # Get which row each connection will go into
             undelayed_row_indices = (
@@ -303,7 +305,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         dynamics = synapse_info.synapse_dynamics
         connections = list()
         if isinstance(dynamics, SynapseDynamicsStatic) \
-                or (isinstance(dynamics, SynapseDynamicsStructural)
+                or (isinstance(dynamics, AbstractSynapseDynamicsStructural)
                     and isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             # Read static data
             if row_data is not None and len(row_data) > 0:

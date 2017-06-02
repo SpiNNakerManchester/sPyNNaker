@@ -179,7 +179,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
             spec.write_value(data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(subpopulation_list) > 0 else 0,
                              data_type=DataType.INT32)
-            words_written = 0
+            words_written = 2
             # TODO Ensure the following values are written in ascending order of low_atom (implicit)
             for subpopulation_info in subpopulation_list:
                 # Subpopulation information (i.e. key and number of atoms)
