@@ -1,21 +1,28 @@
+# utils imports
+import spinn_utilities.conf_loader as conf_loader
+from spinn_utilities.abstract_base import AbstractBase
 
 # common front end imports
-from spinn_front_end_common.interface.spinnaker_main_interface import \
-     SpinnakerMainInterface
+from spinn_front_end_common.interface.abstract_spinnaker_base \
+    import AbstractSpinnakerBase
 from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models.command_sender import CommandSender
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
+from spinn_front_end_common.utilities import globals_variables
 
 # local front end imports
+import spynnaker.pyNN
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.simulator_interface import SimulatorInterface
-from spynnaker.pyNN.utilities import globals_variables
+from spynnaker.pyNN.spynnaker_simulator_interface \
+    import SpynnakerSimulatorInterface
 
 # general imports
+from six import add_metaclass
 import logging
 import math
 import os
@@ -24,20 +31,27 @@ import os
 logger = logging.getLogger(__name__)
 
 
-class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
+@add_metaclass(AbstractBase)
+class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
+                              SpynnakerSimulatorInterface):
     """ main interface for neural code
 
     """
 
+    CONFIG_FILE_NAME = "spynnaker.cfg"
+
     _EXECUTABLE_FINDER = ExecutableFinder()
 
     def __init__(
-            self, config, graph_label, config_default_name,
-            database_socket_addresses, n_chips_required, timestep, max_delay,
-            min_delay, hostname, user_extra_algorithm_xml_path=None,
-            user_extra_mapping_inputs=None, user_extra_algorithms_pre_run=None,
-            time_scale_factor=None, extra_post_run_algorithms=None,
-            extra_mapping_algorithms=None, extra_load_algorithms=None):
+            self, graph_label, database_socket_addresses, n_chips_required,
+            timestep, max_delay, min_delay, hostname,
+            user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
+            user_extra_algorithms_pre_run=None, time_scale_factor=None,
+            extra_post_run_algorithms=None, extra_mapping_algorithms=None,
+            extra_load_algorithms=None):
+
+        # Read config file
+        config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
 
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
@@ -86,7 +100,13 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
-        SpinnakerMainInterface.__init__(
+        # timing parameters
+        self._min_delay = None
+        self._max_delay = None
+
+        self._neurons_per_core_set = set()
+
+        AbstractSpinnakerBase.__init__(
             self, config,
             graph_label=graph_label,
             executable_finder=self._EXECUTABLE_FINDER,
@@ -99,17 +119,10 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
             extra_load_algorithms=extra_load_algorithms,
             extra_mapping_algorithms=extra_mapping_algorithms)
 
-        # timing parameters
-        self._min_supported_delay = None
-        self._max_supported_delay = None
-        self._config_default_name = config_default_name
-
         # set up machine targeted data
         self._set_up_timings(
             timestep, min_delay, max_delay, config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
-
-        self._neurons_per_core_set = set()
 
         logger.info("Setting time scale factor to {}."
                     .format(self._time_scale_factor))
@@ -120,6 +133,10 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
+
+        if time_scale_factor is None:
+            time_scale_factor = helpful_functions.read_config_int(
+                config, "Machine", "timeScaleFactor")
 
         # deal with params allowed via the setup options
         if timestep is not None:
@@ -165,14 +182,14 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
                 "current machine time step".format(
                     0.144 * self._machine_time_step))
         if min_delay is not None:
-            self._min_supported_delay = min_delay
+            self._min_delay = min_delay
         else:
-            self._min_supported_delay = self._machine_time_step / 1000.0
+            self._min_delay = self._machine_time_step / 1000.0
 
         if max_delay is not None:
-            self._max_supported_delay = max_delay
+            self._max_delay = max_delay
         else:
-            self._max_supported_delay = (
+            self._max_delay = (
                 max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         if (config.has_option("Machine", "timeScaleFactor") and
@@ -203,7 +220,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
                         "override this behaviour (at your own risk), please "
                         "add violate_1ms_wall_clock_restriction = True to the "
                         "[Mode] section of your .{} file".format(
-                            self._config_default_name))
+                            self.CONFIG_FILE_NAME))
         else:
             if time_scale_factor is not None:
                 self._time_scale_factor = time_scale_factor
@@ -218,12 +235,12 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
                         "automatic behaviour, please enter a "
                         "timescaleFactor value in your .{}".format(
                             self._time_scale_factor,
-                            self._config_default_name))
+                            self.CONFIG_FILE_NAME))
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
         """
-        changed = SpinnakerMainInterface._detect_if_graph_has_changed(
+        changed = AbstractSpinnakerBase._detect_if_graph_has_changed(
             self, reset_flags)
 
         # Additionally check populations for changes
@@ -243,16 +260,16 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         return changed
 
     @property
-    def min_supported_delay(self):
+    def min_delay(self):
         """ The minimum supported delay based in milliseconds
         """
-        return self._min_supported_delay
+        return self._min_delay
 
     @property
-    def max_supported_delay(self):
+    def max_delay(self):
         """ The maximum supported delay based in milliseconds
         """
-        return self._max_supported_delay
+        return self._max_delay
 
     def add_application_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
@@ -293,7 +310,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         for population in self._populations:
             population._end()
 
-        SpinnakerMainInterface.stop(
+        AbstractSpinnakerBase.stop(
             self, turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator()
@@ -306,7 +323,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
-        SpinnakerMainInterface.run(self, run_time)
+        AbstractSpinnakerBase.run(self, run_time)
 
     @property
     def time_scale_factor(self):
@@ -322,7 +339,7 @@ class SpiNNakerCommon(SpinnakerMainInterface, SimulatorInterface):
         """ Registers an additional binary search path for executables
             :param search_path: absolute search path for binaries
             """
-        SpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
+        AbstractSpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         if hasattr(neuron_type, "set_model_max_atoms_per_core"):
