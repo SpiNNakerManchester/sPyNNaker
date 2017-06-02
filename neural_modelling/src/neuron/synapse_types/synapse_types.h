@@ -5,7 +5,7 @@
 #include "../synapse_row.h"
 
 
-//! Forward declaration of synapse type (creates a definition for a pointer 
+//! Forward declaration of synapse type (creates a definition for a pointer
 //! to a synapse type parameter struct
 typedef struct synapse_param_t* synapse_param_pointer_t;
 

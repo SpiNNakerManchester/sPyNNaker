@@ -1,6 +1,5 @@
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
-    import FromListConnector
+from .from_list_connector import FromListConnector
 import os
 import numpy
 from six import add_metaclass
@@ -13,37 +12,37 @@ class FromFileConnector(FromListConnector):
             self, file,  # @ReservedAssignment
             distributed=False, safe=True, verbose=False):
         self._file = file
-
-        real_file = file
-        opened_file = False
         if isinstance(file, basestring):
             real_file = self.get_reader(file)
-            opened_file = True
-
-        if distributed:
-            directory = os.path.dirname(real_file.file)
-            filename = "{}.".format(os.path.basename(real_file.file))
-
-            conns = list()
-            for found_file in os.listdir(directory):
-                if found_file.startswith(filename):
-                    file_reader = self.get_reader(found_file)
-                    conns.append(file_reader.read())
-                    file_reader.close()
-            conn_list = numpy.concatenate(conns)
+            try:
+                conn_list = self._read_conn_list(real_file, distributed)
+            finally:
+                real_file.close()
         else:
-            conn_list = real_file.read()
-
-        if opened_file:
-            real_file.close()
-
+            conn_list = self._read_conn_list(file, distributed)
         FromListConnector.__init__(self, conn_list, safe, verbose)
+
+    def _read_conn_list(self, the_file, distributed):
+        if not distributed:
+            return the_file.read()
+        directory = os.path.dirname(the_file.file)
+        filename = "{}.".format(os.path.basename(the_file.file))
+
+        conns = list()
+        for found_file in os.listdir(directory):
+            if found_file.startswith(filename):
+                file_reader = self.get_reader(found_file)
+                try:
+                    conns.append(file_reader.read())
+                finally:
+                    file_reader.close()
+        return numpy.concatenate(conns)
 
     def __repr__(self):
         return "FromFileConnector({})".format(self._file)
 
     @abstractmethod
-    def get_reader(self, file):
+    def get_reader(self, file):  # @ReservedAssignment
         """
         get a filereader object probably using the pynn methods
 

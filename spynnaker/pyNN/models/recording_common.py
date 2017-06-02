@@ -1,16 +1,11 @@
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
+from spinn_front_end_common.utilities import globals_variables
 
-from spynnaker.pyNN.models.common.abstract_gsyn_excitatory_recordable import \
-    AbstractGSynExcitatoryRecordable
-from spynnaker.pyNN.models.common.abstract_gsyn_inhibitory_recordable import \
-    AbstractGSynInhibitoryRecordable
-from spynnaker.pyNN.models.common.abstract_spike_recordable import \
-    AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.abstract_v_recordable import \
-    AbstractVRecordable
-from spynnaker.pyNN.models.neuron.input_types.input_type_conductance import \
-    InputTypeConductance
-from spynnaker.pyNN.utilities import globals_variables
+from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
+from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import AbstractVRecordable
+from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from collections import defaultdict
 import numpy
