@@ -264,7 +264,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
         log_error("FAIL@key %d", fake_spike);
-//        rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
     // Saving current state
     current_state.sdram_synaptic_row = synaptic_row_address;
