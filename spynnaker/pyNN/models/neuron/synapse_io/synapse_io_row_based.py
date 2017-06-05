@@ -5,6 +5,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractSynapseDynamics, AbstractStaticSynapseDynamics
 from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
+from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+    AbstractSynapseDynamicsStructural
 from .abstract_synapse_io import AbstractSynapseIO
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import SynapseDynamicsStructural
@@ -111,9 +113,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
-        if isinstance(synapse_dynamics, SynapseDynamicsStatic) or \
+        if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics) or \
             (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-             isinstance(synapse_dynamics.super, SynapseDynamicsStatic)):
+             isinstance(synapse_dynamics.super, AbstractStaticSynapseDynamics)):
 
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -298,7 +300,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         dynamics = synapse_info.synapse_dynamics
         connections = list()
-        if isinstance(dynamics, SynapseDynamicsStatic) \
+        if isinstance(dynamics, AbstractStaticSynapseDynamics) \
                 or (isinstance(dynamics, AbstractSynapseDynamicsStructural)
                     and isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
             # Read static data

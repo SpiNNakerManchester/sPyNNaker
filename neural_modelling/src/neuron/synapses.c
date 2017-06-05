@@ -218,7 +218,7 @@ bool synapses_initialise(
         address_t *indirect_synapses_address,
         address_t *direct_synapses_address) {
 
-    log_info("synapses_initialise: starting");
+    log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
 
     // Get the synapse shaping data
@@ -254,7 +254,7 @@ bool synapses_initialise(
         ring_buffer_to_input_left_shifts[synapse_index] =
             synapse_params_address[
                 ring_buffer_input_left_shifts_base + synapse_index];
-        log_info("synapse type %s, ring buffer to input left shift %u",
+        log_debug("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }
@@ -263,9 +263,9 @@ bool synapses_initialise(
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
-    log_info("Indirect matrix is %u words in size", direct_matrix_offset - 1);
+    log_debug("Indirect matrix is %u words in size", direct_matrix_offset - 1);
     uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
-    log_info("Direct matrix malloc size is %d", direct_matrix_size);
+    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
         *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
@@ -274,7 +274,7 @@ bool synapses_initialise(
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
-        log_info(
+        log_debug(
             "Copying %u bytes of direct synapses to 0x%08x",
             direct_matrix_size, *direct_synapses_address);
         spin1_memcpy(
@@ -284,7 +284,7 @@ bool synapses_initialise(
     }
     *indirect_synapses_address = &(synaptic_matrix_address[1]);
 
-    log_info("synapses_initialise: completed successfully");
+    log_debug("synapses_initialise: completed successfully");
     _print_synapse_parameters();
 
     *neuron_synapse_shaping_params_value = neuron_synapse_shaping_params;

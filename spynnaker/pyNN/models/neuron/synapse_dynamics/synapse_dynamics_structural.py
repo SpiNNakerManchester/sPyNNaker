@@ -1,6 +1,7 @@
 import numpy as np
 
 from data_specification.enums.data_type import DataType
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 from spynnaker.pyNN.models.neural_projections.projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics \
@@ -40,7 +41,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self.super = SynapseDynamicsSTDP(timing_dependence=stdp_model.timing_dependence,
                                              weight_dependence=stdp_model.weight_dependence,
                                              dendritic_delay_fraction=stdp_model._dendritic_delay_fraction,
-                                             mad=stdp_model._mad,
                                              pad_to_length=self._s_max)
         else:
             self.super = SynapseDynamicsStatic(pad_to_length=self._s_max)
@@ -155,7 +155,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         # Current machine vertex key (for future checks)
         current_key = routing_info.get_routing_info_from_pre_vertex(
-                    machine_vertex, constants.SPIKE_PARTITION_ID)
+            machine_vertex, constants.SPIKE_PARTITION_ID)
 
         if current_key is not None:
             current_key = current_key.first_key
@@ -218,7 +218,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         total_size += (80 * 4)
         pop_size = 0
         # approximate the size of the pop -> subpop table
-        from spynnaker.pyNN import ProjectionApplicationEdge
         if in_edges is not None and isinstance(in_edges[0], ProjectionApplicationEdge):
             # Approximation gets computed here based on number of afferent edges
             # How many afferent application vertices?
@@ -253,6 +252,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             return self.super.get_n_words_for_plastic_connections(n_connections)
         except:
             return self.super.get_n_words_for_static_connections(n_connections)
+
+    def get_n_words_for_static_connections(self, n_connections):
+        return self.super.get_n_words_for_static_connections(n_connections)
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         if not fp_size:

@@ -1,7 +1,7 @@
 import math
 import numpy
 
-from spinn_front_end_common.abstract_models.\
+from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
@@ -16,9 +16,8 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
-
+    AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+    AbstractChangableAfterRun):
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0, pad_to_length=None):
@@ -32,7 +31,7 @@ class SynapseDynamicsSTDP(
         self._pad_to_length = pad_to_length
 
         if (self._dendritic_delay_fraction < 0.5 or
-                self._dendritic_delay_fraction > 1.0):
+                    self._dendritic_delay_fraction > 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
@@ -223,10 +222,11 @@ class SynapseDynamicsSTDP(
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
-                np.concatenate((row,
-                               np.zeros(
-                                   np.clip(no_bytes_per_connection * self._pad_to_length - row.size, 0, None)).astype(dtype="uint8"))
-                               ).view(dtype="uint8")
+                numpy.concatenate((row,
+                                   numpy.zeros(
+                                       numpy.clip(no_bytes_per_connection * self._pad_to_length - row.size, 0,
+                                                  None)).astype(dtype="uint8"))
+                                  ).view(dtype="uint8")
             )
 
         return padded_rows
@@ -253,8 +253,8 @@ class SynapseDynamicsSTDP(
         n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         data_fixed = numpy.concatenate([
-            fp_data[i].view(dtype="uint16")[0:fp_size[i]]
-            for i in range(n_rows)])
+                                           fp_data[i].view(dtype="uint16")[0:fp_size[i]]
+                                           for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
