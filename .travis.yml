@@ -9,6 +9,11 @@ addons:
       #- gcc-arm-none-eabi
       #- libnewlib-arm-none-eabi
 
+addons:
+  apt:
+    packages:
+      - kwstyle
+
 virtualenv:
   system_site_packages: true
 
@@ -43,6 +48,7 @@ before_script:
   - echo '[Buffers]' >> ~/.spynnaker.cfg
 
 script:
+  - .travis/run-kwstyle.sh neural_modelling/src -gcc -v -xml .travis/KWStyle.xml
   - py.test unittests
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
