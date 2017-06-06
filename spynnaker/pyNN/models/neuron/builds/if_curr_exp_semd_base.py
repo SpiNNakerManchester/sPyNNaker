@@ -63,8 +63,10 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_exp_sEMD.aplx", label=label,
-            max_atoms_per_core=IFCurrExpSEMDBase._model_based_max_atoms_per_core,
+            self, n_neurons=n_neurons, binary="IF_curr_exp_sEMD.aplx",
+            label=label,
+            max_atoms_per_core=IFCurrExpSEMDBase.
+            _model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
