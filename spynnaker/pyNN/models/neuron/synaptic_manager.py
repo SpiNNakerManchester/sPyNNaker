@@ -266,10 +266,10 @@ class SynapticManager(object):
                     n_delay_stages, self._population_table_type,
                     machine_time_step)
 
-            memory_size = self._population_table_type \
+            memory_size = self._population_table_type\
                 .get_next_allowed_address(memory_size)
             memory_size += undelayed_size
-            memory_size = self._population_table_type \
+            memory_size = self._population_table_type\
                 .get_next_allowed_address(memory_size)
             memory_size += delayed_size
         return memory_size
