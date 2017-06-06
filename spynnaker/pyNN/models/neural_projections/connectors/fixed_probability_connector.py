@@ -1,6 +1,5 @@
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 from spinn_front_end_common.utilities import exceptions
 import math
 import numpy
@@ -18,25 +17,17 @@ class FixedProbabilityConnector(AbstractConnector):
         Population to itself, this flag determines whether a neuron is
         allowed to connect to itself, or only to other neurons in the
         Population.
-    :param weights:
-        may either be a float or a !RandomDistribution object. Units nA.
-    :param delays:
-        If `None`, all synaptic delays will be set
-        to the global minimum delay.
     :param `pyNN.Space` space:
         a Space object, needed if you wish to specify distance-
         dependent weights or delays - not implemented
     """
     def __init__(
-            self, p_connect, weights=0.0, delays=1,
-            allow_self_connections=True, safe=True, space=None, verbose=False):
-        AbstractConnector.__init__(self, safe, space, verbose)
+            self, p_connect, allow_self_connections=True, safe=True,
+            verbose=False):
+        AbstractConnector.__init__(self, safe, verbose)
         self._p_connect = p_connect
-        self._weights = weights
-        self._delays = delays
         self._allow_self_connections = allow_self_connections
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if not 0 <= self._p_connect <= 1:
             raise exceptions.ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")

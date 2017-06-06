@@ -1,15 +1,11 @@
 
 # pacman imports
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_field_constraint import \
-    KeyAllocatorFixedFieldConstraint
-from pacman.model.constraints.key_allocator_constraints.\
-    key_allocator_fixed_mask_constraint import KeyAllocatorFixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints \
+    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFixedMaskConstraint
 from pacman.utilities.utility_objs.field import Field
 
 # spynnaker imports
-from spynnaker.pyNN.models.neuron.master_pop_table_generators.\
-    abstract_master_pop_table_factory import AbstractMasterPopTableFactory
+from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
 
 # spinn front end common imports

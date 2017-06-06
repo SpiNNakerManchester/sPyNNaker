@@ -34,15 +34,30 @@ bool neuron_initialise(
     address_t address, uint32_t recording_flags, uint32_t *n_neurons_value,
     uint32_t *incoming_spike_buffer_size);
 
-//! \setter for the internal input buffers
-//! \param[in] input_buffers_value the new input buffers
-//! \return None this method does not return anything.
-void neuron_set_input_buffers(input_t *input_buffers_value);
+//! \setter for the internal synapse type parameters
+//! \param[in] synapse_shaping_params_value: the new synapse shaping params
+//! \return None
+void neuron_set_neuron_synapse_shaping_params(
+        synapse_param_t *neuron_synapse_shaping_params_value);
 
-//! \brief executes all the updates to neural parameters when a given timer period
-//!        has occurred.
+
+//! \brief executes all the updates to neural parameters when a given timer
+//!        period has occurred.
 //! \param[in] time the timer tick value currently being executed
 //! \return nothing
 void neuron_do_timestep_update(uint32_t time);
+
+//! \brief interface for reloading neuron parameters as needed
+//! \param[in] address: the address where the neuron parameters are stored
+//! in SDRAM
+//! \return bool which is true if the reload of the neuron parameters was
+//! successful or not
+bool neuron_reload_neuron_parameters(address_t address);
+
+//! \brief interface for rewriting the neuron parameters back into sdram
+//! \param[in] address the absolute address in SDRAM for the start of the
+//!            NEURON_PARAMS data region in SDRAM
+void neuron_store_neuron_parameters(address_t address);
+
 
 #endif // _NEURON_H_
