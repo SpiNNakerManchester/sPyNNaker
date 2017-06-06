@@ -76,7 +76,7 @@ class InputTypeCurrentSEMD(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameter_types(self):
         return [item.data_type for item in _CURRENT_SEMD_TYPES]
 
-    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):  #n_synapse_types?
+    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):  # n_synapse_types?
         return 0
 
     @overrides(AbstractContainsUnits.get_units)
