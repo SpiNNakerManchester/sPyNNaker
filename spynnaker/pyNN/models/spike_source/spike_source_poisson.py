@@ -153,6 +153,7 @@ class SpikeSourcePoisson(
 
         # atoms params
         self._n_atoms = n_neurons
+        self._model_name = "SpikeSourcePoisson"
         self._seed = None
 
         # check for changes parameters
@@ -738,3 +739,27 @@ class SpikeSourcePoisson(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID)
+
+    def describe(self):
+        """
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customised by specifying a different template
+        together with an associated template engine
+        (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+
+        parameters = dict()
+        for parameter_name in self.default_parameters:
+            parameters[parameter_name] = self.get_value(parameter_name)
+
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_parameters,
+            "parameters": parameters,
+        }
+        return context
