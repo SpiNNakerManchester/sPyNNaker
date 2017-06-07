@@ -20,7 +20,8 @@ class SynapseDynamicsSTDP(
     AbstractChangableAfterRun):
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
-            voltage_dependence=None, dendritic_delay_fraction=1.0, pad_to_length=None):
+            voltage_dependence=None, dendritic_delay_fraction=1.0,
+            pad_to_length=None):
         AbstractPlasticSynapseDynamics.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
@@ -157,7 +158,8 @@ class SynapseDynamicsSTDP(
 
     def get_n_words_for_plastic_connections(self, n_connections):
         synapse_structure = self._timing_dependence.synaptic_structure
-        if self._pad_to_length is not None and n_connections < self._pad_to_length:
+        if self._pad_to_length is not None and \
+                        n_connections < self._pad_to_length:
             n_connections = self._pad_to_length
 
         fp_size_words = \
@@ -207,8 +209,9 @@ class SynapseDynamicsSTDP(
         # pp_size = fp_size in words => fp_size * no_bytes / 4 (bytes)
         if self._pad_to_length is not None:
             # Pad the data
-            plastic_plastic_row_data = self._pad_row(plastic_plastic_row_data,
-                                                     synapse_structure.get_n_bytes_per_connection())
+            plastic_plastic_row_data = self._pad_row(
+                plastic_plastic_row_data,
+                synapse_structure.get_n_bytes_per_connection())
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
@@ -222,11 +225,15 @@ class SynapseDynamicsSTDP(
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
-                numpy.concatenate((row,
-                                   numpy.zeros(
-                                       numpy.clip(no_bytes_per_connection * self._pad_to_length - row.size, 0,
-                                                  None)).astype(dtype="uint8"))
-                                  ).view(dtype="uint8")
+                numpy.concatenate(
+                    (row,
+                     numpy.zeros(
+                         numpy.clip(
+                             no_bytes_per_connection * self._pad_to_length -
+                             row.size,
+                             0,
+                             None)).astype(dtype="uint8"))
+                ).view(dtype="uint8")
             )
 
         return padded_rows
@@ -253,7 +260,8 @@ class SynapseDynamicsSTDP(
         n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         data_fixed = numpy.concatenate([
-                                           fp_data[i].view(dtype="uint16")[0:fp_size[i]]
+                                           fp_data[i].view(dtype="uint16")[
+                                           0:fp_size[i]]
                                            for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]

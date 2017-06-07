@@ -1,9 +1,7 @@
 import numpy
 import math
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-from spinn_front_end_common.abstract_models.\
+from spinn_front_end_common.abstract_models. \
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
@@ -12,9 +10,8 @@ from spynnaker.pyNN import exceptions
 
 
 class SynapseDynamicsStatic(
-        AbstractStaticSynapseDynamics, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
-
+    AbstractStaticSynapseDynamics, AbstractPopulationSettable,
+    AbstractChangableAfterRun):
     def __init__(self, pad_to_length=None):
         AbstractStaticSynapseDynamics.__init__(self)
         AbstractPopulationSettable.__init__(self)
@@ -39,7 +36,8 @@ class SynapseDynamicsStatic(
         pass
 
     def get_n_words_for_static_connections(self, n_connections):
-        if self._pad_to_length is not None and n_connections < self._pad_to_length:
+        if self._pad_to_length is not None and \
+                        n_connections < self._pad_to_length:
             n_connections = self._pad_to_length
         return n_connections
 
@@ -71,12 +69,16 @@ class SynapseDynamicsStatic(
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
-                numpy.concatenate((row,
-                                   numpy.zeros(
-                                       numpy.clip(no_bytes_per_connection * self._pad_to_length - row.size, 0,
-                                                  None)).astype(
-                                       dtype="uint8"))
-                                  ).view(dtype="uint8")
+                numpy.concatenate(
+                    (row,
+                     numpy.zeros(
+                         numpy.clip(
+                             no_bytes_per_connection * self._pad_to_length -
+                             row.size,
+                             0,
+                             None)).astype(
+                         dtype="uint8"))
+                ).view(dtype="uint8")
             )
 
         return padded_rows
