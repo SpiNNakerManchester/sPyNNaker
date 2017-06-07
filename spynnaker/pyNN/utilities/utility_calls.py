@@ -40,7 +40,11 @@ def convert_param_to_numpy(param, no_atoms):
 
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array
-        return numpy.array([param.next(n=no_atoms)], dtype="float")
+        param_value = param.next(n=no_atoms)
+        if hasattr(param_value, '__iter__'):
+            return numpy.array(param_value, dtype="float")
+        else:
+            return numpy.array([param.next(n=no_atoms)], dtype="float")
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
