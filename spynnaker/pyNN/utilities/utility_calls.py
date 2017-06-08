@@ -44,7 +44,7 @@ def convert_param_to_numpy(param, no_atoms):
         if hasattr(param_value, '__iter__'):
             return numpy.array(param_value, dtype="float")
         else:
-            return numpy.array([param.next(n=no_atoms)], dtype="float")
+            return numpy.array([param_value], dtype="float")
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
