@@ -1,8 +1,13 @@
 language: python
-matrix:
-  include:
-    - python: "2.7"
-    - pytest
+python: "2.7"
+dist: trusty
+
+addons:
+  apt:
+    packages:
+      - vera++
+      #- gcc-arm-none-eabi
+      #- libnewlib-arm-none-eabi
 
 virtualenv:
   system_site_packages: true
@@ -27,6 +32,7 @@ before_install:
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
 
 before_script:
   - echo '[Machine]' > ~/.spynnaker.cfg
@@ -42,6 +48,7 @@ script:
   - flake8 unittests
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
   # - flake8 integration_tests
+  - support/run-vera.sh neural_modelling
   - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
