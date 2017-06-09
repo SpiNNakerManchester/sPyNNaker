@@ -723,11 +723,13 @@ class SynapticManager(object):
                                 master_pop_table_region)
                         next_block_start_address += len(
                             delayed_row_data) * 4
+
                     elif rinfo is not None:
                         self._population_table_type\
                             .update_master_population_table(
                                 spec, 0, 0, rinfo.first_key_and_mask,
                                 master_pop_table_region)
+
                     del delayed_row_data
 
                     if next_block_start_address > all_syn_block_sz:
