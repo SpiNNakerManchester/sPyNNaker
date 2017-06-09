@@ -157,25 +157,27 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 app_vertex):
-            for synapse_info in app_edge.synapse_information:
-                if synapse_info.synapse_dynamics is self:
-                    structural_application_edges.append(app_edge)
-                    population_to_subpopulation_information[
-                        app_edge.pre_vertex] = []
-                    break
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    if synapse_info.synapse_dynamics is self:
+                        structural_application_edges.append(app_edge)
+                        population_to_subpopulation_information[
+                            app_edge.pre_vertex] = []
+                        break
 
         no_pre_populations = len(structural_application_edges)
         # For each structurally plastic APPLICATION edge find the c
         # orresponding machine edges
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            for synapse_info in machine_edge._synapse_information:
-                if synapse_info.synapse_dynamics is self:
-                    structural_machine_edges.append(machine_edge)
-                    # For each structurally plastic MACHINE edge find the
-                    # corresponding presynaptic subvertices
-                    presynaptic_machine_vertices.append(
-                        machine_edge.pre_vertex)
+            if isinstance(machine_edge, ProjectionMachineEdge):
+                for synapse_info in machine_edge._synapse_information:
+                    if synapse_info.synapse_dynamics is self:
+                        structural_machine_edges.append(machine_edge)
+                        # For each structurally plastic MACHINE edge find the
+                        # corresponding presynaptic subvertices
+                        presynaptic_machine_vertices.append(
+                            machine_edge.pre_vertex)
 
         # For each presynaptic subvertex figure out the partition (?)
         # to retrieve the key and n_atoms
@@ -326,7 +328,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         return self.super.get_n_words_for_static_connections(n_connections)
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
-        if not fp_size:
+        if fp_size is not None:
             return self.super.get_n_synapses_in_rows(pp_size, fp_size)
         else:
             return self.super.get_n_synapses_in_rows(pp_size)

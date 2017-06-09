@@ -5,13 +5,13 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractStaticSynapseDynamics
 from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
     abstract_synapse_dynamics_structural import \
     AbstractSynapseDynamicsStructural
 from .abstract_synapse_io import AbstractSynapseIO
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
     import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics.\
+from spynnaker.pyNN.models.neuron.synapse_dynamics. \
     synapse_dynamics_structural import SynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
     import AbstractSynapseDynamics
@@ -373,23 +373,23 @@ class SynapseIORowBased(AbstractSynapseIO):
                                             for i in range(len(n_synapses))],
                                         dtype="uint32")
                 row_min_delay = (row_stage + 1) * 16
-                connection_min_delay = numpy.concatenate([
-                                                             numpy.repeat(
-                                                                 row_min_delay[
-                                                                     i],
-                                                                 n_synapses[i])
-                                                             for i in range(
+                connection_min_delay = numpy.concatenate(
+                    [numpy.repeat(
+                            row_min_delay[
+                                i],
+                            n_synapses[i])
+                        for i in range(
                         len(n_synapses))])
-                connection_source_extra = numpy.concatenate([
-                                                                numpy.repeat(
-                                                                    row_stage[
-                                                                        i] * pre_vertex_slice.n_atoms,
-                                                                    n_synapses[
-                                                                        i])
-                                                                for i in range(
+                connection_source_extra = numpy.concatenate(
+                    [numpy.repeat(
+                            row_stage[
+                                i] * pre_vertex_slice.n_atoms,
+                            n_synapses[
+                                i])
+                        for i in range(
                         len(n_synapses))])
 
-                delayed_connections["source"] -= connection_source_extra
+                delayed_connections["source"] -= connection_source_extra.astype("uint32")
                 delayed_connections["source"] += pre_vertex_slice.lo_atom
                 delayed_connections["delay"] += connection_min_delay
                 connections.append(delayed_connections)

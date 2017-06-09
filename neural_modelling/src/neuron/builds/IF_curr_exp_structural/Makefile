@@ -9,6 +9,6 @@ SYNAPSE_TYPE_H = $(SOURCE_DIR)/neuron/synapse_types/synapse_types_exponential_im
 SYNAPSE_DYNAMICS = $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
 
 SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
-SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis/synaptogenesis_dynamics_topographic_map_impl.c
+SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis/topographic_map_impl.c
 
 include ../Makefile.common
