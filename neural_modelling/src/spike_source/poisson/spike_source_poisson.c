@@ -334,9 +334,9 @@ void resume_callback() {
 
     address_t address = data_specification_get_data_address();
 
-    if(!read_poisson_parameters(
+    if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))){
-        log_error("failed to reread the poisson parameters from SDRAM")   ;
+        log_error("failed to reread the poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
 

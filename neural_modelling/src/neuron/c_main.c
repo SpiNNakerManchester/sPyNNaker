@@ -190,9 +190,9 @@ void resume_callback() {
 
     // try reloading neuron parameters
     address_t address = data_specification_get_data_address();
-    if(!neuron_reload_neuron_parameters(
+    if (!neuron_reload_neuron_parameters(
             data_specification_get_region(
-                NEURON_PARAMS_REGION, address))){
+                NEURON_PARAMS_REGION, address))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
