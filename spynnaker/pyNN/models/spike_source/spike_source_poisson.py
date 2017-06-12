@@ -631,7 +631,8 @@ class SpikeSourcePoisson(
         # Convert end values as timesteps to durations in milliseconds
         self._duration[vertex_slice.as_slice] = \
             self._convert_n_timesteps_to_ms(
-                values[1], self._machine_time_step) - self._start
+                values[1], self._machine_time_step) - \
+            self._start[vertex_slice.as_slice]
 
         # Work out the spikes per tick depending on if the source is slow
         # or fast
