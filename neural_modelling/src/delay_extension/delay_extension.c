@@ -14,7 +14,7 @@
 
 //! values for the priority for each callback
 typedef enum callback_priorities {
-    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 2
+    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
 } callback_priorities;
 
 //! region identifiers
@@ -187,7 +187,7 @@ static bool initialize(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP)) {
+            &infinite_run, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
