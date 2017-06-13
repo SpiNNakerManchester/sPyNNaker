@@ -35,7 +35,7 @@ def convert_param_to_numpy(param, no_atoms):
 
     # Deal with random distributions by generating values
     if globals_variables.get_simulator().is_a_pynn_random(param):
-        
+
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array
         param_value = param.next(n=no_atoms)
