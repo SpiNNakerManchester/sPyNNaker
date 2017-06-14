@@ -335,7 +335,29 @@ class RecordingCommon(object):
                 "bool"))
 
     def _reset(self):
-        self._population._vertex.set_recording_gsyn_excitatory(False)
-        self._population._vertex.set_recording_gsyn_inhibitory(False)
-        self._population._vertex.set_recording_spikes(False)
-        self._population._vertex.set_recording_v(False)
+        # get params
+        placements = globals_variables.get_simulator().placements
+        buffer_manager = globals_variables.get_simulator().buffer_manager
+        graph_mapper = globals_variables.get_simulator().graph_mapper
+
+        # check for gsyn inhib
+        if isinstance(
+                self._population._vertex, AbstractGSynInhibitoryRecordable):
+            self._population._vertex.clear_gsyn_inhibitory_recording(
+                buffer_manager, placements, graph_mapper)
+
+        # check for gsyn excit
+        if isinstance(
+                self._population._vertex, AbstractGSynExcitatoryRecordable):
+            self._population._vertex.clear_gsyn_excitatory_recording(
+                 buffer_manager, placements, graph_mapper)
+
+        # check for v
+        if isinstance(self._population._vertex, AbstractVRecordable):
+            self._population._vertex.clear_v_recording(
+                buffer_manager, placements, graph_mapper)
+
+        # check for spikes
+        if isinstance(self._population._vertex, AbstractSpikeRecordable):
+            self._population._vertex.clear_spike_recording(
+                buffer_manager, placements, graph_mapper)
