@@ -336,8 +336,26 @@ class RecordingCommon(object):
             lambda: numpy.repeat(filter_value, self._population.size).astype(
                 "bool"))
 
-    def _reset(self):
-        self._population._vertex.set_recording_gsyn_excitatory(False)
-        self._population._vertex.set_recording_gsyn_inhibitory(False)
-        self._population._vertex.set_recording_spikes(False)
-        self._population._vertex.set_recording_v(False)
+    def _turn_off_all_recording(self):
+        """
+        turns off recording, is used by a pop saying .record()
+        :rtype: None
+        """
+
+        # check for gsyn inhib
+        if isinstance(
+                self._population._vertex, AbstractGSynInhibitoryRecordable):
+            self._population._vertex.set_recording_gsyn_inhibitory(False)
+
+        # check for gsyn excit
+        if isinstance(
+                self._population._vertex, AbstractGSynExcitatoryRecordable):
+            self._population._vertex.set_recording_gsyn_excitatory(False)
+
+        # check for v
+        if isinstance(self._population._vertex, AbstractVRecordable):
+            self._population._vertex.set_recording_v(False)
+
+        # check for spikes
+        if isinstance(self._population._vertex, AbstractSpikeRecordable):
+            self._population._vertex.set_recording_spikes(False)
