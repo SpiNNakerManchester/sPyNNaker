@@ -20,6 +20,7 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
+#include "profile_tags.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -42,10 +43,7 @@ typedef enum regions_e{
     POPULATION_TABLE_REGION,
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
-    BUFFERING_OUT_SPIKE_RECORDING_REGION,
-    BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-    BUFFERING_OUT_GSYN_RECORDING_REGION,
-    BUFFERING_OUT_CONTROL_REGION,
+    RECORDING_REGION,
     PROVENANCE_DATA_REGION,
     PROFILER_REGION
 } regions_e;

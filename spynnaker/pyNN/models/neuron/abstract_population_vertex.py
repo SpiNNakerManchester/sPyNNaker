@@ -33,8 +33,6 @@ from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.interface.profiling.abstract_has_profile_data \
-    import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.abstract_models\
     .abstract_rewrites_data_specification\
@@ -91,8 +89,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractHasProfileData):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -135,7 +132,6 @@ class AbstractPopulationVertex(
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
-        AbstractHasProfileData.__init__(self)
         AbstractHasGlobalMaxAtoms.__init__(self)
         AbstractAcceptsIncomingSynapses.__init__(self)
         ProvidesKeyToAtomMappingImpl.__init__(self)
@@ -212,8 +208,6 @@ class AbstractPopulationVertex(
         self._change_requires_neuron_parameters_reload = False
 
         # Set up for profiling
-        self._profile_enabled = helpful_functions.read_config_boolean(
-            config, "Mode", "enable_profiling")
         self._n_profile_samples = helpful_functions.read_config_int(
             config, "Mode", "n_profile_samples")
 
@@ -439,14 +433,6 @@ class AbstractPopulationVertex(
         profile_utils.reserve_profile_region(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
-
-    def get_profiling_data(self, txrx, placements, graph_mapper):
-        return profile_utils.get_profiling_data(
-            constants.POPULATION_BASED_REGIONS.PROFILING.value,
-            self._PROFILE_TAG_LABELS,
-            self._machine_time_step,
-            (self._machine_time_step * self._no_machine_time_steps) / 1000.0,
-            txrx, placements, graph_mapper)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
