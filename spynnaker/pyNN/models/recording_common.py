@@ -336,7 +336,7 @@ class RecordingCommon(object):
 
     def _turn_off_all_recording(self):
         """
-        turns off reocrding, is used by a pop saying .record()
+        turns off recording, is used by a pop saying .record()
         :rtype: None
         """
 
