@@ -1,7 +1,5 @@
-from pacman.model.graphs.application.impl.application_edge import  \
-    ApplicationEdge
-from spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge \
-    import DelayAfferentMachineEdge
+from pacman.model.graphs.application import ApplicationEdge
+from .delay_afferent_machine_edge import DelayAfferentMachineEdge
 
 
 class DelayAfferentApplicationEdge(ApplicationEdge):

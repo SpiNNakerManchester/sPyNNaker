@@ -1,16 +1,17 @@
-from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics \
-    import AbstractSynapseDynamics
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
     """
     AbstractPlasticSynapseDynamics : synapses which change over time
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def get_n_words_for_plastic_connections(self, n_connections):

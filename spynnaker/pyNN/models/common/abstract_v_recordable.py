@@ -1,12 +1,14 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractVRecordable(object):
     """ Indicates that membrane voltage can be recorded from this object
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def is_recording_v(self):
@@ -17,8 +19,18 @@ class AbstractVRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_v(self):
+    def set_recording_v(self, new_state=True):
         """ Sets v to being recorded
+        """
+
+    @abstractmethod
+    def clear_v_recording(self, buffer_manager, placements, graph_mapper):
+        """ clears the recorded data from the object
+
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :rtype: None
         """
 
     @abstractmethod

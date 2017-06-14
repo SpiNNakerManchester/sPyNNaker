@@ -63,7 +63,7 @@ typedef enum callback_priorities{
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 3
+#define NUMBER_OF_REGIONS_TO_RECORD 4
 
 // Globals
 
@@ -81,23 +81,11 @@ static uint32_t infinite_run;
 static uint32_t recording_flags = 0;
 
 //! \brief Initialises the recording parts of the model
+//! \param[in] recording_address: the address in sdram where to store
+//! recordings
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(){
-    address_t address = data_specification_get_data_address();
-    address_t system_region = data_specification_get_region(
-        SYSTEM_REGION, address);
-    regions_e regions_to_record[] = {
-        BUFFERING_OUT_SPIKE_RECORDING_REGION,
-        BUFFERING_OUT_POTENTIAL_RECORDING_REGION,
-        BUFFERING_OUT_GSYN_RECORDING_REGION
-    };
-    uint8_t n_regions_to_record = NUMBER_OF_REGIONS_TO_RECORD;
-    uint32_t *recording_flags_from_system_conf =
-        &system_region[
-            SIMULATION_N_TIMING_DETAIL_WORDS + PROFILER_N_HEADER_WORDS];
-    regions_e state_region = BUFFERING_OUT_CONTROL_REGION;
-
-    bool success = recording_initialize(recording_region, &recording_flags);
+static bool initialise_recording(address_t recording_address){
+    bool success = recording_initialize(recording_address, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
     return success;
 }
@@ -136,13 +124,16 @@ static bool initialise(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP_AND_DMA_AND_USER, c_main_store_provenance_data,
-            data_specification_get_region(PROVENANCE_DATA_REGION, address))) {
+            &infinite_run, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER)) {
         return false;
     }
+    simulation_set_provenance_function(
+        c_main_store_provenance_data,
+        data_specification_get_region(PROVENANCE_DATA_REGION, address));
 
     // setup recording region
-    if (!initialise_recording()){
+    if (!initialise_recording(
+            data_specification_get_region(RECORDING_REGION, address))){
         return false;
     }
 
@@ -156,19 +147,21 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up the synapses
-    input_t *input_buffers;
+    synapse_param_t *neuron_synapse_shaping_params;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address;
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
-            n_neurons, &input_buffers,
+            n_neurons, &neuron_synapse_shaping_params,
             &ring_buffer_to_input_buffer_left_shifts,
             &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
-    neuron_set_input_buffers(input_buffers);
+
+    // set the neuron up properly
+    neuron_set_neuron_synapse_shaping_params(neuron_synapse_shaping_params);
 
     // Set up the population table
     uint32_t row_max_n_words;
@@ -187,7 +180,7 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
+            row_max_n_words, MC, SDP_AND_DMA_AND_USER,
             incoming_spike_buffer_size)) {
         return false;
     }
@@ -201,8 +194,19 @@ static bool initialise(uint32_t *timer_period) {
     return true;
 }
 
+//! \brief the function to call when resuming a simulation
+//! return None
 void resume_callback() {
     recording_reset();
+
+    // try reloading neuron parameters
+    address_t address = data_specification_get_data_address();
+    if (!neuron_reload_neuron_parameters(
+            data_specification_get_region(
+                NEURON_PARAMS_REGION, address))) {
+        log_error("failed to reload the neuron parameters.");
+        rt_error(RTE_SWERR);
+    }
 }
 
 //! \brief Timer interrupt callback
@@ -225,6 +229,11 @@ void timer_callback(uint timer_count, uint unused) {
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
         log_info("Completed a run");
+
+        // rewrite neuron params to sdram for reading out if needed
+        address_t address = data_specification_get_data_address();
+        neuron_store_neuron_parameters(
+            data_specification_get_region(NEURON_PARAMS_REGION, address));
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
