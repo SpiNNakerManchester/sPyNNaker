@@ -799,6 +799,9 @@ class SynapticManager(object):
 
         self._weight_scales[placement] = weight_scales
 
+    def clear_connection_cache(self):
+        self._retrieved_blocks = dict()
+
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step):
