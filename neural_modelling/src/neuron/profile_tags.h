@@ -1,4 +1,3 @@
-
 // Profiler tags
 #define PROFILER_TIMER                    0
 #define PROFILER_DMA_READ                 1
