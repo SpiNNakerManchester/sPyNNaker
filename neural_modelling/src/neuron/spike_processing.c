@@ -197,9 +197,7 @@ void _user_event_callback(uint unused0, uint unused1) {
 }
 
 // Called when a DMA completes
-void _dma_complete_callback(uint unused, uint tag) {
-    use(unused);
-
+void _dma_complete_callback(uint id, uint tag) {
     log_debug("DMA transfer complete with tag %u", tag);
 
     // If this DMA is the result of a read

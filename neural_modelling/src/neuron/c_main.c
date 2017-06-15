@@ -95,7 +95,7 @@ uint32_t count_rewires = 0;
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(address_t recording_address){
     bool success = recording_initialize(recording_address, &recording_flags);
-    log_info("Recording flags = 0x%08x", recording_flags);
+    log_debug("Recording flags = 0x%08x", recording_flags);
     return success;
 }
 
@@ -119,7 +119,7 @@ void c_main_store_provenance_data(address_t provenance_region){
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(uint32_t *timer_period) {
-    log_info("Initialise: started");
+    log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
@@ -203,7 +203,7 @@ static bool initialise(uint32_t *timer_period) {
             incoming_spike_buffer_size)) {
         return false;
     }
-    log_info("Initialise: finished");
+    log_debug("Initialise: finished");
     return true;
 }
 
@@ -240,7 +240,7 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
-        log_info("Completed a run");
+        log_debug("Completed a run");
 
         // rewrite neuron params to sdram for reading out if needed
         address_t address = data_specification_get_data_address();
@@ -253,7 +253,7 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
-            log_info("updating recording regions");
+            log_debug("updating recording regions");
             recording_finalise();
         }
 
@@ -261,7 +261,7 @@ void timer_callback(uint timer_count, uint unused) {
         // run
         time -= 1;
 
-        log_info("Rewire tries = %d", count_rewires);
+        log_debug("Rewire tries = %d", count_rewires);
 
         return;
     }
@@ -305,7 +305,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    log_info("setting timer tick callback for %d microseconds",
+    log_debug("setting timer tick callback for %d microseconds",
               timer_period);
     spin1_set_timer_tick(timer_period);
 
