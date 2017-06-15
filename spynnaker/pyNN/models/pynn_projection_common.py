@@ -267,6 +267,10 @@ class PyNNProjectionCommon(object):
         connection_holder.finish()
         return connection_holder
 
+    def _clear_cache(self):
+        post_vertex = self._projection_edge.post_vertex
+        post_vertex.clear_connection_cache()
+
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)
 
