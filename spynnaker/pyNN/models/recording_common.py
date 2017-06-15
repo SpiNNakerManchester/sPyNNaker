@@ -98,10 +98,10 @@ class RecordingCommon(object):
                 "This population does not support the recording of gsyn exc")
         if not isinstance(
                 self._population._vertex.input_type, InputTypeConductance):
-            logger_utils.warn_once(logger,
-                "You are trying to record the excitatory conductance from a "
-                "model which does not use conductance input.  You will "
-                "receive current measurements instead.")
+            msg = "You are trying to record the excitatory conductance from " \
+                  "a model which does not use conductance input.  You will " \
+                  "receive current measurements instead."
+            logger_utils.warn_once(logger, msg)
 
         self._population._vertex.set_recording_gsyn_excitatory()
 
@@ -118,10 +118,10 @@ class RecordingCommon(object):
                 "inhibitory gsyn")
         if not isinstance(
                 self._population._vertex.input_type, InputTypeConductance):
-            logger_utils.warn_once(logger,
-                "You are trying to record the inhibitory conductance from a "
-                "model which does not use conductance input.  You will "
-                "receive current measurements instead.")
+            msg = "You are trying to record the inhibitory conductance from " \
+                  "a model which does not use conductance input.  You will " \
+                  "receive current measurements instead."
+            logger_utils.warn_once(logger, msg)
 
         self._population._vertex.set_recording_gsyn_inhibitory()
 
