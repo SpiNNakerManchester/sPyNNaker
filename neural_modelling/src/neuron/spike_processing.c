@@ -3,6 +3,7 @@
 #include "synapse_row.h"
 #include "synapses.h"
 #include "../common/in_spikes.h"
+#include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
 #include "structural_plasticity/synaptogenesis_dynamics.h"
@@ -196,8 +197,10 @@ void _user_event_callback(uint unused0, uint unused1) {
 }
 
 // Called when a DMA completes
-void _dma_complete_callback(uint id, uint tag) {
-    log_debug("DMA transfer complete with tag %u for id %d", tag, id);
+void _dma_complete_callback(uint unused, uint tag) {
+    use(unused);
+
+    log_debug("DMA transfer complete with tag %u", tag);
 
     // If this DMA is the result of a read
     if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
@@ -264,8 +267,7 @@ void _dma_complete_callback(uint id, uint tag) {
 
 bool spike_processing_initialise(
         size_t row_max_n_words, uint mc_packet_callback_priority,
-        uint dma_transfer_callback_priority, uint user_event_priority,
-        uint incoming_spike_buffer_size) {
+        uint user_event_priority, uint incoming_spike_buffer_size) {
 
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
@@ -296,8 +298,8 @@ bool spike_processing_initialise(
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
             _multicast_packet_received_callback, mc_packet_callback_priority);
-    spin1_callback_on(DMA_TRANSFER_DONE, _dma_complete_callback,
-                      dma_transfer_callback_priority);
+    simulation_dma_transfer_done_callback_on(
+        DMA_TAG_READ_SYNAPTIC_ROW, _dma_complete_callback);
     spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;
