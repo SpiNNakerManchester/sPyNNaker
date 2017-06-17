@@ -22,6 +22,7 @@
 #include "../../../common/neuron-typedefs.h"
 #include "../../../common/maths-util.h"
 #include "../../../common/sp_structs.h"
+#include "simulation.h"
 
 
 
@@ -38,10 +39,10 @@ int (*number_of_connections_in_row)(address_t);
 // Structures and global data
 //---------------------------------------
 // DMA tags
-#define DMA_TAG_READ_SYNAPTIC_ROW 0
-#define DMA_TAG_WRITE_PLASTIC_REGION 1
-#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
-#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
+//#define DMA_TAG_READ_SYNAPTIC_ROW 0
+//#define DMA_TAG_WRITE_PLASTIC_REGION 1
+#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 5
+#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 7
 
 #define MAX_SHORT 65535
 
@@ -115,6 +116,9 @@ static int my_abs(int a){
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
     log_info("SR init.");
+    log_info("Registering DMA callback");
+    simulation_dma_transfer_done_callback_on(DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_restructure);
+    log_info("Callback registered");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
@@ -274,7 +278,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     log_debug("Reading %d bytes from %d saved %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
-    spin1_dma_transfer(
+    int id = spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         n_bytes);
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
@@ -316,7 +320,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 // Might need a function for rewiring. One to be called by the timer to generate
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
-void synaptic_row_restructure(uint dma_id){
+void synaptic_row_restructure(uint dma_id, uint dma_tag){
     // If I am here, then the DMsynaptic_row_addressA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
 

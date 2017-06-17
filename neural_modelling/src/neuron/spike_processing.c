@@ -6,7 +6,6 @@
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
-#include "structural_plasticity/synaptogenesis_dynamics.h"
 
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
@@ -14,8 +13,6 @@
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW 0
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
-#define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 2
-#define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 3
 
 // DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -197,67 +194,48 @@ void _user_event_callback(uint unused0, uint unused1) {
 }
 
 // Called when a DMA completes
-void _dma_complete_callback(uint id, uint tag) {
+void _dma_complete_callback(uint unused, uint tag) {
+    use(unused);
+
     log_debug("DMA transfer complete with tag %u", tag);
 
-    // If this DMA is the result of a read
-    if (tag == DMA_TAG_READ_SYNAPTIC_ROW) {
+    // Get pointer to current buffer
+    uint32_t current_buffer_index = buffer_being_read;
+    dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
-        // Get pointer to current buffer
-        uint32_t current_buffer_index = buffer_being_read;
-        dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
+    // Start the next DMA transfer, so it is complete when we are finished
+    _setup_synaptic_dma_read();
 
-        // Start the next DMA transfer, so it is complete when we are finished
-        _setup_synaptic_dma_read();
+    // Process synaptic row repeatedly
+    bool subsequent_spikes;
+    do {
 
-        // Process synaptic row repeatedly
-        bool subsequent_spikes;
-        do {
+        // Are there any more incoming spikes from the same pre-synaptic
+        // neuron?
+        subsequent_spikes = in_spikes_is_next_spike_equal(
+            current_buffer->originating_spike);
 
-            // Are there any more incoming spikes from the same pre-synaptic
-            // neuron?
-            subsequent_spikes = in_spikes_is_next_spike_equal(
-                current_buffer->originating_spike);
+        // Process synaptic row, writing it back if it's the last time
+        // it's going to be processed
+        if (!synapses_process_synaptic_row(time, current_buffer->row,
+                                      !subsequent_spikes,
+                                      current_buffer_index)) {
+            log_error(
+                "Error processing spike 0x%.8x for address 0x%.8x"
+                "(local=0x%.8x)",
+                current_buffer->originating_spike,
+                current_buffer->sdram_writeback_address,
+                current_buffer->row);
 
-            // Process synaptic row, writing it back if it's the last time
-            // it's going to be processed
-            if (!synapses_process_synaptic_row(time, current_buffer->row,
-                                          !subsequent_spikes,
-                                          current_buffer_index)) {
-                log_error(
-                    "Error processing spike 0x%.8x for address 0x%.8x"
-                    "(local=0x%.8x)",
-                    current_buffer->originating_spike,
-                    current_buffer->sdram_writeback_address,
-                    current_buffer->row);
-
-                // Print out the row for debugging
-                for (uint32_t i = 0;
-                        i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                    log_error("%u: 0x%.8x", i, current_buffer->row[i]);
-                }
-
-                rt_error(RTE_SWERR);
+            // Print out the row for debugging
+            for (uint32_t i = 0;
+                    i < (current_buffer->n_bytes_transferred >> 2); i++) {
+                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
             }
-        } while (subsequent_spikes);
 
-    } else if (tag == DMA_TAG_WRITE_PLASTIC_REGION) {
-
-        // Do Nothing
-
-    } else if (tag == DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
-
-        synaptic_row_restructure(id);
-
-    } else if (tag == DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING){
-
-        // Do Nothing
-
-    } else {
-
-        // Otherwise, if it ISN'T the result of a plastic region write
-        log_error("Invalid tag %d received in DMA", tag);
-    }
+            rt_error(RTE_SWERR);
+        }
+    } while (subsequent_spikes);
 }
 
 
