@@ -1,10 +1,11 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.common.abstract_recordable import AbstractRecordable
 
 
 @add_metaclass(AbstractBase)
-class AbstractSpikeRecordable(object):
+class AbstractSpikeRecordable(AbstractRecordable):
     """ Indicates that spikes can be recorded from this object
     """
 

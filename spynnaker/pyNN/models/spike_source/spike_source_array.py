@@ -18,6 +18,10 @@ from spinn_front_end_common.abstract_models.impl\
 from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import AbstractVRecordable
+from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
+from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
+from spynnaker.pyNN.models.common import AbstractRecordable
 from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
 from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
@@ -198,6 +202,19 @@ class SpikeSourceArray(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
+
+    @overrides(AbstractRecordable.recordable)
+    def recordable(self):
+        variables = list()
+        if isinstance(self. AbstractSpikeRecordable):
+            variables.append('spikes')
+        if isinstance(self, AbstractVRecordable):
+            variables.append('v')
+        if isinstance(self, AbstractGSynExcitatoryRecordable):
+           variables.append('gsyn_exc')
+        if isinstance(self, AbstractGSynInhibitoryRecordable):
+            variables.append('gsyn_inh')
+        return variables
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=sys.maxint):
