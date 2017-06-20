@@ -1,10 +1,11 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.common.recordable import Recordable
 
 
 @add_metaclass(AbstractBase)
-class AbstractGSynInhibitoryRecordable(object):
+class AbstractGSynInhibitoryRecordable(Recordable):
     """ Indicates that conductance can be recorded from this object
     """
 
