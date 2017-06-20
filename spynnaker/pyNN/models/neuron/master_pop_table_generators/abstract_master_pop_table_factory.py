@@ -27,7 +27,7 @@ class AbstractMasterPopTableFactory(object):
         :type master_pop_base_mem_address: int
         :type chip_y: int
         :type chip_x: int
-        :type txrx: spinnman.transciever.Transciever object
+        :type txrx: spinnman.transceiver.Transceiver object
         :return: a synaptic matrix memory position.
         """
 
