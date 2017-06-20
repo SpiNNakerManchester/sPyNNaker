@@ -47,7 +47,6 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractVRecordable
 from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
 from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
-from spynnaker.pyNN.models.common import AbstractRecordable
 from spynnaker.pyNN.models.common import SpikeRecorder, VRecorder
 from spynnaker.pyNN.models.common import GsynExcitatoryRecorder
 from spynnaker.pyNN.models.common import GsynInhibitoryRecorder
@@ -911,19 +910,6 @@ class AbstractPopulationVertex(
             raise InvalidParameterType(
                 "The parameter {} does not exist in this input "
                 "conductance component".format(variable))
-
-    @overrides(AbstractRecordable.recordable)
-    def recordable(self):
-        variables = list()
-        if isinstance(self. AbstractSpikeRecordable):
-            variables.append('spikes')
-        if isinstance(self, AbstractVRecordable):
-            variables.append('v')
-        if isinstance(self, AbstractGSynExcitatoryRecordable):
-            variables.append('gsyn_exc')
-        if isinstance(self, AbstractGSynInhibitoryRecordable):
-            variables.append('gsyn_inh')
-        return variables
 
     def describe(self):
         """

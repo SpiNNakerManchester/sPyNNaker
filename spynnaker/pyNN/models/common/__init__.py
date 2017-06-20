@@ -5,7 +5,6 @@ from .abstract_gsyn_inhibitory_recordable \
 from .abstract_spike_recordable import AbstractSpikeRecordable
 from .abstract_uint32_recorder import AbstractUInt32Recorder
 from .abstract_v_recordable import AbstractVRecordable
-from .abstract_recordable import AbstractRecordable
 from .eieio_spike_recorder import EIEIOSpikeRecorder
 from .gsyn_excitatory_recorder import GsynExcitatoryRecorder
 from .gsyn_inhibitory_recorder import GsynInhibitoryRecorder
@@ -18,7 +17,7 @@ from .v_recorder import VRecorder
 
 __all__ = ["AbstractGSynExcitatoryRecordable", "AbstractUInt32Recorder",
            "AbstractGSynInhibitoryRecordable", "AbstractSpikeRecordable",
-           "AbstractVRecordable", "AbstractRecordable", "EIEIOSpikeRecorder",
+           "AbstractVRecordable", "EIEIOSpikeRecorder",
            "GsynExcitatoryRecorder", "GsynInhibitoryRecorder",
            "MultiSpikeRecorder", "SimplePopulationSettable", "SpikeRecorder",
            "VRecorder", "get_buffer_sizes", "get_data", "needs_buffering",
