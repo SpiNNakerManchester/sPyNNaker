@@ -49,3 +49,7 @@ class AbstractGSynInhibitoryRecordable(Recordable):
                 (neuron_id, time, gsyn_E, gsyn_I)\
                 ordered by time
         """
+
+    @staticmethod
+    def get_recordable_variable():
+        return "gsyn_inh"

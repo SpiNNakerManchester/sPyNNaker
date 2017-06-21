@@ -49,3 +49,8 @@ class AbstractVRecordable(Recordable):
         :return: A numpy array of 3-element arrays of (neuron_id, time, v)\
                 ordered by time
         """
+
+    @staticmethod
+    def get_recordable_variable():
+        return "v"
+

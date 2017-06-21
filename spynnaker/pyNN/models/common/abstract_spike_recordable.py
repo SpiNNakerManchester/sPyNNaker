@@ -46,3 +46,7 @@ class AbstractSpikeRecordable(Recordable):
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time
         """
+
+    @staticmethod
+    def get_recordable_variable():
+        return "spikes"
