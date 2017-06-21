@@ -5,8 +5,7 @@ import ConfigParser
 from spinn_front_end_common.interface.abstract_spinnaker_base \
     import AbstractSpinnakerBase
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs.executable_finder \
-    import ExecutableFinder
+from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spynnaker.pyNN.utilities.spynnaker_failed_state \
     import SpynnakerFailedState
 

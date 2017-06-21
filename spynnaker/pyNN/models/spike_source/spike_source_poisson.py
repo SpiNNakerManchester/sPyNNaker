@@ -15,30 +15,22 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
 
-from spinn_front_end_common.abstract_models. \
-    abstract_changable_after_run import AbstractChangableAfterRun
-from spinn_front_end_common.abstract_models. \
-    abstract_provides_outgoing_partition_constraints import \
-    AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models import \
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
-    import AbstractGeneratesDataSpecification
+from spinn_front_end_common.abstract_models \
+    import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
-from spinn_front_end_common.abstract_models\
-    .abstract_rewrites_data_specification \
+from spinn_front_end_common.abstract_models \
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
-    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
+    import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs.executable_start_type \
-    import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -48,7 +40,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+from spynnaker.pyNN.models.abstract_models\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable

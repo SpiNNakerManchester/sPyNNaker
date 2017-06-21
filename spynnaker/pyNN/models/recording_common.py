@@ -1,5 +1,5 @@
 from spinn_utilities import logger_utils
-from spinn_front_end_common.utilities import exceptions as fec_excceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException 
 from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
@@ -64,7 +64,7 @@ class RecordingCommon(object):
             self._set_v_recording()
             self._set_spikes_recording()
         else:
-            raise fec_excceptions.ConfigurationException(
+            raise ConfigurationException(
                 "The variable {} is not supported by the record method. "
                 "Currently supported variables are: 'gsyn_exc', 'gsyn_inh',"
                 " 'v', 'spikes', 'all'".format(variable))
@@ -183,7 +183,7 @@ class RecordingCommon(object):
         elif variable == "spikes":
             return self._get_spikes()
         else:
-            raise fec_excceptions.ConfigurationException(
+            raise ConfigurationException(
                 "The variable {} is not supported by the get method. "
                 "Currently supported variables are: "
                 "'gsyn_exc', 'gsyn_inh', 'v', 'spikes'".format(variable))
@@ -195,13 +195,12 @@ class RecordingCommon(object):
         """
 
         # check we're in a state where we can get spikes
-        if isinstance(self._population._vertex, AbstractSpikeRecordable):
-            if not self._population._vertex.is_recording_spikes():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record spikes")
-        else:
-            raise fec_excceptions.ConfigurationException(
+        if not isinstance(self._population._vertex, AbstractSpikeRecordable):
+            raise ConfigurationException(
                 "This population has not got the capability to record spikes")
+        if not self._population._vertex.is_recording_spikes():
+            raise ConfigurationException(
+                "This population has not been set to record spikes")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
@@ -229,14 +228,13 @@ class RecordingCommon(object):
         :return: the voltages
         """
 
-        # check that we're ina  state to get voltages
-        if isinstance(self._population._vertex, AbstractVRecordable):
-            if not self._population._vertex.is_recording_v():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record v")
-        else:
-            raise fec_excceptions.ConfigurationException(
+        # check that we're in a state to get voltages
+        if not isinstance(self._population._vertex, AbstractVRecordable):
+            raise ConfigurationException(
                 "This population has not got the capability to record v")
+        if not self._population._vertex.is_recording_v():
+            raise ConfigurationException(
+                "This population has not been set to record v")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
@@ -264,16 +262,14 @@ class RecordingCommon(object):
 
         :return: the gsyn excitatory values
         """
-        if isinstance(
+        if not isinstance(
                 self._population._vertex, AbstractGSynExcitatoryRecordable):
-            if not self._population._vertex.is_recording_gsyn_excitatory():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record gsyn "
-                    "excitatory")
-        else:
-            raise fec_excceptions.ConfigurationException(
+            raise ConfigurationException(
                 "This population has not got the capability to record gsyn "
                 "excitatory")
+        if not self._population._vertex.is_recording_gsyn_excitatory():
+            raise ConfigurationException(
+                "This population has not been set to record gsyn excitatory")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
@@ -299,16 +295,14 @@ class RecordingCommon(object):
 
         :return: the gsyn inhibitory values
         """
-        if isinstance(
+        if not isinstance(
                 self._population._vertex, AbstractGSynInhibitoryRecordable):
-            if not self._population._vertex.is_recording_gsyn_inhibitory():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record gsyn "
-                    "inhibitory")
-        else:
-            raise fec_excceptions.ConfigurationException(
+            raise ConfigurationException(
                 "This population has not got the capability to record gsyn "
                 "inhibitory")
+        if not self._population._vertex.is_recording_gsyn_inhibitory():
+            raise ConfigurationException(
+                "This population has not been set to record gsyn inhibitory")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(

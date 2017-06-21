@@ -3,8 +3,7 @@ import logging
 
 from data_specification.enums.data_type import DataType
 
-from spinn_front_end_common.utilities.utility_objs.provenance_data_item \
-    import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 logger = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions.\
-    front_end_common_graph_data_specification_writer import \
+    graph_data_specification_writer import \
     FrontEndCommonGraphDataSpecificationWriter
 
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex

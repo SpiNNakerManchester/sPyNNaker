@@ -14,22 +14,16 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
 
-from spinn_front_end_common.abstract_models\
-    .abstract_provides_n_keys_for_partition \
+from spinn_front_end_common.abstract_models \
     import AbstractProvidesNKeysForPartition
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.utility_objs.executable_start_type \
-    import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
 
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
-from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models \
+    import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
     import DelayExtensionMachineVertex
 from spynnaker.pyNN.utilities import constants
