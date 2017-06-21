@@ -4,6 +4,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 abstractstaticmethod = abstractmethod
 
+
 @add_metaclass(AbstractBase)
 class Recordable(object):
     """ Indicates that spikes can be recorded from this object
@@ -49,9 +50,9 @@ class Recordable(object):
         """
         # This version only calls the direct subclasses of recordable.
         # So each abstract_x_recordable.get_recordable_variable()
-            # is only called once
+        #   is only called once
         # But would fail if a abstract_x_recordable indirectly inherits
-            # Recordsble
+        #   Recordsble
         if not isinstance(aclass, type):
             aclass = type(aclass)
         variables = list()

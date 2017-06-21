@@ -53,4 +53,3 @@ class AbstractVRecordable(Recordable):
     @staticmethod
     def get_recordable_variable():
         return "v"
-
