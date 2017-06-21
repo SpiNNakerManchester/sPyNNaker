@@ -434,6 +434,10 @@ void neuron_do_timestep_update(timer_t time) {
         }
     }
 
+    // Disable interrupts to avoid possible concurrent access
+    uint cpsr = 0;
+    cpsr = spin1_int_disable();
+
     // record neuron state (membrane potential) if needed
     if (recording_is_channel_enabled(recording_flags, V_RECORDING_CHANNEL)) {
         n_recordings_outstanding += 1;
@@ -443,7 +447,7 @@ void neuron_do_timestep_update(timer_t time) {
             recording_done_callback);
     }
 
-    // record neuron inputs if needed
+    // record neuron inputs (excitatory) if needed
     if (recording_is_channel_enabled(
             recording_flags, GSYN_EXCITATORY_RECORDING_CHANNEL)) {
         n_recordings_outstanding += 1;
@@ -453,7 +457,7 @@ void neuron_do_timestep_update(timer_t time) {
             recording_done_callback);
     }
 
-    // record neuron inputs if needed
+    // record neuron inputs (inhibitory) if needed
     if (recording_is_channel_enabled(
             recording_flags, GSYN_INHIBITORY_RECORDING_CHANNEL)) {
         n_recordings_outstanding += 1;
@@ -476,4 +480,7 @@ void neuron_do_timestep_update(timer_t time) {
                 SPIKE_RECORDING_CHANNEL, time, recording_done_callback);
         }
     }
+
+    // Re-enable interrupts
+    spin1_mode_restore(cpsr);
 }

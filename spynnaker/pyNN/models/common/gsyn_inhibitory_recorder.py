@@ -31,12 +31,12 @@ class GsynInhibitoryRecorder(AbstractUInt32Recorder):
     def get_dtcm_usage_in_bytes(self):
         if not self._record_gsyn_inhibitory:
             return 0
-        return 4
+        return self.N_BYTES_PER_NEURON
 
     def get_n_cpu_cycles(self, n_neurons):
         if not self._record_gsyn_inhibitory:
             return 0
-        return n_neurons * self.N_BYTES_PER_NEURON
+        return n_neurons * self.N_CPU_CYCLES_PER_NEURON
 
     def get_gsyn_inhibitory(
             self, label, buffer_manager, region, placements, graph_mapper,
