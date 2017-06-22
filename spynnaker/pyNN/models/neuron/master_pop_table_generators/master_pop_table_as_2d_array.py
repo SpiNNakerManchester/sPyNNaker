@@ -12,7 +12,7 @@ from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
 from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 
 # general imports

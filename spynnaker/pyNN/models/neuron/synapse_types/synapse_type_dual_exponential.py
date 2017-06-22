@@ -8,7 +8,7 @@ from .abstract_synapse_type import AbstractSynapseType
 
 from spynnaker.pyNN.utilities import utility_calls
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 from enum import Enum
 

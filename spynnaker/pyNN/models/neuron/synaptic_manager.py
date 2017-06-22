@@ -20,7 +20,7 @@ from spinn_front_end_common.utilities.helpful_functions \
 from spinn_front_end_common.utilities import globals_variables
 
 # dsg
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 # spynnaker
 from spynnaker.pyNN.exceptions import SynapticConfigurationException

@@ -1,7 +1,7 @@
 import math
 import logging
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 

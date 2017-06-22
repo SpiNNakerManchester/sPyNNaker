@@ -5,7 +5,7 @@ from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_synapse_type import AbstractSynapseType
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 import numpy
 from enum import Enum

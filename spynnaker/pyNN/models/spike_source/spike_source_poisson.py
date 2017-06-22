@@ -5,7 +5,7 @@ import random
 import numpy
 from enum import Enum
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \

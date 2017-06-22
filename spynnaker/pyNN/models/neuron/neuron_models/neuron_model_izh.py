@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.utilities import utility_calls
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 from enum import Enum
 
