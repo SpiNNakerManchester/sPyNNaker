@@ -1,10 +1,11 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.common.recordable import Recordable
 
 
 @add_metaclass(AbstractBase)
-class AbstractVRecordable(object):
+class AbstractVRecordable(Recordable):
     """ Indicates that membrane voltage can be recorded from this object
     """
 
@@ -48,3 +49,7 @@ class AbstractVRecordable(object):
         :return: A numpy array of 3-element arrays of (neuron_id, time, v)\
                 ordered by time
         """
+
+    @staticmethod
+    def get_recordable_variable():
+        return "v"

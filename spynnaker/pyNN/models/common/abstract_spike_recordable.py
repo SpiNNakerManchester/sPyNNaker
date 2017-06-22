@@ -1,10 +1,11 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.models.common.recordable import Recordable
 
 
 @add_metaclass(AbstractBase)
-class AbstractSpikeRecordable(object):
+class AbstractSpikeRecordable(Recordable):
     """ Indicates that spikes can be recorded from this object
     """
 
@@ -45,3 +46,7 @@ class AbstractSpikeRecordable(object):
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time
         """
+
+    @staticmethod
+    def get_recordable_variable():
+        return "spikes"
