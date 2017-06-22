@@ -158,10 +158,10 @@ class PyNNProjectionCommon(object):
 
         :param pre_synaptic_vertex: the source vertex of the multapse
         :type pre_synaptic_vertex: instance of\
-                pacman.model.graph.application.abstract_application_vertex
+                pacman.model.graph.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex: instance of\
-                pacman.model.graph.application.abstract_application_vertex
+                pacman.model.graph.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
 

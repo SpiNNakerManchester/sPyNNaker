@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints

@@ -1,4 +1,4 @@
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from spinn_front_end_common.utilities.helpful_functions \
     import locate_memory_region_for_placement
 from pacman.model.graphs.machine import MachineVertex

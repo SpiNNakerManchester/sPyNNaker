@@ -9,7 +9,7 @@ from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
 from pacman.model.constraints.partitioner_constraints \
     import PartitionerSameSizeAsVertexConstraint
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource

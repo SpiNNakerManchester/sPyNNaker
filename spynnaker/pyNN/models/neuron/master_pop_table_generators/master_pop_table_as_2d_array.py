@@ -2,7 +2,7 @@
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorFixedFieldConstraint, KeyAllocatorFixedMaskConstraint
-from pacman.utilities.utility_objs.field import Field
+from pacman.utilities.utility_objs import Field
 
 # spynnaker imports
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory

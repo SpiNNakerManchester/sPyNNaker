@@ -1,5 +1,5 @@
 # pacman imports
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import MachineVertex
 
 # front end common imports

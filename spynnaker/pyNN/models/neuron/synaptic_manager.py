@@ -7,9 +7,8 @@ from scipy import special  # @UnresolvedImport
 import numpy
 
 # pacmna imports
-from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
-    AbstractHasGlobalMaxAtoms
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
+from pacman.model.graphs.common import Slice
 
 # spinn utils
 from spinn_utilities.helpful_functions import get_valid_components

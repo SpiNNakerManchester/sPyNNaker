@@ -1,4 +1,4 @@
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance \

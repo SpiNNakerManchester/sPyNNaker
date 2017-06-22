@@ -10,7 +10,7 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
     import KeyAllocatorContiguousRangeContraint
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
