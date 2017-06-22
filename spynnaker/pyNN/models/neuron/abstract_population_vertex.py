@@ -44,12 +44,8 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractVRecordable
-from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
-from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
-from spynnaker.pyNN.models.common import SpikeRecorder, VRecorder
-from spynnaker.pyNN.models.common import GsynExcitatoryRecorder
-from spynnaker.pyNN.models.common import GsynInhibitoryRecorder
+from spynnaker.pyNN.models.common import AbstractNeuronRecordable
+from spynnaker.pyNN.models.common import SpikeRecorder, NeuronRecorder
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
@@ -81,8 +77,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractContainsUnits,
-        AbstractSpikeRecordable, AbstractVRecordable,
-        AbstractGSynExcitatoryRecordable, AbstractGSynInhibitoryRecordable,
+        AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -99,6 +94,13 @@ class AbstractPopulationVertex(
     V_RECORDING_REGION = 1
     GSYN_EXCITATORY_RECORDING_REGION = 2
     GSYN_INHIBITORY_RECORDING_REGION = 3
+
+    RECORDING_REGION = {"spikes":0, "v":1, "gsyn_exc":2, "gsyn_inh":3}
+
+    VARIABLE_LONG = {"spikes":"spikes",
+                     "v": "membrane voltage",
+                     "gsyn_exc":"gsyn_excitatory",
+                     "gsyn_inh": "gsyn_inhibitory"}
 
     N_RECORDING_REGIONS = 4
 
@@ -124,9 +126,7 @@ class AbstractPopulationVertex(
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
-        AbstractVRecordable.__init__(self)
-        AbstractGSynInhibitoryRecordable.__init__(self)
-        AbstractGSynExcitatoryRecordable.__init__(self)
+        AbstractNeuronRecordable.__init__(self)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesIncomingPartitionConstraints.__init__(self)
         AbstractPopulationInitializable.__init__(self)
@@ -163,9 +163,7 @@ class AbstractPopulationVertex(
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder()
-        self._v_recorder = VRecorder()
-        self._gsyn_excitatory_recorder = GsynExcitatoryRecorder()
-        self._gsyn_inhibitory_recorder = GsynInhibitoryRecorder()
+        self._neuron_recorder = NeuronRecorder()
 
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
@@ -622,59 +620,22 @@ class AbstractPopulationVertex(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
-    @overrides(AbstractVRecordable.is_recording_v)
-    def is_recording_v(self):
-        return self._v_recorder.record_v
+    @overrides(AbstractNeuronRecordable.is_recording)
+    def is_recording(self, variable):
+        return self._neuron_recorder.is_recording(variable)
 
-    @overrides(AbstractVRecordable.set_recording_v)
-    def set_recording_v(self, new_state=True):
-        self._change_requires_mapping = not self._v_recorder.record_v
-        self._v_recorder.record_v = new_state
+    @overrides(AbstractNeuronRecordable.set_recording)
+    def set_recording(self, variable, new_state=True):
+        self._change_requires_mapping = not self.is_recording(variable)
+        self._neuron_recorder.set_recording(variable, new_state)
 
-    @overrides(AbstractVRecordable.get_v)
-    def get_v(self, n_machine_time_steps, placements, graph_mapper,
+    @overrides(AbstractNeuronRecordable.get_data)
+    def get_data(self, variable, n_machine_time_steps, placements, graph_mapper,
               buffer_manager, machine_time_step):
-        return self._v_recorder.get_v(
-            self.label, buffer_manager, self.V_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
-
-    @overrides(AbstractGSynExcitatoryRecordable.is_recording_gsyn_excitatory)
-    def is_recording_gsyn_excitatory(self):
-        return self._gsyn_excitatory_recorder.record_gsyn_excitatory
-
-    @overrides(AbstractGSynExcitatoryRecordable.set_recording_gsyn_excitatory)
-    def set_recording_gsyn_excitatory(self, new_state=True):
-        self._change_requires_mapping = \
-            not self._gsyn_excitatory_recorder.record_gsyn_excitatory
-        self._gsyn_excitatory_recorder.record_gsyn_excitatory = new_state
-
-    @overrides(AbstractGSynExcitatoryRecordable.get_gsyn_excitatory)
-    def get_gsyn_excitatory(
-            self, n_machine_time_steps, placements, graph_mapper,
-            buffer_manager, machine_time_step):
-        return self._gsyn_excitatory_recorder.get_gsyn_excitatory(
-            self._label, buffer_manager,
-            self.GSYN_EXCITATORY_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
-
-    @overrides(AbstractGSynInhibitoryRecordable.is_recording_gsyn_inhibitory)
-    def is_recording_gsyn_inhibitory(self):
-        return self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
-
-    @overrides(AbstractGSynInhibitoryRecordable.set_recording_gsyn_inhibitory)
-    def set_recording_gsyn_inhibitory(self, new_state=True):
-        self._change_requires_mapping = \
-            not self._gsyn_inhibitory_recorder.record_gsyn_inhibitory
-        self._gsyn_inhibitory_recorder.record_gsyn_inhibitory = new_state
-
-    @overrides(AbstractGSynInhibitoryRecordable.get_gsyn_inhibitory)
-    def get_gsyn_inhibitory(
-            self, n_machine_time_steps, placements, graph_mapper,
-            buffer_manager, machine_time_step):
-        return self._gsyn_inhibitory_recorder.get_gsyn_inhibitory(
-            self._label, buffer_manager,
-            self.GSYN_INHIBITORY_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
+        return self._neuron_recorder.get_data(
+            self.label, buffer_manager, self.RECORDING_REGION[variable],
+            placements, graph_mapper, self, machine_time_step,
+            self.VARIABLE_LONG[variable])
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
@@ -850,26 +811,12 @@ class AbstractPopulationVertex(
         return [KeyAllocatorContiguousRangeContraint()]
 
     @overrides(
-        AbstractGSynExcitatoryRecordable.clear_gsyn_excitatory_recording)
-    def clear_gsyn_excitatory_recording(
-            self, buffer_manager, placements, graph_mapper):
+        AbstractNeuronRecordable.clear_recording)
+    def clear_recording(
+            self, variable, buffer_manager, placements, graph_mapper):
         self._clear_recording_region(
             buffer_manager, placements, graph_mapper,
-            AbstractPopulationVertex.GSYN_EXCITATORY_RECORDING_REGION)
-
-    @overrides(
-        AbstractGSynInhibitoryRecordable.clear_gsyn_inhibitory_recording)
-    def clear_gsyn_inhibitory_recording(
-            self, buffer_manager, placements, graph_mapper):
-        self._clear_recording_region(
-            buffer_manager, placements, graph_mapper,
-            AbstractPopulationVertex.GSYN_INHIBITORY_RECORDING_REGION)
-
-    @overrides(AbstractVRecordable.clear_v_recording)
-    def clear_v_recording(self, buffer_manager, placements, graph_mapper):
-        self._clear_recording_region(
-            buffer_manager, placements, graph_mapper,
-            AbstractPopulationVertex.V_RECORDING_REGION)
+            self.RECORDING_REGION[variable])
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

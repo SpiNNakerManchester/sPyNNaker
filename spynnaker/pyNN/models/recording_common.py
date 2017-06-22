@@ -5,7 +5,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
 from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractVRecordable
+from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from collections import defaultdict
@@ -103,7 +103,7 @@ class RecordingCommon(object):
                   "receive current measurements instead."
             logger_utils.warn_once(logger, msg)
 
-        self._population._vertex.set_recording_gsyn_excitatory()
+        self._population._vertex.set_recording("gsyn_exc")
 
     def _set_gsyn_inh_recording(self):
         """ sets parameters etc that are used by the gsyn inh recording
@@ -123,19 +123,14 @@ class RecordingCommon(object):
                   "receive current measurements instead."
             logger_utils.warn_once(logger, msg)
 
-        self._population._vertex.set_recording_gsyn_inhibitory()
+        self._population._vertex.set_recording("gsyn_inh")
 
     def _set_v_recording(self):
         """ sets the parameters etc that are used by the v recording
 
         :return: None
         """
-
-        if not isinstance(self._population._vertex, AbstractVRecordable):
-            raise Exception(
-                "This population does not support the recording of v")
-
-        self._population._vertex.set_recording_v()
+        self._population._vertex.set_recording("v")
 
     def _set_spikes_recording(self):
         """ sets the parameters etc that are used by the spikes recording
@@ -230,13 +225,9 @@ class RecordingCommon(object):
         """
 
         # check that we're ina  state to get voltages
-        if isinstance(self._population._vertex, AbstractVRecordable):
-            if not self._population._vertex.is_recording_v():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record v")
-        else:
+        if not self._population._vertex.is_recording("v"):
             raise fec_excceptions.ConfigurationException(
-                "This population has not got the capability to record v")
+                "This population has not been set to record v")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
@@ -252,7 +243,7 @@ class RecordingCommon(object):
 
             # assuming we got here, everything is ok, so we should go get the
             # voltages
-        return self._population._vertex.get_v(
+        return self._population._vertex.get_data("v",
             globals_variables.get_simulator().no_machine_time_steps,
             globals_variables.get_simulator().placements,
             globals_variables.get_simulator().graph_mapper,
@@ -266,7 +257,7 @@ class RecordingCommon(object):
         """
         if isinstance(
                 self._population._vertex, AbstractGSynExcitatoryRecordable):
-            if not self._population._vertex.is_recording_gsyn_excitatory():
+            if not self._population._vertex.is_recording("gsyn_exc"):
                 raise fec_excceptions.ConfigurationException(
                     "This population has not been set to record gsyn "
                     "excitatory")
@@ -287,7 +278,7 @@ class RecordingCommon(object):
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        return self._population._vertex.get_gsyn_excitatory(
+        return self._population._vertex.get_data("gsyn_exc",
             globals_variables.get_simulator().no_machine_time_steps,
             globals_variables.get_simulator().placements,
             globals_variables.get_simulator().graph_mapper,
@@ -301,7 +292,7 @@ class RecordingCommon(object):
         """
         if isinstance(
                 self._population._vertex, AbstractGSynInhibitoryRecordable):
-            if not self._population._vertex.is_recording_gsyn_inhibitory():
+            if not self._population._vertex.is_recording("gsyn_inh"):
                 raise fec_excceptions.ConfigurationException(
                     "This population has not been set to record gsyn "
                     "inhibitory")
@@ -322,7 +313,7 @@ class RecordingCommon(object):
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 4))
 
-        return self._population._vertex.get_gsyn_inhibitory(
+        return self._population._vertex.get_data("gsyn_inh",
             globals_variables.get_simulator().no_machine_time_steps,
             globals_variables.get_simulator().placements,
             globals_variables.get_simulator().graph_mapper,
@@ -341,19 +332,9 @@ class RecordingCommon(object):
         :rtype: None
         """
 
-        # check for gsyn inhib
-        if isinstance(
-                self._population._vertex, AbstractGSynInhibitoryRecordable):
-            self._population._vertex.set_recording_gsyn_inhibitory(False)
-
-        # check for gsyn excit
-        if isinstance(
-                self._population._vertex, AbstractGSynExcitatoryRecordable):
-            self._population._vertex.set_recording_gsyn_excitatory(False)
-
-        # check for v
-        if isinstance(self._population._vertex, AbstractVRecordable):
-            self._population._vertex.set_recording_v(False)
+        # check for standard record
+        if isinstance(self._population._vertex, AbstractNeuronRecordable):
+            self._population._vertex.set_recording("all", False)
 
         # check for spikes
         if isinstance(self._population._vertex, AbstractSpikeRecordable):
