@@ -69,7 +69,7 @@ class SynapseDynamicsSTDP(
             if hasattr(obj, key):
                 return getattr(obj, key)
         raise exceptions.InvalidParameterType(
-            "Type {} does not have parameter {}".format(self._model_name, key))
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
@@ -83,7 +83,7 @@ class SynapseDynamicsSTDP(
                 setattr(obj, key, value)
                 self._change_requires_mapping = True
         raise exceptions.InvalidParameterType(
-            "Type {} does not have parameter {}".format(self._model_name, key))
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @property
     def weight_dependence(self):
