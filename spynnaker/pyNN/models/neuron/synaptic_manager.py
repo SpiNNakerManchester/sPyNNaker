@@ -12,11 +12,11 @@ from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
 from pacman.model.graphs.common.slice import Slice
 
 # spinn utils
-from spinn_utilities import helpful_functions as spinn_utils_helpful_functions
+from spinn_utilities.helpful_functions import get_valid_components
 
 # fec
-from spinn_front_end_common.utilities import helpful_functions as \
-    fec_helpful_functions
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
 from spinn_front_end_common.utilities import globals_variables
 
 # dsg
@@ -59,7 +59,7 @@ class SynapticManager(object):
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + config.get(
                 "MasterPopTable", "generator"))
-            algorithms = spinn_utils_helpful_functions.get_valid_components(
+            algorithms = get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 
@@ -826,16 +826,14 @@ class SynapticManager(object):
                  pre_vertex_slice.hi_atom)].first_key
 
         # Get the block for the connections from the pre_vertex
-        master_pop_table_address = \
-            fec_helpful_functions.locate_memory_region_for_placement(
-                placement,
-                constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-                transceiver)
-        synaptic_matrix_address = \
-            fec_helpful_functions.locate_memory_region_for_placement(
-                placement,
-                constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-                transceiver)
+        master_pop_table_address = locate_memory_region_for_placement(
+            placement,
+            constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            transceiver)
+        synaptic_matrix_address = locate_memory_region_for_placement(
+            placement,
+            constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            transceiver)
         direct_synapses_address = (
             self._get_static_synaptic_matrix_sdram_requirements() +
             synaptic_matrix_address + struct.unpack_from(
@@ -932,11 +930,10 @@ class SynapticManager(object):
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
         # locate sdram address to where the synapse parameters are stored
-        synapse_region_sdram_address = \
-            fec_helpful_functions.locate_memory_region_for_placement(
-                placement,
-                constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
-                transceiver)
+        synapse_region_sdram_address = locate_memory_region_for_placement(
+            placement,
+            constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            transceiver)
 
         # get size of synapse params
         size_of_region = (
