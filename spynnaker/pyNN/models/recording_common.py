@@ -1,5 +1,6 @@
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
 from spinn_front_end_common.utilities import globals_variables
+from spinn_utilities.timer import Timer
 
 from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
 from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
@@ -172,20 +173,25 @@ class RecordingCommon(object):
         are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :return: the data
         """
-
+        timer = Timer()
+        timer.start_timing()
+        data = None
         if variable == "gsyn_exc":
-            return self._get_gsyn_excitatory()
+            data = self._get_gsyn_excitatory()
         elif variable == "gsyn_inh":
-            return self._get_gsyn_inhibitory()
+            data = self._get_gsyn_inhibitory()
         elif variable == "v":
-            return self._get_v()
+            data = self._get_v()
         elif variable == "spikes":
-            return self._get_spikes()
+            data = self._get_spikes()
         else:
             raise fec_excceptions.ConfigurationException(
                 "The variable {} is not supported by the get method. "
                 "Currently supported variables are: "
                 "'gsyn_exc', 'gsyn_inh', 'v', 'spikes'".format(variable))
+        globals_variables.get_simulator().add_extraction_timing(
+            timer.take_sample())
+        return data
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
