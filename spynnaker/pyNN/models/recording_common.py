@@ -2,8 +2,6 @@ from spinn_utilities import logger_utils
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
 from spinn_front_end_common.utilities import globals_variables
 
-from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
-from spynnaker.pyNN.models.common import AbstractGSynInhibitoryRecordable
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
@@ -50,24 +48,10 @@ class RecordingCommon(object):
         """
 
         # tell vertex its recording
-        if variable == "gsyn_exc":
-            self._set_gsyn_excitatory_recording()
-        elif variable == "gsyn_inh":
-            self._set_gsyn_inh_recording()
-        elif variable == "v":
-            self._set_v_recording()
-        elif variable == "spikes":
-            self._set_spikes_recording()
-        elif variable == "all":
-            self._set_gsyn_excitatory_recording()
-            self._set_gsyn_inh_recording()
-            self._set_v_recording()
+        if variable == "spikes":
             self._set_spikes_recording()
         else:
-            raise fec_excceptions.ConfigurationException(
-                "The variable {} is not supported by the record method. "
-                "Currently supported variables are: 'gsyn_exc', 'gsyn_inh',"
-                " 'v', 'spikes', 'all'".format(variable))
+            self._population._vertex.set_recording(variable)
 
         # update file writer
         self._write_to_files_indicators[variable] = to_file
@@ -86,44 +70,6 @@ class RecordingCommon(object):
 
             # Set this bit in indices
             indices[new_index] = True
-
-    def _set_gsyn_excitatory_recording(self):
-        """ sets parameters etc that are used by the gsyn exc recording
-
-        :return: None
-        """
-        if not isinstance(
-                self._population._vertex, AbstractGSynExcitatoryRecordable):
-            raise Exception(
-                "This population does not support the recording of gsyn exc")
-        if not isinstance(
-                self._population._vertex.input_type, InputTypeConductance):
-            msg = "You are trying to record the excitatory conductance from " \
-                  "a model which does not use conductance input.  You will " \
-                  "receive current measurements instead."
-            logger_utils.warn_once(logger, msg)
-
-        self._population._vertex.set_recording("gsyn_exc")
-
-    def _set_gsyn_inh_recording(self):
-        """ sets parameters etc that are used by the gsyn inh recording
-
-        :return: None
-        """
-
-        if not isinstance(
-                self._population._vertex, AbstractGSynInhibitoryRecordable):
-            raise Exception(
-                "This population does not support the recording of "
-                "inhibitory gsyn")
-        if not isinstance(
-                self._population._vertex.input_type, InputTypeConductance):
-            msg = "You are trying to record the inhibitory conductance from " \
-                  "a model which does not use conductance input.  You will " \
-                  "receive current measurements instead."
-            logger_utils.warn_once(logger, msg)
-
-        self._population._vertex.set_recording("gsyn_inh")
 
     def _set_v_recording(self):
         """ sets the parameters etc that are used by the v recording
@@ -225,9 +171,14 @@ class RecordingCommon(object):
         """
 
         # check that we're ina  state to get voltages
-        if not self._population._vertex.is_recording("v"):
+        if isinstance(
+                self._population._vertex, AbstractNeuronRecordable):
+            if not self._population._vertex.is_recording("v"):
+                raise fec_excceptions.ConfigurationException(
+                    "This population has not been set to record v")
+        else:
             raise fec_excceptions.ConfigurationException(
-                "This population has not been set to record v")
+                "This population has not got the capability to record v")
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
@@ -256,7 +207,7 @@ class RecordingCommon(object):
         :return: the gsyn excitatory values
         """
         if isinstance(
-                self._population._vertex, AbstractGSynExcitatoryRecordable):
+                self._population._vertex, AbstractNeuronRecordable):
             if not self._population._vertex.is_recording("gsyn_exc"):
                 raise fec_excceptions.ConfigurationException(
                     "This population has not been set to record gsyn "
@@ -291,7 +242,7 @@ class RecordingCommon(object):
         :return: the gsyn inhibitory values
         """
         if isinstance(
-                self._population._vertex, AbstractGSynInhibitoryRecordable):
+                self._population._vertex, AbstractNeuronRecordable):
             if not self._population._vertex.is_recording("gsyn_inh"):
                 raise fec_excceptions.ConfigurationException(
                     "This population has not been set to record gsyn "

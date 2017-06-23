@@ -163,7 +163,7 @@ class AbstractPopulationVertex(
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder()
-        self._neuron_recorder = NeuronRecorder()
+        self._neuron_recorder = NeuronRecorder(["v", "gsyn_exc", "gsyn_inh"])
 
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
@@ -258,11 +258,11 @@ class AbstractPopulationVertex(
         return [
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1),
-            self._v_recorder.get_sdram_usage_in_bytes(
+            self._neuron_recorder.get_sdram_usage_in_bytes("v",
                 vertex_slice.n_atoms, 1),
-            self._gsyn_excitatory_recorder.get_sdram_usage_in_bytes(
+            self._neuron_recorder.get_sdram_usage_in_bytes("gsyn_exc",
                 vertex_slice.n_atoms, 1),
-            self._gsyn_inhibitory_recorder.get_sdram_usage_in_bytes(
+            self._neuron_recorder.get_sdram_usage_in_bytes("gsyn_inh",
                 vertex_slice.n_atoms, 1)
         ]
 
@@ -274,11 +274,7 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
 
-        is_recording = (
-            self._gsyn_excitatory_recorder.record_gsyn_excitatory or
-            self._gsyn_inhibitory_recorder.record_gsyn_inhibitory or
-            self._v_recorder.record_v or self._spike_recorder.record
-        )
+        is_recording = len(self._neuron_recorder.recording_variables) > 0
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
@@ -307,11 +303,7 @@ class AbstractPopulationVertex(
                 _C_MAIN_BASE_N_CPU_CYCLES +
                 (per_neuron_cycles * vertex_slice.n_atoms) +
                 self._spike_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-                self._v_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-                self._gsyn_excitatory_recorder.get_n_cpu_cycles(
-                    vertex_slice.n_atoms) +
-                self._gsyn_inhibitory_recorder.get_n_cpu_cycles(
-                    vertex_slice.n_atoms) +
+                self._neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._synapse_manager.get_n_cpu_cycles())
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
@@ -325,9 +317,7 @@ class AbstractPopulationVertex(
         return (_NEURON_BASE_DTCM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._spike_recorder.get_dtcm_usage_in_bytes() +
-                self._v_recorder.get_dtcm_usage_in_bytes() +
-                self._gsyn_excitatory_recorder.get_dtcm_usage_in_bytes() +
-                self._gsyn_inhibitory_recorder.get_dtcm_usage_in_bytes() +
+                self._neuron_recorder.get_dtcm_usage_in_bytes() +
                 self._synapse_manager.get_dtcm_usage_in_bytes())
 
     def _get_sdram_usage_for_neuron_params_per_neuron(self):
@@ -371,13 +361,7 @@ class AbstractPopulationVertex(
         return sdram_requirement
 
     def _get_number_of_mallocs_used_by_dsg(self):
-        extra_mallocs = 0
-        if self._gsyn_excitatory_recorder.record_gsyn_excitatory:
-            extra_mallocs += 1
-        if self._gsyn_inhibitory_recorder.record_gsyn_inhibitory:
-            extra_mallocs += 1
-        if self._v_recorder.record_v:
-            extra_mallocs += 1
+        extra_mallocs = len(self._neuron_recorder.recording_variables)
         if self._spike_recorder.record:
             extra_mallocs += 1
         return (
@@ -619,6 +603,10 @@ class AbstractPopulationVertex(
         return self._spike_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
+
+    @overrides(AbstractNeuronRecordable.get_recordable_variables)
+    def get_recordable_variables(self):
+        return self._neuron_recorder.get_recordable_variables
 
     @overrides(AbstractNeuronRecordable.is_recording)
     def is_recording(self, variable):
