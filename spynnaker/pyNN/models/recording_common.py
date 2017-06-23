@@ -1,5 +1,5 @@
 from spinn_utilities import logger_utils
-from spinn_front_end_common.utilities.exceptions import ConfigurationException 
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractGSynExcitatoryRecordable
