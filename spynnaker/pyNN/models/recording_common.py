@@ -115,19 +115,44 @@ class RecordingCommon(object):
         :return: the data
         """
 
-        if variable == "gsyn_exc":
-            return self._get_gsyn_excitatory()
-        elif variable == "gsyn_inh":
-            return self._get_gsyn_inhibitory()
-        elif variable == "v":
-            return self._get_v()
-        elif variable == "spikes":
+        if variable == "spikes":
             return self._get_spikes()
+
+        # check that we're ina  state to get voltages
+        if isinstance(
+                self._population._vertex, AbstractNeuronRecordable):
+            if not self._population._vertex.is_recording(variable):
+                raise fec_excceptions.ConfigurationException(
+                    "This population has not been set to record {}"
+                    "".format(variable))
         else:
             raise fec_excceptions.ConfigurationException(
-                "The variable {} is not supported by the get method. "
-                "Currently supported variables are: "
-                "'gsyn_exc', 'gsyn_inh', 'v', 'spikes'".format(variable))
+                "This population has not got the capability to record {}"
+                    "".format(variable))
+
+        if not globals_variables.get_simulator().has_ran:
+            logger.warn(
+                "The simulation has not yet run, therefore {} cannot"
+                " be retrieved, hence the list will be empty "
+                    "".format(variable))
+            return numpy.zeros((0, 3))
+
+        if globals_variables.get_simulator().use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
+            return numpy.zeros((0, 3))
+
+            # assuming we got here, everything is ok, so we should go get the
+            # voltages
+        return self._population._vertex.get_data(variable,
+            globals_variables.get_simulator().no_machine_time_steps,
+            globals_variables.get_simulator().placements,
+            globals_variables.get_simulator().graph_mapper,
+            globals_variables.get_simulator().buffer_manager,
+            globals_variables.get_simulator().machine_time_step)
+
+
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
@@ -159,113 +184,6 @@ class RecordingCommon(object):
         # assuming we got here, everything is ok, so we should go get the
         # spikes
         return self._population._vertex.get_spikes(
-            globals_variables.get_simulator().placements,
-            globals_variables.get_simulator().graph_mapper,
-            globals_variables.get_simulator().buffer_manager,
-            globals_variables.get_simulator().machine_time_step)
-
-    def _get_v(self):
-        """ get the voltage from the vertex
-
-        :return: the voltages
-        """
-
-        # check that we're ina  state to get voltages
-        if isinstance(
-                self._population._vertex, AbstractNeuronRecordable):
-            if not self._population._vertex.is_recording("v"):
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record v")
-        else:
-            raise fec_excceptions.ConfigurationException(
-                "This population has not got the capability to record v")
-
-        if not globals_variables.get_simulator().has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore v cannot"
-                " be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 3))
-
-        if globals_variables.get_simulator().use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 3))
-
-            # assuming we got here, everything is ok, so we should go get the
-            # voltages
-        return self._population._vertex.get_data("v",
-            globals_variables.get_simulator().no_machine_time_steps,
-            globals_variables.get_simulator().placements,
-            globals_variables.get_simulator().graph_mapper,
-            globals_variables.get_simulator().buffer_manager,
-            globals_variables.get_simulator().machine_time_step)
-
-    def _get_gsyn_excitatory(self):
-        """ get the gsyn excitatory values from the vertex
-
-        :return: the gsyn excitatory values
-        """
-        if isinstance(
-                self._population._vertex, AbstractNeuronRecordable):
-            if not self._population._vertex.is_recording("gsyn_exc"):
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record gsyn "
-                    "excitatory")
-        else:
-            raise fec_excceptions.ConfigurationException(
-                "This population has not got the capability to record gsyn "
-                "excitatory")
-
-        if not globals_variables.get_simulator().has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore gsyn excitatory "
-                "cannot be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        if globals_variables.get_simulator().use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        return self._population._vertex.get_data("gsyn_exc",
-            globals_variables.get_simulator().no_machine_time_steps,
-            globals_variables.get_simulator().placements,
-            globals_variables.get_simulator().graph_mapper,
-            globals_variables.get_simulator().buffer_manager,
-            globals_variables.get_simulator().machine_time_step)
-
-    def _get_gsyn_inhibitory(self):
-        """ get the gsyn inhibitory values from the vertex
-
-        :return: the gsyn inhibitory values
-        """
-        if isinstance(
-                self._population._vertex, AbstractNeuronRecordable):
-            if not self._population._vertex.is_recording("gsyn_inh"):
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record gsyn "
-                    "inhibitory")
-        else:
-            raise fec_excceptions.ConfigurationException(
-                "This population has not got the capability to record gsyn "
-                "inhibitory")
-
-        if not globals_variables.get_simulator().has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore gsyn inhibitory "
-                "cannot be retrieved, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        if globals_variables.get_simulator().use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            return numpy.zeros((0, 4))
-
-        return self._population._vertex.get_data("gsyn_inh",
-            globals_variables.get_simulator().no_machine_time_steps,
             globals_variables.get_simulator().placements,
             globals_variables.get_simulator().graph_mapper,
             globals_variables.get_simulator().buffer_manager,
