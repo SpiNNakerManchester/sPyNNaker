@@ -49,7 +49,6 @@ script:
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
   # - flake8 integration_tests
   - support/run-vera.sh neural_modelling
-  - cd doc/source
-  - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-  - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
-  - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
+  - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
+  - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
+  - support/travis-sphinx.sh singlehtml -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
