@@ -17,6 +17,9 @@
 #include <string.h>
 #include <bit_field.h>
 
+// Declare spin1_wfi
+extern void spin1_wfi();
+
 //! data structure for poisson sources
 typedef struct spike_source_t {
     uint32_t start_ticks;
@@ -115,6 +118,8 @@ static UFRACT seconds_per_tick;
 
 //! the rate per tick below which a source is considered slow
 static REAL slow_rate_per_tick_cutoff;
+
+static bool recording_in_progress = false;
 
 //! \brief ??????????????
 //! \param[in] n ?????????????????
@@ -426,13 +431,22 @@ static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
+void recording_complete_callback() {
+    recording_in_progress = false;
+}
+
 //! \brief writing spikes to sdram
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void _record_spikes(uint32_t time) {
+    while (recording_in_progress) {
+        spin1_wfi();
+    }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
+        recording_in_progress = true;
         spikes->time = time;
-        recording_record(
-            0, spikes, 8 + (spikes->n_buffers * spike_buffer_size));
+        recording_record_and_notify(
+            0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
+            recording_complete_callback);
         _reset_spikes();
     }
 }
@@ -480,6 +494,9 @@ void timer_callback(uint timer_count, uint unused) {
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
+
+    // Reset the out spikes before the loop
+    out_spikes_reset();
 
     // Loop through spike sources
     for (index_t s = 0; s < num_spike_sources; s++) {
@@ -552,7 +569,6 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         _record_spikes(time);
     }
-    out_spikes_reset();
 
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
