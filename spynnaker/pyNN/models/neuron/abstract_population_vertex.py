@@ -714,7 +714,7 @@ class AbstractPopulationVertex(
                 self._change_requires_neuron_parameters_reload = True
                 return
         raise InvalidParameterType(
-            "Type {} does not have parameter {}".format(self._model_name, key))
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
