@@ -95,11 +95,11 @@ class AbstractPopulationVertex(
     GSYN_EXCITATORY_RECORDING_REGION = 2
     GSYN_INHIBITORY_RECORDING_REGION = 3
 
-    RECORDING_REGION = {"spikes":0, "v":1, "gsyn_exc":2, "gsyn_inh":3}
+    RECORDING_REGION = {"spikes": 0, "v": 1, "gsyn_exc": 2, "gsyn_inh": 3}
 
-    VARIABLE_LONG = {"spikes":"spikes",
+    VARIABLE_LONG = {"spikes": "spikes",
                      "v": "membrane voltage",
-                     "gsyn_exc":"gsyn_excitatory",
+                     "gsyn_exc": "gsyn_excitatory",
                      "gsyn_inh": "gsyn_inhibitory"}
 
     N_RECORDING_REGIONS = 4
@@ -258,12 +258,12 @@ class AbstractPopulationVertex(
         return [
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes("v",
-                vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes("gsyn_exc",
-                vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes("gsyn_inh",
-                vertex_slice.n_atoms, 1)
+            self._neuron_recorder.get_sdram_usage_in_bytes(
+                "v", vertex_slice.n_atoms, 1),
+            self._neuron_recorder.get_sdram_usage_in_bytes(
+                "gsyn_exc", vertex_slice.n_atoms, 1),
+            self._neuron_recorder.get_sdram_usage_in_bytes(
+                "gsyn_inh", vertex_slice.n_atoms, 1)
         ]
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
@@ -618,8 +618,8 @@ class AbstractPopulationVertex(
         self._neuron_recorder.set_recording(variable, new_state)
 
     @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable, n_machine_time_steps, placements, graph_mapper,
-              buffer_manager, machine_time_step):
+    def get_data(self, variable, n_machine_time_steps, placements,
+                 graph_mapper, buffer_manager, machine_time_step):
         return self._neuron_recorder.get_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
             placements, graph_mapper, self, machine_time_step,

@@ -1,7 +1,6 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-#from spynnaker.pyNN.models.common.recordable import Recordable
 
 
 @add_metaclass(AbstractBase)
@@ -32,7 +31,7 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def clear_recording(self, variable, buffer_manager, placements,
-                                 graph_mapper):
+                        graph_mapper):
         """ clears the recorded data from the object
 
         :param buffer_manager: the buffer manager object
@@ -42,8 +41,8 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, placements, graph_mapper,
-            buffer_manager, machine_time_step):
+    def get_data(self, variable, n_machine_time_steps, placements,
+                 graph_mapper, buffer_manager, machine_time_step):
         """
 
         :param variable:

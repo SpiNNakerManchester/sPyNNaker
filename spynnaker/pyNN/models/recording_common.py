@@ -50,6 +50,9 @@ class RecordingCommon(object):
         # tell vertex its recording
         if variable == "spikes":
             self._set_spikes_recording()
+        elif variable == "all":
+            self._set_spikes_recording()
+            self._population._vertex.set_recording(variable)
         else:
             self._population._vertex.set_recording(variable)
 
@@ -70,6 +73,21 @@ class RecordingCommon(object):
 
             # Set this bit in indices
             indices[new_index] = True
+
+        if variable == "gsyn_exc":
+            if not isinstance(self._population._vertex.input_type,
+                              InputTypeConductance):
+                msg = "You are trying to record the excitatory conductance " \
+                      "from a model which does not use conductance input.  " \
+                      "You will receive current measurements instead."
+                logger_utils.warn_once(logger, msg)
+        elif variable == "gsyn_inh":
+            if not isinstance(self._population._vertex.input_type,
+                              InputTypeConductance):
+                msg = "You are trying to record the excitatory conductance " \
+                      "from a model which does not use conductance input.  " \
+                      "You will receive current measurements instead."
+                logger_utils.warn_once(logger, msg)
 
     def _set_v_recording(self):
         """ sets the parameters etc that are used by the v recording
@@ -128,13 +146,13 @@ class RecordingCommon(object):
         else:
             raise fec_excceptions.ConfigurationException(
                 "This population has not got the capability to record {}"
-                    "".format(variable))
+                "".format(variable))
 
         if not globals_variables.get_simulator().has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore {} cannot"
                 " be retrieved, hence the list will be empty "
-                    "".format(variable))
+                "".format(variable))
             return numpy.zeros((0, 3))
 
         if globals_variables.get_simulator().use_virtual_board:
@@ -145,14 +163,13 @@ class RecordingCommon(object):
 
             # assuming we got here, everything is ok, so we should go get the
             # voltages
-        return self._population._vertex.get_data(variable,
+        return self._population._vertex.get_data(
+            variable,
             globals_variables.get_simulator().no_machine_time_steps,
             globals_variables.get_simulator().placements,
             globals_variables.get_simulator().graph_mapper,
             globals_variables.get_simulator().buffer_manager,
             globals_variables.get_simulator().machine_time_step)
-
-
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex

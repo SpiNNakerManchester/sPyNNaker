@@ -1,7 +1,6 @@
 import logging
 from spynnaker.pyNN.models.common import recording_utils
 from .abstract_uint32_recorder import AbstractUInt32Recorder
-from .abstract_neuron_recordable import AbstractNeuronRecordable
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
 
 logger = logging.getLogger(__name__)
@@ -43,7 +42,8 @@ class NeuronRecorder(AbstractUInt32Recorder):
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
 
-    def get_sdram_usage_in_bytes(self, variable, n_neurons, n_machine_time_steps):
+    def get_sdram_usage_in_bytes(self, variable, n_neurons,
+                                 n_machine_time_steps):
         if self.is_recording(variable):
             return recording_utils.get_recording_region_size_in_bytes(
                 n_machine_time_steps,  self.N_BYTES_PER_NEURON * n_neurons)
