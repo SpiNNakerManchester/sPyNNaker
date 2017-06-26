@@ -19,7 +19,6 @@ class NeuronRecorder(AbstractUInt32Recorder):
         return self._record.keys()
 
     def is_recording(self, variable):
-        print self._record
         if variable in self._record:
             return self._record[variable]
         msg = "Variable {} is not supported. Supported variables include {}" \
@@ -43,8 +42,6 @@ class NeuronRecorder(AbstractUInt32Recorder):
         else:
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
-        print "set", variable, new_state
-        print self._record
 
     def get_sdram_usage_in_bytes(self, variable, n_neurons, n_machine_time_steps):
         if self.is_recording(variable):
@@ -54,14 +51,8 @@ class NeuronRecorder(AbstractUInt32Recorder):
             return 0
 
     def get_dtcm_usage_in_bytes(self):
-        print self._record
-        print self.recording_variables
-        print len(self.recording_variables)
-        print sum(self._record.values())
-        assert (len(self.recording_variables) == sum(self._record.values()))
-        return  self.N_BYTES_PER_NEURON * sum(self._record.values())
+        return self.N_BYTES_PER_NEURON * sum(self._record.values())
 
     def get_n_cpu_cycles(self, n_neurons):
-        return  n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
+        return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
                 sum(self._record.values())
-
