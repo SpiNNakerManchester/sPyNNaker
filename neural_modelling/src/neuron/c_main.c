@@ -133,7 +133,7 @@ static bool initialise(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP_AND_DMA_AND_USER)) {
+            &infinite_run, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER)) {
         return false;
     }
     simulation_set_provenance_function(
@@ -199,7 +199,7 @@ static bool initialise(uint32_t *timer_period) {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
+            row_max_n_words, MC, SDP_AND_DMA_AND_USER,
             incoming_spike_buffer_size)) {
         return false;
     }

@@ -1,4 +1,5 @@
 from spinn_utilities.progress_bar import ProgressBar
+import struct
 from spinnman.messages.eieio.data_messages.eieio_data_header \
     import EIEIODataHeader
 
@@ -61,17 +62,19 @@ class EIEIOSpikeRecorder(object):
 
             offset = 0
             while offset < number_of_bytes_written:
+                length = struct.unpack_from("<I", spike_data, offset)[0]
+                data_offset = offset + 4
                 eieio_header = EIEIODataHeader.from_bytestring(
-                    spike_data, offset)
-                offset += eieio_header.size
+                    spike_data, data_offset)
+                data_offset += eieio_header.size
                 timestamp = eieio_header.payload_base * ms_per_tick
                 timestamps = numpy.repeat([timestamp], eieio_header.count)
                 keys = numpy.frombuffer(
                     spike_data, dtype="<u4", count=eieio_header.count,
-                    offset=offset)
+                    offset=data_offset)
                 neuron_ids = ((keys - base_key_function(vertex)) +
                               vertex_slice.lo_atom)
-                offset += eieio_header.count * 4
+                offset += length + 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
         if len(missing_str) > 0:
