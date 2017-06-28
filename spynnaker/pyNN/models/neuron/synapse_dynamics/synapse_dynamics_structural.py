@@ -39,6 +39,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
         self._grid = grid
+        self._connections = {}
 
         self.fudge_factor = 1.5
 
@@ -251,6 +252,20 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._lat_distance_probabilities.view(dtype=np.uint32))
         total_words_written += self._lat_distance_probabilities.size // 2
 
+        # Now write the current synaptic capacity table
+        # i.e. for each postsynaptic neuron write the number of
+        # incoming (afferent) connections
+        synaptic_capacity = np.zeros(post_slice.n_atoms)
+
+        if self._connections[post_slice.lo_atom] is not None:
+            for row in self._connections[post_slice.lo_atom]:
+                if row.size > 0:
+                    for source, target, weight, delay, syn_type in row:
+                        synaptic_capacity[target - post_slice.lo_atom] += 1
+
+        spec.write_array(synaptic_capacity)
+        total_words_written += synaptic_capacity.size
+
         self.actual_sdram_usage[
             machine_vertex] = 4 * 16 + 4 * total_words_written
 
@@ -266,6 +281,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
         structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
+        structure_size += n_neurons * 2 # synaptic capacity table
         self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(
             n_neurons, n_synapse_types)
@@ -296,6 +312,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_plastic_synaptic_data(self, connections, connection_row_indices,
                                   n_rows, post_vertex_slice,
                                   n_synapse_types):
+        if not post_vertex_slice.lo_atom in self._connections.keys():
+            self._connections[post_vertex_slice.lo_atom] = []
+        self._connections[post_vertex_slice.lo_atom].append(connections)
         if isinstance(self.super, AbstractPlasticSynapseDynamics):
             return self.super.get_plastic_synaptic_data(connections,
                                                         connection_row_indices,
@@ -312,6 +331,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_static_synaptic_data(self, connections, connection_row_indices,
                                  n_rows, post_vertex_slice,
                                  n_synapse_types):
+        if not post_vertex_slice.lo_atom in self._connections.keys():
+            self._connections[post_vertex_slice.lo_atom] = []
+        self._connections[post_vertex_slice.lo_atom].append(connections)
         return self.super.get_static_synaptic_data(connections,
                                                    connection_row_indices,
                                                    n_rows, post_vertex_slice,

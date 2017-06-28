@@ -64,6 +64,7 @@ typedef struct {
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
     uint16_t *ff_probabilities, *lat_probabilities;
+    uint32_t *synaptic_capacity;
 } rewiring_data_t;
 
 rewiring_data_t rewiring_data;
@@ -193,6 +194,17 @@ address_t synaptogenesis_dynamics_initialise(
 
         rewiring_data.lat_probabilities[index] = *half_word++;
     }
+
+    // TODO Is this aligned?
+    sp_word = (int32_t*) half_word;
+
+    // Read the synaptic capacity table
+    rewiring_data.synaptic_capacity = (uint32_t*) sark_alloc(\
+        rewiring_data.machine_no_atoms, sizeof(uint32_t));
+    for (index = 0; index < rewiring_data.machine_no_atoms; index++) {
+        rewiring_data.synaptic_capacity[index] = *sp_word++;
+    }
+
 
     // Setting up RNG
     validate_mars_kiss64_seed(rewiring_data.shared_seed);
@@ -329,6 +341,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //    if (dma_id != rewiring_dma_buffer.dma_id)
 //        log_error("Servicing invalid synaptic row!");
     use(dma_id);
+    use(dma_tag);
     uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
 
     // Is the row zero in length?
@@ -341,8 +354,8 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
         synaptogenesis_dynamics_elimination_rule();
         // TODO check status of operation and save provenance (statistics)
     }
-    else if(!search_hit &&
-            number_of_connections<rewiring_data.s_max){
+    else if(!search_hit && // TODO Check if there's space in the row
+            rewiring_data.s_max > rewiring_data.synaptic_capacity[current_state.post_syn_id]){
 
         synaptogenesis_dynamics_formation_rule();
         // TODO check status of operation and save provenance (statistics)
@@ -379,6 +392,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             current_state.current_time);
+        rewiring_data.synaptic_capacity[current_state.post_syn_id]--;
         spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
@@ -391,7 +405,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint distance_as_offset = current_state.distance << 3  + current_state.distance << 1;
+    uint distance_as_offset = (current_state.distance << 3)  + (current_state.distance << 1);
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
@@ -418,6 +432,7 @@ bool synaptogenesis_dynamics_formation_rule(){
             current_state.distance,
             current_state.current_controls,
             current_state.current_time);
+        rewiring_data.synaptic_capacity[current_state.post_syn_id]++;
         spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
         rewiring_dma_buffer.row, DMA_WRITE,
