@@ -3,7 +3,7 @@ from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
 
-class WeightDependenceAdditive(
+class CommonWeightDependenceAdditive(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
 
     # noinspection PyPep8Naming
@@ -22,7 +22,7 @@ class WeightDependenceAdditive(
         return self._w_max
 
     def is_same_as(self, weight_dependence):
-        if not isinstance(weight_dependence, WeightDependenceAdditive):
+        if not isinstance(weight_dependence, CommonWeightDependenceAdditive):
             return False
         return (
             (self._w_min == weight_dependence.w_min) and

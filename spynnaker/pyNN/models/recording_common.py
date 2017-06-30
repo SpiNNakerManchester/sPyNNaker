@@ -16,11 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
+
+    # No __slots__ as Population also depends on PyNNPopulationCommon
+
     def __init__(self, population, sampling_interval=None):
         """ object to hold recording behaviour
 
         :param population: the population to record for
-        :param simulator: the spinnaker control class
         """
 
         self._population = population

@@ -6,7 +6,7 @@ from six import add_metaclass
 
 
 @add_metaclass(AbstractBase)
-class FromFileConnector(FromListConnector):
+class CommonFromFileConnector(FromListConnector):
 
     def __init__(
             self, file,  # @ReservedAssignment

@@ -3,7 +3,7 @@ from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
 
-class WeightDependenceMultiplicative(
+class CommonWeightDependenceMultiplicative(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
 
     def __init__(self, w_min=0.0, w_max=1.0):
@@ -21,7 +21,8 @@ class WeightDependenceMultiplicative(
         return self._w_max
 
     def is_same_as(self, weight_dependence):
-        if not isinstance(weight_dependence, WeightDependenceMultiplicative):
+        if not isinstance(weight_dependence,
+                          CommonWeightDependenceMultiplicative):
             return False
         return (
             (self._w_min == weight_dependence._w_min) and

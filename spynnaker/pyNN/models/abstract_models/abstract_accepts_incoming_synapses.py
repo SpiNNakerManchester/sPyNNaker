@@ -10,6 +10,8 @@ class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection
     """
 
+    __slots__ = ()
+
     @abstractproperty
     def synapse_type(self):
         """ The synapse type of the vertex
