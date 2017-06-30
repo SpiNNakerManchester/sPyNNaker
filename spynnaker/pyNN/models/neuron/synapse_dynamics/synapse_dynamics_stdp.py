@@ -1,8 +1,12 @@
 import math
 import numpy
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from spinn_front_end_common.abstract_models.\
+    abstract_changable_after_run import AbstractChangableAfterRun
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from spynnaker.pyNN import exceptions
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
@@ -11,17 +15,20 @@ TIME_STAMP_BYTES = 4
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
-class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
+class SynapseDynamicsSTDP(
+        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+        AbstractChangableAfterRun):
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
-            voltage_dependence=None,
-            dendritic_delay_fraction=1.0, mad=True):
+            voltage_dependence=None, dendritic_delay_fraction=1.0):
         AbstractPlasticSynapseDynamics.__init__(self)
+        AbstractPopulationSettable.__init__(self)
+        AbstractChangableAfterRun.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
-        self._mad = mad
+        self._change_requires_mapping = True
 
         if (self._dendritic_delay_fraction < 0.5 or
                 self._dendritic_delay_fraction > 1.0):
@@ -37,6 +44,46 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
 
+    @overrides(AbstractChangableAfterRun.requires_mapping)
+    def requires_mapping(self):
+        """ True if changes that have been made require that mapping be\
+            performed.  Note that this should return True the first time it\
+            is called, as the vertex must require mapping as it has been\
+            created!
+        """
+        return self._change_requires_mapping
+
+    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    def mark_no_changes(self):
+        """ Marks the point after which changes are reported.  Immediately\
+            after calling this method, requires_mapping should return False.
+        """
+        self._change_requires_mapping = False
+
+    @overrides(AbstractPopulationSettable.get_value)
+    def get_value(self, key):
+        """ Get a property
+        """
+        for obj in [self._timing_dependence, self._weight_dependence, self]:
+            if hasattr(obj, key):
+                return getattr(obj, key)
+        raise exceptions.InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractPopulationSettable.set_value)
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        """
+        for obj in [self._timing_dependence, self._weight_dependence, self]:
+            if hasattr(obj, key):
+                setattr(obj, key, value)
+                self._change_requires_mapping = True
+        raise exceptions.InvalidParameterType(
+            "Type {} does not have parameter {}".format(type(self), key))
+
     @property
     def weight_dependence(self):
         return self._weight_dependence
@@ -49,6 +96,10 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
     def dendritic_delay_fraction(self):
         return self._dendritic_delay_fraction
 
+    @dendritic_delay_fraction.setter
+    def dendritic_delay_fraction(self, new_value):
+        self._dendritic_delay_fraction = new_value
+
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
@@ -58,14 +109,13 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
             self._weight_dependence.is_same_as(
                 synapse_dynamics._weight_dependence) and
             (self._dendritic_delay_fraction ==
-             synapse_dynamics._dendritic_delay_fraction) and
-            (self._mad == synapse_dynamics._mad))
+             synapse_dynamics._dendritic_delay_fraction))
 
     def are_weights_signed(self):
         return False
 
     def get_vertex_executable_suffix(self):
-        name = "_stdp_mad" if self._mad else "_stdp"
+        name = "_stdp_mad"
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name
@@ -97,21 +147,9 @@ class SynapseDynamicsSTDP(AbstractPlasticSynapseDynamics):
     @property
     def _n_header_bytes(self):
 
-        n_bytes = 0
-        if self._mad:
-
-            # If we're using MAD, the header contains a single timestamp and
-            # pre-trace
-            n_bytes = (
-                TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
-        else:
-
-            # Otherwise, headers consist of a counter followed by
-            # NUM_PRE_SYNAPTIC_EVENTS timestamps and pre-traces
-            n_bytes = (
-                4 + (NUM_PRE_SYNAPTIC_EVENTS *
-                     (TIME_STAMP_BYTES +
-                      self.timing_dependence.pre_trace_n_bytes)))
+        # The header contains a single timestamp and pre-trace
+        n_bytes = (
+            TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of words

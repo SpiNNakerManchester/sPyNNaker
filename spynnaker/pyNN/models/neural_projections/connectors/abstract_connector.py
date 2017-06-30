@@ -1,10 +1,9 @@
 from six import add_metaclass
-from pyNN.random import RandomDistribution
-from pyNN.random import NumpyRNG
-
+from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -13,6 +12,12 @@ import re
 
 # global objects
 logger = logging.getLogger(__name__)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 @add_metaclass(AbstractBase)
@@ -26,9 +31,9 @@ class AbstractConnector(object):
 
     __slots__ = ()
 
-    def __init__(self, safe=True, space=None, verbose=False):
+    def __init__(self, safe=True, verbose=False):
         self._safe = safe
-        self._space = space
+        self._space = None
         self._verbose = verbose
 
         self._pre_population = None
@@ -39,6 +44,33 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
+        self._weights = None
+        self._delays = None
+
+    def set_space(self, space):
+        """ allows setting of the space object after instantiation
+
+        :param space:
+        :return:
+        """
+        self._space = space
+
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
+        :param `float` weights:
+            may either be a float, a !RandomDistribution object, a list\
+            1D array with at least as many items as connections to be\
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            delays will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler, \
+            or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
+        """
+        self._weights = weights
+        self._delays = delays
+        self._check_parameters(weights, delays)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -48,14 +80,15 @@ class AbstractConnector(object):
         self._n_post_neurons = post_population.size
         self._rng = rng
         if self._rng is None:
-            self._rng = NumpyRNG()
+            self._rng = globals_variables.get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
 
-    def _check_parameter(self, values, name, allow_lists=True):
+    def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported
         """
         if (not numpy.isscalar(values) and
-                not isinstance(values, RandomDistribution) and
+                not (globals_variables.get_simulator().
+                     is_a_pynn_random(values)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
@@ -63,23 +96,28 @@ class AbstractConnector(object):
                 "Lists of {} are not supported the implementation of"
                 " {} on this platform".format(self.__class__))
 
-    def _check_parameters(self, weights, delays, allow_lists=True):
+    def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\
             be disallowed if desired
         """
-        self._check_parameter(weights, "weights")
-        self._check_parameter(delays, "delays")
+        self._check_parameter(weights, "weights", allow_lists)
+        self._check_parameter(delays, "delays", allow_lists)
 
     @staticmethod
     def _get_delay_maximum(delays, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
-            if delays.boundaries is not None:
-                return min(max(delays.boundaries), max_estimated_delay)
+            if hasattr(delays, "boundaries"):
+                if delays.boundaries is not None:
+                    return min(max(delays.boundaries), max_estimated_delay)
+            elif isinstance(delays.parameters, dict):
+                if "max" in delays.parameters:
+                    return delays.parameters['max']
+
             return max_estimated_delay
         elif numpy.isscalar(delays):
             return delays
@@ -97,7 +135,7 @@ class AbstractConnector(object):
     def _get_delay_variance(delays, connection_slices):
         """ Get the variance of the delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             return utility_calls.get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
@@ -122,7 +160,7 @@ class AbstractConnector(object):
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
-        if isinstance(delays, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(delays):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
@@ -136,6 +174,8 @@ class AbstractConnector(object):
                 delay for delay in delays[connection_slice]
                 if min_delay <= delay <= max_delay])
                 for connection_slice in connection_slices])
+            if n_delayed == 0:
+                return 0
             n_total = sum([
                 len(delays[connection_slice])
                 for connection_slice in connection_slices])
@@ -169,7 +209,7 @@ class AbstractConnector(object):
     def _get_weight_mean(weights, connection_slices):
         """ Get the mean of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -190,7 +230,7 @@ class AbstractConnector(object):
     def _get_weight_maximum(weights, n_connections, connection_slices):
         """ Get the maximum of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -224,7 +264,7 @@ class AbstractConnector(object):
     def _get_weight_variance(weights, connection_slices):
         """ Get the variance of the weights
         """
-        if isinstance(weights, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(weights):
             return utility_calls.get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
@@ -254,7 +294,7 @@ class AbstractConnector(object):
         return False
 
     def _generate_values(self, values, n_connections, connection_slices):
-        if isinstance(values, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(values):
             if n_connections == 1:
                 return numpy.array([values.next(n_connections)])
             return values.next(n_connections)
@@ -280,7 +320,7 @@ class AbstractConnector(object):
                 expand_distances)
 
             if isinstance(values, basestring):
-                return eval(values)
+                return _expr_context.eval(values)
             return values(d)
 
     def _generate_weights(self, values, n_connections, connection_slices):
@@ -335,7 +375,7 @@ class AbstractConnector(object):
 
         # Only certain types of random distributions are supported for\
         # generation on the machine
-        if isinstance(values, RandomDistribution):
+        if globals_variables.get_simulator().is_a_pynn_random(values):
             return values.name in (
                 "uniform", "uniform_int", "poisson", "normal", "exponential")
 
@@ -373,3 +413,27 @@ class AbstractConnector(object):
                     self._post_population.label, self._min_delay,
                     self._n_clipped_delays))))
         return data_items
+
+    @property
+    def safe(self):
+        return self._safe
+
+    @safe.setter
+    def safe(self, new_value):
+        self._safe = new_value
+
+    @property
+    def space(self):
+        return self._space
+
+    @space.setter
+    def space(self, new_value):
+        self._space = new_value
+
+    @property
+    def verbose(self):
+        return self._verbose
+
+    @verbose.setter
+    def verbose(self, new_value):
+        self._verbose = new_value

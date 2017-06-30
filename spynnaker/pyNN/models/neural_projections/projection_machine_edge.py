@@ -1,17 +1,14 @@
-from pyNN.random import RandomDistribution
-
 from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance\
     .abstract_provides_local_provenance_data \
     import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
-from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
-    import AbstractWeightUpdatable
+from spynnaker.pyNN.models.abstract_models \
+    import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
-    import AbstractFilterableEdge
 
 
 class ProjectionMachineEdge(
@@ -73,7 +70,7 @@ class ProjectionMachineEdge(
                 rate = pre_vertex.rate
                 if hasattr(rate, "__getitem__"):
                     rate = max(rate)
-                elif isinstance(rate, RandomDistribution):
+                elif globals_variables.get_simulator().is_a_pynn_random(rate):
                     rate = utility_calls.get_maximum_probable_value(
                         rate, pre_vertex_slice.n_atoms)
                 new_weight *= rate

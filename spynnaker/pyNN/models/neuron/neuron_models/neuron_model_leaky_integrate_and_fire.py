@@ -1,9 +1,7 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate \
-    import NeuronModelLeakyIntegrate
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .neuron_model_leaky_integrate import NeuronModelLeakyIntegrate
 from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
@@ -41,6 +39,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
             tau_refrac, n_neurons)
         self._countdown_to_refactory_period = \
             utility_calls.convert_param_to_numpy(0, n_neurons)
+
+        self._my_units = {'v_reset': 'mV', 'tau_refac': 'ms'}
 
     @property
     def v_reset(self):
@@ -101,3 +101,10 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
         # A guess - 20 for the reset procedure
         return NeuronModelLeakyIntegrate.get_n_cpu_cycles_per_neuron(self) + 20
+
+    @overrides(NeuronModelLeakyIntegrate.get_units)
+    def get_units(self, variable):
+        if variable in self._my_units:
+            return self._my_units[variable]
+        else:
+            return NeuronModelLeakyIntegrate.get_units(variable)

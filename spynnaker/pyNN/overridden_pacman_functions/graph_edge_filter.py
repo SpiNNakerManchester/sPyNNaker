@@ -1,13 +1,13 @@
+from spinn_utilities.progress_bar import ProgressBar
+
 # pacman imports
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.graphs.common.graph_mapper import GraphMapper
-from spinn_machine.utilities.progress_bar import ProgressBar
 
 # spynnaker imports
 from spynnaker.pyNN.exceptions import FilterableException
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
-    import AbstractFilterableEdge
+from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 import logging
 logger = logging.getLogger(__name__)

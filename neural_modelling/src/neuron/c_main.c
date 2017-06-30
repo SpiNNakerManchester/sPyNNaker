@@ -58,7 +58,7 @@ typedef enum callback_priorities{
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 3
+#define NUMBER_OF_REGIONS_TO_RECORD 4
 
 // Globals
 
@@ -119,7 +119,7 @@ static bool initialise(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP_AND_DMA_AND_USER)) {
+            &infinite_run, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER)) {
         return false;
     }
     simulation_set_provenance_function(
@@ -142,19 +142,21 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up the synapses
-    input_t *input_buffers;
+    synapse_param_t *neuron_synapse_shaping_params;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address;
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
-            n_neurons, &input_buffers,
+            n_neurons, &neuron_synapse_shaping_params,
             &ring_buffer_to_input_buffer_left_shifts,
             &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
-    neuron_set_input_buffers(input_buffers);
+
+    // set the neuron up properly
+    neuron_set_neuron_synapse_shaping_params(neuron_synapse_shaping_params);
 
     // Set up the population table
     uint32_t row_max_n_words;
@@ -173,7 +175,7 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
+            row_max_n_words, MC, SDP_AND_DMA_AND_USER,
             incoming_spike_buffer_size)) {
         return false;
     }
@@ -188,9 +190,9 @@ void resume_callback() {
 
     // try reloading neuron parameters
     address_t address = data_specification_get_data_address();
-    if(!neuron_reload_neuron_parameters(
+    if (!neuron_reload_neuron_parameters(
             data_specification_get_region(
-                NEURON_PARAMS_REGION, address))){
+                NEURON_PARAMS_REGION, address))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }

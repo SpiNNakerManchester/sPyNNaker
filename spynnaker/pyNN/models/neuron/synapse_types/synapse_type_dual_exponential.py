@@ -1,10 +1,10 @@
 from pacman.executor.injection_decorator import inject_items
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
-    import AbstractSynapseType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_synapse_type import AbstractSynapseType
 
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -21,6 +21,9 @@ class _DUAL_EXP_TYPES(Enum):
     E2_INIT = (4, DataType.UINT32)
     I_DECAY = (5, DataType.UINT32)
     I_INIT = (6, DataType.UINT32)
+    INITIAL_EXC = (7, DataType.S1615)
+    INITIAL_EXC2 = (8, DataType.S1615)
+    INITIAL_INH = (9, DataType.S1615)
 
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
@@ -33,11 +36,21 @@ class _DUAL_EXP_TYPES(Enum):
         return self._data_type
 
 
-class SynapseTypeDualExponential(AbstractSynapseType):
+class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
-                 tau_syn_I):
+                 tau_syn_I, initial_input_exc, initial_input_exc2,
+                 initial_input_inh):
         AbstractSynapseType.__init__(self)
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            'tau_syn_E': "mV",
+            'tau_syn_E2': "mV",
+            'tau_syn_I': 'mV',
+            'gsyn_exc': "uS",
+            'gsyn_inh': "uS"}
+
         self._n_neurons = n_neurons
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_E, n_neurons)
@@ -45,6 +58,12 @@ class SynapseTypeDualExponential(AbstractSynapseType):
             tau_syn_E2, n_neurons)
         self._tau_syn_I = utility_calls.convert_param_to_numpy(
             tau_syn_I, n_neurons)
+        self._initial_input_exc = utility_calls.convert_param_to_numpy(
+            initial_input_exc, n_neurons)
+        self._initial_input_exc2 = utility_calls.convert_param_to_numpy(
+            initial_input_exc2, n_neurons)
+        self._initial_input_inh = utility_calls.convert_param_to_numpy(
+            initial_input_inh, n_neurons)
 
     @property
     def tau_syn_E(self):
@@ -73,6 +92,30 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         self._tau_syn_E = utility_calls.convert_param_to_numpy(
             tau_syn_I, self._n_neurons)
 
+    @property
+    def isyn_exc(self):
+        return self._initial_input_exc
+
+    @isyn_exc.setter
+    def isyn_exc(self, new_value):
+        self._initial_input_exc = new_value
+
+    @property
+    def isyn_inh(self):
+        return self._initial_input_inh
+
+    @isyn_inh.setter
+    def isyn_inh(self, new_value):
+        self._initial_input_inh = new_value
+
+    @property
+    def isyn_exc2(self):
+        return self._initial_input_exc2
+
+    @isyn_exc2.setter
+    def isyn_exc2(self, new_value):
+        self._initial_input_exc2 = new_value
+
     def get_n_synapse_types(self):
         return 3
 
@@ -89,7 +132,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         return "excitatory", "excitatory2", "inhibitory"
 
     def get_n_synapse_type_parameters(self):
-        return 6
+        return 9
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
@@ -106,7 +149,16 @@ class SynapseTypeDualExponential(AbstractSynapseType):
             NeuronParameter(e_decay2, _DUAL_EXP_TYPES.E2_DECAY.data_type),
             NeuronParameter(e_init2, _DUAL_EXP_TYPES.E2_INIT.data_type),
             NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
-            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type)
+            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
+            NeuronParameter(
+                self._initial_input_exc,
+                _DUAL_EXP_TYPES.INITIAL_EXC.data_type),
+            NeuronParameter(
+                self._initial_input_exc2,
+                _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
+            NeuronParameter(
+                self._initial_input_inh,
+                _DUAL_EXP_TYPES.INITIAL_INH.data_type)
         ]
 
     def get_synapse_type_parameter_types(self):
@@ -116,3 +168,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
 
         # A guess
         return 100
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

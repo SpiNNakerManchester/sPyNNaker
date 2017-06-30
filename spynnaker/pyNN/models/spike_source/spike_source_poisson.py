@@ -36,7 +36,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
-
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
 
@@ -48,7 +48,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities.conf import config
 from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
@@ -114,19 +113,34 @@ class SpikeSourcePoisson(
 
     _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
+    SPIKE_RECORDING_REGION_ID = 0
 
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
     # real-time)
-    _model_based_max_atoms_per_core = 500
+    DEFAULT_MAX_ATOMS_PER_CORE = 500
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     # A count of the number of poisson vertices, to work out the random
     # back off range
     _n_poisson_machine_vertices = 0
 
+    # parameters expected by PyNN
+    default_parameters = {
+        'start': 0.0, 'duration': None, 'rate': 1.0}
+
+    # parameters expected by spinnaker
+    none_pynn_default_parameters = {
+        'constraints': None, 'seed': None, 'label': None}
+
     def __init__(
-            self, n_neurons, constraints=None, label="SpikeSourcePoisson",
-            rate=1.0, start=0.0, duration=None, seed=None):
+            self, n_neurons,
+            constraints=none_pynn_default_parameters['constraints'],
+            label=none_pynn_default_parameters['label'],
+            rate=default_parameters['rate'],
+            start=default_parameters['start'],
+            duration=default_parameters['duration'],
+            seed=none_pynn_default_parameters['seed']):
         ApplicationVertex.__init__(
             self, label, constraints, self._model_based_max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
@@ -135,8 +149,11 @@ class SpikeSourcePoisson(
         SimplePopulationSettable.__init__(self)
         ProvidesKeyToAtomMappingImpl.__init__(self)
 
+        config = globals_variables.get_simulator().config
+
         # atoms params
         self._n_atoms = n_neurons
+        self._model_name = "SpikeSourcePoisson"
         self._seed = None
 
         # check for changes parameters
@@ -192,6 +209,8 @@ class SpikeSourcePoisson(
     def _max_spikes_per_ts(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
         max_rate = numpy.amax(self._rate[vertex_slice.as_slice])
+        if max_rate == 0:
+            return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(n_machine_time_steps)),
@@ -220,7 +239,7 @@ class SpikeSourcePoisson(
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                1)],
+                self._N_POPULATION_RECORDING_REGIONS)],
             n_machine_time_steps, self._minimum_buffer_sdram,
             self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
@@ -292,7 +311,7 @@ class SpikeSourcePoisson(
         self._seed = seed
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         SpikeSourcePoisson._model_based_max_atoms_per_core = new_value
 
     @staticmethod
@@ -497,9 +516,10 @@ class SpikeSourcePoisson(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self):
-        self._change_requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = True
+    def set_recording_spikes(self, new_state=True):
+        self._change_requires_mapping = (
+            self._spike_recorder.record != new_state)
+        self._spike_recorder.record = new_state
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
         """ calculates total sdram usage for a set of atoms
@@ -611,7 +631,8 @@ class SpikeSourcePoisson(
         # Convert end values as timesteps to durations in milliseconds
         self._duration[vertex_slice.as_slice] = \
             self._convert_n_timesteps_to_ms(
-                values[1], self._machine_time_step) - self._start
+                values[1], self._machine_time_step) - \
+            self._start[vertex_slice.as_slice]
 
         # Work out the spikes per tick depending on if the source is slow
         # or fast
@@ -710,3 +731,36 @@ class SpikeSourcePoisson(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         return [KeyAllocatorContiguousRangeContraint()]
+
+    @overrides(AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID)
+
+    def describe(self):
+        """
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customised by specifying a different template
+        together with an associated template engine
+        (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+
+        parameters = dict()
+        for parameter_name in self.default_parameters:
+            parameters[parameter_name] = self.get_value(parameter_name)
+
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_parameters,
+            "parameters": parameters,
+        }
+        return context

@@ -1,15 +1,14 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
-
-from spynnaker.pyNN.models.common import recording_utils
-
-import numpy
 import logging
+from spynnaker.pyNN.models.common import recording_utils
+from .abstract_uint32_recorder import AbstractUInt32Recorder
+
 logger = logging.getLogger(__name__)
 
 
-class VRecorder(object):
+class VRecorder(AbstractUInt32Recorder):
 
     def __init__(self):
+        AbstractUInt32Recorder.__init__(self)
         self._record_v = False
 
     @property
@@ -39,61 +38,6 @@ class VRecorder(object):
 
     def get_v(self, label, buffer_manager, region, placements,
               graph_mapper, application_vertex, machine_time_step):
-
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-
-        ms_per_tick = machine_time_step / 1000.0
-
-        data = list()
-        missing_str = ""
-
-        progress_bar = \
-            ProgressBar(len(vertices),
-                        "Getting membrane voltage for {}".format(label))
-
-        for vertex in vertices:
-
-            vertex_slice = graph_mapper.get_slice(vertex)
-            placement = placements.get_placement_of_vertex(vertex)
-
-            x = placement.x
-            y = placement.y
-            p = placement.p
-
-            # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_data =\
-                buffer_manager.get_data_for_vertex(
-                    placement, region)
-            if missing_data:
-                missing_str += "({}, {}, {}); ".format(x, y, p)
-            record_raw = neuron_param_region_data_pointer.read_all()
-            record_length = len(record_raw)
-            n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
-            record = (numpy.asarray(record_raw, dtype="uint8").
-                      view(dtype="<i4")).reshape((n_rows,
-                                                  (vertex_slice.n_atoms + 1)))
-            split_record = numpy.array_split(record, [1, 1], 1)
-            record_time = numpy.repeat(
-                split_record[0] * float(ms_per_tick), vertex_slice.n_atoms, 1)
-            record_ids = numpy.tile(
-                numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
-                len(record_time)).reshape((-1, vertex_slice.n_atoms))
-            record_membrane_potential = split_record[2] / 32767.0
-
-            part_data = numpy.dstack(
-                [record_ids, record_time, record_membrane_potential])
-            part_data = numpy.reshape(part_data, [-1, 3])
-            data.append(part_data)
-            progress_bar.update()
-
-        progress_bar.end()
-        if len(missing_str) > 0:
-            logger.warn(
-                "Population {} is missing membrane voltage data in region {}"
-                " from the following cores: {}".format(
-                    label, region, missing_str))
-        data = numpy.vstack(data)
-        order = numpy.lexsort((data[:, 1], data[:, 0]))
-        result = data[order]
-        return result
+        return self.get_data(
+            label, buffer_manager, region, placements, graph_mapper,
+            application_vertex, machine_time_step, "membrane voltage")

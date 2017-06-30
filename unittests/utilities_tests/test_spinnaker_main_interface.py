@@ -2,10 +2,13 @@ import unittest
 
 import ConfigParser
 
-from spinn_front_end_common.interface.spinnaker_main_interface import \
-    SpinnakerMainInterface
+from spinn_front_end_common.interface.abstract_spinnaker_base \
+    import AbstractSpinnakerBase
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs.executable_finder \
     import ExecutableFinder
+from spynnaker.pyNN.utilities.spynnaker_failed_state \
+    import SpynnakerFailedState
 
 
 class Close_Once(object):
@@ -23,6 +26,11 @@ class Close_Once(object):
 
 
 class TestSpinnakerMainInterface(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        # Normally this is done by spinnaker.py during import
+        globals_variables.set_failed_state(SpynnakerFailedState())
 
     def default_config(self):
         config = ConfigParser.RawConfigParser()
@@ -45,11 +53,11 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         return config
 
     def test_min_init(self):
-        SpinnakerMainInterface(self.default_config(), ExecutableFinder())
+        AbstractSpinnakerBase(self.default_config(), ExecutableFinder())
 
     def test_stop_init(self):
-        interface = SpinnakerMainInterface(self.default_config(),
-                                           ExecutableFinder())
+        interface = AbstractSpinnakerBase(self.default_config(),
+                                          ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)
@@ -58,12 +66,6 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         self.assertTrue(mock_contoller.closed)
         interface.stop(turn_off_machine=False, clear_routing_tables=False,
                        clear_tags=False)
-
-    @unittest.skip("defaultApplicationDataFilePath=TEMP BROKEN!")
-    def test_temp_defaultApplicationDataFilePath(self):
-        config = self.default_config()
-        config.set("Reports", "defaultApplicationDataFilePath", value="TEMP")
-        SpinnakerMainInterface(config, ExecutableFinder())
 
 
 if __name__ == "__main__":

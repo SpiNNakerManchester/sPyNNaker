@@ -1,9 +1,8 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model \
-    import AbstractNeuronModel
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums.data_type import DataType
@@ -31,10 +30,19 @@ class _IF_TYPES(Enum):
         return self._data_type
 
 
-class NeuronModelLeakyIntegrate(AbstractNeuronModel):
+class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
         AbstractNeuronModel.__init__(self)
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            'v_init': 'mV',
+            'v_rest': 'mV',
+            'tau_m': 'ms',
+            'cm': 'nF',
+            'i_offset': 'nA'}
+
         self._n_neurons = n_neurons
         self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
         self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
@@ -160,3 +168,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel):
 
         # A bit of a guess
         return 80
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]
