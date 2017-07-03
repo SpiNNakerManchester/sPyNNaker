@@ -1,5 +1,4 @@
 # utils imports
-import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.abstract_base import AbstractBase
 
 # common front end imports
@@ -50,9 +49,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None):
 
-        # Read config file
-        config = conf_loader.load_config(spynnaker.pyNN, self.CONFIG_FILE_NAME)
-
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
             os.path.dirname(model_binaries.__file__))
@@ -76,30 +72,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
-        extra_mapping_inputs = dict()
-        extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
-            "Database", "create_routing_info_to_neuron_id_mapping")
-
-        if extra_mapping_algorithms is None:
-            extra_mapping_algorithms = list()
-        if extra_load_algorithms is None:
-            extra_load_algorithms = list()
-        if user_extra_mapping_inputs is not None:
-            extra_mapping_inputs.update(user_extra_mapping_inputs)
-        extra_algorithms_pre_run = list()
-
-        if config.getboolean("Reports", "draw_network_graph"):
-            extra_mapping_algorithms.append(
-                "SpYNNakerConnectionHolderGenerator")
-            extra_load_algorithms.append(
-                "SpYNNakerNeuronGraphNetworkSpecificationReport")
-
-        if config.getboolean("Reports", "reportsEnabled"):
-            if config.getboolean("Reports", "writeSynapticReport"):
-                extra_algorithms_pre_run.append("SynapticMatrixReport")
-        if user_extra_algorithms_pre_run is not None:
-            extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
-
         # timing parameters
         self._min_delay = None
         self._max_delay = None
@@ -107,21 +79,52 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._neurons_per_core_set = set()
 
         AbstractSpinnakerBase.__init__(
-            self, config,
+            self,
             graph_label=graph_label,
             executable_finder=self._EXECUTABLE_FINDER,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
-            extra_mapping_inputs=extra_mapping_inputs,
             n_chips_required=n_chips_required,
-            extra_pre_run_algorithms=extra_algorithms_pre_run,
-            extra_post_run_algorithms=extra_post_run_algorithms,
-            extra_load_algorithms=extra_load_algorithms,
-            extra_mapping_algorithms=extra_mapping_algorithms)
+            additional_default_config_paths=[
+                os.path.join(os.path.dirname(__file__),
+                             self.CONFIG_FILE_NAME)],
+            old_configfile=self.CONFIG_FILE_NAME
+        )
+
+        extra_mapping_inputs = dict()
+        extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
+            self.config.getboolean(
+                "Database", "create_routing_info_to_neuron_id_mapping")
+        if user_extra_mapping_inputs is not None:
+            extra_mapping_inputs.update(user_extra_mapping_inputs)
+
+        if extra_mapping_algorithms is None:
+            extra_mapping_algorithms = list()
+        if extra_load_algorithms is None:
+            extra_load_algorithms = list()
+        extra_algorithms_pre_run = list()
+
+        if self.config.getboolean("Reports", "draw_network_graph"):
+            extra_mapping_algorithms.append(
+                "SpYNNakerConnectionHolderGenerator")
+            extra_load_algorithms.append(
+                "SpYNNakerNeuronGraphNetworkSpecificationReport")
+
+        if self.config.getboolean("Reports", "reportsEnabled"):
+            if self.config.getboolean("Reports", "writeSynapticReport"):
+                extra_algorithms_pre_run.append("SynapticMatrixReport")
+        if user_extra_algorithms_pre_run is not None:
+            extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
+
+        self.update_extra_mapping_inputs(extra_mapping_inputs)
+        self.extend_extra_mapping_algorithms(extra_mapping_algorithms)
+        self.prepend_extra_pre_run_algorithms(extra_algorithms_pre_run)
+        self.extend_extra_post_run_algorithms(extra_post_run_algorithms)
+        self.extend_extra_load_algorithms(extra_load_algorithms)
 
         # set up machine targeted data
         self._set_up_timings(
-            timestep, min_delay, max_delay, config, time_scale_factor)
+            timestep, min_delay, max_delay, self.config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
         logger.info("Setting time scale factor to {}."
