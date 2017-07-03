@@ -13,7 +13,8 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
 
 class IFCurrExpSEMDBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
-        current input
+        current input, where the excitatory input depends upon the inhibitory
+        input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
     """
 
     DEFAULT_MAX_ATOMS_PER_CORE = 255

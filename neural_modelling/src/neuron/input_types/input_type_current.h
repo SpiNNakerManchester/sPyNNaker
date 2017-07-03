@@ -28,9 +28,6 @@ static inline input_t input_type_convert_excitatory_input_to_current(
     return exc_input;
 }
 
-//static inline input_t input_type_convert_inhibitory_input_to_current(
-//        input_t inh_input, input_type_pointer_t input_type,
-//        state_t membrane_voltage) {
 static inline input_t input_type_convert_inhibitory_input_to_current(
 	        input_t inh_input, input_type_pointer_t input_type,
 	        state_t membrane_voltage) {
