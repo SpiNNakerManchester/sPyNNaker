@@ -69,7 +69,7 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
 static inline void synapse_types_add_neuron_input(
-        index_t synapse_type_index, synapse_param_pointer_t parameter, 
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
     if (synapse_type_index == EXCITATORY) {
         parameter->input_buffer_excitatory_value =
@@ -135,13 +135,13 @@ static inline void synapse_types_print_input(
 //! \param[in] parameter: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(
         synapse_param_pointer_t parameter) {
-    log_info("exc_decay = %R\n", (unsigned fract) parameter->exc_decay);
-    log_info("exc_init  = %R\n", (unsigned fract) parameter->exc_init);
-    log_info("inh_decay = %R\n", (unsigned fract) parameter->inh_decay);
-    log_info("inh_init  = %R\n", (unsigned fract) parameter->inh_init);
-    log_info("gsyn_excitatory_initial_value = %11.4k\n",
+    log_debug("exc_decay = %R\n", (unsigned fract) parameter->exc_decay);
+    log_debug("exc_init  = %R\n", (unsigned fract) parameter->exc_init);
+    log_debug("inh_decay = %R\n", (unsigned fract) parameter->inh_decay);
+    log_debug("inh_init  = %R\n", (unsigned fract) parameter->inh_init);
+    log_debug("gsyn_excitatory_initial_value = %11.4k\n",
               parameter->input_buffer_excitatory_value);
-    log_info("gsyn_inhibitory_initial_value = %11.4k\n",
+    log_debug("gsyn_inhibitory_initial_value = %11.4k\n",
               parameter->input_buffer_inhibitory_value);
 }
 

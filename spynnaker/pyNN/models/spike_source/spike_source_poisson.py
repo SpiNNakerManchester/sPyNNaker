@@ -36,7 +36,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
-
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs.executable_start_type \
     import ExecutableStartType
 
@@ -48,7 +48,6 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities import globals_variables
 from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
@@ -154,6 +153,7 @@ class SpikeSourcePoisson(
 
         # atoms params
         self._n_atoms = n_neurons
+        self._model_name = "SpikeSourcePoisson"
         self._seed = None
 
         # check for changes parameters
@@ -209,6 +209,8 @@ class SpikeSourcePoisson(
     def _max_spikes_per_ts(
             self, vertex_slice, n_machine_time_steps, machine_time_step):
         max_rate = numpy.amax(self._rate[vertex_slice.as_slice])
+        if max_rate == 0:
+            return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(n_machine_time_steps)),
@@ -629,7 +631,8 @@ class SpikeSourcePoisson(
         # Convert end values as timesteps to durations in milliseconds
         self._duration[vertex_slice.as_slice] = \
             self._convert_n_timesteps_to_ms(
-                values[1], self._machine_time_step) - self._start
+                values[1], self._machine_time_step) - \
+            self._start[vertex_slice.as_slice]
 
         # Work out the spikes per tick depending on if the source is slow
         # or fast
@@ -721,7 +724,8 @@ class SpikeSourcePoisson(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self.label, buffer_manager, 0,
+            self.label, buffer_manager,
+            SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
@@ -737,3 +741,27 @@ class SpikeSourcePoisson(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID)
+
+    def describe(self):
+        """
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customised by specifying a different template
+        together with an associated template engine
+        (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+
+        parameters = dict()
+        for parameter_name in self.default_parameters:
+            parameters[parameter_name] = self.get_value(parameter_name)
+
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_parameters,
+            "parameters": parameters,
+        }
+        return context

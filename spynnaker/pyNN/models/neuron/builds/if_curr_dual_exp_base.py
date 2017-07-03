@@ -1,14 +1,13 @@
-from spynnaker.pyNN.models.neuron.neuron_models\
-    .neuron_model_leaky_integrate_and_fire \
+from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential \
+from spynnaker.pyNN.models.neuron.synapse_types \
     import SynapseTypeDualExponential
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
-    import ThresholdTypeStatic
-from spynnaker.pyNN.models.neuron.abstract_population_vertex \
-    import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
 
 
 class IFCurrDualExpBase(AbstractPopulationVertex):
@@ -17,7 +16,6 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
         current input
     """
 
-    DEFAULT_MAX_ATOMS_PER_CORE = 255
     _model_based_max_atoms_per_core = 255
 
     default_parameters = {

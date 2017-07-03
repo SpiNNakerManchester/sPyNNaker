@@ -4,32 +4,36 @@ import struct
 import sys
 from collections import defaultdict
 from scipy import special  # @UnresolvedImport
-
 import numpy
+
+# pacmna imports
 from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
     AbstractHasGlobalMaxAtoms
-from spinn_front_end_common.utilities import helpful_functions
-from data_specification.enums.data_type import DataType
 from pacman.model.graphs.common.slice import Slice
 
+# spinn utils
+from spinn_utilities import helpful_functions as spinn_utils_helpful_functions
+
+# fec
+from spinn_front_end_common.utilities import helpful_functions as \
+    fec_helpful_functions
+from spinn_front_end_common.utilities import globals_variables
+
+# dsg
+from data_specification.enums.data_type import DataType
+
+# spynnaker
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector
-from spynnaker.pyNN.models.neural_projections.projection_application_edge \
-    import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
-    import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.synapse_io.synapse_io_row_based \
-    import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson \
-    import SpikeSourcePoisson
-from spynnaker.pyNN.models.utility_models.delay_extension_vertex \
-    import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spynnaker.pyNN.utilities import constants, utility_calls
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spynnaker.pyNN.utilities import globals_variables
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -55,7 +59,7 @@ class SynapticManager(object):
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + config.get(
                 "MasterPopTable", "generator"))
-            algorithms = helpful_functions.get_valid_components(
+            algorithms = spinn_utils_helpful_functions.get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
             self._population_table_type = algorithms[population_table_type]()
 
@@ -218,7 +222,6 @@ class SynapticManager(object):
 
                 # Get an estimate of the number of pre-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
-                # TODO: Can be removed once we move to population-based keys
                 n_atoms_per_machine_vertex = sys.maxint
                 if isinstance(in_edge.pre_vertex, AbstractHasGlobalMaxAtoms):
                     n_atoms_per_machine_vertex = \
@@ -649,10 +652,9 @@ class SynapticManager(object):
                             connection_holder.add_connections(connections)
                             connection_holder.finish()
 
+                    rinfo = routing_info.get_routing_info_for_edge(
+                        machine_edge)
                     if len(row_data) > 0:
-                        rinfo = routing_info.\
-                            get_routing_info_for_edge(machine_edge)
-
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector)):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
@@ -675,6 +677,11 @@ class SynapticManager(object):
                                     rinfo.first_key_and_mask,
                                     master_pop_table_region)
                             next_block_start_address += len(row_data) * 4
+                    elif rinfo is not None:
+                        self._population_table_type\
+                            .update_master_population_table(
+                                spec, 0, 0, rinfo.first_key_and_mask,
+                                master_pop_table_region)
                     del row_data
 
                     if next_block_start_address > all_syn_block_sz:
@@ -683,10 +690,13 @@ class SynapticManager(object):
                             " {} of {} ".format(
                                 next_block_start_address, all_syn_block_sz))
 
+                    rinfo = None
+                    delay_key = (
+                        app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+                        pre_vertex_slice.hi_atom)
+                    if delay_key in self._delay_key_index:
+                        rinfo = self._delay_key_index[delay_key]
                     if len(delayed_row_data) > 0:
-                        rinfo = self._delay_key_index[
-                            (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                             pre_vertex_slice.hi_atom)]
 
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector)):
@@ -712,6 +722,11 @@ class SynapticManager(object):
                                     master_pop_table_region)
                             next_block_start_address += len(
                                 delayed_row_data) * 4
+                    elif rinfo is not None:
+                        self._population_table_type\
+                            .update_master_population_table(
+                                spec, 0, 0, rinfo.first_key_and_mask,
+                                master_pop_table_region)
                     del delayed_row_data
 
                     if next_block_start_address > all_syn_block_sz:
@@ -812,12 +827,12 @@ class SynapticManager(object):
 
         # Get the block for the connections from the pre_vertex
         master_pop_table_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
                 transceiver)
         synaptic_matrix_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 transceiver)
@@ -871,6 +886,8 @@ class SynapticManager(object):
             return None, None
 
         max_row_length, synaptic_block_offset, is_single = items[index]
+        if max_row_length == 0:
+            return None, None
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
@@ -916,7 +933,7 @@ class SynapticManager(object):
             self, transceiver, placement, vertex_slice):
         # locate sdram address to where the synapse parameters are stored
         synapse_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
+            fec_helpful_functions.locate_memory_region_for_placement(
                 placement,
                 constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
                 transceiver)

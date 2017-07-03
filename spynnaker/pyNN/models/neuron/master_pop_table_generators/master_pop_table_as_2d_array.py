@@ -5,8 +5,7 @@ from pacman.model.constraints.key_allocator_constraints \
 from pacman.utilities.utility_objs.field import Field
 
 # spynnaker imports
-from spynnaker.pyNN.models.neuron.master_pop_table_generators.\
-    abstract_master_pop_table_factory import AbstractMasterPopTableFactory
+from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
 
 # spinn front end common imports

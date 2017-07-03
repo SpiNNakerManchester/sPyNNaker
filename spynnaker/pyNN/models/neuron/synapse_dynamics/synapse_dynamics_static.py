@@ -4,10 +4,8 @@ import math
 from spinn_front_end_common.abstract_models.\
     abstract_changable_after_run import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_population_settable import AbstractPopulationSettable
-from spynnaker.pyNN.models.neuron.synapse_dynamics\
-    .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from spynnaker.pyNN import exceptions
 
 
@@ -106,7 +104,7 @@ class SynapseDynamicsStatic(
         if hasattr(self, key):
             return getattr(self, key)
         raise exceptions.InvalidParameterType(
-            "Type {} does not have parameter {}".format(self._model_name, key))
+            "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
@@ -119,4 +117,4 @@ class SynapseDynamicsStatic(
             setattr(self, key, value)
             self._change_requires_mapping = True
         raise exceptions.InvalidParameterType(
-            "Type {} does not have parameter {}".format(self._model_name, key))
+            "Type {} does not have parameter {}".format(type(self), key))

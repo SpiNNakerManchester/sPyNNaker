@@ -1,12 +1,9 @@
 from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.abstract_contains_units import \
-    AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
-    import AbstractInputType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_input_type import AbstractInputType
 
 from enum import Enum
 

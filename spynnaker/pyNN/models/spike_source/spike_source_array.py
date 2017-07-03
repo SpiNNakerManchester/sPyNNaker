@@ -15,16 +15,12 @@ from spinn_front_end_common.abstract_models.abstract_changable_after_run \
     import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import globals_variables
 
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common.eieio_spike_recorder \
-    import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
+from spynnaker.pyNN.models.common import SimplePopulationSettable
 from spynnaker.pyNN.utilities import constants
-
-from spynnaker.pyNN.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +72,8 @@ class SpikeSourceArray(
                 'spike_recorder_buffer_size'],
             buffer_size_before_receive=none_pynn_default_parameters[
                 'buffer_size_before_receive']):
+
+        self._model_name = "SpikeSourceArray"
 
         config = globals_variables.get_simulator().config
         self._ip_address = ip_address
@@ -208,3 +206,27 @@ class SpikeSourceArray(
     @staticmethod
     def get_max_atoms_per_core():
         return SpikeSourceArray._model_based_max_atoms_per_core
+
+    def describe(self):
+        """
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customised by specifying a different template
+        together with an associated template engine
+        (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+
+        parameters = dict()
+        for parameter_name in self.default_parameters:
+            parameters[parameter_name] = self.get_value(parameter_name)
+
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_parameters,
+            "parameters": parameters,
+        }
+        return context

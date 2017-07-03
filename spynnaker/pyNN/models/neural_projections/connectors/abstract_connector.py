@@ -1,9 +1,9 @@
 from six import add_metaclass
-
+from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.utilities import globals_variables
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -12,6 +12,12 @@ import re
 
 # global objects
 logger = logging.getLogger(__name__)
+_expr_context = SafeEval(
+    math, numpy, numpy.arccos, numpy.arcsin, numpy.arctan, numpy.arctan2,
+    numpy.ceil, numpy.cos, numpy.cosh, numpy.exp, numpy.fabs, numpy.floor,
+    numpy.fmod, numpy.hypot, numpy.ldexp, numpy.log, numpy.log10, numpy.modf,
+    numpy.power, numpy.sin, numpy.sinh, numpy.sqrt, numpy.tan, numpy.tanh,
+    numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
 @add_metaclass(AbstractBase)
@@ -53,13 +59,13 @@ class AbstractConnector(object):
         """ sets the weights and delays as needed
 
         :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
+            may either be a float, a !RandomDistribution object, a list\
+            1D array with at least as many items as connections to be\
             created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-            will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler,
-        or random number generator
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            delays will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler, \
+            or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
         self._weights = weights
@@ -168,6 +174,8 @@ class AbstractConnector(object):
                 delay for delay in delays[connection_slice]
                 if min_delay <= delay <= max_delay])
                 for connection_slice in connection_slices])
+            if n_delayed == 0:
+                return 0
             n_total = sum([
                 len(delays[connection_slice])
                 for connection_slice in connection_slices])
@@ -312,7 +320,7 @@ class AbstractConnector(object):
                 expand_distances)
 
             if isinstance(values, basestring):
-                return eval(values)
+                return _expr_context.eval(values)
             return values(d)
 
     def _generate_weights(self, values, n_connections, connection_slices):

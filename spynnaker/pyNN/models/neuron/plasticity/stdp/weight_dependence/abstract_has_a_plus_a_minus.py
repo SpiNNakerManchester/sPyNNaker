@@ -25,7 +25,7 @@ class AbstractHasAPlusAMinus(object):
 
     @property
     def A_plus(self):
-        return self._A_plus
+        return self._a_plus
 
     @A_plus.setter
     def A_plus(self, new_value):
@@ -33,7 +33,7 @@ class AbstractHasAPlusAMinus(object):
 
     @property
     def A_minus(self):
-        return self._A_minus
+        return self._a_minus
 
     @A_minus.setter
     def A_minus(self, new_value):
