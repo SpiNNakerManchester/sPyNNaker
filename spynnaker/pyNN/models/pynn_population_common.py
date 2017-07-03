@@ -242,7 +242,8 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_simulator().has_ran \
                 and not globals_variables.get_simulator().has_reset_last \
                 and self._vertex_read_parameters_before_set \
-                and not self._has_read_neuron_parameters_this_run:
+                and not self._has_read_neuron_parameters_this_run \
+                and not globals_variables.get_simulator().use_virtual_board:
             # locate machine vertices from the application vertices
             machine_vertices = globals_variables.get_simulator().graph_mapper\
                 .get_machine_vertices(self._vertex)
