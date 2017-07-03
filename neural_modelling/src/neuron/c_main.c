@@ -185,7 +185,6 @@ static bool initialise(uint32_t *timer_period) {
 
     // Setup profiler
     profiler_init(
-        &system_region[SIMULATION_N_TIMING_DETAIL_WORDS],
         data_specification_get_region(PROFILER_REGION, address));
 
     log_info("Initialise: finished");

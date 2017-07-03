@@ -374,7 +374,6 @@ class AbstractPopulationVertex(
                 machine_time_step) +
             (self._get_number_of_mallocs_used_by_dsg() *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
-            profile_utils.get_profile_header_size() +
             profile_utils.get_profile_region_size(
                 self._n_profile_samples))
 
@@ -400,12 +399,9 @@ class AbstractPopulationVertex(
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
-        profile_header_size = profile_utils.get_profile_header_size()
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=(
-                common_constants.SYSTEM_BYTES_REQUIREMENT +
-                profile_header_size),
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
@@ -429,6 +425,7 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size,
             label='NeuronParams')
+
 
         profile_utils.reserve_profile_region(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
@@ -582,9 +579,6 @@ class AbstractPopulationVertex(
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
-        profile_utils.write_profile_region_data(
-            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            self._n_profile_samples)
 
         # Write the recording region
         spec.switch_write_focus(
@@ -601,6 +595,10 @@ class AbstractPopulationVertex(
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
+
+        profile_utils.write_profile_region_data(
+            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value,
+            self._n_profile_samples)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
