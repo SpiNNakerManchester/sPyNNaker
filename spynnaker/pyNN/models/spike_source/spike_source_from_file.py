@@ -2,7 +2,7 @@
 # spynnaker imports
 from spynnaker.pyNN.models.spike_source.spike_source_array import \
     SpikeSourceArray
-from spynnaker.pyNN import utility_calls
+from spynnaker.pyNN.utilities import utility_calls
 
 # general imports
 import numpy
@@ -33,14 +33,6 @@ class SpikeSourceFromFile(SpikeSourceArray):
 
     @staticmethod
     def _subsample_spikes_by_time(spike_array, start, stop, step):
-        """
-
-        :param spike_array:
-        :param start:
-        :param stop:
-        :param step:
-        :return:
-        """
         sub_sampled_array = {}
         for neuron in spike_array:
             times = [t for t in spike_array[neuron] if start <= t < stop]
