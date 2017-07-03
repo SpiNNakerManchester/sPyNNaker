@@ -38,6 +38,7 @@
 #include "common/neuron-typedefs.h"
 
 #include <bit_field.h>
+#include <recording.h>
 
 extern bit_field_t out_spikes;
 
@@ -53,7 +54,10 @@ bool out_spikes_initialize(size_t max_spike_sources);
 //!        recording
 //! \param[in] channel The channel to record to
 //! \param[in] time The time at which the recording is being made
-void out_spikes_record(uint8_t channel, uint32_t time);
+//! \param[in] callback Callback to call when the recording is done
+//                      (can be NULL)
+void out_spikes_record(
+    uint8_t channel, uint32_t time, recording_complete_callback_t callback);
 
 //! \brief Check if any spikes have been recorded
 //! \return True if no spikes have been recorded, false otherwise

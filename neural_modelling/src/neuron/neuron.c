@@ -18,6 +18,9 @@
 #include <debug.h>
 #include <string.h>
 
+// declare spin1_wfi
+void spin1_wfi();
+
 #define SPIKE_RECORDING_CHANNEL 0
 #define V_RECORDING_CHANNEL 1
 #define GSYN_EXCITATORY_RECORDING_CHANNEL 2
@@ -72,6 +75,9 @@ static uint32_t time_between_spikes;
 
 //! The expected current clock tick of timer_1 when the next spike can be sent
 static uint32_t expected_time;
+
+//! The number of recordings outstanding
+static uint32_t n_recordings_outstanding = 0;
 
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
@@ -316,6 +322,10 @@ void neuron_set_neuron_synapse_shaping_params(
     neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
 
+void recording_done_callback() {
+    n_recordings_outstanding -= 1;
+}
+
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
 //! \param[in] time the timer tick  value currently being executed
@@ -330,6 +340,15 @@ void neuron_do_timestep_update(timer_t time) {
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
+
+    // Wait until recordings have completed, to ensure the recording space
+    // can be re-written
+    while (n_recordings_outstanding > 0) {
+        spin1_wfi();
+    }
+
+    // Reset the out spikes before starting
+    out_spikes_reset();
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -417,26 +436,37 @@ void neuron_do_timestep_update(timer_t time) {
         }
     }
 
+    // Disable interrupts to avoid possible concurrent access
+    uint cpsr = 0;
+    cpsr = spin1_int_disable();
+
     // record neuron state (membrane potential) if needed
     if (recording_is_channel_enabled(recording_flags, V_RECORDING_CHANNEL)) {
+        n_recordings_outstanding += 1;
         voltages->time = time;
-        recording_record(V_RECORDING_CHANNEL, voltages, voltages_size);
+        recording_record_and_notify(
+            V_RECORDING_CHANNEL, voltages, voltages_size,
+            recording_done_callback);
     }
 
-    // record neuron inputs if needed
+    // record neuron inputs (excitatory) if needed
     if (recording_is_channel_enabled(
             recording_flags, GSYN_EXCITATORY_RECORDING_CHANNEL)) {
+        n_recordings_outstanding += 1;
         inputs_excitatory->time = time;
-        recording_record(
-            GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, input_size);
+        recording_record_and_notify(
+            GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, input_size,
+            recording_done_callback);
     }
 
-    // record neuron inputs if needed
+    // record neuron inputs (inhibitory) if needed
     if (recording_is_channel_enabled(
             recording_flags, GSYN_INHIBITORY_RECORDING_CHANNEL)) {
+        n_recordings_outstanding += 1;
         inputs_inhibitory->time = time;
-        recording_record(
-            GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, input_size);
+        recording_record_and_notify(
+            GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, input_size,
+            recording_done_callback);
     }
 
     // do logging stuff if required
@@ -446,7 +476,13 @@ void neuron_do_timestep_update(timer_t time) {
     // Record any spikes this timestep
     if (recording_is_channel_enabled(
             recording_flags, SPIKE_RECORDING_CHANNEL)) {
-        out_spikes_record(SPIKE_RECORDING_CHANNEL, time);
+        if (!out_spikes_is_empty()) {
+            n_recordings_outstanding += 1;
+            out_spikes_record(
+                SPIKE_RECORDING_CHANNEL, time, recording_done_callback);
+        }
     }
-    out_spikes_reset();
+
+    // Re-enable interrupts
+    spin1_mode_restore(cpsr);
 }

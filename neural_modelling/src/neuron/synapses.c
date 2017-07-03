@@ -200,14 +200,13 @@ static inline void _process_fixed_synapses(
 static inline void _print_synapse_parameters() {
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
-//#if LOG_LEVEL >= LOG_DEBUG
+#if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
         synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
     }
     log_debug("-------------------------------------\n");
-    //}
-//#endif // LOG_LEVEL >= LOG_DEBUG
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 
