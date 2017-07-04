@@ -411,6 +411,10 @@ class AbstractPopulationVertex(
             size=recording_utilities.get_recording_header_size(
                 self.N_RECORDING_REGIONS))
 
+        profile_utils.reserve_profile_region(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
+
         vertex.reserve_provenance_data_region(spec)
 
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
@@ -425,11 +429,6 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
             size=params_size,
             label='NeuronParams')
-
-
-        profile_utils.reserve_profile_region(
-            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
-            self._n_profile_samples)
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
@@ -596,6 +595,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
+        # write profile data
         profile_utils.write_profile_region_data(
             spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value,
             self._n_profile_samples)
