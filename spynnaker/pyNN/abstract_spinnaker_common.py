@@ -12,7 +12,6 @@ from spinn_front_end_common.utilities.utility_objs.executable_finder \
 from spinn_front_end_common.utilities import globals_variables
 
 # local front end imports
-import spynnaker.pyNN
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
