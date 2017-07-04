@@ -79,15 +79,16 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         AbstractSpinnakerBase.__init__(
             self,
-            graph_label=graph_label,
+            configfile=self.CONFIG_FILE_NAME,
             executable_finder=self._EXECUTABLE_FINDER,
+            graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
             default_config_paths=[
                 os.path.join(os.path.dirname(__file__),
                              self.CONFIG_FILE_NAME)],
-            configfile=self.CONFIG_FILE_NAME
+
         )
 
         extra_mapping_inputs = dict()
