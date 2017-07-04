@@ -7,6 +7,11 @@
 #include <spin1_api.h>
 #include <string.h>
 
+//! if using profiler import profiler tags
+#ifdef PROFILER_ENABLED
+    #include "profile_tags.h"
+#endif
+
 // Compute the size of the input buffers and ring buffers
 #define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
                                 + SYNAPSE_INDEX_BITS))
