@@ -39,13 +39,12 @@ class PopulationMachineVertex(
                ("BUFFER_OVERFLOW_COUNT", 2),
                ("CURRENT_TIMER_TIC", 3)])
 
-    PROFILE_TAG_LABELS = [
-        "TIMER",
-        "DMA_READ",
-        "INCOMING_SPIKE",
-        "PROCESS_FIXED_SYNAPSES",
-        "PROCESS_PLASTIC_SYNAPSES"
-    ]
+    PROFILE_TAG_LABELS = {
+        0: "TIMER",
+        1: "DMA_READ",
+        2: "INCOMING_SPIKE",
+        3: "PROCESS_FIXED_SYNAPSES",
+        4: "PROCESS_PLASTIC_SYNAPSES"}
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 4
 
