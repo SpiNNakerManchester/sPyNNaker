@@ -110,8 +110,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
-        if self.config.getboolean("Reports", "reportsEnabled"):
-            if self.config.getboolean("Reports", "writeSynapticReport"):
+        if self.config.getboolean("Reports", "reports_enabled"):
+            if self.config.getboolean("Reports", "write_synaptic_report"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
@@ -139,7 +139,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         if time_scale_factor is None:
             time_scale_factor = helpful_functions.read_config_int(
-                config, "Machine", "timeScaleFactor")
+                config, "Machine", "time_scale_factor")
 
         # deal with params allowed via the setup options
         if timestep is not None:
@@ -158,7 +158,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self._machine_time_step = timestep
         else:
             self._machine_time_step = config.getint(
-                "Machine", "machineTimeStep")
+                "Machine", "machine_time_step")
 
         if (min_delay is not None and
                 float(min_delay * 1000) < self._machine_time_step):
@@ -195,10 +195,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self._max_delay = (
                 max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
-        if (config.has_option("Machine", "timeScaleFactor") and
-                config.get("Machine", "timeScaleFactor") != "None"):
+        if (config.has_option("Machine", "time_scale_factor") and
+                config.get("Machine", "time_scale_factor") != "None"):
             self._time_scale_factor = \
-                config.getint("Machine", "timeScaleFactor")
+                config.getint("Machine", "time_scale_factor")
             if self._machine_time_step * self._time_scale_factor < 1000:
                 if config.getboolean(
                         "Mode", "violate_1ms_wall_clock_restriction"):
