@@ -1,4 +1,3 @@
-import os
 import unittest
 
 import spinn_front_end_common.interface.abstract_spinnaker_base as base
