@@ -6,6 +6,7 @@ addons:
   apt:
     packages:
       - vera++
+      - libxml2-utils
       #- gcc-arm-none-eabi
       #- libnewlib-arm-none-eabi
 
@@ -49,6 +50,7 @@ script:
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
   # - flake8 integration_tests
   - support/run-vera.sh neural_modelling
+  - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh 
   - cd doc/source
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
