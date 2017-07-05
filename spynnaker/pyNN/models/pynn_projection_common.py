@@ -269,7 +269,8 @@ class PyNNProjectionCommon(object):
 
     def _clear_cache(self):
         post_vertex = self._projection_edge.post_vertex
-        post_vertex.clear_connection_cache()
+        if isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
+            post_vertex.clear_connection_cache()
 
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)
