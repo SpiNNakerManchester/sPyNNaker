@@ -323,7 +323,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
-        AbstractSpinnakerBase.run(self, run_time)
+        AbstractSpinnakerBase._run(self, run_time)
 
     @property
     def time_scale_factor(self):
