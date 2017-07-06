@@ -2,7 +2,7 @@
 # pacman imports
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
+    import ContiguousKeyRangeContraint
 from pacman.model.decorators import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
@@ -787,7 +787,7 @@ class AbstractPopulationVertex(
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]
 
     @overrides(
         AbstractNeuronRecordable.clear_recording)

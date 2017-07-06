@@ -1,7 +1,7 @@
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFixedMaskConstraint
+    import FixedKeyFieldConstraint, FixedMaskConstraint
 from pacman.utilities.utility_objs import Field
 
 # spynnaker imports
@@ -212,6 +212,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         fields.append(Field(0, 7, 0xFF000000))
         fields.append(Field(0, 7, 0x00FF0000))
         fields.append(Field(0, 17, 0x0000F800))
-        constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
-        constraints.append(KeyAllocatorFixedFieldConstraint(fields))
+        constraints.append(FixedMaskConstraint(0xFFFFF800))
+        constraints.append(FixedKeyFieldConstraint(fields))
         return constraints

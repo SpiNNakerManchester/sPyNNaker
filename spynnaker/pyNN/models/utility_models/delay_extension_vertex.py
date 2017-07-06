@@ -6,9 +6,9 @@ from spinn_front_end_common.utilities import constants as common_constants
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
+    import ContiguousKeyRangeContraint
 from pacman.model.constraints.partitioner_constraints \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
@@ -66,7 +66,7 @@ class DelayExtensionVertex(
         self._delay_blocks = dict()
 
         self.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(source_vertex))
+            SameAtomsAsVertexConstraint(source_vertex))
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
@@ -272,4 +272,4 @@ class DelayExtensionVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]

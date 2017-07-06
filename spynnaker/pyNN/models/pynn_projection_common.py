@@ -1,5 +1,5 @@
 from pacman.model.constraints.partitioner_constraints \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models \
     import AbstractAcceptsIncomingSynapses
@@ -192,7 +192,7 @@ class PyNNProjectionCommon(object):
                 machine_time_step, timescale_factor, label=delay_name)
             pre_synaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(delay_vertex))
+                SameAtomsAsVertexConstraint(delay_vertex))
             self._spinnaker_control.add_application_vertex(delay_vertex)
 
             # Add the edge

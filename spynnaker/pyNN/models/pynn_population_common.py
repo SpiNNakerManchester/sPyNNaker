@@ -1,6 +1,6 @@
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint
+    import ChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models \
@@ -293,7 +293,7 @@ class PyNNPopulationCommon(object):
         :param p: The processor id of the placement constraint (optional)
         :type p: int
         """
-        self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
+        self._vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
