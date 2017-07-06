@@ -1,20 +1,20 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 from spinn_front_end_common.interface.interface_functions import \
-    FrontEndCommonGraphDataSpecificationWriter
+    GraphDataSpecificationWriter
 
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 
 
 class SpynnakerDataSpecificationWriter(
-        FrontEndCommonGraphDataSpecificationWriter):
+        GraphDataSpecificationWriter):
     """ Executes data specification generation for sPyNNaker
     """
 
     __slots__ = ()
 
     def __init__(self):
-        FrontEndCommonGraphDataSpecificationWriter.__init__(self)
+        GraphDataSpecificationWriter.__init__(self)
 
     def __call__(
             self, placements, graph, hostname,
