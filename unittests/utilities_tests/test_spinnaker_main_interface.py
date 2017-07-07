@@ -1,3 +1,5 @@
+import os
+import sys
 import unittest
 
 import spinn_front_end_common.interface.abstract_spinnaker_base as base
@@ -32,9 +34,17 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         globals_variables.set_failed_state(SpynnakerFailedState())
 
     def test_min_init(self):
+        class_file = sys.modules[self.__module__].__file__
+        path = os.path.dirname(os.path.abspath(class_file))
+        os.chdir(path)
+        print path
         AbstractSpinnakerBase(base.CONFIG_FILE, ExecutableFinder())
 
     def test_stop_init(self):
+        class_file = sys.modules[self.__module__].__file__
+        path = os.path.dirname(os.path.abspath(class_file))
+        os.chdir(path)
+
         interface = AbstractSpinnakerBase(base.CONFIG_FILE, ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
