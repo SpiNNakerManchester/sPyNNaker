@@ -597,7 +597,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
-        return self._neuron_recorder.get_recordable_variables
+        return self._neuron_recorder.get_recordable_variables()
 
     @overrides(AbstractNeuronRecordable.is_recording)
     def is_recording(self, variable):
