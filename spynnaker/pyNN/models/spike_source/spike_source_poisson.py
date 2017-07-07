@@ -716,7 +716,8 @@ class SpikeSourcePoisson(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self._spike_recorder.get_spikes(
-            self.label, buffer_manager, 0,
+            self.label, buffer_manager,
+            SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID,
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
