@@ -1,10 +1,8 @@
 from spinn_utilities.progress_bar import ProgressBar
-import struct
-from spinnman.messages.eieio.data_messages.eieio_data_header \
-    import EIEIODataHeader
+from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
 import numpy
-
+import struct
 import logging
 
 logger = logging.getLogger(__name__)

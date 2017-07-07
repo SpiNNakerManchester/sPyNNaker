@@ -1,4 +1,4 @@
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge

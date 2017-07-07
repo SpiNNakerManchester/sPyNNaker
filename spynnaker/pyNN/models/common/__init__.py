@@ -1,5 +1,4 @@
-from .abstract_neuron_recordable \
-    import AbstractNeuronRecordable
+from .abstract_neuron_recordable import AbstractNeuronRecordable
 from .abstract_spike_recordable import AbstractSpikeRecordable
 from .abstract_uint32_recorder import AbstractUInt32Recorder
 from .eieio_spike_recorder import EIEIOSpikeRecorder

@@ -5,11 +5,10 @@ from spinn_utilities.abstract_base import AbstractBase
 # common front end imports
 from spinn_front_end_common.interface.abstract_spinnaker_base \
     import AbstractSpinnakerBase
-from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utility_models.command_sender import CommandSender
-from spinn_front_end_common.utilities.utility_objs.executable_finder \
-    import ExecutableFinder
+from spinn_front_end_common.utility_models import CommandSender
+from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
 
 # local front end imports
@@ -159,7 +158,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         if (min_delay is not None and
                 float(min_delay * 1000) < self._machine_time_step):
-            raise common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
                     constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
@@ -177,7 +176,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if (max_delay is not None and
                 float(max_delay * 1000.0) >
                 (max_delay_tics_supported * self._machine_time_step)):
-            raise common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
                     0.144 * self._machine_time_step))
@@ -212,7 +211,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                     logger.warn(
                         "****************************************************")
                 else:
-                    raise common_exceptions.ConfigurationException(
+                    raise ConfigurationException(
                         "The combination of simulation time step and the"
                         " machine time scale factor results in a wall clock "
                         "timer tick that is currently not reliably supported "

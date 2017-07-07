@@ -1,6 +1,6 @@
 from spinn_utilities import logger_utils
-from spinn_front_end_common.utilities import exceptions as fec_excceptions
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
@@ -78,14 +78,14 @@ class RecordingCommon(object):
             if not isinstance(self._population._vertex.input_type,
                               InputTypeConductance):
                 msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input.  " \
+                      "from a model which does not use conductance input. " \
                       "You will receive current measurements instead."
                 logger_utils.warn_once(logger, msg)
         elif variable == "gsyn_inh":
             if not isinstance(self._population._vertex.input_type,
                               InputTypeConductance):
                 msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input.  " \
+                      "from a model which does not use conductance input. " \
                       "You will receive current measurements instead."
                 logger_utils.warn_once(logger, msg)
 
@@ -137,39 +137,34 @@ class RecordingCommon(object):
             return self._get_spikes()
 
         # check that we're ina  state to get voltages
-        if isinstance(
-                self._population._vertex, AbstractNeuronRecordable):
-            if not self._population._vertex.is_recording(variable):
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record {}"
-                    "".format(variable))
-        else:
-            raise fec_excceptions.ConfigurationException(
+        if not isinstance(self._population._vertex, AbstractNeuronRecordable):
+            raise ConfigurationException(
                 "This population has not got the capability to record {}"
-                "".format(variable))
+                .format(variable))
+        if not self._population._vertex.is_recording(variable):
+            raise ConfigurationException(
+                "This population has not been set to record {}"
+                .format(variable))
 
-        if not globals_variables.get_simulator().has_ran:
+        sim = get_simulator()
+        if not sim.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore {} cannot"
-                " be retrieved, hence the list will be empty "
-                "".format(variable))
+                " be retrieved, hence the list will be empty".format(
+                    variable))
             return numpy.zeros((0, 3))
 
-        if globals_variables.get_simulator().use_virtual_board:
+        if sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 3))
 
-            # assuming we got here, everything is ok, so we should go get the
-            # voltages
+        # assuming we got here, everything is ok, so we should go get the
+        # voltages
         return self._population._vertex.get_data(
-            variable,
-            globals_variables.get_simulator().no_machine_time_steps,
-            globals_variables.get_simulator().placements,
-            globals_variables.get_simulator().graph_mapper,
-            globals_variables.get_simulator().buffer_manager,
-            globals_variables.get_simulator().machine_time_step)
+            variable, sim.no_machine_time_steps, sim.placements,
+            sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
@@ -178,21 +173,21 @@ class RecordingCommon(object):
         """
 
         # check we're in a state where we can get spikes
-        if isinstance(self._population._vertex, AbstractSpikeRecordable):
-            if not self._population._vertex.is_recording_spikes():
-                raise fec_excceptions.ConfigurationException(
-                    "This population has not been set to record spikes")
-        else:
-            raise fec_excceptions.ConfigurationException(
+        if not isinstance(self._population._vertex, AbstractSpikeRecordable):
+            raise ConfigurationException(
                 "This population has not got the capability to record spikes")
+        if not self._population._vertex.is_recording_spikes():
+            raise ConfigurationException(
+                "This population has not been set to record spikes")
 
-        if not globals_variables.get_simulator().has_ran:
+        sim = get_simulator()
+        if not sim.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        if globals_variables.get_simulator().use_virtual_board:
+        if sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
@@ -201,10 +196,8 @@ class RecordingCommon(object):
         # assuming we got here, everything is ok, so we should go get the
         # spikes
         return self._population._vertex.get_spikes(
-            globals_variables.get_simulator().placements,
-            globals_variables.get_simulator().graph_mapper,
-            globals_variables.get_simulator().buffer_manager,
-            globals_variables.get_simulator().machine_time_step)
+            sim.placements, sim.graph_mapper, sim.buffer_manager,
+            sim.machine_time_step)
 
     def _create_full_filter_list(self, filter_value):
         # Create default dictionary of population-size boolean arrays
