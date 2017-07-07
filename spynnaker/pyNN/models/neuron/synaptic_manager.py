@@ -815,9 +815,9 @@ class SynapticManager(object):
 
         # Get the block for the connections from the delayed pre_vertex
         delayed_data = None
-        max_row_len = 0
+        delayed_max_row_len = 0
         if delayed_key is not None:
-            delayed_data, max_row_len = self._retrieve_synaptic_block(
+            delayed_data, delayed_max_row_len = self._retrieve_synaptic_block(
                 transceiver, placement, master_pop_table_address,
                 indirect_synapses_address, direct_synapses_address,
                 delayed_key,
@@ -827,7 +827,7 @@ class SynapticManager(object):
         # Convert the blocks into connections
         return self._synapse_io.read_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice,
-            max_row_length, max_row_len, n_synapse_types,
+            max_row_length, delayed_max_row_len, n_synapse_types,
             self._weight_scales[placement], data, delayed_data,
             app_edge.n_delay_stages, machine_time_step)
 
