@@ -609,7 +609,7 @@ class SynapticManager(object):
                             synapse_info, pre_slices, pre_slice_idx,
                             post_slices, post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge.n_delay_stages,
-                            self._population_table_type, n_synapse_types,
+                            self._poptable_type, n_synapse_types,
                             weight_scales, machine_time_step, max_feasible_atoms_per_core)
 
                     if app_edge.delay_edge is not None:
