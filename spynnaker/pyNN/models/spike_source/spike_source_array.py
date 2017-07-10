@@ -1,20 +1,17 @@
 import logging
 import sys
 
-from pacman.model.decorators.overrides import overrides
-from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
-    import ReverseIpTagMultiCastSource
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
+from pacman.model.decorators import overrides
+from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
+from spinn_front_end_common.utilities.constants \
+    import MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 from spinn_front_end_common.utilities import exceptions
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl\
-    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
+    import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -127,7 +124,7 @@ class SpikeSourceArray(
         self._space_before_notification = space_before_notification
         if self._max_on_chip_memory_usage_for_spikes is None:
             self._max_on_chip_memory_usage_for_spikes = \
-                front_end_common_constants.MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
+                MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 
         # check the values do not conflict with chip memory limit
         if self._max_on_chip_memory_usage_for_spikes < 0:

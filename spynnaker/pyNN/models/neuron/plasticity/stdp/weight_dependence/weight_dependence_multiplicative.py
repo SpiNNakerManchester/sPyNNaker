@@ -1,4 +1,4 @@
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
