@@ -1,21 +1,18 @@
 
 # pacman imports
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import MachineVertex
 
 # spinn front end common imports
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .abstract_receive_buffers_to_host import AbstractReceiveBuffersToHost
+from spinn_front_end_common.interface.buffer_management.buffer_models \
+    import AbstractReceiveBuffersToHost
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.abstract_recordable \
-    import AbstractRecordable
+from spinn_front_end_common.abstract_models import AbstractRecordable
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants

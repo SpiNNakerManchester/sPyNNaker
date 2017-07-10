@@ -3,7 +3,7 @@ utility class containing simple helper methods
 """
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 import numpy
 import os
@@ -50,8 +50,7 @@ def convert_param_to_numpy(param, no_atoms):
 
     # Deal with multiple values, but not the correct number of them
     if len(param) != no_atoms:
-
-        raise exceptions.ConfigurationException(
+        raise ConfigurationException(
             "The number of params does not equal with the number of atoms in"
             " the vertex")
 
