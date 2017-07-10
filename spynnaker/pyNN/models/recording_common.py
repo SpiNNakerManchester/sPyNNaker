@@ -136,40 +136,40 @@ class RecordingCommon(object):
         timer = Timer()
         timer.start_timing()
         data = None
-
+        sim = get_simulator()
 
         if variable == "spikes":
             data = self._get_spikes()
 
-        # check that we're ina  state to get voltages
-        if not isinstance(self._population._vertex, AbstractNeuronRecordable):
+        # check that we're in a state to get voltages
+        elif not isinstance(
+                self._population._vertex, AbstractNeuronRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record {}"
                 .format(variable))
-        if not self._population._vertex.is_recording(variable):
+        elif not self._population._vertex.is_recording(variable):
             raise ConfigurationException(
                 "This population has not been set to record {}"
                 .format(variable))
 
-        sim = get_simulator()
-        if not sim.has_ran:
+        elif not sim.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore {} cannot"
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
 
-        if sim.use_virtual_board:
+        elif sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
-
-        # assuming we got here, everything is ok, so we should go get the
-        # voltages
-        data = self._population._vertex.get_data(
-            variable, sim.no_machine_time_steps, sim.placements,
-            sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+        else:
+            # assuming we got here, everything is ok, so we should go get the
+            # voltages
+            data = self._population._vertex.get_data(
+                variable, sim.no_machine_time_steps, sim.placements,
+                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
