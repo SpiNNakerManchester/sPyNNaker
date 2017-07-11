@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class AbstractUInt32Recorder(object):
     N_BYTES_PER_NEURON = 4
-    N_CPU_CYCLES_PER_NEURON = 8
+    N_CPU_CYCLES_PER_NEURON = 4
 
     def __init__(self):
         pass

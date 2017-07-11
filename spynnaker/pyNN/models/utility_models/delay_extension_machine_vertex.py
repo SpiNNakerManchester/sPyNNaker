@@ -1,13 +1,11 @@
 # pacman imports
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import MachineVertex
 
 # front end common imports
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 # general imports
 from enum import Enum

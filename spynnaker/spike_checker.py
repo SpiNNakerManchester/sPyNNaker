@@ -3,7 +3,7 @@ import numpy
 
 def synfire_spike_checker(spikes, nNeurons):
     if isinstance(spikes, numpy.ndarray):
-        sorted = spikes[spikes[:, 1].argsort()]
+        sorted = spikes[spikes[:, 1].argsort()]  # @ReservedAssignment
         print len(sorted)
         num = 0
         for row in sorted:
@@ -30,7 +30,7 @@ def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
     :param wrap_around: If True the lines will wrap around when reaching the
         last neuron
     """
-    sorted = spikes[spikes[:, 1].argsort()]
+    sorted = spikes[spikes[:, 1].argsort()]  # @ReservedAssignment
     nums = [0] * lines
     used = [False] * lines
     for row in sorted:
