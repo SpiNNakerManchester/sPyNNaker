@@ -198,7 +198,7 @@ class AbstractPopulationVertex(
 
         # Set up for profiling
         self._n_profile_samples = helpful_functions.read_config_int(
-            config, "Mode", "n_profile_samples")
+            config, "Reports", "n_profile_samples")
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -570,7 +570,7 @@ class AbstractPopulationVertex(
 
         # write profile data
         profile_utils.write_profile_region_data(
-            spec, constants.POPULATION_BASED_REGIONS.SYSTEM.value,
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
 
         # allow the synaptic matrix to write its data spec-able data
