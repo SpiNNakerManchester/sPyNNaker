@@ -1,8 +1,7 @@
 
 # spynnaker imports
 import struct
-from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
-    AbstractHasGlobalMaxAtoms
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.neural_projections \

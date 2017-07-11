@@ -1,44 +1,35 @@
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
-    AbstractHasGlobalMaxAtoms
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.decorators.overrides import overrides
+    import ContiguousKeyRangeContraint
+from pacman.model.decorators import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
 
 # front end common imports
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
-from spinn_front_end_common.utilities.utility_objs.executable_start_type \
-    import ExecutableStartType
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_partition_constraints import \
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as \
-    common_constants
-from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
+    import AbstractRewritesDataSpecification
+from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models.impl\
+    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models\
-    .abstract_rewrites_data_specification\
-    import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models.impl\
-    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import globals_variables
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -796,7 +787,7 @@ class AbstractPopulationVertex(
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]
 
     @overrides(
         AbstractNeuronRecordable.clear_recording)
