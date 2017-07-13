@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
+    import SynapseStructureWeightEligibilityTrace
 
 import logging
 logger = logging.getLogger(__name__)

@@ -30,7 +30,10 @@ typedef struct synapse_param_t {
     decay_t exc_init;
     decay_t inh_decay;
     decay_t inh_init;
+    input_t input_buffer_excitatory_value;
+    input_t input_buffer_inhibitory_value;
 } synapse_param_t;
+
 
 #include "synapse_types.h"
 
@@ -91,68 +94,57 @@ static inline decay_t _in_decay(
 //! in biology (spike goes in, synapse opens, then closes slowly) plus the
 //! leaky aspect of a neuron). as these have not yet been processed and applied
 //! to the neuron.
-//! \param[in] input_buffers the pointer to the input buffers
-//! \param[in] neuron_index the index in the neuron states which represent the
-//! neuron currently being processed
-//! \param[in] parameters the parameters retrieved from SDRAM which cover how
-//! to initialise the synapse shaping rules.
+//! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
 static inline void synapse_types_shape_input(
-        input_t *input_buffers, index_t neuron_index,
-        synapse_param_t* parameters) {
-    // decay the excitatory inputs
-    input_buffers[_ex_offset(neuron_index)] = decay_s1615(
-            input_buffers[_ex_offset(neuron_index)],
-            _ex_decay(parameters, neuron_index));
-    // decay the inhibitory inputs
-    input_buffers[_in_offset(neuron_index)] = decay_s1615(
-            input_buffers[_in_offset(neuron_index)],
-            _in_decay(parameters, neuron_index));
+        synapse_param_pointer_t parameter) {
+
+    parameter->input_buffer_excitatory_value = decay_s1615(
+        parameter->input_buffer_excitatory_value,
+        parameter->exc_decay);
+    parameter->input_buffer_inhibitory_value = decay_s1615(
+        parameter->input_buffer_inhibitory_value,
+        parameter->inh_decay);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
 //! being simulated by this model
-//! \param[in] input_buffers the input buffers which contain the input feed for
-//! the given neuron being updated
 //! \param[in] synapse_type_index the type of input that this input is to be
 //! considered (aka excitatory or inhibitory etc)
-//! \param[in] neuron_index the neuron that is being updated currently.
-//! \param[in] parameters the neuron shaping parameters for this given neuron
-//! being updated.
+//! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
 static inline void synapse_types_add_neuron_input(
-        input_t *input_buffers, index_t synapse_type_index,
-        index_t neuron_index, synapse_param_t* parameters, input_t input) {
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
+        input_t input) {
     if (synapse_type_index == EXCITATORY) {
-        uint32_t index = _ex_offset(neuron_index);
-        input_buffers[index] = input_buffers[index] + decay_s1615(
-            input, parameters[neuron_index].exc_init);
+        parameter->input_buffer_excitatory_value =
+            parameter->input_buffer_excitatory_value +
+            decay_s1615(input, parameter->exc_init);
+
     } else if (synapse_type_index == INHIBITORY) {
-        uint32_t index = _in_offset(neuron_index);
-        input_buffers[index] = input_buffers[index] + decay_s1615(
-            input, parameters[neuron_index].inh_init);
+        parameter->input_buffer_inhibitory_value =
+            parameter->input_buffer_inhibitory_value +
+            decay_s1615(input, parameter->inh_init);
     }
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available
-//! for a given neuron id
-//! \param[in] input_buffers the input buffers available
-//! \param[in] neuron_index the neuron id currently being considered
+//! for a given parameter set
+//! \param[in]  parameter: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron id.
 static inline input_t synapse_types_get_excitatory_input(
-        input_t *input_buffers, index_t neuron_index) {
-    return input_buffers[_ex_offset(neuron_index)];
+        synapse_param_pointer_t parameter) {
+    return parameter->input_buffer_excitatory_value;
 }
 
 //! \brief extracts the inhibitory input buffers from the buffers available
-//! for a given neuron id
-//! \param[in] input_buffers the input buffers available
-//! \param[in] neuron_index the neuron id currently being considered
+//! for a given parameter set
+//! \param[in]  parameter: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron id.
 static inline input_t synapse_types_get_inhibitory_input(
-        input_t *input_buffers, index_t neuron_index) {
-    return input_buffers[_in_offset(neuron_index)];
+        synapse_param_pointer_t parameter) {
+    return parameter->input_buffer_inhibitory_value;
 }
 
 //! \brief returns a human readable character for the type of synapse.
@@ -177,16 +169,16 @@ static inline const char *synapse_types_get_type_char(
 }
 
 //! \brief prints the input for a neuron id given the available inputs
-//! currently only executed when the models are in debug mode, as the prints are
-//! controlled from the synapses.c _print_inputs method.
-//! \param[in] input_buffers the input buffers available
-//! \param[in] neuron_index  the neuron id currently being considered
+//! currently only executed when the models are in debug mode, as the prints
+//! are controlled from the synapses.c _print_inputs method.
+//! \param[in]  parameter: the pointer to the parameters to use
 //! \return Nothing
 static inline void synapse_types_print_input(
-        input_t *input_buffers, index_t neuron_index) {
-    io_printf(IO_BUF, "%12.6k - %12.6k",
-              input_buffers[_ex_offset(neuron_index)],
-              input_buffers[_in_offset(neuron_index)]);
+        synapse_param_pointer_t parameter) {
+    io_printf(
+        IO_BUF, "%12.6k - %12.6k",
+        parameter->input_buffer_excitatory_value,
+        parameter->input_buffer_inhibitory_value);
 }
 
 static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
