@@ -265,7 +265,8 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
 
-        is_recording = len(self._neuron_recorder.recording_variables) > 0
+        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
+                       self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
