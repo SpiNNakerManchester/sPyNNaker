@@ -762,6 +762,9 @@ class AbstractPopulationVertex(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step)
 
+    def clear_connection_cache(self):
+        self._synapse_manager.clear_connection_cache()
+
     @property
     def synapse_type(self):
         return self._synapse_manager.synapse_type
