@@ -139,7 +139,7 @@ class PyNNPopulationCommon(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if globals_variables.get_simulator().has_ran \
+        if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
