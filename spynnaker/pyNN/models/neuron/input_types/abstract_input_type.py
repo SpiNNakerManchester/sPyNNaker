@@ -39,7 +39,7 @@ class AbstractInputType(object):
         """ Get the types of the input type parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        :rtype: list of :py:class:`data_specification.enums.DataType`
         """
 
     @abstractmethod

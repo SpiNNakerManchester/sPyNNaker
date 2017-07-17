@@ -22,6 +22,6 @@ def check_path_gysn(path, n_neurons, runtime, gsyn):
 
 
 def check_sister_gysn(sister, n_neurons, runtime, gsyn):
-    dir = os.path.dirname(os.path.abspath(sister))
+    dir = os.path.dirname(os.path.abspath(sister))  # @ReservedAssignment
     path = os.path.join(dir, "gsyn.data")
     check_path_gysn(path, n_neurons, runtime, gsyn)

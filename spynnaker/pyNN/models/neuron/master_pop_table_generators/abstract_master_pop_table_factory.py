@@ -27,7 +27,7 @@ class AbstractMasterPopTableFactory(object):
         :type master_pop_base_mem_address: int
         :type chip_y: int
         :type chip_x: int
-        :type txrx: spinnman.transciever.Transciever object
+        :type txrx: spinnman.transceiver.Transceiver object
         :return: a synaptic matrix memory position.
         """
 
@@ -44,7 +44,7 @@ class AbstractMasterPopTableFactory(object):
                     keys and masks for a given edge that will require being\
                     received to be stored in the master pop table
         :type keys_and_masks: list of\
-                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
+            :py:class:`pacman.model.routing_info.KeyAndMask`
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
         :param is_single: True if this is a single synapse, False otherwise
@@ -66,7 +66,7 @@ class AbstractMasterPopTableFactory(object):
 
         :return: a list of constraints
         :rtype: list of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
+            :py:class:`pacman.model.constraints.AbstractConstraint`
         """
 
     @abstractmethod
