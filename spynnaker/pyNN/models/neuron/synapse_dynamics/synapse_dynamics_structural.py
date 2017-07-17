@@ -187,7 +187,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 graph_mapper.get_application_vertex(vertex)].append(
                 (routing_info.get_routing_info_from_pre_vertex(
                     vertex, constants.SPIKE_PARTITION_ID).first_key,
-                 graph_mapper.get_slice(vertex)[2]))
+                 graph_mapper.get_slice(vertex)[2],
+                 graph_mapper.get_slice(vertex)[0]))
 
         for subpopulation_list in \
                 population_to_subpopulation_information.itervalues():
@@ -229,7 +230,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             words_written = 2
             # TODO Ensure the following values are written in ascending
             # order of low_atom (implicit)
-            for subpopulation_info in subpopulation_list:
+            dt = np.dtype(
+                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int')])
+            structured_array = np.array(subpopulation_list, dtype=dt)
+            sorted_info_list = np.sort(structured_array, order='lo_atom')
+            for subpopulation_info in sorted_info_list:
                 # Subpopulation information (i.e. key and number of atoms)
                 # Key
                 spec.write_value(data=subpopulation_info[0],
@@ -237,7 +242,10 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 # n_atoms
                 spec.write_value(data=subpopulation_info[1],
                                  data_type=DataType.INT32)
-                words_written += 2
+                # lo_atom
+                spec.write_value(data=subpopulation_info[2],
+                                 data_type=DataType.INT32)
+                words_written += 3
             total_words_written += words_written * 4
 
         # Now we write the probability tables for formation
@@ -281,7 +289,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
         structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
-        structure_size += n_neurons * 2 # synaptic capacity table
+        structure_size += n_neurons * 2  # synaptic capacity table
         self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(
             n_neurons, n_synapse_types)
@@ -303,7 +311,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                         no_pre_vertices_estimate += 1 * np.ceil(
                             edge.pre_vertex.n_atoms / 32.)
             no_pre_vertices_estimate *= 4
-            pop_size += int(40 * (no_pre_vertices_estimate + len(in_edges)))
+            pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
         elif in_edges is not None and isinstance(in_edges[0],
                                                  ProjectionMachineEdge):
             pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)

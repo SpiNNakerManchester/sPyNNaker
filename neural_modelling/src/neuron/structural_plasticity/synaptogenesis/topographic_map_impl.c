@@ -43,6 +43,7 @@ int (*number_of_connections_in_row)(address_t);
 //#define DMA_TAG_WRITE_PLASTIC_REGION 1
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 5
 #define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 7
+#define KEY_INFO_CONSTANTS 3
 
 #define MAX_SHORT 65535
 
@@ -163,12 +164,14 @@ address_t synaptogenesis_dynamics_initialise(
         sp_word = (int32_t*) half_word;
         rewiring_data.pre_pop_info_table.subpop_info[index].total_no_atoms = *sp_word++;
         rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info =  (int32_t*) sark_alloc(\
-            2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices, sizeof(int32_t));
+            KEY_INFO_CONSTANTS * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices, sizeof(int32_t));
         int32_t subpop_index;
-        for (subpop_index = 0; subpop_index < 2 * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices; subpop_index++) {
+        for (subpop_index = 0; subpop_index < KEY_INFO_CONSTANTS * rewiring_data.pre_pop_info_table.subpop_info[index].no_pre_vertices; subpop_index++) {
             // key
             rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index++] = *sp_word++;
             // n_atoms
+            rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index++] = *sp_word++;
+            // lo_atom
             rewiring_data.pre_pop_info_table.subpop_info[index].key_atom_info[subpop_index] = *sp_word++;
         }
     }
@@ -262,7 +265,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     int32_t i;
     int32_t sum=0;
     for(i=0;i<rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].no_pre_vertices; i++) {
-        sum += rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
+        sum += rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * i + 1];
         if (sum >= choice){
             break;
           }
@@ -270,12 +273,12 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     // Select a presynaptic neuron id
     choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *\
-        rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i + 1];
+        rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * i + 1];
 
     // population_table_get_first_address() returns the address (in SDRAM) of the selected synaptic row
 
     address_t synaptic_row_address;
-    spike_t fake_spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2 *i] | choice;
+    spike_t fake_spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * i] | choice;
     size_t n_bytes;
 
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
@@ -303,7 +306,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
     // TODO |Pre computation requires querying the table with global information
     // TODO | or see https://trello.com/c/fTM1BRh2/156-distance-based-rewiring-rules for alternative
-    pre_global_id = rewiring_data.low_atom + current_state.pre_syn_id;
+    pre_global_id = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2] + current_state.pre_syn_id;
     post_global_id = rewiring_data.low_atom + current_state.post_syn_id;
 
     pre_x = pre_global_id / rewiring_data.grid_x;
@@ -405,7 +408,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint distance_as_offset = (current_state.distance << 3)  + (current_state.distance << 1);
+    uint distance_as_offset = current_state.distance*10;
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
