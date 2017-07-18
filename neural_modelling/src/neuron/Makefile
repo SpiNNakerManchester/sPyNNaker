@@ -7,7 +7,8 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_pair_multiplicative \
          IF_curr_exp_stdp_mad_pair_additive \
          IF_curr_exp_stdp_mad_pair_multiplicative \
-         IF_cond_exp_stdp_mad_pair_additive
+         IF_cond_exp_stdp_mad_pair_additive \
+         external_device_lif_control
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all: $(BUILD_DIRS)
