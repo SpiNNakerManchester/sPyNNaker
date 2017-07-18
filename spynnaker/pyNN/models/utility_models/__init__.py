@@ -4,4 +4,4 @@ from .delay_extension_vertex import DelayExtensionVertex
 from .spike_injector import SpikeInjector
 
 __all__ = ["DelayBlock", "DelayExtensionMachineVertex",
-           "DelayExtensionVertex"]
+           "DelayExtensionVertex", "SpikeInjector"]
