@@ -265,7 +265,8 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
 
-        is_recording = len(self._neuron_recorder.recording_variables) > 0
+        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
+                       self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
@@ -760,6 +761,9 @@ class AbstractPopulationVertex(
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step)
+
+    def clear_connection_cache(self):
+        self._synapse_manager.clear_connection_cache()
 
     @property
     def synapse_type(self):
