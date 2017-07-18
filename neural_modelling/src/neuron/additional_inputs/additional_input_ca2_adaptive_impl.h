@@ -1,7 +1,7 @@
 #ifndef _ADDITIONAL_INPUT_CA2_ADAPTIVE_H_
 #define _ADDITIONAL_INPUT_CA2_ADAPTIVE_H_
 
-#include <neuron/additional_inputs/additional_input.h>
+#include "additional_input.h"
 
 //----------------------------------------------------------------------------
 // Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency adaptation of

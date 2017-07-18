@@ -10,15 +10,15 @@ typedef struct post_trace_t {
 typedef struct pre_trace_t {
 } pre_trace_t;
 
-#include "neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h"
-#include "neuron/plasticity/stdp/timing_dependence/timing.h"
-#include "neuron/plasticity/stdp/weight_dependence/weight_one_term.h"
+#include "../synapse_structure/synapse_structure_weight_impl.h"
+#include "timing.h"
+#include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "neuron/plasticity/common/maths.h"
+#include "../../common/maths.h"
 
 //---------------------------------------
 // Macros

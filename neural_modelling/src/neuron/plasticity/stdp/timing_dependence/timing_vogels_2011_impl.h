@@ -7,16 +7,16 @@
 typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include "neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h"
-#include "neuron/plasticity/stdp/timing_dependence/timing.h"
-#include "neuron/plasticity/stdp/weight_dependence/weight_one_term.h"
+#include "../synapse_structure/synapse_structure_weight_impl.h"
+#include "timing.h"
+#include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "neuron/plasticity/common/maths.h"
-#include "neuron/plasticity/common/stdp_typedefs.h"
+#include "../../common/maths.h"
+#include "../../common/stdp_typedefs.h"
 
 //---------------------------------------
 // Macros
@@ -57,7 +57,7 @@ static inline int16_t timing_add_spike(uint32_t time, uint32_t last_time, int16_
 
     // Decay previous trace
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
-	    DECAY_LOOKUP_TAU(delta_time));
+        DECAY_LOOKUP_TAU(delta_time));
 
     // Add new spike to trace
     int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
@@ -99,10 +99,10 @@ static inline update_state_t timing_apply_pre_spike(
     uint32_t time_since_last_post = time - last_post_time;
     int32_t exponential_decay = DECAY_LOOKUP_TAU(time_since_last_post);
     int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace, exponential_decay)
-	- plasticity_trace_region_data.alpha;
+    - plasticity_trace_region_data.alpha;
 
     log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-	    time_since_last_post, decayed_o1);
+        time_since_last_post, decayed_o1);
 
     // Apply potentiation to state (which is a weight_state)
     return weight_one_term_apply_potentiation(previous_state, decayed_o1);
@@ -124,7 +124,7 @@ static inline update_state_t timing_apply_post_spike(
     int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace, exponential_decay);
 
     log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-	    time_since_last_pre, decayed_r1);
+        time_since_last_pre, decayed_r1);
 
     // Apply potentiation to state (which is a weight_state)
     return weight_one_term_apply_potentiation(previous_state, decayed_r1);

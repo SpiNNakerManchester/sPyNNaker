@@ -14,16 +14,16 @@ typedef struct pre_trace_t {
   int16_t r2;
 } pre_trace_t;
 
-#include "neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h"
-#include "neuron/plasticity/stdp/timing_dependence/timing.h"
-#include "neuron/plasticity/stdp/weight_dependence/weight_two_term.h"
+#include "../synapse_structure/synapse_structure_weight_impl.h"
+#include "timing.h"
+#include "../weight_dependence/weight_two_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "neuron/plasticity/common/maths.h"
-#include "neuron/plasticity/common/stdp_typedefs.h"
+#include "../../common/maths.h"
+#include "../../common/stdp_typedefs.h"
 
 //---------------------------------------
 // Macros

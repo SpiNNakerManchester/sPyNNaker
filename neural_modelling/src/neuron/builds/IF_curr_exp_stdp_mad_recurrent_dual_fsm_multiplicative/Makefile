@@ -8,8 +8,8 @@ NEURON_IMPL_H = $(SOURCE_DIR)/neuron/implementations/neuron_impl_standard.h
 THRESHOLD_TYPE_H = $(SOURCE_DIR)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(SOURCE_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
 SYNAPSE_DYNAMICS = $(SOURCE_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl.c
-TIMING_DEPENDENCE = $(EXTRA_SRC_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_dual_fsm_impl.c
-TIMING_DEPENDENCE_H = $(EXTRA_SRC_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_dual_fsm_impl.h
+TIMING_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_dual_fsm_impl.c
+TIMING_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_dual_fsm_impl.h
 WEIGHT_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.c
 WEIGHT_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.h
 

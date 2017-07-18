@@ -9,15 +9,15 @@ typedef uint16_t pre_trace_t;
 
 #include "../synapse_structure/synapse_structure_weight_accumulator_impl.h"
 
-#include "neuron/plasticity/stdp/timing_dependence/timing.h"
-#include "neuron/plasticity/stdp/weight_dependence/weight_one_term.h"
+#include "timing.h"
+#include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "neuron/plasticity/common/maths.h"
-#include "neuron/plasticity/common/stdp_typedefs.h"
+#include "../../common/maths.h"
+#include "../../common/stdp_typedefs.h"
 
 #include "random_util.h"
 

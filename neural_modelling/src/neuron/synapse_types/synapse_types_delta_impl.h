@@ -18,7 +18,7 @@
 #define SYNAPSE_TYPE_COUNT 2
 
 #include <debug.h>
-#include <common/neuron-typedefs.h>
+#include "../../common/neuron-typedefs.h"
 
 //---------------------------------------
 // Synapse parameters
@@ -28,7 +28,7 @@ typedef struct synapse_param_t {
     input_t input_buffer_inhibitory_value;
 } synapse_param_t;
 
-#include <neuron/synapse_types/synapse_types.h>
+#include "synapse_types.h"
 
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
