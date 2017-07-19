@@ -1,6 +1,9 @@
 import unittest
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from pacman.model.placements.placement import Placement
+from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
+from spinn_utilities import conf_loader
+import spynnaker
 
 
 class MockSynapseIO(object):
@@ -30,9 +33,11 @@ class MockTransceiver(object):
 class TestSynapticManager(unittest.TestCase):
 
     def test_retrieve_synaptic_block(self):
+        config = conf_loader.load_config(
+            spynnaker.pyNN, AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
         synaptic_manager = SynapticManager(
             synapse_type=None, ring_buffer_sigma=5.0, spikes_per_second=100.0,
-            config=None, population_table_type=MockMasterPopulationTable(),
+            config=config, population_table_type=MockMasterPopulationTable(),
             synapse_io=MockSynapseIO())
 
         transceiver = MockTransceiver([
