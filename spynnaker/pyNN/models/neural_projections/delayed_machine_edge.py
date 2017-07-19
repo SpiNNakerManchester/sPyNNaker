@@ -1,7 +1,6 @@
-from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.machine.impl.machine_edge import MachineEdge
-from spynnaker.pyNN.models.abstract_models.abstract_filterable_edge \
-    import AbstractFilterableEdge
+from pacman.model.decorators import overrides
+from pacman.model.graphs.machine import MachineEdge
+from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 
 class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):

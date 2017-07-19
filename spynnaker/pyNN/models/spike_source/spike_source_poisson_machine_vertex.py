@@ -1,14 +1,12 @@
-from pacman.model.decorators.overrides import overrides
-from spinn_front_end_common.utilities import helpful_functions
-from pacman.model.graphs.machine.impl.machine_vertex \
-    import MachineVertex
-from spinn_front_end_common.abstract_models.abstract_recordable \
-    import AbstractRecordable
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from pacman.model.decorators import overrides
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
+from pacman.model.graphs.machine import MachineVertex
+from spinn_front_end_common.abstract_models import AbstractRecordable
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .abstract_receive_buffers_to_host import AbstractReceiveBuffersToHost
+from spinn_front_end_common.interface.buffer_management.buffer_models \
+    import AbstractReceiveBuffersToHost
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 
@@ -18,9 +16,8 @@ from enum import Enum
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
-
-    _POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="_POISSON_SPIKE_SOURCE_REGIONS",
+    POISSON_SPIKE_SOURCE_REGIONS = Enum(
+        value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2),
@@ -30,9 +27,6 @@ class SpikeSourcePoissonMachineVertex(
             self, resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, constraints=None, label=None):
         MachineVertex.__init__(self, label, constraints=constraints)
-        ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, self._POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value,
-            0)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
         self._resources = resources_required
@@ -43,6 +37,17 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources
+
+    @property
+    @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
+    def _provenance_region_id(self):
+        return self.POISSON_SPIKE_SOURCE_REGIONS.PROVENANCE_REGION.value
+
+    @property
+    @overrides(
+        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    def _n_additional_data_items(self):
+        return 0
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
@@ -65,6 +70,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement, self._POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION,
+        return locate_memory_region_for_placement(
+            placement,
+            self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)

@@ -1,19 +1,15 @@
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-
+from .abstract_connector import AbstractConnector
 import numpy
 
 
 class SmallWorldConnector(AbstractConnector):
 
     def __init__(
-            self, degree, rewiring, allow_self_connections=True, weights=0.0,
-            delays=1, space=None, safe=True, verbose=False,
-            n_connections=None):
-        AbstractConnector.__init__(self, safe, space, verbose)
+            self, degree, rewiring, allow_self_connections=True, safe=True,
+            verbose=False, n_connections=None):
+        AbstractConnector.__init__(self, safe, verbose)
         self._rewiring = rewiring
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
@@ -25,6 +21,7 @@ class SmallWorldConnector(AbstractConnector):
         post_positions = self._post_population.positions
         distances = self._space.distances(
             pre_positions, post_positions, False)
+        self._degree = degree
         self._mask = (distances < degree).as_type(float)
         self._n_connections = numpy.sum(self._mask)
 
@@ -117,3 +114,7 @@ class SmallWorldConnector(AbstractConnector):
             post_vertex_slice.lo_atom)
 
         return block
+
+    def __repr__(self):
+        return "SmallWorldConnector(degree={}, rewiring={})".format(
+            self._degree, self._rewiring)

@@ -1,21 +1,18 @@
 
 # pacman imports
-from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.decorators import overrides
+from pacman.model.graphs.machine import MachineVertex
 
 # spinn front end common imports
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .abstract_receive_buffers_to_host import AbstractReceiveBuffersToHost
+from spinn_front_end_common.interface.buffer_management.buffer_models \
+    import AbstractReceiveBuffersToHost
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.abstract_recordable \
-    import AbstractRecordable
+from spinn_front_end_common.abstract_models import AbstractRecordable
 
 # spynnaker imports
 from spynnaker.pyNN.utilities import constants
@@ -41,9 +38,6 @@ class PopulationMachineVertex(
             self, resources_required, is_recording, minimum_buffer_sdram_usage,
             buffered_sdram_per_timestep, label, constraints=None):
         MachineVertex.__init__(self, label, constraints)
-        ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value,
-            self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
         self._resources = resources_required
@@ -54,6 +48,16 @@ class PopulationMachineVertex(
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
         return self._resources
+
+    @property
+    @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
+    def _provenance_region_id(self):
+        return constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA.value
+
+    @property
+    @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    def _n_additional_data_items(self):
+        return self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):

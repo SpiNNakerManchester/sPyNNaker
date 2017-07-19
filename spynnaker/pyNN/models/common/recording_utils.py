@@ -1,5 +1,6 @@
-from spinn_front_end_common.utilities import helpful_functions
-from spynnaker.pyNN import exceptions
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
+from spynnaker.pyNN.exceptions import MemReadException
 
 import struct
 import logging
@@ -25,8 +26,8 @@ def get_data(transceiver, placement, region, region_size):
     """ Get the recorded data from a region
     """
 
-    region_base_address = helpful_functions.locate_memory_region_on_core(
-        placement.x, placement.y, placement.p, region, transceiver)
+    region_base_address = locate_memory_region_for_placement(
+        placement, region, transceiver)
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
         placement.x, placement.y, region_base_address, 4))
     number_of_bytes_written = struct.unpack_from(
@@ -35,7 +36,7 @@ def get_data(transceiver, placement, region, region_size):
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - _RECORDING_COUNT_SIZE
     if number_of_bytes_written > expected_size:
-        raise exceptions.MemReadException(
+        raise MemReadException(
             "Expected {} bytes but read {}".format(
                 expected_size, number_of_bytes_written))
 

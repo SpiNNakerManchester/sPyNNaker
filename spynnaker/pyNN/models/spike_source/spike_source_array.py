@@ -1,56 +1,78 @@
-from pacman.model.decorators.overrides import overrides
-
-# spynnaker imports
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
-from spynnaker.pyNN.models.common.eieio_spike_recorder \
-    import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common.abstract_spike_recordable \
-    import AbstractSpikeRecordable
-from spynnaker.pyNN.utilities.conf import config
-
-
-# spinn front end common imports
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
-    import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities import constants as \
-    front_end_common_constants
-from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
-
-
-# general imports
 import logging
 import sys
+
+from pacman.model.decorators import overrides
+from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spinn_front_end_common.abstract_models import \
+    AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.utilities.constants \
+    import MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
+from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models.impl\
+    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import globals_variables
+
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
+from spynnaker.pyNN.models.common import SimplePopulationSettable
+from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
 
 
 class SpikeSourceArray(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
-        SimplePopulationSettable, AbstractChangableAfterRun):
+        SimplePopulationSettable, AbstractChangableAfterRun,
+        ProvidesKeyToAtomMappingImpl):
     """ Model for play back of spikes
     """
 
     _model_based_max_atoms_per_core = sys.maxint
 
+    # parameters expected by pynn
+    default_parameters = {
+        'spike_times': None
+    }
+
+    # parameters expected by spinnaker
+    none_pynn_default_parameters = {
+        'port': None, 'tag': None, 'ip_address': None, 'board_address': None,
+        'max_on_chip_memory_usage_for_spikes_in_bytes': (
+            constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
+        'space_before_notification': 640, 'constraints': None, 'label': None,
+        'spike_recorder_buffer_size': (
+            constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
+        'buffer_size_before_receive': (
+            constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)}
+
+    SPIKE_RECORDING_REGION_ID = 0
+
+    # Needed to get long names past pep8
+    DEFAULT1 = none_pynn_default_parameters[
+        'max_on_chip_memory_usage_for_spikes_in_bytes']
+
     def __init__(
             self, n_neurons,
-            spike_times=None, port=None, tag=None, ip_address=None,
-            board_address=None, max_on_chip_memory_usage_for_spikes_in_bytes=(
-                constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
-            space_before_notification=640,
-            constraints=None, label="SpikeSourceArray",
-            spike_recorder_buffer_size=(
-                constants.EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT),
-            buffer_size_before_receive=(
-                constants.EIEIO_BUFFER_SIZE_BEFORE_RECEIVE)):
+            spike_times=default_parameters['spike_times'],
+            port=none_pynn_default_parameters['port'],
+            tag=none_pynn_default_parameters['tag'],
+            ip_address=none_pynn_default_parameters['ip_address'],
+            board_address=none_pynn_default_parameters['board_address'],
+            max_on_chip_memory_usage_for_spikes_in_bytes=DEFAULT1,
+            space_before_notification=none_pynn_default_parameters[
+                'space_before_notification'],
+            constraints=none_pynn_default_parameters['constraints'],
+            label=none_pynn_default_parameters['label'],
+            spike_recorder_buffer_size=none_pynn_default_parameters[
+                'spike_recorder_buffer_size'],
+            buffer_size_before_receive=none_pynn_default_parameters[
+                'buffer_size_before_receive']):
+
+        self._model_name = "SpikeSourceArray"
+
+        config = globals_variables.get_simulator().config
         self._ip_address = ip_address
         if ip_address is None:
             self._ip_address = config.get("Buffers", "receive_buffer_host")
@@ -81,6 +103,7 @@ class SpikeSourceArray(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder()
@@ -101,7 +124,7 @@ class SpikeSourceArray(
         self._space_before_notification = space_before_notification
         if self._max_on_chip_memory_usage_for_spikes is None:
             self._max_on_chip_memory_usage_for_spikes = \
-                front_end_common_constants.MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
+                MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 
         # check the values do not conflict with chip memory limit
         if self._max_on_chip_memory_usage_for_spikes < 0:
@@ -128,7 +151,6 @@ class SpikeSourceArray(
     @property
     def spike_times(self):
         """ The spike times of the spike source array
-        :return:
         """
         return self.send_buffer_times
 
@@ -136,8 +158,7 @@ class SpikeSourceArray(
     def spike_times(self, spike_times):
         """ Set the spike source array's spike times. Not an extend, but an\
             actual change
-        :param spike_times:
-        :return:
+
         """
         self.send_buffer_times = spike_times
 
@@ -146,12 +167,12 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self):
+    def set_recording_spikes(self, new_state=True):
         self.enable_recording(
             self._spike_recorder_buffer_size,
             self._buffer_size_before_receive)
         self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = True
+        self._spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
@@ -166,10 +187,43 @@ class SpikeSourceArray(
                 else 0,
             machine_time_step)
 
+    @overrides(AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p,
+                SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
+
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=sys.maxint):
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_max_atoms_per_core():
         return SpikeSourceArray._model_based_max_atoms_per_core
+
+    def describe(self):
+        """
+        Returns a human-readable description of the cell or synapse type.
+
+        The output may be customised by specifying a different template
+        together with an associated template engine
+        (see ``pyNN.descriptions``).
+
+        If template is None, then a dictionary containing the template context
+        will be returned.
+        """
+
+        parameters = dict()
+        for parameter_name in self.default_parameters:
+            parameters[parameter_name] = self.get_value(parameter_name)
+
+        context = {
+            "name": self._model_name,
+            "default_parameters": self.default_parameters,
+            "default_initial_values": self.default_parameters,
+            "parameters": parameters,
+        }
+        return context

@@ -1,13 +1,11 @@
 # pacman imports
-from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.machine.impl.machine_vertex import MachineVertex
+from pacman.model.decorators import overrides
+from pacman.model.graphs.machine import MachineVertex
 
 # front end common imports
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 # general imports
 from enum import Enum
@@ -34,9 +32,18 @@ class DelayExtensionMachineVertex(
     def __init__(self, resources_required, label, constraints=None):
         MachineVertex.__init__(
             self, label, constraints=constraints)
-        ProvidesProvenanceDataFromMachineImpl.__init__(
-            self, self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value, 6)
         self._resources = resources_required
+
+    @property
+    @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
+    def _provenance_region_id(self):
+        return self._DELAY_EXTENSION_REGIONS.PROVENANCE_REGION.value
+
+    @property
+    @overrides(
+        ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
+    def _n_additional_data_items(self):
+        return 6
 
     @property
     @overrides(MachineVertex.resources_required)

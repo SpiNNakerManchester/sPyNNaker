@@ -1,7 +1,6 @@
 
 
 class NeuronParameter(object):
-
     def __init__(self, value, datatype):
         self._value = value
         self._datatype = datatype

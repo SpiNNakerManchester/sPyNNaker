@@ -1,8 +1,5 @@
-# pacman imports
-from spynnaker.pyNN.models.abstract_models.abstract_weight_updatable \
-    import AbstractWeightUpdatable
-
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 import logging
 logger = logging.getLogger(__name__)
@@ -19,15 +16,15 @@ class GraphEdgeWeightUpdater(object):
         """
 
         # create progress bar
-        progress_bar = ProgressBar(
-            len(machine_graph.edges), "Updating edge weights")
+        progress = ProgressBar(
+            machine_graph.n_outgoing_edge_partitions,
+            "Updating edge weights")
 
         # start checking edges to decide which ones need pruning....
-        for edge in machine_graph.edges:
-            if isinstance(edge, AbstractWeightUpdatable):
-                edge.update_weight(graph_mapper)
-            progress_bar.update()
-        progress_bar.end()
+        for partition in progress.over(machine_graph.outgoing_edge_partitions):
+            for edge in partition.edges:
+                if isinstance(edge, AbstractWeightUpdatable):
+                    edge.update_weight(graph_mapper)
 
         # return nothing
         return machine_graph

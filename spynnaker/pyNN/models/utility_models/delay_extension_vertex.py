@@ -5,37 +5,25 @@ import random
 from spinn_front_end_common.utilities import constants as common_constants
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints\
-    .key_allocator_contiguous_range_constraint \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.constraints.partitioner_constraints.\
-    partitioner_same_size_as_vertex_constraint \
-    import PartitionerSameSizeAsVertexConstraint
-from pacman.model.decorators.overrides import overrides
-from pacman.model.graphs.application.impl.application_vertex import \
-    ApplicationVertex
-from pacman.model.resources.cpu_cycles_per_tick_resource import \
-    CPUCyclesPerTickResource
-from pacman.model.resources.dtcm_resource import DTCMResource
-from pacman.model.resources.resource_container import ResourceContainer
-from pacman.model.resources.sdram_resource import SDRAMResource
+from pacman.model.constraints.key_allocator_constraints \
+    import ContiguousKeyRangeContraint
+from pacman.model.constraints.partitioner_constraints \
+    import SameAtomsAsVertexConstraint
+from pacman.model.decorators import overrides
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
+from pacman.model.resources import ResourceContainer, SDRAMResource
 
-from spinn_front_end_common.abstract_models\
-    .abstract_provides_n_keys_for_partition \
+from spinn_front_end_common.abstract_models \
     import AbstractProvidesNKeysForPartition
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
 
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
-from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models\
-    .abstract_binary_uses_simulation_run import AbstractBinaryUsesSimulationRun
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models \
+    import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
     import DelayExtensionMachineVertex
 from spynnaker.pyNN.utilities import constants
@@ -50,7 +38,7 @@ class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition, AbstractBinaryUsesSimulationRun):
+        AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -78,7 +66,7 @@ class DelayExtensionVertex(
         self._delay_blocks = dict()
 
         self.add_constraint(
-            PartitionerSameSizeAsVertexConstraint(source_vertex))
+            SameAtomsAsVertexConstraint(source_vertex))
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
@@ -271,9 +259,12 @@ class DelayExtensionVertex(
     def get_binary_file_name(self):
         return "delay_extension.aplx"
 
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableStartType.USES_SIMULATION_INTERFACE
+
     def get_n_keys_for_partition(self, partition, graph_mapper):
-        vertex_slice = graph_mapper.get_slice(
-            partition.edges[0].pre_vertex)
+        vertex_slice = graph_mapper.get_slice(partition.pre_vertex)
         if self._n_delay_stages == 0:
             return 1
         return vertex_slice.n_atoms * self._n_delay_stages
@@ -281,4 +272,4 @@ class DelayExtensionVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]

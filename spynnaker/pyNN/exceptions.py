@@ -1,4 +1,4 @@
-from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class SpynnakerException(Exception):
@@ -20,34 +20,33 @@ class FilterableException(SpynnakerException):
     pass
 
 
-class SynapticConfigurationException(exceptions.ConfigurationException):
+class SynapticConfigurationException(ConfigurationException):
     """ Raised when the synaptic manager fails for some reason
     """
     pass
 
 
-class SynapticBlockGenerationException(exceptions.ConfigurationException):
+class SynapticBlockGenerationException(ConfigurationException):
     """ Raised when the synaptic manager fails to generate a synaptic block
     """
     pass
 
 
-class SynapticBlockReadException(exceptions.ConfigurationException):
+class SynapticBlockReadException(ConfigurationException):
     """ Raised when the synaptic manager fails to read a synaptic block or\
         convert it into readable values
     """
     pass
 
 
-class SynapticMaxIncomingAtomsSupportException(
-        exceptions.ConfigurationException):
+class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
     """ Raised when a synaptic sublist exceeds the max atoms possible to be\
         supported
     """
     pass
 
 
-class DelayExtensionException(exceptions.ConfigurationException):
+class DelayExtensionException(ConfigurationException):
     """ Raised when a delay extension vertex fails
     """
     pass

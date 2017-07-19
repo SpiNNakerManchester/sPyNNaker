@@ -1,4 +1,4 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
+from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -50,15 +50,11 @@ class MultiSpikeRecorder(object):
         spike_ids = list()
         ms_per_tick = machine_time_step / 1000.0
 
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
-
-        progress_bar = ProgressBar(len(vertices),
-                                   "Getting spikes for {}".format(label))
-        for vertex in vertices:
-
+        progress = ProgressBar(vertices,
+                               "Getting spikes for {}".format(label))
+        for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
@@ -94,9 +90,7 @@ class MultiSpikeRecorder(object):
                 indices = indices + lo_atom
                 spike_ids.append(indices)
                 spike_times.append(times)
-            progress_bar.update()
 
-        progress_bar.end()
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing spike data in region {} from the"
