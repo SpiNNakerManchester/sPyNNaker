@@ -39,6 +39,9 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         config.set("Machine", "appID", value="1")
         config.set("Machine", "virtual_board", value="False")
         config.add_section("Reports")
+        # On merge with config branch these can be deleted
+        config.set("Reports", "reportsEnabled", value="True")
+        config.set("Reports", "write_energy_report", value="True")
         config.set("Reports", "defaultReportFilePath", value="DEFAULT")
         config.set("Reports", "max_reports_kept", value="1")
         config.set("Reports", "max_application_binaries_kept", value="1")
