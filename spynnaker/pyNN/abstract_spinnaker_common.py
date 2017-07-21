@@ -78,6 +78,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         extra_mapping_inputs = dict()
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = config.getboolean(
             "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs['MemoryPopulations'] = self._populations
 
         if extra_mapping_algorithms is None:
             extra_mapping_algorithms = list()
