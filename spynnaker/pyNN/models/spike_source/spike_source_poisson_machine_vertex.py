@@ -1,13 +1,12 @@
-from pacman.model.decorators.overrides import overrides
-from spinn_front_end_common.utilities import helpful_functions
+from pacman.model.decorators import overrides
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
 from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.abstract_models.abstract_recordable \
-    import AbstractRecordable
-from spinn_front_end_common.interface.provenance\
-    .provides_provenance_data_from_machine_impl \
+from spinn_front_end_common.abstract_models import AbstractRecordable
+from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models\
-    .abstract_receive_buffers_to_host import AbstractReceiveBuffersToHost
+from spinn_front_end_common.interface.buffer_management.buffer_models \
+    import AbstractReceiveBuffersToHost
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 
@@ -71,7 +70,7 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
-        return helpful_functions.locate_memory_region_for_placement(
+        return locate_memory_region_for_placement(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)

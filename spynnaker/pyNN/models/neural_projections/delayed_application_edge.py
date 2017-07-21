@@ -1,4 +1,4 @@
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 from .delayed_machine_edge import DelayedMachineEdge
 from pacman.model.graphs.application import ApplicationEdge
 
