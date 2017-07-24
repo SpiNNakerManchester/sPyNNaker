@@ -176,7 +176,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         # Sort out the time scale factor if not user specified
         # (including config)
-        if time_scale_factor is None and self._time_scale_factor == 1:
+        if self._time_scale_factor is None:
             self._time_scale_factor = max(
                 1, math.ceil(1000.0 / float(self._machine_time_step)))
             if self._time_scale_factor > 1:
