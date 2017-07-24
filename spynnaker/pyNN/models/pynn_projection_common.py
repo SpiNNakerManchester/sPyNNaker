@@ -43,6 +43,8 @@ class PyNNProjectionCommon(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._requires_mapping = True
+        self._label = None
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
@@ -146,11 +148,11 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
-        return False
+        return self._requires_mapping
 
     def mark_no_changes(self):
         # Does Nothing currently
-        pass
+        self._requires_mapping = False
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -266,6 +268,11 @@ class PyNNProjectionCommon(object):
                 connection_holder.add_connections(connections)
         connection_holder.finish()
         return connection_holder
+
+    def _clear_cache(self):
+        post_vertex = self._projection_edge.post_vertex
+        if isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
+            post_vertex.clear_connection_cache()
 
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)

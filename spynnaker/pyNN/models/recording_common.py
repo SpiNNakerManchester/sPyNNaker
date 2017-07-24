@@ -1,6 +1,7 @@
 from spinn_utilities import logger_utils
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
@@ -47,6 +48,7 @@ class RecordingCommon(object):
         :return:  None
         """
 
+        globals_variables.get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
             self._set_spikes_recording()
@@ -133,6 +135,7 @@ class RecordingCommon(object):
         :return: the data
         """
 
+        globals_variables.get_simulator().verify_not_running()
         if variable == "spikes":
             return self._get_spikes()
 
