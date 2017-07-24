@@ -47,7 +47,7 @@ class AbstractTimingDependence(object):
     @abstractmethod
     def get_parameter_names(self):
         """ get the params from the timing dependencies
-        
+
         :return: iterable of basestring
         """
 
