@@ -5,7 +5,6 @@ from spinn_utilities.abstract_base import AbstractBase
 from spinn_front_end_common.interface.abstract_spinnaker_base \
     import AbstractSpinnakerBase
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
@@ -14,7 +13,6 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN import overridden_pacman_functions
 from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.spynnaker_simulator_interface \
     import SpynnakerSimulatorInterface
 
@@ -136,46 +134,33 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
 
-        if time_scale_factor is None:
-            time_scale_factor = helpful_functions.read_config_int(
-                config, "Machine", "time_scale_factor")
-
-        # deal with params allowed via the setup options
+        # Get the standard values
+        machine_time_step = None
         if timestep is not None:
+            machine_time_step = math.ceil(timestep * 1000.0)
+        self.set_up_timings(machine_time_step, time_scale_factor)
 
-            # convert from milliseconds into microseconds
-            try:
-                if timestep <= 0:
-                    raise InvalidParameterType(
-                        "invalid timestamp {}: must greater than zero".format(
-                            timestep))
-                timestep *= 1000.0
-                timestep = math.ceil(timestep)
-            except (TypeError, AttributeError):
-                raise InvalidParameterType(
-                    "timestamp parameter must numerical")
-            self._machine_time_step = timestep
-        else:
-            self._machine_time_step = config.getint(
-                "Machine", "machine_time_step")
-
+        # Sort out the minimum delay
         if (min_delay is not None and
                 float(min_delay * 1000) < self._machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
                     constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
+        if min_delay is not None:
+            self._min_delay = min_delay
+        else:
+            self._min_delay = self._machine_time_step / 1000.0
 
+        # Sort out the maximum delay
         natively_supported_delay_for_models = \
             constants.MAX_SUPPORTED_DELAY_TICS
         delay_extension_max_supported_delay = (
             constants.MAX_DELAY_BLOCKS *
             constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
-
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
-
         if (max_delay is not None and
                 float(max_delay * 1000.0) >
                 (max_delay_tics_supported * self._machine_time_step)):
@@ -183,61 +168,53 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
                     0.144 * self._machine_time_step))
-        if min_delay is not None:
-            self._min_delay = min_delay
-        else:
-            self._min_delay = self._machine_time_step / 1000.0
-
         if max_delay is not None:
             self._max_delay = max_delay
         else:
             self._max_delay = (
                 max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
-        if (config.has_option("Machine", "time_scale_factor") and
-                config.get("Machine", "time_scale_factor") != "None"):
-            self._time_scale_factor = \
-                config.getint("Machine", "time_scale_factor")
-            if self._machine_time_step * self._time_scale_factor < 1000:
-                if config.getboolean(
-                        "Mode", "violate_1ms_wall_clock_restriction"):
-                    logger.warn(
-                        "****************************************************")
-                    logger.warn(
-                        "*** The combination of simulation time step and  ***")
-                    logger.warn(
-                        "*** the machine time scale factor results in a   ***")
-                    logger.warn(
-                        "*** wall clock timer tick that is currently not  ***")
-                    logger.warn(
-                        "*** reliably supported by the spinnaker machine. ***")
-                    logger.warn(
-                        "****************************************************")
-                else:
-                    raise ConfigurationException(
-                        "The combination of simulation time step and the"
-                        " machine time scale factor results in a wall clock "
-                        "timer tick that is currently not reliably supported "
-                        "by the spinnaker machine.  If you would like to "
-                        "override this behaviour (at your own risk), please "
-                        "add violate_1ms_wall_clock_restriction = True to the "
-                        "[Mode] section of your .{} file".format(
-                            self.CONFIG_FILE_NAME))
-        else:
-            if time_scale_factor is not None:
-                self._time_scale_factor = time_scale_factor
+        # Sort out the time scale factor if not user specified
+        # (including config)
+        if time_scale_factor is None and self._time_scale_factor == 1:
+            self._time_scale_factor = max(
+                1, math.ceil(1000.0 / float(self._machine_time_step)))
+            if self._time_scale_factor > 1:
+                logger.warn(
+                    "A timestep was entered that has forced sPyNNaker "
+                    "to automatically slow the simulation down from "
+                    "real time by a factor of {}. To remove this "
+                    "automatic behaviour, please enter a "
+                    "timescaleFactor value in your .{}".format(
+                        self._time_scale_factor,
+                        self.CONFIG_FILE_NAME))
+
+        # Check the combination of machine time step and time scale factor
+        if self._machine_time_step * self._time_scale_factor < 1000:
+            if config.getboolean(
+                    "Mode", "violate_1ms_wall_clock_restriction"):
+                logger.warn(
+                    "****************************************************")
+                logger.warn(
+                    "*** The combination of simulation time step and  ***")
+                logger.warn(
+                    "*** the machine time scale factor results in a   ***")
+                logger.warn(
+                    "*** wall clock timer tick that is currently not  ***")
+                logger.warn(
+                    "*** reliably supported by the spinnaker machine. ***")
+                logger.warn(
+                    "****************************************************")
             else:
-                self._time_scale_factor = max(
-                    1, math.ceil(1000.0 / float(timestep)))
-                if self._time_scale_factor > 1:
-                    logger.warn(
-                        "A timestep was entered that has forced sPyNNaker "
-                        "to automatically slow the simulation down from "
-                        "real time by a factor of {}. To remove this "
-                        "automatic behaviour, please enter a "
-                        "timescaleFactor value in your .{}".format(
-                            self._time_scale_factor,
-                            self.CONFIG_FILE_NAME))
+                raise ConfigurationException(
+                    "The combination of simulation time step and the"
+                    " machine time scale factor results in a wall clock "
+                    "timer tick that is currently not reliably supported "
+                    "by the spinnaker machine.  If you would like to "
+                    "override this behaviour (at your own risk), please "
+                    "add violate_1ms_wall_clock_restriction = True to the "
+                    "[Mode] section of your .{} file".format(
+                        self.CONFIG_FILE_NAME))
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
