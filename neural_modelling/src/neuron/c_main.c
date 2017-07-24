@@ -20,9 +20,11 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
+#include "profile_tags.h"
 
 #include <data_specification.h>
 #include <simulation.h>
+#include <profiler.h>
 #include <debug.h>
 
 /* validates that the model being compiled does indeed contain a application
@@ -42,7 +44,8 @@ typedef enum regions_e{
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
     RECORDING_REGION,
-    PROVENANCE_DATA_REGION
+    PROVENANCE_DATA_REGION,
+    PROFILER_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
@@ -179,6 +182,11 @@ static bool initialise(uint32_t *timer_period) {
             incoming_spike_buffer_size)) {
         return false;
     }
+
+    // Setup profiler
+    profiler_init(
+        data_specification_get_region(PROFILER_REGION, address));
+
     log_info("Initialise: finished");
     return true;
 }
@@ -207,6 +215,8 @@ void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
 
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+
     time++;
 
     log_debug("Timer tick %u \n", time);
@@ -225,12 +235,15 @@ void timer_callback(uint timer_count, uint unused) {
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             log_info("updating recording regions");
             recording_finalise();
         }
+        profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -246,6 +259,8 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 //! \brief The entry point for this model.
