@@ -38,6 +38,14 @@ class AbstractSynapseDynamics(object):
         """ Write the synapse parameters to the spec
         """
 
+    @abstractmethod
+    def get_parameter_names(self):
+        """ return the parameter names available from the synapse \
+            dynamics components
+
+        :return: iterable list of basestring
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """
