@@ -293,11 +293,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     log_debug("Reading %d bytes from %d saved %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
-    int id = spin1_dma_transfer(
-        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
-        n_bytes);
-    rewiring_dma_buffer.n_bytes_transferred = n_bytes;
-    rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
+
     // Compute the distance at this point to optimize CPU usage.
     // i.e. make use of it while servicing a DMA
 
@@ -327,6 +323,12 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         delta_y -= rewiring_data.grid_y;
 
     current_state.distance = my_abs(delta_x + delta_y);
+
+    int id = spin1_dma_transfer(
+        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+        n_bytes);
+    rewiring_dma_buffer.n_bytes_transferred = n_bytes;
+    rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
 
 }
 
