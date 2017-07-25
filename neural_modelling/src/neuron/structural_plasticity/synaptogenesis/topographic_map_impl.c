@@ -118,9 +118,9 @@ static int my_abs(int a){
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
     log_info("SR init.");
-    log_info("Registering DMA callback");
+    log_debug("Registering DMA callback");
     simulation_dma_transfer_done_callback_on(DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_restructure);
-    log_info("Callback registered");
+    log_debug("Callback registered");
     // Read in all of the parameters from SDRAM
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.p_rew = *sp_word++;
@@ -305,6 +305,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     pre_global_id = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[2] + current_state.pre_syn_id;
     post_global_id = rewiring_data.low_atom + current_state.post_syn_id;
 
+
     pre_x = pre_global_id / rewiring_data.grid_x;
     pre_y = pre_global_id % rewiring_data.grid_y;
 
@@ -316,13 +317,17 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     delta_x = my_abs(pre_x - post_x);
     delta_y = my_abs(pre_y - post_y);
 
-    if( delta_x < rewiring_data.grid_x>>1 )
+    if( delta_x > rewiring_data.grid_x>>1 )
         delta_x -= rewiring_data.grid_x;
 
-    if( delta_y < rewiring_data.grid_y>>1 )
+    if( delta_y > rewiring_data.grid_y>>1 )
         delta_y -= rewiring_data.grid_y;
 
     current_state.distance = my_abs(delta_x + delta_y);
+
+    log_debug("pre id %d, post id %d, distance %d", pre_global_id, post_global_id, current_state.distance);
+    log_debug("pre_x %d pre_y %d", pre_x, pre_y);
+    log_debug("post_x %d post_y %d", post_x, post_y);
 
     int id = spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
@@ -338,7 +343,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
 void synaptic_row_restructure(uint dma_id, uint dma_tag){
-    // If I am here, then the DMsynaptic_row_addressA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
+    // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
 
     // Check that I'm actually servicing the correct row by checking
@@ -382,17 +387,17 @@ bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
     if( current_state.sp_data.weight < rewiring_data.weight >> 1 && r >= rewiring_data.p_elim_dep ){
-        log_debug("\t| FAIL DEP %d", current_state.current_time);
+        log_info("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
     else if ( r >= rewiring_data.p_elim_pot ){
-        log_debug("\t| FAIL POT %d", current_state.current_time);
+        log_info("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_debug("\t| RM pre %d post %d # controls %d %d",
+        log_info("\t| RM pre %d post %d # controls %d %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
@@ -414,7 +419,7 @@ bool synaptogenesis_dynamics_formation_rule(){
 
     if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
-        log_debug("\t| OOB %d %d", current_state.distance, current_state.current_time);
+        log_info("\t| OOB %d %d", current_state.distance, current_state.current_time);
         return false;
     }
     if( current_state.current_controls == 0 )
@@ -424,13 +429,13 @@ bool synaptogenesis_dynamics_formation_rule(){
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
 
     if (r >= probability){
-        log_debug("\t| NO FORM %d", current_state.current_time);
+        log_info("\t| NO FORM %d", current_state.current_time);
         return false;
     }
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_debug("\t| FORM pre %d post %d # controls %d distance %d ctrl %d %d",
+        log_info("\t| FORM pre %d post %d # controls %d distance %d ctrl %d %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
