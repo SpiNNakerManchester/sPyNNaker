@@ -38,7 +38,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_form_lateral = p_form_lateral
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
-        self._grid = grid
+        self._grid = np.asarray(grid, dtype=int)
         self._connections = {}
 
         self.fudge_factor = 1.5
@@ -71,10 +71,29 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 self._p_form_lateral,
                 self._sigma_form_lateral)
 
+    def distance(self, x0, x1, grid=np.asarray([16, 16]), type='euclidian'):
+        x0 = np.asarray(x0)
+        x1 = np.asarray(x1)
+        delta = np.abs(x0 - x1)
+        delta = np.where(delta > grid * .5, delta - grid, delta)
+
+        if type == 'manhattan':
+            return np.abs(delta).sum(axis=-1)
+        return np.sqrt((delta ** 2).sum(axis=-1))
+
     def generate_distance_probability_array(self, probability, sigma):
-        distances = np.asarray(np.linspace(0, 100, 1000), dtype=np.float64)
+        euclidian_distances = np.ones(self._grid ** 2) * np.nan
+        for row in range(euclidian_distances.shape[0]):
+            for column in range(euclidian_distances.shape[1]):
+                euclidian_distances[row, column] = self.distance(
+                    (row // self._grid[0], row % self._grid[1]),
+                    (column // self._grid[0], column % self._grid[1]),
+                    grid=self._grid,
+                    type='euclidian')
+        largest_squared_distance = np.max(euclidian_distances**2)
+        squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
-            np.e ** (-(distances ** 2) / (2 * (sigma ** 2))))
+            np.e ** (-(squared_distances) / (2 * (sigma ** 2))))
         quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
         # Quantize probabilities and cast as uint16 / short
         unfiltered_probabilities = quantised_probabilities.astype(

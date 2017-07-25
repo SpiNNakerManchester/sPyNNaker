@@ -93,7 +93,7 @@ dma_buffer_t rewiring_dma_buffer;
 
 typedef struct {
     address_t sdram_synaptic_row;
-    int32_t pre_syn_id, post_syn_id, distance;
+    uint32_t pre_syn_id, post_syn_id, distance;
     structural_plasticity_data_t sp_data;
     uint32_t current_time;
     int16_t current_controls;
@@ -323,7 +323,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     if( delta_y > rewiring_data.grid_y>>1 )
         delta_y -= rewiring_data.grid_y;
 
-    current_state.distance = my_abs(delta_x + delta_y);
+//    current_state.distance = my_abs(delta_x + delta_y);
+    current_state.distance = delta_x * delta_x + delta_y * delta_y;
 
     log_debug("pre id %d, post id %d, distance %d", pre_global_id, post_global_id, current_state.distance);
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
@@ -387,17 +388,17 @@ bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
     if( current_state.sp_data.weight < rewiring_data.weight >> 1 && r >= rewiring_data.p_elim_dep ){
-        log_info("\t| FAIL DEP %d", current_state.current_time);
+        log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
     else if ( r >= rewiring_data.p_elim_pot ){
-        log_info("\t| FAIL POT %d", current_state.current_time);
+        log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_info("\t| RM pre %d post %d # controls %d %d",
+        log_debug("\t| RM pre %d post %d # controls %d %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
@@ -415,27 +416,26 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint distance_as_offset = current_state.distance*10;
 
-    if( (current_state.current_controls == 0 && distance_as_offset > rewiring_data.size_ff_prob)
-        || (current_state.current_controls == 1 && distance_as_offset > rewiring_data.size_lat_prob)){
-        log_info("\t| OOB %d %d", current_state.distance, current_state.current_time);
+    if( (current_state.current_controls == 0 && current_state.distance > rewiring_data.size_ff_prob)
+        || (current_state.current_controls == 1 && current_state.distance > rewiring_data.size_lat_prob)){
+        log_debug("\t| OOB %d %d", current_state.distance, current_state.current_time);
         return false;
     }
     if( current_state.current_controls == 0 )
-        probability = rewiring_data.ff_probabilities[distance_as_offset];
+        probability = rewiring_data.ff_probabilities[current_state.distance];
     else
-        probability = rewiring_data.lat_probabilities[distance_as_offset];
+        probability = rewiring_data.lat_probabilities[current_state.distance];
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
 
     if (r >= probability){
-        log_info("\t| NO FORM %d", current_state.current_time);
+        log_debug("\t| NO FORM %d", current_state.current_time);
         return false;
     }
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_info("\t| FORM pre %d post %d # controls %d distance %d ctrl %d %d",
+        log_debug("\t| FORM pre %d post %d # controls %d distance %d ctrl %d %d",
             current_state.pre_syn_id,
             current_state.post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
