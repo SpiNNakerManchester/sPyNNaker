@@ -27,43 +27,76 @@ class ConnectionHolder(object):
         # The merged connections formed just before the data is read
         "_merged_connections",
 
-        # The name of a file to write the data to or None to skip
-        "_filename",
-
         # Additional fixed values to be added to the data returned,
         # with the same values per synapse, as a list of tuples of
         # (field name, value)
-        "_fixed_values"
+        "_fixed_values",
+
+        # A callback to call with the data when finished
+        "_notify",
     )
 
     def __init__(
             self, data_items_to_return, as_list, n_pre_atoms, n_post_atoms,
-            connections=None, filename=None, fixed_values=None):
+            connections=None, fixed_values=None, notify=None):
+        """
+
+        :param data_items_to_return: A list of data fields to be returned
+        :param as_list:\
+            True if the data will be returned as a list, False if it is to be\
+            returned as a matrix (or series of matrices)
+        :param n_pre_atoms: The number of atoms in the pre-vertex
+        :param n_post_atoms: The number of atoms in the post-vertex
+        :param connections:\
+            Any initial connections, as a numpy structured array of\
+            source, target, weight and delay
+        :param fixed_values:\
+            A list of tuples of field names and fixed values to be appended\
+            to the other fields per connection, formatted as\
+            [(field_name, value), ...].
+            Note that if the field is to be returned, the name must also\
+            appear in data_items_to_return, which determines the order of\
+            items in the result
+        :param notify:\
+            A callback to call when the connections have all been added.\
+            This should accept a single parameter, which will contain the\
+            data requested
+        """
         self._data_items_to_return = data_items_to_return
         self._as_list = as_list
         self._n_pre_atoms = n_pre_atoms
         self._n_post_atoms = n_post_atoms
         self._connections = connections
         self._merged_connections = None
-        self._filename = filename
+        self._notify = notify
         self._fixed_values = fixed_values
 
     def add_connections(self, connections):
+        """ Add connections to the holder to be returned
+
+        :param connections:\
+            The connection to add, as a numpy structured array of\
+            source, target, weight and delay
+        """
         if self._connections is None:
             self._connections = list()
         self._connections.append(connections)
 
     @property
     def connections(self):
+        """ The connections stored
+        """
         return self._connections
 
     def finish(self):
-        if self._filename is not None:
-
-            # TODO: Write the file
-            pass
+        """ Finish adding connections
+        """
+        if self._notify is not None:
+            self._notify(self)
 
     def _merge_connections(self):
+        """ Merges the connections into the result data format
+        """
 
         # If there are already merged connections cached, return those
         if self._merged_connections is not None:

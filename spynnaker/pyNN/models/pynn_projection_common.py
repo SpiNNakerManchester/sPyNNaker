@@ -226,7 +226,8 @@ class PyNNProjectionCommon(object):
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
 
-    def _get_synaptic_data(self, as_list, data_to_get):
+    def _get_synaptic_data(
+            self, as_list, data_to_get, fixed_values=None, notify=None):
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 
@@ -234,12 +235,16 @@ class PyNNProjectionCommon(object):
         if self._virtual_connection_list is not None:
             post_vertex = self._projection_edge.post_vertex
             pre_vertex = self._projection_edge.pre_vertex
-            return ConnectionHolder(
+            connection_holder = ConnectionHolder(
                 data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
-                self._virtual_connection_list)
+                self._virtual_connection_list, fixed_values=fixed_values,
+                notify=notify)
+            connection_holder.finish()
+            return connection_holder
 
         connection_holder = ConnectionHolder(
-            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
+            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
+            fixed_values=fixed_values, notify=notify)
 
         # If we haven't run, add the holder to get connections, and return it
         if not self._spinnaker_control.has_ran:
@@ -284,32 +289,3 @@ class PyNNProjectionCommon(object):
         """
         # TODO
         raise NotImplementedError
-
-    def get(self, parameter, format, gather):  # @ReservedAssignment
-        """ supports getting things from a projection
-
-        :param parameter: the parameter, "weights, delays, plastic param"
-        :param format: "list" or "array".
-        :param gather: supposedly if True, get connection information from \
-            all MPI nodes, otherwise only from connections that exist in \
-            this node.
-        :return: the returns param
-        """
-
-        # do the gather check before trying to get data
-        if not gather:
-            raise ConfigurationException(
-                "the gather param has no meaning for spinnaker when set to "
-                "false")
-
-        # try for each possible parameters
-        if parameter in {"weight", "delay", "source", "target"}:
-            return self._get_synaptic_data(format == 'list', parameter)
-
-        # get the n_connections and the parameter and then expand to
-        # correct size
-        size = len(self._get_synaptic_data(format == 'list', 'source'))
-        data = numpy.empty(size)
-        data.fill(self._synapse_information.synapse_dynamics.get_value(
-            parameter))
-        return data
