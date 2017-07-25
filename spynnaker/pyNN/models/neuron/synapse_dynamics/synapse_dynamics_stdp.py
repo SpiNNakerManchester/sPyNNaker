@@ -277,3 +277,12 @@ class SynapseDynamicsSTDP(
             prov_data.extend(self._weight_dependence.get_provenance_data(
                 pre_population_label, post_population_label))
         return prov_data
+
+    @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
+    def get_parameter_names(self):
+        names = ['weight', 'delay']
+        if self._timing_dependence is not None:
+            names.extend(self._timing_dependence.get_parameter_names())
+        if self._weight_dependence is not None:
+            names.extend(self._weight_dependence.get_parameter_names())
+        return names
