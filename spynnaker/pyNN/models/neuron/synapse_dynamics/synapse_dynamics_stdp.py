@@ -1,8 +1,7 @@
 import math
 import numpy
 
-from spinn_front_end_common.abstract_models.\
-    abstract_changable_after_run import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -278,3 +277,12 @@ class SynapseDynamicsSTDP(
             prov_data.extend(self._weight_dependence.get_provenance_data(
                 pre_population_label, post_population_label))
         return prov_data
+
+    @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
+    def get_parameter_names(self):
+        names = ['weight', 'delay']
+        if self._timing_dependence is not None:
+            names.extend(self._timing_dependence.get_parameter_names())
+        if self._weight_dependence is not None:
+            names.extend(self._weight_dependence.get_parameter_names())
+        return names

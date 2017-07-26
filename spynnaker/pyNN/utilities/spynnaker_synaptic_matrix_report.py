@@ -38,27 +38,27 @@ class SpYNNakerSynapticMatrixReport(object):
                                "Generating synaptic matrix reports")
 
         # for each application edge, write matrix in new file
-        for application_edge, _ in progress.over(connection_holder.keys()):
+        for edge, _ in progress.over(connection_holder.keys()):
             # only write matrix's for edges which have matrix's
-            if isinstance(application_edge, ProjectionApplicationEdge):
+            if isinstance(edge, ProjectionApplicationEdge):
                 # figure new file name
                 file_name = os.path.join(
                     top_level_folder,
                     "synaptic_matrix_for_application_edge_{}"
-                    .format(application_edge.label))
-
-                # open writer
-                try:
-                    with open(file_name, "w") as output:
-                        # write all data for all synapse_information's in same
-                        # file
-                        for info in application_edge.synapse_information:
-                            this_connection_holder = connection_holder[(
-                                application_edge, info)]
-                            output.write("{}".format(this_connection_holder))
-                except IOError:
-                    logger.error("Generate_placement_reports: Can't open file"
-                                 " {} for writing.".format(file_name))
+                    .format(edge.label))
+                self._write_file(file_name, connection_holder, edge)
 
         # Reset the print options
         numpy.set_printoptions(**print_opts)
+
+    def _write_file(self, file_name, connection_holder, edge):
+        # open writer
+        try:
+            with open(file_name, "w") as output:
+                # write all data for all synapse_information's in same file
+                for info in edge.synapse_information:
+                    this_connection_holder = connection_holder[edge, info]
+                    output.write("{}".format(this_connection_holder))
+        except IOError:
+            logger.error("Generate_placement_reports: Can't open file"
+                         " {} for writing.".format(file_name))

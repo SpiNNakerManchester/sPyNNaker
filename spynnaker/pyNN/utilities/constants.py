@@ -54,7 +54,8 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPTIC_MATRIX', 4),
            ('SYNAPSE_DYNAMICS', 5),
            ('RECORDING', 6),
-           ('PROVENANCE_DATA', 7)])
+           ('PROVENANCE_DATA', 7),
+           ('PROFILING', 8)])
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

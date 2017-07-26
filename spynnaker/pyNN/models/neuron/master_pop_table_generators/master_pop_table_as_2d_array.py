@@ -1,8 +1,8 @@
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorFixedFieldConstraint, KeyAllocatorFixedMaskConstraint
-from pacman.utilities.utility_objs.field import Field
+    import FixedKeyFieldConstraint, FixedMaskConstraint
+from pacman.utilities.utility_objs import Field
 
 # spynnaker imports
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
@@ -12,7 +12,7 @@ from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
 from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 
 # general imports
@@ -212,6 +212,6 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         fields.append(Field(0, 7, 0xFF000000))
         fields.append(Field(0, 7, 0x00FF0000))
         fields.append(Field(0, 17, 0x0000F800))
-        constraints.append(KeyAllocatorFixedMaskConstraint(0xFFFFF800))
-        constraints.append(KeyAllocatorFixedFieldConstraint(fields))
+        constraints.append(FixedMaskConstraint(0xFFFFF800))
+        constraints.append(FixedKeyFieldConstraint(fields))
         return constraints

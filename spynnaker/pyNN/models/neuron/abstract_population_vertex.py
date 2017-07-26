@@ -1,44 +1,36 @@
 
 # pacman imports
-from pacman.model.abstract_classes.abstract_has_global_max_atoms import \
-    AbstractHasGlobalMaxAtoms
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
-from pacman.model.decorators.overrides import overrides
+    import ContiguousKeyRangeContraint
+from pacman.model.decorators import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.common.slice import Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
 
 # front end common imports
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
-from spinn_front_end_common.utilities.utility_objs.executable_start_type \
-    import ExecutableStartType
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_incoming_partition_constraints import \
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models.\
-    abstract_provides_outgoing_partition_constraints import \
+from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities import constants as \
-    common_constants
-from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.abstract_models\
-    .abstract_generates_data_specification \
+    import AbstractRewritesDataSpecification
+from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
-    import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
+from spinn_front_end_common.abstract_models.impl\
+    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.abstract_models\
-    .abstract_rewrites_data_specification\
-    import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models.impl\
-    .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -204,6 +196,10 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = True
         self._change_requires_neuron_parameters_reload = False
 
+        # Set up for profiling
+        self._n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
+
     @property
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
@@ -274,7 +270,8 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
 
-        is_recording = len(self._neuron_recorder.recording_variables) > 0
+        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
+                       self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
@@ -356,7 +353,9 @@ class AbstractPopulationVertex(
                 vertex_slice, graph.get_edges_ending_at_vertex(self),
                 machine_time_step) +
             (self._get_number_of_mallocs_used_by_dsg() *
-             common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
+             common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
+            profile_utils.get_profile_region_size(
+                self._n_profile_samples))
 
         return sdram_requirement
 
@@ -376,7 +375,8 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT, label='System')
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
 
@@ -384,6 +384,10 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
             size=recording_utilities.get_recording_header_size(
                 self.N_RECORDING_REGIONS))
+
+        profile_utils.reserve_profile_region(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -565,6 +569,11 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
+
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
@@ -606,7 +615,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
-        return self._neuron_recorder.get_recordable_variables
+        return self._neuron_recorder.get_recordable_variables()
 
     @overrides(AbstractNeuronRecordable.is_recording)
     def is_recording(self, variable):
@@ -770,6 +779,9 @@ class AbstractPopulationVertex(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step)
 
+    def clear_connection_cache(self):
+        self._synapse_manager.clear_connection_cache()
+
     @property
     def synapse_type(self):
         return self._synapse_manager.synapse_type
@@ -796,7 +808,7 @@ class AbstractPopulationVertex(
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]
 
     @overrides(
         AbstractNeuronRecordable.clear_recording)

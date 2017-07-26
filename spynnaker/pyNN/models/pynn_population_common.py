@@ -1,6 +1,6 @@
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
-    import PlacerChipAndCoreConstraint
+    import ChipAndCoreConstraint
 
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models \
@@ -10,9 +10,8 @@ from spynnaker.pyNN.models.abstract_models \
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.abstract_models.abstract_changable_after_run \
-    import AbstractChangableAfterRun
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
 import logging
 logger = logging.getLogger(__file__)
@@ -22,7 +21,7 @@ class PyNNPopulationCommon(object):
     def __init__(
             self, spinnaker_control, size, vertex, structure, initial_values):
         if size is not None and size <= 0:
-            raise exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
         # copy the parameters so that the end users are not exposed to the
@@ -140,7 +139,7 @@ class PyNNPopulationCommon(object):
             raise KeyError(
                 "Population does not support the initialisation of {}".format(
                     variable))
-        if globals_variables.get_simulator().has_ran \
+        if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
         self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
@@ -208,7 +207,7 @@ class PyNNPopulationCommon(object):
             raise KeyError("Population does not have property {}".format(
                 parameter))
 
-        if globals_variables.get_simulator().has_ran \
+        if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception(
                 "This population does not support changes to settings after"
@@ -275,8 +274,9 @@ class PyNNPopulationCommon(object):
         """ Apply a constraint to a population that restricts the processor\
             onto which its atoms will be placed.
         """
+        globals_variables.get_simulator().verify_not_running()
         if not isinstance(constraint, AbstractConstraint):
-            raise exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
 
         self._vertex.add_constraint(constraint)
@@ -294,7 +294,8 @@ class PyNNPopulationCommon(object):
         :param p: The processor id of the placement constraint (optional)
         :type p: int
         """
-        self._vertex.add_constraint(PlacerChipAndCoreConstraint(x, y, p))
+        globals_variables.get_simulator().verify_not_running()
+        self._vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -307,6 +308,7 @@ class PyNNPopulationCommon(object):
                     optionally "p" as keys, and ints as values
         :type constraint_dict: dict of str->int
         """
+        globals_variables.get_simulator().verify_not_running()
         self.add_placement_constraint(**constraint_dict)
 
         # state that something has changed in the population,
@@ -319,10 +321,11 @@ class PyNNPopulationCommon(object):
         :param new_value: the new value for the max atoms per core.
         """
         if not self._vertex_has_set_max_atoms_per_core:
-            raise exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "This population does not support its max_atoms_per_core "
                 "variable being adjusted by the end user")
 
+        globals_variables.get_simulator().verify_not_running()
         self._vertex.set_model_max_atoms_per_core(new_value)
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -378,5 +381,5 @@ class PyNNPopulationCommon(object):
         """
         if self._vertex_contains_units:
             return self._vertex.get_units(parameter_name)
-        raise exceptions.ConfigurationException(
+        raise ConfigurationException(
             "This population does not support describing its units")

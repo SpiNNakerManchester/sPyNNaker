@@ -1,6 +1,6 @@
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import math
 import numpy
 
@@ -29,7 +29,7 @@ class FixedProbabilityConnector(AbstractConnector):
         self._allow_self_connections = allow_self_connections
 
         if not 0 <= self._p_connect <= 1:
-            raise exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
 
     def get_delay_maximum(self):
