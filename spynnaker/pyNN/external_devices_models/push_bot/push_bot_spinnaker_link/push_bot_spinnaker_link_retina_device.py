@@ -7,6 +7,10 @@ from spynnaker.pyNN.external_devices_models.push_bot \
     import AbstractPushBotRetinaDevice
 from pacman.model.decorators import overrides
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @supports_injection
 class PushBotSpiNNakerLinkRetinaDevice(
@@ -18,6 +22,12 @@ class PushBotSpiNNakerLinkRetinaDevice(
             self, n_neurons, spinnaker_link_id, protocol, resolution,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
+
+        if n_neurons is not None and n_neurons != resolution.value.n_neurons:
+            logger.warn(
+                "The specified number of neurons for the push bot retina"
+                " device has been ignored {} will be used instead"
+                .format(resolution.value.n_neurons))
 
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(
