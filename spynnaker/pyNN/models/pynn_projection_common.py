@@ -1,5 +1,5 @@
 from pacman.model.constraints.partitioner_constraints \
-    import PartitionerSameSizeAsVertexConstraint
+    import SameAtomsAsVertexConstraint
 
 from spynnaker.pyNN.models.abstract_models \
     import AbstractAcceptsIncomingSynapses
@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
-from spinn_front_end_common.utilities import exceptions as common_exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -43,10 +43,12 @@ class PyNNProjectionCommon(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._requires_mapping = True
+        self._label = None
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
-            raise common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
@@ -54,7 +56,7 @@ class PyNNProjectionCommon(object):
         synapse_type = post_synaptic_population._get_vertex \
             .synapse_type.get_synapse_id_by_target(target)
         if synapse_type is None:
-            raise common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
@@ -82,7 +84,7 @@ class PyNNProjectionCommon(object):
             .get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay > (post_vertex_max_supported_delay_ms +
                         _delay_extension_max_supported_delay):
-            raise common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
 
@@ -146,11 +148,11 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
-        return False
+        return self._requires_mapping
 
     def mark_no_changes(self):
         # Does Nothing currently
-        pass
+        self._requires_mapping = False
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -158,10 +160,10 @@ class PyNNProjectionCommon(object):
 
         :param pre_synaptic_vertex: the source vertex of the multapse
         :type pre_synaptic_vertex: instance of\
-                pacman.model.graph.application.abstract_application_vertex
+                pacman.model.graph.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex: instance of\
-                pacman.model.graph.application.abstract_application_vertex
+                pacman.model.graph.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
 
@@ -192,7 +194,7 @@ class PyNNProjectionCommon(object):
                 machine_time_step, timescale_factor, label=delay_name)
             pre_synaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
-                PartitionerSameSizeAsVertexConstraint(delay_vertex))
+                SameAtomsAsVertexConstraint(delay_vertex))
             self._spinnaker_control.add_application_vertex(delay_vertex)
 
             # Add the edge
@@ -267,6 +269,11 @@ class PyNNProjectionCommon(object):
         connection_holder.finish()
         return connection_holder
 
+    def _clear_cache(self):
+        post_vertex = self._projection_edge.post_vertex
+        if isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
+            post_vertex.clear_connection_cache()
+
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)
 
@@ -291,7 +298,7 @@ class PyNNProjectionCommon(object):
 
         # do the gather check before trying to get data
         if not gather:
-            common_exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "the gather param has no meaning for spinnaker when set to "
                 "false")
 

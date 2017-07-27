@@ -1,4 +1,5 @@
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
+from spinn_utilities.overrides import overrides
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
@@ -67,3 +68,7 @@ class WeightDependenceAdditive(
     @property
     def weight_maximum(self):
         return self._w_max
+
+    @overrides(AbstractWeightDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['w_min', 'w_max', 'A_plus', 'A_minus']

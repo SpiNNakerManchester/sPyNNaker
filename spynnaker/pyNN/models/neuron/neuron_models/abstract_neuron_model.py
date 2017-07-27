@@ -34,7 +34,7 @@ class AbstractNeuronModel(object):
         """ Get the types of the neural parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        :rtype: list of :py:class:`data_specification.enums.DataType`
         """
 
     @abstractmethod
@@ -50,7 +50,7 @@ class AbstractNeuronModel(object):
         """ Get the types of the global parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        :rtype: list of :py:class:`data_specification.enums.DataType`
         """
 
     @abstractmethod

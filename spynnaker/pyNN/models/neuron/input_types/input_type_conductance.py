@@ -1,4 +1,4 @@
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
