@@ -19,7 +19,7 @@ static void neuron_impl_convert_excitatory_input_to_current(
 		input_t exc_input_value,
 		input_type_pointer_t input_type, state_t voltage);
 
-//! \brief Sets up the conversion of an inhibittory input to current
+//! \brief Sets up the conversion of an inhibitory input to current
 //! \param[in] inh_value The value of the inhibitory input before conversion
 //! \param[in] input_type The input type pointer to the parameters
 //! \param[in] voltage The voltage to use in conversion
