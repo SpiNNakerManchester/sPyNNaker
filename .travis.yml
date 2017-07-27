@@ -49,7 +49,7 @@ script:
   - flake8 unittests
   # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
   # - flake8 integration_tests
-  - support/run-vera.sh neural_modelling -P max-path-length=120 -P max-filename-length=60
+  - support/run-vera.sh neural_modelling -P max-path-length=120 -P max-filename-length=60 -P max-line-length=110
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh 
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
