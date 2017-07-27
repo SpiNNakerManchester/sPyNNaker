@@ -199,7 +199,6 @@ static inline multicast_packet munich_protocol_get_set_mode_command() {
 
 static inline multicast_packet munich_protocol_set_retina_transmission_key(
         uint32_t new_key, uint32_t uart_id) {
-
     return (multicast_packet) {
         .key = (_ACTIVE_RETINA_EVENT_STREAMING_SET_KEY |
                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
@@ -219,8 +218,7 @@ static inline multicast_packet munich_protocol_disable_retina_event_streaming(
 }
 
 static inline multicast_packet
-    munich_protocol_master_slave_use_internal_counter(
-        uint32_t uart_id) {
+munich_protocol_master_slave_use_internal_counter(uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MASTER_SLAVE_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
                 _instance_key),
@@ -240,8 +238,7 @@ static inline multicast_packet munich_protocol_master_slave_set_slave(
 }
 
 static inline multicast_packet
-    munich_protocol_master_slave_set_master_clock_not_started(
-        uint32_t uart_id) {
+munich_protocol_master_slave_set_master_clock_not_started(uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MASTER_SLAVE_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
                 _instance_key),
@@ -299,7 +296,7 @@ static inline multicast_packet munich_protocol_poll_sensors_once(
 }
 
 static inline multicast_packet
-    munich_protocol_poll_individual_sensor_continuously(
+munich_protocol_poll_individual_sensor_continuously(
         uint32_t sensor_id, uint32_t time_in_ms) {
     return (multicast_packet) {
         .key = _POLL_SENSORS_CONTINUOUSLY_KEY | _instance_key,
@@ -320,7 +317,7 @@ static inline multicast_packet munich_protocol_generic_motor_enable_disable(
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor_total_period_duration(
+munich_protocol_generic_motor_total_period_duration(
         uint32_t time_in_ms, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_RUN_FOR_PERIOD_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -331,7 +328,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor0_raw_output_permanent(
+munich_protocol_generic_motor0_raw_output_permanent(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_0_RAW_PERM_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -342,7 +339,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor1_raw_output_permanent(
+munich_protocol_generic_motor1_raw_output_permanent(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_1_RAW_PERM_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -353,7 +350,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor0_raw_output_leak_to_0(
+munich_protocol_generic_motor0_raw_output_leak_to_0(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_0_RAW_LEAK_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -364,7 +361,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor1_raw_output_leak_to_0(
+munich_protocol_generic_motor1_raw_output_leak_to_0(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_1_RAW_LEAK_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -405,7 +402,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY |
@@ -416,7 +413,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY |
@@ -427,7 +424,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY |
@@ -438,7 +435,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY |
@@ -449,7 +446,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY |
@@ -460,7 +457,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY  |
@@ -508,8 +505,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_set_payload_pins_to_high_impedance(
-        uint32_t payload) {
+munich_protocol_set_payload_pins_to_high_impedance(uint32_t payload) {
     return (multicast_packet) {
         .key = _SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY | _instance_key,
         .payload = payload,
@@ -518,7 +514,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_laser_config_total_period(
+munich_protocol_push_bot_laser_config_total_period(
         uint32_t total_period, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -535,7 +531,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_laser_config_active_time(
+munich_protocol_push_bot_laser_config_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -568,7 +564,7 @@ static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_speaker_config_total_period(
+munich_protocol_push_bot_speaker_config_total_period(
         uint32_t total_period, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -585,7 +581,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_speaker_config_active_time(
+munich_protocol_push_bot_speaker_config_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -730,7 +726,7 @@ static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_motor_0_leaking_towards_zero(
+munich_protocol_push_bot_motor_0_leaking_towards_zero(
         uint32_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -747,7 +743,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_motor_1_leaking_towards_zero(
+munich_protocol_push_bot_motor_1_leaking_towards_zero(
         uint32_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
         log_error(
@@ -792,7 +788,6 @@ static inline multicast_packet _key_retina(
         };
     }
     if (retina_pixels == 16 * 16) {
-
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
                       (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
@@ -814,38 +809,33 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
     // if events in the key.
     if (events_in_key) {
         if (!payload_holds_time_stamps) {
-
             // not using payloads
-            multicast_packet packet =
-                _key_retina(retina_pixels, _PAYLOAD_NO_TIMESTAMPS, uart_id);
-            return packet;
-        } else {
-
-            // using payloads
-            if (size_of_time_stamp_in_bytes == 0) {
-                return _key_retina(
-                    retina_pixels, _PAYLOAD_DELTA_TIMESTAMPS, uart_id);
-            } else if (size_of_time_stamp_in_bytes == 2) {
-                return _key_retina(
-                    retina_pixels, _PAYLOAD_TWO_BYTE_TIME_STAMPS, uart_id);
-            } else if (size_of_time_stamp_in_bytes == 3) {
-                return _key_retina(
-                    retina_pixels, _PAYLOAD_THREE_BYTE_TIME_STAMPS, uart_id);
-            } else if (size_of_time_stamp_in_bytes == 4) {
-                return _key_retina(
-                    retina_pixels, _PAYLOAD_FOUR_BYTE_TIME_STAMPS, uart_id);
-            } else {
-                log_error(
-                    "Unknown size of timestamp in bytes: %d\n",
-                    size_of_time_stamp_in_bytes);
-                rt_error(RTE_SWERR);
-                return (multicast_packet) {
-                    .key = 0, .payload = 0, .payload_flag = 0
-                };
-            }
+            return _key_retina(
+        	    retina_pixels, _PAYLOAD_NO_TIMESTAMPS, uart_id);
         }
-    } else {
 
+        // using payloads
+        if (size_of_time_stamp_in_bytes == 0) {
+            return _key_retina(
+        	    retina_pixels, _PAYLOAD_DELTA_TIMESTAMPS, uart_id);
+        } else if (size_of_time_stamp_in_bytes == 2) {
+            return _key_retina(
+                    retina_pixels, _PAYLOAD_TWO_BYTE_TIME_STAMPS, uart_id);
+        } else if (size_of_time_stamp_in_bytes == 3) {
+            return _key_retina(
+                    retina_pixels, _PAYLOAD_THREE_BYTE_TIME_STAMPS, uart_id);
+        } else if (size_of_time_stamp_in_bytes == 4) {
+            return _key_retina(
+                    retina_pixels, _PAYLOAD_FOUR_BYTE_TIME_STAMPS, uart_id);
+        }
+
+        log_error("Unknown size of timestamp in bytes: %d\n",
+        	size_of_time_stamp_in_bytes);
+        rt_error(RTE_SWERR);
+        return (multicast_packet) {
+            .key = 0, .payload = 0, .payload_flag = 0
+        };
+    } else {
         // using payloads to hold all events
 
         // warn users about models

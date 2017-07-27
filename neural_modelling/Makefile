@@ -2,7 +2,7 @@ BUILDS = spike_source/poisson delay_extension neuron robot_motor_control
 DIRS = $(BUILDS:%=src/%)
 
 all: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
+	@for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 %.aplx: %
 	$(MAKE) -C $*
@@ -11,4 +11,4 @@ all: $(DIRS)
 	$(MAKE) -C neuron/builds/$*
 
 clean: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+	@for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done

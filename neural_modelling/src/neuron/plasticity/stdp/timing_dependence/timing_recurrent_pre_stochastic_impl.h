@@ -13,7 +13,7 @@ typedef struct {
     int32_t accumulator_potentiation_minus_one;
 } plasticity_trace_region_data_t;
 
-#include "../synapse_structure/synapse_structure_weight_state_accumulator_window_impl.h"
+#include "neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_state_accumulator_window_impl.h"
 #include "timing_recurrent_common.h"
 
 extern uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
