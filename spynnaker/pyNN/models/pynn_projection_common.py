@@ -241,18 +241,22 @@ class PyNNProjectionCommon(object):
             connection_holder.finish()
             return connection_holder
 
+        # if not virtual board, make connection holder to be filled in at
+        # possible later date
         connection_holder = ConnectionHolder(
             data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
             fixed_values=fixed_values, notify=notify)
 
         # If we haven't run, add the holder to get connections, and return it
+        # and set up a callback for after run to fill in this connection holder
         if not self._spinnaker_control.has_ran:
             post_vertex.add_pre_run_connection_holder(
                 connection_holder, self._projection_edge,
                 self._synapse_information)
             return connection_holder
 
-        # Otherwise, get the connections now
+        # Otherwise, get the connections now, as we have ran
+        #  and therefore can get them
         graph_mapper = self._spinnaker_control.graph_mapper
         placements = self._spinnaker_control.placements
         transceiver = self._spinnaker_control.transceiver

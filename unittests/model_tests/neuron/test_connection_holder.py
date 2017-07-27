@@ -138,7 +138,7 @@ def test_connection_holder(data_items, fixed_values, as_list):
                     assert math.isnan(matrix[1, 1])
 
 
-def test_connection_holder_matrix_multiple_items(data_items, fixed_values):
+def test_connection_holder_matrix_multiple_items():
     data_items = ["source", "target", "delay", "weight"]
     connection_holder = ConnectionHolder(
         data_items_to_return=data_items,

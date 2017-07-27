@@ -25,7 +25,7 @@ class ConnectionHolder(object):
         "_connections",
 
         # The merged connections formed just before the data is read
-        "_merged_connections",
+        "_data_items",
 
         # Additional fixed values to be added to the data returned,
         # with the same values per synapse, as a list of tuples of
@@ -67,7 +67,7 @@ class ConnectionHolder(object):
         self._n_pre_atoms = n_pre_atoms
         self._n_post_atoms = n_post_atoms
         self._connections = connections
-        self._merged_connections = None
+        self._data_items = None
         self._notify = notify
         self._fixed_values = fixed_values
 
@@ -94,20 +94,21 @@ class ConnectionHolder(object):
         if self._notify is not None:
             self._notify(self)
 
-    def _merge_connections(self):
+    def _get_data_items(self):
         """ Merges the connections into the result data format
         """
 
         # If there are already merged connections cached, return those
-        if self._merged_connections is not None:
-            return self._merged_connections
+        if self._data_items is not None:
+            return self._data_items
 
         # If there are no connections added, raise an exception
         if self._connections is None:
             raise Exception(
                 "Connections are only set after run has been called, even if"
                 " you are trying to see the data before changes have been"
-                " made.  Try examining the weights after the call to run.")
+                " made.  Try examining the {} after the call to run.".format(
+                    self._data_items_to_return))
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
@@ -144,16 +145,16 @@ class ConnectionHolder(object):
             # all the data
             if (self._data_items_to_return is None or
                     len(self._data_items_to_return) == 0):
-                self._merged_connections = connections[order]
+                self._data_items = connections[order]
 
             # There is more than one item to return, so let numpy do its magic
             elif len(self._data_items_to_return) > 1:
-                self._merged_connections = \
+                self._data_items = \
                     connections[order][self._data_items_to_return]
 
             # There is 1 item to return, so make sure only one item exists
             else:
-                self._merged_connections = \
+                self._data_items = \
                     connections[order][self._data_items_to_return[0]]
 
         else:
@@ -180,34 +181,34 @@ class ConnectionHolder(object):
 
             # If there is only one matrix, use it directly
             if len(merged_connections) == 1:
-                self._merged_connections = merged_connections[0]
+                self._data_items = merged_connections[0]
 
             # Otherwise use a tuple of the matrices
             else:
-                self._merged_connections = tuple(merged_connections)
+                self._data_items = tuple(merged_connections)
 
-        return self._merged_connections
+        return self._data_items
 
     def __getitem__(self, s):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return data[s]
 
     def __len__(self):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return len(data)
 
     def __iter__(self):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return iter(data)
 
     def __str__(self):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return data.__str__()
 
     def __repr__(self):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return data.__repr__()
 
     def __getattr__(self, name):
-        data = self._merge_connections()
+        data = self._get_data_items()
         return getattr(data, name)
