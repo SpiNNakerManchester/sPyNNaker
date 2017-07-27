@@ -59,7 +59,7 @@ static inline final_state_t _plasticity_update_synapse(
             current_state = timing_apply_pre_spike(delayed_pre_time,
                     *pre_window.next_trace, pre_window.prev_time,
                     pre_window.prev_trace, post_window.prev_time,
-                    post_window.prev_trace, current_state, 0);
+                    post_window.prev_trace, current_state);
 
             // Go onto next event
             pre_window = pre_events_next(pre_window, delayed_pre_time);
@@ -76,7 +76,7 @@ static inline final_state_t _plasticity_update_synapse(
             current_state = timing_apply_post_spike(*post_window.next_time,
                     *post_window.next_trace, pre_window.prev_time,
                     pre_window.prev_trace, post_window.prev_time,
-                    post_window.prev_trace, current_state, 0);
+                    post_window.prev_trace, current_state);
 
             // Go onto next event
             post_window = post_events_next(post_window);

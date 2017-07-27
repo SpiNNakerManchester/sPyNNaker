@@ -96,7 +96,7 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state, (uint32_t) 0);
+            current_state);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -110,7 +110,7 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state, (uint32_t) 0);
+        post_window.prev_time, post_window.prev_trace, current_state);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
