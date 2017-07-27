@@ -1,9 +1,8 @@
-from spinn_machine.utilities.progress_bar import ProgressBar
-from spinnman.messages.eieio.data_messages.eieio_data_header \
-    import EIEIODataHeader
+from spinn_utilities.progress_bar import ProgressBar
+from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
 import numpy
-
+import struct
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,17 +36,13 @@ class EIEIOSpikeRecorder(object):
     def get_spikes(self, label, buffer_manager, region,
                    placements, graph_mapper, application_vertex,
                    base_key_function, machine_time_step):
-
         results = list()
         missing_str = ""
         ms_per_tick = machine_time_step / 1000.0
-        vertices = \
-            graph_mapper.get_machine_vertices(application_vertex)
-        progress_bar = ProgressBar(len(vertices),
-                                   "Getting spikes for {}".format(label))
-
-        for vertex in vertices:
-
+        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        progress = ProgressBar(vertices,
+                               "Getting spikes for {}".format(label))
+        for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
@@ -65,21 +60,21 @@ class EIEIOSpikeRecorder(object):
 
             offset = 0
             while offset < number_of_bytes_written:
+                length = struct.unpack_from("<I", spike_data, offset)[0]
+                data_offset = offset + 4
                 eieio_header = EIEIODataHeader.from_bytestring(
-                    spike_data, offset)
-                offset += eieio_header.size
+                    spike_data, data_offset)
+                data_offset += eieio_header.size
                 timestamp = eieio_header.payload_base * ms_per_tick
                 timestamps = numpy.repeat([timestamp], eieio_header.count)
                 keys = numpy.frombuffer(
                     spike_data, dtype="<u4", count=eieio_header.count,
-                    offset=offset)
+                    offset=data_offset)
                 neuron_ids = ((keys - base_key_function(vertex)) +
                               vertex_slice.lo_atom)
-                offset += eieio_header.count * 4
+                offset += length + 4
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
-            progress_bar.update()
 
-        progress_bar.end()
         if len(missing_str) > 0:
             logger.warn(
                 "Population {} is missing spike data in region {} from the"

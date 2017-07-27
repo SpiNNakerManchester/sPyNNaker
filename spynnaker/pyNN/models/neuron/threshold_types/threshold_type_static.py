@@ -1,12 +1,11 @@
-from pacman.model.decorators.overrides import overrides
+from pacman.model.decorators import overrides
 
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type \
-    import AbstractThresholdType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_threshold_type import AbstractThresholdType
 
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
 from enum import Enum
 
@@ -25,12 +24,17 @@ class _STATIC_TYPES(Enum):
         return self._data_type
 
 
-class ThresholdTypeStatic(AbstractThresholdType):
+class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
+
     """ A threshold that is a static value
     """
 
     def __init__(self, n_neurons, v_thresh):
         AbstractThresholdType.__init__(self)
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {'v_thresh': "mV"}
+
         self._n_neurons = n_neurons
         self._v_thresh = utility_calls.convert_param_to_numpy(
             v_thresh, n_neurons)
@@ -62,3 +66,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
         # Just a comparison, but 2 just in case!
         return 2
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

@@ -2,20 +2,27 @@ import os
 from setuptools import setup
 from collections import defaultdict
 
-exec(open("spynnaker/pyNN/_version.py").read())
+__version__ = None
+exec(open("spynnaker/_version.py").read())
+assert __version__
 
-if os.environ.get('READTHEDOCS', None) == 'True':
+install_requires = [
+    'SpiNNUtilities >= 1!4.0.0a5, < 1!5.0.0',
+    'SpiNNMan >= 1!4.0.0a5, < 1!5.0.0',
+    'SpiNNaker_PACMAN >= 1!4.0.0a5, < 1!5.0.0',
+    'SpiNNaker_DataSpecification >= 1!4.0.0a5, < 1!5.0.0',
+    'SpiNNFrontEndCommon >= 1!4.0.0a5, < 1!5.0.0',
+    'numpy', 'lxml', 'six']
+if os.environ.get('READTHEDOCS', None) != 'True':
+
     # scipy must be added in config.py as a mock
-    install_requires = ['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                        'pyNN >= 0.7, < 0.8', 'numpy', 'lxml', 'six']
-else:
-    install_requires = ['SpiNNFrontEndCommon >= 3.0.0, < 4.0.0',
-                        'pyNN >= 0.7, < 0.8', 'numpy', 'scipy', 'lxml', 'six']
+    install_requires.append('scipy')
+
 
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
 data_extensions = {".aplx", ".xml"}
-config_extensions = {".cfg",".template"}
+config_extensions = {".cfg", ".template"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []

@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/SpiNNakerManchester/sPyNNaker.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/sPyNNaker)
+
+
 This package provides a PyNN implementation for SpiNNaker.
 
 Requirements
@@ -137,3 +140,11 @@ To install as a development version for only yourself, run:
     python setup.py develop --user
 
 If you also want pyNN.spiNNaker support, please install this as described above.
+
+Documentation
+=============
+[sPyNNaker python documentation](http://spynnaker.readthedocs.io)
+
+[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
+
+[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)

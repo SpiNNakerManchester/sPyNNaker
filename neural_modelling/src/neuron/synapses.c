@@ -2,12 +2,17 @@
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
+#include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
 
+//! if using profiler import profiler tags
+#ifdef PROFILER_ENABLED
+    #include "profile_tags.h"
+#endif
+
 // Compute the size of the input buffers and ring buffers
-#define INPUT_BUFFER_SIZE (1 << (SYNAPSE_TYPE_BITS + SYNAPSE_INDEX_BITS))
 #define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
                                 + SYNAPSE_INDEX_BITS))
 
@@ -22,9 +27,6 @@ static weight_t ring_buffers[RING_BUFFER_SIZE];
 
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
-
-// Input buffer to handle input and shaping of the input
-static input_t input_buffers[INPUT_BUFFER_SIZE];
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
@@ -124,9 +126,10 @@ static inline void _print_inputs() {
     bool empty = true;
     for (index_t i = 0; i < n_neurons; i++) {
         empty = empty
-                && (bitsk(synapse_types_get_excitatory_input(input_buffers, i)
-                    - synapse_types_get_inhibitory_input(input_buffers, i))
-                        == 0);
+                && (bitsk(synapse_types_get_excitatory_input(
+                        &(neuron_synapse_shaping_params[i]))
+                    - synapse_types_get_inhibitory_input(
+                        &(neuron_synapse_shaping_params[i]))) == 0);
     }
 
     if (!empty) {
@@ -134,11 +137,14 @@ static inline void _print_inputs() {
 
         for (index_t i = 0; i < n_neurons; i++) {
             input_t input =
-                synapse_types_get_excitatory_input(input_buffers, i)
-                - synapse_types_get_inhibitory_input(input_buffers, i);
+                synapse_types_get_excitatory_input(
+                    &(neuron_synapse_shaping_params[i]))
+                - synapse_types_get_inhibitory_input(
+                    &(neuron_synapse_shaping_params[i]));
             if (bitsk(input) != 0) {
                 log_debug("%3u: %12.6k (= ", i, input);
-                synapse_types_print_input(input_buffers, i);
+                synapse_types_print_input(
+                    &(neuron_synapse_shaping_params[i]));
                 log_debug(")\n");
             }
         }
@@ -204,31 +210,21 @@ static inline void _print_synapse_parameters() {
         synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
     }
     log_debug("-------------------------------------\n");
-    //}
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 
 /* INTERFACE FUNCTIONS */
-
 bool synapses_initialise(
         address_t synapse_params_address, address_t synaptic_matrix_address,
-        uint32_t n_neurons_value, input_t **input_buffers_value,
+        uint32_t n_neurons_value,
+        synapse_param_t **neuron_synapse_shaping_params_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *indirect_synapses_address,
         address_t *direct_synapses_address) {
 
     log_info("synapses_initialise: starting");
     n_neurons = n_neurons_value;
-    *input_buffers_value = input_buffers;
-
-    // Set the initial values to 0
-    for (uint32_t i = 0; i < INPUT_BUFFER_SIZE; i++) {
-        input_buffers[i] = 0;
-    }
-    for (uint32_t i = 0; i < RING_BUFFER_SIZE; i++) {
-        ring_buffers[i] = 0;
-    }
 
     // Get the synapse shaping data
     if (sizeof(synapse_param_t) > 0) {
@@ -295,6 +291,13 @@ bool synapses_initialise(
 
     log_info("synapses_initialise: completed successfully");
     _print_synapse_parameters();
+
+    *neuron_synapse_shaping_params_value = neuron_synapse_shaping_params;
+
+    for (uint32_t i = 0; i < RING_BUFFER_SIZE; i++) {
+        ring_buffers[i] = 0;
+    }
+
     return true;
 }
 
@@ -310,12 +313,13 @@ void synapses_do_timestep_update(timer_t time) {
             neuron_index++) {
 
         // Shape the existing input according to the included rule
-        synapse_types_shape_input(input_buffers, neuron_index,
-                neuron_synapse_shaping_params);
+        synapse_types_shape_input(
+            &(neuron_synapse_shaping_params[neuron_index]));
 
         // Loop through all synapse types
         for (uint32_t synapse_type_index = 0;
-                synapse_type_index < SYNAPSE_TYPE_COUNT; synapse_type_index++) {
+                synapse_type_index < SYNAPSE_TYPE_COUNT;
+                synapse_type_index++) {
 
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
@@ -324,11 +328,12 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
-            synapse_types_add_neuron_input(input_buffers, synapse_type_index,
-                    neuron_index, neuron_synapse_shaping_params,
-                    synapses_convert_weight_to_input(
-                        ring_buffers[ring_buffer_index],
-                        ring_buffer_to_input_left_shifts[synapse_type_index]));
+            synapse_types_add_neuron_input(
+                synapse_type_index,
+                &(neuron_synapse_shaping_params[neuron_index]),
+                synapses_convert_weight_to_input(
+                    ring_buffers[ring_buffer_index],
+                    ring_buffer_to_input_left_shifts[synapse_type_index]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;
@@ -359,10 +364,15 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
         address_t plastic_region_address = synapse_row_plastic_region(row);
 
         // Process any plastic synapses
+        profiler_write_entry_disable_fiq(
+            PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
                 fixed_region_address, ring_buffers, time)) {
             return false;
         }
+        profiler_write_entry_disable_fiq(
+            PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+
 
         // Perform DMA write back
         if (write) {
@@ -386,8 +396,8 @@ uint32_t synapses_get_saturation_count() {
     return saturation_count;
 }
 
-//! \brief returns the counters for plastic and fixed pre synaptic events based
-//! on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//! \brief returns the counters for plastic and fixed pre synaptic events
+//! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //! returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events() {

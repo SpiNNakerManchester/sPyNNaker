@@ -1,7 +1,4 @@
-from pyNN.random import RandomDistribution
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-
+from .abstract_connector import AbstractConnector
 import numpy
 import logging
 
@@ -11,20 +8,11 @@ logger = logging.getLogger(__file__)
 class FixedNumberPostConnector(AbstractConnector):
 
     def __init__(
-            self, n, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe, space, verbose)
+            self, n, allow_self_connections=True, safe=True, verbose=False):
+        AbstractConnector.__init__(self, safe, verbose)
         self._post_n = n
-        self._weights = weights
-        self._delays = delays
         self._allow_self_connections = allow_self_connections
         self._post_neurons = None
-
-        self._check_parameters(weights, delays, allow_lists=False)
-        if isinstance(n, RandomDistribution):
-            raise NotImplementedError(
-                "RandomDistribution is not supported for n in the"
-                " implementation of FixedNumberPostConnector on this platform")
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -161,3 +149,11 @@ class FixedNumberPostConnector(AbstractConnector):
 
     def __repr__(self):
         return "FixedNumberPostConnector({})".format(self._post_n)
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value

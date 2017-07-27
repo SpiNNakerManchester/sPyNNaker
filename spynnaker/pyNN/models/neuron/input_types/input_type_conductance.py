@@ -1,9 +1,9 @@
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import NeuronParameter
-from spynnaker.pyNN.models.neuron.input_types.abstract_input_type \
-    import AbstractInputType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from .abstract_input_type import AbstractInputType
 
 from enum import Enum
 
@@ -23,12 +23,18 @@ class _CONDUCTANTCE_TYPES(Enum):
         return self._data_type
 
 
-class InputTypeConductance(AbstractInputType):
+class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     """ The conductance input type
     """
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
         AbstractInputType.__init__(self)
+        AbstractContainsUnits.__init__(self)
+
+        self._units = {
+            "e_rev_I": "mV",
+            "e_rev_E": "mV"}
+
         self._n_neurons = n_neurons
         self._e_rev_E = utility_calls.convert_param_to_numpy(
             e_rev_E, n_neurons)
@@ -72,3 +78,7 @@ class InputTypeConductance(AbstractInputType):
 
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10
+
+    @overrides(AbstractContainsUnits.get_units)
+    def get_units(self, variable):
+        return self._units[variable]

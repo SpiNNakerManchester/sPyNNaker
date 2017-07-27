@@ -1,6 +1,5 @@
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
+from .abstract_connector import AbstractConnector
 
 import numpy.random
 
@@ -15,30 +14,35 @@ class MultapseConnector(AbstractConnector):
 
     :param num_synapses:
         Integer. This is the total number of synapses in the connection.
-    :param weights:
-        may either be a float, a !RandomDistribution object, a list/
-        1D array with at least as many items as connections to be
-        created. Units nA.
-    :param delays:
-        as `weights`. If `None`, all synaptic delays will be set
-        to the global minimum delay.
 
     """
     def __init__(
-            self, num_synapses, weights=0.0, delays=1,
-            safe=True, verbose=False):
+            self, num_synapses, safe=True, verbose=False):
         """
         Creates a new connector.
         """
-        AbstractConnector.__init__(self, safe, None, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
         self._num_synapses = num_synapses
-        self._weights = weights
-        self._delays = delays
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
 
-        self._check_parameters(weights, delays)
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
+        :param `float` weights:
+            may either be a float, a !RandomDistribution object, a list \
+            1D array with at least as many items as connections to be \
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            delays will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler, \
+            or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
+        """
+        self._weights = weights
+        self._delays = delays
+        self._check_parameters(weights, delays, allow_lists=True)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._delays, self._num_synapses)

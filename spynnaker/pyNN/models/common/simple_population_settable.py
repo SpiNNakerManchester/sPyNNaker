@@ -1,6 +1,5 @@
-from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
+from pacman.model.decorators import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 
 class SimplePopulationSettable(AbstractPopulationSettable):

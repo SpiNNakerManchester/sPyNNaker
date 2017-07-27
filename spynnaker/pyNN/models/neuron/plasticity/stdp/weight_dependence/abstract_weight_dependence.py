@@ -9,6 +9,25 @@ class AbstractWeightDependence(object):
 
     __slots__ = ()
 
+    def __init__(self):
+        pass
+
+    def get_provenance_data(self, pre_population_label, post_population_label):
+        """ Get any provenance data
+
+        :param pre_population_label: label of pre.
+        :param post_population_label:label of post.
+        :return the provenance data of the weight dependency
+        """
+        return list()
+
+    @abstractmethod
+    def get_parameter_names(self):
+        """ returns iterable of parameter names as basestrings
+
+        :return: iterable of basestring
+        """
+
     @abstractmethod
     def is_same_as(self, weight_dependence):
         """ Determine if this weight dependence is the same as another
@@ -36,8 +55,3 @@ class AbstractWeightDependence(object):
         """ The maximum weight that will ever be set in a synapse as a result\
             of this rule
         """
-
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-        """
-        return list()

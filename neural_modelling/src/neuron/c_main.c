@@ -20,9 +20,11 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
+#include "profile_tags.h"
 
 #include <data_specification.h>
 #include <simulation.h>
+#include <profiler.h>
 #include <debug.h>
 
 /* validates that the model being compiled does indeed contain a application
@@ -42,7 +44,8 @@ typedef enum regions_e{
     SYNAPTIC_MATRIX_REGION,
     SYNAPSE_DYNAMICS_REGION,
     RECORDING_REGION,
-    PROVENANCE_DATA_REGION
+    PROVENANCE_DATA_REGION,
+    PROFILER_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
@@ -58,7 +61,7 @@ typedef enum callback_priorities{
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 3
+#define NUMBER_OF_REGIONS_TO_RECORD 4
 
 // Globals
 
@@ -119,7 +122,7 @@ static bool initialise(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP_AND_DMA_AND_USER)) {
+            &infinite_run, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER)) {
         return false;
     }
     simulation_set_provenance_function(
@@ -142,19 +145,21 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up the synapses
-    input_t *input_buffers;
+    synapse_param_t *neuron_synapse_shaping_params;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address;
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
-            n_neurons, &input_buffers,
+            n_neurons, &neuron_synapse_shaping_params,
             &ring_buffer_to_input_buffer_left_shifts,
             &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
-    neuron_set_input_buffers(input_buffers);
+
+    // set the neuron up properly
+    neuron_set_neuron_synapse_shaping_params(neuron_synapse_shaping_params);
 
     // Set up the population table
     uint32_t row_max_n_words;
@@ -173,10 +178,15 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER,
+            row_max_n_words, MC, SDP_AND_DMA_AND_USER,
             incoming_spike_buffer_size)) {
         return false;
     }
+
+    // Setup profiler
+    profiler_init(
+        data_specification_get_region(PROFILER_REGION, address));
+
     log_info("Initialise: finished");
     return true;
 }
@@ -188,9 +198,9 @@ void resume_callback() {
 
     // try reloading neuron parameters
     address_t address = data_specification_get_data_address();
-    if(!neuron_reload_neuron_parameters(
+    if (!neuron_reload_neuron_parameters(
             data_specification_get_region(
-                NEURON_PARAMS_REGION, address))){
+                NEURON_PARAMS_REGION, address))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -204,6 +214,8 @@ void resume_callback() {
 void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
 
@@ -223,12 +235,15 @@ void timer_callback(uint timer_count, uint unused) {
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             log_info("updating recording regions");
             recording_finalise();
         }
+        profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -244,6 +259,8 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 //! \brief The entry point for this model.
