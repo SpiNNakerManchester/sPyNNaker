@@ -1,6 +1,6 @@
 import math
 import numpy
-
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
@@ -156,3 +156,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @property
     def synaptic_structure(self):
         return self._synapse_structure
+
+
+    @overrides(AbstractTimingDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit', 'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib']
+
