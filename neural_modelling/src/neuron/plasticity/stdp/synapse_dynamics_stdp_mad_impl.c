@@ -317,12 +317,14 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     plastic_synapse_t weight;
+    uint32_t delay;
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
         // Get next control word (auto incrementing)
         weight = *plastic_words++;
         uint32_t control_word = *control_words++;
         // Check if index is the one I'm looking for
+        delay = synapse_row_sparse_delay(control_word);
         if (synapse_row_sparse_index(control_word)==id)
             break;
     }
@@ -330,11 +332,13 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
     if (plastic_synapse > 0){
         sp_data -> weight = weight;
         sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
+        sp_data -> delay  = delay;
         return true;
         }
     else{
         sp_data -> weight = -1;
-        sp_data -> offset = - 1;
+        sp_data -> offset = -1;
+        sp_data -> delay  = -1;
         return false;
         }
 }

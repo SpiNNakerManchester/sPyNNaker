@@ -400,8 +400,7 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region);
 
-    uint32_t weight;
-
+    uint32_t weight, delay;
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get next control word (auto incrementing)
@@ -409,6 +408,7 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
 
         uint32_t synaptic_word = *synaptic_words++;
         weight = synapse_row_sparse_weight(synaptic_word);
+        delay = synapse_row_sparse_delay(synaptic_word);
         if (synapse_row_sparse_index(synaptic_words)==id)
             break;
     }
@@ -419,11 +419,13 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
     if (fixed_synapse > 0){
         sp_data -> weight = weight;
         sp_data -> offset = synapse_row_num_fixed_synapses(fixed_region) - fixed_synapse;
+        sp_data -> delay  = delay;
         return true;
         }
     else{
         sp_data -> weight = -1;
-        sp_data -> offset = - 1;
+        sp_data -> offset = -1;
+        sp_data -> delay  = -1;
         return false;
         }
 }

@@ -90,7 +90,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     (column // self._grid[0], column % self._grid[1]),
                     grid=self._grid,
                     type='euclidian')
-        largest_squared_distance = np.max(euclidian_distances**2)
+        largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
             np.e ** (-(squared_distances) / (2 * (sigma ** 2))))
@@ -100,13 +100,12 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             dtype="uint16")
         # Only return probabilities which are non-zero
         filtered_probabilities = unfiltered_probabilities[
-            [True if x > 0 else False for x in unfiltered_probabilities]]
-
+            unfiltered_probabilities > 0]
         if filtered_probabilities.size % 2 != 0:
             filtered_probabilities = np.concatenate(
                 (filtered_probabilities,
                  np.zeros(
-                     filtered_probabilities.size % 2)))
+                     filtered_probabilities.size % 2, dtype="uint16")))
 
         return filtered_probabilities
 
