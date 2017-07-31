@@ -227,22 +227,13 @@ class SynapticManager(object):
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_machine_vertex:
                     n_atoms_per_machine_vertex = in_edge.pre_vertex.n_atoms
 
-                pre_slices = [Slice(
-                    lo_atom, min(
-                        in_edge.pre_vertex.n_atoms,
-                        lo_atom + n_atoms_per_machine_vertex - 1))
-                    for lo_atom in range(
-                        0, in_edge.pre_vertex.n_atoms,
-                        n_atoms_per_machine_vertex)]
-
+                pre_slices = [Slice(0, in_edge.pre_vertex.n_atoms - 1)]
                 pre_slice_index = 0
-                for pre_vertex_slice in pre_slices:
-                    memory_size += self._get_size_of_synapse_information(
-                        in_edge.synapse_information, pre_slices,
-                        pre_slice_index, post_slices, post_slice_index,
-                        pre_vertex_slice, post_vertex_slice,
-                        in_edge.n_delay_stages, machine_time_step)
-                    pre_slice_index += 1
+                memory_size += self._get_size_of_synapse_information(
+                    in_edge.synapse_information, pre_slices,
+                    pre_slice_index, post_slices, post_slice_index,
+                    pre_slices[pre_slice_index], post_vertex_slice,
+                    in_edge.n_delay_stages, machine_time_step)
 
         return memory_size
 
@@ -803,6 +794,9 @@ class SynapticManager(object):
             machine_time_step, weight_scales)
 
         self._weight_scales[placement] = weight_scales
+
+    def clear_connection_cache(self):
+        self._retrieved_blocks = dict()
 
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
