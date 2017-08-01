@@ -35,8 +35,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     CONFIG_FILE = "spynnaker.cfg"
     DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), CONFIG_FILE)
-    DEFAULT_CONFIG_PATHS = [DEFAULT_CONFIG_PATH, AbstractSpinnakerBase.DEFAULT_CONFIG_PATH]
-    VALIDATION_CONFIGS = []
+    DEFAULT_CONFIG_PATHS = [AbstractSpinnakerBase.DEFAULT_CONFIG_PATH,
+                            DEFAULT_CONFIG_PATH, ]
+    VALIDATION_CONFIGS = [os.path.join(os.path.dirname(__file__),
+                                       "validation_config.cfg")]
 
     _EXECUTABLE_FINDER = ExecutableFinder()
 
