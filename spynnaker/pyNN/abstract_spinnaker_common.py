@@ -33,7 +33,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     """
 
-    CONFIG_FILE_NAME = "spynnaker.cfg"
+    CONFIG_FILE = "spynnaker.cfg"
+    DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), CONFIG_FILE)
+    DEFAULT_CONFIG_PATHS = [DEFAULT_CONFIG_PATH, AbstractSpinnakerBase.DEFAULT_CONFIG_PATH]
+    VALIDATION_CONFIGS = []
 
     _EXECUTABLE_FINDER = ExecutableFinder()
 
@@ -76,16 +79,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         AbstractSpinnakerBase.__init__(
             self,
-            configfile=self.CONFIG_FILE_NAME,
+            configfile=self.CONFIG_FILE,
             executable_finder=self._EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
-            n_chips_required=n_chips_required,
-            default_config_paths=[
-                os.path.join(os.path.dirname(__file__),
-                             self.CONFIG_FILE_NAME)],
-
+            n_chips_required=n_chips_required
         )
 
         extra_mapping_inputs = dict()
@@ -187,7 +186,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                     "automatic behaviour, please enter a "
                     "timescaleFactor value in your .{}".format(
                         self._time_scale_factor,
-                        self.CONFIG_FILE_NAME))
+                        self.CONFIG_FILE))
 
         # Check the combination of machine time step and time scale factor
         if self._machine_time_step * self._time_scale_factor < 1000:
@@ -214,7 +213,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                     "override this behaviour (at your own risk), please "
                     "add violate_1ms_wall_clock_restriction = True to the "
                     "[Mode] section of your .{} file".format(
-                        self.CONFIG_FILE_NAME))
+                        self.CONFIG_FILE))
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes
