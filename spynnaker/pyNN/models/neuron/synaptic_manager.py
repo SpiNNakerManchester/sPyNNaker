@@ -91,6 +91,10 @@ class SynapticManager(object):
         # the edge the connection is for
         self._pre_run_connection_holders = defaultdict(list)
 
+u        # Limit the DTCM used by one-to-one connections
+        self._one_to_one_connection_dtcm_max_bytes = config.getint(
+            "Simulation", "one_to_one_connection_dtcm_max_bytes")
+
     @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
@@ -629,7 +633,9 @@ class SynapticManager(object):
                         m_edge)
                     if len(row_data) > 0:
                         if (row_length == 1 and isinstance(
-                                synapse_info.connector, OneToOneConnector)):
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position * 4) <
+                                self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._poptable_type.update_master_population_table(
@@ -667,61 +673,29 @@ class SynapticManager(object):
                     if delay_key in self._delay_key_index:
                         rinfo = self._delay_key_index[delay_key]
                     if len(delayed_row_data) > 0:
-
-# <<<<<<< HEAD
-#                         #if (delayed_row_length == 1 and isinstance(
-#                         #        synapse_info.connector, OneToOneConnector)):
-#                         #    single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
-#                         #    single_synapses.append(single_rows)
-#                         #   self._population_table_type\
-#                         #        .update_master_population_table(
-#                         #            spec, next_single_start_position, 1,
-#                         #            rinfo.first_key_and_mask,
-#                         #            master_pop_table_region, is_single=True)
-#                         #    next_single_start_position += len(single_rows) * 4
-#                         #else:
-#                         next_block_start_address = self._write_padding(
-#                             spec, synaptic_matrix_region,
-#                             next_block_start_address)
-#                         spec.switch_write_focus(synaptic_matrix_region)
-#                         spec.write_array(delayed_row_data)
-#                         self._population_table_type\
-#                             .update_master_population_table(
-#                                 spec, next_block_start_address,
-#                                 delayed_row_length,
-#                                 rinfo.first_key_and_mask,
-#                                 master_pop_table_region)
-#                         next_block_start_address += len(
-#                             delayed_row_data) * 4
-#
-#                     elif rinfo is not None:
-#                         self._population_table_type\
-#                             .update_master_population_table(
-#                                 spec, 0, 0, rinfo.first_key_and_mask,
-#                                 master_pop_table_region)
-#
-# =======
-#                         if (delayed_row_length == 1 and isinstance(
-#                                 synapse_info.connector, OneToOneConnector)):
-#                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
-#                             single_synapses.append(single_rows)
-#                             self._poptable_type.update_master_population_table(
-#                                 spec, next_single_start_position, 1,
-#                                 rinfo.first_key_and_mask,
-#                                 master_pop_table_region, is_single=True)
-#                             next_single_start_position += len(single_rows) * 4
-#                         else:
-                        next_block_start_address = self._write_padding(
-                            spec, synaptic_matrix_region,
-                            next_block_start_address)
-                        spec.switch_write_focus(synaptic_matrix_region)
-                        spec.write_array(delayed_row_data)
-                        self._poptable_type.update_master_population_table(
-                            spec, next_block_start_address,
-                            delayed_row_length, rinfo.first_key_and_mask,
-                            master_pop_table_region)
-                        next_block_start_address += len(
-                            delayed_row_data) * 4
+                        if (delayed_row_length == 1 and isinstance(
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position * 4) <
+                                self._one_to_one_connection_dtcm_max_bytes):
+                            single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
+                            single_synapses.append(single_rows)
+                            self._poptable_type.update_master_population_table(
+                                spec, next_single_start_position, 1,
+                                rinfo.first_key_and_mask,
+                                master_pop_table_region, is_single=True)
+                            next_single_start_position += len(single_rows) * 4
+                        else:
+                            next_block_start_address = self._write_padding(
+                                spec, synaptic_matrix_region,
+                                next_block_start_address)
+                            spec.switch_write_focus(synaptic_matrix_region)
+                            spec.write_array(delayed_row_data)
+                            self._poptable_type.update_master_population_table(
+                                spec, next_block_start_address,
+                                delayed_row_length, rinfo.first_key_and_mask,
+                                master_pop_table_region)
+                            next_block_start_address += len(
+                                delayed_row_data) * 4
                     elif rinfo is not None:
                         self._poptable_type.update_master_population_table(
                             spec, 0, 0, rinfo.first_key_and_mask,
