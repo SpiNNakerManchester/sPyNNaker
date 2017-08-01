@@ -91,7 +91,7 @@ class SynapticManager(object):
         # the edge the connection is for
         self._pre_run_connection_holders = defaultdict(list)
 
-u        # Limit the DTCM used by one-to-one connections
+        # Limit the DTCM used by one-to-one connections
         self._one_to_one_connection_dtcm_max_bytes = config.getint(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
