@@ -9,7 +9,7 @@ typedef uint16_t pre_trace_t;
 
 #include "neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h"
 
-#include "timing.h"
+#include "neuron/plasticity/stdp/timing_dependence/timing_interface.h"
 #include "neuron/plasticity/stdp/weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc

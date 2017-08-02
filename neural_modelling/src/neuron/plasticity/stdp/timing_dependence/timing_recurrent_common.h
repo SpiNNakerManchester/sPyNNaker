@@ -1,7 +1,7 @@
 #ifndef _TIMING_RECURRENT_COMMON_H_
 #define _TIMING_RECURRENT_COMMON_H_
 
-#include "timing.h"
+#include "neuron/plasticity/stdp/timing_dependence/timing_interface.h"
 #include "neuron/plasticity/stdp/weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
