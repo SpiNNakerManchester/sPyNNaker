@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import \
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-from spynnaker_extra_pynn_models.neuron.synapse_types.synapse_type_comb_exp\
+from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp\
     import set_excitatory_scalar
 from data_specification.enums.data_type import DataType
 from enum import Enum

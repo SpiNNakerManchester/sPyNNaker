@@ -209,8 +209,6 @@ class SynapseTypeCombinedExponential(AbstractSynapseType):
             self._inh_b_tau, machine_time_step)
 
         return [
-            NeuronParameter(self._exc_response, _COMB_EXP_TYPES.RESPONSE.data_type),
-
             NeuronParameter(self._exc_a_response, _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._exc_a_A, _COMB_EXP_TYPES.CONST.data_type),
             NeuronParameter(e_a_decay, _COMB_EXP_TYPES.DECAY.data_type),
@@ -220,8 +218,6 @@ class SynapseTypeCombinedExponential(AbstractSynapseType):
             NeuronParameter(self._exc_b_B, _COMB_EXP_TYPES.CONST.data_type),
             NeuronParameter(e_b_decay, _COMB_EXP_TYPES.DECAY.data_type),
             NeuronParameter(e_b_init, _COMB_EXP_TYPES.INIT.data_type),
-
-            NeuronParameter(self._inh_response, _COMB_EXP_TYPES.RESPONSE.data_type),
 
             NeuronParameter(self._inh_a_response, _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._inh_a_A, _COMB_EXP_TYPES.CONST.data_type),
