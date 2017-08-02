@@ -1,4 +1,4 @@
-APP = external_device_lif_control
+APP = $(notdir $(CURDIR))
 BUILD_DIR = build/
 
 NEURON_MODEL = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.c
@@ -8,4 +8,4 @@ THRESHOLD_TYPE_H = $(SOURCE_DIR)/neuron/threshold_types/threshold_type_external_
 SYNAPSE_TYPE_H = $(SOURCE_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
 SYNAPSE_DYNAMICS = $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
 
-include ../Makefile.common
+include ../common.mk
