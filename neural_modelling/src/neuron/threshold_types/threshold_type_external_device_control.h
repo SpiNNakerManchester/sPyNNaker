@@ -3,6 +3,7 @@
 
 #include "neuron/threshold_types/threshold_type_interface.h"
 #include <spin1_api.h>
+#include <debug.h>
 
 static uint32_t time_between_spikes;
 static uint32_t expected_time;
