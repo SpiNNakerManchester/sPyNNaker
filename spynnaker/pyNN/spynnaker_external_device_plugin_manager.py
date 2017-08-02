@@ -177,7 +177,7 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            label=label, partition_id=partition_id)
+            partition_id=partition_id)
 
         # add to the tracker
         globals_variables.get_simulator().add_live_packet_gatherer_parameters(
