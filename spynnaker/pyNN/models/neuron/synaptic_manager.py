@@ -560,7 +560,7 @@ class SynapticManager(object):
             self, spec, post_slices, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region, routing_info,
-            graph_mapper, machine_graph, machine_time_step):
+            graph_mapper, machine_graph, machine_time_step, max_feasible_atoms_per_core):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -605,7 +605,7 @@ class SynapticManager(object):
                             post_slices, post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge.n_delay_stages,
                             self._poptable_type, n_synapse_types,
-                            weight_scales, machine_time_step)
+                            weight_scales, machine_time_step, max_feasible_atoms_per_core)
 
                     if app_edge.delay_edge is not None:
                         app_edge.delay_edge.pre_vertex.add_delays(
@@ -673,7 +673,6 @@ class SynapticManager(object):
                     if delay_key in self._delay_key_index:
                         rinfo = self._delay_key_index[delay_key]
                     if len(delayed_row_data) > 0:
-
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
                                 (next_single_start_position * 4) <
@@ -728,7 +727,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, input_type, machine_time_step):
+            graph_mapper, input_type, machine_time_step, max_feasible_atoms_per_core):
 
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
@@ -762,7 +761,7 @@ class SynapticManager(object):
             post_vertex_slice, all_syn_block_sz, weight_scales,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            routing_info, graph_mapper, machine_graph, machine_time_step)
+            routing_info, graph_mapper, machine_graph, machine_time_step, max_feasible_atoms_per_core)
 
         self._synapse_dynamics.write_parameters(
             spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
