@@ -398,7 +398,9 @@ class SpikeSourcePoisson(
             spec.write_value(data=key)
 
         # Write the random back off value
-        spec.write_value(random.randint(0, self._n_poisson_machine_vertices))
+        spec.write_value(random.randint(0, min(
+            self._n_poisson_machine_vertices,
+            MICROSECONDS_PER_SECOND / machine_time_step)))
 
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
@@ -410,6 +412,7 @@ class SpikeSourcePoisson(
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
+            print "spikes_per_timestep ", spikes_per_timestep
             time_between_spikes = 0.0
             if spikes_per_timestep > 1:
                 time_between_spikes = (
