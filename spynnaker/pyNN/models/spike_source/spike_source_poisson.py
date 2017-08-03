@@ -412,7 +412,6 @@ class SpikeSourcePoisson(
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
-            print "spikes_per_timestep ", spikes_per_timestep
             time_between_spikes = 0.0
             if spikes_per_timestep > 1:
                 time_between_spikes = (
