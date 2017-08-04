@@ -21,7 +21,7 @@ plasticity_params_recurrent_t recurrent_plasticity_params;
 //---------------------------------------
 uint32_t *timing_initialise(address_t address) {
 
-    log_info("timing_initialise: starting");
+    //log_info("timing_initialise: starting");
     log_info("\tRecurrent dual-FSM STDP Rule");
 
     recurrent_plasticity_params.accum_decay_per_ts     = (int32_t) address[0];
@@ -34,15 +34,15 @@ uint32_t *timing_initialise(address_t address) {
     recurrent_plasticity_params.pre_window_tc[1]       = (int32_t) address[7];
     recurrent_plasticity_params.post_window_tc[1]      = (int32_t) address[8];
 
-    log_info("Accum decay per TS: %d", (int)(recurrent_plasticity_params.accum_decay_per_ts>>ACCUM_SCALING));
-    log_info("Thresh dep excit: %d", recurrent_plasticity_params.accum_dep_plus_one[0]-1);
-    log_info("Thresh pot excit: %d", recurrent_plasticity_params.accum_pot_minus_one[0]+1);
-    log_info("Mean pre-win excit:  %d", recurrent_plasticity_params.pre_window_tc[0]);
-    log_info("Mean post-win excit: %d", recurrent_plasticity_params.post_window_tc[0]);
-    log_info("Thresh dep inhib: %d", recurrent_plasticity_params.accum_dep_plus_one[1]-1);
-    log_info("Thresh pot inhib: %d", recurrent_plasticity_params.accum_pot_minus_one[1]+1);
-    log_info("Mean pre-win inhib:  %d", recurrent_plasticity_params.pre_window_tc[1]);
-    log_info("Mean post-win inhib: %d", recurrent_plasticity_params.post_window_tc[1]);
+    //log_info("Accum decay per TS: %d", (int)(recurrent_plasticity_params.accum_decay_per_ts>>ACCUM_SCALING));
+    //log_info("Thresh dep excit: %d", recurrent_plasticity_params.accum_dep_plus_one[0]-1);
+    //log_info("Thresh pot excit: %d", recurrent_plasticity_params.accum_pot_minus_one[0]+1);
+    //log_info("Mean pre-win excit:  %d", recurrent_plasticity_params.pre_window_tc[0]);
+    //log_info("Mean post-win excit: %d", recurrent_plasticity_params.post_window_tc[0]);
+    //log_info("Thresh dep inhib: %d", recurrent_plasticity_params.accum_dep_plus_one[1]-1);
+    //log_info("Thresh pot inhib: %d", recurrent_plasticity_params.accum_pot_minus_one[1]+1);
+    //log_info("Mean pre-win inhib:  %d", recurrent_plasticity_params.pre_window_tc[1]);
+    //log_info("Mean post-win inhib: %d", recurrent_plasticity_params.post_window_tc[1]);
 
     // Copy LUTs from following memory
     address_t lut_address = maths_copy_int16_lut(
@@ -58,7 +58,7 @@ uint32_t *timing_initialise(address_t address) {
     lut_address += 4;
     validate_mars_kiss64_seed(recurrentSeed);
 
-    log_info("timing_initialise: completed successfully");
+    //log_info("timing_initialise: completed successfully");
 
     return lut_address;
 }

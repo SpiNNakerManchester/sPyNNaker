@@ -117,6 +117,8 @@ class SynapseDynamicsSTDP(
         name = "_stdp_mad"
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
+        print "/n ********************** Executable is ", name
+        print "\n"
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):

@@ -201,6 +201,7 @@ static inline update_state_t timing_apply_post_spike_sd(
              previous_state.accumulator = 0;
              previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                                         syn_type, STDP_FIXED_POINT_ONE);
+             log_info("+");
          }
       }
    }
