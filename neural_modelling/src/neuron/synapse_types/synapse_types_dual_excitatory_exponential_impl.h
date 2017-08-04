@@ -17,6 +17,7 @@
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 2
 #define SYNAPSE_TYPE_COUNT 3
+#define SYNAPSE_INDEX_BITS 8
 
 #include "../decay.h"
 #include <debug.h>
@@ -83,7 +84,7 @@ static inline void synapse_types_add_neuron_input(
         parameter->input_buffer_excitatory_value =
             parameter->input_buffer_excitatory_value +
             decay_s1615(input, parameter->exc_init);
-            
+
     } else if (synapse_type_index == EXCITATORY_TWO) {
         parameter->input_buffer_excitatory2_value =
             parameter->input_buffer_excitatory2_value +

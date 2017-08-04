@@ -56,6 +56,8 @@
 //! how many bits the synapse can support to represent the neuron id.
 #ifndef SYNAPSE_INDEX_BITS
 #define SYNAPSE_INDEX_BITS 8
+#error SYNAPSE_INDEX_BITS was undefined.  It should be defined by a synapse\
+       shaping include
 #endif
 
 //! how many bits the synapse type will need (includes the neuron id size)
