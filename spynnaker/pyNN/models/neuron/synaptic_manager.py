@@ -774,7 +774,8 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step):
+            routing_infos, synapse_info, machine_time_step, max_feasible_atoms_per_core):
+
         app_edge = graph_mapper.get_application_edge(machine_edge)
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -830,7 +831,7 @@ class SynapticManager(object):
             synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_len, n_synapse_types,
             self._weight_scales[placement], data, delayed_data,
-            app_edge.n_delay_stages, machine_time_step)
+            app_edge.n_delay_stages, machine_time_step, max_feasible_atoms_per_core)
 
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,

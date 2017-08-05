@@ -69,15 +69,18 @@ class SynapseDynamicsStatic(
         return ff_size
 
     def read_static_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
+            self, post_vertex_slice, n_synapse_types, ff_size, ff_data, max_feasible_atoms_per_core):
+
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = int(math.ceil(math.log(max_feasible_atoms_per_core,2)))
+
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate([numpy.repeat(
             i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
-        connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"] = (data >> (n_neuron_id_bits + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
 
         return connections
