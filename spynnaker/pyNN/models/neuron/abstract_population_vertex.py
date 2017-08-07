@@ -779,7 +779,7 @@ class AbstractPopulationVertex(
             routing_infos, synapse_info, machine_time_step):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step)
+            routing_infos, synapse_info, machine_time_step, self._max_feasible_atoms_per_core)
 
     def clear_connection_cache(self):
         self._synapse_manager.clear_connection_cache()
