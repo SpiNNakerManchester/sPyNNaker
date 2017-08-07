@@ -16,6 +16,7 @@
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 1
 #define SYNAPSE_TYPE_COUNT 2
+#define SYNAPSE_INDEX_BITS 8
 
 #include <debug.h>
 #include "../../common/neuron-typedefs.h"

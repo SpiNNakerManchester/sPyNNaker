@@ -126,7 +126,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             fp_data, pp_data, fp_size, pp_size = \
                 synapse_dynamics.get_plastic_synaptic_data(
                     connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types)
+                    n_synapse_types, max_feasible_atoms_per_core)
 
         # Add some padding
         row_lengths = [
@@ -268,7 +268,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
-            machine_time_step):
+            machine_time_step, max_feasible_atoms_per_core):
 
         # Translate the data into rows
         row_data = None
@@ -292,14 +292,14 @@ class SynapseIORowBased(AbstractSynapseIO):
             if row_data is not None and len(row_data) > 0:
                 ff_size, ff_data = self._get_static_data(row_data, dynamics)
                 undelayed_connections = dynamics.read_static_synaptic_data(
-                    post_vertex_slice, n_synapse_types, ff_size, ff_data)
+                    post_vertex_slice, n_synapse_types, ff_size, ff_data, max_feasible_atoms_per_core)
                 undelayed_connections["source"] += pre_vertex_slice.lo_atom
                 connections.append(undelayed_connections)
             if delayed_row_data is not None and len(delayed_row_data) > 0:
                 ff_size, ff_data = self._get_static_data(
                     delayed_row_data, dynamics)
                 delayed_connections = dynamics.read_static_synaptic_data(
-                    post_vertex_slice, n_synapse_types, ff_size, ff_data)
+                    post_vertex_slice, n_synapse_types, ff_size, ff_data, max_feasible_atoms_per_core)
 
                 # Use the row index to work out the actual delay and source
                 n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
@@ -328,7 +328,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     row_data, dynamics)
                 undelayed_connections = dynamics.read_plastic_synaptic_data(
                     post_vertex_slice, n_synapse_types, pp_size, pp_data,
-                    fp_size, fp_data)
+                    fp_size, fp_data, max_feasible_atoms_per_core)
                 undelayed_connections["source"] += pre_vertex_slice.lo_atom
                 connections.append(undelayed_connections)
 
@@ -337,7 +337,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_row_data, dynamics)
                 delayed_connections = dynamics.read_plastic_synaptic_data(
                     post_vertex_slice, n_synapse_types, pp_size, pp_data,
-                    fp_size, fp_data)
+                    fp_size, fp_data, max_feasible_atoms_per_core)
 
                 # Use the row index to work out the actual delay and source
                 n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
