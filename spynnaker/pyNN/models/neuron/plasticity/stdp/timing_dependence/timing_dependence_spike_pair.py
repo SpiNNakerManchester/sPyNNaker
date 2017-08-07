@@ -1,4 +1,4 @@
-
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -39,6 +39,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
@@ -56,6 +57,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         # Neighbours are considered and, a single 16-bit R1 trace
         return 2
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return 4 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) + 4
 
@@ -108,3 +110,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
             pre_population_label, post_population_label, "SpikePairRule",
             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
         return prov_data
+
+    @overrides(AbstractTimingDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['tau_plus', 'tau_minus']

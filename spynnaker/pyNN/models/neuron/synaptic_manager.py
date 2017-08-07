@@ -91,6 +91,10 @@ class SynapticManager(object):
         # the edge the connection is for
         self._pre_run_connection_holders = defaultdict(list)
 
+        # Limit the DTCM used by one-to-one connections
+        self._one_to_one_connection_dtcm_max_bytes = config.getint(
+            "Simulation", "one_to_one_connection_dtcm_max_bytes")
+
     @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
@@ -227,22 +231,13 @@ class SynapticManager(object):
                 if in_edge.pre_vertex.n_atoms < n_atoms_per_machine_vertex:
                     n_atoms_per_machine_vertex = in_edge.pre_vertex.n_atoms
 
-                pre_slices = [Slice(
-                    lo_atom, min(
-                        in_edge.pre_vertex.n_atoms,
-                        lo_atom + n_atoms_per_machine_vertex - 1))
-                    for lo_atom in range(
-                        0, in_edge.pre_vertex.n_atoms,
-                        n_atoms_per_machine_vertex)]
-
+                pre_slices = [Slice(0, in_edge.pre_vertex.n_atoms - 1)]
                 pre_slice_index = 0
-                for pre_vertex_slice in pre_slices:
-                    memory_size += self._get_size_of_synapse_information(
-                        in_edge.synapse_information, pre_slices,
-                        pre_slice_index, post_slices, post_slice_index,
-                        pre_vertex_slice, post_vertex_slice,
-                        in_edge.n_delay_stages, machine_time_step)
-                    pre_slice_index += 1
+                memory_size += self._get_size_of_synapse_information(
+                    in_edge.synapse_information, pre_slices,
+                    pre_slice_index, post_slices, post_slice_index,
+                    pre_slices[pre_slice_index], post_vertex_slice,
+                    in_edge.n_delay_stages, machine_time_step)
 
         return memory_size
 
@@ -638,7 +633,9 @@ class SynapticManager(object):
                         m_edge)
                     if len(row_data) > 0:
                         if (row_length == 1 and isinstance(
-                                synapse_info.connector, OneToOneConnector)):
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position * 4) <
+                                self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._poptable_type.update_master_population_table(
@@ -678,7 +675,9 @@ class SynapticManager(object):
                     if len(delayed_row_data) > 0:
 
                         if (delayed_row_length == 1 and isinstance(
-                                synapse_info.connector, OneToOneConnector)):
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position * 4) <
+                                self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._poptable_type.update_master_population_table(
@@ -770,6 +769,9 @@ class SynapticManager(object):
             machine_time_step, weight_scales)
 
         self._weight_scales[placement] = weight_scales
+
+    def clear_connection_cache(self):
+        self._retrieved_blocks = dict()
 
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,

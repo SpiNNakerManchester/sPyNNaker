@@ -17,7 +17,6 @@ from spinn_utilities.progress_bar import ProgressBar
 
 import logging
 import math
-import numpy
 
 logger = logging.getLogger(__name__)
 _delay_extension_max_supported_delay = (
@@ -43,6 +42,8 @@ class PyNNProjectionCommon(object):
         self._projection_edge = None
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
+        self._requires_mapping = True
+        self._label = None
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
@@ -146,11 +147,11 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
-        return False
+        return self._requires_mapping
 
     def mark_no_changes(self):
         # Does Nothing currently
-        pass
+        self._requires_mapping = False
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
         """ Searches though the graph's edges to locate any\
@@ -224,7 +225,8 @@ class PyNNProjectionCommon(object):
             delay_edge.add_synapse_information(self._synapse_information)
         return delay_edge
 
-    def _get_synaptic_data(self, as_list, data_to_get):
+    def _get_synaptic_data(
+            self, as_list, data_to_get, fixed_values=None, notify=None):
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 
@@ -232,21 +234,29 @@ class PyNNProjectionCommon(object):
         if self._virtual_connection_list is not None:
             post_vertex = self._projection_edge.post_vertex
             pre_vertex = self._projection_edge.pre_vertex
-            return ConnectionHolder(
+            connection_holder = ConnectionHolder(
                 data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
-                self._virtual_connection_list)
+                self._virtual_connection_list, fixed_values=fixed_values,
+                notify=notify)
+            connection_holder.finish()
+            return connection_holder
 
+        # if not virtual board, make connection holder to be filled in at
+        # possible later date
         connection_holder = ConnectionHolder(
-            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms)
+            data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
+            fixed_values=fixed_values, notify=notify)
 
         # If we haven't run, add the holder to get connections, and return it
+        # and set up a callback for after run to fill in this connection holder
         if not self._spinnaker_control.has_ran:
             post_vertex.add_pre_run_connection_holder(
                 connection_holder, self._projection_edge,
                 self._synapse_information)
             return connection_holder
 
-        # Otherwise, get the connections now
+        # Otherwise, get the connections now, as we have ran
+        #  and therefore can get them
         graph_mapper = self._spinnaker_control.graph_mapper
         placements = self._spinnaker_control.placements
         transceiver = self._spinnaker_control.transceiver
@@ -267,6 +277,11 @@ class PyNNProjectionCommon(object):
         connection_holder.finish()
         return connection_holder
 
+    def _clear_cache(self):
+        post_vertex = self._projection_edge.post_vertex
+        if isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
+            post_vertex.clear_connection_cache()
+
     def __repr__(self):
         return "projection {}".format(self._projection_edge.label)
 
@@ -277,32 +292,3 @@ class PyNNProjectionCommon(object):
         """
         # TODO
         raise NotImplementedError
-
-    def get(self, parameter, format, gather):  # @ReservedAssignment
-        """ supports getting things from a projection
-
-        :param parameter: the parameter, "weights, delays, plastic param"
-        :param format: "list" or "array".
-        :param gather: supposedly if True, get connection information from \
-            all MPI nodes, otherwise only from connections that exist in \
-            this node.
-        :return: the returns param
-        """
-
-        # do the gather check before trying to get data
-        if not gather:
-            raise ConfigurationException(
-                "the gather param has no meaning for spinnaker when set to "
-                "false")
-
-        # try for each possible parameters
-        if parameter in {"weight", "delay", "source", "target"}:
-            return self._get_synaptic_data(format == 'list', parameter)
-
-        # get the n_connections and the parameter and then expand to
-        # correct size
-        size = len(self._get_synaptic_data(format == 'list', 'source'))
-        data = numpy.empty(size)
-        data.fill(self._synapse_information.synapse_dynamics.get_value(
-            parameter))
-        return data

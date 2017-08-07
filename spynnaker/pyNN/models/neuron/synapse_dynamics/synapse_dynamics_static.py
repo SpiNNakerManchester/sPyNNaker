@@ -117,3 +117,7 @@ class SynapseDynamicsStatic(
             self._change_requires_mapping = True
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
+    def get_parameter_names(self):
+        return ['weight', 'delay']

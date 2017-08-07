@@ -30,6 +30,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
+from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
@@ -195,6 +196,10 @@ class AbstractPopulationVertex(
         self._change_requires_mapping = True
         self._change_requires_neuron_parameters_reload = False
 
+        # Set up for profiling
+        self._n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
+
     @property
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
@@ -265,7 +270,8 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
 
-        is_recording = len(self._neuron_recorder.recording_variables) > 0
+        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
+                       self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
@@ -347,7 +353,9 @@ class AbstractPopulationVertex(
                 vertex_slice, graph.get_edges_ending_at_vertex(self),
                 machine_time_step) +
             (self._get_number_of_mallocs_used_by_dsg() *
-             common_constants.SARK_PER_MALLOC_SDRAM_USAGE))
+             common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
+            profile_utils.get_profile_region_size(
+                self._n_profile_samples))
 
         return sdram_requirement
 
@@ -367,7 +375,8 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT, label='System')
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
 
@@ -375,6 +384,10 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
             size=recording_utilities.get_recording_header_size(
                 self.N_RECORDING_REGIONS))
+
+        profile_utils.reserve_profile_region(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -555,6 +568,11 @@ class AbstractPopulationVertex(
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
+
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(
@@ -760,6 +778,9 @@ class AbstractPopulationVertex(
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step)
+
+    def clear_connection_cache(self):
+        self._synapse_manager.clear_connection_cache()
 
     @property
     def synapse_type(self):
