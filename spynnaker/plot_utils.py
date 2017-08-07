@@ -36,7 +36,7 @@ def line_plot(data_sets, title=None):
     (numrows, numcols) = grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
-        plt.subplot(numrows, numcols, index)
+        plt.subplot(numrows, numcols, index+1)
         neurons = np.unique(data[:, 0])
         for neuron in neurons:
             time = [i[1] for i in data if i[0] == neuron]
@@ -63,7 +63,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
     (numrows, numcols) = grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
-        plt.subplot(numrows, numcols, index)
+        plt.subplot(numrows, numcols, index+1)
         neurons = data[:, 0].astype(int)
         times = data[:, 1].astype(int)
         info = data[:, 2]
@@ -123,7 +123,7 @@ def plot_spikes(spikes, title="spikes"):
     print "Plotting {} set of spikes".format(len(spikes))
     (numrows, numcols) = grid(len(spikes))
     for index in range(len(spikes)):
-        plt.subplot(numrows, numcols, index)
+        plt.subplot(numrows, numcols, index+1)
         single_spikes = spikes[index]
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]
