@@ -168,15 +168,15 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 void print_spike_sources(){
     if (num_spike_sources > 0) {
         for (index_t s = 0; s < num_spike_sources; s++) {
-            log_info("atom %d", s);
-            log_info("scaled_start = %u", spike_source_array[s].start_ticks);
-            log_info("scaled end = %u", spike_source_array[s].end_ticks);
-            log_info("is_fast_source = %d",
+            log_debug("atom %d", s);
+            log_debug("scaled_start = %u", spike_source_array[s].start_ticks);
+            log_debug("scaled end = %u", spike_source_array[s].end_ticks);
+            log_debug("is_fast_source = %d",
                      spike_source_array[s].is_fast_source);
-            log_info("exp_minus_lamda = %k",
+            log_debug("exp_minus_lamda = %k",
                      (REAL)(spike_source_array[s].exp_minus_lambda));
-            log_info("isi_val = %k", spike_source_array[s].mean_isi_ticks);
-            log_info("time_to_spike = %k",
+            log_debug("isi_val = %k", spike_source_array[s].mean_isi_ticks);
+            log_debug("time_to_spike = %k",
                      spike_source_array[s].time_to_spike_ticks);
         }
     }

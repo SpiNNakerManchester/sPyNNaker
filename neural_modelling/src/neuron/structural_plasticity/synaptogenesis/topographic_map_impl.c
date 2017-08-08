@@ -97,6 +97,7 @@ typedef struct {
     structural_plasticity_data_t sp_data;
     uint32_t current_time;
     int16_t current_controls;
+    uint32_t global_pre_syn_id, global_post_syn_id;
 } current_state_t;
 
 current_state_t current_state;
@@ -117,7 +118,7 @@ static int my_abs(int a){
 
 address_t synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address){
-    log_info("SR init.");
+    /*ad*/log_debug("SR init.");
     log_debug("Registering DMA callback");
     simulation_dma_transfer_done_callback_on(DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_restructure);
     log_debug("Callback registered");
@@ -144,7 +145,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.shared_seed[2] = *sp_word++;
     rewiring_data.shared_seed[3] = *sp_word++;
 
-    log_info("p_rew %d weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    log_debug("p_rew %d weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew,rewiring_data.weight, rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
         rewiring_data.grid_x, rewiring_data.grid_y,
@@ -202,8 +203,6 @@ address_t synaptogenesis_dynamics_initialise(
         rewiring_data.size_lat_prob, sizeof(uint16_t));
 
 
-    // SOMETHING  FUCKING WRONG HERHEHERHER!??!?!?!!?! vvvvvvvvvvv
-
     half_word = (uint16_t*)sp_word;
     for (index = 0; index < rewiring_data.size_lat_prob; index++) {
         rewiring_data.lat_probabilities[index] = *half_word++;
@@ -212,14 +211,7 @@ address_t synaptogenesis_dynamics_initialise(
     }
 
     assert(((int)half_word)%4==4);
-//    half_word = (uint16_t*)sp_word;
-//    for (index = 0; index < rewiring_data.size_lat_prob; index++) {
-//        rewiring_data.lat_probabilities[index] = *half_word++;
-//        log_info("lat_probabilities %d for index %d", rewiring_data.lat_probabilities[index], index);
-//    }
-    // SOMETHING  FUCKING WRONG HERHEHERHER!??!?!?!!?! ^^^^^^^^^^^
 
-    // TODO Is this aligned? IT FUCKING SHOULD BE
     sp_word = (int32_t*) half_word;
 
     // Read the synaptic capacity table
@@ -255,7 +247,7 @@ address_t synaptogenesis_dynamics_initialise(
     #endif
 
     log_debug("rewiring_data.s_max %d", rewiring_data.s_max);
-    log_info("SR init complete.");
+    /*ad*/log_debug("SR init complete.");
     return (address_t)sp_word;
 }
 
@@ -305,7 +297,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     size_t n_bytes;
 
     if(!population_table_get_first_address(fake_spike, &synaptic_row_address, &n_bytes)) {
-        log_error("FAIL@key %d", fake_spike);
+//        log_error("FAIL@key %d", fake_spike);
         rt_error(RTE_SWERR);
     }
     // Saving current state
@@ -348,8 +340,13 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
 //    current_state.distance = my_abs(delta_x + delta_y);
     current_state.distance = delta_x * delta_x + delta_y * delta_y;
+    current_state.global_pre_syn_id = pre_global_id;
+    current_state.global_post_syn_id = post_global_id;
 
-    /*ad*/log_debug("global_pre_id %d global_post_id %d global_distance_sq %d", pre_global_id, post_global_id, current_state.distance);
+    /*ad*/log_debug("g_pre_id %d g_post_id %d g_distance_sq %d %d",
+        pre_global_id, post_global_id, current_state.distance,
+        current_state.current_controls
+        );
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
 
@@ -385,6 +382,8 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
+
+    /*ad*/log_debug("sr_attempt %d %d", current_state.current_time, current_state.current_controls);
 
     // Is the row zero in length?
     bool zero_elements = number_of_connections == 0;
@@ -422,28 +421,30 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
-    log_debug("elim rule r %u", r);
+    /*ad*/log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
     if( current_state.sp_data.weight < rewiring_data.weight >> 1 && r >= rewiring_data.p_elim_dep ){
-        log_debug("\t| FAIL DEP %d", current_state.current_time);
+        /*ad*/log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
     else if ( r >= rewiring_data.p_elim_pot ){
-        log_debug("\t| FAIL POT %d", current_state.current_time);
+        /*ad*/log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
 
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        log_debug("\t| RM pre %d post %d # controls %d @ %d",
-            current_state.pre_syn_id,
-            current_state.post_syn_id,
+        /*ad*/log_debug("\t| RM pre %d post %d # controls %d ctrl %d @ %d",
+            current_state.global_pre_syn_id,
+            current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
+            current_state.current_controls,
             current_state.current_time);
         rewiring_data.synaptic_capacity[current_state.post_syn_id]--;
         spin1_dma_transfer(
-        DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
-        rewiring_dma_buffer.row, DMA_WRITE,
-        rewiring_dma_buffer.n_bytes_transferred);
+            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
+            rewiring_dma_buffer.sdram_writeback_address,
+            rewiring_dma_buffer.row, DMA_WRITE,
+            rewiring_dma_buffer.n_bytes_transferred);
         return true;
     }
     return false;
@@ -453,9 +454,12 @@ bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
 
-    if( (current_state.current_controls == 0 && current_state.distance > rewiring_data.size_ff_prob)
-        || (current_state.current_controls == 1 && current_state.distance > rewiring_data.size_lat_prob)){
-        log_debug("\t| OOB %d %d", current_state.distance, current_state.current_time);
+    if( (current_state.current_controls == 0 && current_state.distance >= rewiring_data.size_ff_prob)
+        || (current_state.current_controls == 1 && current_state.distance >= rewiring_data.size_lat_prob)){
+        /*ad*/log_debug("\t| OOB %d %d %d",
+            current_state.distance,
+            current_state.current_time,
+            current_state.current_controls);
         return false;
     }
     if( current_state.current_controls == 0 )
@@ -463,26 +467,28 @@ bool synaptogenesis_dynamics_formation_rule(){
     else
         probability = rewiring_data.lat_probabilities[current_state.distance];
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
-    log_debug("form rule r %u", r);
+//    uint16_t r = mars_kiss64_seed(rewiring_data.local_seed) & 0xFFFF;
+    /*ad*/log_debug("form_prob %u vs r %u ctrl %d", probability, r, current_state.current_controls);
     if (r >= probability){
-        log_debug("\t| NO FORM %d", current_state.current_time);
+        /*ad*/log_debug("\t| NO FORM %d", current_state.current_time);
         return false;
     }
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
-        log_debug("\t| FORM pre %d post %d # controls %d distance %d ctrl %d @ %d",
-            current_state.pre_syn_id,
-            current_state.post_syn_id,
+        /*ad*/log_debug("\t| FORM pre %d post %d # controls %d distance %d ctrl %d @ %d",
+            current_state.global_pre_syn_id,
+            current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             current_state.distance,
             current_state.current_controls,
             current_state.current_time);
         rewiring_data.synaptic_capacity[current_state.post_syn_id]++;
         spin1_dma_transfer(
-        DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING, rewiring_dma_buffer.sdram_writeback_address,
-        rewiring_dma_buffer.row, DMA_WRITE,
-        rewiring_dma_buffer.n_bytes_transferred);
+            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
+            rewiring_dma_buffer.sdram_writeback_address,
+            rewiring_dma_buffer.row, DMA_WRITE,
+            rewiring_dma_buffer.n_bytes_transferred);
         return true;
     }
     return false;

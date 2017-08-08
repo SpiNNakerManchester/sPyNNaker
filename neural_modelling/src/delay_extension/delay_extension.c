@@ -84,13 +84,13 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 
 static bool read_parameters(address_t address) {
 
-    log_info("read_parameters: starting");
+    log_debug("read_parameters: starting");
 
     key = address[KEY];
     incoming_key = address[INCOMING_KEY];
     incoming_mask = address[INCOMING_MASK];
     incoming_neuron_mask = ~incoming_mask;
-    log_info(
+    log_debug(
         "\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
         "incoming key mask = 0x%08x",
         key, incoming_key, incoming_mask, incoming_neuron_mask);
@@ -106,14 +106,14 @@ static bool read_parameters(address_t address) {
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = (num_delay_slots_pot - 1);
 
-    log_info("\t parrot neurons = %u, neuron bit field words = %u,"
+    log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
              " num delay stages = %u, num delay slots = %u (pot = %u),"
              " num delay slots mask = %08x",
              num_neurons, neuron_bit_field_words,
              num_delay_stages, num_delay_slots, num_delay_slots_pot,
              num_delay_slots_mask);
 
-    log_info(
+    log_debug(
         "\t random back off = %u, time_between_spikes = %u",
         random_backoff_us, time_between_spikes);
 
@@ -124,7 +124,7 @@ static bool read_parameters(address_t address) {
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
-        log_info("\t delay stage %u", d);
+        log_debug("\t delay stage %u", d);
 
         // Allocate bit-field
         neuron_delay_stage_config[d] = (bit_field_t) spin1_malloc(
@@ -155,7 +155,7 @@ static bool read_parameters(address_t address) {
         memset(spike_counters[s], 0, num_neurons * sizeof(uint8_t));
     }
 
-    log_info("read_parameters: completed successfully");
+    log_debug("read_parameters: completed successfully");
     return true;
 }
 
@@ -279,13 +279,13 @@ void timer_callback(uint unused0, uint unused1) {
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
 
-        log_info(
+        log_debug(
             "Delay extension finished at time %u, %u received spikes, "
             "%u processed spikes, %u sent spikes, %u added spikes",
             time, n_in_spikes, n_processed_spikes, n_spikes_sent,
             n_spikes_added);
 
-        log_info("Delayed %u times", n_delays);
+        log_debug("Delayed %u times", n_delays);
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -382,7 +382,7 @@ void c_main(void) {
     }
 
     // Set timer tick (in microseconds)
-    log_info("Timer period %u", timer_period);
+    log_debug("Timer period %u", timer_period);
     spin1_set_timer_tick(timer_period);
 
     // Register callbacks
