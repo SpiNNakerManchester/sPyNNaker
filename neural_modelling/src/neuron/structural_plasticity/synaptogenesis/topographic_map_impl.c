@@ -230,7 +230,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_dma_buffer.row = (uint32_t*) sark_alloc(
                 10 * rewiring_data.s_max, sizeof(uint32_t));
     if (rewiring_dma_buffer.row == NULL) {
-//        log_error("Fail init DMA buffers");
+        log_error("Fail init DMA buffers");
         rt_error(RTE_SWERR);
     }
 
