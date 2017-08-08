@@ -6,17 +6,29 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
 
 class WeightDependenceRecurrent(AbstractWeightDependence):
 
-    def __init__(self, w_min_excit=0.0, w_max_excit=1.0, A_plus_excit=0.01, A_minus_excit=0.01,
-                       w_min_inhib=0.0, w_max_inhib=1.0, A_plus_inhib=0.01, A_minus_inhib=0.01):
+    def __init__(self, 
+        w_min_excit  =1.0, w_max_excit  =2.0, A_plus_excit  =3.0, A_minus_excit  =4.0,
+        w_min_excit2 =5.0, w_max_excit2 =6.0, A_plus_excit2 =7.0, A_minus_excit2 =8.0,
+        w_min_inhib  =9.0, w_max_inhib  =10.0, A_plus_inhib  =11.0, A_minus_inhib  =12.0,
+        w_min_inhib2 =13.0, w_max_inhib2 =14.0, A_plus_inhib2 =15.0, A_minus_inhib2 =16.0):
+
         AbstractWeightDependence.__init__(self)
-        self._w_min_excit   = w_min_excit
-        self._w_max_excit   = w_max_excit
-        self._A_plus_excit  = A_plus_excit
-        self._A_minus_excit = A_minus_excit
-        self._w_min_inhib   = w_min_inhib
-        self._w_max_inhib   = w_max_inhib
-        self._A_plus_inhib  = A_plus_inhib
-        self._A_minus_inhib = A_minus_inhib
+        self._w_min_excit    = w_min_excit
+        self._w_max_excit    = w_max_excit
+        self._A_plus_excit   = A_plus_excit
+        self._A_minus_excit  = A_minus_excit
+        self._w_min_excit2   = w_min_excit2
+        self._w_max_excit2   = w_max_excit2
+        self._A_plus_excit2  = A_plus_excit2
+        self._A_minus_excit2 = A_minus_excit2
+        self._w_min_inhib    = w_min_inhib
+        self._w_max_inhib    = w_max_inhib
+        self._A_plus_inhib   = A_plus_inhib
+        self._A_minus_inhib  = A_minus_inhib
+        self._w_min_inhib2   = w_min_inhib2
+        self._w_max_inhib2   = w_max_inhib2
+        self._A_plus_inhib2  = A_plus_inhib2
+        self._A_minus_inhib2 = A_minus_inhib2
 
     @property
     def w_min(self):
@@ -53,7 +65,9 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        return (4 * 4) * n_synapse_types
+        numParams = 4
+        paramSz   = 4
+        return (numParams * paramSz) * n_synapse_types + 32
 
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
@@ -61,14 +75,26 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        spec.write_value( data=int(round(self._w_min_excit   * weight_scales[0])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_excit   * weight_scales[0])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_excit  * weight_scales[0])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_excit * weight_scales[0])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_min_inhib   * weight_scales[1])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_inhib   * weight_scales[1])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib  * weight_scales[1])), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib * weight_scales[1])), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_min_excit    )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_excit    )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit  )), data_type=DataType.INT32)
+
+        spec.write_value( data=int(round(self._w_min_excit2   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_excit2   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit2  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit2 )), data_type=DataType.INT32)
+
+        spec.write_value( data=int(round(self._w_min_inhib    )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_inhib    )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib  )), data_type=DataType.INT32)
+
+        spec.write_value( data=int(round(self._w_min_inhib2   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_inhib2   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib2  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib2 )), data_type=DataType.INT32)
+
 
     @property
     def weight_maximum(self):
