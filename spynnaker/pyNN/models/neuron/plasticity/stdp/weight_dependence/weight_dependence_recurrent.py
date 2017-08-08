@@ -67,7 +67,7 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
 
         numParams = 4
         paramSz   = 4
-        return (numParams * paramSz) * n_synapse_types + 32
+        return (numParams * paramSz) * n_synapse_types
 
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
@@ -75,25 +75,25 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        spec.write_value( data=int(round(self._w_min_excit    )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_excit    )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_excit   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_excit  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_min_excit * weight_scales[0]   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_excit * weight_scales[0]   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit* weight_scales[0]   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit * weight_scales[0] )), data_type=DataType.INT32)
 
-        spec.write_value( data=int(round(self._w_min_excit2   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_excit2   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_excit2  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_excit2 )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_min_excit2 * weight_scales[1]  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_excit2 * weight_scales[1]  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit2 * weight_scales[1] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit2 * weight_scales[1])), data_type=DataType.INT32)
 
-        spec.write_value( data=int(round(self._w_min_inhib    )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_inhib    )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_min_inhib * weight_scales[2]   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_inhib * weight_scales[2]   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib * weight_scales[2]  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib * weight_scales[2] )), data_type=DataType.INT32)
 
-        spec.write_value( data=int(round(self._w_min_inhib2   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._w_max_inhib2   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib2  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib2 )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_min_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._w_max_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib2 * weight_scales[3] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib2* weight_scales[3] )), data_type=DataType.INT32)
 
 
     @property
