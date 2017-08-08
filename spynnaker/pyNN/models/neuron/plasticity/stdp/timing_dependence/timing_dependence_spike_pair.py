@@ -1,3 +1,5 @@
+from data_specification.enums import DataType
+
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
