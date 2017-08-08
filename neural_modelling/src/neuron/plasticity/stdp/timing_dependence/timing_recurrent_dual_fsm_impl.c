@@ -22,7 +22,7 @@ plasticity_params_recurrent_t recurrent_plasticity_params;
 uint32_t *timing_initialise(address_t address) {
 
     //log_info("timing_initialise: starting");
-    log_info("\tRecurrent dual-FSM STDP Rule");
+    log_debug("\tRecurrent dual-FSM STDP Rule");
 
     recurrent_plasticity_params.accum_decay_per_ts     = (int32_t) address[0];
     recurrent_plasticity_params.accum_dep_plus_one[0]  = (int32_t) address[1];
