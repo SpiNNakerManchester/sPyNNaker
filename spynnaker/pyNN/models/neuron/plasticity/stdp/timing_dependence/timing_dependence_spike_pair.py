@@ -14,24 +14,29 @@ LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
+LOOKUP_TAU_C_SIZE = 256
+LOOKUP_TAU_C_SHIFT = 0
+LOOKUP_TAU_D_SIZE = 256
+LOOKUP_TAU_D_SHIFT = 0
+
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0, tau_c=1000, tau_d=200,
-                 nearest=False):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, tau_c=1000, tau_d=200):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
         self._tau_c = tau_c
         self._tau_d = tau_d
-        self._nearest = nearest
 
         self._synapse_structure = SynapseStructureWeightEligibilityTrace()
 
         # provenance data
         self._tau_plus_last_entry = None
         self._tau_minus_last_entry = None
+        self._tau_c_last_entry = None
+        self._tau_d_last_entry = None
 
     @property
     def tau_plus(self):
@@ -61,7 +66,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 4 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) + 4
+        return ((2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE +
+                    LOOKUP_TAU_C_SIZE + LOOKUP_TAU_D_SIZE)) + 4)
 
     @property
     def n_weight_terms(self):
@@ -86,7 +92,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_c, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
-        self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
+        self._tau_d_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_d, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
 
@@ -111,8 +117,14 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         prov_data.append(plasticity_helpers.get_lut_provenance(
             pre_population_label, post_population_label, "SpikePairRule",
             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
+        prov_data.append(plasticity_helpers.get_lut_provenance(
+            pre_population_label, post_population_label, "SpikePairRule",
+            "tau_c_last_entry", "tau_c", self._tau_c_last_entry))
+        prov_data.append(plasticity_helpers.get_lut_provenance(
+            pre_population_label, post_population_label, "SpikePairRule",
+            "tau_d_last_entry", "tau_d", self._tau_d_last_entry))
         return prov_data
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus']
+        return ['tau_plus', 'tau_minus', 'tau_c', 'tau_d']

@@ -217,6 +217,7 @@ static inline void _process_fixed_synapses(
 
           // Store saturated value back in ring-buffer
           ring_buffers[ring_buffer_index] = accumulation;
+
         }
     }
 }

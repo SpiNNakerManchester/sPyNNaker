@@ -19,5 +19,5 @@ class SynapseStructureWeightEligibilityTrace(AbstractSynapseStructure):
 
     def read_synaptic_data(self, fp_size, pp_data):
         return (numpy.concatenate([
-            pp_data[i].view(dtype="uint32")[0:fp_size[i]]
+            pp_data[i][0:fp_size[i] * 4].view("uint32")
             for i in range(len(pp_data))]) >> 16) & 0xFFFF
