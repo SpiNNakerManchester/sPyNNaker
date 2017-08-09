@@ -23,10 +23,10 @@ typedef uint16_t pre_trace_t;
 
 typedef struct {
     int32_t accum_decay_per_ts;
-    int32_t accum_dep_plus_one[2];
-    int32_t accum_pot_minus_one[2];
-    int32_t pre_window_tc[2];
-    int32_t post_window_tc[2];
+    int32_t accum_dep_plus_one[4];
+    int32_t accum_pot_minus_one[4];
+    int32_t pre_window_tc[4];
+    int32_t post_window_tc[4];
 } plasticity_params_recurrent_t;
 
 static inline weight_state_t weight_one_term_apply_potentiation_sd(weight_state_t state,
@@ -72,7 +72,7 @@ static inline post_trace_t timing_add_post_spike(
 }
 
 //---------------------------------------
-static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_time, 
+static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_time,
                   pre_trace_t last_trace, uint32_t syn_type) {
     use(&time);
     use(&last_time);
@@ -155,9 +155,9 @@ static inline update_state_t timing_apply_pre_spike_sd(
 // if this is beyond the current value. This is used by a following pre-spike for depression
 // 2) Check if there is currently a pre-window open and then check if the post-spike is within
 //    it. If so:
-//               a) increment the accumulator 
+//               a) increment the accumulator
 //               b) perform potentiation and reset accumulator if it has reached threshold
-//               c) set the pre_found_post flag, equivalent to clearing the pore_waiting_post 
+//               c) set the pre_found_post flag, equivalent to clearing the pore_waiting_post
 //                  state machine back to idle (later post spikes will not cause an accum increment
 //                  until a new pre-spike has arrived).
 static inline update_state_t timing_apply_post_spike_sd(
@@ -193,7 +193,7 @@ static inline update_state_t timing_apply_post_spike_sd(
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
       if (time_since_last_pre < last_pre_trace) {
-         if (previous_state.accumulator < 
+         if (previous_state.accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
