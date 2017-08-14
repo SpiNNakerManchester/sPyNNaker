@@ -239,7 +239,7 @@ class SynapticManager(object):
                     pre_slices[pre_slice_index], post_vertex_slice,
                     in_edge.n_delay_stages, machine_time_step)
 
-        return memory_size
+        return memory_size * 1.1
 
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
