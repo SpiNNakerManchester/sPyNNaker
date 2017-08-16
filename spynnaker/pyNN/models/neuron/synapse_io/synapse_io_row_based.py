@@ -5,6 +5,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractSynapseDynamics, AbstractStaticSynapseDynamics
 from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from .abstract_synapse_io import AbstractSynapseIO
 
 _N_HEADER_WORDS = 3
@@ -29,11 +30,38 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _n_words(self, n_bytes):
         return math.ceil(float(n_bytes) / 4.0)
 
+    def _get_max_row_bytes(
+            self, size, dynamics, population_table, in_edge, row_length):
+        try:
+            return population_table.get_allowed_row_length(size) * 4
+        except SynapseRowTooBigException as e:
+            max_size = e.max_size
+            item_length_1 = 0
+            item_length_2 = 0
+            if isinstance(dynamics, AbstractStaticSynapseDynamics):
+                item_length_1 = dynamics.get_n_words_for_static_connections(2)
+                item_length_2 = dynamics.get_n_words_for_static_connections(4)
+            else:
+                item_length_1 = dynamics.get_n_words_for_plastic_connections(2)
+                item_length_2 = dynamics.get_n_words_for_plastic_connections(4)
+            item_length = float(item_length_2 - item_length_1) / 2
+            header_length = item_length_1 - (item_length * 2)
+            max_items = int((max_size - header_length) / item_length)
+            raise SynapseRowTooBigException(
+                max_items,
+                "The connection between {} and {} has more synapses ({}) than"
+                " can currently be supported on this implementation of PyNN"
+                " ({} for this connection type)."
+                " Please reduce the size of the target population, or reduce"
+                " the number of neurons per core.".format(
+                    in_edge.pre_vertex, in_edge.post_vertex, row_length,
+                    max_items))
+
     def get_sdram_usage_in_bytes(
             self, synapse_info, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            machine_time_step):
+            machine_time_step, in_edge):
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -78,10 +106,12 @@ class SynapseIORowBased(AbstractSynapseIO):
                 max_delayed_row_length)
 
         # Adjust for the allowed row lengths from the population table
-        undelayed_max_bytes = population_table.get_allowed_row_length(
-            undelayed_size) * 4
-        delayed_max_bytes = population_table.get_allowed_row_length(
-            delayed_size) * 4
+        undelayed_max_bytes = self._get_max_row_bytes(
+            undelayed_size, dynamics, population_table, in_edge,
+            max_undelayed_row_length)
+        delayed_max_bytes = self._get_max_row_bytes(
+            delayed_size, dynamics, population_table, in_edge,
+            max_delayed_row_length)
 
         # Add on the header words and multiply by the number of rows in the
         # block

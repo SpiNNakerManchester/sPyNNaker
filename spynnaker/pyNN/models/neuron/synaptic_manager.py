@@ -195,7 +195,8 @@ class SynapticManager(object):
                     application_edge.synapse_information, pre_slices,
                     pre_slice_index, post_slices, post_slice_index,
                     pre_vertex_slice, post_vertex_slice,
-                    application_edge.n_delay_stages, machine_time_step)
+                    application_edge.n_delay_stages, machine_time_step,
+                    machine_edge)
 
         return memory_size
 
@@ -237,14 +238,15 @@ class SynapticManager(object):
                     in_edge.synapse_information, pre_slices,
                     pre_slice_index, post_slices, post_slice_index,
                     pre_slices[pre_slice_index], post_vertex_slice,
-                    in_edge.n_delay_stages, machine_time_step)
+                    in_edge.n_delay_stages, machine_time_step,
+                    in_edge)
 
         return memory_size
 
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            n_delay_stages, machine_time_step):
+            n_delay_stages, machine_time_step, in_edge):
         memory_size = 0
         for synapse_info in synapse_information:
             undelayed_size, delayed_size = \
@@ -253,7 +255,7 @@ class SynapticManager(object):
                     pre_slice_index, post_slices, post_slice_index,
                     pre_vertex_slice, post_vertex_slice,
                     n_delay_stages, self._poptable_type,
-                    machine_time_step)
+                    machine_time_step, in_edge)
 
             memory_size = self._poptable_type.get_next_allowed_address(
                 memory_size)
