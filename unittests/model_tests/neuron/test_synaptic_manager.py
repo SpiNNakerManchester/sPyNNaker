@@ -11,7 +11,6 @@ from pacman.model.graphs.common.graph_mapper import GraphMapper
 from pacman.model.graphs.common.slice import Slice
 from pacman.model.graphs.machine.machine_graph import MachineGraph
 from pacman.model.routing_info.routing_info import RoutingInfo
-from spinn_storage_handlers.file_data_reader import FileDataReader
 from pacman.model.routing_info.partition_routing_info \
     import PartitionRoutingInfo
 from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
@@ -26,6 +25,7 @@ from data_specification.data_specification_executor \
     import DataSpecificationExecutor
 
 from spinn_storage_handlers.file_data_writer import FileDataWriter
+from spinn_storage_handlers.file_data_reader import FileDataReader
 
 from spinn_front_end_common.utilities import globals_variables
 
@@ -46,6 +46,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector \
     import AllToAllConnector
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type \
     import AbstractSynapseType
+from spynnaker.pyNN.utilities.spynnaker_failed_state \
+    import SpynnakerFailedState
 
 
 class MockSynapseIO(object):
@@ -221,7 +223,7 @@ class TestSynapticManager(unittest.TestCase):
     def test_write_synaptic_matrix_and_master_population_table(self):
 
         simulator = MockSimulator()
-        globals_variables.set_failed_state(simulator)
+        globals_variables.set_failed_state(SpynnakerFailedState())
         globals_variables.set_simulator(simulator)
 
         default_config_paths = os.path.join(
@@ -404,6 +406,8 @@ class TestSynapticManager(unittest.TestCase):
             post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
+
+        globals_variables.unset_simulator()
 
 
 if __name__ == "__main__":
