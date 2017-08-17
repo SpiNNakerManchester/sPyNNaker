@@ -634,7 +634,7 @@ class SynapticManager(object):
                     if len(row_data) > 0:
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
-                                next_single_start_position <
+                                (next_single_start_position + len(row_data)) <=
                                 self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
@@ -676,7 +676,8 @@ class SynapticManager(object):
 
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
-                                next_single_start_position <
+                                (next_single_start_position +
+                                 len(delayed_row_data)) <=
                                 self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
