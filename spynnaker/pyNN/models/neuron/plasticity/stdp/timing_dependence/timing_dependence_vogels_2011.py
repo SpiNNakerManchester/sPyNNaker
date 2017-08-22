@@ -78,4 +78,3 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return ['alpha', 'tau']
-
