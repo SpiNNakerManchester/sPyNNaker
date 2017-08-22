@@ -54,7 +54,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._populations = list()
         self._projections = list()
         self._edge_count = 0
-        PyNNPopulationCommon._first_global_neuron_id = 0
+        PyNNPopulationCommon._next_global_neuron_id = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
