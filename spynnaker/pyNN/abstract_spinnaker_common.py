@@ -1,5 +1,6 @@
 # utils imports
 from spinn_utilities.abstract_base import AbstractBase
+from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 
 # common front end imports
 from spinn_front_end_common.interface.abstract_spinnaker_base \
@@ -53,6 +54,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._populations = list()
         self._projections = list()
         self._edge_count = 0
+        PyNNPopulationCommon._first_global_neuron_id = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
