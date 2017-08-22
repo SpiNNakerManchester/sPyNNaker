@@ -18,6 +18,10 @@ logger = logging.getLogger(__file__)
 
 
 class PyNNPopulationCommon(object):
+
+    # Keep a global neuron id for print headers
+    _next_global_neuron_id = 0
+
     def __init__(
             self, spinnaker_control, size, vertex, structure, initial_values):
         if size is not None and size <= 0:
@@ -70,6 +74,19 @@ class PyNNPopulationCommon(object):
         # parameter
         self._change_requires_mapping = True
         self._has_read_neuron_parameters_this_run = False
+
+        # Store the global neuron id which this population starts at
+        self._first_global_neuron_id = \
+            PyNNPopulationCommon._next_global_neuron_id
+        PyNNPopulationCommon._next_global_neuron_id += size
+
+    @property
+    def first_id(self):
+        return self._first_global_neuron_id
+
+    @property
+    def last_id(self):
+        return self._first_global_neuron_id + self._size - 1
 
     @property
     def requires_mapping(self):
