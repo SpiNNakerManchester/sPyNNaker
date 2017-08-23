@@ -2,8 +2,6 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-from spynnaker.pyNN.utilities import utility_calls
-
 
 @add_metaclass(AbstractBase)
 class AbstractNeuronModel(object):
@@ -93,8 +91,7 @@ class AbstractNeuronModel(object):
         :return: The SDRAM usage
         :rtype: int
         """
-        global_parameters = self.get_global_parameters()
-        return utility_calls.get_parameters_size_in_bytes(global_parameters)
+        return self.get_n_global_parameters() * 4
 
     def set_global_parameters(self, parameters):
         """ Sets any global parameters.  Override if there are changing\
