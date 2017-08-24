@@ -264,126 +264,85 @@
 
  	if (synapse_type_index == EXCITATORY) {
 
- 		parameter->exc_a_response =  parameter->exc_a_response +
- 				decay_s1615(input,
- 				parameter->exc_a_init);
+ 		parameter->exc_a_response =  parameter->exc_a_response + input;
 
 
- 		parameter->exc_b_response = parameter->exc_b_response +
- 				decay_s1615(input,
- 				parameter->exc_b_init);
+ 		parameter->exc_b_response = parameter->exc_b_response + input;
 
- 		// parameter->exc_response = (parameter->exc_a_A * parameter->exc_a_response) + (parameter->exc_b_B * parameter->exc_b_response);
 
  	} else if (synapse_type_index == EXCITATORY2) {
 
- 		parameter->exc2_a_response =  parameter->exc2_a_response +
- 				decay_s1615(input,
- 				parameter->exc2_a_init);
+ 		parameter->exc2_a_response =  parameter->exc2_a_response + input;
 
 
- 		parameter->exc2_b_response = parameter->exc2_b_response +
- 				decay_s1615(input,
- 				parameter->exc2_b_init);
+ 		parameter->exc2_b_response = parameter->exc2_b_response + input;
 
  		// parameter->exc2_response = (parameter->exc2_a_A * parameter->exc2_a_response) + (parameter->exc2_b_B * parameter->exc2_b_response);
 
  	} else if (synapse_type_index == EXCITATORY3) {
 
- 		parameter->exc3_a_response =  parameter->exc3_a_response +
- 				decay_s1615(input,
- 				parameter->exc3_a_init);
+ 		parameter->exc3_a_response =  parameter->exc3_a_response + input;
 
 
- 		parameter->exc3_b_response = parameter->exc3_b_response +
- 				decay_s1615(input,
- 				parameter->exc3_b_init);
+ 		parameter->exc3_b_response = parameter->exc3_b_response + input;
 
  		// parameter->exc3_response = (parameter->exc3_a_A * parameter->exc3_a_response) + (parameter->exc3_b_B * parameter->exc3_b_response);
 
  	} else if (synapse_type_index == EXCITATORY4) {
 
- 		parameter->exc4_a_response =  parameter->exc4_a_response +
- 				decay_s1615(input,
- 				parameter->exc4_a_init);
+ 		parameter->exc4_a_response =  parameter->exc4_a_response + input;
 
 
- 		parameter->exc4_b_response = parameter->exc4_b_response +
- 				decay_s1615(input,
- 				parameter->exc4_b_init);
+ 		parameter->exc4_b_response = parameter->exc4_b_response + input;
 
  		// parameter->exc4_response = (parameter->exc4_a_A * parameter->exc4_a_response) + (parameter->exc4_b_B * parameter->exc4_b_response);
 
  	} else if (synapse_type_index == EXCITATORY5) {
 
- 		parameter->exc5_a_response =  parameter->exc5_a_response +
- 				decay_s1615(input,
- 				parameter->exc5_a_init);
+ 		parameter->exc5_a_response =  parameter->exc5_a_response + input;
 
 
- 		parameter->exc5_b_response = parameter->exc5_b_response +
- 				decay_s1615(input,
- 				parameter->exc5_b_init);
+ 		parameter->exc5_b_response = parameter->exc5_b_response + input;
 
  		// parameter->exc5_response = (parameter->exc5_a_A * parameter->exc5_a_response) + (parameter->exc5_b_B * parameter->exc5_b_response);
 
  	} else if (synapse_type_index == INHIBITORY) {
 
- 		parameter->inh_a_response =  parameter->inh_a_response +
- 				decay_s1615(input,
- 				parameter->inh_a_init);
+ 		parameter->inh_a_response =  parameter->inh_a_response + input;
 
- 		parameter->inh_b_response = parameter->inh_b_response +
- 				decay_s1615(input,
- 				parameter->inh_b_init);
+ 		parameter->inh_b_response = parameter->inh_b_response + input;
 
  		// parameter->inh_response = (parameter->inh_a_A * parameter->inh_a_response) + (parameter->inh_b_B * parameter->inh_b_response);
 
  	} else if (synapse_type_index == INHIBITORY2) {
 
- 		parameter->inh2_a_response =  parameter->inh2_a_response +
- 				decay_s1615(input,
- 				parameter->inh2_a_init);
+ 		parameter->inh2_a_response =  parameter->inh2_a_response + input;
 
- 		parameter->inh2_b_response = parameter->inh2_b_response +
- 				decay_s1615(input,
- 				parameter->inh2_b_init);
+ 		parameter->inh2_b_response = parameter->inh2_b_response + input;
 
  		// parameter->inh2_response = (parameter->inh2_a_A * parameter->inh2_a_response) + (parameter->inh2_b_B * parameter->inh2_b_response);
 
  	} else if (synapse_type_index == INHIBITORY3) {
 
- 		parameter->inh3_a_response =  parameter->inh3_a_response +
- 				decay_s1615(input,
- 				parameter->inh3_a_init);
+ 		parameter->inh3_a_response =  parameter->inh3_a_response + input;
 
- 		parameter->inh3_b_response = parameter->inh3_b_response +
- 				decay_s1615(input,
- 				parameter->inh3_b_init);
+ 		parameter->inh3_b_response = parameter->inh3_b_response + input;
 
  		// parameter->inh3_response = (parameter->inh3_a_A * parameter->inh3_a_response) + (parameter->inh3_b_B * parameter->inh3_b_response);
 
  	} else if (synapse_type_index == INHIBITORY4) {
 
- 		parameter->inh4_a_response =  parameter->inh4_a_response +
- 				decay_s1615(input,
- 				parameter->inh4_a_init);
+ 		parameter->inh4_a_response =  parameter->inh4_a_response + input;
 
- 		parameter->inh4_b_response = parameter->inh4_b_response +
- 				decay_s1615(input,
- 				parameter->inh4_b_init);
+ 		parameter->inh4_b_response = parameter->inh4_b_response + input;
 
  		// parameter->inh4_response = (parameter->inh4_a_A * parameter->inh4_a_response) + (parameter->inh4_b_B * parameter->inh4_b_response);
 
  	} else if (synapse_type_index == INHIBITORY5) {
 
- 		parameter->inh5_a_response =  parameter->inh5_a_response +
- 				decay_s1615(input,
- 				parameter->inh5_a_init);
+ 		parameter->inh5_a_response =  parameter->inh5_a_response + input;
 
- 		parameter->inh5_b_response = parameter->inh5_b_response +
- 				decay_s1615(input,
- 				parameter->inh5_b_init);
+ 		parameter->inh5_b_response = parameter->inh5_b_response + input;
 
  		// parameter->inh5_response = (parameter->inh5_a_A * parameter->inh5_a_response) + (parameter->inh5_b_B * parameter->inh5_b_response);
  	}
