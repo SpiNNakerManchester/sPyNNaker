@@ -26,40 +26,40 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
         'v_rest': -65.0,
         'v_reset': -65.0,
         'v_thresh': -50.0,
+        'tau_refrac': 0.1,
+        'i_offset': 0,
 
         ##### synapse parameters #####
         # excitatory
         'exc_a_response':0,
-        'exc_a_A':-1,
-        'exc_a_tau': 0.2,
+        'exc_a_A':1,
+        'exc_a_tau': 5,
         'exc_b_response':0,
-        'exc_b_B':1,
-        'exc_b_tau': 1.7,
+        'exc_b_B':-1,
+        'exc_b_tau': 1,
         # excitatory2
         'exc2_a_response':0,
-        'exc2_a_A':-1,
-        'exc2_a_tau': 0.2,
+        'exc2_a_A':1,
+        'exc2_a_tau': 5,
         'exc2_b_response':0,
-        'exc2_b_B':1,
-        'exc2_b_tau': 1.7,
+        'exc2_b_B':-1,
+        'exc2_b_tau': 1,
         # inhibitory
         'inh_a_response': 0,
-        'inh_a_A':-1,
-        'inh_a_tau': 0.2,
+        'inh_a_A':1,
+        'inh_a_tau': 5,
         'inh_b_response':0,
-        'inh_b_B':1,
-        'inh_b_tau': 1.7,
+        'inh_b_B':-1,
+        'inh_b_tau': 1,
         # inhibitory2
         'inh2_a_response': 0,
-        'inh2_a_A':-1,
-        'inh2_a_tau': 0.2,
+        'inh2_a_A':1,
+        'inh2_a_tau': 5,
         'inh2_b_response':0,
-        'inh2_b_B':1,
-        'inh2_b_tau': 1.7,
+        'inh2_b_B':-1,
+        'inh2_b_tau': 1}
         ##############################
 
-        'tau_refrac': 0.1,
-        'i_offset': 0}
 
     def __init__(
             self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
