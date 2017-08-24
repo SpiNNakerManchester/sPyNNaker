@@ -65,6 +65,9 @@ class SynapseTypeCombinedExponential(AbstractSynapseType):
         self._inh_b_B = utility_calls.convert_param_to_numpy(inh_b_B, n_neurons)
         self._inh_b_tau = utility_calls.convert_param_to_numpy(inh_b_tau, n_neurons)
 
+        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+        self.inh_a_A, self.inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+
 
     @property
     def exc_a_response(self):

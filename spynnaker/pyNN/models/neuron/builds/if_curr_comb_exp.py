@@ -27,17 +27,17 @@ class IFCurrCombExp(AbstractPopulationVertex):
 
         'exc_a_response':0,
         'exc_a_A':1,
-        'exc_a_tau':1,
+        'exc_a_tau':5,
         'exc_b_response':0,
-        'exc_b_B':5,
-        'exc_b_tau': 0,
+        'exc_b_B':-1,
+        'exc_b_tau': 1,
 
         'inh_a_response':0,
-        'inh_a_A':0,
-        'inh_a_tau': 0,
+        'inh_a_A':1,
+        'inh_a_tau': 5,
         'inh_b_response':0,
-        'inh_b_B':0,
-        'inh_b_tau': 0,
+        'inh_b_B':-1,
+        'inh_b_tau': 1,
 
         'tau_refrac': 0.1,
         'i_offset': 0}
