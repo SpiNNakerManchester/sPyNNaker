@@ -357,10 +357,10 @@ class AbstractConnector(object):
     def _generate_delays(self, values, n_connections, connection_slices):
         """ Generate valid delay values
         """
-        
+
         # Ensure datatype is float to facilitate clipping
-        values = float(values)        
-        
+        values = float(values)
+
         delays = self._generate_values(
             values, n_connections, connection_slices)
 
