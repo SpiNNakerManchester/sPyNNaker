@@ -23,17 +23,17 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
     baseline_defaults = {
         'x_a_response': 0,
         'x_a_A': 1,
-        'x_a_tau': 1,
+        'x_a_tau': 5,
         'x_b_response': 0,
         'x_b_B': -1,
-        'x_b_tau': 0.1,
+        'x_b_tau': 1,
 
         'i_a_response': 0,
         'i_a_A': 1,
-        'i_a_tau': 1,
+        'i_a_tau': 5,
         'i_b_response': 0,
         'i_b_B': -1,
-        'i_b_tau': 0.1
+        'i_b_tau': 1
         }
 
 
