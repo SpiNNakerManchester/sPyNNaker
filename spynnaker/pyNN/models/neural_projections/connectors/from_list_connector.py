@@ -127,14 +127,23 @@ class FromListConnector(AbstractConnector):
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
 
+    def _get_filtered_connections(
+            self, pre_vertex_slice, post_vertex_slice, min_delay=None,
+            max_delay=None):
+        mask = self._conn_list["source"] >= pre_vertex_slice.lo_atom
+        mask &= self._conn_list["source"] <= pre_vertex_slice.hi_atom
+        mask &= self._conn_list["target"] >= post_vertex_slice.lo_atom
+        mask &= self._conn_list["target"] <= post_vertex_slice.hi_atom
+        if min_delay is not None or max_delay is not None:
+            mask &= self._conn_list["delay"] >= min_delay
+            mask &= self._conn_list["delay"] <= max_delay
+        return self._conn_list[numpy.where(mask)[0]]
+
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        delays = self._conn_list["delay"][mask]
+        delays = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)["delay"]
         if delays.size == 0:
             return 0
         return numpy.var(delays)
@@ -143,21 +152,9 @@ class FromListConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
-        mask = None
-        if min_delay is None or max_delay is None:
-            mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                    (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                    (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                    (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        else:
-            mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                    (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                    (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                    (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
-                    (self._conn_list["delay"] >= min_delay) &
-                    (self._conn_list["delay"] <= max_delay))
-        sources = self._conn_list["source"][mask]
+        sources = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice, min_delay,
+            max_delay)["source"]
         if sources.size == 0:
             return 0
         return numpy.max(numpy.bincount(sources.view('int32')))
@@ -165,11 +162,8 @@ class FromListConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        targets = self._conn_list["target"][mask]
+        targets = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)["target"]
         if targets.size == 0:
             return 0
         return numpy.max(numpy.bincount(targets.view('int32')))
@@ -177,11 +171,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)["weight"]
         if weights.size == 0:
             return 0
         return numpy.mean(weights)
@@ -189,11 +180,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)["weight"]
         if weights.size == 0:
             return 0
         return numpy.max(weights)
@@ -201,11 +189,8 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)["weight"]
         if weights.size == 0:
             return 0
         return numpy.var(weights)
@@ -217,11 +202,8 @@ class FromListConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        items = self._conn_list[mask]
+        items = self._get_filtered_connections(
+            pre_vertex_slice, post_vertex_slice)
         block = numpy.zeros(
             items.size, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = items["source"]
