@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from .abstract_input_type import AbstractInputType
 
 
-class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
+class InputTypeCurrentPfc(AbstractInputType, AbstractContainsUnits):
     """ The current input type
     """
 
