@@ -3,8 +3,8 @@ from spynnaker.pyNN.models.neuron.neuron_models\
     import NeuronModelLeakyIntegrateAndFire
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_7E7I\
     import SynapseTypeCombExp7E7I
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.input_types.input_type_current_pfc \
+    import InputTypeCurrentPfc
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
@@ -408,7 +408,7 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
                 inh7_b_B,
                 inh7_b_tau)
 
-        input_type = InputTypeCurrent()
+        input_type = InputTypeCurrentPfc()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(

@@ -77,7 +77,7 @@ static inline void synapse_types_add_neuron_input(
 	if (synapse_type_index == EXCITATORY) {
 
 		parameter->exc_a_response = parameter->exc_a_response + input;
-				/*	
+				/*
 				 parameter->exc_a_response +
 				decay_s1615(input,
 				parameter->exc_a_decay);
@@ -85,11 +85,11 @@ static inline void synapse_types_add_neuron_input(
 
 		parameter->exc_b_response = parameter->exc_b_response + input;
 				/*
-				 parameter->exc_b_response + 
+				 parameter->exc_b_response +
 				decay_s1615(input,
 				parameter->exc_b_decay);
 				*/
-	
+
 	} else if (synapse_type_index == INHIBITORY) {
 
 		parameter->inh_a_response = parameter->inh_a_response + input;
@@ -109,6 +109,7 @@ static inline void synapse_types_add_neuron_input(
 
 static inline input_t synapse_types_get_excitatory_input(
 		synapse_param_pointer_t parameter) {
+	//log_info("%11.6k,  %11.6k, %11.6k, %11.6k", parameter->exc_a_decay, parameter->exc_a_response, parameter->exc_b_decay, parameter->exc_b_response);
 	return (parameter->exc_a_A * parameter->exc_a_response) + (parameter->exc_b_B * parameter->exc_b_response);
 }
 
