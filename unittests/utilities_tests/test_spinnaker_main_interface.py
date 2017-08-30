@@ -65,8 +65,9 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         interface.stop(turn_off_machine=False, clear_routing_tables=False,
                        clear_tags=False)
         self.assertTrue(mock_contoller.closed)
-        interface.stop(turn_off_machine=False, clear_routing_tables=False,
-                       clear_tags=False)
+        with self.assertRaises(ConfigurationException):
+            interface.stop(turn_off_machine=False, clear_routing_tables=False,
+                           clear_tags=False)
 
     def test_timings(self):
 

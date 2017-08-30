@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
     import AbstractHasAPlusAMinus
@@ -95,3 +96,7 @@ class WeightDependenceAdditiveTriplet(
     @property
     def weight_maximum(self):
         return self._w_max
+
+    @overrides(AbstractWeightDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['w_min', 'w_max', 'A3_plus', 'A3_minus']
