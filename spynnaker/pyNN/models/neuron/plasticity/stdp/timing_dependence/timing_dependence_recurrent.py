@@ -2,6 +2,7 @@ import math
 
 from data_specification.enums import DataType
 
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
     import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
@@ -100,3 +101,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @property
     def synaptic_structure(self):
         return self._synapse_structure
+
+    @overrides(AbstractTimingDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['accumulator_depression', 'accumulator_potentiation',
+                'mean_pre_window', 'mean_post_window', 'dual_fsm']
