@@ -2,6 +2,8 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
+_BYTES_PER_PARAMETER = 4
+
 
 @add_metaclass(AbstractBase)
 class AbstractNeuronModel(object):
@@ -75,7 +77,7 @@ class AbstractNeuronModel(object):
         :return: The SDRAM usage
         :rtype: int
         """
-        return self.get_n_neural_parameters() * 4
+        return self.get_n_neural_parameters() * _BYTES_PER_PARAMETER
 
     def get_dtcm_usage_per_neuron_in_bytes(self):
         """ Get the DTCM usage of this neuron model in bytes
@@ -83,7 +85,7 @@ class AbstractNeuronModel(object):
         :return: The DTCM usage
         :rtype: int
         """
-        return self.get_n_neural_parameters() * 4
+        return self.get_n_neural_parameters() * _BYTES_PER_PARAMETER
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         """ Get the SDRAM usage of the global parameters in bytes
@@ -91,7 +93,7 @@ class AbstractNeuronModel(object):
         :return: The SDRAM usage
         :rtype: int
         """
-        return self.get_n_global_parameters() * 4
+        return self.get_n_global_parameters() * _BYTES_PER_PARAMETER
 
     def set_global_parameters(self, parameters):
         """ Sets any global parameters.  Override if there are changing\
