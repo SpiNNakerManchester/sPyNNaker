@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
@@ -94,3 +95,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
             pre_population_label, post_population_label, "SpikePairRule",
             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
         return prov_data
+
+    @overrides(AbstractTimingDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['tau_plus', 'tau_minus']

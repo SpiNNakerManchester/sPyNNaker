@@ -44,6 +44,9 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
+# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
+_SYNAPSE_SDRAM_OVERSCALE = 1.1
+
 
 class SynapticManager(object):
     """ Deals with synapses
@@ -239,7 +242,7 @@ class SynapticManager(object):
                     pre_slices[pre_slice_index], post_vertex_slice,
                     in_edge.n_delay_stages, machine_time_step)
 
-        return memory_size
+        return memory_size * _SYNAPSE_SDRAM_OVERSCALE
 
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
