@@ -637,7 +637,7 @@ class SynapticManager(object):
                     if len(row_data) > 0:
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
-                                (next_single_start_position * 4) <
+                                (next_single_start_position + len(row_data)) <=
                                 self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
@@ -679,7 +679,8 @@ class SynapticManager(object):
 
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
-                                (next_single_start_position * 4) <
+                                (next_single_start_position +
+                                 len(delayed_row_data)) <=
                                 self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
@@ -879,7 +880,7 @@ class SynapticManager(object):
                 # read in the synaptic row data
                 single_block = numpy.asarray(transceiver.read_memory(
                     placement.x, placement.y,
-                    direct_synapses_address + (synaptic_block_offset * 4),
+                    direct_synapses_address + synaptic_block_offset,
                     synaptic_block_size), dtype="uint8").view("uint32")
 
                 # Convert the block into a set of rows
