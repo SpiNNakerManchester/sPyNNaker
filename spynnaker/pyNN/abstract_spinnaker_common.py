@@ -43,7 +43,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
-            extra_load_algorithms=None, front_end_name=None):
+            extra_load_algorithms=None, front_end_versions=None):
 
         # add model binaries
         self._EXECUTABLE_FINDER.add_path(
@@ -85,7 +85,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             default_config_paths=[
                 os.path.join(os.path.dirname(__file__),
                              self.CONFIG_FILE_NAME)],
-            front_end_name=front_end_name
+            front_end_versions=front_end_versions
         )
 
         extra_mapping_inputs = dict()
