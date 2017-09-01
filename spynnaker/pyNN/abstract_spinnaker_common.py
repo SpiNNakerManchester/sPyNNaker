@@ -15,6 +15,7 @@ from spynnaker.pyNN import model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.spynnaker_simulator_interface \
     import SpynnakerSimulatorInterface
+from spynnaker import __version__ as version
 
 # general imports
 from six import add_metaclass
@@ -74,6 +75,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         self._neurons_per_core_set = set()
 
+        versions = [("sPyNNaker", version)]
+        if front_end_versions is not None:
+            versions.extend(front_end_versions)
+
         AbstractSpinnakerBase.__init__(
             self,
             configfile=self.CONFIG_FILE_NAME,
@@ -85,7 +90,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             default_config_paths=[
                 os.path.join(os.path.dirname(__file__),
                              self.CONFIG_FILE_NAME)],
-            front_end_versions=front_end_versions
+            front_end_versions=versions
         )
 
         extra_mapping_inputs = dict()
