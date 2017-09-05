@@ -89,6 +89,3 @@ class ProjectionMachineEdge(
                 synapse_info.synapse_dynamics.get_provenance_data(
                     self.pre_vertex.label, self.post_vertex.label))
         return prov_items
-
-    def __repr__(self):
-        return "{}:{}".format(self.pre_vertex, self.post_vertex)
