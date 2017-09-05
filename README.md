@@ -13,22 +13,12 @@ the version of PyNN you wish to work with.
 Developer Installation
 ----------------------
 If you want to be able to edit the source code, but still have it referenced
-from other Python modules, you can set the install to be a developer install.
-In this case, download the source code, and extract it locally, or else clone
-the git repository:
+from other Python modules, you can set the install to be a 
+[developer install](http://spinnakermanchester.github.io/development/devenv.html)
+which describes the process of installing not only the `sPyNNaker7` and `sPyNNaker8`
+packages for accessing the user-facing APIs, but also the other modules which these 
+depend upon for a complete editable install.
 
-    git clone http://github.com/SpiNNakerManchester/sPyNNaker.git
-
-To install as a development version which all users will then be able to use,
-run the following where the code has been extracted:
-
-    sudo python setup.py develop
-
-To install as a development version for only yourself, run:
-
-    python setup.py develop --user
-
-If you also want pyNN.spiNNaker support, please install this as described above.
 
 Documentation
 -------------
