@@ -16,13 +16,13 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def __init__(
             self, accum_decay = 10.00,
             accum_dep_thresh_excit=-6, accum_pot_thresh_excit=7,
-            pre_window_tc_excit=20.0, post_window_tc_excit=25.0, 
+            pre_window_tc_excit=20.0, post_window_tc_excit=25.0,
             accum_dep_thresh_excit2=-6, accum_pot_thresh_excit2=7,
-            pre_window_tc_excit2=20.0, post_window_tc_excit2=25.0, 
+            pre_window_tc_excit2=20.0, post_window_tc_excit2=25.0,
             accum_dep_thresh_inhib=-4, accum_pot_thresh_inhib=5,
-            pre_window_tc_inhib=35.0, post_window_tc_inhib=45.0, 
+            pre_window_tc_inhib=35.0, post_window_tc_inhib=45.0,
             accum_dep_thresh_inhib2=-4, accum_pot_thresh_inhib2=5,
-            pre_window_tc_inhib2=35.0, post_window_tc_inhib2=45.0, 
+            pre_window_tc_inhib2=35.0, post_window_tc_inhib2=45.0,
             dual_fsm=True, seed=None):
         AbstractTimingDependence.__init__(self)
 
@@ -88,13 +88,16 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        numParams = 17
+        numParams = (4 * 4) + 1
         numLUTs   = 4
         numSeeds  = 4
+        thirty_two_bit_bytes = 4
+        sixteen_bit_bytes = 2
+
         return (
-            (4 * numParams) 
-          + (4 * plasticity_helpers.STDP_FIXED_POINT_ONE * numLUTs)
-          + (4 * numSeeds))
+            (thirty_two_bit_bytes * numParams)
+          + (sixteen_bit_bytes * plasticity_helpers.STDP_FIXED_POINT_ONE * numLUTs)
+          + (thirty_two_bit_bytes * numSeeds))
 
     @property
     def n_weight_terms(self):

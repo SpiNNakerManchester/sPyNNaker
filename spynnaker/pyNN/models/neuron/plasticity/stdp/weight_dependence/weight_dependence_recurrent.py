@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
 
 class WeightDependenceRecurrent(AbstractWeightDependence):
 
-    def __init__(self, 
+    def __init__(self,
         w_min_excit  =1.0, w_max_excit  =2.0, A_plus_excit  =3.0, A_minus_excit  =4.0,
         w_min_excit2 =5.0, w_max_excit2 =6.0, A_plus_excit2 =7.0, A_minus_excit2 =8.0,
         w_min_inhib  =9.0, w_max_inhib  =10.0, A_plus_inhib  =11.0, A_minus_inhib  =12.0,
