@@ -89,15 +89,15 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
         numParams = (4 * 4) + 1
-        numLUTs   = 4
+        numLUTs   = 8
         numSeeds  = 4
-        thirty_two_bit_bytes = 4
-        sixteen_bit_bytes = 2
+        thirty_two_bit_wordlength = 4
+        sixteen_bit_wordlength = 2
 
         return (
-            (thirty_two_bit_bytes * numParams)
-          + (sixteen_bit_bytes * plasticity_helpers.STDP_FIXED_POINT_ONE * numLUTs)
-          + (thirty_two_bit_bytes * numSeeds))
+            (thirty_two_bit_wordlength * numParams)
+          + (sixteen_bit_wordlength * plasticity_helpers.STDP_FIXED_POINT_ONE * numLUTs)
+          + (thirty_two_bit_wordlength * numSeeds))
 
     @property
     def n_weight_terms(self):
@@ -203,5 +203,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit', 'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib']
+        return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit', 
+                               'accum_dep_plus_one_excit2', 'accum_pot_minus_one_excit2', 'pre_window_tc_excit2', 'post_window_tc_excit2', 
+                               'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib',
+                               'accum_dep_plus_one_inhib2', 'accum_pot_minus_one_inhib2', 'pre_window_tc_inhib2', 'post_window_tc_inhib2']
 
