@@ -77,23 +77,23 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
 
         spec.write_value( data=int(round(self._w_min_excit * weight_scales[0]   )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_excit * weight_scales[0]   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_excit* weight_scales[0]   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_excit * weight_scales[0] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit* 32768   )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit * 32768 )), data_type=DataType.INT32)
 
         spec.write_value( data=int(round(self._w_min_excit2 * weight_scales[1]  )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_excit2 * weight_scales[1]  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_excit2 * weight_scales[1] )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_excit2 * weight_scales[1])), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_excit2 * 32768 )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_excit2 * 32768 )), data_type=DataType.INT32)
 
         spec.write_value( data=int(round(self._w_min_inhib * weight_scales[2]   )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_inhib * weight_scales[2]   )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib * weight_scales[2]  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib * weight_scales[2] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib * 32768  )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib * 32768 )), data_type=DataType.INT32)
 
         spec.write_value( data=int(round(self._w_min_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib2 * weight_scales[3] )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib2* weight_scales[3] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib2 * 32768 )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib2* 32768 )), data_type=DataType.INT32)
 
 
     @property
@@ -102,5 +102,8 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A_plus', 'A_minus']
+        return ['w_min_X', 'w_max_X', 'A_plus_X', 'A_minus_X', 
+                'w_min_X2', 'w_max_X2', 'A_plus_X2', 'A_minus_X2', 
+                'w_min_I', 'w_max_I', 'A_plus_I', 'A_minus_I',
+                'w_min_I2', 'w_max_I2', 'A_plus_I2', 'A_minus_I2']
 

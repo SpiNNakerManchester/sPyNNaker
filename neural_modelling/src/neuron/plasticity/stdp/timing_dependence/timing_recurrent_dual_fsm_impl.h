@@ -23,10 +23,10 @@ typedef uint16_t pre_trace_t;
 
 typedef struct {
     int32_t accum_decay_per_ts;
-    int32_t accum_dep_plus_one[2];
-    int32_t accum_pot_minus_one[2];
-    int32_t pre_window_tc[2];
-    int32_t post_window_tc[2];
+    int32_t accum_dep_plus_one[4];
+    int32_t accum_pot_minus_one[4];
+    int32_t pre_window_tc[4];
+    int32_t post_window_tc[4];
 } plasticity_params_recurrent_t;
 
 static inline weight_state_t weight_one_term_apply_potentiation_sd(weight_state_t state,
@@ -37,10 +37,14 @@ static inline weight_state_t weight_one_term_apply_depression_sd(weight_state_t 
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
+extern uint16_t pre_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE];
+extern uint16_t post_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE];
+extern uint16_t pre_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE];
+extern uint16_t post_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE];
 extern uint16_t pre_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE];
 extern uint16_t post_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE];
+extern uint16_t pre_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE];
+extern uint16_t post_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE];
 extern plasticity_params_recurrent_t recurrent_plasticity_params;
 
 static uint32_t last_event_time;
@@ -83,12 +87,14 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
-    if (syn_type == 0) {
-       window_length = pre_exp_dist_lookup[random];       // Excit. synapse
-    }
-    else {
-       window_length = pre_exp_dist_lookup_inhib[random]; // Inhib. synapse
-    }
+   if (syn_type == 0)
+      window_length = pre_exp_dist_lookup_excit[random];
+   else if (syn_type == 1)
+      window_length = pre_exp_dist_lookup_excit2[random];
+   else if (syn_type == 2)
+      window_length = pre_exp_dist_lookup_inhib[random];
+   else
+      window_length = pre_exp_dist_lookup_inhib2[random];
     // Return window length
     return window_length;
 }
@@ -173,9 +179,13 @@ static inline update_state_t timing_apply_post_spike_sd(
    uint32_t random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
    uint16_t window_length;
    if (syn_type == 0)
-      window_length = post_exp_dist_lookup[random];
-   else
+      window_length = post_exp_dist_lookup_excit[random];
+   else if (syn_type == 1)
+      window_length = post_exp_dist_lookup_excit2[random];
+   else if (syn_type == 2)
       window_length = post_exp_dist_lookup_inhib[random];
+   else
+      window_length = post_exp_dist_lookup_inhib2[random];
 
    uint32_t this_window_close_time = time + window_length;
 
@@ -190,6 +200,7 @@ static inline update_state_t timing_apply_post_spike_sd(
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
+      log_info("+, acc %d", previous_state.accumulator);
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
       if (time_since_last_pre < last_pre_trace) {
@@ -198,10 +209,10 @@ static inline update_state_t timing_apply_post_spike_sd(
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
          } else {
+             log_info("!+ %d", postNeuronIndex);
              previous_state.accumulator = 0;
              previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                                         syn_type, STDP_FIXED_POINT_ONE);
-             log_info("+");
          }
       }
    }
@@ -211,13 +222,16 @@ static inline update_state_t timing_apply_post_spike_sd(
 static inline weight_state_t weight_one_term_apply_potentiation_sd(
    weight_state_t state, uint32_t syn_type, int32_t potentiation) {
 
+   int32_t old_w = state.weight;
    int32_t scale = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
-                   state.weight_region->a2_plus, state.weight_multiply_right_shift);
+                   state.weight_region->a2_plus, 15);
+                   //state.weight_region->a2_plus, state.weight_multiply_right_shift);
 
    // Multiply scale by potentiation and add
    // **NOTE** using standard STDP fixed-point format handles format conversion
    state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+   log_info("oldW:%d A2: %d, sc: %d, newW: %d", old_w, state.weight_region->a2_plus, scale, state.weight); 
    return state;
 }
 
@@ -226,7 +240,8 @@ static inline weight_state_t weight_one_term_apply_depression_sd(
 
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
-                   state.weight_region->a2_minus, state.weight_multiply_right_shift);
+                   state.weight_region->a2_minus, 15);
+                   //state.weight_region->a2_minus, state.weight_multiply_right_shift);
 
     // Multiply scale by depression and subtract
     // **NOTE** using standard STDP fixed-point format handles format conversion

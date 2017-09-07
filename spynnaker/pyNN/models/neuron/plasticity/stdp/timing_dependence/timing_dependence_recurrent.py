@@ -103,7 +103,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Acc decay per timeStep is scaled up by 1024 to preserve 10-bit precision:
-        acc_decay_per_ts = (float(self.accum_decay) * float(machine_time_step)*1.024)
+        acc_decay_per_ts = (int)((float(self.accum_decay) * float(machine_time_step)*1.024))
         # Write parameters (four per synapse type):
         spec.write_value(data=acc_decay_per_ts,                data_type=DataType.INT32)
         spec.write_value(data=self.accum_dep_plus_one_excit,   data_type=DataType.INT32)
@@ -136,29 +136,42 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         mean_post_timesteps_inhib = (float(self.post_window_tc_inhib) *
                                (1000.0 / float(machine_time_step)))
 
+        mean_pre_timesteps_excit2 = (float(self.pre_window_tc_excit2) *
+                              (1000.0 / float(machine_time_step)))
+        mean_post_timesteps_excit2 = (float(self.post_window_tc_excit2) *
+                               (1000.0 / float(machine_time_step)))
+        mean_pre_timesteps_inhib2 = (float(self.pre_window_tc_inhib2) *
+                              (1000.0 / float(machine_time_step)))
+        mean_post_timesteps_inhib2 = (float(self.post_window_tc_inhib2) *
+                               (1000.0 / float(machine_time_step)))
+
         # Write lookup tables
         self._write_exp_dist_lut(spec, mean_pre_timesteps_excit)
         self._write_exp_dist_lut(spec, mean_post_timesteps_excit)
+        self._write_exp_dist_lut(spec, mean_pre_timesteps_excit2)
+        self._write_exp_dist_lut(spec, mean_post_timesteps_excit2)
         self._write_exp_dist_lut(spec, mean_pre_timesteps_inhib)
         self._write_exp_dist_lut(spec, mean_post_timesteps_inhib)
+        self._write_exp_dist_lut(spec, mean_pre_timesteps_inhib2)
+        self._write_exp_dist_lut(spec, mean_post_timesteps_inhib2)
 
         # Write random seeds
-        spec.write_value(data=self.rng.randint(0x7FFFFFF1),
-                         data_type=DataType.UINT32)
-        spec.write_value(data=self.rng.randint(0x7FFFFFF2),
-                         data_type=DataType.UINT32)
-        spec.write_value(data=self.rng.randint(0x7FFFFFF3),
-                         data_type=DataType.UINT32)
-        spec.write_value(data=self.rng.randint(0x7FFFFFF4),
-                         data_type=DataType.UINT32)
-        #spec.write_value(data=0x7FFFFFF1,
+        #spec.write_value(data=self.rng.randint(0x7FFFFFF1),
         #                 data_type=DataType.UINT32)
-        #spec.write_value(data=0x7FFFFFF2,
-        #                data_type=DataType.UINT32)
-        #spec.write_value(data=0x7FFFFFF3,
+        #spec.write_value(data=self.rng.randint(0x7FFFFFF2),
         #                 data_type=DataType.UINT32)
-        #spec.write_value(data=0x7FFFFFF4,
+        #spec.write_value(data=self.rng.randint(0x7FFFFFF3),
         #                 data_type=DataType.UINT32)
+        #spec.write_value(data=self.rng.randint(0x7FFFFFF4),
+        #                 data_type=DataType.UINT32)
+        spec.write_value(data=0x7FFFFFF1,
+                         data_type=DataType.UINT32)
+        spec.write_value(data=0x7FFFFFF2,
+                        data_type=DataType.UINT32)
+        spec.write_value(data=0x7FFFFFF3,
+                         data_type=DataType.UINT32)
+        spec.write_value(data=0x7FFFFFF4,
+                         data_type=DataType.UINT32)
 
     @property
     def pre_trace_size_bytes(self):
