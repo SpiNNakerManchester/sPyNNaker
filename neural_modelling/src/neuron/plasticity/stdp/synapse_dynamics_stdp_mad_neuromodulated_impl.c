@@ -18,7 +18,8 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 //---------------------------------------
 // Macros
 //---------------------------------------
-// The plastic control words used by Morrison synapses store an axonal delay in the upper 3 bits
+// The plastic control words used by Morrison synapses store an axonal delay
+// in the upper 3 bits.
 // Assuming a maximum of 16 delay slots, this is all that is required as:
 //
 // 1) Dendritic + Axonal <= 15
@@ -26,14 +27,16 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 //
 // Therefore:
 //
-// * Maximum value of dendritic delay is 15 (with axonal delay of 0) - It requires 4 bits
-// * Maximum value of axonal delay is 7 (with dendritic delay of 8) - It requires 3 bits
+// * Maximum value of dendritic delay is 15 (with axonal delay of 0)
+//    - It requires 4 bits
+// * Maximum value of axonal delay is 7 (with dendritic delay of 8)
+//    - It requires 3 bits
 //
-//             |        Axonal delay       |  Dendritic delay   |       Type        |      Index         |
-//             |---------------------------|--------------------|-------------------|--------------------|
-// Bit count   | SYNAPSE_AXONAL_DELAY_BITS | SYNAPSE_DELAY_BITS | SYNAPSE_TYPE_BITS | SYNAPSE_INDEX_BITS |
-//             |                           |                    |        SYNAPSE_TYPE_INDEX_BITS         |
-//             |---------------------------|--------------------|----------------------------------------|
+// |        Axonal delay       |  Dendritic delay   |       Type        |      Index         |
+// |---------------------------|--------------------|-------------------|--------------------|
+// | SYNAPSE_AXONAL_DELAY_BITS | SYNAPSE_DELAY_BITS | SYNAPSE_TYPE_BITS | SYNAPSE_INDEX_BITS |
+// |                           |                    |        SYNAPSE_TYPE_INDEX_BITS         |
+// |---------------------------|--------------------|----------------------------------------|
 #ifndef SYNAPSE_AXONAL_DELAY_BITS
   #define SYNAPSE_AXONAL_DELAY_BITS 3
 #endif
@@ -50,8 +53,7 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 //---------------------------------------
 // Structures
 //---------------------------------------
-typedef struct
-{
+typedef struct {
   pre_trace_t prev_trace;
   uint32_t prev_time;
 } pre_event_history_t;
@@ -99,14 +101,15 @@ static inline void correlation_apply_post_spike(
     int16_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
         time - post_event_history -> last_dopamine_spike_time);
     int16_t third_exp_component;
-    if (last_update_time == last_non_dopamine_spike_time)
+    if (last_update_time == last_non_dopamine_spike_time) {
         third_exp_component = DECAY_LOOKUP_TAU_D(
             last_non_dopamine_spike_time -
             post_event_history -> last_dopamine_spike_time);
-    else
+    } else {
         third_exp_component = DECAY_LOOKUP_TAU_C(
              post_event_history -> last_dopamine_spike_time -
              last_non_dopamine_spike_time);
+    }
 
     // Evaluate weight function
     uint32_t weight_change = STDP_FIXED_MUL_16X16(
@@ -118,13 +121,15 @@ static inline void correlation_apply_post_spike(
 
     previous_state -> weight += weight_change;
 
-    if (previous_state -> weight & 0x8000)
+    if (previous_state -> weight & 0x8000) {
         previous_state -> weight = 0;
-    else
+    }
+    else {
         // Saturate weight
         previous_state -> weight= MIN(weight_state.weight_region->max_weight,
                                       MAX(previous_state -> weight,
                                       weight_state.weight_region->min_weight));
+    }
 
     // Update eligibility trace if this spike is non-dopamine spike
     if (trace.dopamine == 0) {
@@ -158,14 +163,15 @@ static inline void correlation_apply_pre_spike(
     int16_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
         time - post_event_history -> last_dopamine_spike_time);
     int16_t third_exp_component;
-    if (last_update_time == last_non_dopamine_spike_time)
+    if (last_update_time == last_non_dopamine_spike_time) {
         third_exp_component = DECAY_LOOKUP_TAU_D(
             last_non_dopamine_spike_time -
             post_event_history -> last_dopamine_spike_time);
-    else
+    } else {
         third_exp_component = DECAY_LOOKUP_TAU_C(
              post_event_history -> last_dopamine_spike_time -
              last_non_dopamine_spike_time);
+    }
 
     // Evaluate weight function
     uint32_t weight_change = STDP_FIXED_MUL_16X16(
@@ -177,13 +183,14 @@ static inline void correlation_apply_pre_spike(
 
     previous_state -> weight += weight_change;
 
-    if (previous_state -> weight & 0x8000)
+    if (previous_state -> weight & 0x8000) {
         previous_state -> weight = 0;
-    else
+    } else {
         // Saturate weight
         previous_state -> weight= MIN(weight_state.weight_region->max_weight,
                                       MAX(previous_state -> weight,
                                       weight_state.weight_region->min_weight));
+    }
 
     // Update eligibility trace if this spike is non-dopamine spike
     if (last_post_trace.dopamine == 0) {
@@ -198,7 +205,9 @@ static inline void correlation_apply_pre_spike(
                 last_post_trace.stdp_post_trace,
                 DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
             decayed_eligibility_trace -= decayed_r1;
-            if (decayed_eligibility_trace < 0) decayed_eligibility_trace = 0;
+            if (decayed_eligibility_trace < 0) {
+                decayed_eligibility_trace = 0;
+            }
         }
         previous_state -> eligibility_trace = decayed_eligibility_trace;
     }
@@ -228,7 +237,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
     uint32_t last_non_dopamine_spike_time = delayed_last_pre_time;
     post_trace_t last_non_dopamine_post_trace = post_window.prev_trace;
 
-    while(post_window.num_events > 0) {
+    while (post_window.num_events > 0) {
         const uint32_t delayed_post_time =
             *post_window.next_time + delay_dendritic;
 
@@ -334,7 +343,9 @@ void synapse_dynamics_process_post_synaptic_event(
 //--------------------------------------
 void synapse_dynamics_process_neuromodulator_event(
         uint32_t time, int16_t concentration, uint32_t neuron_index) {
-    log_debug("Adding neuromodulation event to trace at time:%u concentration: %d", time, concentration);
+    log_debug(
+        "Adding neuromodulation event to trace at time:%u concentration:%d",
+        time, concentration);
 
     // Get post event history of this neuron
     post_event_history_t *history = &post_event_history[neuron_index];
@@ -432,7 +443,8 @@ void print_plastic_synapses(address_t plastic, address_t fixed)
   size_t plastic_synapse  = num_plastic_controls(fixed);
   const pre_synaptic_event_history_t *event_history = plastic_event_history(plastic);
 
-  printf ("Plastic region %u synapses pre-synaptic event buffer count:%u:\n", plastic_synapse, event_history->count);
+  printf ("Plastic region %u synapses pre-synaptic event buffer count:%u:\n",
+          plastic_synapse, event_history->count);
 
   // Loop through plastic synapses
   for (uint32_t i = 0; i < plastic_synapse; i++)
