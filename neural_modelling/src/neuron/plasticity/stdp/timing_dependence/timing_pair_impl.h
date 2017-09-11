@@ -4,8 +4,7 @@
 //---------------------------------------
 // Typedefines
 //---------------------------------------
-typedef struct
-{
+typedef struct {
   int16_t stdp_post_trace;
   int16_t dopamine;
 } post_trace_t;
