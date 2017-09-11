@@ -163,6 +163,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc_b_B = utility_calls.convert_param_to_numpy(exc_b_B, n_neurons)
         self._exc_b_tau = utility_calls.convert_param_to_numpy(exc_b_tau, n_neurons)
 
+        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+
         # excitatory2
         self._exc2_a_response = utility_calls.convert_param_to_numpy(exc2_a_response, n_neurons)
         self._exc2_a_A = utility_calls.convert_param_to_numpy(exc2_a_A, n_neurons)
@@ -170,6 +172,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc2_b_response = utility_calls.convert_param_to_numpy(exc2_b_response, n_neurons)
         self._exc2_b_B = utility_calls.convert_param_to_numpy(exc2_b_B, n_neurons)
         self._exc2_b_tau = utility_calls.convert_param_to_numpy(exc2_b_tau, n_neurons)
+
+        self.exc2_a_A, self.exc2_b_B = set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
 
         # excitatory3
         self._exc3_a_response = utility_calls.convert_param_to_numpy(exc3_a_response, n_neurons)
@@ -179,6 +183,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc3_b_B = utility_calls.convert_param_to_numpy(exc3_b_B, n_neurons)
         self._exc3_b_tau = utility_calls.convert_param_to_numpy(exc3_b_tau, n_neurons)
 
+        self.exc3_a_A, self.exc3_b_B = set_excitatory_scalar(self._exc3_a_tau, self._exc3_b_tau)
+
         # excitatory4
         self._exc4_a_response = utility_calls.convert_param_to_numpy(exc4_a_response, n_neurons)
         self._exc4_a_A = utility_calls.convert_param_to_numpy(exc4_a_A, n_neurons)
@@ -186,6 +192,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc4_b_response = utility_calls.convert_param_to_numpy(exc4_b_response, n_neurons)
         self._exc4_b_B = utility_calls.convert_param_to_numpy(exc4_b_B, n_neurons)
         self._exc4_b_tau = utility_calls.convert_param_to_numpy(exc4_b_tau, n_neurons)
+
+        self.exc4_a_A, self.exc4_b_B = set_excitatory_scalar(self._exc4_a_tau, self._exc4_b_tau)
 
         # excitatory5
         self._exc5_a_response = utility_calls.convert_param_to_numpy(exc5_a_response, n_neurons)
@@ -195,6 +203,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc5_b_B = utility_calls.convert_param_to_numpy(exc5_b_B, n_neurons)
         self._exc5_b_tau = utility_calls.convert_param_to_numpy(exc5_b_tau, n_neurons)
 
+        self.exc5_a_A, self.exc5_b_B = set_excitatory_scalar(self._exc5_a_tau, self._exc5_b_tau)
+
         # excitatory6
         self._exc6_a_response = utility_calls.convert_param_to_numpy(exc6_a_response, n_neurons)
         self._exc6_a_A = utility_calls.convert_param_to_numpy(exc6_a_A, n_neurons)
@@ -202,6 +212,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc6_b_response = utility_calls.convert_param_to_numpy(exc6_b_response, n_neurons)
         self._exc6_b_B = utility_calls.convert_param_to_numpy(exc6_b_B, n_neurons)
         self._exc6_b_tau = utility_calls.convert_param_to_numpy(exc6_b_tau, n_neurons)
+
+        self.exc6_a_A, self.exc6_b_B = set_excitatory_scalar(self._exc6_a_tau, self._exc6_b_tau)
 
         # excitatory7
         self._exc7_a_response = utility_calls.convert_param_to_numpy(exc7_a_response, n_neurons)
@@ -211,6 +223,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._exc7_b_B = utility_calls.convert_param_to_numpy(exc7_b_B, n_neurons)
         self._exc7_b_tau = utility_calls.convert_param_to_numpy(exc7_b_tau, n_neurons)
 
+        self.exc7_a_A, self.exc7_b_B = set_excitatory_scalar(self._exc7_a_tau, self._exc7_b_tau)
+
         #inhibitory
         self._inh_a_response = utility_calls.convert_param_to_numpy(inh_a_response, n_neurons)
         self._inh_a_A = utility_calls.convert_param_to_numpy(inh_a_A, n_neurons)
@@ -218,6 +232,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh_b_response = utility_calls.convert_param_to_numpy(inh_b_response, n_neurons)
         self._inh_b_B = utility_calls.convert_param_to_numpy(inh_b_B, n_neurons)
         self._inh_b_tau = utility_calls.convert_param_to_numpy(inh_b_tau, n_neurons)
+
+        self._inh_a_A, self._inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
         # inhibitory2
         self._inh2_a_response = utility_calls.convert_param_to_numpy(inh2_a_response, n_neurons)
@@ -227,6 +243,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh2_b_B = utility_calls.convert_param_to_numpy(inh2_b_B, n_neurons)
         self._inh2_b_tau = utility_calls.convert_param_to_numpy(inh2_b_tau, n_neurons)
 
+        self._inh2_a_A, self._inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+
         # inhibitory3
         self._inh3_a_response = utility_calls.convert_param_to_numpy(inh3_a_response, n_neurons)
         self._inh3_a_A = utility_calls.convert_param_to_numpy(inh3_a_A, n_neurons)
@@ -234,6 +252,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh3_b_response = utility_calls.convert_param_to_numpy(inh3_b_response, n_neurons)
         self._inh3_b_B = utility_calls.convert_param_to_numpy(inh3_b_B, n_neurons)
         self._inh3_b_tau = utility_calls.convert_param_to_numpy(inh3_b_tau, n_neurons)
+
+        self._inh3_a_A, self._inh3_b_B = set_excitatory_scalar(self._inh3_a_tau, self._inh3_b_tau)
 
         # inhibitory4
         self._inh4_a_response = utility_calls.convert_param_to_numpy(inh4_a_response, n_neurons)
@@ -243,6 +263,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh4_b_B = utility_calls.convert_param_to_numpy(inh4_b_B, n_neurons)
         self._inh4_b_tau = utility_calls.convert_param_to_numpy(inh4_b_tau, n_neurons)
 
+        self._inh4_a_A, self._inh4_b_B = set_excitatory_scalar(self._inh4_a_tau, self._inh4_b_tau)
+
         # inhibitory5
         self._inh5_a_response = utility_calls.convert_param_to_numpy(inh5_a_response, n_neurons)
         self._inh5_a_A = utility_calls.convert_param_to_numpy(inh5_a_A, n_neurons)
@@ -250,6 +272,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh5_b_response = utility_calls.convert_param_to_numpy(inh5_b_response, n_neurons)
         self._inh5_b_B = utility_calls.convert_param_to_numpy(inh5_b_B, n_neurons)
         self._inh5_b_tau = utility_calls.convert_param_to_numpy(inh5_b_tau, n_neurons)
+
+        self._inh5_a_A, self._inh5_b_B = set_excitatory_scalar(self._inh5_a_tau, self._inh5_b_tau)
 
         # inhibitory6
         self._inh6_a_response = utility_calls.convert_param_to_numpy(inh6_a_response, n_neurons)
@@ -259,6 +283,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh6_b_B = utility_calls.convert_param_to_numpy(inh6_b_B, n_neurons)
         self._inh6_b_tau = utility_calls.convert_param_to_numpy(inh6_b_tau, n_neurons)
 
+        self._inh6_a_A, self._inh6_b_B = set_excitatory_scalar(self._inh6_a_tau, self._inh6_b_tau)
+
         # inhibitory7
         self._inh7_a_response = utility_calls.convert_param_to_numpy(inh7_a_response, n_neurons)
         self._inh7_a_A = utility_calls.convert_param_to_numpy(inh7_a_A, n_neurons)
@@ -266,6 +292,8 @@ class SynapseTypeCombExp7E7I(AbstractSynapseType):
         self._inh7_b_response = utility_calls.convert_param_to_numpy(inh7_b_response, n_neurons)
         self._inh7_b_B = utility_calls.convert_param_to_numpy(inh7_b_B, n_neurons)
         self._inh7_b_tau = utility_calls.convert_param_to_numpy(inh7_b_tau, n_neurons)
+
+        self._inh7_a_A, self._inh7_b_B = set_excitatory_scalar(self._inh7_a_tau, self._inh7_b_tau)
 
     #excitatory
     @property

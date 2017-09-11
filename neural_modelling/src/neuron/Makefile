@@ -28,7 +28,6 @@ MODELS = IF_curr_exp \
          IF_curr_comb_exp_2E2I_stdp_mad_pair_additive \
          IF_curr_comb_exp_5E5I \
          IF_curr_comb_exp_7E7I \
-         IF_curr_comb_exp_7E7I_no_init \
          
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 

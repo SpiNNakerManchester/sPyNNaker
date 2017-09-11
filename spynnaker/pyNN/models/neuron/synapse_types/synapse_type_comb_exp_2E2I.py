@@ -73,6 +73,8 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
         self._exc_b_B = utility_calls.convert_param_to_numpy(exc_b_B, n_neurons)
         self._exc_b_tau = utility_calls.convert_param_to_numpy(exc_b_tau, n_neurons)
 
+        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+
         # excitatory 2
         self._exc2_a_response = utility_calls.convert_param_to_numpy(exc2_a_response, n_neurons)
         self._exc2_a_A = utility_calls.convert_param_to_numpy(exc2_a_A, n_neurons)
@@ -80,6 +82,8 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
         self._exc2_b_response = utility_calls.convert_param_to_numpy(exc2_b_response, n_neurons)
         self._exc2_b_B = utility_calls.convert_param_to_numpy(exc2_b_B, n_neurons)
         self._exc2_b_tau = utility_calls.convert_param_to_numpy(exc2_b_tau, n_neurons)
+
+        self.exc2_a_A, self.exc2_b_B = set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
 
         #inhibitory
         self._inh_a_response = utility_calls.convert_param_to_numpy(inh_a_response, n_neurons)
@@ -89,6 +93,8 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
         self._inh_b_B = utility_calls.convert_param_to_numpy(inh_b_B, n_neurons)
         self._inh_b_tau = utility_calls.convert_param_to_numpy(inh_b_tau, n_neurons)
 
+        self.inh_a_A, self.inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+
         # inhibitory 2
         self._inh2_a_response = utility_calls.convert_param_to_numpy(inh2_a_response, n_neurons)
         self._inh2_a_A = utility_calls.convert_param_to_numpy(inh2_a_A, n_neurons)
@@ -96,6 +102,8 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
         self._inh2_b_response = utility_calls.convert_param_to_numpy(inh2_b_response, n_neurons)
         self._inh2_b_B = utility_calls.convert_param_to_numpy(inh2_b_B, n_neurons)
         self._inh2_b_tau = utility_calls.convert_param_to_numpy(inh2_b_tau, n_neurons)
+
+        self.inh2_a_A, self.inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
     #excitatory
     @property
