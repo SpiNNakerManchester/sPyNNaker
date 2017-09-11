@@ -20,19 +20,14 @@ LOOKUP_TAU_D_SIZE = 256
 LOOKUP_TAU_D_SHIFT = 0
 
 
-
 class TimingDependenceSpikePair(AbstractTimingDependence):
-
     def __init__(self, tau_plus=20.0, tau_minus=20.0, tau_c=1000, tau_d=200):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
         self._tau_c = tau_c
         self._tau_d = tau_d
-
         self._synapse_structure = SynapseStructureWeightEligibilityTrace()
-
-        # provenance data
         self._tau_plus_last_entry = None
         self._tau_minus_last_entry = None
         self._tau_c_last_entry = None
@@ -67,7 +62,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return ((2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE +
-                    LOOKUP_TAU_C_SIZE + LOOKUP_TAU_D_SIZE)) + 4)
+                      LOOKUP_TAU_C_SIZE + LOOKUP_TAU_D_SIZE)) + 4)
 
     @property
     def n_weight_terms(self):
@@ -98,7 +93,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.
-        weight_update_component = 1 / (-((1.0/self._tau_c) + (1.0/self._tau_d)))
+        weight_update_component = \
+            1 / (-((1.0/self._tau_c) + (1.0/self._tau_d)))
         weight_update_component = \
             plasticity_helpers.float_to_fixed(weight_update_component,
                                               (1 << 11))
