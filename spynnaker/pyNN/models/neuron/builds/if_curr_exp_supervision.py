@@ -72,7 +72,7 @@ class IFCurrExpSupervision(AbstractPopulationVertex):
                 model_name="IF_curr_exp_supervision",
 
                 # the matching binary name
-                binary="IF_curr_exp_supervision.aplx")
+                binary="IF_curr_exp_supervision_stdp_mad_neuromodulated.aplx")
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
