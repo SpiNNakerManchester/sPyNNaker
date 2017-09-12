@@ -3,19 +3,10 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 
-<<<<<<< HEAD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
     abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp\
     .synapse_structure.synapse_structure_weight_accumulator \
-=======
-from data_specification.enums import DataType
-
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
->>>>>>> refs/remotes/origin/additional_synaptic_shaping
     import SynapseStructureWeightAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
@@ -209,18 +200,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def synaptic_structure(self):
         return self._synapse_structure
 
-<<<<<<< HEAD
-
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit', 
-                               'accum_dep_plus_one_excit2', 'accum_pot_minus_one_excit2', 'pre_window_tc_excit2', 'post_window_tc_excit2', 
+        return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit',
+                               'accum_dep_plus_one_excit2', 'accum_pot_minus_one_excit2', 'pre_window_tc_excit2', 'post_window_tc_excit2',
                                'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib',
                                'accum_dep_plus_one_inhib2', 'accum_pot_minus_one_inhib2', 'pre_window_tc_inhib2', 'post_window_tc_inhib2']
 
-=======
-    @overrides(AbstractTimingDependence.get_parameter_names)
-    def get_parameter_names(self):
-        return ['accumulator_depression', 'accumulator_potentiation',
-                'mean_pre_window', 'mean_post_window', 'dual_fsm']
->>>>>>> refs/remotes/origin/additional_synaptic_shaping
