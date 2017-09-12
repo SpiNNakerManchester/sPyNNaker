@@ -68,7 +68,7 @@ uint32_t *timing_initialise(address_t address) {
 
     // Copy LUTs from following memory
     address_t lut_address = maths_copy_int16_lut(
-        &address[17], STDP_FIXED_POINT_ONE, (int16_t*) &pre_exp_dist_lookup[0]);
+        &address[17], STDP_FIXED_POINT_ONE, (int16_t*) &pre_exp_dist_lookup_excit[0]);
 
     lut_address = maths_copy_int16_lut(
         lut_address, STDP_FIXED_POINT_ONE, (int16_t*) &post_exp_dist_lookup_excit[0]);
