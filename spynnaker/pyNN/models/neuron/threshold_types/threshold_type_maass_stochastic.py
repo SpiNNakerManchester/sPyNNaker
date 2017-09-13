@@ -7,7 +7,7 @@ import numpy
 from enum import Enum
 
 
-class _MASS_TYPES(Enum):
+class _MAASS_TYPES(Enum):
     DU_TH = (1, DataType.S1615)
     TAU_TH = (2, DataType.S1615)
     V_THRESH = (3, DataType.S1615)
@@ -76,13 +76,13 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._du_th_inv, _MASS_TYPES.DU_TH.data_type),
-            NeuronParameter(self._tau_th_inv, _MASS_TYPES.TAU_TH.data_type),
-            NeuronParameter(self._v_thresh, _MASS_TYPES.V_THRESH.data_type)
+            NeuronParameter(self._du_th_inv, _MAASS_TYPES.DU_TH.data_type),
+            NeuronParameter(self._tau_th_inv, _MAASS_TYPES.TAU_TH.data_type),
+            NeuronParameter(self._v_thresh, _MAASS_TYPES.V_THRESH.data_type)
         ]
 
     def get_threshold_parameter_types(self):
-        return [item.data_type for item in _MASS_TYPES]
+        return [item.data_type for item in _MAASS_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self):
         return 30
