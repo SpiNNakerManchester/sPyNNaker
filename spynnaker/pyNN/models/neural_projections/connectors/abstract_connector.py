@@ -240,9 +240,11 @@ class AbstractConnector(object):
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
                     weights, n_connections)
-                if weights.boundaries is not None:
-                    return abs(min(max_weight, max(weights.boundaries)))
-                return abs(max_weight)
+                high = utility_calls.high(weights)
+                if high is None:
+                    return abs(max_weight)
+                else:
+                    return abs(min(max_weight, high))
 
         elif numpy.isscalar(weights):
             return abs(weights)
