@@ -6,9 +6,9 @@
 //---------------------------------------
 // Plastic synapse contains normal 16-bit weight and an accumulator
 typedef struct plastic_synapse_t {
-    weight_t weight;
-
+	// See python SynapseStructureWeightRecurrentAccumulator() for datastructure
     int16_t accumulator;
+    weight_t weight;
 } plastic_synapse_t;
 
 // The update state is a weight state with 32-bit ARM-friendly version of the

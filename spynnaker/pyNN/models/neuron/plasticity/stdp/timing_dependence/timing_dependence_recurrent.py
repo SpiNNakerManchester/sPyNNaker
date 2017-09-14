@@ -6,8 +6,8 @@ from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
     abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp\
-    .synapse_structure.synapse_structure_weight_accumulator \
-    import SynapseStructureWeightAccumulator
+    .synapse_structure.synapse_structure_weight_recurrent_accumulator \
+    import SynapseStructureWeightRecurrentAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 
@@ -54,7 +54,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self.dual_fsm = dual_fsm
         self.rng = numpy.random.RandomState(seed)
 
-        self._synapse_structure = SynapseStructureWeightAccumulator()
+        self._synapse_structure = SynapseStructureWeightRecurrentAccumulator()
 
     def is_same_as(self, other):
         if (other is None) or (not isinstance(
