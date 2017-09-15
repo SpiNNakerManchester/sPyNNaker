@@ -288,6 +288,26 @@ def get_variance(dist):
     return stats.var(dist)
 
 
+def high(dist):
+    """ Gets the high or max boundry value for this distribution
+
+    Could return None
+    """
+    simulator = globals_variables.get_simulator()
+    stats = simulator.get_distribution_to_stats()[dist.name]
+    return stats.high(dist)
+
+
+def low(dist):
+    """ Gets the high or min boundry value for this distribution
+
+    Could return None
+    """
+    simulator = globals_variables.get_simulator()
+    stats = simulator.get_distribution_to_stats()[dist.name]
+    return stats.low(dist)
+
+
 def validate_mars_kiss_64_seed(seed):
     """ Update the seed to make it compatible with the rng algorithm
     """
