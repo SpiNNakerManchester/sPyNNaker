@@ -5,7 +5,7 @@
 #ifndef _ALPHA_SYNAPSE_H_
 #define _ALPHA_SYNAPSE_H_
 
-#include <neuron/decay.h>
+#include "../decay.h"
 #include <debug.h>
 
 //---------------------------------------
@@ -21,29 +21,27 @@ typedef struct synapse_param_t {
 
 	input_t dt;
 
-	input_t exc_response;
+	// buffer for linear term
+	input_t exc_lin_buff;
 
-	input_t exc_exp_response;
-	input_t exc_const_response;
-	input_t exc_t;
-	input_t exc_k;
-	input_t exc_tau_inv;
+	// buffer for exponential term
+	input_t exc_exp_buff;
+
+	// Inverse of tau
+	input_t inv_exc_tau_sqr;
+
+	// Exponential decay multiplier
 	decay_t exc_decay;
-	decay_t exc_init;
 
 
-	input_t inh_response;
-	input_t inh_exp_response;
-	input_t inh_const_response;
-	input_t inh_t;
-	input_t inh_k;
-	input_t inh_tau_inv;
+	input_t inh_lin_buff;
+	input_t inh_exp_buff;
+	input_t inv_inh_tau_sqr;
 	decay_t inh_decay;
-	decay_t inh_init;
 
 } synapse_param_t;
 
-#include <neuron/synapse_types/synapse_types.h>
+#include "synapse_types.h"
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
@@ -54,17 +52,19 @@ typedef enum input_buffer_regions {
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
 	// Excitatory
-	parameter->exc_exp_response = decay_s1615(
-			parameter->exc_exp_response,
+
+	// Update linear buffer
+	parameter->exc_lin_buff = parameter->exc_lin_buff + parameter->dt * parameter->inv_exc_tau_sqr;
+
+	// Update exponential buffer
+	parameter->exc_exp_buff = decay_s1615(
+			parameter->exc_exp_buff,
 			parameter->exc_decay);
 
-	parameter->exc_const_response =  parameter->exc_k
-					  * parameter->exc_t
-					  * parameter->exc_tau_inv;
+	log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k", parameter->exc_lin_buff, parameter->exc_exp_buff, parameter->exc_lin_buff*parameter->exc_exp_buff);
 
-	parameter->exc_response = parameter->exc_exp_response * parameter->exc_const_response;
+	//INHIBITORY
 
-	parameter->exc_t += parameter->dt;
 
 }
 
@@ -76,18 +76,16 @@ static inline void synapse_types_add_neuron_input(
         input_t input){
 
 	if (synapse_type_index == EXCITATORY) {
-		parameter->exc_exp_response = parameter->exc_exp_response + decay_s1615(
-				input,	parameter->exc_init);
-		if (input > 0.1){
-			parameter->exc_t = 0;
+
+		if (input > 0.0){
+			// Update exponential buffer
+			parameter->exc_exp_buff = parameter->exc_exp_buff * decay_s1615(
+				input,	parameter->exc_decay) + 1;
+
+			// Update linear buffer second (need t+1 value of exponential buffer)
+			parameter->exc_lin_buff = (parameter->exc_lin_buff + parameter->dt * parameter->inv_exc_tau_sqr) * (1 - 1/parameter->exc_exp_buff);
 		}
-/*		parameter->exc_const_response = parameter->exc_const_response +
-				(parameter->exc_k
-				  * parameter->exc_t
-				  * parameter->exc_tau_inv);
-		parameter->exc_response =  parameter->exc_const_response * parameter->exc_exp_response;
-		parameter->exc_t += parameter->dt;
-*/
+
 	} else if (synapse_type_index == INHIBITORY) {
 
 	}
@@ -95,12 +93,12 @@ static inline void synapse_types_add_neuron_input(
 
 static inline input_t synapse_types_get_excitatory_input(
 		synapse_param_pointer_t parameter) {
-	return parameter->exc_response;
+	return parameter->exc_lin_buff * parameter->exc_exp_buff;
 }
 
 static inline input_t synapse_types_get_inhibitory_input(
 		synapse_param_pointer_t parameter) {
-	return parameter->inh_response;
+	return parameter->inh_lin_buff * parameter->inh_exp_buff;
 }
 
 static inline const char *synapse_types_get_type_char(
@@ -118,15 +116,15 @@ static inline const char *synapse_types_get_type_char(
 static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
     io_printf(
-        IO_BUF, "%12.6k + %12.6k - %12.6k",
-        parameter->exc_response,
-        parameter->inh_response);
+        IO_BUF, "EX: %12.6k + INH: %12.6k",
+        parameter->exc_lin_buff * parameter->exc_exp_buff,
+        parameter->inh_lin_buff * parameter->inh_exp_buff);
 }
 
 static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
     log_info("-------------------------------------\n");
-	log_info("exc_response  = %11.4k\n", parameter->exc_response);
-	log_info("inh_response  = %11.4k\n", parameter->inh_response);
+	log_info("exc_response  = %11.4k\n", parameter->exc_lin_buff);
+	log_info("inh_response  = %11.4k\n", parameter->inh_lin_buff);
 }
 
 #endif // _ALPHA_SYNAPSE_H_
