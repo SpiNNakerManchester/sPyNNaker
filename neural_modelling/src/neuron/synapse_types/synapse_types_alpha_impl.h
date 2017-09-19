@@ -79,8 +79,9 @@ static inline void synapse_types_add_neuron_input(
 
 		if (input > 0.0){
 			// Update exponential buffer
-			parameter->exc_exp_buff = parameter->exc_exp_buff * decay_s1615(
-				input,	parameter->exc_decay) + 1;
+			parameter->exc_exp_buff = parameter->exc_exp_buff
+					* input + 1;
+					//decay_s1615(input,	parameter->exc_decay) + 1;
 
 			// Update linear buffer second (need t+1 value of exponential buffer)
 			parameter->exc_lin_buff = (parameter->exc_lin_buff + parameter->dt * parameter->inv_exc_tau_sqr) * (1 - 1/parameter->exc_exp_buff);
