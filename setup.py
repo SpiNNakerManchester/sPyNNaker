@@ -13,7 +13,7 @@ install_requires = [
     'SpiNNMan >= 1!4.0.0a5, < 1!5.0.0',
     'SpiNNaker_PACMAN >= 1!4.0.0a5, < 1!5.0.0',
     'SpiNNaker_DataSpecification >= 1!4.0.0a5, < 1!5.0.0',
-    'spalloc >= 0.2.2, < 1.0.0',
+    'spalloc >= v0.2.6, < 1.0.0',
     'SpiNNFrontEndCommon >= 1!4.0.0a5, < 1!5.0.0',
     'numpy', 'lxml', 'six']
 if os.environ.get('READTHEDOCS', None) != 'True':
