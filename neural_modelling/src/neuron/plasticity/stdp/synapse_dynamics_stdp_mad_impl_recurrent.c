@@ -239,7 +239,7 @@ bool synapse_dynamics_process_plastic_synapses(
     event_history->prev_trace = timing_add_pre_spike_sd(time, last_pre_time,
                                                      last_pre_trace, syn_type);
 
-    update_state_t current_state = synapse_structure_get_update_state(*plastic_words, 0);
+    //update_state_t current_state = synapse_structure_get_update_state(*plastic_words, 0);
     //setup_params_sd(current_state);
 
     // Loop through plastic synapses
@@ -259,7 +259,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         //log_info("D:%d A:%d", delay_dendritic, delay_axonal);
         // Create update state from the plastic synaptic word
-        current_state = synapse_structure_get_update_state(*plastic_words, type);
+        update_state_t current_state = synapse_structure_get_update_state(*plastic_words, type);
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
