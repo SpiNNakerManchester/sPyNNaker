@@ -33,3 +33,13 @@ class AbstractRandomStats(object):
     def var(self, dist):
         """ Return the variance of the distribution
         """
+
+    @abstractmethod
+    def high(self, dist):
+        """ Return the variance of the distribution
+        """
+
+    @abstractmethod
+    def low(self, dist):
+        """ Return the variance of the distribution
+        """
