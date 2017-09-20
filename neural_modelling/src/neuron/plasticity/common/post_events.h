@@ -18,12 +18,9 @@
 //---------------------------------------
 typedef struct {
     uint32_t count_minus_one;
-
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
     post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
-    uint32_t last_dopamine_spike_time;
-    int16_t last_neuromodulator_trace; // Trace (Updated on pre-spikes)
-    int16_t neuromodulator_level;      // Real time neuromodulator level
+    uint32_t dopamine_trace_markers;
 } post_event_history_t;
 
 typedef struct {
@@ -58,9 +55,6 @@ static inline post_event_history_t *post_events_init_buffers(
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
-        post_event_history[n].last_dopamine_spike_time = 0;
-        post_event_history[n].last_neuromodulator_trace = 0;
-        post_event_history[n].neuromodulator_level = 0;
     }
 
     return post_event_history;

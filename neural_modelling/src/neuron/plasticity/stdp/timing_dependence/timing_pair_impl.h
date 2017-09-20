@@ -67,7 +67,7 @@ static inline post_trace_t timing_add_post_spike(
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
-    // Decay previous o1 and o2 traces
+    // Decay previous post trace
     int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace.stdp_post_trace,
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
@@ -77,9 +77,15 @@ static inline post_trace_t timing_add_post_spike(
 
     log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
 
+    // Decay previous dopamine trace
+    int32_t new_dopamine_trace = STDP_FIXED_MUL_16X16(last_trace.dopamine,
+            DECAY_LOOKUP_TAU_D(delta_time));
+
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) { .stdp_post_trace = new_o1_trace, .dopamine = 0 };
+    return (post_trace_t) { .stdp_post_trace = new_o1_trace,
+                            .dopamine = new_dopamine_trace,
+                            .is_not_dopamine = true };
 }
 
 //---------------------------------------
