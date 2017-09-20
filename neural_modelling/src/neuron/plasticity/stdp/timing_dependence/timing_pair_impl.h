@@ -84,8 +84,7 @@ static inline post_trace_t timing_add_post_spike(
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
     return (post_trace_t) { .stdp_post_trace = new_o1_trace,
-                            .dopamine = new_dopamine_trace,
-                            .is_not_dopamine = true };
+                            .dopamine = new_dopamine_trace };
 }
 
 //---------------------------------------

@@ -29,6 +29,7 @@ typedef struct {
     const post_trace_t *next_trace;
     const uint32_t *next_time;
     uint32_t num_events;
+    uint32_t dopamine_trace_markers;
 } post_event_window_t;
 
 //---------------------------------------
@@ -55,6 +56,7 @@ static inline post_event_history_t *post_events_init_buffers(
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
+        post_event_history[n].dopamine_trace_markers = 0x00000000;
     }
 
     return post_event_history;
@@ -105,12 +107,19 @@ static inline post_event_window_t post_events_get_window_delayed(
     const uint32_t *end_event_time = events->times + count;
     const uint32_t *event_time = end_event_time;
 
+    uint32_t dopamine_trace_markers = events -> dopamine_trace_markers;
+    uint32_t dopamine_trace_markers_window = 0;
+
     post_event_window_t window;
     do {
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
+
+        dopamine_trace_markers_window |= dopamine_trace_markers & 0x1;
+        dopamine_trace_markers_window <<= 1;
+        dopamine_trace_markers >>= 1;
 
         // If this event is still in the future, set it as the end
         if (*event_time > end_time) {
@@ -132,6 +141,7 @@ static inline post_event_window_t post_events_get_window_delayed(
     const post_trace_t *end_event_trace = events->traces + count;
     window.next_trace = (end_event_trace - window.num_events);
     window.prev_trace = *(window.next_trace - 1);
+    window.dopamine_trace_markers = dopamine_trace_markers_window;
 
     // Return window
     return window;
@@ -162,12 +172,18 @@ static inline post_event_window_t post_events_next_delayed(
 
     // Decrement remaining events
     window.num_events--;
+    window.dopamine_trace_markers >>= 1;
     return window;
+}
+
+static inline bool post_events_next_is_dopamine(
+        post_event_window_t window) {
+    return (window.dopamine_trace_markers & 0x1) != 0x0;
 }
 
 //---------------------------------------
 static inline void post_events_add(uint32_t time, post_event_history_t *events,
-                                   post_trace_t trace) {
+                                   post_trace_t trace, bool dopamine) {
 
     if (events->count_minus_one < (MAX_POST_SYNAPTIC_EVENTS - 1)) {
 
@@ -189,6 +205,12 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
         events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
     }
+    if (dopamine)
+        events->dopamine_trace_markers =
+           (events->dopamine_trace_markers << 1) | 0x1;
+    else
+        events->dopamine_trace_markers =
+           (events->dopamine_trace_markers << 1);
 }
 
 #endif  // _POST_EVENTS_H_

@@ -87,16 +87,18 @@ static inline post_trace_t add_dopamine_spike(
 
     // Return decayed dopamine trace
     return (post_trace_t) { .stdp_post_trace = decayed_last_post_trace,
-                            .dopamine = new_trace,
-                            .is_not_dopamine = false };
+                            .dopamine = new_trace };
 }
 
 static inline void correlation_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, int32_t last_dopamine_trace,
-        uint32_t last_update_time, plastic_synapse_t *previous_state) {
+        uint32_t last_update_time, plastic_synapse_t *previous_state,
+        bool dopamine) {
 
     use(&trace);
+
+    printf("Applying post spike");
 
     // Calculate EXP components in JK's weight update equation
     int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
@@ -127,7 +129,7 @@ static inline void correlation_apply_post_spike(
     }
 
     // Update eligibility trace if this spike is non-dopamine spike
-    if (trace.is_not_dopamine) {
+    if (!dopamine) {
         // Decay eligibility trace
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state -> eligibility_trace, decay_eligibility_trace);
@@ -146,7 +148,7 @@ static inline void correlation_apply_post_spike(
 static inline void correlation_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_post_time,
         post_trace_t last_post_trace, int32_t last_dopamine_trace,
-        plastic_synapse_t *previous_state) {
+        plastic_synapse_t *previous_state, bool dopamine) {
 
     use(&trace);
     use(&last_post_trace);
@@ -177,7 +179,7 @@ static inline void correlation_apply_pre_spike(
     }
 
     // Update eligibility trace if this spike is non-dopamine spike
-    if (last_post_trace.is_not_dopamine) {
+    if (!dopamine) {
         // Decay eligibility trace
         int32_t decayed_eligibility_trace = STDP_FIXED_MUL_16X16(
             previous_state -> eligibility_trace, decay_eligibility_trace);
@@ -221,16 +223,19 @@ static inline plastic_synapse_t plasticity_update_synapse(
     int32_t last_dopamine_trace = STDP_FIXED_MUL_16X16(
             post_window.prev_trace.dopamine,
             DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time));
+    bool next_trace_is_dopamine = false;
 
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time =
             *post_window.next_time + delay_dendritic;
+        next_trace_is_dopamine = post_events_next_is_dopamine(post_window);
 
         correlation_apply_post_spike(
             delayed_post_time, *post_window.next_trace,
             delayed_last_pre_time, last_pre_trace,
             last_dopamine_trace,
-            prev_corr_time, current_state);
+            prev_corr_time, current_state,
+            next_trace_is_dopamine);
 
         // Update previous correlation to point to this post-event
         prev_corr_time = delayed_post_time;
@@ -250,7 +255,8 @@ static inline plastic_synapse_t plasticity_update_synapse(
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
         prev_corr_time, post_window.prev_trace,
-        last_dopamine_trace, current_state);
+        last_dopamine_trace, current_state,
+        next_trace_is_dopamine);
 
     return *current_state;
 }
@@ -316,7 +322,7 @@ void synapse_dynamics_process_post_synaptic_event(
     const post_trace_t last_post_trace =
         history->traces[history->count_minus_one];
     post_events_add(time, history, timing_add_post_spike(time, last_post_time,
-                                                         last_post_trace));
+                                                     last_post_trace), false);
 }
 
 //--------------------------------------
@@ -334,7 +340,7 @@ void synapse_dynamics_process_neuromodulator_event(
 
     // Update neuromodulator level reaching this post synaptic neuron
     post_events_add(time, history, add_dopamine_spike(time,
-        concentration, last_post_time, last_post_trace));
+        concentration, last_post_time, last_post_trace), true);
 }
 
 //---------------------------------------
