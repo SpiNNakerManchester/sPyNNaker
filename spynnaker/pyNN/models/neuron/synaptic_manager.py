@@ -98,6 +98,9 @@ class SynapticManager(object):
         self._one_to_one_connection_dtcm_max_bytes = config.getint(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
+        # TODO: Hard-coded to 0 to disable as currently broken!
+        self._one_to_one_connection_dtcm_max_bytes = 0
+
     @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
