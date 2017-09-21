@@ -98,15 +98,11 @@ static inline void correlation_apply_post_spike(
 
     use(&trace);
 
-    printf("Applying post spike");
-
     // Calculate EXP components in JK's weight update equation
     int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
         time - last_update_time);
     int32_t decay_dopamine_trace = DECAY_LOOKUP_TAU_D(
         time - last_update_time);
-
-    printf("%x \n", last_dopamine_trace);
 
     // Evaluate weight function
     uint32_t weight_change = STDP_FIXED_MUL_16X16(
