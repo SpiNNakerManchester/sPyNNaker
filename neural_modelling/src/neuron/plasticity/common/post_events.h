@@ -117,10 +117,6 @@ static inline post_event_window_t post_events_get_window_delayed(
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
 
-        dopamine_trace_markers_window |= dopamine_trace_markers & 0x1;
-        dopamine_trace_markers_window <<= 1;
-        dopamine_trace_markers >>= 1;
-
         // If this event is still in the future, set it as the end
         if (*event_time > end_time) {
             end_event_time = event_time;
@@ -136,6 +132,9 @@ static inline post_event_window_t post_events_get_window_delayed(
 
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
+
+    dopamine_trace_markers_window =
+      (events -> dopamine_trace_markers >> (window.next_time - events->times));
 
     // Using num_events, find next and previous traces
     const post_trace_t *end_event_trace = events->traces + count;
@@ -192,6 +191,13 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         const uint32_t new_index = ++events->count_minus_one;
         events->times[new_index] = time;
         events->traces[new_index] = trace;
+
+        if(dopamine) {
+            events->dopamine_trace_markers |= (1 << new_index);
+        }
+        else {
+            events->dopamine_trace_markers &= ~(1 << new_index);
+        }
     } else {
 
         // Otherwise Shuffle down elements
@@ -204,13 +210,16 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         // Stick new time at end
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
         events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
+
+        if(dopamine) {
+            events->dopamine_trace_markers |=
+                (1 << (MAX_POST_SYNAPTIC_EVENTS - 1));
+        }
+        else {
+            events->dopamine_trace_markers &=
+                ~(1 << (MAX_POST_SYNAPTIC_EVENTS - 1));
+        }
     }
-    if (dopamine)
-        events->dopamine_trace_markers =
-           (events->dopamine_trace_markers << 1) | 0x1;
-    else
-        events->dopamine_trace_markers =
-           (events->dopamine_trace_markers << 1);
 }
 
 #endif  // _POST_EVENTS_H_
