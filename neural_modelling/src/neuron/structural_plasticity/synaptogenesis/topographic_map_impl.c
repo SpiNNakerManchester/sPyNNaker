@@ -390,6 +390,9 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     // Does the neuron exist in the row?
     bool search_hit = search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
 
+    // TODO Change this so that there's a decision between between creation and deletion
+    // TODO based on the current number of existing vs open potential synaptic locations
+
     if (!zero_elements && search_hit) {
 
         synaptogenesis_dynamics_elimination_rule();
