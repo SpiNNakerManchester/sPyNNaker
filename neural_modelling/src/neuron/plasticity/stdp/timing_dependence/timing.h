@@ -23,4 +23,11 @@ static update_state_t timing_apply_post_spike(
     pre_trace_t last_pre_trace, uint32_t last_post_time,
     post_trace_t last_post_trace, update_state_t previous_state);
 
+static inline int32_t get_post_trace(int32_t trace);
+
+static inline int32_t get_dopamine_trace(int32_t trace);
+
+static inline int32_t trace_build(int32_t post_trace, int32_t dopamine_trace);
+
+
 #endif // _TIMING_H_
