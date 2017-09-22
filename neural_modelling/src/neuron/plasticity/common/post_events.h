@@ -107,9 +107,6 @@ static inline post_event_window_t post_events_get_window_delayed(
     const uint32_t *end_event_time = events->times + count;
     const uint32_t *event_time = end_event_time;
 
-    uint32_t dopamine_trace_markers = events -> dopamine_trace_markers;
-    uint32_t dopamine_trace_markers_window = 0;
-
     post_event_window_t window;
     do {
         // Cache pointer to this event as potential
@@ -133,14 +130,12 @@ static inline post_event_window_t post_events_get_window_delayed(
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
 
-    dopamine_trace_markers_window =
-      (events -> dopamine_trace_markers >> (window.next_time - events->times));
-
     // Using num_events, find next and previous traces
     const post_trace_t *end_event_trace = events->traces + count;
     window.next_trace = (end_event_trace - window.num_events);
     window.prev_trace = *(window.next_trace - 1);
-    window.dopamine_trace_markers = dopamine_trace_markers_window;
+    window.dopamine_trace_markers = (events -> dopamine_trace_markers
+                                     >> (window.next_time - events->times));
 
     // Return window
     return window;
@@ -206,6 +201,7 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
             events->times[e - 1] = events->times[e];
             events->traces[e - 1] = events->traces[e];
         }
+        events->dopamine_trace_markers >>= 1;
 
         // Stick new time at end
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
