@@ -4,10 +4,7 @@
 //---------------------------------------
 // Typedefines
 //---------------------------------------
-typedef struct {
-  int16_t stdp_post_trace;
-  int16_t dopamine;
-} post_trace_t;
+typedef int32_t post_trace_t;
 typedef int16_t pre_trace_t;
 
 #include "../synapse_structure/synapse_structure_weight_impl.h"
@@ -57,7 +54,7 @@ extern int16_t tau_d_lookup[TAU_PLUS_SIZE];
 // Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace() {
-    return (post_trace_t) {.stdp_post_trace = 0, .dopamine = 0};
+    return (post_trace_t)0x0;
 }
 
 //---------------------------------------
@@ -68,7 +65,7 @@ static inline post_trace_t timing_add_post_spike(
     uint32_t delta_time = time - last_time;
 
     // Decay previous post trace
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace.stdp_post_trace,
+    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(get_post_trace(last_trace),
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
@@ -78,13 +75,25 @@ static inline post_trace_t timing_add_post_spike(
     log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
 
     // Decay previous dopamine trace
-    int32_t new_dopamine_trace = STDP_FIXED_MUL_16X16(last_trace.dopamine,
+    int32_t new_dopamine_trace = STDP_FIXED_MUL_16X16(get_dopamine_trace(last_trace),
             DECAY_LOOKUP_TAU_D(delta_time));
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) { .stdp_post_trace = new_o1_trace,
-                            .dopamine = new_dopamine_trace };
+    return (post_trace_t) trace_build(new_o1_trace, new_dopamine_trace);
+}
+
+// Trace get and set helper funtions
+static inline int32_t get_post_trace(int32_t trace) {
+    return (trace >> 16);
+}
+
+static inline int32_t get_dopamine_trace(int32_t trace) {
+    return (trace & 0xFFFF);
+}
+
+static inline int32_t trace_build(int32_t post_trace, int32_t dopamine_trace) {
+    return (post_trace << 16 | dopamine_trace);
 }
 
 //---------------------------------------

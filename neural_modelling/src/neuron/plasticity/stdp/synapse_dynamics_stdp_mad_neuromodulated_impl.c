@@ -74,7 +74,7 @@ static inline post_trace_t add_dopamine_spike(
     uint32_t delta_time = time - last_post_time;
 
     // Apply exponential decay to get the current value
-    int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace.dopamine,
+    int32_t decayed_trace = STDP_FIXED_MUL_16X16(get_post_trace(last_trace),
             DECAY_LOOKUP_TAU_D(delta_time));
 
     // Increase dopamine level due to new spike
@@ -82,12 +82,11 @@ static inline post_trace_t add_dopamine_spike(
 
     // Decay previous post trace
     int32_t decayed_last_post_trace = STDP_FIXED_MUL_16X16(
-            last_trace.stdp_post_trace,
+            get_post_trace(last_trace),
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Return decayed dopamine trace
-    return (post_trace_t) { .stdp_post_trace = decayed_last_post_trace,
-                            .dopamine = new_trace };
+    return (post_trace_t) trace_build(decayed_last_post_trace, new_trace);
 }
 
 static inline void correlation_apply_post_spike(
@@ -184,7 +183,7 @@ static inline void correlation_apply_pre_spike(
         uint32_t time_since_last_post = time - last_post_time;
         if (time_since_last_post > 0) {
             int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-                last_post_trace.stdp_post_trace,
+                get_post_trace(last_post_trace),
                 DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
             decayed_eligibility_trace -= decayed_r1;
             if (decayed_eligibility_trace < 0) {
@@ -217,7 +216,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
     int32_t last_dopamine_trace = STDP_FIXED_MUL_16X16(
-            post_window.prev_trace.dopamine,
+            get_dopamine_trace(post_window.prev_trace),
             DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time));
     bool next_trace_is_dopamine = false;
 
@@ -235,7 +234,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
 
         // Update previous correlation to point to this post-event
         prev_corr_time = delayed_post_time;
-        last_dopamine_trace = post_window.next_trace -> dopamine;
+        last_dopamine_trace = get_dopamine_trace(*post_window.next_trace);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
