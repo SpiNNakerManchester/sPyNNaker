@@ -340,7 +340,7 @@ void synapse_dynamics_process_neuromodulator_event(
 }
 
 //---------------------------------------
-void synapse_dynamics_process_plastic_synapses(address_t plastic,
+bool synapse_dynamics_process_plastic_synapses(address_t plastic,
          address_t fixed, weight_t *ring_buffer, uint32_t time) {
 
     // Extract seperate arrays of plastic synapses (from plastic region),
