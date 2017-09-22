@@ -40,7 +40,7 @@ class ExternalDeviceLifControl(
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': 0.0, 'v_reset': 0.0,
         'tau_syn_E': 5.0, 'tau_syn_I': 5.0, 'tau_refrac': 0.1, 'i_offset': 0,
-        'initial_input_inh': 0, 'initial_input_exc': 0}
+        'isyn_exc': 0.0, 'isyn_inh': 0.0}
 
     none_pynn_default_parameters = {'v_init': None}
 
@@ -71,8 +71,8 @@ class ExternalDeviceLifControl(
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
             v_init=none_pynn_default_parameters['v_init'],
-            initial_input_inh=default_parameters['initial_input_inh'],
-            initial_input_exc=default_parameters['initial_input_exc']
+            isyn_inh=default_parameters['isyn_inh'],
+            isyn_exc=default_parameters['isyn_exc']
     ):
         """
 
@@ -112,8 +112,8 @@ class ExternalDeviceLifControl(
             v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
             n_neurons, tau_syn_E, tau_syn_I,
-            initial_input_inh=initial_input_inh,
-            initial_input_exc=initial_input_exc)
+            initial_input_inh=isyn_inh,
+            initial_input_exc=isyn_exc)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeMulticastDeviceControl(devices)
 
