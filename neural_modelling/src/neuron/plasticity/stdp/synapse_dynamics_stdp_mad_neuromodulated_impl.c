@@ -235,7 +235,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
     int32_t last_dopamine_trace = __smulbb(post_window.prev_trace, 
-            DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time))
+            DECAY_LOOKUP_TAU_D(post_window.prev_time - delayed_last_pre_time))
             >> STDP_FIXED_POINT;
     bool next_trace_is_dopamine = false;
 
@@ -260,12 +260,13 @@ static inline plastic_synapse_t plasticity_update_synapse(
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
-
+/*
     // Decay dopamine trace to current time
     last_dopamine_trace = __smulbb(
         last_dopamine_trace,
-        DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time))
+        DECAY_LOOKUP_TAU_D(delayed_pre_time - post_window.prev_time))
         >> STDP_FIXED_POINT;
+*/
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
