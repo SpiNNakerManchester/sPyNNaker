@@ -187,7 +187,7 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         events->times[new_index] = time;
         events->traces[new_index] = trace;
 
-        if(dopamine) {
+        if (dopamine) {
             events->dopamine_trace_markers |= (1 << new_index);
         }
         else {
@@ -207,7 +207,7 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
         events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
 
-        if(dopamine) {
+        if (dopamine) {
             events->dopamine_trace_markers |=
                 (1 << (MAX_POST_SYNAPTIC_EVENTS - 1));
         }

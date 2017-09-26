@@ -234,7 +234,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
 
     // Process events in post-synaptic window
     uint32_t prev_corr_time = delayed_last_pre_time;
-    int32_t last_dopamine_trace = __smulbb(post_window.prev_trace, 
+    int32_t last_dopamine_trace = __smulbb(post_window.prev_trace,
             DECAY_LOOKUP_TAU_D(delayed_last_pre_time - post_window.prev_time))
             >> STDP_FIXED_POINT;
     bool next_trace_is_dopamine = false;
