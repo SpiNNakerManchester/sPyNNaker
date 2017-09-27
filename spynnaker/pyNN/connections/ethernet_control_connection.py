@@ -4,8 +4,10 @@ from spinnman.connections.udp_packet_connections import EIEIOConnection
 from spinnman.messages.eieio.data_messages \
     import EIEIODataMessage, KeyDataElement, KeyPayloadDataElement
 
+import logging
 from threading import Thread
-import traceback
+
+logger = logging.getLogger(__name__)
 
 
 class EthernetControlConnection(EIEIOConnection, Thread):
@@ -47,7 +49,7 @@ class EthernetControlConnection(EIEIOConnection, Thread):
 
         except Exception:
             if self._running:
-                traceback.print_exc()
+                logger.error("failure processing EIEIO message", exc_info=True)
 
     def close(self):
         """ Close the connection
