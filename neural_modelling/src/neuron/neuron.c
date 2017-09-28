@@ -281,6 +281,10 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     _print_neuron_parameters();
 
+    log_info("set pointer to neuron array in STDP code");
+    synapse_dynamics_stdp_mad_set_neuron_array(neuron_array);
+
+
     return true;
 }
 

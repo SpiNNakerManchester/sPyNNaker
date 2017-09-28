@@ -47,3 +47,7 @@ void synapse_dynamics_print_plastic_synapses(
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
+
+void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t *neuron_array){
+	use(neuron_array);
+}
