@@ -14,6 +14,7 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_mad_recurrent_dual_fsm_multiplicative \
          IF_curr_exp_stdp_mad_vogels_2011_additive \
          IF_curr_delta \
+         IF_curr_exp_stdp_mad_pre_only_fusi \
          IF_curr_exp_ca2_adaptive \
          IF_curr_exp_stdp_nearest_pair_additive \
          IF_curr_exp_stdp_nearest_pair_multiplicative \
