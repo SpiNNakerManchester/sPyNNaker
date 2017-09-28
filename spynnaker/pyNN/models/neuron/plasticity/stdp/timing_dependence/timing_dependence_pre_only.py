@@ -1,4 +1,5 @@
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -17,11 +18,11 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependencePreOnly(AbstractTimingDependence):
 
-    def __init__(self, A_plus=.01, A_minus=.01, th_v_mem = -55.0  ):
+    def __init__(self, A_plus=0.01, A_minus=0.01, th_v_mem = -55.0  ):
         AbstractTimingDependence.__init__(self)
-        self.A_plus = A_plus
-        self.A_minus = A_minus
-        self.th_v_mem = th_v_mem
+        self._A_plus = A_plus
+        self._A_minus = A_minus
+        self._th_v_mem = th_v_mem
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -31,15 +32,15 @@ class TimingDependencePreOnly(AbstractTimingDependence):
 
     @property
     def A_plus(self):
-        return self.A_plus
+        return self._A_plus
 
     @property
     def A_minus(self):
-        return self.A_minus
+        return self._A_minus
 
     @property
     def th_v_mem(self):
-        return self.th_v_mem
+        return self._th_v_mem
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):

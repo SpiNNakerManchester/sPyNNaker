@@ -41,7 +41,7 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 //extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 //extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-
+REAL th_v_mem;
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
@@ -105,6 +105,15 @@ static inline update_state_t timing_apply_pre_spike(
     use(last_pre_time);
     use(&last_pre_trace);
 
+    if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem){
+    	log_info("above_threshold");
+    	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);
+
+    } else {
+    	log_info("below threshold");
+    	return weight_one_term_apply_depression(previous_state, last_pre_trace);
+
+    }
     // get V_post(t_pre)
     // get Ca_post(t_pre)
     // get A+, A-
@@ -115,7 +124,7 @@ static inline update_state_t timing_apply_pre_spike(
 
     // missing params: th_v, up range, down range, th_w (drifts), 2 drift rates
 
-    return previous_state;
+//    return previous_state;
 }
 
 //---------------------------------------

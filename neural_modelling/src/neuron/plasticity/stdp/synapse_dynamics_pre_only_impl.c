@@ -71,6 +71,36 @@ post_event_history_t *post_event_history;
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
+
+
+// Helper function to perform update based only on pre-spike
+final_state_t _update_on_pre_only(
+		uint32_t time,
+		const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
+		const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
+		const uint32_t delay_axonal, update_state_t current_state,
+		const post_event_history_t *post_event_history,
+		neuron_pointer_t post_synaptic_neuron) {
+
+	// Apply axonal delay to time of last presynaptic spike
+	    const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
+
+    const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
+        (delayed_last_pre_time - delay_dendritic) : 0;
+    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
+	post_event_window_t post_window = post_events_get_window_delayed(
+	            post_event_history, window_begin_time, window_end_time);
+
+	// for Fusi rule call weight_apply_potentiation and weight_apply_depression based on
+	// post-synaptic neuron voltage
+	current_state = timing_apply_pre_spike(
+	        time, new_pre_trace, last_pre_time, last_pre_trace,
+	        post_window.prev_time, post_window.prev_trace, current_state,
+			post_synaptic_neuron);
+
+	return synapse_structure_get_final_state(current_state);
+}
+
 static inline final_state_t _plasticity_update_synapse(
         uint32_t time,
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
@@ -265,20 +295,27 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
+        //neuron_pointer_t neuron = neuron_array_stdp;
+        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(neuron));
 
 
+        final_state_t final_state = _update_on_pre_only(time, last_pre_time,
+        		last_pre_trace, event_history->prev_trace,
+                delay_dendritic, delay_axonal, current_state,
+                &post_event_history[index], neuron);
+
+
+        /*
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
             &post_event_history[index]);
+        */
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 delay_axonal + delay_dendritic + time, type_index);
-
-        //neuron_pointer_t neuron = neuron_array_stdp;
-        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(neuron));
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
@@ -294,33 +331,6 @@ bool synapse_dynamics_process_plastic_synapses(
 }
 
 
-// Helper function to perform update based only on pre-spike
-final_state_t _update_on_pre_only(
-		uint32_t time,
-		const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
-		const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
-		const uint32_t delay_axonal, update_state_t current_state,
-		const post_event_history_t *post_event_history,
-		neuron_pointer_t post_synaptic_neuron) {
-
-	// Apply axonal delay to time of last presynaptic spike
-	    const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
-
-    const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
-        (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
-	post_event_window_t post_window = post_events_get_window_delayed(
-	            post_event_history, window_begin_time, window_end_time);
-
-	// for Fusi rule call weight_apply_potentiation and weight_apply_depression based on
-	// post-synaptic neuron voltage
-	current_state = timing_apply_pre_spike(
-	        time, new_pre_trace, last_pre_time, last_pre_trace,
-	        post_window.prev_time, post_window.prev_trace, current_state,
-			post_synaptic_neuron);
-
-	return synapse_structure_get_final_state(current_state);
-}
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
