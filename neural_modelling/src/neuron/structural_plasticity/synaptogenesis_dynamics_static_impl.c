@@ -30,3 +30,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
 int32_t get_p_rew() {
     return -1;
 }
+
+bool is_fast() {
+    return false;
+}

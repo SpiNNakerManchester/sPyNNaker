@@ -16,6 +16,9 @@ void synaptic_row_restructure();
 
 int32_t get_p_rew();
 
+bool is_fast();
+
+
 //bool record_this_timestep = false;
 //int recording_channel;
 //static void record_rewiring(int rewiring_recording_channel) {

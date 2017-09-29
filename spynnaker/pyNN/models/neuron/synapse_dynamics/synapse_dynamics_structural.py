@@ -1,4 +1,5 @@
 import numpy as np
+import collections
 
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -41,7 +42,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._grid = np.asarray(grid, dtype=int)
         self._connections = {}
 
-        self.fudge_factor = 1.5
+        self.fudge_factor = 1.3
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(
@@ -132,8 +133,21 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 SYNAPSE_DYNAMICS.value:
             spec.switch_write_focus(region)
 
-        spec.write_value(data=int(self._p_rew * machine_time_step),
-                         data_type=DataType.INT32)
+        if self._p_rew * 1000. < machine_time_step / 1000.:
+            # Fast rewiring
+            spec.write_value(data=1)
+            spec.write_value(
+                data=int(machine_time_step / (self._p_rew * 10 ** 6)),
+                data_type=DataType.INT32)
+        else:
+            # Slow rewiring
+            spec.write_value(data=0)
+            spec.write_value(
+                data=int((self._p_rew * 10 ** 6) / float(machine_time_step)),
+                data_type=DataType.INT32)
+
+        # TODO when implementing inhibitory connections add another
+        # spec.write_value here multiplied by weight_scale[1]
         spec.write_value(data=int(round(self._weight * weight_scales[0])),
                          data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
@@ -160,7 +174,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             spec.write_value(data=seed)
 
         # Compute the max number of presynaptic subpopulations
-        population_to_subpopulation_information = {}
+        population_to_subpopulation_information = collections.OrderedDict()
 
         # Can figure out the presynaptic subvertices (machine vertices)
         # for the current machine vertex
@@ -171,7 +185,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         presynaptic_machine_vertices = []
         structural_application_edges = []
         structural_machine_edges = []
-        no_pre_populations = 0
         max_subpartitions = 0
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
@@ -246,7 +259,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     subpopulation_list) > 0 else 0,
                 data_type=DataType.INT32)
             words_written = 2
-            # TODO Ensure the following values are written in ascending
+            # Ensure the following values are written in ascending
             # order of low_atom (implicit)
             dt = np.dtype(
                 [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int')])
@@ -285,13 +298,58 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         if self._connections[post_slice.lo_atom] is not None:
             for row in self._connections[post_slice.lo_atom]:
-                if row.size > 0:
-                    for source, target, weight, delay, syn_type in row:
+                if row[0].size > 0:
+                    for source, target, weight, delay, syn_type in row[0]:
                         synaptic_capacity[target - post_slice.lo_atom] += 1
 
         spec.write_array(synaptic_capacity)
         total_words_written += synaptic_capacity.size
 
+        # Setting up Post to Pre table
+        post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
+                                    dtype=np.int32) * -1
+        for row in self._connections[post_slice.lo_atom]:
+            if row[0].size > 0:
+                for source, target, weight, delay, syn_type in row[0]:
+                    # Select pre vertex
+                    pre_vertex_slice = graph_mapper._slice_by_machine_vertex[
+                        row[2].pre_vertex]
+                    pre_vertex_id = source - pre_vertex_slice.lo_atom
+                    masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
+                    # Select population index
+                    pop_index = population_to_subpopulation_information.keys().index(
+                        row[1].pre_vertex)
+                    masked_pop_index = pop_index & (2 ** 9 - 1)
+                    # Select subpopulation index
+                    dt = np.dtype(
+                        [('key', 'int'), ('n_atoms', 'int'),
+                         ('lo_atom', 'int')])
+                    structured_array = np.array(
+                        population_to_subpopulation_information[
+                            row[1].pre_vertex], dtype=dt)
+                    sorted_info_list = np.sort(structured_array,
+                                               order='lo_atom')
+                    # find index where lo_atom equals the one in pre_vertex_slice
+                    subpop_index = np.argwhere(sorted_info_list[
+                                                   'lo_atom'] == pre_vertex_slice.lo_atom).ravel()[
+                        0]
+                    masked_sub_pop_index = subpop_index & (2 ** 9 - 1)
+                    # identifier combines the vertex, pop and subpop
+                    # into 1 x 32 bit word
+                    identifier = (masked_pop_index << (32 - 8)) | (
+                    masked_sub_pop_index << 16) | masked_pre_vertex_id
+                    try:
+                        synaptic_entry = np.argmax(post_to_pre_table[
+                                                       target - post_slice.lo_atom] == -1).ravel()[
+                            0]
+                    except:
+                        break
+                    post_to_pre_table[
+                        target - post_slice.lo_atom, synaptic_entry] = identifier
+
+        spec.write_array(post_to_pre_table.ravel())
+
+        total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
             machine_vertex] = 4 * 16 + 4 * total_words_written
 
@@ -308,6 +366,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                                             in_edges=None):
         structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
         structure_size += n_neurons * 2  # synaptic capacity table
+        post_to_pre_table_size = n_neurons * self._s_max * 4
+        structure_size += post_to_pre_table_size
+
         self.structure_size = structure_size
         initial_size = self.super.get_parameters_sdram_usage_in_bytes(
             n_neurons, n_synapse_types)
@@ -337,10 +398,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_plastic_synaptic_data(self, connections, connection_row_indices,
                                   n_rows, post_vertex_slice,
-                                  n_synapse_types):
+                                  n_synapse_types, app_edge, machine_edge):
         if not post_vertex_slice.lo_atom in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
-        self._connections[post_vertex_slice.lo_atom].append(connections)
+        self._connections[post_vertex_slice.lo_atom].append(
+            (connections, app_edge, machine_edge))
         if isinstance(self.super, AbstractPlasticSynapseDynamics):
             return self.super.get_plastic_synaptic_data(connections,
                                                         connection_row_indices,
@@ -356,10 +418,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_static_synaptic_data(self, connections, connection_row_indices,
                                  n_rows, post_vertex_slice,
-                                 n_synapse_types):
+                                 n_synapse_types, app_edge, machine_edge):
         if not post_vertex_slice.lo_atom in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
-        self._connections[post_vertex_slice.lo_atom].append(connections)
+        self._connections[post_vertex_slice.lo_atom].append(
+            (connections, app_edge, machine_edge))
         return self.super.get_static_synaptic_data(connections,
                                                    connection_row_indices,
                                                    n_rows, post_vertex_slice,

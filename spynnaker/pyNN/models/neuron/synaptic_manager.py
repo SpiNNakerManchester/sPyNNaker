@@ -641,7 +641,8 @@ class SynapticManager(object):
                             post_slices, post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge.n_delay_stages,
                             self._population_table_type, n_synapse_types,
-                            weight_scales, machine_time_step)
+                            weight_scales, machine_time_step,
+                            app_edge, machine_edge)
 
                     if app_edge.delay_edge is not None:
                         app_edge.delay_edge.pre_vertex.add_delays(
