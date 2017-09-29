@@ -68,7 +68,7 @@ weight_state_t weight_state;
 // post trace.
 static inline post_trace_t add_dopamine_spike(
         uint32_t time, int32_t concentration, uint32_t last_post_time,
-        post_trace_t last_trace) {
+        post_trace_t last_trace, uint32_t synapse_type) {
 
     // Get time since last dopamine spike
     uint32_t delta_time = time - last_post_time;
@@ -76,6 +76,16 @@ static inline post_trace_t add_dopamine_spike(
     // Apply exponential decay to get the current value
     int32_t decayed_trace = __smulbb(last_trace,
             DECAY_LOOKUP_TAU_D(delta_time)) >> STDP_FIXED_POINT;
+
+    // Put concentration in STDP fixed-point format
+    weight_state_t weight_state = weight_get_initial(
+        concentration, synapse_type);
+    if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT)
+        concentration >>=
+           (weight_state.weight_multiply_right_shift - STDP_FIXED_POINT);
+    else
+        concentration <<=
+           (STDP_FIXED_POINT - weight_state.weight_multiply_right_shift);
 
     // Increase dopamine level due to new spike
     int32_t new_trace = decayed_trace + concentration;
@@ -340,7 +350,8 @@ void synapse_dynamics_process_post_synaptic_event(
 
 //--------------------------------------
 void synapse_dynamics_process_neuromodulator_event(
-        uint32_t time, int32_t concentration, uint32_t neuron_index) {
+        uint32_t time, int32_t concentration, uint32_t neuron_index,
+        uint32_t synapse_type) {
     log_debug(
         "Adding neuromodulation event to trace at time:%u concentration:%d",
         time, concentration);
@@ -353,7 +364,7 @@ void synapse_dynamics_process_neuromodulator_event(
 
     // Update neuromodulator level reaching this post synaptic neuron
     post_events_add(time, history, add_dopamine_spike(time,
-        concentration, last_post_time, last_post_trace), true);
+        concentration, last_post_time, last_post_trace, synapse_type), true);
 }
 
 //---------------------------------------

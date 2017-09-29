@@ -188,7 +188,7 @@ static inline void _process_fixed_synapses(
                 concentration = ~concentration + 1;
             }
             synapse_dynamics_process_neuromodulator_event(time + delay,
-                concentration, index);
+                concentration, index, synapse_type);
         }
         else {
             // Extract components from this word
