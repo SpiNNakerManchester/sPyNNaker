@@ -140,6 +140,8 @@ static inline void correlation_apply_post_spike(
         if (time_since_last_pre > 0) {
             int32_t decayed_r1 = __smulbb(
                 last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre)) >> STDP_FIXED_POINT;
+            decayed_r1 = __smulbb(decayed_r1,
+                weight_state.weight_region -> a2_plus) >> STDP_FIXED_POINT;
             decayed_eligibility_trace += decayed_r1;
         }
     }
@@ -201,6 +203,8 @@ static inline void correlation_apply_pre_spike(
             int32_t decayed_r1 = __smultb(
                 last_post_trace,
                 DECAY_LOOKUP_TAU_MINUS(time_since_last_post)) >> STDP_FIXED_POINT;
+            decayed_r1 = __smulbb(decayed_r1,
+                weight_state.weight_region -> a2_minus) >> STDP_FIXED_POINT;
             decayed_eligibility_trace -= decayed_r1;
             if (decayed_eligibility_trace < 0) {
                 decayed_eligibility_trace = 0;
