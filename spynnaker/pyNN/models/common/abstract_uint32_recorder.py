@@ -2,6 +2,7 @@ import numpy
 import logging
 
 from spinn_utilities.progress_bar import ProgressBar
+from data_specification.enums import DataType
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +66,8 @@ class AbstractUInt32Recorder(object):
             record_ids = numpy.tile(
                 numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
                 len(record_time)).reshape((-1, vertex_slice.n_atoms))
-            record_membrane_potential = split_record[2] / 32767.0
+            record_membrane_potential = (
+                split_record[2] / float(DataType.S1615.scale))
 
             part_data = numpy.dstack(
                 [record_ids, record_time, record_membrane_potential])

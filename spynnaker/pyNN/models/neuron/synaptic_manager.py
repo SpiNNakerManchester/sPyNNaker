@@ -44,6 +44,11 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
+# Amount to scale synapse SDRAM estimate by to make sure the synapses fit
+_SYNAPSE_SDRAM_OVERSCALE = 1.1
+
+_ONE_WORD = struct.Struct("<I")
+
 
 class SynapticManager(object):
     """ Deals with synapses
@@ -90,6 +95,13 @@ class SynapticManager(object):
         # A list of connection holders to be filled in pre-run, indexed by
         # the edge the connection is for
         self._pre_run_connection_holders = defaultdict(list)
+
+        # Limit the DTCM used by one-to-one connections
+        self._one_to_one_connection_dtcm_max_bytes = config.getint(
+            "Simulation", "one_to_one_connection_dtcm_max_bytes")
+
+        # TODO: Hard-coded to 0 to disable as currently broken!
+        self._one_to_one_connection_dtcm_max_bytes = 0
 
     @property
     def synapse_dynamics(self):
@@ -235,7 +247,7 @@ class SynapticManager(object):
                     pre_slices[pre_slice_index], post_vertex_slice,
                     in_edge.n_delay_stages, machine_time_step)
 
-        return memory_size
+        return memory_size * _SYNAPSE_SDRAM_OVERSCALE
 
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
@@ -629,7 +641,9 @@ class SynapticManager(object):
                         m_edge)
                     if len(row_data) > 0:
                         if (row_length == 1 and isinstance(
-                                synapse_info.connector, OneToOneConnector)):
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position + len(row_data)) <=
+                                self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._poptable_type.update_master_population_table(
@@ -669,7 +683,10 @@ class SynapticManager(object):
                     if len(delayed_row_data) > 0:
 
                         if (delayed_row_length == 1 and isinstance(
-                                synapse_info.connector, OneToOneConnector)):
+                                synapse_info.connector, OneToOneConnector) and
+                                (next_single_start_position +
+                                 len(delayed_row_data)) <=
+                                self._one_to_one_connection_dtcm_max_bytes):
                             single_rows = delayed_row_data.reshape(-1, 4)[:, 3]
                             single_synapses.append(single_rows)
                             self._poptable_type.update_master_population_table(
@@ -798,8 +815,8 @@ class SynapticManager(object):
             transceiver)
         direct_synapses_address = (
             self._get_static_synaptic_matrix_sdram_requirements() +
-            synaptic_matrix_address + struct.unpack_from(
-                "<I", str(transceiver.read_memory(
+            synaptic_matrix_address + _ONE_WORD.unpack_from(
+                str(transceiver.read_memory(
                     placement.x, placement.y, synaptic_matrix_address, 4)))[0])
         indirect_synapses_address = synaptic_matrix_address + 4
         data, max_row_length = self._retrieve_synaptic_block(
@@ -868,7 +885,7 @@ class SynapticManager(object):
                 # read in the synaptic row data
                 single_block = numpy.asarray(transceiver.read_memory(
                     placement.x, placement.y,
-                    direct_synapses_address + (synaptic_block_offset * 4),
+                    direct_synapses_address + synaptic_block_offset,
                     synaptic_block_size), dtype="uint8").view("uint32")
 
                 # Convert the block into a set of rows
