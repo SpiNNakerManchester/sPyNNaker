@@ -8,11 +8,14 @@ class WeightDependenceFusi(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
 
     # noinspection PyPep8Naming
-    def __init__(self, w_min=0.0, w_max=1.0):
+    def __init__(self, w_min=0.0, w_max=1.0, th_w = 0.5, w_drift = 0.001):
         AbstractWeightDependence.__init__(self)
         AbstractHasAPlusAMinus.__init__(self)
         self._w_min = w_min
         self._w_max = w_max
+        self._th_w = th_w
+        self._w_drift = w_drift
+
 
     @property
     def w_min(self):
@@ -21,6 +24,14 @@ class WeightDependenceFusi(
     @property
     def w_max(self):
         return self._w_max
+
+    @property
+    def th_w(self):
+        return self._th_w
+
+    @property
+    def w_drift(self):
+        return self._w_drift
 
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceFusi):
@@ -38,7 +49,7 @@ class WeightDependenceFusi(
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms == 1:
-            return (4 * 4) * n_synapse_types
+            return (6 * 4) * n_synapse_types
         else:
             raise NotImplementedError(
                 "Additive weight dependence only supports one term")
@@ -54,6 +65,10 @@ class WeightDependenceFusi(
                 data=int(round(self._w_min * w)), data_type=DataType.INT32)
             spec.write_value(
                 data=int(round(self._w_max * w)), data_type=DataType.INT32)
+            spec.write_value(
+                data=int(round(self._th_w * w)), data_type=DataType.INT32)
+            spec.write_value(
+                data=self._w_drift, data_type=DataType.S1615)
 
             spec.write_value(
                 data=int(round(self._a_plus * w)),
@@ -68,4 +83,4 @@ class WeightDependenceFusi(
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['w_min', 'w_max', 'A_plus', 'A_minus']
+        return ['w_min', 'w_max', 'th_w', 'w_drift', 'A_plus', 'A_minus']

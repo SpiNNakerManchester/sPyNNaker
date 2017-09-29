@@ -105,6 +105,19 @@ static inline update_state_t timing_apply_pre_spike(
     use(last_pre_time);
     use(&last_pre_trace);
 
+//    dt = time - last_pre_time;
+    int32_t w =  previous_state.initial_weight;
+    int32_t th_w = previous_state.weight_region->th_weight;
+
+    if(w>th_w){
+    	log_info("drifting up");
+    	//w+=
+    }else{
+    	log_info("drifting down");
+    }
+
+    previous_state.initial_weight = w;
+
     if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem){
     	log_info("above_threshold");
     	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);

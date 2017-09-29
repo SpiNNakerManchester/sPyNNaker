@@ -23,13 +23,17 @@ address_t weight_initialise(address_t address,
     for (uint32_t s = 0; s < SYNAPSE_TYPE_COUNT; s++) {
         plasticity_weight_region_data[s].min_weight = *plasticity_word++;
         plasticity_weight_region_data[s].max_weight = *plasticity_word++;
+        plasticity_weight_region_data[s].th_weight = *plasticity_word++;
+        plasticity_weight_region_data[s].weight_drift = *plasticity_word++;
         plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
         plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
 
         log_info(
-            "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
+            "\tSynapse type %u: Min weight:%d, Max weight:%d, weight threshold:%d, weight drift: %12.6k, A2+:%d, A2-:%d",
             s, plasticity_weight_region_data[s].min_weight,
             plasticity_weight_region_data[s].max_weight,
+            plasticity_weight_region_data[s].th_weight,
+            plasticity_weight_region_data[s].weight_drift,
             plasticity_weight_region_data[s].a2_plus,
             plasticity_weight_region_data[s].a2_minus);
     }

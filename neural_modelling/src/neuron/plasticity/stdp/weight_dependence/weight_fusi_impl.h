@@ -14,6 +14,8 @@
 typedef struct {
     int32_t min_weight;
     int32_t max_weight;
+    int32_t th_weight;
+    int32_t weight_drift;
 
     int32_t a2_plus;
     int32_t a2_minus;
