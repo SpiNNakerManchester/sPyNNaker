@@ -5,8 +5,8 @@
  *
  */
 
-#include "../../common/out_spikes.h"
-#include "../../common/maths-util.h"
+#include "common/out_spikes.h"
+#include "common/maths-util.h"
 
 #include <data_specification.h>
 #include <recording.h>

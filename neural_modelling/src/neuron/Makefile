@@ -24,8 +24,10 @@ MODELS = IF_curr_exp \
          IF_cond_exp_stdp_mad_nearest_pair_additive
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
-all: $(BUILD_DIRS)
-	for d in $(BUILD_DIRS); do (cd $$d; "$(MAKE)") || exit $$?; done
+all:
+	@for d in $(BUILD_DIRS); do $(MAKE) -C $$d all || exit $$?; done
 
-clean: $(BUILD_DIRS)
-	for d in $(BUILD_DIRS); do (cd $$d; "$(MAKE)" clean) || exit $$?; done
+clean:
+	@for d in $(BUILD_DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+
+.PHONY: all clean

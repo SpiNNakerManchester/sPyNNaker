@@ -1,8 +1,11 @@
 #ifndef _SYNAPSES_H_
 #define _SYNAPSES_H_
 
-#include "../common/neuron-typedefs.h"
-#include "synapse_row.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "common/neuron-typedefs.h"
+#include "neuron/synapse_row.h"
 
 // Get the index of the ring buffer for a given timestep, synapse type and
 // neuron index

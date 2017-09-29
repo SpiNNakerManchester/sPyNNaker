@@ -1,7 +1,7 @@
-#ifndef _ADDITIONAL_INPUT_TYPE_H_
-#define _ADDITIONAL_INPUT_TYPE_H_
+#ifndef _ADDITIONAL_INPUT_TYPE_INTERFACE_
+#define _ADDITIONAL_INPUT_TYPE_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 
 //! Forward declaration of the additional input pointer
 typedef struct additional_input_t* additional_input_pointer_t;
@@ -22,4 +22,4 @@ static input_t additional_input_get_input_value_as_current(
 static void additional_input_has_spiked(
     additional_input_pointer_t additional_input);
 
-#endif // _ADDITIONAL_INPUT_TYPE_H_
+#endif // _ADDITIONAL_INPUT_TYPE_INTERFACE_

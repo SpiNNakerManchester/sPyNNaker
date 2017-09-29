@@ -1,7 +1,7 @@
-#ifndef _INPUT_TYPE_H_
-#define _INPUT_TYPE_H_
+#ifndef _INPUT_TYPE_INTERFACE_
+#define _INPUT_TYPE_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
+#include "common/neuron-typedefs.h"
 
 //! Forward declaration of the input type pointer
 typedef struct input_type_t* input_type_pointer_t;
@@ -33,4 +33,4 @@ static input_t input_type_convert_inhibitory_input_to_current(
     input_t inh_input, input_type_pointer_t input_type,
     state_t membrane_voltage);
 
-#endif // _INPUT_TYPE_H_
+#endif // _INPUT_TYPE_INTERFACE_

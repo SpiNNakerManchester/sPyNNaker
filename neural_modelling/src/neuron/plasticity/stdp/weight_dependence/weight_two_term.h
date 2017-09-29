@@ -1,7 +1,7 @@
 #ifndef _WEIGHT_TWO_TERM_H_
 #define _WEIGHT_TWO_TERM_H_
 
-#include "weight.h"
+#include "neuron/plasticity/stdp/weight_dependence/weight_interface.h"
 
 static weight_state_t weight_two_term_apply_depression(weight_state_t state,
                                                 int32_t depression_1,

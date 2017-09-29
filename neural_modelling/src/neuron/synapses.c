@@ -1,7 +1,9 @@
-#include "synapses.h"
-#include "spike_processing.h"
-#include "synapse_types/synapse_types.h"
-#include "plasticity/synapse_dynamics.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "neuron/synapses.h"
+#include "neuron/spike_processing.h"
+#include "neuron/plasticity/synapse_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -9,12 +11,12 @@
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
-    #include "profile_tags.h"
-#endif
+#include "neuron/profile_tags.h"
+#endif // PROFILER_ENABLED
 
 // Compute the size of the input buffers and ring buffers
-#define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
-                                + SYNAPSE_INDEX_BITS))
+#define RING_BUFFER_SIZE \
+    (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS + SYNAPSE_INDEX_BITS))
 
 // Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;

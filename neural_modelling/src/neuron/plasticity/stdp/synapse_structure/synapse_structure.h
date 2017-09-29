@@ -1,7 +1,8 @@
 #ifndef _SYNAPSE_STRUCTURE_H_
 #define _SYNAPSE_STRUCTURE_H_
 
-#include "../weight_dependence/weight.h"
+// sPyNNaker class definitions
+#include "weight.h"
 
 static update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type);

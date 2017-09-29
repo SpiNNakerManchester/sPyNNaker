@@ -1,4 +1,7 @@
-#include "weight_multiplicative_impl.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.h"
 
 //---------------------------------------
 // Globals

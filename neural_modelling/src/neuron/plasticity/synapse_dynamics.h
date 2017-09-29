@@ -1,8 +1,8 @@
 #ifndef _SYNAPSE_DYNAMICS_H_
 #define _SYNAPSE_DYNAMICS_H_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_row.h"
+#include "common/neuron-typedefs.h"
+#include "neuron/synapse_row.h"
 
 bool synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,

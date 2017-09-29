@@ -1,4 +1,3 @@
-#!/bin/sh
 # Setup script to define the location of the files and the required binaries
 
 set -a

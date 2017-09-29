@@ -1,4 +1,7 @@
-#include "weight_additive_one_term_impl.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h"
 
 //---------------------------------------
 // Globals

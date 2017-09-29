@@ -1,9 +1,8 @@
-#ifndef _SYNAPSE_TYPES_H_
-#define _SYNAPSE_TYPES_H_
+#ifndef _SYNAPSE_TYPES_INTERFACE_
+#define _SYNAPSE_TYPES_INTERFACE_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_row.h"
-
+#include "common/neuron-typedefs.h"
+#include "neuron/synapse_row.h"
 
 //! Forward declaration of synapse type (creates a definition for a pointer
 //! to a synapse type parameter struct
@@ -25,22 +24,22 @@ static void synapse_types_shape_input(synapse_param_pointer_t parameter);
 //! \param[in] input: the inputs for that given synapse_type.
 //! \return None
 static void synapse_types_add_neuron_input(
-    index_t synapse_type_index, synapse_param_pointer_t parameter,
-    input_t input);
+	index_t synapse_type_index, synapse_param_pointer_t parameter,
+	input_t input);
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //! for a given neuron id
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron id.
 static input_t synapse_types_get_excitatory_input(
-    synapse_param_pointer_t parameter);
+	synapse_param_pointer_t parameter);
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given neuron id
 //! \param[in]  parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron id.
 static input_t synapse_types_get_inhibitory_input(
-    synapse_param_pointer_t parameter);
+	synapse_param_pointer_t parameter);
 
 //! \brief returns a human readable character for the type of synapse.
 //! examples would be X = excitatory types, I = inhibitory types etc etc.
@@ -52,7 +51,7 @@ static const char *synapse_types_get_type_char(index_t synapse_type_index);
 //! \brief prints the parameters of the synapse type
 //! \param[in] parameters: the pointer to the parameters to print
 static void synapse_types_print_parameters(
-    synapse_param_pointer_t parameters);
+	synapse_param_pointer_t parameters);
 
 //! \brief prints the input for a neuron id given the available inputs
 //! currently only executed when the models are in debug mode, as the prints
@@ -61,4 +60,4 @@ static void synapse_types_print_parameters(
 //! \return Nothing
 static void synapse_types_print_input(synapse_param_pointer_t parameters);
 
-#endif // _SYNAPSE_TYPES_H_
+#endif // _SYNAPSE_TYPES_INTERFACE_

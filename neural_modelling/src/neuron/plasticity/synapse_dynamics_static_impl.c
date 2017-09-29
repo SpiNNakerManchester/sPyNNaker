@@ -1,4 +1,7 @@
-#include "synapse_dynamics.h"
+// sPyNNaker class definitions
+#include "synapse_type.h"
+
+#include "neuron/plasticity/synapse_dynamics.h"
 #include <debug.h>
 
 bool synapse_dynamics_initialise(

@@ -1,7 +1,7 @@
 #ifndef _THRESHOLD_TYPE_STOCHASTIC_H_
 #define _THRESHOLD_TYPE_STOCHASTIC_H_
 
-#include "threshold_type.h"
+#include "neuron/threshold_types/threshold_type_interface.h"
 #include <random.h>
 #include <stdfix-exp.h>
 

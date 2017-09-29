@@ -1,7 +1,7 @@
 #ifndef _INPUT_TYPE_CURRENT_H_
 #define _INPUT_TYPE_CURRENT_H_
 
-#include "input_type.h"
+#include "neuron/input_types/input_type_interface.h"
 
 typedef struct input_type_t {
 } input_type_t;
