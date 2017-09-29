@@ -245,13 +245,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
-/*
-    // Decay dopamine trace to current time
-    last_dopamine_trace = __smulbb(
-        last_dopamine_trace,
-        DECAY_LOOKUP_TAU_D(delayed_pre_time - post_window.prev_time))
-        >> STDP_FIXED_POINT;
-*/
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
