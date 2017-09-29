@@ -90,9 +90,9 @@ static inline pre_trace_t timing_add_pre_spike(
 //    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
 //
 //    log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
-
-    // Return new pre-synaptic event with decayed trace values with energy
-    // for new spike added
+//
+//    // Return new pre-synaptic event with decayed trace values with energy
+//    // for new spike added
     return (pre_trace_t) last_trace;
 }
 

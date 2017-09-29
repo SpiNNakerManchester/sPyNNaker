@@ -98,6 +98,7 @@ final_state_t _update_on_pre_only(
 	        post_window.prev_time, post_window.prev_trace, current_state,
 			post_synaptic_neuron);
 
+	// update the weight and return
 	return synapse_structure_get_final_state(current_state);
 }
 
@@ -289,20 +290,20 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type = synapse_row_sparse_type(control_word);
         uint32_t index = synapse_row_sparse_index(control_word);
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
-        neuron_pointer_t neuron = &neuron_array_stdp[index];
+        neuron_pointer_t post_synaptic_neuron = &neuron_array_stdp[index];
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
         //neuron_pointer_t neuron = neuron_array_stdp;
-        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(neuron));
+        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(post_synaptic_neuron));
 
 
         final_state_t final_state = _update_on_pre_only(time, last_pre_time,
         		last_pre_trace, event_history->prev_trace,
                 delay_dendritic, delay_axonal, current_state,
-                &post_event_history[index], neuron);
+                &post_event_history[index], post_synaptic_neuron);
 
 
         /*
