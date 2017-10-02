@@ -313,6 +313,11 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * pre_sub_pop] | choice;
     }
 
+    if (!_spike) {
+        log_debug("No previous spikes");
+        return;
+    }
+
     address_t synaptic_row_address;
     size_t n_bytes;
 
