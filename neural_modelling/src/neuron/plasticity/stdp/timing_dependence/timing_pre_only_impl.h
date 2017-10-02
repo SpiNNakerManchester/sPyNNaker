@@ -105,15 +105,17 @@ static inline update_state_t timing_apply_pre_spike(
     use(last_pre_time);
     use(&last_pre_trace);
 
-//    dt = time - last_pre_time;
+    int dt = time - last_pre_time;
     int32_t w =  previous_state.initial_weight;
     int32_t th_w = previous_state.weight_region->th_weight;
+    int32_t w_drift = previous_state.weight_region->weight_drift;
 
     if(w>th_w){
     	log_info("drifting up");
-    	//w+=
+    	w += w_drift * dt;
     }else{
     	log_info("drifting down");
+    	w -= w_drift * dt;
     }
 
     previous_state.initial_weight = w;
