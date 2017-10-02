@@ -13,4 +13,6 @@ void spike_processing_finish_write(uint32_t process_id);
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows();
 
+spike_t get_last_spike();
+
 #endif // _SPIKE_PROCESSING_H_

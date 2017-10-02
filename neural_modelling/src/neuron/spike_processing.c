@@ -51,6 +51,9 @@ static spike_t spike;
 
 static uint32_t single_fixed_synapse[4];
 
+// Last spike
+spike_t last_spike;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -166,7 +169,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-
+    last_spike = spike;
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
 
@@ -291,4 +294,8 @@ uint32_t spike_processing_get_buffer_overflows() {
 
     // Check for buffer overflow
     return in_spikes_get_n_buffer_overflows();
+}
+
+spike_t get_last_spike() {
+    return last_spike;
 }

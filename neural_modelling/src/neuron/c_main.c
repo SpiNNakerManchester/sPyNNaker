@@ -272,12 +272,6 @@ void timer_callback(uint timer_count, uint unused) {
         synaptogenesis_dynamics_rewire(time);
         count_rewires++;
     }
-    //TODO
-    /*
-        1. Count timesteps
-        2. Once the desired period has elapsed trigger rewiring attempt
-            - Select
-    */
 
 
     // otherwise do synapse and neuron time step updates

@@ -291,20 +291,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._lat_distance_probabilities.view(dtype=np.uint32))
         total_words_written += self._lat_distance_probabilities.size // 2
 
-        # Now write the current synaptic capacity table
-        # i.e. for each postsynaptic neuron write the number of
-        # incoming (afferent) connections
-        synaptic_capacity = np.zeros(post_slice.n_atoms)
-
-        if self._connections[post_slice.lo_atom] is not None:
-            for row in self._connections[post_slice.lo_atom]:
-                if row[0].size > 0:
-                    for source, target, weight, delay, syn_type in row[0]:
-                        synaptic_capacity[target - post_slice.lo_atom] += 1
-
-        spec.write_array(synaptic_capacity)
-        total_words_written += synaptic_capacity.size
-
         # Setting up Post to Pre table
         post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
                                     dtype=np.int32) * -1
@@ -365,7 +351,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
         structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
-        structure_size += n_neurons * 2  # synaptic capacity table
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 
