@@ -111,7 +111,7 @@ static inline update_state_t timing_apply_pre_spike(
     int32_t w_drift = previous_state.weight_region->weight_drift;
 
     if(w>th_w){
-    	log_info("drifting up");
+    	log_info("drifting up w_drift: %d, dt: %d", w_drift, dt);
     	w += w_drift * dt;
     }else{
     	log_info("drifting down");

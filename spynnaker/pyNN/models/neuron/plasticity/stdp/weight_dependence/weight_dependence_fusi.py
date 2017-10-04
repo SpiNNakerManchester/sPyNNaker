@@ -8,7 +8,7 @@ class WeightDependenceFusi(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
 
     # noinspection PyPep8Naming
-    def __init__(self, w_min=0.0, w_max=1.0, th_w = 0.5, w_drift = 0.001):
+    def __init__(self, w_min=0.0, w_max=1.0, th_w = 0.5, w_drift = .001):
         AbstractWeightDependence.__init__(self)
         AbstractHasAPlusAMinus.__init__(self)
         self._w_min = w_min
@@ -68,7 +68,8 @@ class WeightDependenceFusi(
             spec.write_value(
                 data=int(round(self._th_w * w)), data_type=DataType.INT32)
             spec.write_value(
-                data=self._w_drift, data_type=DataType.S1615)
+#                data=self._w_drift*w , data_type=DataType.S1615) # changed type
+                data=self._w_drift*w , data_type=DataType.INT32) # changed type
 
             spec.write_value(
                 data=int(round(self._a_plus * w)),
