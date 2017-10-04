@@ -266,17 +266,17 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    if (rewiring && last_rewiring_time > rewiring_period)
+    // otherwise do synapse and neuron time step updates
+    synapses_do_timestep_update(time);
+    neuron_do_timestep_update(time);
+
+    // Do rewiring
+    if (rewiring && last_rewiring_time >= rewiring_period)
     {
         last_rewiring_time = 0;
         synaptogenesis_dynamics_rewire(time);
         count_rewires++;
     }
-
-
-    // otherwise do synapse and neuron time step updates
-    synapses_do_timestep_update(time);
-    neuron_do_timestep_update(time);
 
     // trigger buffering_out_mechanism
     if (recording_flags > 0) {
@@ -307,4 +307,5 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER_AND_BUFFERING);
 
     simulation_run();
+    log_info("rewire attempts %d", count_rewires);
 }

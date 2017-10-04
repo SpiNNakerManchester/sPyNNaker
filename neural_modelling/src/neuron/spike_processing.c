@@ -169,7 +169,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-    last_spike = spike;
+    last_spike = key;
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
 
