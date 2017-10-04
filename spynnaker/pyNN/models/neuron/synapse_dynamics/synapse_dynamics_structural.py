@@ -219,7 +219,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 (routing_info.get_routing_info_from_pre_vertex(
                     vertex, constants.SPIKE_PARTITION_ID).first_key,
                  graph_mapper.get_slice(vertex)[2],
-                 graph_mapper.get_slice(vertex)[0]))
+                 graph_mapper.get_slice(vertex)[0],
+                routing_info.get_routing_info_from_pre_vertex(
+                    vertex, constants.SPIKE_PARTITION_ID).first_mask))
 
         for subpopulation_list in \
                 population_to_subpopulation_information.itervalues():
@@ -262,7 +264,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             # Ensure the following values are written in ascending
             # order of low_atom (implicit)
             dt = np.dtype(
-                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int')])
+                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int'), ('mask', 'uint')])
             structured_array = np.array(subpopulation_list, dtype=dt)
             sorted_info_list = np.sort(structured_array, order='lo_atom')
             for subpopulation_info in sorted_info_list:
@@ -276,7 +278,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 # lo_atom
                 spec.write_value(data=subpopulation_info[2],
                                  data_type=DataType.INT32)
-                words_written += 3
+                # mask
+                spec.write_value(data=subpopulation_info[3],
+                                 data_type=DataType.UINT32)
+
+                words_written += 4
             total_words_written += words_written * 4
 
         # Now we write the probability tables for formation
@@ -309,7 +315,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     # Select subpopulation index
                     dt = np.dtype(
                         [('key', 'int'), ('n_atoms', 'int'),
-                         ('lo_atom', 'int')])
+                         ('lo_atom', 'int'), ('mask', 'uint')])
                     structured_array = np.array(
                         population_to_subpopulation_information[
                             row[1].pre_vertex], dtype=dt)
