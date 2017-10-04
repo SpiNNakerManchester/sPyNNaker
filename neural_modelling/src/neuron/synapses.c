@@ -405,7 +405,11 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
+    profiler_write_entry_disable_fiq(
+        PROFILER_ENTER | PROFILER_PROCESS_FIXED_SYNAPSES);
     _process_fixed_synapses(fixed_region_address, time);
+    profiler_write_entry_disable_fiq(
+        PROFILER_EXIT | PROFILER_PROCESS_FIXED_SYNAPSES);
     //}
     return true;
 }
