@@ -151,6 +151,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
     bool sr_done = false;
     if (do_intercept && buffer->originating_spike == spike_to_intercept){
+        set_intercept(false, -1);
         sr_done = sr_callback(buffer);
 //        rt_error(RTE_SWERR);
     }
@@ -160,9 +161,6 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
             DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
             synapse_row_plastic_region(buffer->row),
             DMA_WRITE, n_plastic_region_bytes);
-    }
-    else {
-        set_intercept(false, -1);
     }
 }
 

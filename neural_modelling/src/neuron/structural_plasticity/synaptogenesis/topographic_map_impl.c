@@ -251,8 +251,8 @@ address_t synaptogenesis_dynamics_initialise(
 //    for (index = 0; index < total_no_of_elements; index++)
 //        rewiring_data.post_to_pre_table[index] = *sp_word++;
 //    log_info("%d", rewiring_data.post_to_pre_table);
-    sp_word = sp_word + (total_no_of_elements * 4);
-
+//    sp_word = sp_word + (total_no_of_elements * 4);
+    sp_word = &rewiring_data.post_to_pre_table[total_no_of_elements + 1];
 
     // Setting up RNG
     validate_mars_kiss64_seed(rewiring_data.shared_seed);
@@ -316,6 +316,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     element_exists = unpack_post_to_pre(value, &pre_app_pop,
                                   &pre_sub_pop, &choice);
 
+    current_state.element_exists = element_exists;
     spike_t _spike=-1;
     if (!element_exists) {
         // Retrieve the last spike
@@ -393,7 +394,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     }
     // Saving current state
 
-    current_state.element_exists = element_exists;
     current_state.pop_index = pre_app_pop;
     current_state.subpop_index = pre_sub_pop;
     current_state.neuron_index = choice;
@@ -488,17 +488,17 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     }
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
-        log_error("o %d v %d a %x row_address %x",
-        current_state.offset_in_table,
-        rewiring_data.post_to_pre_table[current_state.offset_in_table],
-        rewiring_data.post_to_pre_table,
-        rewiring_dma_buffer.row);
-
-        log_info("%d",
-        number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
-
-
-        log_error("pre %d post %d", current_state.pre_syn_id, current_state.post_syn_id);
+//        log_error("o %d v %d a %x row_address %x",
+//        current_state.offset_in_table,
+//        rewiring_data.post_to_pre_table[current_state.offset_in_table],
+//        rewiring_data.post_to_pre_table,
+//        rewiring_dma_buffer.row);
+//
+//        log_info("%d",
+//        number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
+//
+//
+//        log_error("pre %d post %d", current_state.pre_syn_id, current_state.post_syn_id);
 //    current_state.pop_index = pre_app_pop;
 //    current_state.subpop_index = pre_sub_pop;
 //    current_state.neuron_index = choice;
@@ -506,11 +506,12 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //    current_state.offset_in_table);
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+1] = 0xdeadbeef;
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+2] = -1;
-        rt_error(RTE_SWERR);
+//        rt_error(RTE_SWERR);
     }
     else {
-        log_info("y u here");
-        synaptogenesis_dynamics_formation_rule(&rewiring_dma_buffer);
+        log_error("y u here");
+//        rt_error(RTE_SWERR);
+//        synaptogenesis_dynamics_formation_rule(&rewiring_dma_buffer);
     }
 }
 
@@ -543,7 +544,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
             current_state.current_controls,
             current_state.current_time);
         rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
-        log_info("-1 @ %d", current_state.offset_in_table);
+//        log_info("-1 @ %d", current_state.offset_in_table);
         spin1_dma_transfer(
             DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
             rewiring_dma_buffer.sdram_writeback_address,
@@ -557,7 +558,10 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-
+    if( current_state.element_exists ) {
+            log_error("element exists");
+            return false;
+            }
 //    log_info("%x %d", intercepted_dma_buffer->row,
 //    number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row)));
 
@@ -587,7 +591,7 @@ bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer)
             DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
             intercepted_dma_buffer->sdram_writeback_address,
             intercepted_dma_buffer->row, DMA_WRITE,
-            intercepted_dma_buffer->n_bytes_transferred)) {
+            rewiring_dma_buffer.n_bytes_transferred)) {
             return false;
             }
 
@@ -600,7 +604,7 @@ bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer)
             current_state.current_time);
         int the_pack = \
             pack(current_state.pop_index, current_state.subpop_index, current_state.neuron_index);
-        log_info("e_exists %d pack %d @ %d", current_state.element_exists, the_pack, current_state.offset_in_table);
+//        log_info("e_exists %d pack %d @ %d", current_state.element_exists, the_pack, current_state.offset_in_table);
         rewiring_data.post_to_pre_table[current_state.offset_in_table] = the_pack;
 
 //        for (int i=0; i<32; i++)
