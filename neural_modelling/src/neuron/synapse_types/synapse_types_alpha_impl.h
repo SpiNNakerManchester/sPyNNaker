@@ -71,7 +71,9 @@ static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
 
 static inline void _add_input_alpha(alpha_params* a_params, input_t input){
 	a_params->exp_buff = a_params->exp_buff * input + 1;
-	a_params->lin_buff = (a_params->lin_buff + a_params->dt * a_params->inv_tau_sqr) * ( 1 - 1/a_params->exp_buff);
+	a_params->lin_buff = (a_params->lin_buff
+			+ a_params->dt * a_params->inv_tau_sqr)
+					* ( 1 - 1/a_params->exp_buff);
 }
 
 
