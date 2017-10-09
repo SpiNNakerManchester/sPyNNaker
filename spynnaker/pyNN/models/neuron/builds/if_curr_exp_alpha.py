@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 import numpy
 
-class IFCurrExpAlpha(AbstractPopulationVertex):
+class IFCurrAlpha(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with alpha-shaped PSC \
     """
 
@@ -28,11 +28,11 @@ class IFCurrExpAlpha(AbstractPopulationVertex):
 
         'exc_response':0,
         'exc_exp_response':0,
-        'exc_tau':20,
+        'exc_tau':2,
 
         'inh_response':0,
         'inh_exp_response':0,
-        'inh_tau':20,
+        'inh_tau':2,
 
         'tau_refrac': 0.1,
         'i_offset': 0}
