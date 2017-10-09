@@ -31,12 +31,11 @@ class _COMB_EXP_TYPES(Enum):
 
 class SynapseTypeAlpha(AbstractSynapseType):
 
-    def __init__(self, n_neurons, dt, exc_response, exc_exp_response,
+    def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
 
         AbstractSynapseType.__init__(self)
         self._n_neurons = n_neurons
-        self._dt = 0.1
 
         self._exc_response = utility_calls.convert_param_to_numpy(
             exc_response, n_neurons)
@@ -113,9 +112,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
         i_decay, i_init = get_exponential_decay_and_init(
             self._tau_syn_I, machine_time_step)
 
-        # premultiply constants
-        dt_divided_by_tau_syn_E_sqr = self._dt/(self._tau_syn_E * self._tau_syn_E)
-        dt_divided_by_tau_syn_I_sqr = self._dt/(self._tau_syn_I * self._tau_syn_I)
+        # pre-multiply constants (convert to millisecond)
+        dt_divided_by_tau_syn_E_sqr=(machine_time_step/1000) \
+                                /(self._tau_syn_E * self._tau_syn_E)
+        dt_divided_by_tau_syn_I_sqr=(machine_time_step/1000) \
+                                /(self._tau_syn_I * self._tau_syn_I)
 
         return [
             # linear term buffer

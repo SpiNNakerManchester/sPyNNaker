@@ -35,7 +35,6 @@ class IFCurrAlpha(AbstractPopulationVertex):
                                    'exc_exp_response': 0,  # Internal Parameter
                                    'inh_response': 0,  # Internal Parameter
                                    'inh_exp_response': 0,  # Internal Parameter
-                                   'dt': 0.1
                                    }
 
     def __init__(
@@ -45,7 +44,6 @@ class IFCurrAlpha(AbstractPopulationVertex):
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
             v_thresh=default_parameters['v_thresh'],
-            dt=non_pynn_default_parameters['dt'],
             exc_response=non_pynn_default_parameters['exc_response'],
             exc_exp_response=non_pynn_default_parameters['exc_exp_response'],
             tau_syn_E=default_parameters['tau_syn_E'],
@@ -63,7 +61,6 @@ class IFCurrAlpha(AbstractPopulationVertex):
 
         synapse_type = SynapseTypeAlpha(
                 n_neurons,
-                dt,
                 exc_response,
                 exc_exp_response,
                 tau_syn_E,
