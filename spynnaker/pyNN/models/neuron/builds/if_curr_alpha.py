@@ -5,8 +5,8 @@ from spynnaker.pyNN.models.neuron.neuron_models\
     import NeuronModelLeakyIntegrateAndFire
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha\
     import SynapseTypeAlpha
-from spynnaker.pyNN.models.neuron.input_types.input_type_current_alpha \
-    import InputTypeCurrentAlpha
+from spynnaker.pyNN.models.neuron.input_types.input_type_current \
+    import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 
@@ -54,7 +54,6 @@ class IFCurrAlpha(AbstractPopulationVertex):
             i_offset=default_parameters['i_offset'],
             v_init=non_pynn_default_parameters['v_init']):
 
-        # Construct neuron/synapse objects
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
@@ -69,7 +68,7 @@ class IFCurrAlpha(AbstractPopulationVertex):
                 tau_syn_I
                 )
 
-        input_type = InputTypeCurrentAlpha()
+        input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
