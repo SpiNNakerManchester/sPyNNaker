@@ -107,7 +107,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         return "excitatory",  "inhibitory"
 
     def get_n_synapse_type_parameters(self):
-        return 9
+        return 10
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
