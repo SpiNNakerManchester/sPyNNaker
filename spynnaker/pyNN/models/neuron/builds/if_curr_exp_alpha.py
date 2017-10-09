@@ -32,7 +32,7 @@ class IFCurrExpAlpha(AbstractPopulationVertex):
 
         'inh_response':0,
         'inh_exp_response':0,
-        'inh_tau':10,
+        'inh_tau':20,
 
         'tau_refrac': 0.1,
         'i_offset': 0}
