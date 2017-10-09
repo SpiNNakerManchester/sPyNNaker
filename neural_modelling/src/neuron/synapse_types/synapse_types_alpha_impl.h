@@ -15,16 +15,14 @@
 #define SYNAPSE_TYPE_COUNT 2
 
 typedef struct alpha_params{
-	input_t dt;
-
 	// buffer for linear term
 	input_t lin_buff;
 
 	// buffer for exponential term
 	input_t exp_buff;
 
-	// Inverse of tau
-	input_t inv_tau_sqr;
+	// Inverse of tau pre-multiplied by dt
+	input_t dt_divided_by_tau_sqr;
 
 	// Exponential decay multiplier
 	decay_t decay;
@@ -48,7 +46,7 @@ typedef enum input_buffer_regions {
 
 
 static inline void _alpha_shaping(alpha_params* a_params){
-	a_params->lin_buff = a_params->lin_buff + a_params->dt * a_params->inv_tau_sqr;
+	a_params->lin_buff = a_params->lin_buff + a_params->dt_divided_by_tau_sqr;
 
 	// Update exponential buffer
 	a_params->exp_buff = decay_s1615(
@@ -72,7 +70,7 @@ static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
 static inline void _add_input_alpha(alpha_params* a_params, input_t input){
 	a_params->exp_buff = a_params->exp_buff * input + 1;
 	a_params->lin_buff = (a_params->lin_buff
-			+ a_params->dt * a_params->inv_tau_sqr)
+			+ a_params->dt_divided_by_tau_sqr)
 					* ( 1 - 1/a_params->exp_buff);
 }
 

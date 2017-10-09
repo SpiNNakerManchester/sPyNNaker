@@ -103,7 +103,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
         return "excitatory",  "inhibitory"
 
     def get_n_synapse_type_parameters(self):
-        return 10
+        return 8
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
@@ -113,12 +113,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
         i_decay, i_init = get_exponential_decay_and_init(
             self._tau_syn_I, machine_time_step)
 
-        inv_tau_syn_E_sqr = 1/(self._tau_syn_E * self._tau_syn_E)
-        inv_tau_syn_I_sqr = 1/(self._tau_syn_I * self._tau_syn_I)
+        # premultiply constants
+        dt_divided_by_tau_syn_E_sqr = self._dt/(self._tau_syn_E * self._tau_syn_E)
+        dt_divided_by_tau_syn_I_sqr = self._dt/(self._tau_syn_I * self._tau_syn_I)
 
         return [
-
-            NeuronParameter(self._dt, _COMB_EXP_TYPES.RESPONSE.data_type),
             # linear term buffer
             NeuronParameter(self._exc_response,
                             _COMB_EXP_TYPES.RESPONSE.data_type),
@@ -126,17 +125,15 @@ class SynapseTypeAlpha(AbstractSynapseType):
             NeuronParameter(self._exc_exp_response,
                             _COMB_EXP_TYPES.RESPONSE.data_type),
             # evolution parameters
-            NeuronParameter(inv_tau_syn_E_sqr,
+            NeuronParameter(dt_divided_by_tau_syn_E_sqr,
                             _COMB_EXP_TYPES.CONST.data_type),
             NeuronParameter(e_decay, _COMB_EXP_TYPES.DECAY.data_type),
 
-            NeuronParameter(self._dt,
-                            _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._inh_response,
                             _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._inh_exp_response,
                             _COMB_EXP_TYPES.RESPONSE.data_type),
-            NeuronParameter(inv_tau_syn_I_sqr,
+            NeuronParameter(dt_divided_by_tau_syn_I_sqr,
                             _COMB_EXP_TYPES.CONST.data_type),
             NeuronParameter(i_decay, _COMB_EXP_TYPES.DECAY.data_type),
         ]
