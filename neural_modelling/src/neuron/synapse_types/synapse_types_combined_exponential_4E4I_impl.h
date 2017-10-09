@@ -21,36 +21,28 @@
  //---------------------------------------
 
 typedef struct {
- 	input_t exc_a_response;
- 	input_t exc_a_A;
- 	decay_t exc_a_decay;
- 	input_t exc_b_response;
- 	input_t exc_b_B;
- 	decay_t exc_b_decay;
+ 	input_t a_response;
+ 	input_t a_A;
+ 	decay_t a_decay;
+ 	input_t b_response;
+ 	input_t b_B;
+ 	decay_t b_decay;
 } bi_exp_parm;
 
 
  typedef struct synapse_param_t {
-	// excitatory
-	// input_t exc_response;
-// 	input_t exc_a_response;
-// 	input_t exc_a_A;
-// 	decay_t exc_a_decay;
-// 	input_t exc_b_response;
-// 	input_t exc_b_B;
-// 	decay_t exc_b_decay;
 
+	// 4 excitatory bi-exponential synapses
 	bi_exp_parm ex1_str;
 	bi_exp_parm ex2_str;
 	bi_exp_parm ex3_str;
 	bi_exp_parm ex4_str;
 
+	// 4 inhibitory bi-exponential synapses
 	bi_exp_parm inh1_str;
 	bi_exp_parm inh2_str;
 	bi_exp_parm inh3_str;
 	bi_exp_parm inh4_str;
- 	// excitatory2
-
  } synapse_param_t;
 
 #include "synapse_types.h"
@@ -62,136 +54,34 @@ typedef struct {
  } input_buffer_regions;
 
 
- static inline bi_exp_parm _shape_input(bi_exp_parm bi_exp_params){
-	 	bi_exp_params.exc_a_response = decay_s1615(
-	 			bi_exp_params.exc_a_response,
-	 			bi_exp_params.exc_a_decay);
+ //static inline bi_exp_parm _shape_input(bi_exp_parm bi_exp_params){
+ static inline void _shape_input(bi_exp_parm* bi_exp_params){
+	 	bi_exp_params->a_response = decay_s1615(
+	 			bi_exp_params->a_response,
+	 			bi_exp_params->a_decay);
 
-	 	bi_exp_params.exc_b_response = decay_s1615(
-	 			bi_exp_params.exc_b_response,
-	 			bi_exp_params.exc_b_decay);
-	 	return bi_exp_params;
+	 	bi_exp_params->b_response = decay_s1615(
+	 			bi_exp_params->b_response,
+	 			bi_exp_params->b_decay);
  }
 
  static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
  	// EXCITATORY
-		parameter->ex1_str.exc_a_response = decay_s1615(
-		 			parameter->ex1_str.exc_a_response,
-		 			parameter->ex1_str.exc_a_decay);
+	_shape_input(&parameter->ex1_str);
+	_shape_input(&parameter->ex2_str);
+	_shape_input(&parameter->ex3_str);
+	_shape_input(&parameter->ex4_str);
 
-    	parameter->ex1_str.exc_b_response = decay_s1615(
-		 			parameter->ex1_str.exc_b_response,
-		 			parameter->ex1_str.exc_b_decay);
-
-
- 	// EXCITATORY2
-	 _shape_input(parameter->ex2_str);
-		parameter->ex2_str.exc_a_response = decay_s1615(
-		 			parameter->ex2_str.exc_a_response,
-		 			parameter->ex2_str.exc_a_decay);
-
-    	parameter->ex2_str.exc_b_response = decay_s1615(
-		 			parameter->ex2_str.exc_b_response,
-		 			parameter->ex2_str.exc_b_decay);
-
-
-
-
- 	// EXCITATORY3
-	 _shape_input(parameter->ex3_str);
-		parameter->ex3_str.exc_a_response = decay_s1615(
-		 			parameter->ex3_str.exc_a_response,
-		 			parameter->ex3_str.exc_a_decay);
-
-    	parameter->ex3_str.exc_b_response = decay_s1615(
-		 			parameter->ex3_str.exc_b_response,
-		 			parameter->ex3_str.exc_b_decay);
-
-
-
-
- 	// EXCITATORY4
-	 _shape_input(parameter->ex4_str);
-		parameter->ex4_str.exc_a_response = decay_s1615(
-		 			parameter->ex4_str.exc_a_response,
-		 			parameter->ex4_str.exc_a_decay);
-
-    	parameter->ex4_str.exc_b_response = decay_s1615(
-		 			parameter->ex4_str.exc_b_response,
-		 			parameter->ex4_str.exc_b_decay);
-
-
-
- 	// INHIBITORY
-    //_shape_input(parameter->inh1_str);
-		parameter->inh1_str.exc_a_response = decay_s1615(
-		 			parameter->inh1_str.exc_a_response,
-		 			parameter->inh1_str.exc_a_decay);
-
-    	parameter->inh1_str.exc_b_response = decay_s1615(
-		 			parameter->inh1_str.exc_b_response,
-		 			parameter->inh1_str.exc_b_decay);
-
-
-
-
- 	// INHIBITORY2
-
-		parameter->inh2_str.exc_a_response = decay_s1615(
-		 			parameter->inh2_str.exc_a_response,
-		 			parameter->inh2_str.exc_a_decay);
-
-    	parameter->inh2_str.exc_b_response = decay_s1615(
-		 			parameter->inh2_str.exc_b_response,
-		 			parameter->inh2_str.exc_b_decay);
-
-
-	 // INHIBITORY3
-		parameter->inh3_str.exc_a_response = decay_s1615(
-		 			parameter->inh3_str.exc_a_response,
-		 			parameter->inh3_str.exc_a_decay);
-
-    	parameter->inh3_str.exc_b_response = decay_s1615(
-		 			parameter->inh3_str.exc_b_response,
-		 			parameter->inh3_str.exc_b_decay);
-
-
- 	// INHIBITORY4
-		parameter->inh4_str.exc_a_response = decay_s1615(
-		 			parameter->inh4_str.exc_a_response,
-		 			parameter->inh4_str.exc_a_decay);
-
-    	parameter->inh4_str.exc_b_response = decay_s1615(
-		 			parameter->inh4_str.exc_b_response,
-		 			parameter->inh4_str.exc_b_decay);
-
-/*
- 	parameter->exc_response = (parameter->exc_a_A * parameter->exc_a_response) + (parameter->exc_b_B * parameter->exc_b_response);
- 	parameter->exc2_response = (parameter->exc2_a_A * parameter->exc2_a_response) + (parameter->exc2_b_B * parameter->exc2_b_response);
- 	parameter->exc3_response = (parameter->exc3_a_A * parameter->exc3_a_response) + (parameter->exc3_b_B * parameter->exc3_b_response);
- 	parameter->exc4_response = (parameter->exc4_a_A * parameter->exc4_a_response) + (parameter->exc4_b_B * parameter->exc4_b_response);
-
- 	parameter->inh_response = (parameter->inh_a_A * parameter->inh_a_response) + (parameter->inh_b_B * parameter->inh_b_response);
- 	parameter->inh2_response = (parameter->inh2_a_A * parameter->inh2_a_response) + (parameter->inh2_b_B * parameter->inh2_b_response);
- 	parameter->inh3_response = (parameter->inh3_a_A * parameter->inh3_a_response) + (parameter->inh3_b_B * parameter->inh3_b_response);
- 	parameter->inh4_response = (parameter->inh4_a_A * parameter->inh4_a_response) + (parameter->inh4_b_B * parameter->inh4_b_response);
-     */
- 	/*
- 	log_info("ex1 = %8.4k, ex2 = %8.4k, ex3 = %8.4k, ex4 = %8.4k, inh = %8.4k, inh2 = %8.4k, inh3 = %8.4k, inh4 = %8.4k,
- 			parameter->exc_response,
-			parameter->exc2_response,
-			parameter->exc3_response,
-			parameter->exc4_response,
-			parameter->inh_response,
-			parameter->inh2_response,
-			parameter->inh3_response,
-			parameter->inh4_response
-			); */
+	// INHIBITORY
+	_shape_input(&parameter->inh1_str);
+	_shape_input(&parameter->inh2_str);
+	_shape_input(&parameter->inh3_str);
+	_shape_input(&parameter->inh4_str);
  }
 
- static inline void _add_input(bi_exp_parm bi_exp_params, input_t input){
-	 bi_exp_params.exc_a_response =  bi_exp_params.exc_a_response + input;
-	 bi_exp_params.exc_b_response = bi_exp_params.exc_b_response + input;
+ static inline void _add_input(bi_exp_parm* bi_exp_params, input_t input){
+	 bi_exp_params->a_response =  bi_exp_params->a_response + input;
+	 bi_exp_params->b_response = bi_exp_params->b_response + input;
  }
 
  static inline void synapse_types_add_neuron_input(
@@ -200,72 +90,47 @@ typedef struct {
          input_t input){
 
  	if (synapse_type_index == EXCITATORY) {
- 		//_add_input(parameter->ex1_str, input);
- 		parameter->ex1_str.exc_a_response = parameter->ex1_str.exc_a_response + input;
- 		parameter->ex1_str.exc_b_response = parameter->ex1_str.exc_b_response + input;
-
+ 		_add_input(&parameter->ex1_str, input);
 
  	} else if (synapse_type_index == EXCITATORY2) {
- 		parameter->ex2_str.exc_a_response =  parameter->ex2_str.exc_a_response + input;
- 		parameter->ex2_str.exc_b_response = parameter->ex2_str.exc_b_response + input;
+ 		_add_input(&parameter->ex2_str, input);
 
  	} else if (synapse_type_index == EXCITATORY3) {
- 		parameter->ex3_str.exc_a_response =  parameter->ex3_str.exc_a_response + input;
- 		parameter->ex3_str.exc_b_response = parameter->ex3_str.exc_b_response + input;
-
+ 		_add_input(&parameter->ex3_str, input);
 
  	} else if (synapse_type_index == EXCITATORY4) {
- 		parameter->ex4_str.exc_a_response =  parameter->ex4_str.exc_a_response + input;
- 		parameter->ex4_str.exc_b_response = parameter->ex4_str.exc_b_response + input;
-
-
+ 		_add_input(&parameter->ex4_str, input);
 
  	} else if (synapse_type_index == INHIBITORY) {
- 		parameter->inh1_str.exc_a_response =  parameter->inh1_str.exc_a_response + input;
- 		parameter->inh1_str.exc_b_response = parameter->inh1_str.exc_b_response + input;
-
+ 		_add_input(&parameter->inh1_str, input);
 
  	} else if (synapse_type_index == INHIBITORY2) {
- 		parameter->inh2_str.exc_a_response =  parameter->inh2_str.exc_a_response + input;
- 		parameter->inh2_str.exc_b_response = parameter->inh2_str.exc_b_response + input;
-
+ 		_add_input(&parameter->inh2_str, input);
 
  	} else if (synapse_type_index == INHIBITORY3) {
- 		parameter->inh3_str.exc_a_response =  parameter->inh3_str.exc_a_response + input;
- 		parameter->inh3_str.exc_b_response = parameter->inh3_str.exc_b_response + input;
-
+ 		_add_input(&parameter->inh3_str, input);
 
  	} else if (synapse_type_index == INHIBITORY4) {
- 		parameter->inh4_str.exc_a_response =  parameter->inh4_str.exc_a_response + input;
- 		parameter->inh4_str.exc_b_response = parameter->inh4_str.exc_b_response + input;
+ 		_add_input(&parameter->inh4_str, input);
+
  	}
  }
 
  static inline input_t synapse_types_get_excitatory_input(
  		synapse_param_pointer_t parameter) {
-	 /*
- 	return parameter->exc_response
- 			+ parameter->exc2_response
- 			+ parameter->exc3_response
- 			+ parameter->exc4_response
- 			*/
-	 return ((parameter->ex1_str.exc_a_A * parameter->ex1_str.exc_a_response) + (parameter->ex1_str.exc_b_B * parameter->ex1_str.exc_b_response))+
-			 ((parameter->ex2_str.exc_a_A * parameter->ex2_str.exc_a_response) + (parameter->ex2_str.exc_b_B * parameter->ex2_str.exc_b_response)) +
-			 ((parameter->ex3_str.exc_a_A * parameter->ex3_str.exc_a_response) + (parameter->ex3_str.exc_b_B * parameter->ex3_str.exc_b_response)) +
-			 ((parameter->ex4_str.exc_a_A * parameter->ex4_str.exc_a_response) + (parameter->ex4_str.exc_b_B * parameter->ex4_str.exc_b_response));
+
+	 return ((parameter->ex1_str.a_A * parameter->ex1_str.a_response) + (parameter->ex1_str.b_B * parameter->ex1_str.b_response))+
+			 ((parameter->ex2_str.a_A * parameter->ex2_str.a_response) + (parameter->ex2_str.b_B * parameter->ex2_str.b_response)) +
+			 ((parameter->ex3_str.a_A * parameter->ex3_str.a_response) + (parameter->ex3_str.b_B * parameter->ex3_str.b_response)) +
+			 ((parameter->ex4_str.a_A * parameter->ex4_str.a_response) + (parameter->ex4_str.b_B * parameter->ex4_str.b_response));
  }
 
  static inline input_t synapse_types_get_inhibitory_input(
  		synapse_param_pointer_t parameter) {
- 	/*return parameter->inh_response
- 			+ parameter->inh2_response
- 			+ parameter->inh3_response
- 			+ parameter->inh4_response
- 			*/
-	 return ((parameter->inh1_str.exc_a_A * parameter->inh1_str.exc_a_response) + (parameter->inh1_str.exc_b_B * parameter->inh1_str.exc_b_response))+
-			 ((parameter->inh2_str.exc_a_A * parameter->inh2_str.exc_a_response) + (parameter->inh2_str.exc_b_B * parameter->inh2_str.exc_b_response)) +
-			 ((parameter->inh3_str.exc_a_A * parameter->inh3_str.exc_a_response) + (parameter->inh3_str.exc_b_B * parameter->inh3_str.exc_b_response)) +
-			 ((parameter->inh4_str.exc_a_A * parameter->inh4_str.exc_a_response) + (parameter->inh4_str.exc_b_B * parameter->inh4_str.exc_b_response));
+	 return ((parameter->inh1_str.a_A * parameter->inh1_str.a_response) + (parameter->inh1_str.b_B * parameter->inh1_str.b_response))+
+			 ((parameter->inh2_str.a_A * parameter->inh2_str.a_response) + (parameter->inh2_str.b_B * parameter->inh2_str.b_response)) +
+			 ((parameter->inh3_str.a_A * parameter->inh3_str.a_response) + (parameter->inh3_str.b_B * parameter->inh3_str.b_response)) +
+			 ((parameter->inh4_str.a_A * parameter->inh4_str.a_response) + (parameter->inh4_str.b_B * parameter->inh4_str.b_response));
  }
 
  static inline const char *synapse_types_get_type_char(
@@ -301,13 +166,13 @@ typedef struct {
  static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
  /*   log_info("-------------------------------------\n");
 
-    log_info("exc_response  = %11.4k\n", parameter->exc_response);
- 	log_info("exc_a_decay  = %11.4k\n", parameter->exc_a_decay);
- 	log_info("exc_a_init   = %11.4k\n", parameter->exc_a_init);
- 	log_info("exc_a_response  = %11.4k\n", parameter->exc_a_response);
- 	log_info("exc_b_decay = %11.4k\n", parameter->exc_b_decay);
- 	log_info("exc_b_init  = %11.4k\n", parameter->exc_b_init);
- 	log_info("exc_b_response  = %11.4k\n", parameter->exc_b_response);
+    log_info("response  = %11.4k\n", parameter->response);
+ 	log_info("a_decay  = %11.4k\n", parameter->a_decay);
+ 	log_info("a_init   = %11.4k\n", parameter->a_init);
+ 	log_info("a_response  = %11.4k\n", parameter->a_response);
+ 	log_info("b_decay = %11.4k\n", parameter->b_decay);
+ 	log_info("b_init  = %11.4k\n", parameter->b_init);
+ 	log_info("b_response  = %11.4k\n", parameter->b_response);
 
  	log_info("exc2_response  = %11.4k\n", parameter->exc2_response);
  	log_info("exc2_a_decay  = %11.4k\n", parameter->exc2_a_decay);
