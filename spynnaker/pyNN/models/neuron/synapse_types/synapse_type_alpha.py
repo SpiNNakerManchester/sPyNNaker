@@ -133,6 +133,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
             NeuronParameter(inv_exc_tau_sqr, _COMB_EXP_TYPES.CONST.data_type),
             NeuronParameter(e_decay, _COMB_EXP_TYPES.DECAY.data_type),
 
+            NeuronParameter(self._dt, _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._inh_response, _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(self._inh_exp_response, _COMB_EXP_TYPES.RESPONSE.data_type),
             NeuronParameter(inv_inh_tau_sqr, _COMB_EXP_TYPES.CONST.data_type),
