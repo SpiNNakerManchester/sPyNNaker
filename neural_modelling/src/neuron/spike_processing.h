@@ -13,6 +13,30 @@ void spike_processing_finish_write(uint32_t process_id);
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows();
 
+
+// DMA buffer structure combines the row read from SDRAM with
+typedef struct dma_buffer {
+
+    // Address in SDRAM to write back plastic region to
+    address_t sdram_writeback_address;
+
+    // Key of originating spike
+    // (used to allow row data to be re-used for multiple spikes)
+    spike_t originating_spike;
+
+    uint32_t n_bytes_transferred;
+
+    // Row data
+    uint32_t *row;
+
+} dma_buffer;
+
 spike_t get_last_spike();
+
+void set_intercept(bool intercept, spike_t spike);
+
+void set_intercept_callback(bool (*callback)(dma_buffer* buffer));
+
+
 
 #endif // _SPIKE_PROCESSING_H_

@@ -19,7 +19,8 @@ void synaptic_row_restructure(){
     log_error("%s", sp_error_message);
 }
 
-bool synaptogenesis_dynamics_formation_rule(){
+bool synaptogenesis_dynamics_formation_rule(dma_buffer *buffer){
+    use(buffer);
     return false;
 }
 

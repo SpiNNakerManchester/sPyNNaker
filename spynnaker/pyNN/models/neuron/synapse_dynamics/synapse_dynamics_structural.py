@@ -235,7 +235,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         if current_key is not None:
             current_key = current_key.first_key
         else:
-            current_key = 0
+            current_key = -1
 
         # Table header
         spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
@@ -283,6 +283,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                                  data_type=DataType.UINT32)
 
                 words_written += 4
+
             total_words_written += words_written * 4
 
         # Now we write the probability tables for formation
@@ -340,6 +341,39 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                         target - post_slice.lo_atom, synaptic_entry] = identifier
 
         spec.write_array(post_to_pre_table.ravel())
+
+        # def unpack(value):
+        #     neuron = value & 0xFFFF
+        #     subpop = (value >> 16) & 0xFF
+        #     pop = (value >> 24) & 0xFF
+        #     return pop, subpop, neuron
+        #
+        # for position, entry in np.ndenumerate(post_to_pre_table):
+        #     pop_no, subpop_no, neuron_no = unpack(entry)
+        #     pop = population_to_subpopulation_information.keys()[pop_no]
+        #     unordered_shits = population_to_subpopulation_information[pop]
+        #     dt = np.dtype(
+        #         [('key', 'int'), ('n_atoms', 'int'),
+        #          ('lo_atom', 'int'), ('mask', 'uint')])
+        #     structured_array = np.array(
+        #         unordered_shits, dtype=dt)
+        #     sorted_info_list = np.sort(structured_array,
+        #                                order='lo_atom')
+        #     subpop = sorted_info_list[subpop_no]
+        #
+        #     # now check if this shit exists in self._connections
+        #
+        #     # filter connections by post vertex
+        #     for conn in self._connections[post_slice.lo_atom]:
+        #         if conn[1].pre_vertex == pop and graph_mapper._slice_by_machine_vertex[conn[2].pre_vertex].lo_atom == subpop['lo_atom']:
+        #             assert routing_info._partition_info_by_edge[conn[2]].first_key == subpop['key']
+        #             cancer = np.asarray([list(item) for item in conn[0]])
+        #             pos = np.argwhere(cancer[:,1] == post_slice.lo_atom+position[0])
+        #             assert graph_mapper._slice_by_machine_vertex[conn[2].pre_vertex].lo_atom + neuron_no in cancer[pos, 0]
+
+
+
+
 
         total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
