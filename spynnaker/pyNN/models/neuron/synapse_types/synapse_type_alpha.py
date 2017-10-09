@@ -113,10 +113,10 @@ class SynapseTypeAlpha(AbstractSynapseType):
             self._tau_syn_I, machine_time_step)
 
         # pre-multiply constants (convert to millisecond)
-        dt_divided_by_tau_syn_E_sqr=(machine_time_step/1000) \
-                                /(self._tau_syn_E * self._tau_syn_E)
-        dt_divided_by_tau_syn_I_sqr=(machine_time_step/1000) \
-                                /(self._tau_syn_I * self._tau_syn_I)
+        dt_divided_by_tau_syn_E_sqr = (machine_time_step / 1000) \
+            / (self._tau_syn_E * self._tau_syn_E)
+        dt_divided_by_tau_syn_I_sqr = (machine_time_step / 1000) \
+            / (self._tau_syn_I * self._tau_syn_I)
 
         return [
             # linear term buffer
