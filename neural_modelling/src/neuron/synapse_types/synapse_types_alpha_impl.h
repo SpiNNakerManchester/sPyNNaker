@@ -44,7 +44,6 @@ typedef enum input_buffer_regions {
 	EXCITATORY, INHIBITORY,
 } input_buffer_regions;
 
-
 static inline void _alpha_shaping(alpha_params* a_params){
 	a_params->lin_buff = a_params->lin_buff + a_params->dt_divided_by_tau_sqr;
 
@@ -53,7 +52,6 @@ static inline void _alpha_shaping(alpha_params* a_params){
 			a_params->exp_buff,
 			a_params->decay);
 }
-
 
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
@@ -66,14 +64,12 @@ static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
 			parameter->exc.lin_buff * parameter->exc.exp_buff);
 }
 
-
 static inline void _add_input_alpha(alpha_params* a_params, input_t input){
 	a_params->exp_buff = a_params->exp_buff * input + 1;
 	a_params->lin_buff = (a_params->lin_buff
 			+ a_params->dt_divided_by_tau_sqr)
 					* ( 1 - 1/a_params->exp_buff);
 }
-
 
 // Add input from ring buffer - zero if no spikes, otherwise one or more weights
 static inline void synapse_types_add_neuron_input(
@@ -115,8 +111,9 @@ static inline const char *synapse_types_get_type_char(
 
 static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
-//    io_printf(
-//        IO_BUF, "EX: %12.6k + INH: %12.6k",
+    io_printf(IO_BUF, "%12.6k - %12.6k",
+    		parameter->exc.lin_buff * parameter->exc.exp_buff,
+			parameter->inh.lin_buff * parameter->inh.exp_buff);
 }
 
 static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
