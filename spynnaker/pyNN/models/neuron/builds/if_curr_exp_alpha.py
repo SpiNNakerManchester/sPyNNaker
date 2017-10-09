@@ -15,7 +15,7 @@ class IFCurrAlpha(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with alpha-shaped PSC \
     """
 
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core =  128
 
     default_parameters = {
         'tau_m': 20.0,
