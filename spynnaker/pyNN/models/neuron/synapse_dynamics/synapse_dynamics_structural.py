@@ -169,9 +169,14 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         spec.write_value(data=int(self._p_elim_pot * (2 ** 32 - 1)),
                          data_type=DataType.UINT32)
 
-        # write the random seed (4 words), generated randomly!
+        # write the random seed (4 words), generated randomly,
+        # but the same for all postsynaptic vertices!
         for seed in self._seeds:
             spec.write_value(data=seed)
+
+        # write local seed (4 words), generated randomly!
+        for _ in range(4):
+            spec.write_value(data=np.random.randint(0x7FFFFFFF))
 
         # Compute the max number of presynaptic subpopulations
         population_to_subpopulation_information = collections.OrderedDict()
@@ -377,7 +382,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
-            machine_vertex] = 4 * 16 + 4 * total_words_written
+            machine_vertex] = 4 * 20 + 4 * total_words_written
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
         #
@@ -390,7 +395,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
-        structure_size = 20 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 24 * 4 + 4 * 4  # parameters + rng seed
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 

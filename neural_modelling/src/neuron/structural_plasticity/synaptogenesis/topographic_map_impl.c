@@ -173,7 +173,12 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.shared_seed[2] = *sp_word++;
     rewiring_data.shared_seed[3] = *sp_word++;
 
-    log_debug("p_rew %d fast %d weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    rewiring_data.local_seed[0] = *sp_word++;
+    rewiring_data.local_seed[1] = *sp_word++;
+    rewiring_data.local_seed[2] = *sp_word++;
+    rewiring_data.local_seed[3] = *sp_word++;
+
+    log_info("p_rew %d fast %d weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight, rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
         rewiring_data.grid_x, rewiring_data.grid_y,
@@ -256,6 +261,8 @@ address_t synaptogenesis_dynamics_initialise(
 
     // Setting up RNG
     validate_mars_kiss64_seed(rewiring_data.shared_seed);
+    // Setting up local RNG
+    validate_mars_kiss64_seed(rewiring_data.local_seed);
 
     // Setting up DMA buffers
     rewiring_dma_buffer.row = (uint32_t*) sark_alloc(
@@ -558,10 +565,10 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    log_info("curr time %d", current_state.current_time);
+//    log_info("curr time %d", current_state.current_time);
     uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row));
     if (no_elems == 32) {
-        log_info("row is full");
+        log_error("row is full");
         return false;
     }
 

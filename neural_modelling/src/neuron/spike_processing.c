@@ -30,7 +30,7 @@ static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
 
-static spike_t spike;
+static spike_t spike=-1;
 
 static uint32_t single_fixed_synapse[4];
 
