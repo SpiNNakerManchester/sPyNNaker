@@ -9,7 +9,7 @@ address_t synaptogenesis_dynamics_initialise(
 
 void synaptogenesis_dynamics_rewire(uint32_t time);
 
-bool synaptogenesis_dynamics_formation_rule(dma_buffer * rewiring_dma_buffer);
+bool synaptogenesis_dynamics_formation_rule();
 
 bool synaptogenesis_dynamics_elimination_rule();
 

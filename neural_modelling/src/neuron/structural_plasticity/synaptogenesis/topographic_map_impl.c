@@ -284,9 +284,6 @@ address_t synaptogenesis_dynamics_initialise(
         number_of_connections_in_row = &synapse_row_num_fixed_synapses;
     #endif
 
-    // spike_processing.c
-    set_intercept_callback(&synaptogenesis_dynamics_formation_rule);
-
     log_info("SR init complete.");
     return (address_t)sp_word;
 }
@@ -334,7 +331,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
             return;
         }
 
-        set_intercept(true, _spike);
+//        set_intercept(true, _spike);
         // unpack the spike into key and identifying information for the neuron
         // Identify pop, subpop and lo and hi atoms
         // Amazing linear search inc.
@@ -387,7 +384,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 //        }
     }
     else {
-        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[pre_sub_pop] | choice;
+        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[pre_sub_pop * KEY_INFO_CONSTANTS + 0] | choice;
     }
 
 
@@ -453,13 +450,13 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
 
-    if(element_exists) {
-        spin1_dma_transfer(
-        DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
-        n_bytes);
-        rewiring_dma_buffer.n_bytes_transferred = n_bytes;
-        rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
-    }
+
+    spin1_dma_transfer(
+    DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+    n_bytes);
+    rewiring_dma_buffer.n_bytes_transferred = n_bytes;
+    rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
+
 }
 
 
@@ -495,11 +492,11 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     }
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
-//        log_error("o %d v %d a %x row_address %x",
-//        current_state.offset_in_table,
-//        rewiring_data.post_to_pre_table[current_state.offset_in_table],
-//        rewiring_data.post_to_pre_table,
-//        rewiring_dma_buffer.row);
+        log_error("o %d v %d a %x row_address %x",
+        current_state.offset_in_table,
+        rewiring_data.post_to_pre_table[current_state.offset_in_table],
+        rewiring_data.post_to_pre_table,
+        rewiring_dma_buffer.row);
 //
 //        log_info("%d",
 //        number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
@@ -516,9 +513,9 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //        rt_error(RTE_SWERR);
     }
     else {
-        log_error("y u here");
+//        log_error("y u here");
 //        rt_error(RTE_SWERR);
-//        synaptogenesis_dynamics_formation_rule(&rewiring_dma_buffer);
+        synaptogenesis_dynamics_formation_rule();
     }
 }
 
@@ -562,11 +559,11 @@ bool synaptogenesis_dynamics_elimination_rule(){
     return false;
 }
 
-bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer){
+bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
 //    log_info("curr time %d", current_state.current_time);
-    uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row));
+    uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
     if (no_elems == 32) {
         log_error("row is full");
         return false;
@@ -576,8 +573,8 @@ bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer)
             log_error("element exists");
             return false;
             }
-//    log_info("%x %d", intercepted_dma_buffer->row,
-//    number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row)));
+//    log_info("%x %d", rewiring_dma_buffer.row,
+//    number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
 
     if( (current_state.current_controls == 0 && current_state.distance >= rewiring_data.size_ff_prob)
         || (current_state.current_controls == 1 && current_state.distance >= rewiring_data.size_lat_prob)){
@@ -598,13 +595,13 @@ bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer)
         return false;
     }
 
-    if(add_neuron(current_state.post_syn_id, intercepted_dma_buffer->row,
+    if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
 
         if(-1==spin1_dma_transfer(
             DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
-            intercepted_dma_buffer->sdram_writeback_address,
-            intercepted_dma_buffer->row, DMA_WRITE,
+            rewiring_dma_buffer.sdram_writeback_address,
+            rewiring_dma_buffer.row, DMA_WRITE,
             rewiring_dma_buffer.n_bytes_transferred)) {
             return false;
             }
@@ -612,7 +609,7 @@ bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer)
         /*ad*/log_info("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
-            number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row)),
+            number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
             current_state.distance,
             current_state.current_controls,
             current_state.current_time);

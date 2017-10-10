@@ -33,10 +33,4 @@ typedef struct dma_buffer {
 
 spike_t get_last_spike();
 
-void set_intercept(bool intercept, spike_t spike);
-
-void set_intercept_callback(bool (*callback)(dma_buffer* buffer));
-
-
-
 #endif // _SPIKE_PROCESSING_H_

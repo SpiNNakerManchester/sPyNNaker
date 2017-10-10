@@ -35,19 +35,7 @@ static spike_t spike=-1;
 static uint32_t single_fixed_synapse[4];
 
 // Last spike
-spike_t last_spike, spike_to_intercept;
-dma_buffer* dma_buffer_of_last_spike;
-bool do_intercept;
-bool (*sr_callback)(dma_buffer* buffer);
-
-void set_intercept(bool intercept, spike_t spike) {
-    do_intercept = intercept;
-    spike_to_intercept = spike;
-}
-
-void set_intercept_callback(bool (*callback)(dma_buffer* buffer)) {
-    sr_callback = callback;
-}
+spike_t last_spike;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -149,19 +137,14 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 
     log_debug("Writing back %u bytes of plastic region to %08x",
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
-    bool sr_done = false;
-    if (do_intercept && buffer->originating_spike == spike_to_intercept){
-        set_intercept(false, -1);
-        sr_done = sr_callback(buffer);
-//        rt_error(RTE_SWERR);
-    }
-    if (!sr_done) {
-        // Start transfer
-        spin1_dma_transfer(
-            DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
-            synapse_row_plastic_region(buffer->row),
-            DMA_WRITE, n_plastic_region_bytes);
-    }
+
+    // Store last processed spike
+    last_spike = buffer->originating_spike;
+    // Start transfer
+    spin1_dma_transfer(
+        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
+        synapse_row_plastic_region(buffer->row),
+        DMA_WRITE, n_plastic_region_bytes);
 }
 
 
@@ -300,5 +283,7 @@ uint32_t spike_processing_get_buffer_overflows() {
 }
 
 spike_t get_last_spike() {
-    return last_spike;
+    spike_t temp_spike = last_spike;
+    last_spike = -1;
+    return temp_spike;
 }
