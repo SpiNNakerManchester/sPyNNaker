@@ -341,10 +341,10 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         for (int i=0; i< rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
             // Loop over all subpopulations and check if the KEY matches (with neuron id masked out)
             for (int subpop_index = 0; subpop_index < rewiring_data.pre_pop_info_table.subpop_info[i].no_pre_vertices; subpop_index++) {
-                if ((_spike & rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[3]) == rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index]) {
+                if ((_spike & rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3]) == rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index]) {
                     pre_app_pop = i;
                     pre_sub_pop = subpop_index;
-                    choice = _spike & !rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[3];
+                    choice = _spike & !rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3];
                     found = true;
                 }
 //                log_info("%x %x %d",(_spike & rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[3]), rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index], found);
@@ -510,7 +510,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //    current_state.offset_in_table);
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+1] = 0xdeadbeef;
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+2] = -1;
-//        rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
     else {
 //        log_error("y u here");
