@@ -492,11 +492,12 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     }
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
-        log_error("o %d v %d a %x row_address %x",
-        current_state.offset_in_table,
-        rewiring_data.post_to_pre_table[current_state.offset_in_table],
-        rewiring_data.post_to_pre_table,
-        rewiring_dma_buffer.row);
+        rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
+//        log_error("o %d v %d a %x row_address %x",
+//        current_state.offset_in_table,
+//        rewiring_data.post_to_pre_table[current_state.offset_in_table],
+//        rewiring_data.post_to_pre_table,
+//        rewiring_dma_buffer.row);
 //
 //        log_info("%d",
 //        number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
@@ -510,7 +511,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //    current_state.offset_in_table);
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+1] = 0xdeadbeef;
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table+2] = -1;
-        rt_error(RTE_SWERR);
+//        rt_error(RTE_SWERR);
     }
     else {
 //        log_error("y u here");
@@ -540,6 +541,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
         return false;
     }
 
+//    log_info("removing %d", current_state.post_syn_id);
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
         /*ad*/log_info("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
