@@ -558,6 +558,13 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(dma_buffer * intercepted_dma_buffer){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
+    log_info("curr time %d", current_state.current_time);
+    uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(intercepted_dma_buffer->row));
+    if (no_elems == 32) {
+        log_info("row is full");
+        return false;
+    }
+
     if( current_state.element_exists ) {
             log_error("element exists");
             return false;
