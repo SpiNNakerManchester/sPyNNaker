@@ -19,6 +19,10 @@ class _IF_TYPES(Enum):
     EXP_TC = (4, DataType.S1615)
     I_OFFSET = (5, DataType.S1615)
 
+    EXP_TCA = (6, DataType.S1615)
+    CA = (7, DataType.S1615)
+    J_CA = (8, DataType.S1615)
+
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
         obj._value_ = value
@@ -32,7 +36,7 @@ class _IF_TYPES(Enum):
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
-    def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
+    def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, ca_init=0.0, tau_ca=60.0, J_ca = 1.0):
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
 
@@ -50,9 +54,45 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         self._cm = utility_calls.convert_param_to_numpy(cm, n_neurons)
         self._i_offset = utility_calls.convert_param_to_numpy(
             i_offset, n_neurons)
+        self._ca_init = utility_calls.convert_param_to_numpy(ca_init, n_neurons)
+        self._tau_ca = utility_calls.convert_param_to_numpy(tau_ca, n_neurons)
+        self._J_ca = utility_calls.convert_param_to_numpy(
+            J_ca, n_neurons)
+
 
         if v_init is None:
             self._v_init = self._v_rest
+
+    @property
+    def ca_init(self):
+        return self._ca_init
+
+    @property
+    def tau_ca(self):
+        return self._tau_ca
+
+
+    @property
+    def j_ca(self):
+        return self._J_ca
+
+
+    @ca_init.setter
+    def ca_init(self, value):
+        self.__ca_init = utility_calls.convert_param_to_numpy(
+            value, self._n_neurons)
+
+
+    @tau_ca.setter
+    def tau_ca(self, value):
+        self.__tau_ca = utility_calls.convert_param_to_numpy(
+            value, self._n_neurons)
+
+    @j_ca.setter
+    def j_ca(self, value):
+        self.__J_ca = utility_calls.convert_param_to_numpy(
+            value, self._n_neurons)
+
 
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(
@@ -172,3 +212,6 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):
         return self._units[variable]
+    ca_init = property(get_ca_init, set_ca_init, del_ca_init, "ca_init's docstring")
+    tau_ca = property(get_tau_ca, set_tau_ca, del_tau_ca, "tau_ca's docstring")
+    J_ca = property(get_j_ca, set_j_ca, del_j_ca, "J_ca's docstring")

@@ -1,5 +1,5 @@
-#ifndef _NEURON_MODEL_LIF_CURR_IMPL_H_
-#define _NEURON_MODEL_LIF_CURR_IMPL_H_
+#ifndef _NEURON_MODEL_LIF_FUSI_IMPL_H_
+#define _NEURON_MODEL_LIF_FUSI_IMPL_H_
 
 #include "neuron_model.h"
 
@@ -23,6 +23,15 @@ typedef struct neuron_t {
     // offset current [nA]
     REAL     I_offset;
 
+    // exp ( -(machine time step in ms)/(TauCa) )
+    REAL    exp_TauCa;
+
+    // Calcium
+    REAL    Ca2;
+
+    // Influx of CA2 caused by each spike
+    REAL J_Ca;
+
     // countdown to end of next refractory period [timesteps]
     int32_t  refract_timer;
 
@@ -31,9 +40,10 @@ typedef struct neuron_t {
 
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
+
 } neuron_t;
 
 typedef struct global_neuron_params_t {
 } global_neuron_params_t;
 
-#endif // _NEURON_MODEL_LIF_CURR_IMPL_H_
+#endif // _NEURON_MODEL_LIF_FUSI_IMPL_H_
