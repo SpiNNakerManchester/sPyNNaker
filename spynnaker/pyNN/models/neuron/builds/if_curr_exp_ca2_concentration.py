@@ -5,15 +5,14 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.additional_inputs \
-    import AdditionalInputCa2Adaptive
+    import AdditionalInputCa2Concentration
 
 
-
-class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
-    """ Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency\
-        adaptation of a generalized leaky integrate-and-fire model neuron. \
-        Journal of Computational Neuroscience, 10(1), 25-45. \
-        doi:10.1023/A:1008916026143
+class IFCurrExpCa2Concentration(AbstractPopulationVertex):
+    """
+    // Model from Braeder, J., Senn, W., and Fusi, S.: Learning Real-World
+    // Stimuli in a Neural Network with Spike-Driven Synaptic Dynamics, Journal of
+    // Neural Computation, 2007
     """
 
     _model_based_max_atoms_per_core = 255
@@ -61,26 +60,27 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
             initial_input_inh=isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
-        additional_input = AdditionalInputCa2Adaptive(
+        additional_input = AdditionalInputCa2Concentration(
             n_neurons, tau_ca2, i_ca2, i_alpha)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_exp_ca2_adaptive.aplx",
+            self, n_neurons=n_neurons, binary="IF_curr_exp_ca2_concentration.aplx",
             label=label,
             max_atoms_per_core=(
-                IFCurrExpCa2Adaptive._model_based_max_atoms_per_core),
+                IFCurrExpCa2Concentration._model_based_max_atoms_per_core),
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="IF_curr_exp_ca2_adaptive", neuron_model=neuron_model,
+            model_name="IF_curr_exp_ca2_concentration", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, additional_input=additional_input,
             constraints=constraints)
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExpCa2Adaptive._model_based_max_atoms_per_core
+        return IFCurrExpCa2Concentration._model_based_max_atoms_per_core
 
     @staticmethod
     def set_max_atoms_per_core(new_value):
-        IFCurrExpCa2Adaptive._model_based_max_atoms_per_core = new_value
+        IFCurrExpCa2Concentration._model_based_max_atoms_per_core = new_value
+
