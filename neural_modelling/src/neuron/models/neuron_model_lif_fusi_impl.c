@@ -1,18 +1,15 @@
-#include "neuron_model_lif_fusi_impl.h"
+#include "neuron_model_lif_impl.h"
 
 #include <debug.h>
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
-        neuron_pointer_t neuron, REAL V_prev, REAL Ca2_prev, input_t input_this_timestep) {
+        neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
-
-    // update Ca
-    neuron->Ca2 = Ca2_prev * neuron->exp_TauCa;
 }
 
 void neuron_model_set_global_neuron_params(
@@ -34,7 +31,7 @@ state_t neuron_model_state_update(
             exc_input - inh_input + external_bias + neuron->I_offset;
 
         _lif_neuron_closed_form(
-            neuron, neuron->V_membrane, neuron->Ca2, input_this_timestep);
+            neuron, neuron->V_membrane, input_this_timestep);
     } else {
 
         // countdown refractory timer
@@ -55,8 +52,6 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset refractory timer
     neuron->refract_timer  = neuron->T_refract;
-    // update Ca
-    neuron->Ca2  += neuron->J_Ca;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
@@ -65,7 +60,6 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
 
 void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
     log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
-    log_debug("Ca2    = %11.4k ", neuron->Ca2);
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
@@ -78,9 +72,4 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
 
     log_debug("T refract     = %u timesteps", neuron->T_refract);
-
-    log_debug("exp(-ms/(tau_Ca)) = %11.4k [.]", neuron->exp_TauCa);
-
-    log_debug("J_Ca     = %11.4k ", neuron->J_Ca);
-
 }
