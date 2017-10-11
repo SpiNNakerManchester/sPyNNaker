@@ -58,17 +58,18 @@ static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
 	_alpha_shaping(&parameter->exc);
 	_alpha_shaping(&parameter->inh);
 
-	log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k",
+	/*log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k",
 			parameter->exc.lin_buff,
 			parameter->exc.exp_buff,
-			parameter->exc.lin_buff * parameter->exc.exp_buff);
+			parameter->exc.lin_buff * parameter->exc.exp_buff); */
 }
 
 static inline void _add_input_alpha(alpha_params* a_params, input_t input){
-	a_params->exp_buff = a_params->exp_buff * input + 1;
+	a_params->exp_buff = (a_params->exp_buff * input) + ONE;
+
 	a_params->lin_buff = (a_params->lin_buff
 			+ a_params->dt_divided_by_tau_sqr)
-					* ( 1 - 1/a_params->exp_buff);
+					* (ONE - ONE/a_params->exp_buff);
 }
 
 // Add input from ring buffer - zero if no spikes, otherwise one or more weights
@@ -77,7 +78,7 @@ static inline void synapse_types_add_neuron_input(
 		synapse_param_pointer_t parameter,
         input_t input){
 
-	if (input > 0.0){
+	if (input > ZERO){
 		if (synapse_type_index == EXCITATORY) {
 				_add_input_alpha(&parameter->exc, input);
 
@@ -117,9 +118,9 @@ static inline void synapse_types_print_input(
 }
 
 static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
-    log_info("-------------------------------------\n");
-	log_info("exc_response  = %11.4k\n", parameter->exc.lin_buff * parameter->exc.exp_buff);
-	log_info("inh_response  = %11.4k\n", parameter->inh.lin_buff * parameter->inh.exp_buff);
+    log_debug("-------------------------------------\n");
+	log_debug("exc_response  = %11.4k\n", parameter->exc.lin_buff * parameter->exc.exp_buff);
+	log_debug("inh_response  = %11.4k\n", parameter->inh.lin_buff * parameter->inh.exp_buff);
 }
 
 #endif // _ALPHA_SYNAPSE_H_
