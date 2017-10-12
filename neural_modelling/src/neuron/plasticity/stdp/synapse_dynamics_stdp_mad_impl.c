@@ -318,10 +318,6 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     plastic_synapse_t weight;
     uint32_t delay;
-
-//    log_info("#plastic %d", synapse_row_num_plastic_controls(fixed_region));
-
-
     // Loop through plastic synapses
     bool found = false;
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -330,8 +326,6 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
         uint32_t control_word = *control_words++;
         // Check if index is the one I'm looking for
         delay = synapse_row_sparse_delay(control_word);
-//        log_info("s%d", synapse_row_sparse_index(control_word));
-
         if (synapse_row_sparse_index(control_word)==id) {
             found = true;
             break;
@@ -364,16 +358,12 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
-//    log_info("%x %x", &control_words[offset], &fixed_region[1]);
     // Delete weight at offset
-//    log_info("n_id %d", synapse_row_sparse_index(control_words[offset]));
     plastic_words[offset] =  plastic_words[plastic_synapse-1];
     plastic_words[plastic_synapse-1] = 0;
-//    spin1_memcpy(&plastic_words[offset], & plastic_words[plastic_synapse-1], sizeof(plastic_synapse_t));
-    // Delete control word at offset
+   // Delete control word at offset
     control_words[offset] = control_words[plastic_synapse-1];
     control_words[plastic_synapse-1] = 0;
-//    spin1_memcpy(&control_words[offset], & control_words[plastic_synapse-1], sizeof(control_t));
 
     // Decrement FP
     fixed_region[1] = fixed_region[1] - 1;
@@ -407,10 +397,9 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uin
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     // Add weight at offset
     plastic_words[plastic_synapse] = new_weight;
-//    spin1_memcpy(&plastic_words[plastic_synapse], &new_weight, sizeof(plastic_synapse_t));
-//    // Add control word at offset
+    // Add control word at offset
     control_words[plastic_synapse] = new_control;
-//    spin1_memcpy(& control_words[plastic_synapse], &new_control, sizeof(control_t));
+
     // Increment FP
     fixed_region[1] = fixed_region[1] + 1;
     return true;

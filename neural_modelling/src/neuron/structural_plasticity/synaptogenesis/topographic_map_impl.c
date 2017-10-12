@@ -5,7 +5,6 @@
  *
  */
 #include "../synaptogenesis_dynamics.h"
-//#include "../../../common/maths-util.h"
 #include "../../population_table/population_table.h"
 
 
@@ -19,7 +18,6 @@
 #include "../../synapses.h"
 #include "../../plasticity/synapse_dynamics.h"
 
-//#include "../../../common/neuron-typedefs.h"
 #include "../../../common/maths-util.h"
 #include "../../../common/sp_structs.h"
 #include "simulation.h"
@@ -71,25 +69,7 @@ typedef struct {
 
 rewiring_data_t rewiring_data;
 
-//typedef struct {
-//
-//    // Address in SDRAM to write back plastic region to
-//    address_t sdram_writeback_address;
-//
-//    // Key of originating spike
-//    // (used to allow row data to be re-used for multiple spikes)
-//    spike_t originating_spike;
-//
-//    size_t n_bytes_transferred;
-//
-//    // Row data
-//    uint32_t *row;
-//
-//    // DMA Tag
-//    uint dma_id;
-//
-//} dma_buffer_t;
-
+// dma_buffer defined in spike_processing.h
 dma_buffer rewiring_dma_buffer;
 
 typedef struct {
@@ -332,11 +312,9 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
             return;
         }
 
-//        set_intercept(true, _spike);
         // unpack the spike into key and identifying information for the neuron
         // Identify pop, subpop and lo and hi atoms
         // Amazing linear search inc.
-        log_debug("last_spike %x", _spike);
         // Loop over all populations
         bool found=false;
         for (int i=0; i< rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
@@ -348,41 +326,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
                     choice = _spike & ~rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3];
                     found = true;
                 }
-//                log_info("%x %x %d",(_spike & rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[3]), rewiring_data.pre_pop_info_table.subpop_info[i].key_atom_info[KEY_INFO_CONSTANTS * subpop_index], found);
             }
         }
-//        if (!found) {
-//            // This means that the last spike did NOT originate from a source
-//            // which can be considered for synaptic rewiring
-//            // i.e. the connector is not structurally plastic
-//            // choose a random pre_synaptic connector
-//            // If element does not exist, select an arbitrary presynaptic population
-//
-//            // I SHOULDN'T USE THE SAME SEED AS THE OTHER POPULATIONS HERE AS IT WILL MESS UP
-//            // RN GENERATION ON DIFFERENT CORES
-//            log_error("NOT FOUND %x", _spike);
-//
-//            pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
-//            // Select presynaptic subpopulation
-//            choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].total_no_atoms;
-//            uint32_t sum=0;
-//            int i;
-//            for(i=0;i<rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].no_pre_vertices; i++) {
-//                sum += rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * i + 1];
-//                if (sum >= choice){
-//                    break;
-//                  }
-//            }
-//            pre_sub_pop = i;
-//            // Select a presynaptic neuron id
-//            choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *\
-//                rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * pre_sub_pop + 1];
-//            // Log all random stuff
-//            // population_table_get_first_address() returns the address (in SDRAM) of the selected synaptic row
-//            _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * pre_sub_pop] | choice;
-//
-//            log_debug("NOT FOUND, using %x", _spike);
-//        }
     }
     else {
         _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[pre_sub_pop * KEY_INFO_CONSTANTS + 0] | choice;
@@ -439,7 +384,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     if( delta_y > rewiring_data.grid_y>>1 )
         delta_y -= rewiring_data.grid_y;
 
-//    current_state.distance = my_abs(delta_x + delta_y);
     current_state.distance = delta_x * delta_x + delta_y * delta_y;
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
@@ -465,32 +409,27 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 // a fake spike and trigger a dma callback
 // and one to be called by the dma callback and then call formation or elimination
 void synaptic_row_restructure(uint dma_id, uint dma_tag){
-    // If I am here, then the DMA read was successful. As such, the synaptic row is in rewiring_dma_buffer, while
+    // If I am here, then the DMA read was successful.
+    // As such, the synaptic row is in rewiring_dma_buffer, while
     // the selected pre and postsynaptic ids are in current_state
 
-    // Check that I'm actually servicing the correct row by checking
-    // the current dma id with the one I received when I made the dma request
-//    if (dma_id != current_state.dma_id)
-//        log_error("invalid dma id %d != %d", dma_id, current_state.dma_id);
-//    if (dma_tag == DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING) {
-//        log_error("wth am i doing");
-//        rt_error(RTE_SWERR);
-//    }
     use(dma_id);
-//    if (dma_tag != DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING) {
-//        log_error("invalid dma_tag %d != %d", dma_tag, DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING);
-//        rt_error(RTE_SWERR);
-//    }
     use(dma_tag);
 //    uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
 
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_debug("sr_attempt %d %d exists %d", current_state.current_time, current_state.current_controls, current_state.element_exists);
+    /*ad*/log_debug("sr_attempt %d %d exists %d",
+        current_state.current_time,
+        current_state.current_controls,
+        current_state.element_exists);
 
-    bool search_hit = search_for_neuron(current_state.post_syn_id, rewiring_dma_buffer.row, &(current_state.sp_data));
-//    uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
+    bool search_hit = search_for_neuron(
+        current_state.post_syn_id,
+        rewiring_dma_buffer.row,
+        &(current_state.sp_data));
+
     if (current_state.element_exists && search_hit) {
         synaptogenesis_dynamics_elimination_rule();
     }
@@ -510,21 +449,10 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //
 //        log_info("%d",current_state.post_syn_id);
         log_info("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
-//
-//
-//        log_error("pre %d post %d", current_state.pre_syn_id, current_state.post_syn_id);
-//    current_state.pop_index = pre_app_pop;
-//    current_state.subpop_index = pre_sub_pop;
-//    current_state.neuron_index = choice;
-//    current_state.sdram_synaptic_row = synaptic_row_address;
-//    current_state.offset_in_table);
-//        rewiring_data.post_to_pre_table[current_state.offset_in_table+1] = 0xdeadbeef;
-//        rewiring_data.post_to_pre_table[current_state.offset_in_table+2] = -1;
+
         rt_error(RTE_SWERR);
     }
     else {
-//        log_error("should be formation");
-//        rt_error(RTE_SWERR);
         synaptogenesis_dynamics_formation_rule();
     }
 }
@@ -549,8 +477,6 @@ bool synaptogenesis_dynamics_elimination_rule(){
         log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
-
-//    log_info("removing %d", current_state.post_syn_id);
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
         while (-1 == spin1_dma_transfer(
                 DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
@@ -564,8 +490,6 @@ bool synaptogenesis_dynamics_elimination_rule(){
             current_state.current_controls,
             current_state.current_time);
         rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
-//        log_info("-1 @ %d", current_state.offset_in_table);
-
         return true;
     }
     return false;
@@ -574,7 +498,6 @@ bool synaptogenesis_dynamics_elimination_rule(){
 bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-//    log_info("curr time %d", current_state.current_time);
     uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
     if (no_elems == 32) {
         log_error("row is full");
@@ -624,12 +547,11 @@ bool synaptogenesis_dynamics_formation_rule(){
             current_state.current_controls,
             current_state.current_time);
         int the_pack = \
-            pack(current_state.pop_index, current_state.subpop_index, current_state.neuron_index);
-//        log_info("e_exists %d pack %d @ %d", current_state.element_exists, the_pack, current_state.offset_in_table);
-        rewiring_data.post_to_pre_table[current_state.offset_in_table] = the_pack;
-
-//        for (int i=0; i<32; i++)
-//            log_info("%x",rewiring_data.post_to_pre_table[i]);
+            pack(current_state.pop_index,
+                 current_state.subpop_index,
+                 current_state.neuron_index);
+        rewiring_data.post_to_pre_table[current_state.offset_in_table] = \
+            the_pack;
         return true;
     }
     return false;
