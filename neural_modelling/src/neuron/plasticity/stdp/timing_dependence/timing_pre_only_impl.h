@@ -43,6 +43,11 @@ typedef int16_t pre_trace_t;
 //extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 //extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 REAL th_v_mem;
+// Ca thresholds
+REAL th_ca_up_l;
+REAL th_ca_up_h;
+REAL th_ca_dn_l;
+REAL th_ca_dn_h;
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
@@ -128,12 +133,14 @@ static inline update_state_t timing_apply_pre_spike(
 
     previous_state.initial_weight = w;
 
-    if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem){
-    	log_info("above_threshold");
+    REAL I_Ca2 = post_synaptic_additional_input->I_Ca2;
+
+    if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem && I_Ca2 > th_ca_up_l && I_Ca2 < th_ca_up_h ){
+    	log_info("above_threshold, in ca range");
     	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);
 
-    } else {
-    	log_info("below threshold");
+    } else if (neuron_model_get_membrane_voltage(post_synaptic_neuron) <= th_v_mem && I_Ca2 > th_ca_dn_l && I_Ca2 < th_ca_dn_h ){
+    	log_info("below threshold, in ca range");
     	return weight_one_term_apply_depression(previous_state, last_pre_trace);
 
     }
@@ -147,7 +154,7 @@ static inline update_state_t timing_apply_pre_spike(
 
     // missing params: th_v, up range, down range, th_w (drifts), 2 drift rates
 
-//    return previous_state;
+    return previous_state;
 }
 
 //---------------------------------------

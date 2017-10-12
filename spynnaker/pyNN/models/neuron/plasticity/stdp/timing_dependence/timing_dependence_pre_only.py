@@ -18,11 +18,16 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependencePreOnly(AbstractTimingDependence):
 
-    def __init__(self, A_plus=0.01, A_minus=0.01, th_v_mem = -55.0  ):
+    def __init__(self, A_plus=0.01, A_minus=0.01, th_v_mem = -55.0, th_ca_up_l=0.0, th_ca_up_h=10.0, th_ca_dn_l=0.0, th_ca_dn_h=5.0 ):
         AbstractTimingDependence.__init__(self)
         self._A_plus = A_plus
         self._A_minus = A_minus
         self._th_v_mem = th_v_mem
+
+        self._th_ca_up_l = th_ca_up_l
+        self._th_ca_up_h = th_ca_up_h
+        self._th_ca_dn_l = th_ca_dn_l
+        self._th_ca_dn_h = th_ca_dn_h
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -41,6 +46,22 @@ class TimingDependencePreOnly(AbstractTimingDependence):
     @property
     def th_v_mem(self):
         return self._th_v_mem
+
+    @property
+    def th_ca_up_l(self):
+        return self._th_ca_up_l
+
+    @property
+    def th_ca_up_h(self):
+        return self._th_ca_up_h
+
+    @property
+    def th_ca_dn_l(self):
+        return self._th_ca_dn_l
+
+    @property
+    def th_ca_dn_h(self):
+        return self._th_ca_dn_h
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
@@ -63,7 +84,7 @@ class TimingDependencePreOnly(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
 #         return ( 4 + 4 + 4 )
-        return ( 4 )
+        return ( 4 * 5 )
     @property
     def n_weight_terms(self):
         return 1
@@ -77,9 +98,25 @@ class TimingDependencePreOnly(AbstractTimingDependence):
 #             data=int(round(self.A_minus)),
 #             data_type=DataType.INT32)
 
-        # write threshold
+        # write thresholds
         spec.write_value(
             data=int(round(self.th_v_mem)),
+            data_type=DataType.S1615)
+
+        spec.write_value(
+            data=int(round(self.th_ca_up_l)),
+            data_type=DataType.S1615)
+
+        spec.write_value(
+            data=int(round(self.th_ca_up_h)),
+            data_type=DataType.S1615)
+
+        spec.write_value(
+            data=int(round(self.th_ca_dn_l)),
+            data_type=DataType.S1615)
+
+        spec.write_value(
+            data=int(round(self.th_ca_dn_h)),
             data_type=DataType.S1615)
 
 
@@ -99,4 +136,4 @@ class TimingDependencePreOnly(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['A_plus', 'A_minus', 'th_v_mem']
+        return ['A_plus', 'A_minus', 'th_v_mem', 'th_ca_up_l', 'th_ca_up_h', 'th_ca_dn_l', 'th_ca_dn_h']
