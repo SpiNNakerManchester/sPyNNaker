@@ -232,12 +232,6 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.post_to_pre_table = sp_word;
 //    log_info("post to pre %x", rewiring_data.post_to_pre_table);
     int total_no_of_elements = rewiring_data.s_max * rewiring_data.machine_no_atoms;
-//    rewiring_data.post_to_pre_table = (int32_t*) sark_alloc(\
-//        total_no_of_elements, sizeof(int32_t));
-//    for (index = 0; index < total_no_of_elements; index++)
-//        rewiring_data.post_to_pre_table[index] = *sp_word++;
-//    log_info("%d", rewiring_data.post_to_pre_table);
-//    sp_word = sp_word + (total_no_of_elements * 4);
     sp_word = &rewiring_data.post_to_pre_table[total_no_of_elements + 1];
 
     // Setting up RNG
@@ -355,9 +349,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     log_debug("Reading %d bytes from %d saved %d", n_bytes, synaptic_row_address, rewiring_dma_buffer.row);
 
 
-    // Compute the distance at this point to optimize CPU usage.
-    // i.e. make use of it while servicing a DMA
-
+    // Compute distances
     // To do this I need to take the DIV and MOD of the postsyn neuron id, of the presyn neuron id
     // Compute the distance of these 2 measures (start with Manhattan distance)
     int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
@@ -394,7 +386,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         );
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
-
 
     spin1_dma_transfer(
     DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
