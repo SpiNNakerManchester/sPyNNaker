@@ -12,9 +12,9 @@
 typedef struct additional_input_t {
 
     // exp ( -(machine time step in ms)/(TauCa) )
-    REAL    exp_TauCa;
+    decay_t  exp_TauCa;
 
-    // Calcium current
+    // Calcium Concentration
     REAL    I_Ca2;
 
     // Influx of CA2 caused by each spike
@@ -27,10 +27,11 @@ static input_t additional_input_get_input_value_as_current(
         state_t membrane_voltage) {
 
     // Decay Ca2 trace
-    additional_input->I_Ca2 *= additional_input->exp_TauCa;
+    //additional_input->I_Ca2 *= additional_input->exp_TauCa;
+	additional_input->I_Ca2 = decay_s1615(additional_input->I_Ca2, additional_input->exp_TauCa);
+    log_info("calcium concentration from neuron code = %12.6k", additional_input->I_Ca2);
 
-
-    // Return 0.0 contribution from the Ca2
+    // Return 0.0 current contribution from the Ca2
     return ZERO;
 }
 
@@ -39,7 +40,6 @@ static void additional_input_has_spiked(
     // Apply influx of calcium to trace
     additional_input->I_Ca2 += additional_input->I_alpha;
 
-    log_info("calcium concentration = %12.6k", additional_input->I_Ca2);
 }
 
 #endif // _ADDITIONAL_INPUT_CA2_CONCENTRATION_H_

@@ -13,15 +13,19 @@
 #include <string.h>
 #include <debug.h>
 #include "../../models/neuron_model.h"
+#include "../../additional_inputs/additional_input.h"
+#include "../../threshold_types/threshold_type.h"
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 /*
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 */
-static neuron_pointer_t *neuron_array_stdp;
-// Get access to the neuron data
 
+// Get access to the neuron data
+static neuron_pointer_t *neuron_array_stdp;
+static additional_input_pointer_t *additional_input_array_stdp;
+static threshold_type_pointer_t *threshold_type_array_stdp;
 
 //---------------------------------------
 // Macros
@@ -80,7 +84,8 @@ final_state_t _update_on_pre_only(
 		const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
 		const uint32_t delay_axonal, update_state_t current_state,
 		const post_event_history_t *post_event_history,
-		neuron_pointer_t post_synaptic_neuron) {
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input ) {
 
 	// Apply axonal delay to time of last presynaptic spike
 	    const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -96,7 +101,8 @@ final_state_t _update_on_pre_only(
 	current_state = timing_apply_pre_spike(
 	        time, new_pre_trace, last_pre_time, last_pre_trace,
 	        post_window.prev_time, post_window.prev_trace, current_state,
-			post_synaptic_neuron);
+			post_synaptic_neuron,
+			post_synaptic_additional_input);
 
 	// update the weight and return
 	return synapse_structure_get_final_state(current_state);
@@ -290,7 +296,10 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type = synapse_row_sparse_type(control_word);
         uint32_t index = synapse_row_sparse_index(control_word);
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
+
         neuron_pointer_t post_synaptic_neuron = &neuron_array_stdp[index];
+        additional_input_pointer_t post_synaptic_additional_input =
+        		&additional_input_array_stdp[index];
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
@@ -303,7 +312,8 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = _update_on_pre_only(time, last_pre_time,
         		last_pre_trace, event_history->prev_trace,
                 delay_dendritic, delay_axonal, current_state,
-                &post_event_history[index], post_synaptic_neuron);
+                &post_event_history[index], post_synaptic_neuron,
+				post_synaptic_additional_input );
 
 
         /*
@@ -364,7 +374,16 @@ void neuron_set_neuron_synapse_shaping_params(
     neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
 */
+
 void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t *neuron_array){
 	neuron_array_stdp = neuron_array;
+}
+
+void synapse_dynamics_stdp_mad_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_stdp = threshold_type_array;
+}
+
+void synapse_dynamics_stdp_mad_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_stdp = additional_input_array;
 }
 

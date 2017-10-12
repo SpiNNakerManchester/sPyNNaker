@@ -10,6 +10,7 @@ typedef int16_t pre_trace_t;
 #include "../synapse_structure/synapse_structure_weight_impl.h"
 #include "timing.h"
 #include "../weight_dependence/weight_one_term.h"
+#include "../../../additional_inputs/additional_input_ca2_concentration_impl.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -100,7 +101,10 @@ static inline pre_trace_t timing_add_pre_spike(
 static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state, neuron_pointer_t post_synaptic_neuron) {
+        post_trace_t last_post_trace, update_state_t previous_state,
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input) {
+
     use(&trace);
     use(last_pre_time);
     use(&last_pre_trace);
@@ -109,6 +113,10 @@ static inline update_state_t timing_apply_pre_spike(
     int32_t w =  previous_state.initial_weight;
     int32_t th_w = previous_state.weight_region->th_weight;
     int32_t w_drift = previous_state.weight_region->weight_drift;
+
+    log_info("Ca concentration: %12.6k", post_synaptic_additional_input->I_Ca2);
+    log_info("Ca alpha: %12.6k", post_synaptic_additional_input->I_alpha);
+    log_info("Ca tau multiplier: %u", post_synaptic_additional_input->exp_TauCa);
 
     if(w>th_w){
     	log_info("drifting up w_drift: %d, dt: %d", w_drift, dt);

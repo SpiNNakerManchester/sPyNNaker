@@ -10,7 +10,7 @@ from enum import Enum
 
 
 class _CA2_TYPES(Enum):
-    EXP_TAU_CA2 = (1, DataType.S1615)
+    EXP_TAU_CA2 = (1, DataType.U032)
     I_CA2 = (2, DataType.S1615)
     I_ALPHA = (3, DataType.S1615)
 
