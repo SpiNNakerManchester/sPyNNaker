@@ -1,7 +1,6 @@
 from .abstract_connector import AbstractConnector
 from pacman.model.decorators import overrides
 import numpy
-from numpy.ma.core import ids
 
 
 class SmallWorldConnector(AbstractConnector):
@@ -36,8 +35,8 @@ class SmallWorldConnector(AbstractConnector):
             pre_positions, post_positions, False)
 
         # PyNN 0.8 returns a flattened (C-style) array from space.distances,
-        # so the easiest thing to do here is to reshape it back to the "expected"
-        # PyNN 0.7 shape again; otherwise later code gets confusing and difficult
+        # so the easiest thing to do here is to reshape back to the "expected"
+        # PyNN 0.7 shape; otherwise later code gets confusing and difficult
         if (len(distances.shape) == 1):
             d = numpy.reshape(distances, (pre_positions.shape[0],
                                           post_positions.shape[0]))
@@ -57,7 +56,6 @@ class SmallWorldConnector(AbstractConnector):
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
-        # In PyNN0.7, _mask is an N,M 2d array, in PyNN0.8 it is an N*M 1d array
         return numpy.sum(self._mask[pre_vertex_slice.as_slice,
                                     post_vertex_slice.as_slice])
 
@@ -115,7 +113,7 @@ class SmallWorldConnector(AbstractConnector):
 
         ids = numpy.where(self._mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
-        n_connections = len(ids)  # previously numpy.sum(ids) ?  why?
+        n_connections = len(ids)
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)

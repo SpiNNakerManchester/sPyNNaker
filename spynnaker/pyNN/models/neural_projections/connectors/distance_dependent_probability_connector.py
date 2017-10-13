@@ -11,7 +11,6 @@ from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
 from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
 from numpy import log, log10, modf, power, sin, sinh, sqrt
 from numpy import tan, tanh, maximum, minimum, e, pi
-from pip._vendor.requests.api import post
 
 logger = logging.getLogger(__name__)
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
@@ -72,10 +71,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             pre_positions, post_positions, expand_distances)
 
         # PyNN 0.8 returns a flattened (C-style) array from space.distances,
-        # so the easiest thing to do here is to reshape it back to the "expected"
-        # PyNN 0.7 shape again; otherwise later code gets confusing and difficult
+        # so the easiest thing to do here is to reshape back to the "expected"
+        # PyNN 0.7 shape; otherwise later code gets confusing and difficult
         if (len(d1.shape) == 1):
-            d = numpy.reshape(d1, (pre_positions.shape[0],post_positions.shape[0]))
+            d = numpy.reshape(d1, (pre_positions.shape[0],
+                                   post_positions.shape[0]))
         else:
             d = d1
 
