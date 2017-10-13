@@ -1,5 +1,7 @@
 from .abstract_connector import AbstractConnector
+from pacman.model.decorators import overrides
 import numpy
+from numpy.ma.core import ids
 
 
 class SmallWorldConnector(AbstractConnector):
@@ -9,20 +11,41 @@ class SmallWorldConnector(AbstractConnector):
             verbose=False, n_connections=None):
         AbstractConnector.__init__(self, safe, verbose)
         self._rewiring = rewiring
+        self._degree = degree
 
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
                 " SmallWorldConnector on this platform")
 
+    @overrides(AbstractConnector.set_projection_information)
+    def set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step):
+        AbstractConnector.set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step)
+        self.set_probabilities()
+
+    def set_probabilities(self):
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
+        # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
         pre_positions = self._pre_population.positions
         post_positions = self._post_population.positions
+
         distances = self._space.distances(
             pre_positions, post_positions, False)
-        self._degree = degree
-        self._mask = (distances < degree).as_type(float)
+
+        # PyNN 0.8 returns a flattened (C-style) array from space.distances,
+        # so the easiest thing to do here is to reshape it back to the "expected"
+        # PyNN 0.7 shape again; otherwise later code gets confusing and difficult
+        if (len(distances.shape) == 1):
+            d = numpy.reshape(distances, (pre_positions.shape[0],
+                                          post_positions.shape[0]))
+        else:
+            d = distances
+
+        self._mask = (d < self._degree).astype(float)
+
         self._n_connections = numpy.sum(self._mask)
 
     def get_delay_maximum(self):
@@ -34,15 +57,15 @@ class SmallWorldConnector(AbstractConnector):
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
-        return numpy.sum(
-            self._mask[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
+        # In PyNN0.7, _mask is an N,M 2d array, in PyNN0.8 it is an N*M 1d array
+        return numpy.sum(self._mask[pre_vertex_slice.as_slice,
+                                    post_vertex_slice.as_slice])
 
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
-        n_connections = numpy.amax([
+        n_connections = numpy.sum([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
             for i in range(
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)])
@@ -57,7 +80,7 @@ class SmallWorldConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = numpy.amax([
+        n_connections = numpy.sum([
             numpy.sum(self._mask[pre_vertex_slice.as_slice, i])
             for i in range(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
@@ -92,7 +115,7 @@ class SmallWorldConnector(AbstractConnector):
 
         ids = numpy.where(self._mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
-        n_connections = numpy.sum(ids)
+        n_connections = len(ids)  # previously numpy.sum(ids) ?  why?
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)

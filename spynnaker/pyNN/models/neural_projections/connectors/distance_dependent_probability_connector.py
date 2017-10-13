@@ -1,6 +1,7 @@
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spinn_utilities.safe_eval import SafeEval
+from pacman.model.decorators import overrides
 import logging
 import numpy
 import math
@@ -10,6 +11,7 @@ from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
 from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
 from numpy import log, log10, modf, power, sin, sinh, sqrt
 from numpy import tan, tanh, maximum, minimum, e, pi
+from pip._vendor.requests.api import post
 
 logger = logging.getLogger(__name__)
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
@@ -52,14 +54,31 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 "n_connections is not implemented for"
                 " DistanceDependentProbabilityConnector on this platform")
 
-        # Get the probabilities up-front for now
+    @overrides(AbstractConnector.set_projection_information)
+    def set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step):
+        AbstractConnector.set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step)
+        self.set_probabilities()
+
+    def set_probabilities(self):
+        # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self._d_expression)
         pre_positions = self._pre_population.positions
         post_positions = self._post_population.positions
 
-        d = self._space.distances(
+        d1 = self._space.distances(
             pre_positions, post_positions, expand_distances)
+
+        # PyNN 0.8 returns a flattened (C-style) array from space.distances,
+        # so the easiest thing to do here is to reshape it back to the "expected"
+        # PyNN 0.7 shape again; otherwise later code gets confusing and difficult
+        if (len(d1.shape) == 1):
+            d = numpy.reshape(d1, (pre_positions.shape[0],post_positions.shape[0]))
+        else:
+            d = d1
+
         self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
     def get_delay_maximum(self):
@@ -128,13 +147,12 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
 
-        probs = self._probs[
-            pre_slice_index.to_slice, post_slice_index.to_slice]
+        probs = self._probs[pre_slice_index, post_slice_index]
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
-        # If self connections are not allowed, remove possibility the self
-        # connections by setting them to a value of infinity
+        # If self connections are not allowed, remove the possibility of
+        # self connections by setting them to a value of infinity
         if not self._allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
