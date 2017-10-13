@@ -104,19 +104,19 @@ class TimingDependencePreOnly(AbstractTimingDependence):
             data_type=DataType.S1615)
 
         spec.write_value(
-            data=int(round(self.th_ca_up_l)),
+            data=self.th_ca_up_l,
             data_type=DataType.S1615)
 
         spec.write_value(
-            data=int(round(self.th_ca_up_h)),
+            data=self.th_ca_up_h,
             data_type=DataType.S1615)
 
         spec.write_value(
-            data=int(round(self.th_ca_dn_l)),
+            data=self.th_ca_dn_l,
             data_type=DataType.S1615)
 
         spec.write_value(
-            data=int(round(self.th_ca_dn_h)),
+            data=self.th_ca_dn_h,
             data_type=DataType.S1615)
 
 

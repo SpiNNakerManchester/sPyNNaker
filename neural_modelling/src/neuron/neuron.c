@@ -301,19 +301,19 @@ void neuron_store_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
 
-    log_info("writing neuron global parameters");
+    //log_info("writing neuron global parameters");
     memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
-    log_info("writing neuron local parameters");
+    //log_info("writing neuron local parameters");
     memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
-    log_info("writing input type parameters");
+    //log_info("writing input type parameters");
     memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
-    log_info("writing additional input type parameters");
+    //log_info("writing additional input type parameters");
     memcpy(&address[next], additional_input_array,
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
@@ -360,6 +360,7 @@ void neuron_do_timestep_update(timer_t time) {
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        log_info("neuron %u  time %u", neuron_index, time);
 
         // Get the parameters for this neuron
         neuron_pointer_t neuron = &neuron_array[neuron_index];

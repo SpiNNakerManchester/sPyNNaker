@@ -135,6 +135,8 @@ static inline update_state_t timing_apply_pre_spike(
 
     REAL I_Ca2 = post_synaptic_additional_input->I_Ca2;
 
+    log_info("Ca: %12.6k, dn_l:  %12.6k, dn_h:  %12.6k", I_Ca2, th_ca_dn_l, th_ca_dn_h);
+
     if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem && I_Ca2 > th_ca_up_l && I_Ca2 < th_ca_up_h ){
     	log_info("above_threshold, in ca range");
     	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);
