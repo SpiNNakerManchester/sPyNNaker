@@ -1,38 +1,30 @@
-from pyNN.space import Space
-
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-
+from .abstract_connector import AbstractConnector
+from spinn_utilities.safe_eval import SafeEval
 import logging
 import numpy
 import math
 
 # support for arbitrary expression for the distance dependence
-# NOTE: Do NOT delete these to fix PEP8 issues
-
-# noinspection PyUnresolvedReferences
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos  # @UnusedImport
-
-# noinspection PyUnresolvedReferences
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp  # @UnusedImport
-
-# noinspection PyUnresolvedReferences
-from numpy import log, log10, modf, power, sin, sinh, sqrt  # @UnusedImport
-
-# noinspection PyUnresolvedReferences
-from numpy import tan, tanh, maximum, minimum, e, pi  # @UnusedImport
+from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
+from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
+from numpy import log, log10, modf, power, sin, sinh, sqrt
+from numpy import tan, tanh, maximum, minimum, e, pi
 
 logger = logging.getLogger(__name__)
+_d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
+                           cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
+                           log, log10, modf, power, sin, sinh, sqrt, tan, tanh,
+                           maximum, minimum, e=e, pi=pi)
 
 
 class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
     """
 
-    def __init__(self, d_expression, allow_self_connections=True,
-                 weights=0.0, delays=1, space=Space(), safe=True,
-                 verbose=False, n_connections=None):
+    def __init__(
+            self, d_expression, allow_self_connections=True, safe=True,
+            verbose=False, n_connections=None):
         """
 
         :param `string` d_expression:
@@ -45,25 +37,16 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-            will be set to the global minimum delay.
         :param `pyNN.Space` space:
             a Space object, needed if you wish to specify distance-
             dependent weights or delays
         :param `int` n_connections:
             The number of efferent synaptic connections per neuron.
         """
-        AbstractConnector.__init__(self, safe, space, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
         self._d_expression = d_expression
         self._allow_self_connections = allow_self_connections
-        self._weights = weights
-        self._delays = delays
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
@@ -75,11 +58,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         pre_positions = self._pre_population.positions
         post_positions = self._post_population.positions
 
-        # d is apparently unused, but is in fact expected by d_expression
-        # so is used when eval is called
-        d = self._space.distances(  # @UnusedVariable
+        d = self._space.distances(
             pre_positions, post_positions, expand_distances)
-        self._probs = eval(self._d_expression)
+        self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -87,6 +68,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
+
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
         max_prob = numpy.amax(
@@ -118,9 +104,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
-            pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
@@ -171,3 +154,23 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "DistanceDependentProbabilityConnector({})".format(
+            self._d_expression)
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value
+
+    @property
+    def d_expression(self):
+        return self._d_expression
+
+    @d_expression.setter
+    def d_expression(self, new_value):
+        self._d_expression = new_value

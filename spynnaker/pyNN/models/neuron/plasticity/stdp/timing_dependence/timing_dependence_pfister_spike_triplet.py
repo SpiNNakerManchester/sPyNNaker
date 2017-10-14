@@ -1,10 +1,10 @@
-
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    .abstract_timing_dependence import AbstractTimingDependence
+    import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    .synapse_structure_weight_only import SynapseStructureWeightOnly
+    import SynapseStructureWeightOnly
 
 import logging
 logger = logging.getLogger(__name__)
@@ -124,3 +124,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
             "PfisterSpikeTripletRule", "tau_y_last_entry",
             "tau_y", self._tau_y_last_entry))
         return prov_data
+
+    @overrides(AbstractTimingDependence.get_parameter_names)
+    def get_parameter_names(self):
+        return ['tau_plus', 'tau_minus', 'tau_x', 'tau_y']

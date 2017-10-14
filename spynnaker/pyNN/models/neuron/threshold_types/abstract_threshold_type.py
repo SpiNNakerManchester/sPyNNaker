@@ -1,12 +1,14 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractThresholdType(object):
     """ Represents types of threshold for a neuron (e.g. stochastic)
     """
+
+    __slots__ = ()
 
     @abstractmethod
     def get_n_threshold_parameters(self):
@@ -23,6 +25,14 @@ class AbstractThresholdType(object):
         :return: An array of parameters
         :rtype: array of\
                 :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+        """
+
+    @abstractmethod
+    def get_threshold_parameter_types(self):
+        """ Get the types of the threshold parameters
+
+        :return: A list of DataType objects, in the order of the parameters
+        :rtype: list of :py:class:`data_specification.enums.DataType`
         """
 
     @abstractmethod
@@ -49,3 +59,14 @@ class AbstractThresholdType(object):
         :rtype: int
         """
         return self.get_n_threshold_parameters() * 4
+
+    def set_threshold_parameters(self, parameters, vertex_slice):
+        """ Sets the threshold type parameters.  Override if there are any\
+            variables that change.
+
+        :param parameters:\
+            the parameter values in a list of numpy arrays, ordered the same\
+            as get_threshold_type_parameters
+        :param vertex_slice: The neurons to which the parameters apply
+        """
+        pass

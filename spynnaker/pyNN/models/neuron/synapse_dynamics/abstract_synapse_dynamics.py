@@ -1,13 +1,14 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-
 import numpy
 import math
 
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-@add_metaclass(ABCMeta)
+
+@add_metaclass(AbstractBase)
 class AbstractSynapseDynamics(object):
+
+    __slots__ = ()
 
     NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
                               ("weight", "float64"), ("delay", "float64")]
@@ -37,6 +38,14 @@ class AbstractSynapseDynamics(object):
         """ Write the synapse parameters to the spec
         """
 
+    @abstractmethod
+    def get_parameter_names(self):
+        """ return the parameter names available from the synapse \
+            dynamics components
+
+        :return: iterable list of basestring
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """
@@ -46,6 +55,15 @@ class AbstractSynapseDynamics(object):
         """ Get the maximum delay for the synapses
         """
         return connector.get_delay_maximum()
+
+    def get_delay_variance(
+            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        """ Get the variance in delay for the synapses
+        """
+        return connector.get_delay_variance(
+            n_pre_slices, pre_slice_index, n_post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice)
 
     def get_weight_mean(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,

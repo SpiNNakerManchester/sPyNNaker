@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.abstract_models.abstract_population_settable \
-    import AbstractPopulationSettable
+from pacman.model.decorators import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 
 class SimplePopulationSettable(AbstractPopulationSettable):
@@ -7,25 +7,18 @@ class SimplePopulationSettable(AbstractPopulationSettable):
         Population i.e. no properties are hidden
     """
 
-    def __init__(self):
-        AbstractPopulationSettable.__init__(self)
+    __slots__ = ()
 
+    @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
-        """ Get a property of the overall model
-        """
         if hasattr(self, key):
             return getattr(self, key)
         raise Exception("Population {} does not have parameter {}".format(
             self, key))
 
+    @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property of the overall model
-
-        :param key: the name of the param to change
-        :param value: the value of the parameter to change
-        """
         if hasattr(self, key):
             setattr(self, key, value)
         else:
-            raise Exception("Type {} does not have parameter {}"
-                            .format(self._model_name, key))
+            raise Exception("Parameter {} not found".format(key))

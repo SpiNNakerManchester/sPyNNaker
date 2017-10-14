@@ -1,19 +1,15 @@
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-
+from .abstract_connector import AbstractConnector
 import numpy
 
 
 class SmallWorldConnector(AbstractConnector):
 
     def __init__(
-            self, degree, rewiring, allow_self_connections=True, weights=0.0,
-            delays=1, space=None, safe=True, verbose=False,
-            n_connections=None):
-        AbstractConnector.__init__(self, safe, space, verbose)
+            self, degree, rewiring, allow_self_connections=True, safe=True,
+            verbose=False, n_connections=None):
+        AbstractConnector.__init__(self, safe, verbose)
         self._rewiring = rewiring
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
@@ -25,11 +21,17 @@ class SmallWorldConnector(AbstractConnector):
         post_positions = self._post_population.positions
         distances = self._space.distances(
             pre_positions, post_positions, False)
+        self._degree = degree
         self._mask = (distances < degree).as_type(float)
         self._n_connections = numpy.sum(self._mask)
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._delays, self._n_connections)
+
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         return numpy.sum(
@@ -65,8 +67,6 @@ class SmallWorldConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
@@ -114,3 +114,7 @@ class SmallWorldConnector(AbstractConnector):
             post_vertex_slice.lo_atom)
 
         return block
+
+    def __repr__(self):
+        return "SmallWorldConnector(degree={}, rewiring={})".format(
+            self._degree, self._rewiring)

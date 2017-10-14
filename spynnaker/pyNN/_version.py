@@ -1,4 +1,4 @@
-__version__ = "2016.001"
-__version_month__ = "March"
-__version_year__ = "2016"
-__version_name__ = "Another Fine Product from the Nonsense Factory"
+from spynnaker._version import __version__  # NOQA
+from spynnaker._version import __version_name__  # NOQA
+from spynnaker._version import __version_month__  # NOQA
+from spynnaker._version import __version_year__  # NOQA

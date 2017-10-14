@@ -1,12 +1,13 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractRandomStats(object):
     """ Statistics about PyNN RandomDistribution objects
     """
+    __slots__ = ()
 
     @abstractmethod
     def cdf(self, dist, v):
@@ -31,4 +32,16 @@ class AbstractRandomStats(object):
     @abstractmethod
     def var(self, dist):
         """ Return the variance of the distribution
+        """
+
+    @abstractmethod
+    def high(self, dist):
+        """ Return the high cutoff value of the distribution, or None if the\
+            distribution is unbounded
+        """
+
+    @abstractmethod
+    def low(self, dist):
+        """ Return the low cutoff value of the distribution, or None if the\
+            distribution is unbounded
         """

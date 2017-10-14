@@ -1,18 +1,16 @@
-
 # general imports
-from abc import ABCMeta
-from six import add_metaclass
-from abc import abstractmethod
 import logging
+from six import add_metaclass
+
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 logger = logging.getLogger(__name__)
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractMasterPopTableFactory(object):
 
-    def __init__(self):
-        pass
+    __slots__ = ()
 
     @abstractmethod
     def extract_synaptic_matrix_data_location(
@@ -29,27 +27,27 @@ class AbstractMasterPopTableFactory(object):
         :type master_pop_base_mem_address: int
         :type chip_y: int
         :type chip_x: int
-        :type txrx: spinnman.transciever.Transciever object
+        :type txrx: spinnman.transceiver.Transceiver object
         :return: a synaptic matrix memory position.
         """
 
     @abstractmethod
     def update_master_population_table(
             self, spec, block_start_addr, row_length, keys_and_masks,
-            master_pop_table_region):
+            master_pop_table_region, is_single=False):
         """ updates a spec with a master pop entry in some form
 
         :param spec: the spec to write the master pop entry to
-        :param block_start_addr: the start address of the master pop table
+        :param block_start_addr: the start address of the row in the region
         :param row_length: the row length of this entry
         :param keys_and_masks: list of key_and_mask objects containing the\
                     keys and masks for a given edge that will require being\
                     received to be stored in the master pop table
         :type keys_and_masks: list of\
-                    :py:class:`pacman.model.routing_info.key_and_mask.KeyAndMask`
+            :py:class:`pacman.model.routing_info.KeyAndMask`
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
-        :return:
+        :param is_single: True if this is a single synapse, False otherwise
         """
 
     @abstractmethod
@@ -59,7 +57,6 @@ class AbstractMasterPopTableFactory(object):
         :param spec: the spec to write the master pop entry to
         :param master_pop_table_region: the region to which the master pop\
                     table is being stored
-        :return:
         """
 
     @abstractmethod
@@ -69,8 +66,7 @@ class AbstractMasterPopTableFactory(object):
 
         :return: a list of constraints
         :rtype: list of\
-                    :py:class:`pacman.model.constraints.abstract_constraint.AbstractConstraint`
-        :raise None: this method does not raise any known exceptions
+            :py:class:`pacman.model.constraints.AbstractConstraint`
         """
 
     @abstractmethod

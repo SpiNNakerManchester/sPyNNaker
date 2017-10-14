@@ -1,5 +1,5 @@
 APP = spike_source_poisson
 BUILD_DIR = build/
-OBJECTS = ../../common/out_spikes.o spike_source_poisson.o
+SOURCES = ../../common/out_spikes.c spike_source_poisson.c
 
 include ../../Makefile.common

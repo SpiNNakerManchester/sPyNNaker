@@ -1,6 +1,4 @@
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-
+from .abstract_connector import AbstractConnector
 import numpy
 import logging
 
@@ -12,9 +10,7 @@ class AllToAllConnector(AbstractConnector):
         the postsynaptic population
     """
 
-    def __init__(
-            self, weights=0.0, delays=1, allow_self_connections=True,
-            space=None, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
 
         :param `bool` allow_self_connections:
@@ -22,19 +18,28 @@ class AllToAllConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list/
-            1D array with at least as many items as connections to be
-            created. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic delays
-            will be set to the global minimum delay.
     """
-        AbstractConnector.__init__(self, safe, space, verbose)
+        AbstractConnector.__init__(self, safe, verbose)
+        self._allow_self_connections = allow_self_connections
+        self._weights = None
+        self._delays = None
+
+    def set_weights_and_delays(self, weights, delays):
+        """ sets the weights and delays as needed
+
+        :param `float` weights:
+            may either be a float, a !RandomDistribution object, a list \
+            1D array with at least as many items as connections to be \
+            created, or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            delays will be set to the global minimum delay.
+        :raises Exception: when not a standard interface of list, scaler, \
+            or random number generator
+        :raises NotImplementedError: when lists are not supported and entered
+        """
         self._weights = weights
         self._delays = delays
-        self._allow_self_connections = allow_self_connections
-
-        self._check_parameters(weights, delays)
+        self._check_parameters(weights, delays, allow_lists=True)
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections
@@ -49,12 +54,19 @@ class AllToAllConnector(AbstractConnector):
             slice(n + post_vertex_slice.lo_atom, n + stop_atom)
             for n in range(
                 pre_vertex_slice.lo_atom * n_post_neurons,
-                (pre_vertex_slice.hi_atom + 1 * n_post_neurons),
+                (pre_vertex_slice.hi_atom + 1) * n_post_neurons,
                 n_post_neurons)]
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, self._n_pre_neurons * self._n_post_neurons)
+
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        connection_slices = self._connection_slices(
+            pre_vertex_slice, post_vertex_slice)
+        return self._get_delay_variance(self._delays, connection_slices)
 
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
@@ -157,3 +169,14 @@ class AllToAllConnector(AbstractConnector):
             self._delays, n_connections, connection_slices)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "AllToAllConnector()"
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value

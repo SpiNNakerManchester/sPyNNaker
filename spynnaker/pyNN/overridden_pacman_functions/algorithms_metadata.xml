@@ -1,86 +1,54 @@
-<algorithms>
+<algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="GraphEdgeFilter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>new_sub_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>new_graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-        </produces_outputs>
+        <outputs>
+            <param_type>MemoryMachineGraph</param_type>
+            <param_type>MemoryGraphMapper</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="GraphEdgeWeightUpdater">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</python_module>
         <python_class>GraphEdgeWeightUpdater</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>graph_mapper</param_name>
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
-        </required_inputs>
-        <parameters>
-        </parameters>
-        <produces_outputs>
-            <parameter>
-                <param_name>subgraph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-        </produces_outputs>
-    </algorithm>
-    <algorithm name="SpyNNakerRecordingExtractor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_recording_extractor</python_module>
-        <python_class>SpyNNakerRecordingExtractor</python_class>
+        </input_definitions>
         <required_inputs>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>placements</param_name>
-                <param_type>MemoryPlacements</param_type>
-            </parameter>
-            <parameter>
-                <param_name>runtime_in_machine_time_steps</param_name>
-                <param_type>RunTimeMachineTimeSteps</param_type>
-            </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
-                <param_name>buffer_manager</param_name>
-                <param_type>BufferManager</param_type>
-            </parameter>
-            <parameter>
-                <param_name>ran_token</param_name>
-                <param_type>RanToken</param_type>
-            </parameter>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
         </required_inputs>
+        <outputs>
+            <param_type>MemoryMachineGraph</param_type>
+        </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
-        <required_inputs>
+        <input_definitions>
             <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
@@ -90,24 +58,9 @@
                 <param_type>MemoryGraphMapper</param_type>
             </parameter>
             <parameter>
-                <param_name>tags</param_name>
-                <param_type>MemoryTags</param_type>
-            </parameter>
-            <parameter>
-                <param_name>executable_finder</param_name>
-                <param_type>ExecutableFinder</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitioned_graph</param_name>
-                <param_type>MemoryPartitionedGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>partitionable_graph</param_name>
-                <param_type>MemoryPartitionableGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>routing_infos</param_name>
-                <param_type>MemoryRoutingInfos</param_type>
+                <param_name>graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
                 <param_name>hostname</param_name>
@@ -125,16 +78,82 @@
                 <param_name>app_data_runtime_folder</param_name>
                 <param_type>ApplicationDataFolder</param_type>
             </parameter>
-        </required_inputs>
-        <produces_outputs>
             <parameter>
-                <param_name>executable_targets</param_name>
-                <param_type>ExecutableTargets</param_type>
+                <param_name>machine</param_name>
+                <param_type>MemoryExtendedMachine</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>placements</param_name>
+            <param_name>graph</param_name>
+            <param_name>hostname</param_name>
+            <param_name>report_default_directory</param_name>
+            <param_name>write_text_specs</param_name>
+            <param_name>app_data_runtime_folder</param_name>
+            <param_name>machine</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>graph_mapper</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>DataSpecificationTargets</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="SynapticMatrixReport">
+        <python_module>spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report</python_module>
+        <python_class>SpYNNakerSynapticMatrixReport</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>connection_holder</param_name>
+                <param_type>ConnectionHolders</param_type>
             </parameter>
             <parameter>
                 <param_name>dsg_targets</param_name>
                 <param_type>DataSpecificationTargets</param_type>
             </parameter>
-        </produces_outputs>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>connection_holder</param_name>
+            <param_name>dsg_targets</param_name>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="SpYNNakerConnectionHolderGenerator">
+        <python_module>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations</python_module>
+        <python_class>SpYNNakerConnectionHolderGenerator</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>application_graph</param_name>
+        </required_inputs>
+        <outputs>
+            <param_type>ConnectionHolders</param_type>
+        </outputs>
+    </algorithm>
+    <algorithm name="SpYNNakerNeuronGraphNetworkSpecificationReport">
+        <python_module>spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report</python_module>
+        <python_class>SpYNNakerNeuronGraphNetworkSpecificationReport</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>report_folder</param_name>
+            <param_name>application_graph</param_name>
+        </required_inputs>
     </algorithm>
 </algorithms>

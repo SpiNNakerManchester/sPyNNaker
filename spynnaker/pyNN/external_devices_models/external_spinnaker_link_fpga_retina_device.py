@@ -1,0 +1,173 @@
+import logging
+
+from pacman.model.constraints.key_allocator_constraints \
+    import FixedKeyAndMaskConstraint
+from pacman.model.decorators import overrides
+from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from pacman.model.routing_info import BaseKeyAndMask
+from spinn_front_end_common.abstract_models import \
+    AbstractProvidesOutgoingPartitionConstraints
+from spinn_front_end_common.abstract_models \
+    import AbstractSendMeMulticastCommandsVertex
+from spinn_front_end_common.abstract_models.impl\
+    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.utility_models import MultiCastCommand
+from spynnaker.pyNN.exceptions import SpynnakerException
+
+logger = logging.getLogger(__name__)
+
+
+def get_y_from_fpga_retina(key, mode):
+    if mode == 128:
+        return key & 0x7f
+    elif mode == 64:
+        return key & 0x3f
+    elif mode == 32:
+        return key & 0x1f
+    elif mode == 16:
+        return key & 0xf
+    else:
+        return None
+
+
+def get_x_from_fpga_retina(key, mode):
+    if mode == 128:
+        return (key >> 7) & 0x7f
+    elif mode == 64:
+        return (key >> 6) & 0x3f
+    elif mode == 32:
+        return (key >> 5) & 0x1f
+    elif mode == 16:
+        return (key >> 4) & 0xf
+    else:
+        return None
+
+
+def get_spike_value_from_fpga_retina(key, mode):
+    if mode == 128:
+        return (key >> 14) & 0x1
+    elif mode == 64:
+        return (key >> 14) & 0x1
+    elif mode == 32:
+        return (key >> 14) & 0x1
+    elif mode == 16:
+        return (key >> 14) & 0x1
+    else:
+        return None
+
+
+class ExternalFPGARetinaDevice(
+        ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
+        AbstractProvidesOutgoingPartitionConstraints,
+        ProvidesKeyToAtomMappingImpl):
+
+    MODE_128 = "128"
+    MODE_64 = "64"
+    MODE_32 = "32"
+    MODE_16 = "16"
+    UP_POLARITY = "UP"
+    DOWN_POLARITY = "DOWN"
+    MERGED_POLARITY = "MERGED"
+
+    default_parameters = {
+        'board_address': None, 'label': "ExternalFPGARetinaDevice"}
+
+    def __init__(
+            self, mode, retina_key, spinnaker_link_id, polarity,
+            label=default_parameters['label'], n_neurons=None,
+            board_address=default_parameters['board_address']):
+        """
+        :param mode: The retina "mode"
+        :param retina_key: The value of the top 16-bits of the key
+        :param spinnaker_link_id: The spinnaker link to which the retina is\
+                connected
+        :param polarity: The "polarity" of the retina data
+        :param label:
+        :param n_neurons: The number of neurons in the population
+        :param board_address:
+        """
+        self._polarity = polarity
+        self._fixed_key = (retina_key & 0xFFFF) << 16
+        self._fixed_mask = 0xFFFF8000
+        if polarity == ExternalFPGARetinaDevice.UP_POLARITY:
+            self._fixed_key |= 0x4000
+
+        fixed_n_neurons = self.get_n_neurons(mode, polarity)
+        self._fixed_mask = self._get_mask(mode)
+
+        if fixed_n_neurons != n_neurons and n_neurons is not None:
+            logger.warn("The specified number of neurons for the FPGA retina"
+                        " device has been ignored {} will be used instead"
+                        .format(fixed_n_neurons))
+        ApplicationSpiNNakerLinkVertex.__init__(
+            self, n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+            label=label, max_atoms_per_core=fixed_n_neurons,
+            board_address=board_address)
+        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
+        ProvidesKeyToAtomMappingImpl.__init__(self)
+
+    def _get_mask(self, mode):
+        if mode == ExternalFPGARetinaDevice.MODE_128:
+            return 0xFFFFC000
+        elif mode == ExternalFPGARetinaDevice.MODE_64:
+            return 0xFFFFF000
+        elif mode == ExternalFPGARetinaDevice.MODE_32:
+            return 0xFFFFFC00
+        elif mode == ExternalFPGARetinaDevice.MODE_16:
+            return 0xFFFFFF00
+        else:
+            raise SpynnakerException(
+                "the FPGA retina does not recognise this mode")
+
+    @staticmethod
+    def get_n_neurons(mode, polarity):
+        if mode == ExternalFPGARetinaDevice.MODE_128:
+            if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
+                    polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
+                return 128 * 128
+            else:
+                return 128 * 128 * 2
+        elif mode == ExternalFPGARetinaDevice.MODE_64:
+            if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
+                    polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
+                return 64 * 64
+            else:
+                return 64 * 64 * 2
+        elif mode == ExternalFPGARetinaDevice.MODE_32:
+            if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
+                    polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
+                return 32 * 32
+            else:
+                return 32 * 32 * 2
+        elif mode == ExternalFPGARetinaDevice.MODE_16:
+            if (polarity == ExternalFPGARetinaDevice.UP_POLARITY or
+                    polarity == ExternalFPGARetinaDevice.DOWN_POLARITY):
+                return 16 * 16
+            else:
+                return 16 * 16 * 2
+        else:
+            raise SpynnakerException(
+                "the FPGA retina does not recognise this mode")
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
+    def start_resume_commands(self):
+        return [MultiCastCommand(
+            key=0x0000FFFF, payload=1, repeat=5,
+            delay_between_repeats=100)]
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
+    def pause_stop_commands(self):
+        return [MultiCastCommand(
+            key=0x0000FFFE, payload=0, repeat=5,
+            delay_between_repeats=100)]
+
+    @property
+    @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
+    def timed_commands(self):
+        return []
+
+    def get_outgoing_partition_constraints(self, partition):
+        return [FixedKeyAndMaskConstraint(
+            [BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]

@@ -1,7 +1,6 @@
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_projections.connectors.abstract_connector \
-    import AbstractConnector
-from spinn_front_end_common.utilities import exceptions
+from .abstract_connector import AbstractConnector
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import math
 import numpy
 
@@ -18,27 +17,19 @@ class FixedProbabilityConnector(AbstractConnector):
         Population to itself, this flag determines whether a neuron is
         allowed to connect to itself, or only to other neurons in the
         Population.
-    :param weights:
-        may either be a float or a !RandomDistribution object. Units nA.
-    :param delays:
-        If `None`, all synaptic delays will be set
-        to the global minimum delay.
     :param `pyNN.Space` space:
         a Space object, needed if you wish to specify distance-
         dependent weights or delays - not implemented
     """
     def __init__(
-            self, p_connect, weights=0.0, delays=1,
-            allow_self_connections=True, safe=True, space=None, verbose=False):
-        AbstractConnector.__init__(self, safe, space, verbose)
+            self, p_connect, allow_self_connections=True, safe=True,
+            verbose=False):
+        AbstractConnector.__init__(self, safe, verbose)
         self._p_connect = p_connect
-        self._weights = weights
-        self._delays = delays
         self._allow_self_connections = allow_self_connections
 
-        self._check_parameters(weights, delays, allow_lists=False)
         if not 0 <= self._p_connect <= 1:
-            raise exceptions.ConfigurationException(
+            raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
 
     def get_delay_maximum(self):
@@ -46,6 +37,11 @@ class FixedProbabilityConnector(AbstractConnector):
             self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons, self._p_connect))
+
+    def get_delay_variance(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice):
+        return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
@@ -73,8 +69,6 @@ class FixedProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
@@ -124,3 +118,6 @@ class FixedProbabilityConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def __repr__(self):
+        return "FixedProbabilityConnector({})".format(self._p_connect)

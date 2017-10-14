@@ -1,11 +1,13 @@
 from six import add_metaclass
-from abc import ABCMeta
-from abc import abstractmethod
-from abc import abstractproperty
+
+from spinn_utilities.abstract_base import \
+    AbstractBase, abstractmethod, abstractproperty
 
 
-@add_metaclass(ABCMeta)
+@add_metaclass(AbstractBase)
 class AbstractTimingDependence(object):
+
+    __slots__ = ()
 
     @abstractmethod
     def is_same_as(self, timing_dependence):
@@ -40,6 +42,13 @@ class AbstractTimingDependence(object):
     @abstractproperty
     def synaptic_structure(self):
         """ Get the synaptic structure of the plastic part of the rows
+        """
+
+    @abstractmethod
+    def get_parameter_names(self):
+        """ get the params from the timing dependencies
+
+        :return: iterable of basestring
         """
 
     def get_provenance_data(self, pre_population_label, post_population_label):
