@@ -266,6 +266,11 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
+
+    // otherwise do synapse and neuron time step updates
+    synapses_do_timestep_update(time);
+    neuron_do_timestep_update(time);
+
     // Do rewiring
     if (rewiring && last_rewiring_time >= rewiring_period)
     {
@@ -273,10 +278,6 @@ void timer_callback(uint timer_count, uint unused) {
         synaptogenesis_dynamics_rewire(time);
         count_rewires++;
     }
-
-    // otherwise do synapse and neuron time step updates
-    synapses_do_timestep_update(time);
-    neuron_do_timestep_update(time);
 
 
     // trigger buffering_out_mechanism
