@@ -387,9 +387,11 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
 
-    spin1_dma_transfer(
-    DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
-    n_bytes);
+    while(0==spin1_dma_transfer(
+            DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+            n_bytes)) {
+        log_error("DMA queue full-read");
+    }
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
 
@@ -411,7 +413,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_debug("sr_attempt %d %d exists %d",
+    /*ad*/log_info("sr_attempt %d %d exists %d",
         current_state.current_time,
         current_state.current_controls,
         current_state.element_exists);
@@ -469,11 +471,13 @@ bool synaptogenesis_dynamics_elimination_rule(){
         return false;
     }
     if(remove_neuron(current_state.sp_data.offset, rewiring_dma_buffer.row)){
-        while (-1 == spin1_dma_transfer(
+        while (0 == spin1_dma_transfer(
                 DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
                 rewiring_dma_buffer.sdram_writeback_address,
                 rewiring_dma_buffer.row, DMA_WRITE,
-                rewiring_dma_buffer.n_bytes_transferred)){}
+                rewiring_dma_buffer.n_bytes_transferred)){
+            log_error("DMA queue full-removal");
+         }
         /*ad*/log_info("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
@@ -524,11 +528,13 @@ bool synaptogenesis_dynamics_formation_rule(){
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             rewiring_data.weight, rewiring_data.delay)){
 
-        while(-1==spin1_dma_transfer(
+        while(0==spin1_dma_transfer(
                 DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
                 rewiring_dma_buffer.sdram_writeback_address,
                 rewiring_dma_buffer.row, DMA_WRITE,
-                rewiring_dma_buffer.n_bytes_transferred)) {}
+                rewiring_dma_buffer.n_bytes_transferred)) {
+            log_error("DMA queue full-formation");
+                }
 
         /*ad*/log_info("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
