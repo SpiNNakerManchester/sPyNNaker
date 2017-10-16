@@ -347,7 +347,9 @@ class TestSynapticManager(unittest.TestCase):
         # the second is potentially direct, but has been restricted by the
         # restriction on the size of the direct matrix
         assert len(items) == 3
-        assert items[0][2]
+
+        # TODO: This has been changed because direct matrices are disabled!
+        assert not items[0][2]
         assert not items[1][2]
         assert not items[2][2]
 
