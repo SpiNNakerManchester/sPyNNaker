@@ -47,6 +47,8 @@ _SYNAPSES_BASE_N_CPU_CYCLES = 8
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
 
+_ONE_WORD = struct.Struct("<I")
+
 
 class SynapticManager(object):
     """ Deals with synapses
@@ -813,8 +815,8 @@ class SynapticManager(object):
             transceiver)
         direct_synapses_address = (
             self._get_static_synaptic_matrix_sdram_requirements() +
-            synaptic_matrix_address + struct.unpack_from(
-                "<I", str(transceiver.read_memory(
+            synaptic_matrix_address + _ONE_WORD.unpack_from(
+                str(transceiver.read_memory(
                     placement.x, placement.y, synaptic_matrix_address, 4)))[0])
         indirect_synapses_address = synaptic_matrix_address + 4
         data, max_row_length = self._retrieve_synaptic_block(
