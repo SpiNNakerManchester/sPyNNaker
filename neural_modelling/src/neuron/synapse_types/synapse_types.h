@@ -32,14 +32,14 @@ static void synapse_types_add_neuron_input(
 //! for a given neuron id
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron id.
-static input_t synapse_types_get_excitatory_input(
+static input_t* synapse_types_get_excitatory_input(
     synapse_param_pointer_t parameter);
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given neuron id
 //! \param[in]  parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron id.
-static input_t synapse_types_get_inhibitory_input(
+static input_t* synapse_types_get_inhibitory_input(
     synapse_param_pointer_t parameter);
 
 //! \brief returns a human readable character for the type of synapse.

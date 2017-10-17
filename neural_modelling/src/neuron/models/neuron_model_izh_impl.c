@@ -68,10 +68,10 @@ void neuron_model_set_global_neuron_params(
 }
 
 state_t neuron_model_state_update(
-        input_t exc_input, input_t inh_input, input_t external_bias,
+        input_t* exc_input, input_t* inh_input, input_t external_bias,
         neuron_pointer_t neuron) {
 
-    input_t input_this_timestep = exc_input - inh_input
+    input_t input_this_timestep = exc_input[0] - inh_input[0]
                                   + external_bias + neuron->I_offset;
 
     // the best AR update so far

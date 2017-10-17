@@ -365,18 +365,23 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
-        input_t exc_input_value = input_type_get_input_value(
-            synapse_types_get_excitatory_input(
-                &(neuron_synapse_shaping_params[neuron_index])),
-            input_type);
-        input_t inh_input_value = input_type_get_input_value(
-            synapse_types_get_inhibitory_input(
-                &(neuron_synapse_shaping_params[neuron_index])),
-            input_type);
-        input_t exc_input = input_type_convert_excitatory_input_to_current(
-            exc_input_value, input_type, voltage);
-        input_t inh_input = input_type_convert_inhibitory_input_to_current(
-            inh_input_value, input_type, voltage);
+        input_t* exc_syn_input = synapse_types_get_excitatory_input(&(neuron_synapse_shaping_params[neuron_index]));
+        input_t* inh_syn_input = synapse_types_get_inhibitory_input(&(neuron_synapse_shaping_params[neuron_index]));
+        input_t exc_input[1];
+        input_t inh_input[1];
+
+        for (int i = 0; i< 1; i++){
+        	exc_syn_input[i] = input_type_get_input_value(exc_syn_input[i], input_type);
+        	exc_input[i] = input_type_convert_excitatory_input_to_current(
+                    exc_syn_input[i], input_type, voltage);
+        }
+
+        for (int i=0; i< 1; i++){
+        	inh_syn_input[i] = input_type_get_input_value(inh_syn_input[i], input_type);
+        	inh_input[i] = input_type_convert_inhibitory_input_to_current(
+        	            inh_syn_input[i], input_type, voltage);
+        }
+
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
@@ -385,8 +390,9 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
-        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
+        inputs_excitatory->inputs[neuron_index].input = exc_input[0];
+        inputs_inhibitory->inputs[neuron_index].input = inh_input[0];
+
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
