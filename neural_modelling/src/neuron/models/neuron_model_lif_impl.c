@@ -23,12 +23,15 @@ state_t neuron_model_state_update(
         input_t* exc_input, input_t* inh_input, input_t external_bias,
         neuron_pointer_t neuron) {
 
+	log_info("Excitatory 1: %12.6k, Excitatory 2: %12.6k", exc_input[0], exc_input[1]);
+
+
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
 
         // Get the input in nA
         input_t input_this_timestep =
-            exc_input[0] - inh_input[0] + external_bias + neuron->I_offset;
+            exc_input[0] + exc_input[1] - inh_input[0] + external_bias + neuron->I_offset;
 
         _lif_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep);

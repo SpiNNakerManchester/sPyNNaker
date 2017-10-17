@@ -367,10 +367,10 @@ void neuron_do_timestep_update(timer_t time) {
         // to current input
         input_t* exc_syn_input = synapse_types_get_excitatory_input(&(neuron_synapse_shaping_params[neuron_index]));
         input_t* inh_syn_input = synapse_types_get_inhibitory_input(&(neuron_synapse_shaping_params[neuron_index]));
-        input_t exc_input[1];
+        input_t exc_input[2];
         input_t inh_input[1];
 
-        for (int i = 0; i< 1; i++){
+        for (int i = 0; i < 2; i++){
         	exc_syn_input[i] = input_type_get_input_value(exc_syn_input[i], input_type);
         	exc_input[i] = input_type_convert_excitatory_input_to_current(
                     exc_syn_input[i], input_type, voltage);
@@ -390,7 +390,12 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = exc_input[0];
+        REAL total_exc;
+        for (int i=0; i < 2; i++){
+        	total_exc += exc_input[i];
+        }
+
+        inputs_excitatory->inputs[neuron_index].input = total_exc;
         inputs_inhibitory->inputs[neuron_index].input = inh_input[0];
 
 
