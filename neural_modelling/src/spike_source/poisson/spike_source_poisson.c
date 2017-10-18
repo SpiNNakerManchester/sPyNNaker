@@ -563,11 +563,9 @@ void timer_callback(uint timer_count, uint unused) {
 }
 
 void set_spike_source_rate(int id, REAL rate) {
-    log_info("Attempting to set rate of %d to %k", id, rate);
     if ((id >= parameters.first_source_id) &&
             ((id - parameters.first_source_id) < parameters.n_spike_sources)) {
         uint32_t sub_id = id - parameters.first_source_id;
-        REAL rate = 0.0;
         log_info("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * parameters.seconds_per_tick;
         if (rate > parameters.slow_rate_per_tick_cutoff) {
