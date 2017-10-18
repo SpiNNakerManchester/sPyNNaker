@@ -392,7 +392,6 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay,
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type){
     plastic_synapse_t new_weight = _weight_conversion(weight);
     control_t new_control = _control_conversion(id, delay, type);
-    log_info("%d", new_control);
 
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
