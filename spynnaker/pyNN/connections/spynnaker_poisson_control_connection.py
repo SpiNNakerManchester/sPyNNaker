@@ -66,7 +66,9 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param neuron_id: The neuron id to set the rate of
         :param rate: The rate to set in Hz
         """
-        control_label = self._control_label(label)
+        control_label = label
+        if not control_label.endswith(self._control_label_extension):
+            control_label = self._control_label(label)
         self.set_rates(control_label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
@@ -75,7 +77,9 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param label: The label of the Population to set the rates of
         :param neuron_id_rates: A list of tuples of (neuron id, rate) to be set
         """
-        control_label = self._control_label(label)
+        control_label = label
+        if not control_label.endswith(self._control_label_extension):
+            control_label = self._control_label(label)
         max_keys = _MAX_RATES_PER_PACKET
 
         pos = 0
