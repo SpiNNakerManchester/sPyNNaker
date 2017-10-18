@@ -1,7 +1,11 @@
-#include "neuron_model_lif_impl.h"
+#include "neuron_model_lif_US_multicompartment_impl.h"
 
 #include <debug.h>
 
+// update single compartment
+static inline void _update_compartment(input_t current, compartment_t* comp){
+	comp->V_compartment = current * comp->C_compartment;
+}
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
@@ -19,16 +23,20 @@ void neuron_model_set_global_neuron_params(
     // Does Nothing - no params
 }
 
+
 state_t neuron_model_state_update(
-        input_t exc_input, input_t inh_input, input_t external_bias,
-        neuron_pointer_t neuron) {
+		const num_excitatory_inputs, input_t* exc_input,
+		const num_inhibitory_inputs, input_t* inh_input,
+		input_t external_bias, neuron_pointer_t neuron) {
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
+    	_update_compartment(exc_input[0], &neuron->comp1);
+    	_update_compartment(exc_input[1], &neuron->comp2);
 
         // Get the input in nA
         input_t input_this_timestep =
-            exc_input - inh_input + external_bias + neuron->I_offset;
+            exc_input[0] - inh_input[0] + external_bias + neuron->I_offset;
 
         _lif_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep);
