@@ -127,12 +127,12 @@ static inline void correlation_apply_post_spike(
     int32_t decayed_eligibility_trace =
        synapse_structure_get_eligibility_trace(*previous_state);
 
+    // Decay eligibility trace
+    decayed_eligibility_trace = __smulbb(
+        *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
+
     // Update eligibility trace if this spike is non-dopamine spike
     if (!dopamine) {
-        // Decay eligibility trace
-        decayed_eligibility_trace = __smulbb(
-            *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
-
         // Apply STDP
         uint32_t time_since_last_pre = time - last_pre_time;
         if (time_since_last_pre > 0) {
@@ -179,12 +179,12 @@ static inline void correlation_apply_pre_spike(
     int32_t decayed_eligibility_trace =
        synapse_structure_get_eligibility_trace(*previous_state);
 
+    // Decay eligibility trace
+    decayed_eligibility_trace = __smulbb(
+        *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
+
     // Update eligibility trace if this spike is non-dopamine spike
     if (!dopamine) {
-        // Decay eligibility trace
-        decayed_eligibility_trace = __smulbb(
-            *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
-
         // Apply STDP
         uint32_t time_since_last_post = time - last_post_time;
         if (time_since_last_post > 0) {
