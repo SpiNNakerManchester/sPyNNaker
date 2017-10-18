@@ -33,6 +33,7 @@ from spinn_front_end_common.abstract_models.impl\
     import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -374,8 +375,8 @@ class SpikeSourcePoisson(
                 placement.vertex)), label='PoissonParams')
 
     def _write_poisson_parameters(
-            self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor):
+            self, spec, graph, placement, routing_info,
+            vertex_slice, machine_time_step, time_scale_factor):
         """ Generate Neuron Parameter data for Poisson spike sources
 
         :param spec: the data specification writer
@@ -396,17 +397,26 @@ class SpikeSourcePoisson(
             region=(SpikeSourcePoissonMachineVertex.
                     POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION.value))
 
-        # Write header info to the memory region:
-
         # Write Key info for this core:
-        if key is None:
-            # if there's no key, then two false will cover it.
-            spec.write_value(data=0)
-            spec.write_value(data=0)
-        else:
-            # has a key, thus set has key to 1 and then add key
-            spec.write_value(data=1)
-            spec.write_value(data=key)
+        key = routing_info.get_first_key_from_pre_vertex(
+            placement.vertex, constants.SPIKE_PARTITION_ID),
+        spec.write_value(1 if key is not None else 0)
+        spec.write_value(key if key is not None else 0)
+
+        # Write the incoming mask if there is one
+        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
+            placement.vertex, constants.CONTROL_PARTITION_ID)
+        if len(in_edges) > 1:
+            raise ConfigurationException(
+                "Only one control edge can end at a Poisson vertex")
+        incoming_mask = 0
+        if len(in_edges) == 1:
+            in_edge = in_edges[0]
+
+            # Get the mask of the incoming keys
+            incoming_mask = \
+                routing_info.get_routing_info_for_edge(in_edge).first_mask
+        spec.write_value(incoming_mask)
 
         # Write the random back off value
         spec.write_value(random.randint(0, min(
@@ -436,20 +446,6 @@ class SpikeSourcePoisson(
             # of a rate change later on
             spec.write_value(data=1)
 
-        # Write the random seed (4 words), generated randomly!
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-
-        # Write the SDP port to use for updates
-        spec.write_value(
-            data=(front_end_common_constants.SDP_PORTS
-                  .POISSON_UPDATE_RATE_SDP_PORT.value))
-
-        # Write the number of sources
-        spec.write_value(data=vertex_slice.n_atoms)
-
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
             data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
@@ -463,6 +459,18 @@ class SpikeSourcePoisson(
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
             data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+
+        # Write the lo_atom id
+        spec.write_value(data=vertex_slice.lo_atom)
+
+        # Write the number of sources
+        spec.write_value(data=vertex_slice.n_atoms)
+
+        # Write the random seed (4 words), generated randomly!
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
 
         # Compute the start times in machine time steps
         start = self._start[vertex_slice.as_slice]
@@ -573,24 +581,24 @@ class SpikeSourcePoisson(
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
-        "routing_info": "MemoryRoutingInfos"})
+        "routing_info": "MemoryRoutingInfos",
+        "graph": "MemoryMachineGraph"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info"})
+            "routing_info", "graph"})
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info):
+            graph_mapper, routing_info, graph):
 
         # reserve the neuron parameters data region
         self._reserve_poisson_params_region(placement, graph_mapper, spec)
 
         # allocate parameters
         self._write_poisson_parameters(
-            key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
-            spec=spec,
+            spec=spec, graph=graph, placement=placement,
+            routing_info=routing_info,
             vertex_slice=graph_mapper.get_slice(placement.vertex),
             machine_time_step=machine_time_step,
             time_scale_factor=time_scale_factor)
@@ -673,18 +681,19 @@ class SpikeSourcePoisson(
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "tags": "MemoryTags",
-        "n_machine_time_steps": "TotalMachineTimeSteps"
+        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "graph": "MemoryMachineGraph"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "tags", "n_machine_time_steps"
+            "routing_info", "tags", "n_machine_time_steps", "graph"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, tags, n_machine_time_steps):
+            graph_mapper, routing_info, tags, n_machine_time_steps, graph):
         self._machine_time_step = machine_time_step
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
@@ -719,10 +728,9 @@ class SpikeSourcePoisson(
             self._buffer_size_before_receive, ip_tags))
 
         # write parameters
-        key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
         self._write_poisson_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, graph, placement, routing_info, vertex_slice,
+            machine_time_step, time_scale_factor)
 
         # End-of-Spec:
         spec.end_specification()

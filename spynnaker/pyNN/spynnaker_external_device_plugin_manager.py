@@ -3,6 +3,8 @@ from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source \
+    import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities.notification_protocol \
     import SocketAddress
 from spinn_front_end_common.utilities.utility_objs \
@@ -181,6 +183,28 @@ class SpynnakerExternalDevicePluginManager(object):
         # add to the tracker
         globals_variables.get_simulator().add_live_packet_gatherer_parameters(
             params, vertex_to_record_from)
+
+    @staticmethod
+    def add_poisson_live_rate_control(
+            poisson_population, control_label_extension="_control",
+            receive_port=None):
+        """ Add a live rate controller to a Poisson population
+
+        :param poisson_population: The population to control
+        :param control_label_extension:\
+            An extension to add to the label of the Poisson source.  Must\
+            match up with the equivalent in the\
+            SpynnakerPoissonControlConnection
+        :param receive_port:\
+            The port that the SpiNNaker board should listen on
+        """
+        vertex = poisson_population._get_vertex
+        control_label = "{}{}".format(vertex.label, control_label_extension)
+        controller = ReverseIpTagMultiCastSource(
+            n_keys=vertex.n_atoms, label=control_label,
+            receive_port=receive_port)
+        SpynnakerExternalDevicePluginManager.add_edge(
+            controller, vertex, constants.CONTROL_PARTITION_ID)
 
     @staticmethod
     def add_edge(vertex, device_vertex, partition_id):

@@ -59,3 +59,6 @@ POPULATION_BASED_REGIONS = Enum(
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
+
+# The partition ID used for control data
+CONTROL_PARTITION_ID = "CONTROL"
