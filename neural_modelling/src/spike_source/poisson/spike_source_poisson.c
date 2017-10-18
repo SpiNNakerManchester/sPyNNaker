@@ -566,7 +566,7 @@ void set_spike_source_rate(int id, REAL rate) {
     if ((id >= parameters.first_source_id) &&
             ((id - parameters.first_source_id) < parameters.n_spike_sources)) {
         uint32_t sub_id = id - parameters.first_source_id;
-        log_info("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
+        log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * parameters.seconds_per_tick;
         if (rate > parameters.slow_rate_per_tick_cutoff) {
             spike_source_array[sub_id].is_fast_source = true;
