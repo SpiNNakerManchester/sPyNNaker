@@ -50,21 +50,18 @@ from spynnaker.pyNN.models.common.simple_population_settable \
 
 logger = logging.getLogger(__name__)
 
-# has key, key, random back-off, time_between_spikes, n_sources,
-# seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
-PARAMS_BASE_WORDS = 8
+# bool has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
+# uint32_t random_backoff_us; uint32_t time_between_spikes;
+# UFRACT seconds_per_tick; REAL ticks_per_second;
+# REAL slow_rate_per_tick_cutoff; uint32_t first_source_id;
+# uint32_t n_spike_sources; mars_kiss64_seed_t (uint[4]) spike_source_seed;
+PARAMS_BASE_WORDS = 14
 
 # start_scaled, end_scaled, is_fast_source, exp_minus_lambda, isi_val,
 # time_to_spike
 PARAMS_WORDS_PER_NEURON = 6
 
-# seed1, seed2, seed3, seed4
-RANDOM_SEED_WORDS = 4
-
-# has key, key, random_back off, time_between_spikes,
-# seed1, seed2, seed3 , seed4,
-# n_sources, seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
-START_OF_POISSON_GENERATOR_PARAMETERS = 12 * 4
+START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
@@ -328,7 +325,7 @@ class SpikeSourcePoisson(
 
         :param vertex_slice:
         """
-        return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS +
+        return (PARAMS_BASE_WORDS +
                 (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
@@ -399,9 +396,9 @@ class SpikeSourcePoisson(
 
         # Write Key info for this core:
         key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, constants.SPIKE_PARTITION_ID),
-        spec.write_value(1 if key is not None else 0)
-        spec.write_value(key if key is not None else 0)
+            placement.vertex, constants.SPIKE_PARTITION_ID)
+        spec.write_value(data=1 if key is not None else 0)
+        spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(

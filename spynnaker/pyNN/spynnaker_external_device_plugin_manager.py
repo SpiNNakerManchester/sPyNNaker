@@ -187,7 +187,9 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_poisson_live_rate_control(
             poisson_population, control_label_extension="_control",
-            receive_port=None):
+            receive_port=None, database_notify_host=None,
+            database_notify_port_num=None,
+            database_ack_port_num=None, notify=True):
         """ Add a live rate controller to a Poisson population
 
         :param poisson_population: The population to control
@@ -197,14 +199,30 @@ class SpynnakerExternalDevicePluginManager(object):
             SpynnakerPoissonControlConnection
         :param receive_port:\
             The port that the SpiNNaker board should listen on
+        :param database_notify_host: the hostname for the device which is\
+                listening to the database notification.
+        :type database_notify_host: str
+        :param database_ack_port_num: the port number to which a external \
+                device will acknowledge that they have finished reading the \
+                database and are ready for it to start execution
+        :type database_ack_port_num: int
+        :param database_notify_port_num: The port number to which a external\
+                device will receive the database is ready command
+        :type database_notify_port_num: int
         """
+        _spinnaker = globals_variables.get_simulator()
         vertex = poisson_population._get_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
             receive_port=receive_port)
+        SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, constants.CONTROL_PARTITION_ID)
+        if notify:
+            SpynnakerExternalDevicePluginManager.add_database_socket_address(
+                database_notify_host, database_notify_port_num,
+                database_ack_port_num)
 
     @staticmethod
     def add_edge(vertex, device_vertex, partition_id):

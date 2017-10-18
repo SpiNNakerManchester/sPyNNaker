@@ -3,6 +3,7 @@ from spinn_front_end_common.utilities.connections.live_event_connection\
 
 from spinnman.messages.eieio.eieio_type import EIEIOType
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinnman.messages.eieio.data_messages.eieio_data_message \
     import EIEIODataMessage
 
@@ -36,10 +37,27 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         ]
 
         LiveEventConnection.__init__(
-            self, send_labels=control_labels,
+            self, live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
         self._control_label_extension = control_label_extension
+
+    def _control_label(self, label):
+        return "{}{}".format(label, self._control_label_extension)
+
+    def add_start_callback(self, label, start_callback):
+        control_label = self._control_label(label)
+        LiveEventConnection.add_start_callback(
+            self, control_label, start_callback)
+
+    def add_init_callback(self, label, init_callback):
+        control_label = self._control_label(label)
+        LiveEventConnection.add_init_callback(
+            self, control_label, init_callback)
+
+    def add_receive_callback(self, label, live_event_callback):
+        raise ConfigurationException(
+            "SpynnakerPoissonControlPopulation can't receive data")
 
     def set_rate(self, label, neuron_id, rate):
         """ Set the rate of a Poisson neuron within a Poisson source
@@ -48,7 +66,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param neuron_id: The neuron id to set the rate of
         :param rate: The rate to set in Hz
         """
-        control_label = "{}{}".format(label, self._control_label_extension)
+        control_label = self._control_label(label)
         self.set_rates(control_label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
@@ -57,7 +75,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param label: The label of the Population to set the rates of
         :param neuron_id_rates: A list of tuples of (neuron id, rate) to be set
         """
-        control_label = "{}{}".format(label, self._control_label_extension)
+        control_label = self._control_label(label)
         max_keys = _MAX_RATES_PER_PACKET
 
         pos = 0
