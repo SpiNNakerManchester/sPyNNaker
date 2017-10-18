@@ -200,8 +200,9 @@ bool read_poisson_parameters(address_t address) {
     spin1_memcpy(&parameters, address, sizeof(parameters));
 
     log_info(
-        "\t key = %08x, back off = %u",
-        parameters.key, parameters.random_backoff_us);
+        "\t key = %08x, set rate mask = %08x, back off = %u",
+        parameters.key, parameters.set_rate_neuron_id_mask,
+        parameters.random_backoff_us);
 
     log_info("\t seed = %u %u %u %u", parameters.spike_source_seed[0],
         parameters.spike_source_seed[1], parameters.spike_source_seed[2],
@@ -209,7 +210,9 @@ bool read_poisson_parameters(address_t address) {
 
     validate_mars_kiss64_seed(parameters.spike_source_seed);
 
-    log_info("\t spike sources = %u", parameters.n_spike_sources);
+    log_info(
+        "\t spike sources = %u, starting at %u",
+        parameters.n_spike_sources, parameters.first_source_id);
     log_info("seconds_per_tick = %k\n", (REAL)(parameters.seconds_per_tick));
     log_info("ticks_per_second = %k\n", parameters.ticks_per_second);
     log_info("slow_rate_per_tick_cutoff = %k\n",
@@ -560,6 +563,7 @@ void timer_callback(uint timer_count, uint unused) {
 }
 
 void set_spike_source_rate(int id, REAL rate) {
+    log_info("Attempting to set rate of %i to %k", id, rate);
     if ((id >= parameters.first_source_id) &&
             ((id - parameters.first_source_id) < parameters.n_spike_sources)) {
         uint32_t sub_id = id - parameters.first_source_id;
