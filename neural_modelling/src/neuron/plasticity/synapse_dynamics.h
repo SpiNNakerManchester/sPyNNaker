@@ -39,6 +39,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 //!         fixed region (this can be used to when removing the connection)
 bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row);
-bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay);
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
+                                uint32_t delay, uint32_t type);
 
 #endif // _SYNAPSE_DYNAMICS_H_

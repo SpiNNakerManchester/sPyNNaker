@@ -316,10 +316,13 @@ bool remove_plastic_neuron_with_id(uint32_t offset, address_t row){
  * in order to make space for the extra information.
  * return: true iff the addition and expansion have succeeded
  */
-bool add_plastic_neuron_with_id(uint32_t offset, address_t row, uint32_t weight, uint32_t delay){
+bool add_plastic_neuron_with_id(uint32_t offset, address_t row,
+                                uint32_t weight, uint32_t delay,
+                                uint32_t type){
     use(offset);
     use(row);
     use(weight);
     use(delay);
+    use(type);
     return false;
 }

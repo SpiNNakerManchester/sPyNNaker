@@ -375,8 +375,10 @@ static inline plastic_synapse_t _weight_conversion(uint32_t weight){
     return (plastic_synapse_t)(0xFFFF & weight);
 }
 
-static inline control_t _control_conversion(uint32_t id, uint32_t delay){
+static inline control_t _control_conversion(uint32_t id, uint32_t delay,
+                                            uint32_t type){
     control_t new_control = ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
+    new_control |= (type & ((1<<SYNAPSE_TYPE_BITS) - 1)) << SYNAPSE_INDEX_BITS;
     new_control |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
     return new_control;
 }
@@ -387,9 +389,10 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay){
  * in order to make space for the extra information.
  * return: true iff the addition and expansion have succeeded
  */
-bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type){
     plastic_synapse_t new_weight = _weight_conversion(weight);
-    control_t new_control = _control_conversion(id, delay);
+    control_t new_control = _control_conversion(id, delay, type);
+    log_info("%d", new_control);
 
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));

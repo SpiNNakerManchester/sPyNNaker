@@ -61,7 +61,8 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     return false;
 }
 
-bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay){
+bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
+                                uint32_t delay, uint32_t type){
     use(id);
     use(row);
     use(weight);

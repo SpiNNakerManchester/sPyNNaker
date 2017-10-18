@@ -25,7 +25,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4,
-                 grid=np.array([16, 16]), seed=None):
+                 grid=np.array([16, 16]), lateral_inhibition=0,
+                 seed=None):
 
         AbstractSynapseDynamicsStructural.__init__(self)
         self._f_rew = f_rew  # Hz
@@ -33,6 +34,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._weight = weight
         self._delay = delay
         self._s_max = s_max  # maximum number of presynaptic neurons
+        self._lateral_inhibition = lateral_inhibition
         self._sigma_form_forward = sigma_form_forward
         self._sigma_form_lateral = sigma_form_lateral
         self._p_form_forward = p_form_forward
@@ -152,6 +154,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                          data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
+        spec.write_value(data=int(self._lateral_inhibition), data_type=DataType.INT32)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
         # write local low, high and number of atoms
@@ -395,7 +398,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
-        structure_size = 24 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 25 * 4 + 4 * 4  # parameters + rng seed
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 

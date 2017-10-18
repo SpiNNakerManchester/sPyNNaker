@@ -88,6 +88,7 @@ uint32_t synapses_get_pre_synaptic_events();
 //!         fixed region (this can be used to when removing the connection)
 bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
-bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay);
+bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
+                               uint32_t delay, uint32_t type);
 
 #endif // _SYNAPSES_H_

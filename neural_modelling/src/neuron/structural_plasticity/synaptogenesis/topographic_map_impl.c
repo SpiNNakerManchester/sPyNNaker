@@ -30,7 +30,7 @@
 //---------------------------------------
 bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
 bool (*remove_neuron)(uint32_t, address_t);
-bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t);
+bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t, uint32_t);
 int (*number_of_connections_in_row)(address_t);
 
 
@@ -65,6 +65,7 @@ typedef struct {
     pre_pop_info_table_t pre_pop_info_table;
     uint16_t *ff_probabilities, *lat_probabilities; // distance dependent probabilities LUTs
     int32_t *post_to_pre_table;
+    int32_t lateral_inhibition;
 } rewiring_data_t;
 
 rewiring_data_t rewiring_data;
@@ -136,6 +137,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.weight = *sp_word++;
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
+    rewiring_data.lateral_inhibition = *sp_word++;
 
     rewiring_data.app_no_atoms = *sp_word++;
     rewiring_data.low_atom = *sp_word++;
@@ -413,7 +415,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_info("sr_attempt %d %d exists %d",
+    /*ad*/log_debug("sr_attempt %d %d exists %d",
         current_state.current_time,
         current_state.current_controls,
         current_state.element_exists);
@@ -526,7 +528,8 @@ bool synaptogenesis_dynamics_formation_rule(){
     }
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
-            rewiring_data.weight, rewiring_data.delay)){
+            rewiring_data.weight, rewiring_data.delay,
+            rewiring_data.lateral_inhibition ? current_state.current_controls : 0)){
 
         while(0==spin1_dma_transfer(
                 DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
