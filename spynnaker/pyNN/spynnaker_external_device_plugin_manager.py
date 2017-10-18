@@ -210,7 +210,6 @@ class SpynnakerExternalDevicePluginManager(object):
                 device will receive the database is ready command
         :type database_notify_port_num: int
         """
-        _spinnaker = globals_variables.get_simulator()
         vertex = poisson_population._get_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(

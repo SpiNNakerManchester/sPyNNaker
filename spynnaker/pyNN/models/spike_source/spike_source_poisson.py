@@ -8,7 +8,6 @@ from enum import Enum
 from data_specification.enums import DataType
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.resources.reverse_iptag_resource import ReverseIPtagResource
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.model.decorators import overrides
@@ -132,8 +131,7 @@ class SpikeSourcePoisson(
             rate=default_parameters['rate'],
             start=default_parameters['start'],
             duration=default_parameters['duration'],
-            seed=none_pynn_default_parameters['seed'],
-            port=None, live=False):
+            seed=none_pynn_default_parameters['seed']):
         ApplicationVertex.__init__(
             self, label, constraints, self._model_based_max_atoms_per_core)
         AbstractSpikeRecordable.__init__(self)
@@ -162,14 +160,6 @@ class SpikeSourcePoisson(
             0, n_neurons)
         self._rng = numpy.random.RandomState(seed)
         self._machine_time_step = None
-
-        self._updatable = False
-        self._reverse_ip_tags = None
-        if port is not None or live is True:
-            self._reverse_ip_tags = ReverseIPtagResource(
-                port, sdp_port=(front_end_common_constants.SDP_PORTS
-                                .POISSON_UPDATE_RATE_SDP_PORT.value))
-            self._updatable = True
 
         # Prepare for recording, and to get spikes
         self._spike_recorder = MultiSpikeRecorder()
@@ -275,7 +265,7 @@ class SpikeSourcePoisson(
         return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             minimum_buffer_sdram[0], buffered_sdram_per_timestep,
-            constraints, label, self._updatable)
+            constraints, label)
 
     @property
     def rate(self):

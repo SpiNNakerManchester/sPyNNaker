@@ -1,4 +1,6 @@
 from pacman.model.decorators import overrides
+from pacman.executor.injection_decorator import inject_items
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models \
     import AbstractSupportsDatabaseInjection
 from spinn_front_end_common.utilities.helpful_functions \
@@ -11,6 +13,8 @@ from spinn_front_end_common.interface.buffer_management.buffer_models \
     import AbstractReceiveBuffersToHost
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
+
+from spynnaker.pyNN.utilities import constants
 
 from enum import Enum
 
@@ -28,15 +32,13 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, constraints=None, label=None,
-            updatable=False):
+            buffered_sdram_per_timestep, constraints=None, label=None):
         MachineVertex.__init__(self, label, constraints=constraints)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
         self._resources = resources_required
         self._minimum_buffer_sdram = minimum_buffer_sdram
         self._buffered_sdram_per_timestep = buffered_sdram_per_timestep
-        self._updatable = updatable
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -80,6 +82,14 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
-    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
-    def is_in_injection_mode(self):
-        return self._updatable
+    @inject_items({"graph": "MemoryMachineGraph"})
+    @overrides(
+        AbstractSupportsDatabaseInjection.is_in_injection_mode,
+        additional_arguments=["graph"])
+    def is_in_injection_mode(self, graph):
+        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
+            self, constants.CONTROL_PARTITION_ID)
+        if len(in_edges) > 1:
+            raise ConfigurationException(
+                "Poisson source can only have one incoming control")
+        return len(in_edges) == 1
