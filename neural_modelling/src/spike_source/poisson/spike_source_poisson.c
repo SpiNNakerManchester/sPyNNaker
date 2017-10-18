@@ -563,7 +563,7 @@ void timer_callback(uint timer_count, uint unused) {
 }
 
 void set_spike_source_rate(int id, REAL rate) {
-    log_info("Attempting to set rate of %i to %k", id, rate);
+    log_info("Attempting to set rate of %d to %k", id, rate);
     if ((id >= parameters.first_source_id) &&
             ((id - parameters.first_source_id) < parameters.n_spike_sources)) {
         uint32_t sub_id = id - parameters.first_source_id;
