@@ -403,7 +403,8 @@ class SpikeSourcePoisson(
             # Get the mask of the incoming keys
             incoming_mask = \
                 routing_info.get_routing_info_for_edge(in_edge).first_mask
-        spec.write_value(~incoming_mask)
+            incoming_mask = ~incoming_mask & 0xFFFFFFFF
+        spec.write_value(incoming_mask)
 
         # Write the random back off value
         spec.write_value(random.randint(0, min(
