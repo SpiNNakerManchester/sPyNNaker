@@ -91,7 +91,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             while pos < len(neuron_id_rates) and events_in_packet < max_keys:
                 (neuron_id, rate) = neuron_id_rates[pos]
                 key = self._atom_id_to_key[control_label][neuron_id]
-                rate_accum = int(round(rate / DataType.S1615.scale))
+                rate_accum = int(round(rate * DataType.S1615.scale))
                 message.add_key_and_payload(key, rate_accum)
                 pos += 1
                 events_in_packet += 1
