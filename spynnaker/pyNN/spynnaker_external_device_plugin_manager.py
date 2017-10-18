@@ -214,7 +214,7 @@ class SpynnakerExternalDevicePluginManager(object):
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
-            receive_port=receive_port)
+            receive_port=receive_port, reserve_reverse_ip_tag=True)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, constants.CONTROL_PARTITION_ID)
