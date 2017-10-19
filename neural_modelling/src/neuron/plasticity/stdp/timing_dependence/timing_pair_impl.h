@@ -28,6 +28,12 @@ typedef int16_t pre_trace_t;
 #define TAU_MINUS_TIME_SHIFT 0
 #define TAU_MINUS_SIZE 256
 
+#define TAU_C_TIME_SHIFT 4
+#define TAU_C_SIZE 520
+
+#define TAU_D_TIME_SHIFT 2
+#define TAU_D_SIZE 370
+
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
@@ -37,10 +43,10 @@ typedef int16_t pre_trace_t;
         time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
 #define DECAY_LOOKUP_TAU_C(time) \
     maths_lut_exponential_decay( \
-        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_c_lookup)
+        time, TAU_C_TIME_SHIFT, TAU_C_SIZE, tau_c_lookup)
 #define DECAY_LOOKUP_TAU_D(time) \
     maths_lut_exponential_decay( \
-        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_d_lookup)
+        time, TAU_D_TIME_SHIFT, TAU_D_SIZE, tau_d_lookup)
 
 //---------------------------------------
 // Externals
