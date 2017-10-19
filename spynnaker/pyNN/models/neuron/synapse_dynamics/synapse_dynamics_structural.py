@@ -25,7 +25,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4,
-                 grid=np.array([16, 16]), lateral_inhibition=0,
+                 grid=np.array([16, 16]), lateral_inhibition=0, random_partner=False,
                  seed=None):
 
         AbstractSynapseDynamicsStructural.__init__(self)
@@ -42,6 +42,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._p_elim_dep = p_elim_dep
         self._p_elim_pot = p_elim_pot
         self._grid = np.asarray(grid, dtype=int)
+        self._random_partner = random_partner
         self._connections = {}
 
         self.fudge_factor = 1.3
@@ -155,6 +156,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
         spec.write_value(data=int(self._lateral_inhibition), data_type=DataType.INT32)
+        spec.write_value(data=int(self._random_partner), data_type=DataType.INT32)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
         # write local low, high and number of atoms
@@ -350,39 +352,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         spec.write_array(post_to_pre_table.ravel())
 
-        # def unpack(value):
-        #     neuron = value & 0xFFFF
-        #     subpop = (value >> 16) & 0xFF
-        #     pop = (value >> 24) & 0xFF
-        #     return pop, subpop, neuron
-        #
-        # for position, entry in np.ndenumerate(post_to_pre_table):
-        #     pop_no, subpop_no, neuron_no = unpack(entry)
-        #     pop = population_to_subpopulation_information.keys()[pop_no]
-        #     unordered_shits = population_to_subpopulation_information[pop]
-        #     dt = np.dtype(
-        #         [('key', 'int'), ('n_atoms', 'int'),
-        #          ('lo_atom', 'int'), ('mask', 'uint')])
-        #     structured_array = np.array(
-        #         unordered_shits, dtype=dt)
-        #     sorted_info_list = np.sort(structured_array,
-        #                                order='lo_atom')
-        #     subpop = sorted_info_list[subpop_no]
-        #
-        #     # now check if this shit exists in self._connections
-        #
-        #     # filter connections by post vertex
-        #     for conn in self._connections[post_slice.lo_atom]:
-        #         if conn[1].pre_vertex == pop and graph_mapper._slice_by_machine_vertex[conn[2].pre_vertex].lo_atom == subpop['lo_atom']:
-        #             assert routing_info._partition_info_by_edge[conn[2]].first_key == subpop['key']
-        #             cancer = np.asarray([list(item) for item in conn[0]])
-        #             pos = np.argwhere(cancer[:,1] == post_slice.lo_atom+position[0])
-        #             assert graph_mapper._slice_by_machine_vertex[conn[2].pre_vertex].lo_atom + neuron_no in cancer[pos, 0]
-
-
-
-
-
         total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
             machine_vertex] = 4 * 20 + 4 * total_words_written
@@ -398,7 +367,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
-        structure_size = 25 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 26 * 4 + 4 * 4  # parameters + rng seed
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 

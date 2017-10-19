@@ -65,7 +65,7 @@ typedef struct {
     pre_pop_info_table_t pre_pop_info_table;
     uint16_t *ff_probabilities, *lat_probabilities; // distance dependent probabilities LUTs
     int32_t *post_to_pre_table;
-    int32_t lateral_inhibition;
+    int32_t lateral_inhibition, random_partner;
 } rewiring_data_t;
 
 rewiring_data_t rewiring_data;
@@ -138,6 +138,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
+    rewiring_data.random_partner = *sp_word++;
 
     rewiring_data.app_no_atoms = *sp_word++;
     rewiring_data.low_atom = *sp_word++;
@@ -299,7 +300,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 
     current_state.element_exists = element_exists;
     spike_t _spike=-1;
-    if (!element_exists) {
+    if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
         _spike = get_last_spike();
         //    log_info("spike key %d", _spike);
@@ -324,6 +325,26 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
                 }
             }
         }
+    }
+    else if (!element_exists && rewiring_data.random_partner) {
+            pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.no_pre_pops;
+            // Select presynaptic subpopulation
+            choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].total_no_atoms;
+            uint32_t sum=0;
+            int i;
+            for(i=0;i<rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].no_pre_vertices; i++) {
+                sum += rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * i + 1];
+                if (sum >= choice){
+                    break;
+                  }
+            }
+            pre_sub_pop = i;
+            // Select a presynaptic neuron id
+            choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *\
+                rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * pre_sub_pop + 1];
+            // Log all random stuff
+            // population_table_get_first_address() returns the address (in SDRAM) of the selected synaptic row
+            _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[pre_sub_pop * KEY_INFO_CONSTANTS + 0] | choice;
     }
     else {
         _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[pre_sub_pop * KEY_INFO_CONSTANTS + 0] | choice;
