@@ -14,10 +14,10 @@ LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
 LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
-LOOKUP_TAU_C_SIZE = 256
-LOOKUP_TAU_C_SHIFT = 0
-LOOKUP_TAU_D_SIZE = 256
-LOOKUP_TAU_D_SHIFT = 0
+LOOKUP_TAU_C_SIZE = 4
+LOOKUP_TAU_C_SHIFT = 520
+LOOKUP_TAU_D_SIZE = 2
+LOOKUP_TAU_D_SHIFT = 370
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
@@ -85,11 +85,11 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
         # Write Izhikevich model exp look up tables
         self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_c, LOOKUP_TAU_PLUS_SIZE,
-            LOOKUP_TAU_PLUS_SHIFT)
+            spec, self._tau_c, LOOKUP_TAU_C_SIZE,
+            LOOKUP_TAU_C_SHIFT)
         self._tau_d_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_d, LOOKUP_TAU_PLUS_SIZE,
-            LOOKUP_TAU_PLUS_SHIFT)
+            spec, self._tau_d, LOOKUP_TAU_D_SIZE,
+            LOOKUP_TAU_D_SHIFT)
 
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.

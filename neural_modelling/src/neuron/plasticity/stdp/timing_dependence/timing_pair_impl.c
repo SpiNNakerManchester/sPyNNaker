@@ -6,8 +6,8 @@
 // Exponential lookup-tables
 int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-int16_t tau_c_lookup[TAU_PLUS_SIZE];
-int16_t tau_d_lookup[TAU_PLUS_SIZE];
+int16_t tau_c_lookup[TAU_C_SIZE];
+int16_t tau_d_lookup[TAU_D_SIZE];
 
 //---------------------------------------
 // Functions
@@ -23,9 +23,9 @@ address_t timing_initialise(address_t address) {
                                                  &tau_plus_lookup[0]);
     lut_address = maths_copy_int16_lut(lut_address, TAU_MINUS_SIZE,
                                        &tau_minus_lookup[0]);
-    lut_address = maths_copy_int16_lut(lut_address, TAU_PLUS_SIZE,
+    lut_address = maths_copy_int16_lut(lut_address, TAU_C_SIZE,
                                        &tau_c_lookup[0]);
-    lut_address = maths_copy_int16_lut(lut_address, TAU_PLUS_SIZE,
+    lut_address = maths_copy_int16_lut(lut_address, TAU_D_SIZE,
                                        &tau_d_lookup[0]);
 
 

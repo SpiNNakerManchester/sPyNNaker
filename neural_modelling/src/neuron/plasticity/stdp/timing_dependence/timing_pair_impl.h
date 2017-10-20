@@ -53,8 +53,8 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-extern int16_t tau_c_lookup[TAU_PLUS_SIZE];
-extern int16_t tau_d_lookup[TAU_PLUS_SIZE];
+extern int16_t tau_c_lookup[TAU_C_SIZE];
+extern int16_t tau_d_lookup[TAU_D_SIZE];
 
 //---------------------------------------
 // Timing dependence inline functions
