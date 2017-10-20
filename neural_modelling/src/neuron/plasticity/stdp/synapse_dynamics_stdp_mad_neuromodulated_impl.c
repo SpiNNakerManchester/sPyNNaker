@@ -6,7 +6,7 @@
 
 // Plasticity common includes
 #include "../common/maths.h"
-#include "../common/post_events.h"
+#include "../common/post_events_with_da.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
