@@ -45,50 +45,6 @@ typedef enum input_buffer_regions {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-//! \brief helper method to make lower code more human readable
-//! \param[in] neuron_index the index of the neuron in the neuron state array
-//! which is currently being considered.
-//! \return the offset position within the input buffer which points to the
-//! input of the excitatory inputs for a given neuron
-static inline index_t _ex_offset(index_t neuron_index) {
-    return synapse_types_get_input_buffer_index(EXCITATORY, neuron_index);
-}
-
-//! \brief helper method to make lower code more human readable
-//! \param[in] neuron_index the index of the neuron in the neuron state array
-//! which is currently being considered.
-//! \return the offset position within the input buffer which points to the
-//! input of the inhibitory inputs for a given neuron
-static inline index_t _in_offset(index_t neuron_index) {
-    return synapse_types_get_input_buffer_index(INHIBITORY, neuron_index);
-}
-
-//! \brief method which deduces how much decay to put on a excitatory input
-//! (to compensate for the valve behaviour of a synapse in biology (spike goes
-//! in, synapse opens, then closes slowly) plus the leaky aspect of a neuron).
-//! \param[in] parameters the synapse parameters read from SDRAM to initialise
-//! the synapse shaping.
-//! \param[in] neuron_index the index in the neuron state array which
-//! Corresponds to the parameters of the neuron currently being considered.
-//! \return the decay amount for the excitatory input
-static inline decay_t _ex_decay(
-        synapse_param_t *parameters, index_t neuron_index) {
-    return (parameters[neuron_index].exc_decay);
-}
-
-//! \brief method which deduces how much decay to put on a inhibitory input
-//! (to compensate for the valve behaviour of a synapse in biology (spike goes
-//! in, synapse opens, then closes slowly) plus the leaky aspect of a neuron).
-//! \param[in] parameters the synapse parameters read from SDRAM to initialise
-//! the synapse shaping.
-//! \param[in] neuron_index the index in the neuron state array which
-//! Corresponds to the parameters of the neuron currently being considered.
-//! \return the decay amount for the inhibitory input
-static inline decay_t _in_decay(
-        synapse_param_t *parameters, index_t neuron_index) {
-    return (parameters[neuron_index].inh_decay);
-}
-
 //! \brief decays the stuff thats sitting in the input buffers
 //! (to compensate for the valve behaviour of a synapse
 //! in biology (spike goes in, synapse opens, then closes slowly) plus the
