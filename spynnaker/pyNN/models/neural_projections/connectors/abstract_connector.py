@@ -110,14 +110,10 @@ class AbstractConnector(object):
         if globals_variables.get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
-            if hasattr(delays, "boundaries"):
-                if delays.boundaries is not None:
-                    return min(max(delays.boundaries), max_estimated_delay)
-            elif isinstance(delays.parameters, dict):
-                if "max" in delays.parameters:
-                    return delays.parameters['max']
-
-            return max_estimated_delay
+            high = utility_calls.high(delays)
+            if high is None:
+                return max_estimated_delay
+            return max(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -234,15 +230,17 @@ class AbstractConnector(object):
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
                     weights, n_connections)
-                if weights.boundaries is not None:
-                    return abs(max(min_weight, min(weights.boundaries)))
-                return abs(min_weight)
+                low = utility_calls.low(weights)
+                if low is None:
+                    return abs(min_weight)
+                return abs(max(min_weight, low))
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
                     weights, n_connections)
-                if weights.boundaries is not None:
-                    return abs(min(max_weight, max(weights.boundaries)))
-                return abs(max_weight)
+                high = utility_calls.high(weights)
+                if high is None:
+                    return abs(max_weight)
+                return abs(min(max_weight, high))
 
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -295,14 +293,15 @@ class AbstractConnector(object):
     def _generate_values(self, values, n_connections, connection_slices):
         if globals_variables.get_simulator().is_a_pynn_random(values):
             if n_connections == 1:
-                return numpy.array([values.next(n_connections)])
+                return numpy.array([values.next(n_connections)],
+                                   dtype="float64")
             return values.next(n_connections)
         elif numpy.isscalar(values):
-            return numpy.repeat([values], n_connections)
+            return numpy.repeat([values], n_connections).astype("float64")
         elif hasattr(values, "__getitem__"):
             return numpy.concatenate([
                 values[connection_slice]
-                for connection_slice in connection_slices])
+                for connection_slice in connection_slices]).astype("float64")
         elif isinstance(values, basestring) or callable(values):
             if self._space is None:
                 raise Exception(
@@ -357,6 +356,7 @@ class AbstractConnector(object):
     def _generate_delays(self, values, n_connections, connection_slices):
         """ Generate valid delay values
         """
+
         delays = self._generate_values(
             values, n_connections, connection_slices)
 
