@@ -16,7 +16,7 @@ from spinn_front_end_common.abstract_models\
     import AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.abstract_models.impl import \
     ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.abstract_models \
     import AbstractVertexWithEdgeToDependentVertices
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -188,7 +188,7 @@ class MunichMotorDevice(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     def reserve_memory_regions(self, spec):
         """
