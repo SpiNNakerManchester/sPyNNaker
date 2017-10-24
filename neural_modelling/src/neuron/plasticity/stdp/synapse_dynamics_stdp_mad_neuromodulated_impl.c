@@ -183,20 +183,17 @@ static inline void correlation_apply_pre_spike(
     decayed_eligibility_trace = __smulbb(
         *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
 
-    // Update eligibility trace if this spike is non-dopamine spike
-    if (!dopamine) {
-        // Apply STDP
-        uint32_t time_since_last_post = time - last_post_time;
-        if (time_since_last_post > 0) {
-            int32_t decayed_r1 = __smultb(
-                last_post_trace,
-                DECAY_LOOKUP_TAU_MINUS(time_since_last_post)) >> STDP_FIXED_POINT;
-            decayed_r1 = __smulbb(decayed_r1,
-                weight_state.weight_region -> a2_minus) >> weight_state.weight_multiply_right_shift;
-            decayed_eligibility_trace -= decayed_r1;
-            if (decayed_eligibility_trace < 0) {
-                decayed_eligibility_trace = 0;
-            }
+    // Apply STDP
+    uint32_t time_since_last_post = time - last_post_time;
+    if (time_since_last_post > 0) {
+        int32_t decayed_r1 = __smultb(
+            last_post_trace,
+            DECAY_LOOKUP_TAU_MINUS(time_since_last_post)) >> STDP_FIXED_POINT;
+        decayed_r1 = __smulbb(decayed_r1,
+            weight_state.weight_region -> a2_minus) >> weight_state.weight_multiply_right_shift;
+        decayed_eligibility_trace -= decayed_r1;
+        if (decayed_eligibility_trace < 0) {
+            decayed_eligibility_trace = 0;
         }
     }
 
