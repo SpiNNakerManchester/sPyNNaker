@@ -1,7 +1,8 @@
 /*! \file
  * \brief implementation of synapse_types.h for Exponential shaping
 *
-* \details This is used to give a simple exponential decay to synapses.
+* \details This is used to give a simple exponential decay + allows
+* for reward or punishment synapses for neuromodulated plasticity.
 *
 * If we have combined excitatory/inhibitory synapses it will be
 * because both excitatory and inhibitory synaptic time-constants
@@ -9,8 +10,8 @@
 */
 
 
-#ifndef _SYNAPSE_TYPES_EXP_SUPERVISION
-#define _SYNAPSE_TYPES_EXP_SUPERVISION
+#ifndef _SYNAPSE_TYPES_IZHIKEVICH_NEUROMODULATED
+#define _SYNAPSE_TYPES_IZHIKEVICH_NEUROMODULATED
 
 //---------------------------------------
 // Macros
@@ -144,4 +145,4 @@ static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
     log_debug("inh_init  = %R\n", (unsigned fract) parameters->inh_init);
 }
 
-#endif  // _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
+#endif  // _SYNAPSE_TYPES_IZHIKEVICH_NEUROMODULATED_IMPL_H_

@@ -1,15 +1,14 @@
-#ifndef _TIMING_PAIR_IMPL_H_
-#define _TIMING_PAIR_IMPL_H_
+#ifndef _TIMING_IZHIKEVICH_NEUROMODULATION_H_
+#define _TIMING_IZHIKEVICH_NEUROMODULATION_H_
 
 //---------------------------------------
 // Typedefines
 //---------------------------------------
-typedef int16_t post_trace_t;
+typedef int32_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include "../synapse_structure/synapse_structure_weight_impl.h"
+#include "../synapse_structure/synapse_structure_weight_eligibility_trace.h"
 #include "timing.h"
-#include "../weight_dependence/weight_one_term.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -28,6 +27,12 @@ typedef int16_t pre_trace_t;
 #define TAU_MINUS_TIME_SHIFT 0
 #define TAU_MINUS_SIZE 256
 
+#define TAU_C_TIME_SHIFT 4
+#define TAU_C_SIZE 520
+
+#define TAU_D_TIME_SHIFT 2
+#define TAU_D_SIZE 370
+
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
@@ -35,18 +40,39 @@ typedef int16_t pre_trace_t;
 #define DECAY_LOOKUP_TAU_MINUS(time) \
     maths_lut_exponential_decay( \
         time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
+#define DECAY_LOOKUP_TAU_C(time) \
+    maths_lut_exponential_decay( \
+        time, TAU_C_TIME_SHIFT, TAU_C_SIZE, tau_c_lookup)
+#define DECAY_LOOKUP_TAU_D(time) \
+    maths_lut_exponential_decay( \
+        time, TAU_D_TIME_SHIFT, TAU_D_SIZE, tau_d_lookup)
 
 //---------------------------------------
 // Externals
 //---------------------------------------
 extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
 extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
+extern int16_t tau_c_lookup[TAU_C_SIZE];
+extern int16_t tau_d_lookup[TAU_D_SIZE];
 
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace() {
-    return 0;
+    return (post_trace_t) 0;
+}
+
+// Trace get and set helper funtions
+static inline int32_t get_post_trace(int32_t trace) {
+    return (trace >> 16);
+}
+
+static inline int32_t get_dopamine_trace(int32_t trace) {
+    return (trace & 0xFFFF);
+}
+
+static inline int32_t trace_build(int32_t post_trace, int32_t dopamine_trace) {
+    return (post_trace << 16 | dopamine_trace);
 }
 
 //---------------------------------------
@@ -56,8 +82,8 @@ static inline post_trace_t timing_add_post_spike(
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
-    // Decay previous o1 and o2 traces
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
+    // Decay previous post trace
+    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(get_post_trace(last_trace),
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
@@ -66,9 +92,13 @@ static inline post_trace_t timing_add_post_spike(
 
     log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
 
+    // Decay previous dopamine trace
+    int32_t new_dopamine_trace = STDP_FIXED_MUL_16X16(get_dopamine_trace(last_trace),
+            DECAY_LOOKUP_TAU_D(delta_time));
+
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) new_o1_trace;
+    return (post_trace_t) trace_build(new_o1_trace, new_dopamine_trace);
 }
 
 //---------------------------------------
@@ -92,54 +122,4 @@ static inline pre_trace_t timing_add_pre_spike(
     return (pre_trace_t) new_r1_trace;
 }
 
-//---------------------------------------
-static inline update_state_t timing_apply_pre_spike(
-        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(last_pre_time);
-    use(&last_pre_trace);
-
-    // Get time of event relative to last post-synaptic event
-    uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
-
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-                  time_since_last_post, decayed_o1);
-
-        // Apply depression to state (which is a weight_state)
-        return weight_one_term_apply_depression(previous_state, decayed_o1);
-    } else {
-        return previous_state;
-    }
-}
-
-//---------------------------------------
-static inline update_state_t timing_apply_post_spike(
-        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(last_post_time);
-    use(&last_post_trace);
-
-    // Get time of event relative to last pre-synaptic event
-    uint32_t time_since_last_pre = time - last_pre_time;
-    if (time_since_last_pre > 0) {
-        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
-
-        log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-                  time_since_last_pre, decayed_r1);
-
-        // Apply potentiation to state (which is a weight_state)
-        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
-    } else {
-        return previous_state;
-    }
-}
-
-#endif // _TIMING_PAIR_IMPL_H_
+#endif // _TIMING_IZHIKEVICH_NEUROMODULATION_H_

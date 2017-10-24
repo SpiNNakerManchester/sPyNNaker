@@ -5,11 +5,11 @@ NEURON_MODEL = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.c
 NEURON_MODEL_H = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.h
 INPUT_TYPE_H = $(SOURCE_DIR)/neuron/input_types/input_type_current.h
 THRESHOLD_TYPE_H = $(SOURCE_DIR)/neuron/threshold_types/threshold_type_static.h
-SYNAPSE_TYPE_H = $(SOURCE_DIR)/neuron/synapse_types/synapse_types_exp_supervision.h
-SYNAPSE_DYNAMICS = $(SOURCE_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_neuromodulated_impl.c
+SYNAPSE_TYPE_H = $(SOURCE_DIR)/neuron/synapse_types/synapse_types_izhikevich_neuromodulated.h
+SYNAPSE_DYNAMICS = $(SOURCE_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_izhikevich_neuromodulation.c
 TIMING_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timing_izhikevich_neuromodulation.c
 TIMING_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timing_izhikevich_neuromodulation.h
-WEIGHT_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_izhikevich_neuromodulation.c
-WEIGHT_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_izhikevich_neuromodulation.h
+WEIGHT_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.c
+WEIGHT_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.h
 
 include ../Makefile.common

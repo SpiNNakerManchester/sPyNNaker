@@ -38,7 +38,7 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 // |                           |                    |        SYNAPSE_TYPE_INDEX_BITS         |
 // |---------------------------|--------------------|----------------------------------------|
 #ifndef SYNAPSE_AXONAL_DELAY_BITS
-  #define SYNAPSE_AXONAL_DELAY_BITS 3
+  #define SYNAPSE_AXONAL_DELAY_BITS 2
 #endif
 
 #define SYNAPSE_AXONAL_DELAY_MASK ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
