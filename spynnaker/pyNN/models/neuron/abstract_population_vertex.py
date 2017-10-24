@@ -21,22 +21,18 @@ from spinn_front_end_common.abstract_models\
 from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models.\
-    abstract_utilities_data_speed_up_extractor import \
-    AbstractUtilitiesDataSpeedUpExtractor
 from spinn_front_end_common.abstract_models.impl\
     import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
-from spynnaker.pyNN import exceptions
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -79,8 +75,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractUtilitiesDataSpeedUpExtractor):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -383,12 +378,6 @@ class AbstractPopulationVertex(
             size=common_constants.SYSTEM_BYTES_REQUIREMENT,
             label='System')
 
-        spec.reserve_memory_region(
-            size=common_constants.MULTICAST_SPEEDUP_N_BYTES,
-            region=constants.POPULATION_BASED_REGIONS.
-            DATA_SPEED_UP_SUPPORT.value,
-            label="mc speed up")
-
         self._reserve_neuron_params_data_region(spec, vertex_slice)
 
         spec.reserve_memory_region(
@@ -564,11 +553,6 @@ class AbstractPopulationVertex(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
-        # write mc speed up data extractor
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.DATA_SPEED_UP_SUPPORT.value)
-        spec.write_array(self.generate_speed_up_data(vertex, routing_info))
-
         # Write the recording region
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.RECORDING.value)
@@ -611,7 +595,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -896,19 +880,6 @@ class AbstractPopulationVertex(
             "parameters": parameters,
         }
         return context
-
-    @overrides(AbstractUtilitiesDataSpeedUpExtractor.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition, graph_mapper):
-        if partition.identifier == constants.SPIKE_PARTITION_ID:
-            return graph_mapper.get_slice(partition.pre_vertex).n_atoms
-        else:
-            n_keys = AbstractUtilitiesDataSpeedUpExtractor.\
-                get_n_keys_for_partition(self, partition, graph_mapper)
-            if n_keys is None:
-                raise exceptions.ConfigurationException(
-                    "Do not recognise this partition id: {}. ".format(
-                        partition))
-            return n_keys
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)
