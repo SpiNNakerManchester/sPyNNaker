@@ -116,7 +116,8 @@ class SynapseDynamicsSTDP(
         return False
 
     def get_vertex_executable_suffix(self):
-        # For neuromodulation binary name is set in the supervision synapse
+        # For neuro:modulation binary name is set completely in the build
+        # as it is not using standard weight and timing dependence
         if self._neuromodulation:
             return ""
         name = "_stdp_mad"

@@ -1,6 +1,7 @@
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.models.neuron.synapse_types import ExpSupervision
+from spynnaker.pyNN.models.neuron.synapse_types import \
+    ExpIzhikevichNeuromodulated
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -9,7 +10,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 
 
-class IFCurrExpSupervision(AbstractPopulationVertex):
+class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
@@ -50,28 +51,29 @@ class IFCurrExpSupervision(AbstractPopulationVertex):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
-        synapse_type = ExpSupervision(
+        synapse_type = ExpIzhikevichNeuromodulated(
             n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_exp_supervision_stdp_mad_neuromodulated.aplx", label=label,
-            max_atoms_per_core=IFCurrExpSupervision._model_based_max_atoms_per_core,
+            self, n_neurons=n_neurons,
+            binary="IF_curr_exp_stdp_izhikevich_neuromodulation.aplx", label=label,
+            max_atoms_per_core=IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="IF_curr_exp_supervision", neuron_model=neuron_model,
+            model_name="IF_curr_exp_izhikevich_neuromodulation", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-        IFCurrExpSupervision._model_based_max_atoms_per_core = new_value
+        IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExpSupervision._model_based_max_atoms_per_core
+        return IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core
 
     @property
     def isyn_exc(self):

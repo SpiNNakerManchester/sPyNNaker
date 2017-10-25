@@ -13,7 +13,6 @@
 #endif
 
 // Compute the size of the input buffers and ring buffers
-#define INPUT_BUFFER_SIZE (1 << (SYNAPSE_INPUT_TYPE_BITS + SYNAPSE_INDEX_BITS))
 #define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_INPUT_TYPE_BITS\
                                 + SYNAPSE_INDEX_BITS))
 
@@ -175,7 +174,7 @@ static inline void _process_fixed_synapses(
         uint32_t synapse_type = synapse_row_sparse_type(synaptic_word);
 
         // If synapse type has non-input synapses and this synapse
-        // connects to one pass event directly to synapse dynamics
+        // connects to one, pass event directly to synapse dynamics
         if (synapse_type > 1) {
             // Dopaminergic neurons send some amount of neuromodulator
             // concentration so this can actually be a weight as usual.
@@ -405,11 +404,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    profiler_write_entry_disable_fiq(
-        PROFILER_ENTER | PROFILER_PROCESS_FIXED_SYNAPSES);
     _process_fixed_synapses(fixed_region_address, time);
-    profiler_write_entry_disable_fiq(
-        PROFILER_EXIT | PROFILER_PROCESS_FIXED_SYNAPSES);
     //}
     return true;
 }

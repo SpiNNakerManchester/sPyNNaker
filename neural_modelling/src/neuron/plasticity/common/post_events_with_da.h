@@ -18,9 +18,9 @@
 //---------------------------------------
 typedef struct {
     uint32_t count_minus_one;
-
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
     post_trace_t traces[MAX_POST_SYNAPTIC_EVENTS];
+    uint32_t dopamine_trace_markers;
 } post_event_history_t;
 
 typedef struct {
@@ -29,6 +29,7 @@ typedef struct {
     const post_trace_t *next_trace;
     const uint32_t *next_time;
     uint32_t num_events;
+    uint32_t dopamine_trace_markers;
 } post_event_window_t;
 
 //---------------------------------------
@@ -55,6 +56,7 @@ static inline post_event_history_t *post_events_init_buffers(
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
+        post_event_history[n].dopamine_trace_markers = 0x00000000;
     }
 
     return post_event_history;
@@ -132,6 +134,8 @@ static inline post_event_window_t post_events_get_window_delayed(
     const post_trace_t *end_event_trace = events->traces + count;
     window.next_trace = (end_event_trace - window.num_events);
     window.prev_trace = *(window.next_trace - 1);
+    window.dopamine_trace_markers = (events -> dopamine_trace_markers
+                                     >> (count - window.num_events));
 
     // Return window
     return window;
@@ -162,12 +166,18 @@ static inline post_event_window_t post_events_next_delayed(
 
     // Decrement remaining events
     window.num_events--;
+    window.dopamine_trace_markers >>= 1;
     return window;
+}
+
+static inline bool post_events_next_is_dopamine(
+        post_event_window_t window) {
+    return (window.dopamine_trace_markers & 0x1) != 0x0;
 }
 
 //---------------------------------------
 static inline void post_events_add(uint32_t time, post_event_history_t *events,
-                                   post_trace_t trace) {
+                                   post_trace_t trace, bool dopamine) {
 
     if (events->count_minus_one < (MAX_POST_SYNAPTIC_EVENTS - 1)) {
 
@@ -176,6 +186,13 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         const uint32_t new_index = ++events->count_minus_one;
         events->times[new_index] = time;
         events->traces[new_index] = trace;
+
+        if (dopamine) {
+            events->dopamine_trace_markers |= (1 << new_index);
+        }
+        else {
+            events->dopamine_trace_markers &= ~(1 << new_index);
+        }
     } else {
 
         // Otherwise Shuffle down elements
@@ -184,10 +201,20 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
             events->times[e - 1] = events->times[e];
             events->traces[e - 1] = events->traces[e];
         }
+        events->dopamine_trace_markers >>= 1;
 
         // Stick new time at end
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
         events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
+
+        if (dopamine) {
+            events->dopamine_trace_markers |=
+                (1 << (MAX_POST_SYNAPTIC_EVENTS - 1));
+        }
+        else {
+            events->dopamine_trace_markers &=
+                ~(1 << (MAX_POST_SYNAPTIC_EVENTS - 1));
+        }
     }
 }
 
