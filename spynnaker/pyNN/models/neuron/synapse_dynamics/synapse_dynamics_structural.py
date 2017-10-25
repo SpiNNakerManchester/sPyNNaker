@@ -46,6 +46,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._connections = {}
 
         self.fudge_factor = 1.3
+        self._actual_row_max_length = self._s_max
 
         if stdp_model is not None:
             self.super = SynapseDynamicsSTDP(
@@ -152,6 +153,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         # TODO when implementing inhibitory connections add another
         # spec.write_value here multiplied by weight_scale[1]
         spec.write_value(data=int(round(self._weight * weight_scales[0])),
+                         data_type=DataType.INT32)
+        spec.write_value(data=int(round(self._weight * weight_scales[1])),
                          data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
@@ -354,7 +357,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
-            machine_vertex] = 4 * 20 + 4 * total_words_written
+            machine_vertex] = 4 * 27 + 4 * total_words_written
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
         #
@@ -367,7 +370,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges=None):
-        structure_size = 26 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 27 * 4 + 4 * 4  # parameters + rng seed
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 
@@ -432,13 +435,16 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
-            return self.super.get_n_words_for_plastic_connections(
+            self._actual_row_max_length = self.super.get_n_words_for_plastic_connections(
                 n_connections)
+            return self._actual_row_max_length
         except:
-            return self.super.get_n_words_for_static_connections(n_connections)
+            self._actual_row_max_length = self.super.get_n_words_for_static_connections(n_connections)
+            return self._actual_row_max_length
 
     def get_n_words_for_static_connections(self, n_connections):
-        return self.super.get_n_words_for_static_connections(n_connections)
+        self._actual_row_max_length = self.super.get_n_words_for_static_connections(n_connections)
+        return self._actual_row_max_length
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         if fp_size is not None:

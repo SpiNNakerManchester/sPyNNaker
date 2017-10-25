@@ -59,7 +59,7 @@ typedef struct {
 } pre_pop_info_table_t;
 
 typedef struct {
-    uint32_t p_rew, fast, weight, delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom,\
+    uint32_t p_rew, fast, weight[2], delay, s_max, app_no_atoms, machine_no_atoms, low_atom, high_atom,\
         size_ff_prob, size_lat_prob, grid_x, grid_y, p_elim_dep, p_elim_pot;
     mars_kiss64_seed_t shared_seed, local_seed;
     pre_pop_info_table_t pre_pop_info_table;
@@ -134,7 +134,8 @@ address_t synaptogenesis_dynamics_initialise(
     int32_t *sp_word = (int32_t*) sdram_sp_address;
     rewiring_data.fast = *sp_word++;
     rewiring_data.p_rew = *sp_word++;
-    rewiring_data.weight = *sp_word++;
+    rewiring_data.weight[0] = *sp_word++;
+    rewiring_data.weight[1] = *sp_word++;
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
@@ -161,8 +162,9 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.local_seed[2] = *sp_word++;
     rewiring_data.local_seed[3] = *sp_word++;
 
-    log_debug("p_rew %d fast %d weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
-        rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight, rewiring_data.delay, rewiring_data.s_max,
+    log_info("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+        rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight[0], rewiring_data.weight[1],
+        rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
         rewiring_data.grid_x, rewiring_data.grid_y,
         rewiring_data.p_elim_dep, rewiring_data.p_elim_pot
@@ -451,22 +453,22 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     }
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
-        log_error("o %d v %d a %x row_address %x syn_row_add %x",
-        current_state.offset_in_table,
-        rewiring_data.post_to_pre_table[current_state.offset_in_table],
-        rewiring_data.post_to_pre_table,
-        rewiring_dma_buffer.row,
-        rewiring_dma_buffer.sdram_writeback_address
-        );
-
-        for (int shite=0; shite < rewiring_dma_buffer.n_bytes_transferred/4; shite++) {
-            log_info("%x", rewiring_dma_buffer.row[shite]);
-        }
+//        log_error("o %d v %d a %x row_address %x syn_row_add %x",
+//        current_state.offset_in_table,
+//        rewiring_data.post_to_pre_table[current_state.offset_in_table],
+//        rewiring_data.post_to_pre_table,
+//        rewiring_dma_buffer.row,
+//        rewiring_dma_buffer.sdram_writeback_address
+//        );
 //
-//        log_info("%d",current_state.post_syn_id);
-        log_info("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
-
-        rt_error(RTE_SWERR);
+//        for (int shite=0; shite < rewiring_dma_buffer.n_bytes_transferred/4; shite++) {
+//            log_info("%x", rewiring_dma_buffer.row[shite]);
+//        }
+////
+////        log_info("%d",current_state.post_syn_id);
+//        log_info("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
+//
+//        rt_error(RTE_SWERR);
     }
     else {
         synaptogenesis_dynamics_formation_rule();
@@ -484,7 +486,8 @@ bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
     log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
-    if( current_state.sp_data.weight < rewiring_data.weight / 2 && r >= rewiring_data.p_elim_dep ){
+    int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
+    if( current_state.sp_data.weight < appr_scaled_weight / 2 && r >= rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
@@ -547,9 +550,10 @@ bool synaptogenesis_dynamics_formation_rule(){
         log_debug("\t| NO FORM %d", current_state.current_time);
         return false;
     }
+    int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
 
     if(add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
-            rewiring_data.weight, rewiring_data.delay,
+            appr_scaled_weight, rewiring_data.delay,
             rewiring_data.lateral_inhibition ? current_state.current_controls : 0)){
 
         while(0==spin1_dma_transfer(
