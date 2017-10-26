@@ -20,7 +20,7 @@ class PushBotRetinaViewer(Thread):
             decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
         try:
             import matplotlib  # @UnusedImport # NOQA
-        except:
+        except Exception:
             raise Exception("matplotlib must be installed to use this viewer")
 
         Thread.__init__(self, name="PushBotRetinaViewer")
