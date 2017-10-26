@@ -62,18 +62,6 @@ class PyNNPopulationCommon(object):
         self._spinnaker_control.add_application_vertex(self._vertex)
 
         # initialise common stuff
-        if not isinstance(size, int):
-            # Allow a float which has a near int value
-            temp = int(round(size))
-            if abs(temp - size) < 0.001:
-                size = temp
-                logger.warning("Size of the popluation rounded to {}"
-                               "".format(size))
-            else:
-                raise ConfigurationException(
-                    "Size of a population must be an int received {}"
-                    "".format(size))
-
         self._size = size
         self._record_spike_file = None
         self._record_v_file = None
@@ -395,3 +383,22 @@ class PyNNPopulationCommon(object):
             return self._vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
+
+    def _roundsize(self, size, label):
+        if isinstance(size, int):
+            return size
+        if label is None:
+            label = "None"
+        # Allow a float which has a near int value
+        temp = int(round(size))
+        if abs(temp - size) < 0.001:
+            logger.warning("Size of the popluation with label {} "
+                           "rounded from {} to {} "
+                           "Please use int values for size"
+                           "".format(label, size, temp))
+            return temp
+        else:
+            raise ConfigurationException(
+                "Size of a population with label {} must be an int,"
+                " received {}".format(label, size))
+
