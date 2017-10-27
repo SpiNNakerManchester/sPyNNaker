@@ -136,6 +136,6 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
-	      -include $(NEURON_IMPL_H) \
 	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+	      -include $(ADDITIONAL_INPUT_H) \
+	      -include $(NEURON_IMPL_H) -o $@ $<
