@@ -57,12 +57,6 @@ uint32_t input_size;
 //! The number of recordings outstanding
 static uint32_t n_recordings_outstanding = 0;
 
-input_t gl_exc_input=0;
-input_t exc_input_value=0;
-input_t gl_inh_input=0;
-input_t inh_input_value=0;
-input_t gl_membrane_voltage=0;
-
 //! \brief Initialise the particular implementation of the data
 //! \param[in] data_address The address of the data to be initialised
 //! \return boolean for error
@@ -124,18 +118,6 @@ static bool neuron_impl_initialise(uint32_t n_neurons)
             return false;
         }
     }
-
-//    // load the data into the allocated DTCM spaces.
-//    if (!_neuron_load_neuron_parameters(data_address)){
-//        return false;
-//    }
-//
-//    // Set up the out spikes array
-//    if (!out_spikes_initialize(n_neurons)) {
-//        return false;
-//    }
-
-//    recording_flags = recording_flags_param;
 
     voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
     voltages = (timed_state_t *) spin1_malloc(voltages_size);
@@ -202,7 +184,7 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
         &additional_input_array[neuron_index];
 
     // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
+    state_t voltage = neuron_impl_get_membrane_voltage(neuron_index);
 
     // If we should be recording potential, record this neuron parameter
     voltages->states[neuron_index] = voltage;
@@ -213,17 +195,27 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
     input_t inh_value = synapse_types_get_inhibitory_input(
     		&(neuron_synapse_shaping_params[neuron_index]));
 
-    // Call impl functions to obtain exc_input and inh_input
-    neuron_impl_convert_inputs_to_current(exc_value, inh_value,
-    		input_type, voltage);
-    input_t exc_input = neuron_impl_get_excitatory_input();
-    input_t inh_input = neuron_impl_get_inhibitory_input();
+    // Call functions to obtain exc_input and inh_input
+    input_t exc_input_value = input_type_get_input_value(
+    		exc_value, input_type);
+    input_t inh_input_value = input_type_get_input_value(
+    		inh_value, input_type);
 
-    // Call impl functions to get the input values to be recorded
-    inputs_excitatory->inputs[neuron_index].input =
-    		neuron_impl_get_recording_excitatory_value();
-    inputs_inhibitory->inputs[neuron_index].input =
-    		neuron_impl_get_recording_inhibitory_value();
+    // Call functions to convert exc_input to current
+    input_t exc_input = input_type_convert_excitatory_input_to_current(
+    		exc_input_value, input_type, voltage);
+
+    // Set the inhibitory multiplicator value
+    input_type_set_inhibitory_multiplicator_value(
+    		exc_input, input_type, inh_input_value);
+
+    // Call functions to convert exc_input and inh_input to current
+    input_t inh_input = input_type_convert_inhibitory_input_to_current(
+    		inh_input_value, input_type, voltage);
+
+    // Call functions to get the input values to be recorded
+    inputs_excitatory->inputs[neuron_index].input = exc_input;
+    inputs_inhibitory->inputs[neuron_index].input = inh_input;
 
     // Get external bias from any source of intrinsic plasticity
     input_t external_bias =
@@ -252,7 +244,6 @@ static void neuron_impl_has_spiked(index_t neuron_index)
     additional_input_pointer_t additional_input =
         &additional_input_array[neuron_index];
 	additional_input_has_spiked(additional_input);
-
 }
 
 //! \setter for the internal input buffers
@@ -263,15 +254,15 @@ static void neuron_impl_set_neuron_synapse_shaping_params(
     neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
 
+//! \brief Wrapper for the neuron model's print state variables function
 static void neuron_impl_print_state_variables(index_t neuron_index)
 {
-	// wrapper to the model print function
 	neuron_model_print_state_variables(&(neuron_array[neuron_index]));
 }
 
+//! \brief Wrapper for the neuron model's print parameters function
 static void neuron_impl_print_parameters(index_t neuron_index)
 {
-	// wrapper to the model print function
 	neuron_model_print_parameters(&(neuron_array[neuron_index]));
 }
 
@@ -325,79 +316,86 @@ static void neuron_impl_do_recording(timer_t time, uint32_t recording_flags)
 	}
 }
 
-//! \brief Sets up the conversion of (voltage) input to current
-//! \param[in] exc_value The value of the excitatory input before conversion
-//! \param[in] inh_value The value of the inhibitory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_inputs_to_current(
-		input_t exc_value, input_t inh_value, input_type_pointer_t input_type,
-		state_t voltage)
+//! \return The membrane voltage value
+static input_t neuron_impl_get_membrane_voltage(index_t neuron_index)
 {
-    exc_input_value = input_type_get_input_value(exc_value, input_type);
-	inh_input_value = input_type_get_input_value(inh_value, input_type);
-
-	neuron_impl_convert_excitatory_input_to_current(
-			exc_input_value, input_type, voltage);
-    input_type_set_inhibitory_multiplicator_value(gl_exc_input, input_type,
-            		inh_input_value);
-	neuron_impl_convert_inhibitory_input_to_current(
-			inh_input_value, input_type, voltage);
+    neuron_pointer_t neuron = &neuron_array[neuron_index];
+	return neuron_model_get_membrane_voltage(neuron);
 }
 
-//! \brief Sets up the conversion of an excitatory input to current
-//! \param[in] exc_value The value of the excitatory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_excitatory_input_to_current(
-		input_t exc_input_value,
-		input_type_pointer_t input_type, state_t voltage)
-{
-    gl_exc_input = input_type_convert_excitatory_input_to_current(
-    		exc_input_value, input_type, voltage);
-}
-
-//! \brief Sets up the conversion of an inhibitory input to current
-//! \param[in] inh_value The value of the inhibitory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_inhibitory_input_to_current(
-		input_t inh_input_value,
-		input_type_pointer_t input_type, state_t voltage)
-{
-    gl_inh_input = input_type_convert_inhibitory_input_to_current(
-    		inh_input_value, input_type, voltage);
-}
-
-//! \brief Gets excitatory input value
-//! \return The excitatory input value
-static input_t neuron_impl_get_excitatory_input()
-{
-	return gl_exc_input;
-}
-
-//! \brief Gets inhibitory input value
-//! \return The inhibitory input value
-static input_t neuron_impl_get_inhibitory_input()
-{
-	return gl_inh_input;
-}
-
-//! \brief Gets the value to be recorded as the excitatory value
-//! \return The excitatory recording value
-static input_t neuron_impl_get_recording_excitatory_value()
-{
-	return gl_exc_input;
-}
-
-//! \brief Gets the value to be recorded as the inhibitory value
-//! \return The inhibitory recording value
-static input_t neuron_impl_get_recording_inhibitory_value()
-{
-	return gl_inh_input;
-}
+////! \brief Sets up the conversion of (voltage) input to current
+////! \param[in] exc_value The value of the excitatory input before conversion
+////! \param[in] inh_value The value of the inhibitory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_inputs_to_current(
+//		input_t exc_value, input_t inh_value, input_type_pointer_t input_type,
+//		state_t voltage)
+//{
+//    exc_input_value = input_type_get_input_value(exc_value, input_type);
+//	inh_input_value = input_type_get_input_value(inh_value, input_type);
+//
+//	neuron_impl_convert_excitatory_input_to_current(
+//			exc_input_value, input_type, voltage);
+//    input_type_set_inhibitory_multiplicator_value(gl_exc_input, input_type,
+//            		inh_input_value);
+//	neuron_impl_convert_inhibitory_input_to_current(
+//			inh_input_value, input_type, voltage);
+//}
+//
+////! \brief Sets up the conversion of an excitatory input to current
+////! \param[in] exc_value The value of the excitatory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_excitatory_input_to_current(
+//		input_t exc_input_value,
+//		input_type_pointer_t input_type, state_t voltage)
+//{
+//    gl_exc_input = input_type_convert_excitatory_input_to_current(
+//    		exc_input_value, input_type, voltage);
+//}
+//
+////! \brief Sets up the conversion of an inhibitory input to current
+////! \param[in] inh_value The value of the inhibitory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_inhibitory_input_to_current(
+//		input_t inh_input_value,
+//		input_type_pointer_t input_type, state_t voltage)
+//{
+//    gl_inh_input = input_type_convert_inhibitory_input_to_current(
+//    		inh_input_value, input_type, voltage);
+//}
+//
+////! \brief Gets excitatory input value
+////! \return The excitatory input value
+//static input_t neuron_impl_get_excitatory_input()
+//{
+//	return gl_exc_input;
+//}
+//
+////! \brief Gets inhibitory input value
+////! \return The inhibitory input value
+//static input_t neuron_impl_get_inhibitory_input()
+//{
+//	return gl_inh_input;
+//}
+//
+////! \brief Gets the value to be recorded as the excitatory value
+////! \return The excitatory recording value
+//static input_t neuron_impl_get_recording_excitatory_value()
+//{
+//	return gl_exc_input;
+//}
+//
+////! \brief Gets the value to be recorded as the inhibitory value
+////! \return The inhibitory recording value
+//static input_t neuron_impl_get_recording_inhibitory_value()
+//{
+//	return gl_inh_input;
+//}
 
 #endif // _NEURON_IMPL_SEMD_H_

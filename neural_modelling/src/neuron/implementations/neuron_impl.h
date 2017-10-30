@@ -2,14 +2,6 @@
 #define _NEURON_IMPL_H_
 
 #include "../../common/neuron-typedefs.h"
-//#include "../models/neuron_model.h"
-//#include "../input_types/input_type.h"
-//#include "../additional_inputs/additional_input.h"
-//#include "../threshold_types/threshold_type.h"
-//#include "../synapse_types/synapse_types.h"
-//#include "../plasticity/synapse_dynamics.h"
-//#include "../../common/out_spikes.h"
-//#include "recording.h"
 
 //! Forward declaration of the neuron impl pointer
 typedef struct neuron_impl_t* neuron_impl_pointer_t;
@@ -48,8 +40,10 @@ static void neuron_impl_has_spiked(index_t neuron_index);
 static void neuron_impl_set_neuron_synapse_shaping_params(
 		synapse_param_t *neuron_synapse_shaping_params_value);
 
+//! \brief Wrapper for the neuron model's print state variables function
 static void neuron_impl_print_state_variables(index_t neuron_index);
 
+//! \brief Wrapper for the neuron model's print parameters function
 static void neuron_impl_print_parameters(index_t neuron_index);
 
 //! \brief Do any required recording
@@ -57,49 +51,49 @@ static void neuron_impl_print_parameters(index_t neuron_index);
 //! \return None
 static void neuron_impl_do_recording(timer_t time, uint32_t recording_flags);
 
-//! \brief Sets up the conversion of (voltage) input to current
-//! \param[in] exc_value The value of the excitatory input before conversion
-//! \param[in] inh_value The value of the inhibitory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_inputs_to_current(
-		input_t exc_value, input_t inh_value, input_type_pointer_t input_type,
-		state_t voltage);
-
-//! \brief Sets up the conversion of an excitatory input to current
-//! \param[in] exc_value The value of the excitatory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_excitatory_input_to_current(
-		input_t exc_input_value,
-		input_type_pointer_t input_type, state_t voltage);
-
-//! \brief Sets up the conversion of an inhibitory input to current
-//! \param[in] inh_value The value of the inhibitory input before conversion
-//! \param[in] input_type The input type pointer to the parameters
-//! \param[in] voltage The voltage to use in conversion
-//! \return None
-static void neuron_impl_convert_inhibitory_input_to_current(
-		input_t inh_input_value,
-		input_type_pointer_t input_type, state_t voltage);
-
 //! \return The membrane voltage value
-static input_t neuron_impl_get_membrane_voltage();  // not sure this needs the index value?
+static input_t neuron_impl_get_membrane_voltage(index_t neuron_index);
 
-//! \return The global excitatory input value
-static input_t neuron_impl_get_excitatory_input();
-
-//! \return The global inhibitory input value
-static input_t neuron_impl_get_inhibitory_input();
-
-//! \brief Gets the value to be recorded as the excitatory value
-//! \return The global excitatory input value
-static input_t neuron_impl_get_recording_excitatory_value();
-
-//! \brief Gets the value to be recorded as the inhibitory value
-//! \return The global inhibitory input value
-static input_t neuron_impl_get_recording_inhibitory_value();
+////! \brief Sets up the conversion of (voltage) input to current
+////! \param[in] exc_value The value of the excitatory input before conversion
+////! \param[in] inh_value The value of the inhibitory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_inputs_to_current(
+//		input_t exc_value, input_t inh_value, input_type_pointer_t input_type,
+//		state_t voltage);
+//
+////! \brief Sets up the conversion of an excitatory input to current
+////! \param[in] exc_value The value of the excitatory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_excitatory_input_to_current(
+//		input_t exc_input_value,
+//		input_type_pointer_t input_type, state_t voltage);
+//
+////! \brief Sets up the conversion of an inhibitory input to current
+////! \param[in] inh_value The value of the inhibitory input before conversion
+////! \param[in] input_type The input type pointer to the parameters
+////! \param[in] voltage The voltage to use in conversion
+////! \return None
+//static void neuron_impl_convert_inhibitory_input_to_current(
+//		input_t inh_input_value,
+//		input_type_pointer_t input_type, state_t voltage);
+//
+////! \return The global excitatory input value
+//static input_t neuron_impl_get_excitatory_input();
+//
+////! \return The global inhibitory input value
+//static input_t neuron_impl_get_inhibitory_input();
+//
+////! \brief Gets the value to be recorded as the excitatory value
+////! \return The global excitatory input value
+//static input_t neuron_impl_get_recording_excitatory_value();
+//
+////! \brief Gets the value to be recorded as the inhibitory value
+////! \return The global inhibitory input value
+//static input_t neuron_impl_get_recording_inhibitory_value();
 
 #endif // _NEURON_IMPL_H_
