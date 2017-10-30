@@ -162,7 +162,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.local_seed[2] = *sp_word++;
     rewiring_data.local_seed[3] = *sp_word++;
 
-    log_debug("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    log_info("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight[0], rewiring_data.weight[1],
         rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
@@ -383,29 +383,41 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     pre_global_id = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop].key_atom_info[KEY_INFO_CONSTANTS * pre_sub_pop + 2] + current_state.pre_syn_id;
     post_global_id = current_state.post_syn_id + rewiring_data.low_atom;
 
+    if (rewiring_data.grid_x > 1) {
+        pre_x = pre_global_id / rewiring_data.grid_x;
+        post_x = post_global_id / rewiring_data.grid_x;
+    }
+    else {
+        pre_x = 0;
+        post_x = 0;
+    }
 
-    pre_x = pre_global_id / rewiring_data.grid_x;
-    pre_y = pre_global_id % rewiring_data.grid_y;
+    if (rewiring_data.grid_y > 1) {
+        pre_y = pre_global_id % rewiring_data.grid_y;
+        post_y = post_global_id % rewiring_data.grid_y;
+    }
+    else {
+        pre_y = 0;
+        post_y = 0;
+    }
 
-    post_x = post_global_id / rewiring_data.grid_x;
-    post_y = post_global_id % rewiring_data.grid_y;
 
     // With periodic boundary conditions
     uint delta_x, delta_y;
     delta_x = my_abs(pre_x - post_x);
     delta_y = my_abs(pre_y - post_y);
 
-    if( delta_x > rewiring_data.grid_x>>1 )
+    if( delta_x > rewiring_data.grid_x>>1 && rewiring_data.grid_x > 1)
         delta_x -= rewiring_data.grid_x;
 
-    if( delta_y > rewiring_data.grid_y>>1 )
+    if( delta_y > rewiring_data.grid_y>>1 && rewiring_data.grid_y > 1)
         delta_y -= rewiring_data.grid_y;
 
     current_state.distance = delta_x * delta_x + delta_y * delta_y;
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    log_debug("g_pre_id %d g_post_id %d g_distance_sq %d %d",
+    log_info("g_pre_id %d g_post_id %d g_distance_sq %d %d",
         pre_global_id, post_global_id, current_state.distance,
         current_state.current_controls
         );
@@ -438,7 +450,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_info("sr_attempt %d %d exists %d",
+    /*ad*/log_debug("sr_attempt %d %d exists %d",
         current_state.current_time,
         current_state.current_controls,
         current_state.element_exists);
@@ -520,15 +532,15 @@ bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
     uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
-    if (no_elems == 32) {
+    if (no_elems == rewiring_data.s_max) {
         log_error("row is full");
         return false;
     }
 
-    if( current_state.element_exists ) {
-            log_error("element exists");
-            return false;
-            }
+//    if( current_state.element_exists ) {
+//            log_error("element exists");
+//            return false;
+//            }
 //    log_info("%x %d", rewiring_dma_buffer.row,
 //    number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
 
