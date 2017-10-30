@@ -6,6 +6,7 @@ from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums import DataType
+from spinn_utilities.ranged.ranged_list import RangedList
 
 import numpy
 from enum import Enum
@@ -44,12 +45,11 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
             'i_offset': 'nA'}
 
         self._n_neurons = n_neurons
-        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
-        self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
-        self._tau_m = utility_calls.convert_param_to_numpy(tau_m, n_neurons)
-        self._cm = utility_calls.convert_param_to_numpy(cm, n_neurons)
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, n_neurons)
+        self._v_init = RangedList(n_neurons, v_init, "v_init")
+        self._v_rest = RangedList(n_neurons, v_rest, "v_rest")
+        self._tau_m = RangedList(n_neurons, tau_m, "tau_m")
+        self._cm = RangedList(n_neurons, cm, "cm")
+        self._i_offset = RangedList(n_neurons, i_offset, "i_offset")
 
         if v_init is None:
             self._v_init = self._v_rest
@@ -107,8 +107,9 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         return self._tau_m / self._cm
 
     def _exp_tc(self, machine_time_step):
-        return numpy.exp(float(-machine_time_step) /
-                         (1000.0 * self._tau_m))
+        operation = lambda x: numpy.exp(float(-machine_time_step) /
+                                        (1000.0 * x))
+        return self._tau_m.apply_operation(operation=operation)
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
