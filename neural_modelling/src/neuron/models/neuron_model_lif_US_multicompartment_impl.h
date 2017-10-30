@@ -38,6 +38,7 @@ typedef struct neuron_t {
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
+    // Two separate 'compartments' (see struct above)
     compartment_t comp1;
     compartment_t comp2;
 
