@@ -33,6 +33,8 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(weight_state_
                                                 uint32_t syn_type, int32_t potentiation);
 static inline weight_state_t weight_one_term_apply_depression_sd(weight_state_t state,
                                                   uint32_t syn_type, int32_t depression);
+static inline weight_state_t weight_load_balance_potentiation(weight_state_t state,
+                                                  int32_t depression);
 
 //---------------------------------------
 // Externals
@@ -100,7 +102,8 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 }
 
 //---------------------------------------
-// This performs three functions:
+// For inhib1-type synapses, this always reduces the weight.
+// For other synapse types, this performs three functions:
 // 1) Decay the accumulator value. Long periods with no spikes should cause the state to forget as this
 //    will not correspond to a complete set of pattern repeats.
 // 2) Set the flag for pre_waiting_post (we've got a pre-spike so now waiting for a post -pike)
@@ -118,6 +121,11 @@ static inline update_state_t timing_apply_pre_spike_sd(
 	// Decay accum value so that long periods without spikes cause it to forget:
     uint32_t time_since_last_event = time - last_event_time;
 
+    // For inhib1-type synapses, always decay the weight a little:
+    if (syn_type == 2) {
+       previous_state.weight_state.weight -= (accum) 0.01;
+    }
+
     int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event)>>ACCUM_SCALING;
     if (previous_state.accumulator > 0) {
         previous_state.accumulator -= acc_change;
@@ -134,6 +142,14 @@ static inline update_state_t timing_apply_pre_spike_sd(
     // trigger an accum decrement (a step towards synaptic depression):
     if ((time > last_post_time) && (time < previous_state.longest_post_pre_window_closing_time)) {
        // The pre-spike has occurred inside a post window.
+
+       // For type-2 synapses (inhibitory) we potentiate if we are inside a post-pre window! ((Then exit)
+       if (syn_type == 2) {
+          previous_state.weight_state = weight_load_balance_potentiation(previous_state.weight_state, (accum)0.1);
+
+          return previous_state;
+       }
+
        // Get time of event relative to last post-synaptic event
        uint32_t time_since_last_post = time - last_post_time;
 
@@ -141,8 +157,10 @@ static inline update_state_t timing_apply_pre_spike_sd(
           recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit depression limit, decrement it
              previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
+             //log_info("-, acc %d", previous_state.accumulator);
           } else {
              // Otherwise, reset accumulator and apply depression
+             //log_info("!- %d", postNeuronIndex);
              previous_state.accumulator = 0;
              previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
                                                                                 syn_type, STDP_FIXED_POINT_ONE);
@@ -156,9 +174,12 @@ static inline update_state_t timing_apply_pre_spike_sd(
     return previous_state;
 }
 
-// This routine has two major responsibilities:
+// This routine has different functionality depending on synapse type.
+// For inhib1-type synapses, it performs potentiation if the latest pre is soon after or if it followed
+// soon after a pre.
+// For other types it has two major responsibilities:
 // 1) Generate the window size for this post spike and extend the window closure time
-// if this is beyond the current value. This is used by a following pre-spike for depression
+//    if this is beyond the current value. This is used by a following pre-spike for depression
 // 2) Check if there is currently a pre-window open and then check if the post-spike is within
 //    it. If so:
 //               a) increment the accumulator
@@ -189,6 +210,13 @@ static inline update_state_t timing_apply_post_spike_sd(
 
    uint32_t this_window_close_time = time + window_length;
 
+   // For inhib1-type synapses, if we're inside either the pre-post or the 
+   // post-pre windows, perform potentiation:
+   if ((syn_type == 2) && (time < last_pre_trace)) {
+         previous_state.weight_state = weight_load_balance_potentiation(previous_state.weight_state,
+                                                                           (accum)0.1);
+      return previous_state;
+   }
    // Check if this post-spike extends the open window:
    if (previous_state.longest_post_pre_window_closing_time < this_window_close_time) {
       previous_state.longest_post_pre_window_closing_time = this_window_close_time;
@@ -200,7 +228,7 @@ static inline update_state_t timing_apply_post_spike_sd(
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
-      log_info("+, acc %d", previous_state.accumulator);
+      //log_info("+, acc %d", previous_state.accumulator);
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
       if (time_since_last_pre < last_pre_trace) {
@@ -209,7 +237,7 @@ static inline update_state_t timing_apply_post_spike_sd(
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
          } else {
-             log_info("!+ %d", postNeuronIndex);
+             //log_info("!+ %d", postNeuronIndex);
              previous_state.accumulator = 0;
              previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                                         syn_type, STDP_FIXED_POINT_ONE);
@@ -217,6 +245,12 @@ static inline update_state_t timing_apply_post_spike_sd(
       }
    }
    return previous_state;
+}
+
+static inline weight_state_t weight_load_balance_potentiation(
+   weight_state_t state, int32_t potentiation) {
+   state.weight += STDP_FIXED_MUL_16X16(state.weight, potentiation);
+   return state;
 }
 
 static inline weight_state_t weight_one_term_apply_potentiation_sd(
@@ -231,7 +265,7 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
    // Multiply scale by potentiation and add
    // **NOTE** using standard STDP fixed-point format handles format conversion
    state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
-   log_info("oldW:%d A2: %d, sc: %d, newW: %d", old_w, state.weight_region->a2_plus, scale, state.weight); 
+   //log_info("oldW:%d A2: %d, sc: %d, newW: %d", old_w, state.weight_region->a2_plus, scale, state.weight); 
    return state;
 }
 

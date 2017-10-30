@@ -159,22 +159,22 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps_inhib2)
 
         # Write random seeds
-        #spec.write_value(data=self.rng.randint(0x7FFFFFF1),
-        #                 data_type=DataType.UINT32)
-        #spec.write_value(data=self.rng.randint(0x7FFFFFF2),
-        #                 data_type=DataType.UINT32)
-        #spec.write_value(data=self.rng.randint(0x7FFFFFF3),
-        #                 data_type=DataType.UINT32)
-        #spec.write_value(data=self.rng.randint(0x7FFFFFF4),
-        #                 data_type=DataType.UINT32)
-        spec.write_value(data=0x7FFFFFF1,
+        spec.write_value(data=self.rng.randint(0x7FFFFFF1),
                          data_type=DataType.UINT32)
-        spec.write_value(data=0x7FFFFFF2,
-                        data_type=DataType.UINT32)
-        spec.write_value(data=0x7FFFFFF3,
+        spec.write_value(data=self.rng.randint(0x7FFFFFF2),
                          data_type=DataType.UINT32)
-        spec.write_value(data=0x7FFFFFF4,
+        spec.write_value(data=self.rng.randint(0x7FFFFFF3),
                          data_type=DataType.UINT32)
+        spec.write_value(data=self.rng.randint(0x7FFFFFF4),
+                         data_type=DataType.UINT32)
+        #spec.write_value(data=0x7FFFFFF1,
+        #                 data_type=DataType.UINT32)
+        #spec.write_value(data=0x7FFFFFF2,
+        #                data_type=DataType.UINT32)
+        #spec.write_value(data=0x7FFFFFF3,
+        #                 data_type=DataType.UINT32)
+        #spec.write_value(data=0x7FFFFFF4,
+        #                 data_type=DataType.UINT32)
 
     @property
     def pre_trace_size_bytes(self):
