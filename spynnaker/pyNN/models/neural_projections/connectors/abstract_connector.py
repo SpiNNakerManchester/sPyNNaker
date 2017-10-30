@@ -45,6 +45,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
+    _DISTANCE_REGEXP = re.compile(r'.*d\[\d*\].*')
 
     __slots__ = [
         "_delays",
@@ -333,8 +334,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param str d_expression:
         :rtype: bool
         """
-        regexpr = re.compile(r'.*d\[\d*\].*')
-        return regexpr.match(d_expression)
+        return self._DISTANCE_REGEXP.match(d_expression)
 
     def _generate_random_values(
             self, values, n_connections, pre_vertex_slice, post_vertex_slice):

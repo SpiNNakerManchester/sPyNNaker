@@ -109,9 +109,7 @@ def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
         return False
     if not enable_buffered_recording:
         return False
-    if buffer_max < space_needed:
-        return True
-    return False
+    return buffer_max < space_needed
 
 
 def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
