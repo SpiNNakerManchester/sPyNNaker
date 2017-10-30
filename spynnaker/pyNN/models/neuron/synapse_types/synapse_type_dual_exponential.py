@@ -5,9 +5,7 @@ from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_synapse_type import AbstractSynapseType
-
-from spynnaker.pyNN.utilities import utility_calls
-
+from spinn_utilities.ranged.ranged_list import RangedList
 from data_specification.enums import DataType
 
 from enum import Enum
@@ -52,18 +50,15 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             'gsyn_inh': "uS"}
 
         self._n_neurons = n_neurons
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, n_neurons)
-        self._tau_syn_E2 = utility_calls.convert_param_to_numpy(
-            tau_syn_E2, n_neurons)
-        self._tau_syn_I = utility_calls.convert_param_to_numpy(
-            tau_syn_I, n_neurons)
-        self._initial_input_exc = utility_calls.convert_param_to_numpy(
-            initial_input_exc, n_neurons)
-        self._initial_input_exc2 = utility_calls.convert_param_to_numpy(
-            initial_input_exc2, n_neurons)
-        self._initial_input_inh = utility_calls.convert_param_to_numpy(
-            initial_input_inh, n_neurons)
+        self._tau_syn_E = RangedList(size=n_neurons, default=tau_syn_E)
+        self._tau_syn_E2 = RangedList(size=n_neurons, default=tau_syn_E2)
+        self._tau_syn_I = RangedList(size=n_neurons, default=tau_syn_I)
+        self._initial_input_exc = RangedList(
+            size=n_neurons, default=initial_input_exc)
+        self._initial_input_exc2 = RangedList(
+            size=n_neurons, default=initial_input_exc2)
+        self._initial_input_inh = RangedList(
+            size=n_neurons, default=initial_input_inh)
 
     @property
     def tau_syn_E(self):
@@ -71,8 +66,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, self._n_neurons)
+        self._tau_syn_E.set_value(tau_syn_E)
 
     @property
     def tau_syn_E2(self):
@@ -80,8 +74,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @tau_syn_E2.setter
     def tau_syn_E2(self, tau_syn_E2):
-        self._tau_syn_E2 = utility_calls.convert_param_to_numpy(
-            tau_syn_E2, self._n_neurons)
+        self._tau_syn_E2.set_value(tau_syn_E2)
 
     @property
     def tau_syn_I(self):
@@ -89,8 +82,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @tau_syn_I.setter
     def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_I, self._n_neurons)
+        self._tau_syn_E.set_value(tau_syn_I)
 
     @property
     def isyn_exc(self):
@@ -98,7 +90,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @isyn_exc.setter
     def isyn_exc(self, new_value):
-        self._initial_input_exc = new_value
+        self._initial_input_exc.set_value(new_value)
 
     @property
     def isyn_inh(self):
@@ -106,7 +98,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @isyn_inh.setter
     def isyn_inh(self, new_value):
-        self._initial_input_inh = new_value
+        self._initial_input_inh.set_value(new_value)
 
     @property
     def isyn_exc2(self):
@@ -114,7 +106,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @isyn_exc2.setter
     def isyn_exc2(self, new_value):
-        self._initial_input_exc2 = new_value
+        self._initial_input_exc2.set_value(new_value)
 
     def get_n_synapse_types(self):
         return 3
