@@ -3,6 +3,7 @@
 
 // sPyNNaker neural modelling includes
 #include "../../synapses.h"
+#include "../synapse_dynamics.h"
 
 // Plasticity common includes
 #include "../common/maths.h"
@@ -10,10 +11,13 @@
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
+
 #include <string.h>
 #include <debug.h>
 
 uint32_t num_plastic_pre_synaptic_events = 0;
+
+
 
 //---------------------------------------
 // Macros
@@ -301,3 +305,17 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
+
+void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t *neuron_array){
+	neuron_array_stdp = neuron_array;
+}
+
+void synapse_dynamics_stdp_mad_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_stdp = threshold_type_array;
+}
+
+void synapse_dynamics_stdp_mad_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_stdp = additional_input_array;
+}
+
+
