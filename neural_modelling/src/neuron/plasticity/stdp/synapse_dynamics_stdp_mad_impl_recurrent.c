@@ -76,7 +76,9 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history, const uint32_t type) {
+        const post_event_history_t *post_event_history, const uint32_t type,
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -264,8 +266,12 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
 
         neuron_pointer_t post_synaptic_neuron = &neuron_array_stdp[index];
-        log_info("post_synaptic neuron V_hist = %12.6k", post_synaptic_neuron->V_mem_hist);
+        additional_input_pointer_t post_synaptic_additional_input =
+                		&additional_input_array_stdp[index];
 
+        // test to check variable assignment
+        log_info("Current V = %12.6k, V_hist = %12.6k",
+        		post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
 
         //log_info("D:%d A:%d", delay_dendritic, delay_axonal);
         // Create update state from the plastic synaptic word
@@ -275,7 +281,10 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index], type);
+            &post_event_history[index], type,
+			post_synaptic_neuron,
+			post_synaptic_additional_input
+        	);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
