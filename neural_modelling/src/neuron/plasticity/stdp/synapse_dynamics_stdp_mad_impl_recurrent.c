@@ -15,6 +15,10 @@
 #include <string.h>
 #include <debug.h>
 
+// include neuron model to access struct parameters
+#include "../../models/neuron_model_lif_v_hist_impl.h"
+
+
 #ifdef SYNAPSE_BENCHMARK
   uint32_t num_plastic_pre_synaptic_events = 0;
 #endif  // SYNAPSE_BENCHMARK
@@ -258,6 +262,10 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type = synapse_row_sparse_type(control_word);
         uint32_t index = synapse_row_sparse_index(control_word);
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
+
+        neuron_pointer_t post_synaptic_neuron = &neuron_array_stdp[index];
+        log_info("post_synaptic neuron V_hist = %12.6k", post_synaptic_neuron->V_mem_hist);
+
 
         //log_info("D:%d A:%d", delay_dendritic, delay_axonal);
         // Create update state from the plastic synaptic word
