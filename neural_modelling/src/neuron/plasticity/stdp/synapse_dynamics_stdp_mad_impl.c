@@ -72,7 +72,8 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history,
 		neuron_pointer_t post_synaptic_neuron,
-		additional_input_pointer_t post_synaptic_additional_input) {
+		additional_input_pointer_t post_synaptic_additional_input,
+        threshold_type_pointer_t post_synaptic_threshold) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -259,6 +260,7 @@ bool synapse_dynamics_process_plastic_synapses(
         neuron_pointer_t post_synaptic_neuron = &neuron_array_stdp[index];
         additional_input_pointer_t post_synaptic_additional_input =
                 		&additional_input_array_stdp[index];
+        threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_stdp[index];
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
@@ -268,8 +270,8 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index],post_synaptic_neuron,
-			post_synaptic_additional_input);
+            &post_event_history[index], post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
