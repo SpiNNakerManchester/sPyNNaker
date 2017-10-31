@@ -3,7 +3,6 @@ from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
-from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums import DataType
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
@@ -118,18 +117,36 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
-        datatypes = {}
-        datatypes["v_init"] = _IF_TYPES.V_INIT.data_type
-        datatypes["v_rest"] = _IF_TYPES.V_REST.data_type
-        datatypes["r_membrane"] = _IF_TYPES.R_MEMBRANE.data_type
-        datatypes["exp_tc"] = _IF_TYPES.EXP_TC.data_type
-        datatypes["i_offset"] = _IF_TYPES.I_OFFSET.data_type
+        return [
 
-        exp_tc = self._exp_tc(machine_time_step)
-        self._data.add_list("exp_tc", exp_tc)
+            # membrane voltage [mV]
+            # REAL     V_membrane;
+            NeuronParameter(self._data.get_list("v_init"),
+                            _IF_TYPES.V_INIT.data_type),
 
-        names = ["v_init", "v_rest", "r_membrane", "exp_tc", "i_offset"]
-        return (names, datatypes, self._data)
+            # membrane resting voltage [mV]
+            # REAL     V_rest;
+            NeuronParameter(self._data.get_list("v_rest"),
+                            _IF_TYPES.V_REST.data_type),
+
+            # membrane resistance [MOhm]
+            # REAL     R_membrane;
+            NeuronParameter(self._data.get_list("r_membrane"),
+                            _IF_TYPES.R_MEMBRANE.data_type),
+
+            # 'fixed' computation parameter - time constant multiplier for
+            # closed-form solution
+            # exp( -(machine time step in ms)/(R * C) ) [.]
+            # REAL     exp_TC;
+            NeuronParameter(
+                self._exp_tc(machine_time_step),
+                _IF_TYPES.EXP_TC.data_type),
+
+            # offset current [nA]
+            # REAL     I_offset;
+            NeuronParameter(self._data.get_list("i_offset"),
+                            _IF_TYPES.I_OFFSET.data_type)
+        ]
 
     @overrides(AbstractNeuronModel.get_neural_parameter_types)
     def get_neural_parameter_types(self):
