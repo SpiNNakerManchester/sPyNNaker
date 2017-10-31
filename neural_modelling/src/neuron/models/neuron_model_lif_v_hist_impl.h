@@ -1,5 +1,5 @@
-#ifndef _NEURON_MODEL_LIF_CURR_IMPL_H_
-#define _NEURON_MODEL_LIF_CURR_IMPL_H_
+#ifndef _NEURON_MODEL_LIF_CURR_V_HIST_IMPL_H_
+#define _NEURON_MODEL_LIF_CURR_V_HIST_IMPL_H_
 
 #include "neuron_model.h"
 
@@ -41,4 +41,4 @@ typedef struct neuron_t {
 typedef struct global_neuron_params_t {
 } global_neuron_params_t;
 
-#endif // _NEURON_MODEL_LIF_CURR_IMPL_H_
+#endif // _NEURON_MODEL_LIF_CURR_V_HIST_IMPL_H_

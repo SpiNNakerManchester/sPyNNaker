@@ -1,4 +1,4 @@
-#include "neuron_model_lif_impl.h"
+#include "neuron_model_lif_v_hist_impl.h"
 
 #include <debug.h>
 
