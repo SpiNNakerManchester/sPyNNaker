@@ -23,6 +23,9 @@ state_t neuron_model_state_update(
         input_t exc_input, input_t inh_input, input_t external_bias,
         neuron_pointer_t neuron) {
 
+	// track previous timestep membrane voltage
+    neuron->V_mem_hist = neuron->V_membrane;
+
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
 
@@ -37,6 +40,7 @@ state_t neuron_model_state_update(
         // countdown refractory timer
         neuron->refract_timer -= 1;
     }
+
     return neuron->V_membrane;
 }
 

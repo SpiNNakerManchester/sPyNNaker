@@ -31,6 +31,11 @@ typedef struct neuron_t {
 
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
+
+    // variable to track history of membrane voltage
+    REAL V_mem_hist;
+
+
 } neuron_t;
 
 typedef struct global_neuron_params_t {
