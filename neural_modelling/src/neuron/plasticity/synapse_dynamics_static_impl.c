@@ -59,7 +59,3 @@ void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_typ
 void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
 	additional_input_array_stdp = additional_input_array;
 }
-
-
-
-
