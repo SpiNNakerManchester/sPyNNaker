@@ -268,7 +268,7 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index],post_synaptic_neuron,
+            &post_event_history[index], post_synaptic_neuron,
 			post_synaptic_additional_input);
 
         // Convert into ring buffer offset
