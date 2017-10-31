@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.neuron.neuron_models\
-    .neuron_model_leaky_integrate_and_fire \
-    import NeuronModelLeakyIntegrateAndFire
+    .neuron_model_leaky_integrate_and_fire_v_hist \
+    import NeuronModelLeakyIntegrateAndFireVHist
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_2E2I\
     import SynapseTypeCombExp2E2I
 from spynnaker.pyNN.models.neuron.input_types.input_type_current \
@@ -28,6 +28,7 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
         'v_thresh': -50.0,
         'tau_refrac': 0.1,
         'i_offset': 0,
+        'v_hist':0,
 
         ##### synapse parameters #####
         # excitatory
@@ -68,6 +69,7 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
             v_thresh=default_parameters['v_thresh'],
+            v_mem_hist=default_parameters['v_hist'],
 
             # excitatory
             exc_a_response=default_parameters['exc_a_response'],
@@ -106,9 +108,9 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
 
 
         # Construct neuron/synapse objects
-        neuron_model = NeuronModelLeakyIntegrateAndFire(
+        neuron_model = NeuronModelLeakyIntegrateAndFireVHist(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
-            v_reset, tau_refrac)
+            v_reset, tau_refrac, v_mem_hist)
 
         synapse_type = SynapseTypeCombExp2E2I(
                 n_neurons,
