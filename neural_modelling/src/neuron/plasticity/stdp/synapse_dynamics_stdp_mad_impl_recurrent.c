@@ -3,6 +3,8 @@
 
 // sPyNNaker neural modelling includes
 #include "../../synapses.h"
+#include "../synapse_dynamics.h"
+
 
 // Plasticity common includes
 #include "../common/maths.h"
@@ -232,7 +234,7 @@ bool synapse_dynamics_process_plastic_synapses(
     {
         // Get the synapse type from the first synapse in the row:
         syn_type = synapse_row_sparse_type(*control_words);
-    } 
+    }
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = time;
@@ -310,3 +312,17 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return 0;
 #endif  // SYNAPSE_BENCHMARK
 }
+
+void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t *neuron_array){
+	neuron_array_stdp = neuron_array;
+}
+
+void synapse_dynamics_stdp_mad_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_stdp = threshold_type_array;
+}
+
+void synapse_dynamics_stdp_mad_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_stdp = additional_input_array;
+}
+
+
