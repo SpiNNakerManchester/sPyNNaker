@@ -24,7 +24,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                  s_max=32,
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
-                 p_elim_dep=0.0245, p_elim_pot=1.36 * np.e ** -4,
+                 p_elim_dep=0.0245, p_elim_pot=1.36 * 10 ** -4,
                  grid=np.array([16, 16]), lateral_inhibition=0, random_partner=False,
                  seed=None):
 
@@ -80,7 +80,13 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         x0 = np.asarray(x0)
         x1 = np.asarray(x1)
         delta = np.abs(x0 - x1)
-        delta = np.where(delta > grid * .5, delta - grid, delta)
+        #     delta = np.where(delta > grid * .5, delta - grid, delta)
+        #     print delta, grid
+        if delta[0] > grid[0] * .5 and grid[0] > 0:
+            delta[0] -= grid[0]
+
+        if delta[1] > grid[1] * .5 and grid[1] > 0:
+            delta[1] -= grid[1]
 
         if type == 'manhattan':
             return np.abs(delta).sum(axis=-1)
@@ -90,9 +96,15 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         euclidian_distances = np.ones(self._grid ** 2) * np.nan
         for row in range(euclidian_distances.shape[0]):
             for column in range(euclidian_distances.shape[1]):
+                if self._grid[0] > 1:
+                    pre = (row // self._grid[0], row % self._grid[1])
+                    post = (column // self._grid[0], column % self._grid[1])
+                else:
+                    pre = (0, row % self._grid[1])
+                    post = (0, column % self._grid[1])
                 euclidian_distances[row, column] = self.distance(
-                    (row // self._grid[0], row % self._grid[1]),
-                    (column // self._grid[0], column % self._grid[1]),
+                    pre,
+                    post,
                     grid=self._grid,
                     type='euclidian')
         largest_squared_distance = np.max(euclidian_distances ** 2)

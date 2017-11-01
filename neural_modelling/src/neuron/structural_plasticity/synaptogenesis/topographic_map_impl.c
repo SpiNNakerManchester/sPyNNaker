@@ -450,7 +450,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_debug("sr_attempt %d %d exists %d",
+    /*ad*/log_info("sr_attempt %d %d exists %d",
         current_state.current_time,
         current_state.current_controls,
         current_state.element_exists);
