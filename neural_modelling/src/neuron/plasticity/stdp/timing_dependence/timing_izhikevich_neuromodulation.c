@@ -33,4 +33,3 @@ address_t timing_initialise(address_t address) {
 
     return lut_address;
 }
-

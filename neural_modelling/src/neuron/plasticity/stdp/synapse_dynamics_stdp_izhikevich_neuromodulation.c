@@ -80,12 +80,14 @@ static inline post_trace_t add_dopamine_spike(
     // Put concentration in STDP fixed-point format
     weight_state_t weight_state = weight_get_initial(
         concentration, synapse_type);
-    if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT)
+    if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT) {
         concentration >>=
            (weight_state.weight_multiply_right_shift - STDP_FIXED_POINT);
-    else
+    }
+    else {
         concentration <<=
            (STDP_FIXED_POINT - weight_state.weight_multiply_right_shift);
+    }
 
     // Increase dopamine level due to new spike
     int32_t new_trace = decayed_trace + concentration;
@@ -262,12 +264,14 @@ static inline plastic_synapse_t plasticity_update_synapse(
 
     // Put total weight change into correct run-time weight fixed-point format
     // NOTE: Accuracy loss when shifting right.
-    if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT)
+    if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT) {
         weight_update <<=
            (weight_state.weight_multiply_right_shift - STDP_FIXED_POINT);
-    else
+    }
+    else {
         weight_update >>=
            (STDP_FIXED_POINT - weight_state.weight_multiply_right_shift);
+    }
 
     int32_t new_weight = weight_update + synapse_structure_get_weight(*current_state);
 

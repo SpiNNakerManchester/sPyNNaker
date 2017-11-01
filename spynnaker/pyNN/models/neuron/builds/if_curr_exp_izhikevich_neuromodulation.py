@@ -58,22 +58,27 @@ class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons,
-            binary="IF_curr_exp_stdp_izhikevich_neuromodulation.aplx", label=label,
-            max_atoms_per_core=IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core,
+            binary="IF_curr_exp_stdp_izhikevich_neuromodulation.aplx",
+            label=label,
+            max_atoms_per_core=IFCurrExpIzhikevichNeuromodulation.
+            _model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="IF_curr_exp_izhikevich_neuromodulation", neuron_model=neuron_model,
+            model_name="IF_curr_exp_izhikevich_neuromodulation",
+            neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-        IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core = new_value
+        IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core =
+        new_value
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExpIzhikevichNeuromodulation._model_based_max_atoms_per_core
+        return IFCurrExpIzhikevichNeuromodulation.\
+            _model_based_max_atoms_per_core
 
     @property
     def isyn_exc(self):
