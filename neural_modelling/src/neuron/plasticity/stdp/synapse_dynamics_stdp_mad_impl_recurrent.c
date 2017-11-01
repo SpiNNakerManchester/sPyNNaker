@@ -17,7 +17,7 @@
 
 // include neuron model to access struct parameters
 #include "../../models/neuron_model_lif_v_hist_impl.h"
-
+#include "../../threshold_types/threshold_type_static.h"
 
 #ifdef SYNAPSE_BENCHMARK
   uint32_t num_plastic_pre_synaptic_events = 0;
