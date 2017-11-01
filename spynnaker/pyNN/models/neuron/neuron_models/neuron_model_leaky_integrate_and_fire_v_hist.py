@@ -35,6 +35,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
 
         self._v_hist = v_hist
         self._my_units = {'v_hist': 'mV'}
+        # add getter/setters!
 
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)
