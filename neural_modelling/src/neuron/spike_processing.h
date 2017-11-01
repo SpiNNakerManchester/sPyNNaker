@@ -2,6 +2,7 @@
 #define _SPIKE_PROCESSING_H_
 
 #include "../common/neuron-typedefs.h"
+#include "../common/in_spikes.h"
 
 bool spike_processing_initialise(
     size_t row_max_n_bytes, uint mc_packet_callback_priority,
@@ -31,6 +32,8 @@ typedef struct dma_buffer {
 
 } dma_buffer;
 
-spike_t get_last_spike();
+//spike_t get_last_spike();
+//uint32_t get_buffer_real_size();
+circular_buffer get_circular_buffer();
 
 #endif // _SPIKE_PROCESSING_H_

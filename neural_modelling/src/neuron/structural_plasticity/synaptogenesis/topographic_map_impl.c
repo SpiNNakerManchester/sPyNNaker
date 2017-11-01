@@ -22,6 +22,9 @@
 #include "../../../common/sp_structs.h"
 #include "simulation.h"
 
+// For last spike selection
+#include <circular_buffer.h>
+
 
 
 
@@ -85,6 +88,8 @@ typedef struct {
 } current_state_t;
 
 current_state_t current_state;
+
+uint32_t my_input;
 
 
 static int my_abs(int a){
@@ -162,7 +167,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.local_seed[2] = *sp_word++;
     rewiring_data.local_seed[3] = *sp_word++;
 
-    log_info("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    log_debug("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight[0], rewiring_data.weight[1],
         rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
@@ -270,6 +275,23 @@ address_t synaptogenesis_dynamics_initialise(
 
 
 
+static inline spike_t select_last_spike () {
+    circular_buffer cb = get_circular_buffer();
+    uint32_t cb_size = circular_buffer_real_size(cb);
+    uint32_t cb_input = (circular_buffer_input(cb)-1)&cb_size;
+    uint32_t cb_my_tail = my_input;
+    my_input = cb_input;
+    uint32_t size = cb_input >= cb_my_tail?
+        cb_input - cb_my_tail:
+        (cb_input + cb_size + 1) - cb_my_tail;
+    if (size == 0)
+        return -1;
+    uint32_t offset=ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * size;
+    log_info("%d %d %d", cb_my_tail, cb_input, my_input);
+    return circular_buffer_value_at_index(cb, (cb_my_tail + offset)&cb_size);
+}
+
+
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] None
@@ -282,6 +304,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
         log_debug("\t| NOTME %d @ %d", post_id, time);
+        circular_buffer cb = get_circular_buffer();
+        my_input = (circular_buffer_input(cb)-1) & circular_buffer_real_size(cb);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -304,10 +328,10 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     spike_t _spike=-1;
     if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
-        _spike = get_last_spike();
+        _spike = select_last_spike();
         //    log_info("spike key %d", _spike);
         if (_spike==-1) {
-            log_debug("No previous spikes");
+            log_info("No previous spikes");
             return;
         }
 
@@ -499,12 +523,12 @@ bool synaptogenesis_dynamics_elimination_rule(){
     uint r = mars_kiss64_seed(rewiring_data.local_seed);
     log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
-    if( current_state.sp_data.weight < appr_scaled_weight / 2 && r >= rewiring_data.p_elim_dep ){
+    if( current_state.sp_data.weight < appr_scaled_weight / 2 && r <= rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
-    else if ( r >= rewiring_data.p_elim_pot ){
+    else if ( r <= rewiring_data.p_elim_pot ){
         log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }

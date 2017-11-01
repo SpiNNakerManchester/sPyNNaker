@@ -310,5 +310,4 @@ void c_main(void) {
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER_AND_BUFFERING);
 
     simulation_run();
-    log_info("rewire attempts %d", count_rewires);
 }

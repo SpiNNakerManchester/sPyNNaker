@@ -2,7 +2,6 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
-#include "../common/in_spikes.h"
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -35,8 +34,8 @@ static spike_t spike=-1;
 static uint32_t single_fixed_synapse[4];
 
 // Last spike
-spike_t last_spike;
-
+//spike_t last_spike;
+//uint32_t buffer_real_size;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -138,8 +137,6 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
     log_debug("Writing back %u bytes of plastic region to %08x",
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
 
-    // Store last processed spike
-    last_spike = buffer->originating_spike;
     // Start transfer
     spin1_dma_transfer(
         DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
@@ -253,6 +250,8 @@ bool spike_processing_initialise(
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
         return false;
     }
+//
+//    buffer_real_size = in_spikes_real_size();
 
     // Set up for single fixed synapses (data that is consistent per direct row)
     single_fixed_synapse[0] = 0;
@@ -281,8 +280,16 @@ uint32_t spike_processing_get_buffer_overflows() {
     return in_spikes_get_n_buffer_overflows();
 }
 
-spike_t get_last_spike() {
-    spike_t temp_spike = last_spike;
-    last_spike = -1;
-    return temp_spike;
+//spike_t get_last_spike() {
+//    spike_t temp_spike = last_spike;
+//    last_spike = -1;
+//    return temp_spike;
+//}
+
+//uint32_t get_buffer_real_size() {
+//    return buffer_real_size;
+//}
+
+circular_buffer get_circular_buffer(){
+    return buffer;
 }

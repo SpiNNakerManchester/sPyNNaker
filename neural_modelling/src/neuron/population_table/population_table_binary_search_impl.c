@@ -70,7 +70,7 @@ static inline void _print_master_population_table() {
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
-    log_info("population_table_initialise: starting");
+    log_debug("population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
     log_debug("master pop table length is %d\n", master_population_table_length);

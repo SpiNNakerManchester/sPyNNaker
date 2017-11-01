@@ -6,7 +6,7 @@ static const char* sp_error_message = "Non-structurally plastic implementation."
 address_t synaptogenesis_dynamics_initialise(
 	address_t sdram_sp_address){
 	use(sdram_sp_address);
-	log_info("%s", sp_error_message);
+	log_debug("%s", sp_error_message);
     return sdram_sp_address;
 }
 
