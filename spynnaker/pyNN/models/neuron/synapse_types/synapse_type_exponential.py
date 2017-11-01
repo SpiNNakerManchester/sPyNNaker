@@ -9,6 +9,11 @@ from data_specification.enums import DataType
 import numpy
 from enum import Enum
 
+TAU_SYN_E = 'tau_syn_E'
+TAU_SYN_I = 'tau_syn_I'
+GSYN_EXC = 'gsyn_exc'
+GSYN_INH = 'gsyn_inh'
+
 
 class _EXP_TYPES(Enum):
 
@@ -57,50 +62,49 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
         AbstractContainsUnits.__init__(self)
 
         self._units = {
-            'tau_syn_E': "mV",
-            'tau_syn_I': 'mV',
-            'gsyn_exc': "uS",
-            'gsyn_inh': "uS"}
+            TAU_SYN_E: "mV",
+            TAU_SYN_I: 'mV',
+            GSYN_EXC: "uS",
+            GSYN_INH: "uS"}
 
         self._n_neurons = n_neurons
-        defaults = {}
-        defaults["tau_syn_E"] = tau_syn_E
-        defaults["tau_syn_I"] = tau_syn_I
-        defaults["gsyn_exc"] = initial_input_exc
-        defaults["gsyn_inh"] = initial_input_inh
-        self._data = RangeDictionary(size=n_neurons, defaults=defaults)
+        self._data = RangeDictionary(size=n_neurons)
+        self._data[TAU_SYN_E] = tau_syn_E
+        self._data[TAU_SYN_I] = tau_syn_I
+        self._data[GSYN_EXC] = initial_input_exc
+        self._data[GSYN_INH] = initial_input_inh
 
     @property
     def tau_syn_E(self):
-        return self._data.get_list("tau_syn_E")
+        return self._data[TAU_SYN_E]
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._data.set_value(key="tau_syn_E", value=tau_syn_E)
+        self._data.set_value(value=TAU_SYN_E, key=tau_syn_E)
 
     @property
     def tau_syn_I(self):
-        return self._data.get_list("tau_syn_I")
+        return self._data[TAU_SYN_I]
 
     @tau_syn_I.setter
     def tau_syn_I(self, tau_syn_I):
-        self._data.set_value(key="tau_syn_I", value=tau_syn_I)
+        self._data.set_value(key=TAU_SYN_I, value=tau_syn_I)
 
     @property
     def isyn_exc(self):
-        return self._data.get_list("gsyn_exc")
+        return self._data[GSYN_EXC]
 
     @isyn_exc.setter
     def isyn_exc(self, new_value):
-        self._data.set_value(key="gsyn_exc", value=new_value)
+        self._data.set_value(key=GSYN_EXC, value=new_value)
 
     @property
     def isyn_inh(self):
-        return self._data.get_list("gsyn_inh")
+        return self._data[GSYN_INH]
 
     @isyn_inh.setter
     def isyn_inh(self, new_value):
-        self._data.set_value(key="gsyn_inh", value=new_value)
+        self._data.set_value(key=GSYN_INH, value=new_value)
 
     def get_n_synapse_types(self):
         return 2
@@ -121,9 +125,9 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._data.get_list("tau_syn_E"), machine_time_step)
+            self._data[TAU_SYN_E], machine_time_step)
         i_decay, i_init = get_exponential_decay_and_init(
-            self._data.get_list("tau_syn_I"), machine_time_step)
+            self._data[TAU_SYN_I], machine_time_step)
 
         return [
             NeuronParameter(e_decay, _EXP_TYPES.E_DECAY.data_type),
@@ -131,9 +135,9 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
             NeuronParameter(i_decay, _EXP_TYPES.I_DECAY.data_type),
             NeuronParameter(i_init, _EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
-                self._data.get_list("gsyn_exc"), _EXP_TYPES.INITIAL_EXC.data_type),
+                self._data[GSYN_EXC], _EXP_TYPES.INITIAL_EXC.data_type),
             NeuronParameter(
-                self._data.get_list("gsyn_inh"), _EXP_TYPES.INITIAL_INH.data_type)
+                self._data[GSYN_INH], _EXP_TYPES.INITIAL_INH.data_type)
         ]
 
     def get_synapse_type_parameter_types(self):

@@ -1,5 +1,6 @@
 from spinn_utilities.ranged.abstract_list import AbstractList
 
+
 class NeuronParameter(object):
     def __init__(self, value, datatype):
         self._value = value

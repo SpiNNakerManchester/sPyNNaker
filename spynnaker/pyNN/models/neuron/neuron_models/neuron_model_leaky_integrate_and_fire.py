@@ -9,6 +9,10 @@ from data_specification.enums import DataType
 import numpy
 from enum import Enum
 
+V_RESET = "v_reset"
+TAU_REFRAC = "tau_refrac"
+COUNTDOWN_TO_REFRACTORY_PERIOD = "countdown_to_refactory_period"
+
 
 class _LIF_TYPES(Enum):
     REFRACT_COUNT = (1, DataType.INT32)
@@ -33,30 +37,26 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
             tau_refrac):
         NeuronModelLeakyIntegrate.__init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset)
-        a_list = RangedList(size=n_neurons, default=v_reset)
-        self._data.add_list(key="v_reset", a_list=a_list)
-        a_list = RangedList(size=n_neurons, default=tau_refrac)
-        self._data.add_list(key="tau_refrac", a_list=a_list)
-        a_list = RangedList(size=n_neurons, default=0)
-        self._data.add_list(key="countdown_to_refactory_period", a_list=a_list)
-
-        self._my_units = {'v_reset': 'mV', 'tau_refac': 'ms'}
+        self._data[V_RESET] = v_reset
+        self._data[TAU_REFRAC] = tau_refrac
+        self._data[COUNTDOWN_TO_REFRACTORY_PERIOD] = 0
+        self._my_units = {V_RESET: 'mV', TAU_REFRAC: 'ms'}
 
     @property
     def v_reset(self):
-        return self._data.get_list("v_reset")
+        return self._data[V_RESET]
 
     @v_reset.setter
     def v_reset(self, v_reset):
-        self._data.set_value("v_reset", v_reset)
+        self._data.set_value(key=V_RESET, value=v_reset)
 
     @property
     def tau_refrac(self):
-        return self._data.get_list("tau_refrac")
+        return self._data[TAU_REFRAC]
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
-        self._data.set_value("tau_refrac", tau_refrac)
+        self._data.set_value(key=TAU_REFRAC, value=tau_refrac)
 
     @overrides(NeuronModelLeakyIntegrate.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -64,8 +64,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     def _tau_refrac_timesteps(self, machine_time_step):
         operation = lambda x: numpy.ceil(x / (machine_time_step / 1000.0))
-        return self._data.get_list("tau_refrac").\
-            apply_operation(operation=operation)
+        return self._data[TAU_REFRAC].apply_operation(operation=operation)
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_neural_parameters(self, machine_time_step):
@@ -75,12 +74,12 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
             # count down to end of next refractory period [timesteps]
             # int32_t  refract_timer;
             NeuronParameter(
-                self._data.get_list("countdown_to_refactory_period"),
+                self._data[COUNTDOWN_TO_REFRACTORY_PERIOD],
                 _LIF_TYPES.REFRACT_COUNT.data_type),
 
             # post-spike reset membrane voltage [mV]
             # REAL     V_reset;
-            NeuronParameter(self._data.get_list("v_reset"),
+            NeuronParameter(self._data[V_RESET],
                             _LIF_TYPES.V_RESET.data_type),
 
             # refractory time of neuron [timesteps]

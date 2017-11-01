@@ -5,10 +5,19 @@ from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_synapse_type import AbstractSynapseType
-from spinn_utilities.ranged.ranged_list import RangedList
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 from enum import Enum
+
+TAU_SYN_E = 'tau_syn_E'
+TAU_SYN_E2 = 'tau_syn_E2'
+TAU_SYN_I = 'tau_syn_I',
+GSYN_EXC = 'gsyn_exc'
+GSYN_INH = 'gsyn_inh'
+INITIAL_INPUT_EXC = "initial_input_exc"
+INITIAL_INPUT_EXC2 = "initial_input_exc2"
+INITIAL_INPUT_INH = "initial_input_inh"
 
 
 class _DUAL_EXP_TYPES(Enum):
@@ -43,46 +52,44 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
         AbstractContainsUnits.__init__(self)
 
         self._units = {
-            'tau_syn_E': "mV",
-            'tau_syn_E2': "mV",
-            'tau_syn_I': 'mV',
-            'gsyn_exc': "uS",
-            'gsyn_inh': "uS"}
+            TAU_SYN_E: "mV",
+            TAU_SYN_E2: "mV",
+            TAU_SYN_I: 'mV',
+            GSYN_EXC: "uS",
+            GSYN_INH: "uS"}
 
         self._n_neurons = n_neurons
-        self._tau_syn_E = RangedList(size=n_neurons, default=tau_syn_E)
-        self._tau_syn_E2 = RangedList(size=n_neurons, default=tau_syn_E2)
-        self._tau_syn_I = RangedList(size=n_neurons, default=tau_syn_I)
-        self._initial_input_exc = RangedList(
-            size=n_neurons, default=initial_input_exc)
-        self._initial_input_exc2 = RangedList(
-            size=n_neurons, default=initial_input_exc2)
-        self._initial_input_inh = RangedList(
-            size=n_neurons, default=initial_input_inh)
+        self._data = RangeDictionary(size=n_neurons)
+        self._data[TAU_SYN_E] = tau_syn_E
+        self._data[TAU_SYN_E2] = tau_syn_E2
+        self._data[TAU_SYN_I] = tau_syn_I
+        self._data[INITIAL_INPUT_EXC] = initial_input_exc
+        self._data[INITIAL_INPUT_EXC2] = initial_input_exc2
+        self._data[INITIAL_INPUT_INH] = initial_input_inh
 
     @property
     def tau_syn_E(self):
-        return self._tau_syn_E
+        return self._data[TAU_SYN_E]
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E.set_value(tau_syn_E)
+        self._data.set_value(key=TAU_SYN_E,_value=tau_syn_E)
 
     @property
     def tau_syn_E2(self):
-        return self._tau_syn_E2
+        return self._data[TAU_SYN_E2]
 
     @tau_syn_E2.setter
     def tau_syn_E2(self, tau_syn_E2):
-        self._tau_syn_E2.set_value(tau_syn_E2)
+        self._data.set_value(key=TAU_SYN_E2, value=tau_syn_E2)
 
     @property
     def tau_syn_I(self):
-        return self._tau_syn_I
+        return self._data[TAU_SYN_I]
 
     @tau_syn_I.setter
     def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_E.set_value(tau_syn_I)
+        self._data.set_value(key=TAU_SYN_I, value=tau_syn_I)
 
     @property
     def isyn_exc(self):
@@ -129,11 +136,11 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
         e_decay, e_init = get_exponential_decay_and_init(
-            self._tau_syn_E, machine_time_step)
+            self._data[TAU_SYN_E], machine_time_step)
         e_decay2, e_init2 = get_exponential_decay_and_init(
-            self._tau_syn_E2, machine_time_step)
+            self._data[TAU_SYN_E2], machine_time_step)
         i_decay, i_init = get_exponential_decay_and_init(
-            self._tau_syn_I, machine_time_step)
+            self._data[TAU_SYN_I], machine_time_step)
 
         return [
             NeuronParameter(e_decay, _DUAL_EXP_TYPES.E_DECAY.data_type),
@@ -143,13 +150,13 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
             NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
-                self._initial_input_exc,
+                self._data[INITIAL_INPUT_EXC],
                 _DUAL_EXP_TYPES.INITIAL_EXC.data_type),
             NeuronParameter(
-                self._initial_input_exc2,
+                self._data[INITIAL_INPUT_EXC2],
                 _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
             NeuronParameter(
-                self._initial_input_inh,
+                self._datat[INITIAL_INPUT_INH],
                 _DUAL_EXP_TYPES.INITIAL_INH.data_type)
         ]
 

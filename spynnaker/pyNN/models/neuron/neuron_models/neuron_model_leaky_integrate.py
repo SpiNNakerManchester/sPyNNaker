@@ -10,6 +10,13 @@ from spinn_utilities.ranged.range_dictionary import RangeDictionary
 import numpy
 from enum import Enum
 
+V_INIT = "v_init"
+V_REST = "v_rest"
+TAU_M = "tau_m"
+CM = "cm"
+I_OFFSET = "i_offset"
+R_MEMBRANE = "r_membrane"
+
 
 class _IF_TYPES(Enum):
 
@@ -37,77 +44,74 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         AbstractContainsUnits.__init__(self)
 
         self._units = {
-            'v_init': 'mV',
-            'v_rest': 'mV',
-            'tau_m': 'ms',
-            'cm': 'nF',
-            'i_offset': 'nA'}
+            V_INIT: 'mV',
+            V_REST: 'mV',
+            TAU_M: 'ms',
+            CM: 'nF',
+            I_OFFSET: 'nA'}
 
         self._n_neurons = n_neurons
         if v_init is None:
             v_init = v_rest
-        defaults = {}
-        defaults["v_init"] = v_init
-        defaults["v_rest"] = v_rest
-        defaults["tau_m"] = tau_m
-        defaults["cm"] = cm
-        defaults["i_offset"] = i_offset
-        self._data = RangeDictionary(size=n_neurons, defaults=defaults)
-        r_membrane = self._data.get_list("tau_m") / self._data.get_list("cm")
-        self._data.add_list("r_membrane", r_membrane)
+        self._data = RangeDictionary(size=n_neurons)
+        self._data[V_INIT] = v_init
+        self._data[V_REST] = v_rest
+        self._data[TAU_M] = tau_m
+        self._data[CM] = cm
+        self._data[I_OFFSET] = i_offset
+        self._data["r_membrane"] = self._data[TAU_M] / self._data[CM]
 
     def initialize_v(self, v_init):
-        self._data.set_value(key="v_init", value=v_init)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     @property
     def v_init(self):
-        return self._data.get_list("v_init")
+        return self._data[V_INIT]
 
     @v_init.setter
     def v_init(self, v_init):
-        self._data.set_value(key="v_init", value=v_init)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     @property
     def v_rest(self):
-        return self._data.get_list("v_rest")
+        return self._data[V_REST]
 
     @v_rest.setter
     def v_rest(self, v_rest):
-        self._data.set_value(key="v_rest", value=v_rest)
+        self._data.set_value(key=V_REST, value=v_rest)
 
     @property
     def tau_m(self):
-        return self._data.get_list("tau_m")
+        return self._data[TAU_M]
 
     @tau_m.setter
     def tau_m(self, tau_m):
-        self._data.set_value(key="tau_m", value=tau_m)
+        self._data.set_value(key=TAU_M, value=tau_m)
 
     @property
     def cm(self):
-        return self._data.get_list("cm")
+        return self._data[CM]
 
     @cm.setter
     def cm(self, cm):
-        self._data.set_value(key="cm", value=cm)
+        self._data.set_value(key=CM, value=cm)
 
     @property
     def i_offset(self):
-        return self._data.get_list("i_offset")
+        return self._data[I_OFFSET]
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(key="i_offset", value=i_offset)
+        self._data.set_value(key=I_OFFSET, value=i_offset)
 
     @property
     def _r_membrane(self):
-        return self._data.get_list("r_membrane")
+        return self._data[R_MEMBRANE]
 
     def _exp_tc(self, machine_time_step):
         operation = lambda x: numpy.exp(float(-machine_time_step) /
                                         (1000.0 * x))
-        return self._data.get_list("tau_m")\
-            .apply_operation(operation=operation)
+        return self._data[TAU_M].apply_operation(operation=operation)
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -121,17 +125,15 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._data.get_list("v_init"),
-                            _IF_TYPES.V_INIT.data_type),
+            NeuronParameter(self._data[V_INIT], _IF_TYPES.V_INIT.data_type),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
-            NeuronParameter(self._data.get_list("v_rest"),
-                            _IF_TYPES.V_REST.data_type),
+            NeuronParameter(self._data[V_REST], _IF_TYPES.V_REST.data_type),
 
             # membrane resistance [MOhm]
             # REAL     R_membrane;
-            NeuronParameter(self._data.get_list("r_membrane"),
+            NeuronParameter(self._data[R_MEMBRANE],
                             _IF_TYPES.R_MEMBRANE.data_type),
 
             # 'fixed' computation parameter - time constant multiplier for
@@ -144,7 +146,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
             # offset current [nA]
             # REAL     I_offset;
-            NeuronParameter(self._data.get_list("i_offset"),
+            NeuronParameter(self._data[I_OFFSET],
                             _IF_TYPES.I_OFFSET.data_type)
         ]
 
