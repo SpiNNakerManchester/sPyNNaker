@@ -12,5 +12,6 @@ from .timing_dependence_izhikevich_neuromodulation \
 __all__ = [
     "AbstractTimingDependence", "TimingDependenceSpikePair",
     "TimingDependencePfisterSpikeTriplet", "TimingDependenceRecurrent",
-    "TimingDependenceSpikeNearestPair", "TimingDependenceVogels2011"
+    "TimingDependenceSpikeNearestPair", "TimingDependenceVogels2011",
+    "TimingDependenceIzhikevichNeuromodulation"
 ]
