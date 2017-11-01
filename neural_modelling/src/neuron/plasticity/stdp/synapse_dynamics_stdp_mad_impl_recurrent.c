@@ -273,9 +273,9 @@ bool synapse_dynamics_process_plastic_synapses(
 
 
         // test to check variable assignment
-        log_info("Current V = %12.6k, V_hist = %12.6k",
+        log_debug("Current V = %12.6k, V_hist = %12.6k",
         		post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
-        log_info("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
+        log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(*plastic_words, type);
