@@ -56,7 +56,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
         ])
         return params
 
-    @overrides(NeuronModelLeakyIntegrate.get_neural_parameter_types)
+    @overrides(NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types)
     def get_neural_parameter_types(self):
         if_types = NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types(self)
         if_types.extend([item.data_type for item in _LIFVHist_TYPES])
