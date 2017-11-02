@@ -80,7 +80,7 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._data.set_value(value=TAU_SYN_E, key=tau_syn_E)
+        self._data.set_value(key=TAU_SYN_E, value=tau_syn_E)
 
     @property
     def tau_syn_I(self):

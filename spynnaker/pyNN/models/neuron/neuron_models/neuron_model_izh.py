@@ -4,10 +4,18 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.utilities import utility_calls
-
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 from enum import Enum
+
+A = 'a'
+B = 'b'
+C = 'c'
+D = 'd'
+V_INIT = 'v_init'
+U_INIT = 'u_init'
+I_OFFSET = 'i_offset'
 
 
 class _IZH_TYPES(Enum):
@@ -52,90 +60,85 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
         AbstractContainsUnits.__init__(self)
 
         self._units = {
-            'a': "ms",
-            'b': "ms",
-            'c': "mV",
-            'd': "mV/ms",
-            'v_init': "mV",
-            'u_init': "mV/ms",
-            'i_offset': "nA"}
+            A: "ms",
+            B: "ms",
+            C: "mV",
+            D: "mV/ms",
+            V_INIT: "mV",
+            U_INIT: "mV/ms",
+            I_OFFSET: "nA"}
 
         self._n_neurons = n_neurons
-        self._a = utility_calls.convert_param_to_numpy(a, n_neurons)
-        self._b = utility_calls.convert_param_to_numpy(b, n_neurons)
-        self._c = utility_calls.convert_param_to_numpy(c, n_neurons)
-        self._d = utility_calls.convert_param_to_numpy(d, n_neurons)
-        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
-        self._u_init = utility_calls.convert_param_to_numpy(u_init, n_neurons)
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, n_neurons)
+        self._data = RangeDictionary(size=n_neurons)
+        self._data[A] = a
+        self._data[B] = b
+        self._data[C] = c
+        self._data[D] = d
+        self._data[V_INIT] = v_init
+        self._data[U_INIT] = u_init
+        self._data[I_OFFSET] = i_offset
 
     @property
     def a(self):
-        return self._a
+        return self._data[A]
 
     @a.setter
     def a(self, a):
-        self._a = utility_calls.convert_param_to_numpy(a, self._n_neurons)
+        self._data.set_value(key=A, value = a)
 
     @property
     def b(self):
-        return self._b
+        return self._data[B]
 
     @b.setter
     def b(self, b):
-        self._b = utility_calls.convert_param_to_numpy(b, self._n_neurons)
+        self._data.set_value(key=B, value=b)
 
     @property
     def c(self):
-        return self._c
+        return self._data[C]
 
     @c.setter
     def c(self, c):
-        self._c = utility_calls.convert_param_to_numpy(c, self._n_neurons)
+        self._data.set_value(key=C, value=c)
 
     @property
     def d(self):
-        return self._d
+        return self._data[D]
 
     @d.setter
     def d(self, d):
-        self._d = utility_calls.convert_param_to_numpy(d, self._n_neurons)
+        self._data.set_value(key=D, value=d)
 
     @property
     def i_offset(self):
-        return self._i_offset
+        return self._data[I_OFFSET]
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, self._n_neurons)
+        self._data.set_value(I_OFFSET. i_offset)
 
     @property
     def v_init(self):
-        return self._v_init
+        return self._data[V_INIT]
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
-            v_init, self._n_neurons)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     @property
     def u_init(self):
-        return self._u_init
+        return self._data[U_INIT]
 
     @u_init.setter
     def u_init(self, u_init):
-        self._u_init = utility_calls.convert_param_to_numpy(
-            u_init, self._n_neurons)
+        self._data.set_value(key=U_INIT, value=u_init)
 
     def initialize_v(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
-            v_init, self._n_neurons)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     def initialize_u(self, u_init):
-        self._u_init = utility_calls.convert_param_to_numpy(
-            u_init, self._n_neurons)
+        self._data.set_value(key=U_INIT, value=u_init)
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -148,26 +151,26 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
         return [
 
             # REAL A
-            NeuronParameter(self._a, _IZH_TYPES.A.data_type),
+            NeuronParameter(self._data[A], _IZH_TYPES.A.data_type),
 
             # REAL B
-            NeuronParameter(self._b, _IZH_TYPES.B.data_type),
+            NeuronParameter(self._data[B], _IZH_TYPES.B.data_type),
 
             # REAL C
-            NeuronParameter(self._c, _IZH_TYPES.C.data_type),
+            NeuronParameter(self._data[C], _IZH_TYPES.C.data_type),
 
             # REAL D
-            NeuronParameter(self._d, _IZH_TYPES.D.data_type),
+            NeuronParameter(self._data[D], _IZH_TYPES.D.data_type),
 
             # REAL V
-            NeuronParameter(self._v_init, _IZH_TYPES.V_INIT.data_type),
+            NeuronParameter(self._data[V_INIT], _IZH_TYPES.V_INIT.data_type),
 
             # REAL U
-            NeuronParameter(self._u_init, _IZH_TYPES.U_INIT.data_type),
+            NeuronParameter(self._data[U_INIT], _IZH_TYPES.U_INIT.data_type),
 
             # offset current [nA]
             # REAL I_offset;
-            NeuronParameter(self._i_offset, _IZH_TYPES.I_OFFSET.data_type),
+            NeuronParameter(self._data[I_OFFSET], _IZH_TYPES.I_OFFSET.data_type),
 
             # current timestep - simple correction for threshold
             # REAL this_h;
