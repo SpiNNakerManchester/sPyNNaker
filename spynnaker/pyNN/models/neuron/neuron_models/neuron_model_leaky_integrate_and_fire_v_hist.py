@@ -36,6 +36,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
         self._v_hist = utility_calls.convert_param_to_numpy(
             v_hist, n_neurons)
         self._my_units = {'v_hist': 'mV'}
+<<<<<<< HEAD
 
     @property
     def v_hist(self):
@@ -45,6 +46,9 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
     def v_hist(self, v_hist):
         self._v_hist = utility_calls.convert_param_to_numpy(
             v_hist, self._n_neurons)
+=======
+        # add getter/setters!
+>>>>>>> branch 'recurrent_stdp_debug' of https://github.com/SpiNNakerManchester/sPyNNaker
 
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)

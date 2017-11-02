@@ -299,13 +299,13 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
          
     // Initialise pointers to Neuron parameters in STDP code
     synapse_dynamics_set_neuron_array(neuron_array);
-    log_info("set pointer to neuron array in stdp code");
+    //log_info("set pointer to neuron array in stdp code");
 
     synapse_dynamics_set_additional_input_array(additional_input_array);
-    log_info("set pointer to additional input array in stdp code");
+    //log_info("set pointer to additional input array in stdp code");
 
     synapse_dynamics_set_threshold_array(threshold_type_array);
-    log_info("set pointer to threshold type array in stdp code");
+    //log_info("set pointer to threshold type array in stdp code");
 
     return true;
 }
