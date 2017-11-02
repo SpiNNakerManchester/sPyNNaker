@@ -41,7 +41,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
     def v_hist(self):
         return self._v_hist
 
-    @v_reset.setter
+    @v_hist.setter
     def v_hist(self, v_hist):
         self._v_hist = utility_calls.convert_param_to_numpy(
             v_hist, self._n_neurons)
