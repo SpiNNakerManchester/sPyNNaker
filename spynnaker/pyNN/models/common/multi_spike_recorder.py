@@ -8,6 +8,7 @@ import logging
 import struct
 
 logger = logging.getLogger(__name__)
+_TWO_WORDS = struct.Struct("<II")
 
 
 class MultiSpikeRecorder(object):
@@ -69,19 +70,18 @@ class MultiSpikeRecorder(object):
 
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, data_missing = \
-                buffer_manager.get_data_for_vertex(
-                    placement, region)
+                buffer_manager.get_data_for_vertex(placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(x, y, p)
             raw_data = neuron_param_region_data_pointer.read_all()
             offset = 0
             while offset < len(raw_data):
-                ((time, n_blocks), offset) = (
-                    struct.unpack_from("<II", raw_data, offset), offset + 8)
-                (spike_data, offset) = (numpy.frombuffer(
+                time, n_blocks = _TWO_WORDS.unpack_from(raw_data, offset)
+                offset += _TWO_WORDS.size
+                spike_data = numpy.frombuffer(
                     raw_data, dtype="uint8",
-                    count=n_bytes_per_block * n_blocks, offset=offset),
-                    offset + (n_bytes_per_block * n_blocks))
+                    count=n_bytes_per_block * n_blocks, offset=offset)
+                offset += n_bytes_per_block * n_blocks
                 spikes = spike_data.view("<i4").byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes_per_block * 8))

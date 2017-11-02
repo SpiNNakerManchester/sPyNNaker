@@ -6,6 +6,7 @@ import struct
 import logging
 
 logger = logging.getLogger(__name__)
+_ONE_WORD = struct.Struct("<I")
 
 
 class EIEIOSpikeRecorder(object):
@@ -60,7 +61,7 @@ class EIEIOSpikeRecorder(object):
 
             offset = 0
             while offset < number_of_bytes_written:
-                length = struct.unpack_from("<I", spike_data, offset)[0]
+                length = _ONE_WORD.unpack_from(spike_data, offset)[0]
                 data_offset = offset + 4
                 eieio_header = EIEIODataHeader.from_bytestring(
                     spike_data, data_offset)
