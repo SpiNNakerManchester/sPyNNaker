@@ -69,7 +69,7 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
             v_thresh=default_parameters['v_thresh'],
-            v_mem_hist=default_parameters['v_hist'],
+            v_hist=default_parameters['v_hist'],
 
             # excitatory
             exc_a_response=default_parameters['exc_a_response'],
@@ -110,7 +110,7 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
         # Construct neuron/synapse objects
         neuron_model = NeuronModelLeakyIntegrateAndFireVHist(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
-            v_reset, tau_refrac, v_mem_hist)
+            v_reset, tau_refrac, v_hist)
 
         synapse_type = SynapseTypeCombExp2E2I(
                 n_neurons,

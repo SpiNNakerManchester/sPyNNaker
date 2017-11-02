@@ -33,8 +33,18 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac)
 
-        self._v_hist = v_hist
+        self._v_hist = utility_calls.convert_param_to_numpy(
+            v_hist, n_neurons)
         self._my_units = {'v_hist': 'mV'}
+
+    @property
+    def v_hist(self):
+        return self._v_hist
+
+    @v_reset.setter
+    def v_hist(self, v_hist):
+        self._v_hist = utility_calls.convert_param_to_numpy(
+            v_hist, self._n_neurons)
 
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)
@@ -58,9 +68,9 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types)
     def get_neural_parameter_types(self):
-        if_types = NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types(self)
-        if_types.extend([item.data_type for item in _LIFVHist_TYPES])
-        return if_types
+        lif_types = NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types(self)
+        lif_types.extend([item.data_type for item in _LIFVHist_TYPES])
+        return lif_types
 
     def get_n_cpu_cycles_per_neuron(self):
         # A guess - 20 for the reset procedure
