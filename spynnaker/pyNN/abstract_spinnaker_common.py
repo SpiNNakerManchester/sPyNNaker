@@ -1,6 +1,5 @@
 # utils imports
 from spinn_utilities.abstract_base import AbstractBase
-from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 
 # common front end imports
 from spinn_front_end_common.interface.abstract_spinnaker_base \
@@ -55,7 +54,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._populations = list()
         self._projections = list()
         self._edge_count = 0
-        PyNNPopulationCommon._next_global_neuron_id = 0
+        self._id_counter = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
@@ -347,3 +346,22 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def reset_number_of_neurons_per_core(self):
         for neuron_type in self._neurons_per_core_set:
             neuron_type.set_model_max_atoms_per_core()
+
+    @property
+    def id_counter(self):
+        """ property for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :return:
+        """
+        return self._id_counter
+
+    @id_counter.setter
+    def id_counter(self, new_value):
+        """ setter for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :param new_value: new value for id_counter
+        :return:
+        """
+        self._id_counter = new_value
