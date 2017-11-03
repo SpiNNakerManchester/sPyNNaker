@@ -15,6 +15,7 @@ import sys
 import math
 
 logger = logging.getLogger(__name__)
+_TWO_WORDS = struct.Struct("<II")
 
 
 class _MasterPopEntry(object):
@@ -260,7 +261,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # get entries in master pop
         count_data = txrx.read_memory(
             chip_x, chip_y, master_pop_base_mem_address, 8)
-        n_entries, n_addresses = struct.unpack("<II", buffer(count_data))
+        n_entries, n_addresses = _TWO_WORDS.unpack(buffer(count_data))
         n_entry_bytes = (
             n_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
         n_address_bytes = (

@@ -13,6 +13,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
+import numpy
 import logging
 logger = logging.getLogger(__file__)
 
@@ -279,6 +280,16 @@ class PyNNPopulationCommon(object):
                         machine_vertex))
 
             self._has_read_neuron_parameters_this_run = True
+
+    def get_spike_counts(self, spikes, gather=True):
+        """ Return the number of spikes for each neuron.
+        """
+        n_spikes = {}
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
+                                minlength=self._vertex.n_atoms)
+        for i in range(self._vertex.n_atoms):
+            n_spikes[i] = counts[i]
+        return n_spikes
 
     @property
     def structure(self):
