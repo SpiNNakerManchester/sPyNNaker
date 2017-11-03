@@ -43,6 +43,9 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
             'cm': 'nF',
             'i_offset': 'nA'}
 
+        if v_init is None:
+            v_init = v_rest
+
         self._n_neurons = n_neurons
         self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
         self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
@@ -51,8 +54,6 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         self._i_offset = utility_calls.convert_param_to_numpy(
             i_offset, n_neurons)
 
-        if v_init is None:
-            self._v_init = self._v_rest
 
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(
