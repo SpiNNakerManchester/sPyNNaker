@@ -1,6 +1,7 @@
 #include "synapses.h"
 #include "spike_processing.h"
 #include "synapse_types/synapse_types.h"
+#include "implementations/synapse_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
@@ -328,12 +329,12 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
-            synapse_types_add_neuron_input(
-                synapse_type_index,
-                &(neuron_synapse_shaping_params[neuron_index]),
-                synapses_convert_weight_to_input(
-                    ring_buffers[ring_buffer_index],
-                    ring_buffer_to_input_left_shifts[synapse_type_index]));
+            synapse_impl_add_inputs(
+            	synapse_type_index,
+				&(neuron_synapse_shaping_params[neuron_index]),
+				synapses_convert_weight_to_input(
+					ring_buffers[ring_buffer_index],
+					ring_buffer_to_input_left_shifts[synapse_type_index]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;

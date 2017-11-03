@@ -46,6 +46,10 @@ ifndef NEURON_IMPL_H
     $(error NEURON_IMPL_H is not set.  Please select a neuron implementation header file)
 endif
 
+ifndef SYNAPSE_IMPL_H
+    $(error SYNAPSE_IMPL_H is not set.  Please select a synapse implementation header file)
+endif
+
 ifndef THRESHOLD_TYPE_H
     $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
 endif
@@ -91,20 +95,22 @@ endif
 include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
 
 define synapse_type_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
+$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) $$(SYNAPSE_IMPL_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
+	        -include $(SYNAPSE_TYPE_H) \
+	        -include $(SYNAPSE_IMPL_H) -o $$@ $$<
 endef
 
 define stdp_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
+$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) $$(SYNAPSE_IMPL_H) \
                                $$(WEIGHT_DEPENDENCE_H) $$(TIMING_DEPENDENCE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) \
 	      -include $$(SYNAPSE_TYPE_H) \
+	      -include $$(SYNAPSE_IMPL_H) \
 	      -include $$(WEIGHT_DEPENDENCE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
 endef
@@ -112,13 +118,13 @@ endef
 $(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
 $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 
-$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H) $(SYNAPSE_IMPL_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
-                        $(WEIGHT_DEPENDENCE_H)
+                        $(WEIGHT_DEPENDENCE_H) $(SYNAPSE_IMPL_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
