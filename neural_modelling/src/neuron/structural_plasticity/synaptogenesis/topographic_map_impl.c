@@ -98,7 +98,7 @@ static int my_abs(int a){
 
 static inline bool unpack_post_to_pre(int32_t value, uint* pop_index,
                         uint* subpop_index, uint* neuron_index) {
-//    log_info("value %d", value);
+//    log_debug("value %d", value);
     if (value==-1)
         return false;
     else {
@@ -167,7 +167,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.local_seed[2] = *sp_word++;
     rewiring_data.local_seed[3] = *sp_word++;
 
-    log_debug("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    log_info("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight[0], rewiring_data.weight[1],
         rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
@@ -240,7 +240,7 @@ address_t synaptogenesis_dynamics_initialise(
     sp_word = (int32_t*) half_word;
     // Setting up Post to Pre table
     rewiring_data.post_to_pre_table = sp_word;
-//    log_info("post to pre %x", rewiring_data.post_to_pre_table);
+//    log_debug("post to pre %x", rewiring_data.post_to_pre_table);
     int total_no_of_elements = rewiring_data.s_max * rewiring_data.machine_no_atoms;
     sp_word = &rewiring_data.post_to_pre_table[total_no_of_elements + 1];
 
@@ -269,7 +269,7 @@ address_t synaptogenesis_dynamics_initialise(
         number_of_connections_in_row = &synapse_row_num_fixed_synapses;
     #endif
 
-    log_info("SR init complete.");
+    log_debug("SR init complete.");
     return (address_t)sp_word;
 }
 
@@ -287,7 +287,7 @@ static inline spike_t select_last_spike () {
     if (size == 0)
         return -1;
     uint32_t offset=ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * size;
-    log_info("%d %d %d", cb_my_tail, cb_input, my_input);
+    log_debug("%d %d %d", cb_my_tail, cb_input, my_input);
     return circular_buffer_value_at_index(cb, (cb_my_tail + offset)&cb_size);
 }
 
@@ -329,9 +329,9 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
         _spike = select_last_spike();
-        //    log_info("spike key %d", _spike);
+        //    log_debug("spike key %d", _spike);
         if (_spike==-1) {
-            log_info("No previous spikes");
+            log_debug("No previous spikes");
             return;
         }
 
@@ -489,6 +489,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     }
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
+        rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
 //        log_error("o %d v %d a %x row_address %x syn_row_add %x",
 //        current_state.offset_in_table,
 //        rewiring_data.post_to_pre_table[current_state.offset_in_table],
@@ -498,11 +499,11 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 //        );
 //
 //        for (int shite=0; shite < rewiring_dma_buffer.n_bytes_transferred/4; shite++) {
-//            log_info("%x", rewiring_dma_buffer.row[shite]);
+//            log_debug("%x", rewiring_dma_buffer.row[shite]);
 //        }
 ////
-////        log_info("%d",current_state.post_syn_id);
-//        log_info("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
+////        log_debug("%d",current_state.post_syn_id);
+//        log_debug("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
 //
 //        rt_error(RTE_SWERR);
     }
@@ -520,8 +521,8 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
  */
 bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
-    uint r = mars_kiss64_seed(rewiring_data.local_seed);
-    log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
+    uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
+    log_info("elim_prob r %u ctrl %d", r, current_state.current_controls);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
     if( current_state.sp_data.weight < appr_scaled_weight / 2 && r <= rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
@@ -565,7 +566,7 @@ bool synaptogenesis_dynamics_formation_rule(){
 //            log_error("element exists");
 //            return false;
 //            }
-//    log_info("%x %d", rewiring_dma_buffer.row,
+//    log_debug("%x %d", rewiring_dma_buffer.row,
 //    number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
 
     if( (current_state.current_controls == 0 && current_state.distance >= rewiring_data.size_ff_prob)

@@ -138,10 +138,16 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
               n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
 
     // Start transfer
+//    spin1_dma_transfer(
+//        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
+//        synapse_row_plastic_region(buffer->row),
+//        DMA_WRITE, n_plastic_region_bytes);
+
+    // Start transfer of the entire row, not just PP
     spin1_dma_transfer(
-        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
-        synapse_row_plastic_region(buffer->row),
-        DMA_WRITE, n_plastic_region_bytes);
+        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address,
+        buffer->row,
+        DMA_WRITE, buffer->n_bytes_transferred);
 }
 
 
