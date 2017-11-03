@@ -35,27 +35,16 @@ class SynapseIORowBased(AbstractSynapseIO):
         try:
             return population_table.get_allowed_row_length(size) * 4
         except SynapseRowTooBigException as e:
-            max_size = e.max_size
-            item_length_1 = 0
-            item_length_2 = 0
-            if isinstance(dynamics, AbstractStaticSynapseDynamics):
-                item_length_1 = dynamics.get_n_words_for_static_connections(2)
-                item_length_2 = dynamics.get_n_words_for_static_connections(4)
-            else:
-                item_length_1 = dynamics.get_n_words_for_plastic_connections(2)
-                item_length_2 = dynamics.get_n_words_for_plastic_connections(4)
-            item_length = float(item_length_2 - item_length_1) / 2
-            header_length = item_length_1 - (item_length * 2)
-            max_items = int((max_size - header_length) / item_length)
+            max_synapses = dynamics.get_max_synapses(e.max_size)
             raise SynapseRowTooBigException(
-                max_items,
+                max_synapses,
                 "The connection between {} and {} has more synapses ({}) than"
                 " can currently be supported on this implementation of PyNN"
                 " ({} for this connection type)."
                 " Please reduce the size of the target population, or reduce"
                 " the number of neurons per core.".format(
                     in_edge.pre_vertex, in_edge.post_vertex, row_length,
-                    max_items))
+                    max_synapses))
 
     def get_sdram_usage_in_bytes(
             self, synapse_info, n_pre_slices, pre_slice_index,
