@@ -54,7 +54,6 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         self._i_offset = utility_calls.convert_param_to_numpy(
             i_offset, n_neurons)
 
-
     def initialize_v(self, v_init):
         self._v_init = utility_calls.convert_param_to_numpy(
             v_init, self._n_neurons)
