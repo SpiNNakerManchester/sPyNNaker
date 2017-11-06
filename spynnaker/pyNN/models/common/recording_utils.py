@@ -7,8 +7,7 @@ import logging
 import numpy
 
 logger = logging.getLogger(__name__)
-
-_RECORDING_COUNT_SIZE = 4
+_RECORDING_COUNT = struct.Struct("<I")
 
 
 def get_recording_region_size_in_bytes(
@@ -30,11 +29,11 @@ def get_data(transceiver, placement, region, region_size):
         placement, region, transceiver)
     number_of_bytes_written_buf = buffer(transceiver.read_memory(
         placement.x, placement.y, region_base_address, 4))
-    number_of_bytes_written = struct.unpack_from(
-        "<I", number_of_bytes_written_buf)[0]
+    number_of_bytes_written = _RECORDING_COUNT.unpack_from(
+        number_of_bytes_written_buf)[0]
 
     # Subtract 4 for the word representing the size itself
-    expected_size = region_size - _RECORDING_COUNT_SIZE
+    expected_size = region_size - _RECORDING_COUNT.size
     if number_of_bytes_written > expected_size:
         raise MemReadException(
             "Expected {} bytes but read {}".format(
