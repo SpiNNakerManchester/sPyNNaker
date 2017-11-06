@@ -524,12 +524,12 @@ bool synaptogenesis_dynamics_elimination_rule(){
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
     log_info("elim_prob r %u ctrl %d", r, current_state.current_controls);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
-    if( current_state.sp_data.weight < appr_scaled_weight / 2 && r <= rewiring_data.p_elim_dep ){
+    if( current_state.sp_data.weight < appr_scaled_weight / 2 && r > rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
-    else if ( r <= rewiring_data.p_elim_pot ){
+    else if ( r > rewiring_data.p_elim_pot ){
         log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
@@ -569,8 +569,8 @@ bool synaptogenesis_dynamics_formation_rule(){
 //    log_debug("%x %d", rewiring_dma_buffer.row,
 //    number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)));
 
-    if( (current_state.current_controls == 0 && current_state.distance >= rewiring_data.size_ff_prob)
-        || (current_state.current_controls == 1 && current_state.distance >= rewiring_data.size_lat_prob)){
+    if( (current_state.current_controls == 0 && current_state.distance > rewiring_data.size_ff_prob)
+        || (current_state.current_controls == 1 && current_state.distance > rewiring_data.size_lat_prob)){
         /*ad*/log_debug("\t| OOB %d %d %d",
             current_state.distance,
             current_state.current_time,
@@ -583,7 +583,7 @@ bool synaptogenesis_dynamics_formation_rule(){
         probability = rewiring_data.lat_probabilities[current_state.distance];
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
     log_debug("form_prob %u vs r %u ctrl %d", probability, r, current_state.current_controls);
-    if (r >= probability){
+    if (r > probability){
         log_debug("\t| NO FORM %d", current_state.current_time);
         return false;
     }
