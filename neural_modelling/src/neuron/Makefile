@@ -20,6 +20,7 @@ MODELS = IF_curr_exp \
          IF_curr_comb_exp \
          IF_curr_comb_exp_2E2I \
          IF_curr_comb_exp_2E2I_stdp_mad_pair_additive \
+         IF_curr_comb_exp_4E4I \
          IF_curr_comb_exp_5E5I \
          IF_curr_comb_exp_7E7I \
          IZK_curr_comb_exp_4E4I
