@@ -100,7 +100,7 @@ class TimingDependencePreOnly(AbstractTimingDependence):
 
         # write thresholds
         spec.write_value(
-            data=int(round(self.th_v_mem)),
+            data=self.th_v_mem,
             data_type=DataType.S1615)
 
         spec.write_value(
