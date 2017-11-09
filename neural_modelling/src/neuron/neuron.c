@@ -212,15 +212,6 @@ void neuron_do_timestep_update(timer_t time) {
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            // Call the implementation to then call relevant model-based functions
-            neuron_impl_has_spiked(neuron_index);
-
-            // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
-
-            // Record the spike  // maybe this goes out to implementation too?
-            out_spikes_set_spike(neuron_index);
-
             if (use_key) {
 
                 // Wait until the expected time to send

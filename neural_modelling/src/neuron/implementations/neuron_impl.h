@@ -33,11 +33,6 @@ static void neuron_impl_set_global_neuron_parameters();
 //! \return bool value for whether a spike has occurred
 static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index);
 
-//! \brief Communicate with parts of the model when spike occurs
-//! \param[in] neuron index
-//! \return None
-static void neuron_impl_has_spiked(index_t neuron_index);
-
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
 static void neuron_impl_set_neuron_synapse_shaping_params(

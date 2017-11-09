@@ -231,23 +231,27 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
     state_t result = neuron_model_state_update(
     		exc_input, inh_input, external_bias, neuron);
 
-    // determine if a spike should occur and return this
-    return threshold_type_is_above_threshold(result, threshold_type);
-}
+    // determine if a spike should occur
+    bool spike = threshold_type_is_above_threshold(result, threshold_type);
 
-//! \brief Communicate with parts of the model when spike occurs
-//! \param[in] neuron index
-//! \return None
-static void neuron_impl_has_spiked(index_t neuron_index)
-{
-	// Tell the neuron model
-    neuron_pointer_t neuron = &neuron_array[neuron_index];
-	neuron_model_has_spiked(neuron);
+    // If spike occurs, communicate to relevant parts of model
+    if (spike) {
+        // Call relevant model-based functions
+    	// Tell the neuron model
+    	neuron_model_has_spiked(neuron);
 
-	// Tell the additional input
-    additional_input_pointer_t additional_input =
-        &additional_input_array[neuron_index];
-	additional_input_has_spiked(additional_input);
+    	// Tell the additional input
+    	additional_input_has_spiked(additional_input);
+
+        // Do any required synapse processing
+        synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+
+        // Record the spike
+        out_spikes_set_spike(neuron_index);
+    }
+
+    // Return the boolean to the model timestep update
+    return spike;
 }
 
 //! \setter for the internal input buffers
