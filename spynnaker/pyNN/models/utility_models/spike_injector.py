@@ -1,15 +1,15 @@
 from pacman.model.decorators import overrides
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
+
 from spinn_front_end_common.abstract_models \
     import AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common \
     import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
     SimplePopulationSettable
-from spynnaker.pyNN.utilities.constants import \
-    EIEIO_BUFFER_SIZE_BEFORE_RECEIVE, EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT
 
 
 class SpikeInjector(ReverseIpTagMultiCastSource,
@@ -28,19 +28,40 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             self, n_neurons, label=default_parameters['label'],
             port=default_parameters['port'],
             virtual_key=default_parameters['virtual_key'],
-            spike_buffer_max_size=EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT,
-            buffer_size_before_receive=EIEIO_BUFFER_SIZE_BEFORE_RECEIVE):
+            spike_buffer_max_size=None, buffer_size_before_receive=None,
+            time_between_requests=None, buffer_notification_ip_address=None,
+            buffer_notification_port=None):
+
+        config = globals_variables.get_simulator().config
+        if buffer_notification_ip_address is None:
+            buffer_notification_ip_address = config.get(
+                "Buffers", "receive_buffer_host")
+        if buffer_notification_port is None:
+            buffer_notification_port = config.get_int(
+                "Buffers", "receive_buffer_port")
 
         ReverseIpTagMultiCastSource.__init__(
             self, n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True)
+            virtual_key=virtual_key, reserve_reverse_ip_tag=True,
+            buffer_notification_ip_address=buffer_notification_ip_address,
+            buffer_notification_port=buffer_notification_port)
 
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
 
         # Set up for recording
         self._spike_recorder = EIEIOSpikeRecorder()
         self._spike_buffer_max_size = spike_buffer_max_size
+        if spike_buffer_max_size is None:
+            self._spike_buffer_max_size = config.getint(
+                "Buffers", "spike_buffer_size")
         self._buffer_size_before_receive = buffer_size_before_receive
+        if buffer_size_before_receive is None:
+            self._buffer_size_before_receive = config.getint(
+                "Buffers", "buffer_size_before_receive")
+        self._time_between_requests = time_between_requests
+        if time_between_requests is None:
+            self._time_between_requests = config.getint(
+                "Buffers", "time_between_requests")
 
     @property
     def port(self):
@@ -65,8 +86,8 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(self, new_state=True):
         self.enable_recording(
-            self._spike_buffer_max_size,
-            self._buffer_size_before_receive)
+            self._spike_buffer_max_size, self._buffer_size_before_receive,
+            self._time_between_requests)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = new_state
 
