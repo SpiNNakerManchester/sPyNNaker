@@ -1,5 +1,6 @@
 from pacman.model.constraints.partitioner_constraints \
     import SameAtomsAsVertexConstraint
+from spinn_front_end_common.utilities import helpful_functions
 
 from spynnaker.pyNN.models.abstract_models \
     import AbstractAcceptsIncomingSynapses
@@ -261,7 +262,26 @@ class PyNNProjectionCommon(object):
         placements = self._spinnaker_control.placements
         transceiver = self._spinnaker_control.transceiver
         routing_infos = self._spinnaker_control.routing_infos
+        machine = self._spinnaker_control.machine
         machine_time_step = self._spinnaker_control.machine_time_step
+        using_extra_monitor_functionality = \
+            self._spinnaker_control.get_generated_output(
+                "UsingAdvancedMonitorSupport")
+        extra_monitor_cores = None
+        receivers = None
+        extra_monitors_by_chip = None
+
+        # if using extra monitor functionality, locate extra data items
+        if using_extra_monitor_functionality:
+            extra_monitor_cores = \
+                self._spinnaker_control.get_generated_output(
+                    "MemoryExtraMonitorVertices")
+            receivers = self._spinnaker_control.get_generated_output(
+                    "MemoryMCGatherVertexToEthernetConnectedChipMapping")
+            extra_monitors_by_chip = \
+                self._spinnaker_control.get_generated_output(
+                    "MemoryExtraMonitorToChipMapping")
+
         edges = graph_mapper.get_machine_edges(self._projection_edge)
         progress = ProgressBar(
             edges, "Getting {}s for projection between {} and {}".format(
@@ -269,9 +289,26 @@ class PyNNProjectionCommon(object):
         for edge in progress.over(edges):
             placement = placements.get_placement_of_vertex(
                 edge.post_vertex)
+
+            # if using extra monitor data extractor find local receiver
+            receiver = None
+            sender_extra_monitor_core_placement = None
+            if using_extra_monitor_functionality:
+                receiver = helpful_functions.locate_extra_monitor_mc_receiver(
+                    placement_x=placement.x, placement_y=placement.y,
+                    machine=machine,
+                    extra_monitor_cores_to_ethernet_connection_map=receivers)
+                sender_extra_monitor_core = \
+                    extra_monitors_by_chip[(placement.x, placement.y)]
+                sender_extra_monitor_core_placement = \
+                    placements.get_placement_of_vertex(
+                        sender_extra_monitor_core)
+
             connections = post_vertex.get_connections_from_machine(
                 transceiver, placement, edge, graph_mapper, routing_infos,
-                self._synapse_information, machine_time_step)
+                self._synapse_information, machine_time_step,
+                using_extra_monitor_functionality, placements, receiver,
+                sender_extra_monitor_core_placement, extra_monitor_cores)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()
