@@ -1,6 +1,4 @@
 # utils imports
-from collections import defaultdict
-
 from spinn_utilities.abstract_base import AbstractBase
 
 # common front end imports
@@ -361,6 +359,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :return: a extracted data object with get method for getting the data
         :rtype ExtractedData object
         """
+
         # build data structure for holding data
         mother_lode = ExtractedData()
 
@@ -373,22 +372,22 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if using_extra_monitor_functionality:
             receivers = self._locate_receivers_from_projections(
                 projection_to_attribute_map.keys(),
-                self._spinnaker_control.get_generated_output(
+                self.get_generated_output(
                     "MemoryMCGatherVertexToEthernetConnectedChipMapping"),
-                self._spinnaker_control.get_generated_output(
+                self.get_generated_output(
                     "MemoryExtraMonitorToChipMapping"))
 
         # set up the router timeouts to stop packet loss
         if using_extra_monitor_functionality:
             for data_receiver, extra_monitor_cores in receivers:
                 data_receiver.set_cores_for_data_extraction(
-                    self._txrx, extra_monitor_cores, self._placements)
+                    self._txrx, list(extra_monitor_cores), self._placements)
 
         # acquire the data
         for projection in projection_to_attribute_map:
             for attribute in projection_to_attribute_map[projection]:
                 data = projection._get_synaptic_data(
-                    self, True, attribute,
+                    as_list=True, data_to_get=attribute,
                     fixed_values=None, notify=None,
                     handle_time_out_configuration=False)
                 mother_lode.set(projection, attribute, data)
@@ -397,7 +396,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if using_extra_monitor_functionality:
             for data_receiver, extra_monitor_cores in receivers:
                 data_receiver.unset_cores_for_data_extraction(
-                    self._txrx, extra_monitor_cores, self._placements)
+                    self._txrx, list(extra_monitor_cores), self._placements)
 
         # return data items
         return mother_lode
@@ -427,14 +426,14 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 chip = self._machine.get_chip_at(placement.x, placement.y)
 
                 # locate extra monitor cores on the board of this chip
-                extra_monitor_cores_on_board = list()
-                for board_chip in self._machine.get_chips_on_board(chip):
-                    extra_monitor_cores_on_board.append(
-                        extra_monitors_per_chip[(board_chip.x, board_chip.y)])
+                extra_monitor_cores_on_board = set()
+                for (chip_x, chip_y) in self._machine.get_chips_on_board(chip):
+                    extra_monitor_cores_on_board.add(
+                        extra_monitors_per_chip[(chip_x, chip_y)])
 
-                # map gatherer to extra monitor cores for baord
-                important_gathers.add((
-                    gatherers[(chip.nearest_ethernet_x,
-                               chip.nearest_ethernet_y)],
-                    extra_monitor_cores_on_board))
+                # map gatherer to extra monitor cores for board
+                important_gathers.add(
+                    (gatherers[(chip.nearest_ethernet_x,
+                                chip.nearest_ethernet_y)],
+                     frozenset(extra_monitor_cores_on_board)))
         return list(important_gathers)
