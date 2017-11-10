@@ -787,7 +787,8 @@ class SynapticManager(object):
             routing_infos, synapse_info, machine_time_step,
             using_extra_monitor_cores, placements=None, data_receiver=None,
             sender_extra_monitor_core_placement=None,
-            extra_monitor_cores_for_router_timeout=None):
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         app_edge = graph_mapper.get_application_edge(machine_edge)
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -841,7 +842,8 @@ class SynapticManager(object):
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
                 synapse_info.index, placements, data_receiver,
                 sender_extra_monitor_core_placement,
-                extra_monitor_cores_for_router_timeout)
+                extra_monitor_cores_for_router_timeout,
+                handle_time_out_configuration)
 
         # Convert the blocks into connections
         return self._synapse_io.read_synapses(
@@ -855,7 +857,8 @@ class SynapticManager(object):
             indirect_synapses_address, direct_synapses_address,
             key, n_rows, index, using_extra_monitor_cores, placements=None,
             data_receiver=None, sender_extra_monitor_core_placement=None,
-            extra_monitor_cores_for_router_timeout=None):
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         """ Read in a synaptic block from a given processor and vertex on\
             the machine
         """
@@ -879,7 +882,7 @@ class SynapticManager(object):
 
             # if exploiting the extra monitor cores, need to set the machine
             # for data extraction mode
-            if using_extra_monitor_cores:
+            if using_extra_monitor_cores and handle_time_out_configuration:
                 data_receiver.set_cores_for_data_extraction(
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
@@ -924,7 +927,7 @@ class SynapticManager(object):
                 block = bytearray(numpy_block.tobytes())
                 max_row_length = 1
 
-            if using_extra_monitor_cores:
+            if using_extra_monitor_cores and handle_time_out_configuration:
                 data_receiver.unset_cores_for_data_extraction(
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)

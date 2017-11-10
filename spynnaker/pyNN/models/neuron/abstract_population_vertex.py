@@ -778,13 +778,15 @@ class AbstractPopulationVertex(
             synapse_information, machine_time_step, using_extra_monitor_cores,
             placements=None, data_receiver=None,
             sender_extra_monitor_core_placement=None,
-            extra_monitor_cores_for_router_timeout=None):
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_information, machine_time_step,
             using_extra_monitor_cores, placements, data_receiver,
             sender_extra_monitor_core_placement,
-            extra_monitor_cores_for_router_timeout)
+            extra_monitor_cores_for_router_timeout,
+            handle_time_out_configuration)
 
     def clear_connection_cache(self):
         self._synapse_manager.clear_connection_cache()

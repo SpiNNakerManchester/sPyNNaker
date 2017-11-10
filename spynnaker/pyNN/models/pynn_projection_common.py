@@ -227,7 +227,8 @@ class PyNNProjectionCommon(object):
         return delay_edge
 
     def _get_synaptic_data(
-            self, as_list, data_to_get, fixed_values=None, notify=None):
+            self, as_list, data_to_get, fixed_values=None, notify=None,
+            handle_time_out_configuration=True):
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 
@@ -308,7 +309,8 @@ class PyNNProjectionCommon(object):
                 transceiver, placement, edge, graph_mapper, routing_infos,
                 self._synapse_information, machine_time_step,
                 using_extra_monitor_functionality, placements, receiver,
-                sender_extra_monitor_core_placement, extra_monitor_cores)
+                sender_extra_monitor_core_placement, extra_monitor_cores,
+                handle_time_out_configuration)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()

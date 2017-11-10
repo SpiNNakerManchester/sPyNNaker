@@ -15,7 +15,7 @@ install_requires = [
     'SpiNNaker_DataSpecification >= 1!4.0.1, < 1!5.0.0',
     'spalloc >= 1.0.1, < 2.0.0',
     'SpiNNFrontEndCommon >= 1!4.0.1, < 1!5.0.0',
-    'numpy', 'lxml', 'six']
+    'numpy', 'lxml', 'six', 'filedict == 0.08']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
     # scipy must be added in config.py as a mock
