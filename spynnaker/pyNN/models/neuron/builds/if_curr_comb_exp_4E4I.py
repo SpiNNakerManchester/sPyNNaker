@@ -17,7 +17,7 @@ class IFCurrCombExp4E4I(AbstractPopulationVertex):
         synaptic response = Ae^(-t/tau_a) + Be^(-t/tau_b)
     """
 
-    _max_feasible_max_atoms_per_core = 32
+    _max_feasible_max_atoms_per_core = 64
     _model_based_max_atoms_per_core = _max_feasible_max_atoms_per_core
 
     baseline_defaults = {
