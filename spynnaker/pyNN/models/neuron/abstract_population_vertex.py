@@ -289,13 +289,16 @@ class AbstractPopulationVertex(
     def get_cpu_usage_for_atoms(self, vertex_slice):
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
-            self._neuron_model.get_n_cpu_cycles_per_neuron() +
-            self._input_type.get_n_cpu_cycles_per_neuron(
-                self._synapse_manager.synapse_type.get_n_synapse_types()) +
-            self._threshold_type.get_n_cpu_cycles_per_neuron())
+            self._neuron_model.get_n_cpu_cycles_per_neuron())
+        if self._input_type is not None:
+            per_neuron_cycles += self._input_type.get_n_cpu_cycles_per_neuron(
+                self._synapse_manager.synapse_type.get_n_synapse_types())
+        if self._threshold_type is not None:
+            per_neuron_cycles += (
+                self._threshold_type.get_n_cpu_cycles_per_neuron())
         if self._additional_input is not None:
-            per_neuron_cycles += \
-                self._additional_input.get_n_cpu_cycles_per_neuron()
+            per_neuron_cycles += (
+                self._additional_input.get_n_cpu_cycles_per_neuron())
         return (_NEURON_BASE_N_CPU_CYCLES +
                 _C_MAIN_BASE_N_CPU_CYCLES +
                 (per_neuron_cycles * vertex_slice.n_atoms) +
@@ -305,12 +308,16 @@ class AbstractPopulationVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         per_neuron_usage = (
-            self._neuron_model.get_dtcm_usage_per_neuron_in_bytes() +
-            self._input_type.get_dtcm_usage_per_neuron_in_bytes() +
-            self._threshold_type.get_dtcm_usage_per_neuron_in_bytes())
+            self._neuron_model.get_dtcm_usage_per_neuron_in_bytes())
+        if self._input_type is not None:
+            per_neuron_usage += (
+                self._input_type.get_dtcm_usage_per_neuron_in_bytes())
+        if self._threshold_type is not None:
+            per_neuron_usage += (
+                self._threshold_type.get_dtcm_usage_per_neuron_in_bytes())
         if self._additional_input is not None:
-            per_neuron_usage += \
-                self._additional_input.get_dtcm_usage_per_neuron_in_bytes()
+            per_neuron_usage += (
+                self._additional_input.get_dtcm_usage_per_neuron_in_bytes())
         return (_NEURON_BASE_DTCM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
                 self._spike_recorder.get_dtcm_usage_in_bytes() +
@@ -319,12 +326,16 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_neuron_params_per_neuron(self):
         per_neuron_usage = (
-            self._input_type.get_sdram_usage_per_neuron_in_bytes() +
-            self._threshold_type.get_sdram_usage_per_neuron_in_bytes() +
             self._neuron_model.get_sdram_usage_per_neuron_in_bytes())
+        if self._threshold_type is not None:
+            per_neuron_usage += (
+                self._threshold_type.get_sdram_usage_per_neuron_in_bytes())
+        if self._input_type is not None:
+            per_neuron_usage += (
+                self._input_type.get_sdram_usage_per_neuron_in_bytes())
         if self._additional_input is not None:
-            per_neuron_usage += \
-                self._additional_input.get_sdram_usage_per_neuron_in_bytes()
+            per_neuron_usage += (
+                self._additional_input.get_sdram_usage_per_neuron_in_bytes())
         return per_neuron_usage
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
@@ -451,8 +462,10 @@ class AbstractPopulationVertex(
             spec, vertex_slice, self._neuron_model.get_neural_parameters())
 
         # Write the input type parameters
-        utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, self._input_type.get_input_type_parameters())
+        if self._input_type is not None:
+            utility_calls.write_parameters_per_neuron(
+                spec, vertex_slice,
+                self._input_type.get_input_type_parameters())
 
         # Write the additional input parameters
         if self._additional_input is not None:
@@ -460,9 +473,10 @@ class AbstractPopulationVertex(
                 spec, vertex_slice, self._additional_input.get_parameters())
 
         # Write the threshold type parameters
-        utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice,
-            self._threshold_type.get_threshold_parameters())
+        if self._threshold_type is not None:
+            utility_calls.write_parameters_per_neuron(
+                spec, vertex_slice,
+                self._threshold_type.get_threshold_parameters())
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -575,10 +589,17 @@ class AbstractPopulationVertex(
             self._n_profile_samples)
 
         # allow the synaptic matrix to write its data spec-able data
-        self._synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info, graph_mapper,
-            self._input_type, machine_time_step)
+        if self._input_type is not None:
+            self._synapse_manager.write_data_spec(
+                spec, self, vertex_slice, vertex, placement, machine_graph,
+                application_graph, routing_info, graph_mapper,
+                self._input_type, machine_time_step)
+        else:
+            # write using the neuron model instead, which should have the function
+            self._synapse_manager.write_data_spec(
+                spec, self, vertex_slice, vertex, placement, machine_graph,
+                application_graph, routing_info, graph_mapper,
+                self._neuron_model, machine_time_step)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -715,11 +736,13 @@ class AbstractPopulationVertex(
             byte_array, offset, vertex_slice)
         self._neuron_model.set_neural_parameters(neuron_params, vertex_slice)
 
-        # handle input params
-        input_params, offset = utility_calls.translate_parameters(
-            self._input_type.get_input_type_parameter_types(),
-            byte_array, offset, vertex_slice)
-        self._input_type.set_input_type_parameters(input_params, vertex_slice)
+        # handle input params, if they exist
+        if self._input_type is not None:
+            input_params, offset = utility_calls.translate_parameters(
+                self._input_type.get_input_type_parameter_types(),
+                byte_array, offset, vertex_slice)
+            self._input_type.set_input_type_parameters(input_params,
+                                                       vertex_slice)
 
         # handle additional input params, if they exist
         if self._additional_input is not None:
@@ -729,12 +752,13 @@ class AbstractPopulationVertex(
             self._additional_input.set_parameters(
                 additional_params, vertex_slice)
 
-        # handle threshold type params
-        threshold_params, offset = utility_calls.translate_parameters(
-            self._threshold_type.get_threshold_parameter_types(),
-            byte_array, offset, vertex_slice)
-        self._threshold_type.set_threshold_parameters(
-            threshold_params, vertex_slice)
+        # handle threshold type params, if they exist
+        if self._threshold_type is not None:
+            threshold_params, offset = utility_calls.translate_parameters(
+                self._threshold_type.get_threshold_parameter_types(),
+                byte_array, offset, vertex_slice)
+            self._threshold_type.set_threshold_parameters(
+                threshold_params, vertex_slice)
 
         # Read synapse parameters
         self._synapse_manager.read_parameters_from_machine(

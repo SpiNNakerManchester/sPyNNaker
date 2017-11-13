@@ -39,7 +39,7 @@ ifndef NEURON_MODEL_H
 endif
 
 ifndef INPUT_TYPE_H
-    $(error INPUT_TYPE_H is not set.  Please select an input type header file)
+    INPUT_TYPE_H = $(SOURCE_DIR)/neuron/input_types/input_type_none.h
 endif
 
 ifndef NEURON_IMPL_H
@@ -51,7 +51,7 @@ ifndef SYNAPSE_IMPL_H
 endif
 
 ifndef THRESHOLD_TYPE_H
-    $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
+    THRESHOLD_TYPE_H = $(SOURCE_DIR)/neuron/threshold_types/threshold_type_none.h
 endif
 
 ifndef SYNAPSE_TYPE_H
