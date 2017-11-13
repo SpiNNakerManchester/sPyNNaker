@@ -127,7 +127,7 @@ static inline update_state_t timing_apply_pre_spike(
     	log_info("drifting up w_drift: %d, dt: %d", w_drift, dt);
     	w += w_drift * dt;
     }else{
-    	log_info("drifting down");
+    	log_info("drifting down w_drift: %d, dt: %d", w_drift, dt);
     	w -= w_drift * dt;
     }
 
@@ -138,12 +138,15 @@ static inline update_state_t timing_apply_pre_spike(
     log_info("Ca: %12.6k, dn_l:  %12.6k, dn_h:  %12.6k", I_Ca2, th_ca_dn_l, th_ca_dn_h);
 
     if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem && I_Ca2 > th_ca_up_l && I_Ca2 < th_ca_up_h ){
-    	log_info("above_threshold, in ca range");
+    	log_info("above threshold, in ca range");
     	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);
 
     } else if (neuron_model_get_membrane_voltage(post_synaptic_neuron) <= th_v_mem && I_Ca2 > th_ca_dn_l && I_Ca2 < th_ca_dn_h ){
     	log_info("below threshold, in ca range");
     	return weight_one_term_apply_depression(previous_state, last_pre_trace);
+
+    } else {
+    	log_info("not in the ca range");
 
     }
     // get V_post(t_pre)

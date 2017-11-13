@@ -87,8 +87,8 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     new_weight = MIN(new_state.weight_region->max_weight,
                      MAX(new_weight, new_state.weight_region->min_weight));
 
-    log_info("\told_weight:%u, a2+:%d, a2-:%d,"
-              " new_weight:%d",
+    log_info("\told_weight: %u, a2+:%d, a2-:%d,"
+              " new_weight: %d",
               new_state.initial_weight, new_state.a2_plus, new_state.a2_minus,
               new_weight);
 
