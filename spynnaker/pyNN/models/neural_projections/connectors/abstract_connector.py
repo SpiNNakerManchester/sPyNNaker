@@ -113,7 +113,9 @@ class AbstractConnector(object):
             high = utility_calls.high(delays)
             if high is None:
                 return max_estimated_delay
-            return max(max_estimated_delay, high)
+
+            # The maximum is the minimum of the possible maximums
+            return min(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
