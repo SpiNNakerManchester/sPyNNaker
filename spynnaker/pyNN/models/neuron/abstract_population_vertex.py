@@ -632,7 +632,7 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.get_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
             placements, graph_mapper, self, machine_time_step,
-            self.VARIABLE_LONG[variable])
+            self.VARIABLE_LONG[variable], n_machine_time_steps)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):

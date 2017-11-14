@@ -6,6 +6,7 @@ from pacman.model.graphs.application import ApplicationVertex
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 # general imports
@@ -151,7 +152,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :return: the row length available
         """
         if row_length > 255:
-            raise Exception("Only rows of up to 255 entries are allowed")
+            raise SynapseRowTooBigException(
+                255, "Only rows of up to 255 entries are allowed")
         return row_length
 
     def get_next_allowed_address(self, next_address):
