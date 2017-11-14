@@ -595,7 +595,7 @@ class AbstractPopulationVertex(
                 application_graph, routing_info, graph_mapper,
                 self._input_type, machine_time_step)
         else:
-            # write using the neuron model instead, which should have the function
+            # write using the neuron model instead
             self._synapse_manager.write_data_spec(
                 spec, self, vertex_slice, vertex, placement, machine_graph,
                 application_graph, routing_info, graph_mapper,
