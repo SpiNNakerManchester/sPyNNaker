@@ -46,13 +46,13 @@ def get_exponential_decay_and_init(tau, machine_time_step):
     decay_scaled = numpy.multiply(decay, scale).astype("uint32")
     init_scaled = numpy.multiply(init, scale).astype("uint32")
     """
-    decay_operation = lambda x: \
-        int(numpy.exp(-float(machine_time_step)/(1000.0 * x)) * pow(2, 32))
-    init_operation = lambda x: \
-        int(x * (1.0 - numpy.exp(-float(machine_time_step)/(1000.0 * x))) * \
-        (1000.0 / float(machine_time_step)) * pow(2, 32))
-    return tau.apply_operation(decay_operation), \
-           tau.apply_operation(init_operation)
+    return tau.apply_operation(
+        lambda x: int(numpy.exp(-float(machine_time_step)/(1000.0 * x)) *
+                      pow(2, 32))), \
+        tau.apply_operation(
+            lambda x: int(x * (1.0 - numpy.exp(
+                -float(machine_time_step)/(1000.0 * x))) *
+                          (1000.0 / float(machine_time_step)) * pow(2, 32)))
 
 
 class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):

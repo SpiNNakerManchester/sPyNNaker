@@ -3,7 +3,6 @@ from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
-from spynnaker.pyNN.utilities import utility_calls
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
@@ -84,7 +83,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @a.setter
     def a(self, a):
-        self._data.set_value(key=A, value = a)
+        self._data.set_value(key=A, value=a)
 
     @property
     def b(self):
@@ -170,7 +169,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
             # offset current [nA]
             # REAL I_offset;
-            NeuronParameter(self._data[I_OFFSET], _IZH_TYPES.I_OFFSET.data_type),
+            NeuronParameter(self._data[I_OFFSET],
+                            _IZH_TYPES.I_OFFSET.data_type),
 
             # current timestep - simple correction for threshold
             # REAL this_h;

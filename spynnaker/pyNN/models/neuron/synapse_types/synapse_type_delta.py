@@ -1,7 +1,6 @@
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.utilities import utility_calls
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 INITIAL_INPUT_EXC = "initial_input_exc"

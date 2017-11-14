@@ -109,9 +109,9 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         return self._data[R_MEMBRANE]
 
     def _exp_tc(self, machine_time_step):
-        operation = lambda x: numpy.exp(float(-machine_time_step) /
-                                        (1000.0 * x))
-        return self._data[TAU_M].apply_operation(operation=operation)
+        return self._data[TAU_M].apply_operation(
+            operation=lambda x: numpy.exp(
+                float(-machine_time_step) / (1000.0 * x)))
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):

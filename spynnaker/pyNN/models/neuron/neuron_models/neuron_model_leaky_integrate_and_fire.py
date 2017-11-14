@@ -2,7 +2,6 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .neuron_model_leaky_integrate import NeuronModelLeakyIntegrate
-from spinn_utilities.ranged.ranged_list import RangedList
 
 from data_specification.enums import DataType
 
@@ -63,8 +62,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
         return NeuronModelLeakyIntegrate.get_n_neural_parameters(self) + 3
 
     def _tau_refrac_timesteps(self, machine_time_step):
-        operation = lambda x: numpy.ceil(x / (machine_time_step / 1000.0))
-        return self._data[TAU_REFRAC].apply_operation(operation=operation)
+        return self._data[TAU_REFRAC].apply_operation(
+            operation=lambda x: numpy.ceil(x / (machine_time_step / 1000.0)))
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_neural_parameters(self, machine_time_step):

@@ -61,9 +61,8 @@ def convert_param_to_numpy(param, no_atoms):
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
     if len(parameters) == 0:
         return
-    operation = lambda x: x.start_iterator_by_slice(
-        vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
-    iterable = all(map(operation, parameters))
+    iterable = all(map(lambda x: x.start_iterator_by_slice(
+        vertex_slice.lo_atom, vertex_slice.hi_atom + 1), parameters))
     if iterable:
         while True:  # Keep going until you get a StopIteration
             try:
