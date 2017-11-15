@@ -19,7 +19,7 @@ from spinn_front_end_common.abstract_models \
 from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spinn_front_end_common.abstract_models \
@@ -261,7 +261,7 @@ class DelayExtensionVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     def get_n_keys_for_partition(self, partition, graph_mapper):
         vertex_slice = graph_mapper.get_slice(partition.pre_vertex)
