@@ -360,6 +360,11 @@ bool store_poisson_parameters(){
     address = data_specification_get_region(POISSON_PARAMS, address);
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
 
+    // Copy the current seed
+    memcpy(&address[PARAMETER_SEED_START_POSITION], spike_source_seed,
+    		seed_size);
+
+    // Get number of spike sources
     num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
     log_info("\t spike sources = %u", num_spike_sources);
 
