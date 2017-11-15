@@ -56,6 +56,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._populations = list()
         self._projections = list()
         self._edge_count = 0
+        self._id_counter = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
@@ -437,3 +438,22 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                                 chip.nearest_ethernet_y)],
                      frozenset(extra_monitor_cores_on_board)))
         return list(important_gathers)
+
+    @property
+    def id_counter(self):
+        """ property for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :return:
+        """
+        return self._id_counter
+
+    @id_counter.setter
+    def id_counter(self, new_value):
+        """ setter for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :param new_value: new value for id_counter
+        :return:
+        """
+        self._id_counter = new_value
