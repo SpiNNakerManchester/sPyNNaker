@@ -523,11 +523,11 @@ class SynapticManager(object):
 
     def _write_synapse_parameters(
             self, spec, machine_vertex, machine_graph, graph_mapper,
-            post_slices, post_slice_index, post_vertex_slice, input_type,
+            post_slices, post_slice_index, post_vertex_slice, weight_scale,
             machine_time_step):
 
         # Get the ring buffer shifts and scaling factors
-        weight_scale = input_type.get_global_weight_scale()
+        # weight_scale = input_type.get_global_weight_scale()
         ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
             machine_vertex, machine_graph, graph_mapper, post_slices,
             post_slice_index, post_vertex_slice, machine_time_step,
@@ -737,7 +737,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, input_type, machine_time_step):
+            graph_mapper, weight_scale, machine_time_step):
 
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
@@ -764,7 +764,7 @@ class SynapticManager(object):
 
         weight_scales = self._write_synapse_parameters(
             spec, machine_vertex, machine_graph, graph_mapper, post_slices,
-            post_slice_idx, post_vertex_slice, input_type, machine_time_step)
+            post_slice_idx, post_vertex_slice, weight_scale, machine_time_step)
 
         self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,

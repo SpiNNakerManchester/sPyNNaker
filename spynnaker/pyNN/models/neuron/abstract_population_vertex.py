@@ -588,18 +588,17 @@ class AbstractPopulationVertex(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
 
-        # allow the synaptic matrix to write its data spec-able data
+        # Get the weight_scale value from the appropriate location
         if self._input_type is not None:
-            self._synapse_manager.write_data_spec(
-                spec, self, vertex_slice, vertex, placement, machine_graph,
-                application_graph, routing_info, graph_mapper,
-                self._input_type, machine_time_step)
+            weight_scale = self._input_type.get_global_weight_scale()
         else:
-            # write using the neuron model instead
-            self._synapse_manager.write_data_spec(
-                spec, self, vertex_slice, vertex, placement, machine_graph,
-                application_graph, routing_info, graph_mapper,
-                self._neuron_model, machine_time_step)
+            weight_scale = self._neuron_model.get_global_weight_scale()
+
+        # allow the synaptic matrix to write its data spec-able data
+        self._synapse_manager.write_data_spec(
+            spec, self, vertex_slice, vertex, placement, machine_graph,
+            application_graph, routing_info, graph_mapper,
+            weight_scale, machine_time_step)
 
         # End the writing of this specification:
         spec.end_specification()
