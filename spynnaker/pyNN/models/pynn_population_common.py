@@ -19,10 +19,6 @@ logger = logging.getLogger(__file__)
 
 
 class PyNNPopulationCommon(object):
-
-    # Keep a global neuron id for print headers
-    _next_global_neuron_id = 0
-
     def __init__(
             self, spinnaker_control, size, vertex, structure, initial_values):
         if size is not None and size <= 0:
