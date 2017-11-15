@@ -56,3 +56,17 @@ class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised
     """
     pass
+
+
+class SynapseRowTooBigException(SpynnakerException):
+    """ Raised when a synapse row is bigger than is allowed
+    """
+    def __init__(self, max_size, message):
+        SpynnakerException.__init__(self, message)
+        self._max_size = max_size
+
+    @property
+    def max_size(self):
+        """ The maximum size allowed
+        """
+        return self._max_size

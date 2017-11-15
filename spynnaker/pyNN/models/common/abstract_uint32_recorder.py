@@ -17,7 +17,8 @@ class AbstractUInt32Recorder(object):
     @staticmethod
     def get_data(
             label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, machine_time_step, variable):
+            application_vertex, machine_time_step, variable,
+            n_machine_time_steps):
         """ method for reading a uint32 mapped to time and neuron ids from\
         the SpiNNaker machine
 
@@ -30,6 +31,7 @@ class AbstractUInt32Recorder(object):
         :param application_vertex:
         :param machine_time_step:
         :param variable:
+        :param n_machine_time_steps:
         :return:
         """
 
@@ -37,6 +39,7 @@ class AbstractUInt32Recorder(object):
         ms_per_tick = machine_time_step / 1000.0
         data = list()
         missing_str = ""
+        all_times = numpy.arange(0, n_machine_time_steps)
 
         progress = ProgressBar(
                 vertices, "Getting {} for {}".format(variable, label))
@@ -73,6 +76,28 @@ class AbstractUInt32Recorder(object):
                 [record_ids, record_time, record_membrane_potential])
             part_data = numpy.reshape(part_data, [-1, 3])
             data.append(part_data)
+
+            # Fill in any missing data
+            if missing_data:
+                records_without_data = all_times[numpy.invert(
+                    numpy.isin(all_times, split_record[0].flatten()))]
+                times_without_data = numpy.repeat(
+                    records_without_data, vertex_slice.n_atoms).reshape(
+                        (-1, vertex_slice.n_atoms))
+                ids_without_data = numpy.tile(
+                    numpy.arange(
+                        vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
+                    len(records_without_data)).reshape(
+                            (-1, vertex_slice.n_atoms))
+                values_without_data = numpy.repeat(
+                    numpy.nan,
+                    len(records_without_data) * vertex_slice.n_atoms).reshape(
+                        (-1, vertex_slice.n_atoms))
+                missing_values = numpy.dstack(
+                    [ids_without_data, times_without_data,
+                     values_without_data])
+                missing_values = numpy.reshape(missing_values, [-1, 3])
+                data.append(missing_values)
 
         if len(missing_str) > 0:
             logger.warn(
