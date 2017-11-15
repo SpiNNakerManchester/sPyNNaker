@@ -436,4 +436,3 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "Size of a population with label {} must be an int,"
                 " received {}".format(label, size))
-
