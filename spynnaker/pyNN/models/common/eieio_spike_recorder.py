@@ -62,18 +62,23 @@ class EIEIOSpikeRecorder(object):
             offset = 0
             while offset < number_of_bytes_written:
                 length = _ONE_WORD.unpack_from(spike_data, offset)[0]
-                data_offset = offset + 4
+                time = _ONE_WORD.unpack_from(spike_data, offset + 4)[0]
+                time *= ms_per_tick
+                data_offset = offset + 8
                 eieio_header = EIEIODataHeader.from_bytestring(
                     spike_data, data_offset)
+                if eieio_header.eieio_type.payload_bytes > 0:
+                    raise Exception("Can only read spikes as keys")
                 data_offset += eieio_header.size
-                timestamp = eieio_header.payload_base * ms_per_tick
-                timestamps = numpy.repeat([timestamp], eieio_header.count)
+                timestamps = numpy.repeat([time], eieio_header.count)
+                key_bytes = eieio_header.eieio_type.key_bytes
                 keys = numpy.frombuffer(
-                    spike_data, dtype="<u4", count=eieio_header.count,
-                    offset=data_offset)
+                    spike_data, dtype="<u{}".format(key_bytes),
+                    count=eieio_header.count, offset=data_offset)
+
                 neuron_ids = ((keys - base_key_function(vertex)) +
                               vertex_slice.lo_atom)
-                offset += length + 4
+                offset += length + 8
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
         if len(missing_str) > 0:
