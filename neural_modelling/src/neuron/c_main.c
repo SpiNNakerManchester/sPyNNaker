@@ -271,7 +271,21 @@ void timer_callback(uint timer_count, uint unused) {
     if (rewiring && last_rewiring_time >= rewiring_period)
     {
         last_rewiring_time = 0;
+        // put flag in spike processing to do synaptic rewiring
         synaptogenesis_dynamics_rewire(time);
+        // disable interrupts
+//       // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+//        if (!dma_busy) {
+//
+//            log_debug("Sending user event for new spike");
+//            if (spin1_trigger_user_event(0, 0)) {
+//                dma_busy = true;
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
+//        }
+// enable interrupts
         count_rewires++;
     }
     // otherwise do synapse and neuron time step updates

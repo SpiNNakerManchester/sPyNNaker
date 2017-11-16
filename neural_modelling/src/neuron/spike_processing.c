@@ -75,6 +75,13 @@ static inline void _setup_synaptic_dma_read() {
     uint cpsr = 0;
     while (!setup_done && !finished) {
 
+        // If rewiring needs doing on synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
+        //    n_bytes)) {
+
+        // setup_done = true;
+
+
+
         // If there's more rows to process from the previous spike
         while (!setup_done && population_table_get_next_address(
                 &row_address, &n_bytes_to_transfer)) {

@@ -448,6 +448,9 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
 
+    // IN spike processing mark this as something to be done
+
+    // DO DMA READ CALLS THIS AS A FUNCTION {
     while(0==spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
             n_bytes)) {
@@ -455,6 +458,21 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     }
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
+    // }
+
+// disable interrupts
+//       // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+//        if (!dma_busy) {
+//
+//            log_debug("Sending user event for new spike");
+//            if (spin1_trigger_user_event(0, 0)) {
+//                dma_busy = true;
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
+//        }
+// enable interrupts
 
 }
 
@@ -510,6 +528,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     else {
         synaptogenesis_dynamics_formation_rule();
     }
+    // This calls _setup_synaptic_dma_read() again!
 }
 
  /*
