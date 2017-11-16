@@ -306,6 +306,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         log_debug("\t| NOTME %d @ %d", post_id, time);
         circular_buffer cb = get_circular_buffer();
         my_input = (circular_buffer_input(cb)-1) & circular_buffer_real_size(cb);
+        _setup_synaptic_dma_read();
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -332,6 +333,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         //    log_debug("spike key %d", _spike);
         if (_spike==-1) {
             log_debug("No previous spikes");
+            _setup_synaptic_dma_read();
             return;
         }
 
@@ -523,12 +525,13 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 ////        log_debug("%d",current_state.post_syn_id);
 //        log_debug("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
 //
-//        rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
     else {
         synaptogenesis_dynamics_formation_rule();
     }
     // This calls _setup_synaptic_dma_read() again!
+    _setup_synaptic_dma_read();
 }
 
  /*

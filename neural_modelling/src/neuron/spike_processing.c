@@ -2,6 +2,7 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -36,6 +37,7 @@ static uint32_t single_fixed_synapse[4];
 // Last spike
 //spike_t last_spike;
 //uint32_t buffer_real_size;
+uint32_t number_of_rewires=0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -64,7 +66,7 @@ static inline void _do_direct_row(address_t row_address) {
     synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
-static inline void _setup_synaptic_dma_read() {
+void _setup_synaptic_dma_read() {
 
     // Set up to store the DMA location and size to read
     address_t row_address;
@@ -77,8 +79,12 @@ static inline void _setup_synaptic_dma_read() {
 
         // If rewiring needs doing on synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         //    n_bytes)) {
+        if (number_of_rewires) {
+            number_of_rewires--;
+            synaptogenesis_dynamics_rewire(time);
+            setup_done = true;
+        }
 
-        // setup_done = true;
 
 
 
@@ -305,4 +311,17 @@ uint32_t spike_processing_get_buffer_overflows() {
 
 circular_buffer get_circular_buffer(){
     return buffer;
+}
+
+void set_dma_busy(bool busy) {
+    dma_busy = busy;
+}
+
+bool get_dma_busy() {
+    return dma_busy;
+}
+
+bool do_rewiring() {
+    number_of_rewires++;
+    return true;
 }

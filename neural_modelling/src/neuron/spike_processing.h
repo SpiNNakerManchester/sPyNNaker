@@ -36,4 +36,12 @@ typedef struct dma_buffer {
 //uint32_t get_buffer_real_size();
 circular_buffer get_circular_buffer();
 
+void set_dma_busy(bool busy);
+
+bool get_dma_busy();
+
+bool do_rewiring();
+
+void _setup_synaptic_dma_read();
+
 #endif // _SPIKE_PROCESSING_H_
