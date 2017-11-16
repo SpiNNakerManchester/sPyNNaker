@@ -67,7 +67,7 @@ class NeuronParameter(object):
 
     def iterator_by_slice(self, slice_start, slice_stop):
         if isinstance(self._value, AbstractList):
-            if self._value._range_based:
+            if self._value.range_based:
                 return _Range_Iterator(
                     self._value, self._data_type, slice_start, slice_stop)
             else:
