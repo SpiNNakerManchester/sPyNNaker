@@ -126,3 +126,7 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         return ['weight', 'delay']
+
+    @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
+    def get_max_synapses(self, n_words):
+        return n_words
