@@ -110,7 +110,7 @@ class SpikeSourcePoisson(
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
     # real-time)
-    DEFAULT_MAX_ATOMS_PER_CORE = 64
+    DEFAULT_MAX_ATOMS_PER_CORE = 32
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     # A count of the number of poisson vertices, to work out the random
