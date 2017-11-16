@@ -560,7 +560,7 @@ class SynapticManager(object):
             spec.set_register_value(
                 register_id=15,
                 data=next_block_allowed_address - next_block_start_address)
-            spec.write_value(
+            spec.write_repeat_value(
                 data=0xDD, repeats=15, repeats_is_register=True,
                 data_type=DataType.UINT8)
             return next_block_allowed_address
