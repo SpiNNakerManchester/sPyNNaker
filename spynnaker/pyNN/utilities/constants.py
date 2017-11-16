@@ -65,4 +65,3 @@ SPIKES = 'spikes'
 MEMBRANE_POTENTIAL = "v"
 GSYN_EXCIT = "gsyn_exc"
 GSYN_INHIB = "gsyn_inh"
-
