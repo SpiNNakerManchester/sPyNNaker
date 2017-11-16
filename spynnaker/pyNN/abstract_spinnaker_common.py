@@ -350,9 +350,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
-        """ common data extractor for projection data. Allows fully 
-        exploitation of the 
-        
+        """ common data extractor for projection data. Allows fully \
+        exploitation of the
+
         :param projection_to_attribute_map: the projection to attributes \
         mapping
         :type projection_to_attribute_map: dict of projection with set of \
@@ -404,9 +404,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):
-        """ locates receivers and their corresponding monitor cores for 
+        """ locates receivers and their corresponding monitor cores for \
         setting router time outs
-         
+
         :param projections: the projections going to be read
         :param gatherers: the gathers per ethernet chip
         :param extra_monitors_per_chip: the extra monitor cores per chip
