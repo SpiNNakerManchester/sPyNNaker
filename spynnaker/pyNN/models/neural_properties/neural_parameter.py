@@ -1,8 +1,6 @@
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
-from data_specification import constants, exceptions
-import decimal
-import struct
+from data_specification import exceptions
 
 
 class _List_Iterator(object):
@@ -73,7 +71,7 @@ class _Get_Iterator(object):
         """
         self._value = value
         self._datatype = datatype
-        self._index = slice_start -1
+        self._index = slice_start - 1
         self._slice_stop = slice_stop
         self._spec = spec
 
