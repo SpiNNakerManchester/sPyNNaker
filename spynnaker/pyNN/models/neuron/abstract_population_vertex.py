@@ -765,7 +765,12 @@ class AbstractPopulationVertex(
 
     @property
     def weight_scale(self):
-        return self._input_type.get_global_weight_scale()
+        # TO DO: Need to edit this
+        if self._input_type is not None:
+            return self._input_type.get_global_weight_scale()
+        else:
+            return self._neuron_model.get_global_weight_scale()
+
 
     @property
     def ring_buffer_sigma(self):
