@@ -19,6 +19,7 @@ class ExtractedData(object):
         if projection in self._data:
             if attribute in self._data[projection]:
                 return self._data[projection][attribute]
+        return None
 
     def set(self, projection, attribute, data):
         """ allows the addition of data from a projection and attribute.
