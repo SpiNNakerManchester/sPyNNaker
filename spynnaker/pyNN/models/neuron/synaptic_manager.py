@@ -785,8 +785,11 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step, max_feasible_atoms_per_core):
-
+            routing_infos, synapse_info, machine_time_step, max_feasible_atoms_per_core,
+            using_extra_monitor_cores, placements=None, data_receiver=None,
+            sender_extra_monitor_core_placement=None,
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         app_edge = graph_mapper.get_application_edge(machine_edge)
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -824,7 +827,10 @@ class SynapticManager(object):
         data, max_row_length = self._retrieve_synaptic_block(
             transceiver, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
-            key, pre_vertex_slice.n_atoms, synapse_info.index)
+            key, pre_vertex_slice.n_atoms, synapse_info.index,
+            using_extra_monitor_cores, placements, data_receiver,
+            sender_extra_monitor_core_placement,
+            extra_monitor_cores_for_router_timeout)
 
         # Get the block for the connections from the delayed pre_vertex
         delayed_data = None
@@ -835,7 +841,10 @@ class SynapticManager(object):
                 indirect_synapses_address, direct_synapses_address,
                 delayed_key,
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
-                synapse_info.index)
+                synapse_info.index, placements, data_receiver,
+                sender_extra_monitor_core_placement,
+                extra_monitor_cores_for_router_timeout,
+                handle_time_out_configuration)
 
         # Convert the blocks into connections
         return self._synapse_io.read_synapses(
@@ -847,7 +856,10 @@ class SynapticManager(object):
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
-            key, n_rows, index):
+            key, n_rows, index, using_extra_monitor_cores, placements=None,
+            data_receiver=None, sender_extra_monitor_core_placement=None,
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         """ Read in a synaptic block from a given processor and vertex on\
             the machine
         """
@@ -869,26 +881,45 @@ class SynapticManager(object):
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
 
+            # if exploiting the extra monitor cores, need to set the machine
+            # for data extraction mode
+            if using_extra_monitor_cores and handle_time_out_configuration:
+                data_receiver.set_cores_for_data_extraction(
+                    transceiver, extra_monitor_cores_for_router_timeout,
+                    placements)
+
             if not is_single:
                 # calculate the synaptic block size in bytes
                 synaptic_block_size = self._synapse_io.get_block_n_bytes(
                     max_row_length, n_rows)
 
                 # read in the synaptic block
-                block = transceiver.read_memory(
-                    placement.x, placement.y,
-                    indirect_synapses_address + synaptic_block_offset,
-                    synaptic_block_size)
+                if using_extra_monitor_cores:
+                    block = data_receiver.get_data(
+                        transceiver, sender_extra_monitor_core_placement,
+                        indirect_synapses_address + synaptic_block_offset,
+                        synaptic_block_size)
+                else:
+                    block = transceiver.read_memory(
+                        placement.x, placement.y,
+                        indirect_synapses_address + synaptic_block_offset,
+                        synaptic_block_size)
 
             else:
                 # The data is one per row
                 synaptic_block_size = n_rows * 4
 
-                # read in the synaptic row data
-                single_block = numpy.asarray(transceiver.read_memory(
-                    placement.x, placement.y,
-                    direct_synapses_address + synaptic_block_offset,
-                    synaptic_block_size), dtype="uint8").view("uint32")
+                if using_extra_monitor_cores:
+                    # read in the synaptic row data
+                    single_block = numpy.asarray(data_receiver.get_data(
+                        transceiver, sender_extra_monitor_core_placement,
+                        direct_synapses_address + synaptic_block_offset,
+                        synaptic_block_size), dtype="uint8").view("uint32")
+                else:
+                    single_block = numpy.asarray(transceiver.read_memory(
+                        placement.x, placement.y,
+                        direct_synapses_address + synaptic_block_offset,
+                        synaptic_block_size), dtype="uint8").view("uint32")
 
                 # Convert the block into a set of rows
                 numpy_block = numpy.zeros((n_rows, 4), dtype="uint32")
@@ -896,6 +927,11 @@ class SynapticManager(object):
                 numpy_block[:, 1] = 1
                 block = bytearray(numpy_block.tobytes())
                 max_row_length = 1
+
+            if using_extra_monitor_cores and handle_time_out_configuration:
+                data_receiver.unset_cores_for_data_extraction(
+                    transceiver, extra_monitor_cores_for_router_timeout,
+                    placements)
 
         self._retrieved_blocks[placement, key, index] = (block, max_row_length)
         return block, max_row_length
