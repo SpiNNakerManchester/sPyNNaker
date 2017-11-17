@@ -4,10 +4,13 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_threshold_type import AbstractThresholdType
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 from data_specification.enums import DataType
 
 from enum import Enum
+
+V_THRESH = "v_thresh"
 
 
 class _STATIC_TYPES(Enum):
@@ -33,20 +36,19 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
         AbstractThresholdType.__init__(self)
         AbstractContainsUnits.__init__(self)
 
-        self._units = {'v_thresh': "mV"}
+        self._units = {V_THRESH: "mV"}
 
         self._n_neurons = n_neurons
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, n_neurons)
+        self._data = RangeDictionary(size=n_neurons)
+        self._data[V_THRESH] = v_thresh
 
     @property
     def v_thresh(self):
-        return self._v_thresh
+        return self._data[V_THRESH]
 
     @v_thresh.setter
     def v_thresh(self, v_thresh):
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, self._n_neurons)
+        self._data.set_value(key=V_THRESH, value=v_thresh)
 
     @overrides(AbstractThresholdType.get_n_threshold_parameters)
     def get_n_threshold_parameters(self):
@@ -55,7 +57,7 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._v_thresh, _STATIC_TYPES.V_THRESH.data_type)
+            NeuronParameter(self._data[V_THRESH], _STATIC_TYPES.V_THRESH.data_type)
         ]
 
     @overrides(AbstractThresholdType.get_threshold_parameter_types)
