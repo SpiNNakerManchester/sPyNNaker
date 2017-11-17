@@ -64,14 +64,12 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters):
     iterators = []
     for param in parameters:
         iterators.append(param.iterator_by_slice(
-            vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
+            vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
     while True:  # Keep going until you get a StopIteration
         try:
             for iterator in iterators:
-                print iterator
-                value, datatype = iterator.next()
-                spec.write_value(data=value,
-                                 data_type=datatype)
+                (cmd_word_list, cmd_string) = iterator.next()
+                spec.write_command_to_files(cmd_word_list, cmd_string)
         except StopIteration:
             return
 
