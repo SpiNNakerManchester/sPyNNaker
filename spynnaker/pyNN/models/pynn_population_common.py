@@ -418,3 +418,21 @@ class PyNNPopulationCommon(object):
             return self._vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
+
+    def _roundsize(self, size, label):
+        if isinstance(size, int):
+            return size
+        if label is None:
+            label = "None"
+        # Allow a float which has a near int value
+        temp = int(round(size))
+        if abs(temp - size) < 0.001:
+            logger.warning("Size of the popluation with label {} "
+                           "rounded from {} to {} "
+                           "Please use int values for size"
+                           "".format(label, size, temp))
+            return temp
+        else:
+            raise ConfigurationException(
+                "Size of a population with label {} must be an int,"
+                " received {}".format(label, size))
