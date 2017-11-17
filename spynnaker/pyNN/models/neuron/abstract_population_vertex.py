@@ -771,7 +771,6 @@ class AbstractPopulationVertex(
         else:
             return self._neuron_model.get_global_weight_scale()
 
-
     @property
     def ring_buffer_sigma(self):
         return self._synapse_manager.ring_buffer_sigma
