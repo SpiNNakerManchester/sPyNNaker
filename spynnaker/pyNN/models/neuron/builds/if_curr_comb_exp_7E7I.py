@@ -422,7 +422,8 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
             threshold_type=threshold_type, constraints=constraints, max_feasible_atoms_per_core=IFCurrCombExp7E7I._max_feasible_max_atoms_per_core)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(
+            new_value=IFCurrCombExp7E7I._max_feasible_max_atoms_per_core):
         IFCurrCombExp7E7I._model_based_max_atoms_per_core = new_value
         print "Adjusting neurons per core to: {}".format(new_value)
 
