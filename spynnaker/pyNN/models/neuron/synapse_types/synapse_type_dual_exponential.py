@@ -12,7 +12,7 @@ from enum import Enum
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
-TAU_SYN_I = 'tau_syn_I',
+TAU_SYN_I = 'tau_syn_I'
 GSYN_EXC = 'gsyn_exc'
 GSYN_INH = 'gsyn_inh'
 INITIAL_INPUT_EXC = "initial_input_exc"
@@ -156,7 +156,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
                 self._data[INITIAL_INPUT_EXC2],
                 _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
             NeuronParameter(
-                self._datat[INITIAL_INPUT_INH],
+                self._data[INITIAL_INPUT_INH],
                 _DUAL_EXP_TYPES.INITIAL_INH.data_type)
         ]
 
