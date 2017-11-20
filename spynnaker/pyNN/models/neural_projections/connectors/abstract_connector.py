@@ -113,7 +113,9 @@ class AbstractConnector(object):
             high = utility_calls.high(delays)
             if high is None:
                 return max_estimated_delay
-            return max(max_estimated_delay, high)
+
+            # The maximum is the minimum of the possible maximums
+            return min(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -328,7 +330,8 @@ class AbstractConnector(object):
             values, n_connections, connection_slices)
         if self._safe:
             if len(weights) == 0:
-                logger.warning("No connection in " + str(self))
+                pass
+                # logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"

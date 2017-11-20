@@ -30,7 +30,7 @@ from spinn_front_end_common.abstract_models \
 from spinn_front_end_common.abstract_models.impl\
     import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -110,7 +110,7 @@ class SpikeSourcePoisson(
     # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
     # in terms of CPU (2900 at 10 times slow down is fine, but not at
     # real-time)
-    DEFAULT_MAX_ATOMS_PER_CORE = 500
+    DEFAULT_MAX_ATOMS_PER_CORE = 32
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     # A count of the number of poisson vertices, to work out the random
@@ -717,7 +717,7 @@ class SpikeSourcePoisson(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

@@ -1,18 +1,18 @@
 from spynnaker.pyNN.models.neuron.neuron_models\
     .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_7E7I\
-    import SynapseTypeCombExp7E7I
-from spynnaker.pyNN.models.neuron.input_types.input_type_current_pfc \
-    import InputTypeCurrentPfc
+from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_4E4I\
+    import SynapseTypeCombExp4E4I
+from spynnaker.pyNN.models.neuron.input_types.input_type_current \
+    import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 import numpy
 
-class IFCurrCombExp7E7I(AbstractPopulationVertex):
-    """ Leaky integrate and fire neuron with 7 excitatory and 7 inhibitory\
+class IFCurrCombExp4E4I(AbstractPopulationVertex):
+    """ Leaky integrate and fire neuron with 2 excitatory and 2 inhibitory\
         synapses, each comprised of a combination of exponential functions:\
         synaptic response = Ae^(-t/tau_a) + Be^(-t/tau_b)
     """
@@ -23,17 +23,17 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
     baseline_defaults = {
         'x_a_response': 0,
         'x_a_A': 1,
-        'x_a_tau': 5,
+        'x_a_tau': 1,
         'x_b_response': 0,
         'x_b_B': -1,
-        'x_b_tau': 1,
+        'x_b_tau': 0.1,
 
         'i_a_response': 0,
         'i_a_A': 1,
-        'i_a_tau': 5,
+        'i_a_tau': 1,
         'i_b_response': 0,
         'i_b_B': -1,
-        'i_b_tau': 1
+        'i_b_tau': 0.1
         }
 
 
@@ -77,30 +77,6 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
         'exc4_b_B':baseline_defaults['x_b_B'],
         'exc4_b_tau':baseline_defaults['x_b_tau'],
 
-        # excitatory5
-        'exc5_a_response':baseline_defaults['x_a_response'],
-        'exc5_a_A':baseline_defaults['x_a_A'],
-        'exc5_a_tau':baseline_defaults['x_a_tau'],
-        'exc5_b_response':baseline_defaults['x_b_response'],
-        'exc5_b_B':baseline_defaults['x_b_B'],
-        'exc5_b_tau':baseline_defaults['x_b_tau'],
-
-        # excitatory6
-        'exc6_a_response':baseline_defaults['x_a_response'],
-        'exc6_a_A':baseline_defaults['x_a_A'],
-        'exc6_a_tau':baseline_defaults['x_a_tau'],
-        'exc6_b_response':baseline_defaults['x_b_response'],
-        'exc6_b_B':baseline_defaults['x_b_B'],
-        'exc6_b_tau':baseline_defaults['x_b_tau'],
-
-        # excitatory7
-        'exc7_a_response':baseline_defaults['x_a_response'],
-        'exc7_a_A':baseline_defaults['x_a_A'],
-        'exc7_a_tau':baseline_defaults['x_a_tau'],
-        'exc7_b_response':baseline_defaults['x_b_response'],
-        'exc7_b_B':baseline_defaults['x_b_B'],
-        'exc7_b_tau':baseline_defaults['x_b_tau'],
-
         # inhibitory
         'inh_a_response':baseline_defaults['i_a_response'],
         'inh_a_A':baseline_defaults['i_a_A'],
@@ -132,31 +108,6 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
         'inh4_b_response':baseline_defaults['i_b_response'],
         'inh4_b_B':baseline_defaults['i_b_B'],
         'inh4_b_tau':baseline_defaults['i_b_tau'],
-
-        # inhibitory5
-        'inh5_a_response':baseline_defaults['i_a_response'],
-        'inh5_a_A':baseline_defaults['i_a_A'],
-        'inh5_a_tau':baseline_defaults['i_a_tau'],
-        'inh5_b_response':baseline_defaults['i_b_response'],
-        'inh5_b_B':baseline_defaults['i_b_B'],
-        'inh5_b_tau':baseline_defaults['i_b_tau'],
-
-        # inhibitory6
-        'inh6_a_response':baseline_defaults['i_a_response'],
-        'inh6_a_A':baseline_defaults['i_a_A'],
-        'inh6_a_tau':baseline_defaults['i_a_tau'],
-        'inh6_b_response':baseline_defaults['i_b_response'],
-        'inh6_b_B':baseline_defaults['i_b_B'],
-        'inh6_b_tau':baseline_defaults['i_b_tau'],
-
-        # inhibitory7
-        'inh7_a_response':baseline_defaults['i_a_response'],
-        'inh7_a_A':baseline_defaults['i_a_A'],
-        'inh7_a_tau':baseline_defaults['i_a_tau'],
-        'inh7_b_response':baseline_defaults['i_b_response'],
-        'inh7_b_B':baseline_defaults['i_b_B'],
-        'inh7_b_tau':baseline_defaults['i_b_tau'],
-
 
 
         ##############################
@@ -204,30 +155,6 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
             exc4_b_B=default_parameters['exc4_b_B'],
             exc4_b_tau=default_parameters['exc4_b_tau'],
 
-            # excitatory5
-            exc5_a_response=default_parameters['exc5_a_response'],
-            exc5_a_A=default_parameters['exc5_a_A'],
-            exc5_a_tau=default_parameters['exc5_a_tau'],
-            exc5_b_response=default_parameters['exc5_b_response'],
-            exc5_b_B=default_parameters['exc5_b_B'],
-            exc5_b_tau=default_parameters['exc5_b_tau'],
-
-            # excitatory6
-            exc6_a_response=default_parameters['exc6_a_response'],
-            exc6_a_A=default_parameters['exc6_a_A'],
-            exc6_a_tau=default_parameters['exc6_a_tau'],
-            exc6_b_response=default_parameters['exc6_b_response'],
-            exc6_b_B=default_parameters['exc6_b_B'],
-            exc6_b_tau=default_parameters['exc6_b_tau'],
-
-            # excitatory7
-            exc7_a_response=default_parameters['exc7_a_response'],
-            exc7_a_A=default_parameters['exc7_a_A'],
-            exc7_a_tau=default_parameters['exc7_a_tau'],
-            exc7_b_response=default_parameters['exc7_b_response'],
-            exc7_b_B=default_parameters['exc7_b_B'],
-            exc7_b_tau=default_parameters['exc7_b_tau'],
-
             # inhibitory
             inh_a_response=default_parameters['inh_a_response'],
             inh_a_A=default_parameters['inh_a_A'],
@@ -260,30 +187,6 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
             inh4_b_B=default_parameters['inh4_b_B'],
             inh4_b_tau=default_parameters['inh4_b_tau'],
 
-            # inhibitory5
-            inh5_a_response=default_parameters['inh5_a_response'],
-            inh5_a_A=default_parameters['inh5_a_A'],
-            inh5_a_tau=default_parameters['inh5_a_tau'],
-            inh5_b_response=default_parameters['inh5_b_response'],
-            inh5_b_B=default_parameters['inh5_b_B'],
-            inh5_b_tau=default_parameters['inh5_b_tau'],
-
-            # inhibitory6
-            inh6_a_response=default_parameters['inh6_a_response'],
-            inh6_a_A=default_parameters['inh6_a_A'],
-            inh6_a_tau=default_parameters['inh6_a_tau'],
-            inh6_b_response=default_parameters['inh6_b_response'],
-            inh6_b_B=default_parameters['inh6_b_B'],
-            inh6_b_tau=default_parameters['inh6_b_tau'],
-
-            # inhibitory7
-            inh7_a_response=default_parameters['inh7_a_response'],
-            inh7_a_A=default_parameters['inh7_a_A'],
-            inh7_a_tau=default_parameters['inh7_a_tau'],
-            inh7_b_response=default_parameters['inh7_b_response'],
-            inh7_b_B=default_parameters['inh7_b_B'],
-            inh7_b_tau=default_parameters['inh7_b_tau'],
-
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'], v_init=None):
 
@@ -293,7 +196,7 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
 
-        synapse_type = SynapseTypeCombExp7E7I(
+        synapse_type = SynapseTypeCombExp4E4I(
                 n_neurons,
 
                 # excitatory
@@ -328,30 +231,6 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
                 exc4_b_B,
                 exc4_b_tau,
 
-                # excitatory5
-                exc5_a_response,
-                exc5_a_A,
-                exc5_a_tau,
-                exc5_b_response,
-                exc5_b_B,
-                exc5_b_tau,
-
-                # excitatory6
-                exc6_a_response,
-                exc6_a_A,
-                exc6_a_tau,
-                exc6_b_response,
-                exc6_b_B,
-                exc6_b_tau,
-
-                # excitatory7
-                exc7_a_response,
-                exc7_a_A,
-                exc7_a_tau,
-                exc7_b_response,
-                exc7_b_B,
-                exc7_b_tau,
-
                 # inhibitory
                 inh_a_response,
                 inh_a_A,
@@ -382,52 +261,29 @@ class IFCurrCombExp7E7I(AbstractPopulationVertex):
                 inh4_a_tau,
                 inh4_b_response,
                 inh4_b_B,
-                inh4_b_tau,
+                inh4_b_tau)
 
-                # inhibitory5
-                inh5_a_response,
-                inh5_a_A,
-                inh5_a_tau,
-                inh5_b_response,
-                inh5_b_B,
-                inh5_b_tau,
 
-                # inhibitory5
-                inh6_a_response,
-                inh6_a_A,
-                inh6_a_tau,
-                inh6_b_response,
-                inh6_b_B,
-                inh6_b_tau,
-
-                # inhibitory5
-                inh7_a_response,
-                inh7_a_A,
-                inh7_a_tau,
-                inh7_b_response,
-                inh7_b_B,
-                inh7_b_tau)
-
-        input_type = InputTypeCurrentPfc()
+        input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
         AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_comb_exp_7E7I.aplx", label=label,
-            max_atoms_per_core=IFCurrCombExp7E7I._model_based_max_atoms_per_core,
+            self, n_neurons=n_neurons, binary="IF_curr_comb_exp_4E4I.aplx", label=label,
+            max_atoms_per_core=IFCurrCombExp4E4I._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="IF_curr_comb_exp_7E7I", neuron_model=neuron_model,
+            model_name="IF_curr_comb_exp_4E4I", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints, max_feasible_atoms_per_core=IFCurrCombExp7E7I._max_feasible_max_atoms_per_core)
+            threshold_type=threshold_type, constraints=constraints, max_feasible_atoms_per_core=IFCurrCombExp4E4I._max_feasible_max_atoms_per_core)
 
     @staticmethod
     def set_model_max_atoms_per_core(
-            new_value=IFCurrCombExp7E7I._max_feasible_max_atoms_per_core):
-        IFCurrCombExp7E7I._model_based_max_atoms_per_core = new_value
+            new_value=IFCurrCombExp4E4I._max_feasible_max_atoms_per_core):
+        IFCurrCombExp4E4I._model_based_max_atoms_per_core = new_value
         print "Adjusting neurons per core to: {}".format(new_value)
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrCombExp7E7I._model_based_max_atoms_per_core
+        return IFCurrCombExp4E4I._model_based_max_atoms_per_core
 

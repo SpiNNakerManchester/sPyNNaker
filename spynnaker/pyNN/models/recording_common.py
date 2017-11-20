@@ -36,8 +36,10 @@ class RecordingCommon(object):
             'gsyn_inh': None,
             'v': None}
 
-        # Create default dictionary of population-size filters
-        self._indices_to_record = self._create_full_filter_list(0)
+        # Create a dict of variable name -> bool array of indices in population
+        # that are recorded (initially all False)
+        self._indices_to_record = defaultdict(
+            lambda: numpy.repeat(False, population.size))
 
     def _record(self, variable, new_ids, sampling_interval, to_file):
         """ tells the vertex to record data
@@ -210,12 +212,6 @@ class RecordingCommon(object):
         return self._population._vertex.get_spikes(
             sim.placements, sim.graph_mapper, sim.buffer_manager,
             sim.machine_time_step)
-
-    def _create_full_filter_list(self, filter_value):
-        # Create default dictionary of population-size boolean arrays
-        return defaultdict(
-            lambda: numpy.repeat(filter_value, self._population.size).astype(
-                "bool"))
 
     def _turn_off_all_recording(self):
         """

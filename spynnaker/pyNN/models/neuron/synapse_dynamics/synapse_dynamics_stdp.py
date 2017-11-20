@@ -156,8 +156,9 @@ class SynapseDynamicsSTDP(
 
     def get_n_words_for_plastic_connections(self, n_connections):
         synapse_structure = self._timing_dependence.synaptic_structure
-        fp_size_words = \
-            n_connections if n_connections % 2 == 0 else n_connections + 1
+        fp_size_words = (
+            n_connections / 2 if n_connections % 2 == 0
+            else (n_connections + 1) / 2)
         pp_size_bytes = (
             self._n_header_bytes +
             (synapse_structure.get_n_bytes_per_connection() * n_connections))
@@ -292,3 +293,27 @@ class SynapseDynamicsSTDP(
         if self._weight_dependence is not None:
             names.extend(self._weight_dependence.get_parameter_names())
         return names
+
+    @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
+    def get_max_synapses(self, n_words):
+
+        # Subtract the header size that will always exist
+        n_header_words = self._n_header_bytes / 4
+        n_words_space = n_words - n_header_words
+
+        # Get plastic plastic size per connection
+        synapse_structure = self._timing_dependence.synaptic_structure
+        bytes_per_pp = synapse_structure.get_n_bytes_per_connection()
+
+        # The fixed plastic size per connection is 2 bytes
+        bytes_per_fp = 2
+
+        # Maximum possible connections, ignoring word alignment
+        n_connections = (n_words_space * 4) / (bytes_per_pp + bytes_per_fp)
+
+        # Reduce until correct
+        while (self.get_n_words_for_plastic_connections(n_connections) >
+               n_words):
+            n_connections -= 1
+
+        return n_connections
