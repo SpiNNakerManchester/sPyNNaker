@@ -40,7 +40,7 @@ void set_dma_busy(bool busy);
 
 bool get_dma_busy();
 
-bool do_rewiring();
+bool do_rewiring(int number_of_rew);
 
 void _setup_synaptic_dma_read();
 

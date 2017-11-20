@@ -268,12 +268,15 @@ void timer_callback(uint timer_count, uint unused) {
 
     uint cpsr = 0;
     // Do rewiring
-    if (rewiring && last_rewiring_time >= rewiring_period)
+    if (rewiring && ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast()))
     {
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
 //        synaptogenesis_dynamics_rewire(time);
-        do_rewiring();
+        if (is_fast())
+            do_rewiring(rewiring_period);
+        else
+            do_rewiring(1);
         // disable interrupts
         cpsr = spin1_int_disable();
 //       // If we're not already processing synaptic DMAs,

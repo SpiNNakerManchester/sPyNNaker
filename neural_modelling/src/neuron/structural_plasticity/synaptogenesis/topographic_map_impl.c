@@ -443,16 +443,13 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    log_info("g_pre_id %d g_post_id %d g_distance_sq %d %d",
+    log_debug("g_pre_id %d g_post_id %d g_distance_sq %d %d",
         pre_global_id, post_global_id, current_state.distance,
         current_state.current_controls
         );
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
     log_debug("post_x %d post_y %d", post_x, post_y);
 
-    // IN spike processing mark this as something to be done
-
-    // DO DMA READ CALLS THIS AS A FUNCTION {
     while(0==spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
             n_bytes)) {
@@ -460,22 +457,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     }
     rewiring_dma_buffer.n_bytes_transferred = n_bytes;
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
-    // }
-
-// disable interrupts
-//       // If we're not already processing synaptic DMAs,
-//        // flag pipeline as busy and trigger a feed event
-//        if (!dma_busy) {
-//
-//            log_debug("Sending user event for new spike");
-//            if (spin1_trigger_user_event(0, 0)) {
-//                dma_busy = true;
-//            } else {
-//                log_debug("Could not trigger user event\n");
-//            }
-//        }
-// enable interrupts
-
 }
 
 
@@ -494,7 +475,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
 
-    /*ad*/log_info("sr_attempt %d %d exists %d",
+    /*ad*/log_debug("sr_attempt %d %d exists %d",
         current_state.current_time,
         current_state.current_controls,
         current_state.element_exists);
@@ -525,7 +506,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 ////        log_debug("%d",current_state.post_syn_id);
 //        log_debug("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
 //
-        rt_error(RTE_SWERR);
+//        rt_error(RTE_SWERR);
     }
     else {
         synaptogenesis_dynamics_formation_rule();
@@ -544,7 +525,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 bool synaptogenesis_dynamics_elimination_rule(){
     // Is synaptic weight <.5 g_max?
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
-    log_info("elim_prob r %u ctrl %d", r, current_state.current_controls);
+    log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
     if( current_state.sp_data.weight < appr_scaled_weight / 2 && r > rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
