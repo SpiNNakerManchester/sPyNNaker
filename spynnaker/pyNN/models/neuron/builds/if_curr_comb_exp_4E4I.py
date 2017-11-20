@@ -11,14 +11,17 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 import numpy
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 32
+
 class IFCurrCombExp4E4I(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with 2 excitatory and 2 inhibitory\
         synapses, each comprised of a combination of exponential functions:\
         synaptic response = Ae^(-t/tau_a) + Be^(-t/tau_b)
     """
 
-    _max_feasible_max_atoms_per_core = 32
-    _model_based_max_atoms_per_core = _max_feasible_max_atoms_per_core
+    _max_feasible_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     baseline_defaults = {
         'x_a_response': 0,
