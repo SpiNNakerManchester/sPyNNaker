@@ -93,27 +93,27 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     @property
     def isyn_exc(self):
-        return self._initial_input_exc
+        return self._data[INITIAL_INPUT_EXC]
 
     @isyn_exc.setter
     def isyn_exc(self, new_value):
-        self._initial_input_exc.set_value(new_value)
+        self._data.set_value(key=INITIAL_INPUT_EXC, value=new_value)
 
     @property
     def isyn_inh(self):
-        return self._initial_input_inh
+        return self._data[INITIAL_INPUT_INH]
 
     @isyn_inh.setter
     def isyn_inh(self, new_value):
-        self._initial_input_inh.set_value(new_value)
+        self._data.set_value(key=INITIAL_INPUT_INH, value=new_value)
 
     @property
     def isyn_exc2(self):
-        return self._initial_input_exc2
+        return self._data[INITIAL_INPUT_EXC2]
 
     @isyn_exc2.setter
     def isyn_exc2(self, new_value):
-        self._initial_input_exc2.set_value(new_value)
+        self._data.set_value(key=INITIAL_INPUT_EXC2, value=new_value)
 
     def get_n_synapse_types(self):
         return 3
