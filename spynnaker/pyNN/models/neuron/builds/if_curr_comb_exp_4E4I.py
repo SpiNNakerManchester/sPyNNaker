@@ -282,7 +282,7 @@ class IFCurrCombExp4E4I(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(
-            new_value=IFCurrCombExp4E4I._max_feasible_max_atoms_per_core):
+            new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IFCurrCombExp4E4I._model_based_max_atoms_per_core = new_value
         print "Adjusting neurons per core to: {}".format(new_value)
 
