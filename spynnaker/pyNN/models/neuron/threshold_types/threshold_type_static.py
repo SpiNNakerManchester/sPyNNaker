@@ -1,7 +1,6 @@
 from pacman.model.decorators import overrides
 
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_threshold_type import AbstractThresholdType
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
