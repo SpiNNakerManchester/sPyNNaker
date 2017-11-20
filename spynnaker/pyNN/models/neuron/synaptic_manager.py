@@ -842,8 +842,8 @@ class SynapticManager(object):
                 indirect_synapses_address, direct_synapses_address,
                 delayed_key,
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
-                synapse_info.index, placements, data_receiver,
-                sender_extra_monitor_core_placement,
+                synapse_info.index, using_extra_monitor_cores, placements,
+                data_receiver, sender_extra_monitor_core_placement,
                 extra_monitor_cores_for_router_timeout,
                 handle_time_out_configuration)
 
