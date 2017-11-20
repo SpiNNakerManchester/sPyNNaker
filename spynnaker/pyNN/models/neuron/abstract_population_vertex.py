@@ -784,8 +784,7 @@ class AbstractPopulationVertex(
             handle_time_out_configuration=True):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step, self._max_feasible_atoms_per_core,
-            routing_infos, synapse_information, machine_time_step,
+            routing_infos, synapse_information, machine_time_step, self._max_feasible_atoms_per_core,
             using_extra_monitor_cores, placements, data_receiver,
             sender_extra_monitor_core_placement,
             extra_monitor_cores_for_router_timeout,
