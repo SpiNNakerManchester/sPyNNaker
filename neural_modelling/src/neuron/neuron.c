@@ -318,7 +318,7 @@ void neuron_store_neuron_parameters(address_t address){
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
-    log_info("writing threshold type parameters");
+    //log_info("writing threshold type parameters");
     memcpy(&address[next], threshold_type_array,
            n_neurons * sizeof(threshold_type_t));
 }

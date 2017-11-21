@@ -257,6 +257,8 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
+    log_info("time: %d ", time);
+
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = _plastic_synapses(
@@ -338,6 +340,8 @@ bool synapse_dynamics_process_plastic_synapses(
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
             final_state);
     }
+    log_info("time: %d ", time);
+
     return true;
 }
 
