@@ -44,4 +44,6 @@ bool do_rewiring(int number_of_rew);
 
 void _setup_synaptic_dma_read();
 
+bool received_any_spike();
+
 #endif // _SPIKE_PROCESSING_H_

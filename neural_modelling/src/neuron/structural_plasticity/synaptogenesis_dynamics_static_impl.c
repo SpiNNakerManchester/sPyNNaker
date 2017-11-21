@@ -34,3 +34,7 @@ int32_t get_p_rew() {
 bool is_fast() {
     return false;
 }
+
+void update_goal_posts(uint32_t time) {
+    use(time);
+}

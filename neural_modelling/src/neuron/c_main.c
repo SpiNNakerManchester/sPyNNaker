@@ -234,6 +234,10 @@ void timer_callback(uint timer_count, uint unused) {
     time++;
     last_rewiring_time++;
 
+    // This is the part where I save the input and output indices
+    //   from the circular buffer
+    // If time == 0 as well as output == input == 0  then no rewire is
+    //   supposed to happen. No spikes yet
     log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
@@ -270,6 +274,7 @@ void timer_callback(uint timer_count, uint unused) {
     // Do rewiring
     if (rewiring && ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast()))
     {
+        update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
 //        synaptogenesis_dynamics_rewire(time);

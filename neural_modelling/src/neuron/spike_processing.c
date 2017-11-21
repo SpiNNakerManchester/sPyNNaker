@@ -38,6 +38,7 @@ static uint32_t single_fixed_synapse[4];
 //spike_t last_spike;
 //uint32_t buffer_real_size;
 uint32_t number_of_rewires=0;
+bool any_spike = false;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -170,6 +171,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
 
+    any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
@@ -327,4 +329,8 @@ bool get_dma_busy() {
 bool do_rewiring(int number_of_rew) {
     number_of_rewires+=number_of_rew;
     return true;
+}
+
+bool received_any_spike() {
+    return any_spike;
 }

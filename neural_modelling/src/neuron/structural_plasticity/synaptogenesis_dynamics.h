@@ -19,6 +19,7 @@ int32_t get_p_rew();
 
 bool is_fast();
 
+void update_goal_posts(uint32_t time);
 
 //bool record_this_timestep = false;
 //int recording_channel;

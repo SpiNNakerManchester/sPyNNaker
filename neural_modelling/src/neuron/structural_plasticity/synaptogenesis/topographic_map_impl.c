@@ -85,11 +85,12 @@ typedef struct {
     uint32_t global_pre_syn_id, global_post_syn_id;
     bool element_exists;
     uint32_t offset_in_table, pop_index, subpop_index, neuron_index;
+    // circular buffer indices
+    uint32_t my_cb_input, my_cb_output, no_spike_in_interval, cb_total_size;
+    circular_buffer cb;
 } current_state_t;
 
 current_state_t current_state;
-
-uint32_t my_input;
 
 
 static int my_abs(int a){
@@ -273,22 +274,29 @@ address_t synaptogenesis_dynamics_initialise(
     return (address_t)sp_word;
 }
 
+void update_goal_posts(uint32_t time) {
+    use(time);
+    if (!received_any_spike()){
+        return;
+    }
+    current_state.cb = get_circular_buffer();
+    current_state.cb_total_size = circular_buffer_real_size(current_state.cb);
 
+    current_state.my_cb_output = current_state.my_cb_input;
+    current_state.my_cb_input = (circular_buffer_input(current_state.cb)-1)&current_state.cb_total_size;
+
+     current_state.no_spike_in_interval = (current_state.my_cb_input >= current_state.my_cb_output?
+        current_state.my_cb_input - current_state.my_cb_output:
+        (current_state.my_cb_input + current_state.cb_total_size + 1) - current_state.my_cb_output);
+}
 
 static inline spike_t select_last_spike () {
-    circular_buffer cb = get_circular_buffer();
-    uint32_t cb_size = circular_buffer_real_size(cb);
-    uint32_t cb_input = (circular_buffer_input(cb)-1)&cb_size;
-    uint32_t cb_my_tail = my_input;
-    my_input = cb_input;
-    uint32_t size = cb_input >= cb_my_tail?
-        cb_input - cb_my_tail:
-        (cb_input + cb_size + 1) - cb_my_tail;
-    if (size == 0)
+    if (current_state.no_spike_in_interval == 0)
         return -1;
-    uint32_t offset=ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * size;
-    log_debug("%d %d %d", cb_my_tail, cb_input, my_input);
-    return circular_buffer_value_at_index(cb, (cb_my_tail + offset)&cb_size);
+    uint32_t offset=ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * current_state.no_spike_in_interval;
+    return circular_buffer_value_at_index(
+        current_state.cb,
+        (current_state.my_cb_output + offset) & current_state.cb_total_size);
 }
 
 
@@ -304,8 +312,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom || post_id > rewiring_data.high_atom) {
         log_debug("\t| NOTME %d @ %d", post_id, time);
-        circular_buffer cb = get_circular_buffer();
-        my_input = (circular_buffer_input(cb)-1) & circular_buffer_real_size(cb);
         _setup_synaptic_dma_read();
         return;
     }
@@ -329,7 +335,9 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     spike_t _spike=-1;
     if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
-        _spike = select_last_spike();
+        if (received_any_spike()){
+            _spike = select_last_spike();
+        }
         //    log_debug("spike key %d", _spike);
         if (_spike==-1) {
             log_debug("No previous spikes");
@@ -443,7 +451,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    log_debug("g_pre_id %d g_post_id %d g_distance_sq %d %d",
+    /*ad*/log_info("g_pre_id %d g_post_id %d g_distance_sq %d %d",
         pre_global_id, post_global_id, current_state.distance,
         current_state.current_controls
         );
@@ -470,7 +478,6 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
 
     use(dma_id);
     use(dma_tag);
-//    uint number_of_connections = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
 
     log_debug("rew current_weight %d", current_state.sp_data.weight);
     log_debug("sanity check delay %d", current_state.sp_data.delay);
@@ -491,21 +498,6 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag){
     else if (current_state.element_exists && (!search_hit)) {
         log_error("FAIL Search");
         rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
-//        log_error("o %d v %d a %x row_address %x syn_row_add %x",
-//        current_state.offset_in_table,
-//        rewiring_data.post_to_pre_table[current_state.offset_in_table],
-//        rewiring_data.post_to_pre_table,
-//        rewiring_dma_buffer.row,
-//        rewiring_dma_buffer.sdram_writeback_address
-//        );
-//
-//        for (int shite=0; shite < rewiring_dma_buffer.n_bytes_transferred/4; shite++) {
-//            log_debug("%x", rewiring_dma_buffer.row[shite]);
-//        }
-////
-////        log_debug("%d",current_state.post_syn_id);
-//        log_debug("delete %d-%d rec %d", current_state.global_pre_syn_id, current_state.global_post_syn_id, current_state.current_controls);
-//
 //        rt_error(RTE_SWERR);
     }
     else {
