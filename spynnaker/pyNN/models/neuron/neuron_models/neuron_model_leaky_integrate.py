@@ -1,16 +1,16 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits, \
+    AbstractRangedData
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
 
 from data_specification.enums import DataType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 import numpy
 from enum import Enum
 
-V_INIT = "v_init"
+V = 'v'  # Constant value as specified by PyNN
 V_REST = "v_rest"
 TAU_M = "tau_m"
 CM = "cm"
@@ -37,40 +37,37 @@ class _IF_TYPES(Enum):
         return self._data_type
 
 
-class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
+class NeuronModelLeakyIntegrate(
+    AbstractNeuronModel, AbstractContainsUnits, AbstractRangedData):
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
+        AbstractRangedData.__init__(self, n_neurons)
 
         self._units = {
-            V_INIT: 'mV',
+            V: 'mV',
             V_REST: 'mV',
             TAU_M: 'ms',
             CM: 'nF',
             I_OFFSET: 'nA'}
 
-        self._n_neurons = n_neurons
         if v_init is None:
             v_init = v_rest
-        self._data = RangeDictionary(size=n_neurons)
-        self._data[V_INIT] = v_init
+        self._data[V] = v_init
         self._data[V_REST] = v_rest
         self._data[TAU_M] = tau_m
         self._data[CM] = cm
         self._data[I_OFFSET] = i_offset
         self._data["r_membrane"] = self._data[TAU_M] / self._data[CM]
 
-    def initialize_v(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
-
     @property
     def v_init(self):
-        return self._data[V_INIT]
+        return self._data[V]
 
     @v_init.setter
     def v_init(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
+        self._data.set_value(key=V, value=v_init)
 
     @property
     def v_rest(self):
@@ -125,7 +122,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._data[V_INIT], _IF_TYPES.V_INIT.data_type),
+            NeuronParameter(self._data[V], _IF_TYPES.V_INIT.data_type),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
@@ -168,7 +165,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[0]
+        self._data[V][vertex_slice.as_slice] = neural_parameters[0]
 
     def get_n_cpu_cycles_per_neuron(self):
 

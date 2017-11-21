@@ -91,6 +91,8 @@ class NeuronParameter(object):
             raise exceptions.DataSpecificationUnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
         self._data_type = data_type
+        if not isinstance(self._value, AbstractList):
+            raise Exception("pop {}".format(type(self._value)))
 
     def get_value(self):
         return self._value

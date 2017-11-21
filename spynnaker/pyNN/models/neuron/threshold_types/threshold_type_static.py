@@ -1,9 +1,9 @@
 from pacman.model.decorators import overrides
 
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits, \
+    AbstractRangedData
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_threshold_type import AbstractThresholdType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 from data_specification.enums import DataType
 
@@ -26,7 +26,8 @@ class _STATIC_TYPES(Enum):
         return self._data_type
 
 
-class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
+class ThresholdTypeStatic(
+    AbstractThresholdType, AbstractContainsUnits, AbstractRangedData):
 
     """ A threshold that is a static value
     """
@@ -34,11 +35,10 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
     def __init__(self, n_neurons, v_thresh):
         AbstractThresholdType.__init__(self)
         AbstractContainsUnits.__init__(self)
+        AbstractRangedData.__init__(self, n_neurons)
 
         self._units = {V_THRESH: "mV"}
 
-        self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
         self._data[V_THRESH] = v_thresh
 
     @property

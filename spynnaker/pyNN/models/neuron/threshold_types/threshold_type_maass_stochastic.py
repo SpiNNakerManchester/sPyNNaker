@@ -1,7 +1,7 @@
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
+from spynnaker.pyNN.models.abstract_models import AbstractRangedData
 
 import numpy
 from enum import Enum
@@ -29,15 +29,14 @@ class _MAASS_TYPES(Enum):
         return self._data_type
 
 
-class ThresholdTypeMaassStochastic(AbstractThresholdType):
+class ThresholdTypeMaassStochastic(AbstractThresholdType, AbstractRangedData):
     """ A stochastic threshold
     """
 
     def __init__(self, n_neurons, du_th, tau_th, v_thresh):
         AbstractThresholdType.__init__(self)
-        self._n_neurons = n_neurons
+        AbstractRangedData.__init__(self, n_neurons)
 
-        self._data = RangeDictionary(size=n_neurons)
         self._data[DU_TH] = du_th
         self._data[DU_TH_INV] = self._data[DU_TH].apply_operation(
             lambda x: 1.0 / x)

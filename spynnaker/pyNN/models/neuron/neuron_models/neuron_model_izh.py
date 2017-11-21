@@ -1,9 +1,9 @@
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits, \
+    AbstractRangedData
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_neuron_model import AbstractNeuronModel
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 from enum import Enum
@@ -12,8 +12,8 @@ A = 'a'
 B = 'b'
 C = 'c'
 D = 'd'
-V_INIT = 'v_init'
-U_INIT = 'u_init'
+V = 'v'  # Constant value as specified by PyNN
+U = 'u'  # Constant value as specified by PyNN
 I_OFFSET = 'i_offset'
 
 
@@ -52,29 +52,28 @@ class _IZH_GLOBAL_TYPES(Enum):
         return self._data_type
 
 
-class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
+class NeuronModelIzh(
+    AbstractNeuronModel, AbstractContainsUnits, AbstractRangedData):
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
-
+        AbstractRangedData.init(self, n_neurons)
         self._units = {
             A: "ms",
             B: "ms",
             C: "mV",
             D: "mV/ms",
-            V_INIT: "mV",
-            U_INIT: "mV/ms",
+            V: "mV",
+            U: "mV/ms",
             I_OFFSET: "nA"}
 
-        self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
         self._data[A] = a
         self._data[B] = b
         self._data[C] = c
         self._data[D] = d
-        self._data[V_INIT] = v_init
-        self._data[U_INIT] = u_init
+        self._data[V] = v_init
+        self._data[U] = u_init
         self._data[I_OFFSET] = i_offset
 
     @property
@@ -119,25 +118,19 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @property
     def v_init(self):
-        return self._data[V_INIT]
+        return self._data[V]
 
     @v_init.setter
     def v_init(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
+        self._data.set_value(key=V, value=v_init)
 
     @property
     def u_init(self):
-        return self._data[U_INIT]
+        return self._data[U]
 
     @u_init.setter
     def u_init(self, u_init):
-        self._data.set_value(key=U_INIT, value=u_init)
-
-    def initialize_v(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
-
-    def initialize_u(self, u_init):
-        self._data.set_value(key=U_INIT, value=u_init)
+        self._data.set_value(key=U, value=u_init)
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -162,10 +155,10 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
             NeuronParameter(self._data[D], _IZH_TYPES.D.data_type),
 
             # REAL V
-            NeuronParameter(self._data[V_INIT], _IZH_TYPES.V_INIT.data_type),
+            NeuronParameter(self._data[V], _IZH_TYPES.V_INIT.data_type),
 
             # REAL U
-            NeuronParameter(self._data[U_INIT], _IZH_TYPES.U_INIT.data_type),
+            NeuronParameter(self._data[U], _IZH_TYPES.U_INIT.data_type),
 
             # offset current [nA]
             # REAL I_offset;
@@ -202,8 +195,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._v_init[vertex_slice.as_slice] = neural_parameters[4]
-        self._u_init[vertex_slice.as_slice] = neural_parameters[5]
+        self._data[V][vertex_slice.as_slice] = neural_parameters[4]
+        self._data[U][vertex_slice.as_slice] = neural_parameters[5]
 
     def get_n_cpu_cycles_per_neuron(self):
 
