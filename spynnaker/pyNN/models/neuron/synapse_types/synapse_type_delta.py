@@ -1,19 +1,19 @@
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.models.abstract_models import AbstractRangedData
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 INITIAL_INPUT_EXC = "initial_input_exc"
 INITIAL_INPUT_INH = "initial_input_inh"
 
 
-class SynapseTypeDelta(AbstractSynapseType, AbstractRangedData):
+class SynapseTypeDelta(AbstractSynapseType):
     """ This represents a synapse type with two delta synapses
     """
 
     def __init__(self, n_neurons, initial_input_exc, initial_input_inh):
         AbstractSynapseType.__init__(self)
-        AbstractRangedData.__init__(self, n_neurons)
+        self._data = RangeDictionary(size=n_neurons)
         self._data[INITIAL_INPUT_EXC] = initial_input_exc
         self._data[INITIAL_INPUT_INH] = initial_input_inh
 

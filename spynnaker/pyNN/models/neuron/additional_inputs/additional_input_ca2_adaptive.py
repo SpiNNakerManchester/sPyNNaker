@@ -1,6 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.models.abstract_models import AbstractRangedData
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AbstractAdditionalInput
@@ -29,11 +29,13 @@ class _CA2_TYPES(Enum):
         return self._data_type
 
 
-class AdditionalInputCa2Adaptive(AbstractAdditionalInput, AbstractRangedData):
+class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     def __init__(self, n_neurons, tau_ca2, i_ca2, i_alpha):
         AbstractAdditionalInput.__init__(self)
-        AbstractRangedData.__init__(self, n_neurons)
+
+        self._n_neurons = n_neurons
+        self._data = RangeDictionary(size=n_neurons)
         self._data[TAU_CA2] = tau_ca2
         self._data[I_CA2] = i_ca2
         self._data[I_ALPHA] = i_alpha
@@ -84,8 +86,9 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput, AbstractRangedData):
         return [item.data_type for item in _CA2_TYPES]
 
     def set_parameters(self, parameters, vertex_slice):
+
         # Can ignore anything that isn't a state variable
-        self._data[I_CA2][vertex_slice.slice] = parameters[1]
+        self._i_ca_2[vertex_slice.slice] = parameters[1]
 
     def get_n_cpu_cycles_per_neuron(self):
         return 3

@@ -42,13 +42,11 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses, \
-    AbstractRangedData
+    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.utilities import utility_calls
 
 import logging
 import os
@@ -638,16 +636,12 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
-        if isinstance(self._neuron_model, AbstractRangedData):
-            self._neuron_model.initialize(variable, value)
-        else:
-            initialize_attr = getattr(
-                self._neuron_model, "initialize_%s" % variable, None)
-            if initialize_attr is None or not callable(initialize_attr):
-                raise Exception("Vertex does not support initialisation of"
-                                " parameter {}".format(variable))
-            value_list = utility_calls.convert_param_to_numpy(value, self.n_atoms)
-            initialize_attr(value_list)
+        initialize_attr = getattr(
+            self._neuron_model, "initialize_%s" % variable, None)
+        if initialize_attr is None or not callable(initialize_attr):
+            raise Exception("Vertex does not support initialisation of"
+                            " parameter {}".format(variable))
+        initialize_attr(value)
         self._change_requires_neuron_parameters_reload = True
 
     @property

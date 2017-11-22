@@ -1,9 +1,9 @@
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits, \
-    AbstractRangedData
 from .abstract_synapse_type import AbstractSynapseType
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 import numpy
@@ -55,13 +55,11 @@ def get_exponential_decay_and_init(tau, machine_time_step):
                           (1000.0 / float(machine_time_step)) * pow(2, 32)))
 
 
-class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits,
-                             AbstractRangedData):
+class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
     def __init__(self, n_neurons, tau_syn_E, tau_syn_I,
                  initial_input_exc=0.0, initial_input_inh=0.0):
         AbstractSynapseType.__init__(self)
         AbstractContainsUnits.__init__(self)
-        AbstractRangedData.__init__(self, n_neurons)
 
         self._units = {
             TAU_SYN_E: "mV",
@@ -69,6 +67,8 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits,
             GSYN_EXC: "uS",
             GSYN_INH: "uS"}
 
+        self._n_neurons = n_neurons
+        self._data = RangeDictionary(size=n_neurons)
         self._data[TAU_SYN_E] = tau_syn_E
         self._data[TAU_SYN_I] = tau_syn_I
         self._data[GSYN_EXC] = initial_input_exc

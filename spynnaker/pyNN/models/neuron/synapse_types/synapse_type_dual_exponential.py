@@ -1,11 +1,11 @@
 from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits, \
-    AbstractRangedData
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .abstract_synapse_type import AbstractSynapseType
+from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 from enum import Enum
@@ -43,15 +43,13 @@ class _DUAL_EXP_TYPES(Enum):
         return self._data_type
 
 
-class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits,
-                                 AbstractRangedData):
+class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
 
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
                  tau_syn_I, initial_input_exc, initial_input_exc2,
                  initial_input_inh):
         AbstractSynapseType.__init__(self)
         AbstractContainsUnits.__init__(self)
-        AbstractRangedData.__init__(self, n_neurons)
 
         self._units = {
             TAU_SYN_E: "mV",
@@ -60,6 +58,8 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits,
             GSYN_EXC: "uS",
             GSYN_INH: "uS"}
 
+        self._n_neurons = n_neurons
+        self._data = RangeDictionary(size=n_neurons)
         self._data[TAU_SYN_E] = tau_syn_E
         self._data[TAU_SYN_E2] = tau_syn_E2
         self._data[TAU_SYN_I] = tau_syn_I
