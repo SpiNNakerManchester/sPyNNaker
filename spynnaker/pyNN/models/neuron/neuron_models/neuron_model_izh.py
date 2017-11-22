@@ -132,6 +132,12 @@ class NeuronModelIzh(
     def u_init(self, u_init):
         self._data.set_value(key=U, value=u_init)
 
+    def initialize_v(self, v_init):
+        self._data.set_value(key=V, value=v_init)
+
+    def initialize_u(self, u_init):
+        self._data.set_value(key=U, value=u_init)
+
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return 8
