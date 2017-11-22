@@ -61,9 +61,6 @@ class NeuronModelLeakyIntegrate(
         self._data[I_OFFSET] = i_offset
         self._data["r_membrane"] = self._data[TAU_M] / self._data[CM]
 
-    def initialize_v(self, v_init):
-        self._data.set_value(key=V, value=v_init)
-
     @property
     def v_init(self):
         return self._data[V]

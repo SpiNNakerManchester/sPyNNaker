@@ -638,14 +638,16 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
-        if not isinstance(self._neuron_model, AbstractRangedData):
+        if isinstance(self._neuron_model, AbstractRangedData):
+            self._neuron_model.initialize(variable, value)
+        else:
+            initialize_attr = getattr(
+                self._neuron_model, "initialize_%s" % variable, None)
+            if initialize_attr is None or not callable(initialize_attr):
+                raise Exception("Vertex does not support initialisation of"
+                                " parameter {}".format(variable))
             value_list = utility_calls.convert_param_to_numpy(value, self.n_atoms)
-        initialize_attr = getattr(
-            self._neuron_model, "initialize_%s" % variable, None)
-        if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialisation of"
-                            " parameter {}".format(variable))
-        initialize_attr(value)
+            initialize_attr(value_list)
         self._change_requires_neuron_parameters_reload = True
 
     @property
