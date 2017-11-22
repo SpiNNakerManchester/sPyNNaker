@@ -56,7 +56,8 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._data[V_THRESH], _STATIC_TYPES.V_THRESH.data_type)
+            NeuronParameter(self._data[V_THRESH],
+                            _STATIC_TYPES.V_THRESH.data_type)
         ]
 
     @overrides(AbstractThresholdType.get_threshold_parameter_types)

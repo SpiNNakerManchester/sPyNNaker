@@ -3,7 +3,6 @@ from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
-import numpy
 from enum import Enum
 
 DU_TH = "du_th"
