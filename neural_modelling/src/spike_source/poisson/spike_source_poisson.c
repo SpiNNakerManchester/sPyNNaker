@@ -349,8 +349,8 @@ bool store_poisson_parameters() {
     address_t address = data_specification_get_data_address();
     address = data_specification_get_region(POISSON_PARAMS, address);
 
-    // Copy the current seed
-    parameters.spike_source_seed = spike_source_seed;
+    // Copy the parameters back to SDRAM
+    spin1_memcpy(address, &parameters, sizeof(parameters));
 
     // store array of spike sources into sdram for reading by the host
     if (parameters.n_spike_sources > 0) {
