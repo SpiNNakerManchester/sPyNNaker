@@ -60,5 +60,11 @@ POPULATION_BASED_REGIONS = Enum(
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
 
+# names for recording components
+SPIKES = 'spikes'
+MEMBRANE_POTENTIAL = "v"
+GSYN_EXCIT = "gsyn_exc"
+GSYN_INHIB = "gsyn_inh"
+
 # The partition ID used for control data
 CONTROL_PARTITION_ID = "CONTROL"
