@@ -7,6 +7,7 @@ class _List_Iterator(object):
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
         """
+        Iterator over a RangedList which is list based
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -30,6 +31,7 @@ class _Range_Iterator(object):
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
         """
+        Iterator over a RangedList which is range based
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -61,6 +63,7 @@ class _Get_Iterator(object):
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
         """
+        Iterator over a standard collection that supports __get_item__
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -82,6 +85,36 @@ class _Get_Iterator(object):
         (cmd_word_list, cmd_string) = self._spec.create_cmd(
             data=self._value[self._index], data_type=self._datatype)
         return (cmd_word_list, cmd_string)
+
+
+class _SingleValue_Iterator(object):
+
+    def __init__(self, value, datatype, slice_start, slice_stop, spec):
+        """
+        Iterator that repeats the single values the required number of times
+
+        Allows a single Value parameter to be treated the same as parameters
+        with len
+        Caches cmd_word_list and cmd_string so they are only created once.
+
+        :param value: The list or Abstract list holding the data
+        :param datatype: The type of each element of data
+        :param slice_start: Inclusive start of the range
+        :param slice_stop: Exclusive end of the range
+        :param spec: The data specification to write to
+        :type spec: DataSpecificationGenerator
+        """
+        (self._cmd_word_list, self._cmd_string) = spec.create_cmd(
+            data=value, data_type=datatype)
+        # We want the inner iterator to throw a Stopiteration the first time
+        self._index = slice_start
+        self._stop = slice_stop
+
+    def next(self):
+        self._index += 1
+        if self._index >= self._stop:
+            raise StopIteration
+        return (self._cmd_word_list, self._cmd_string)
 
 
 class NeuronParameter(object):
@@ -116,5 +149,8 @@ class NeuronParameter(object):
                 return _List_Iterator(
                     self._value, self._data_type, slice_start, slice_stop,
                     spec)
-        return _Get_Iterator(
+        if hasattr(self._value, '__getitem__'):
+            return _Get_Iterator(
+                self._value, self._data_type, slice_start, slice_stop, spec)
+        return _SingleValue_Iterator(
             self._value, self._data_type, slice_start, slice_stop, spec)
