@@ -451,8 +451,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    /*ad*/log_info("g_pre_id %d g_post_id %d g_distance_sq %d %d",
-        pre_global_id, post_global_id, current_state.distance,
+    /*ad*/log_info("g_pre_id %d g_post_id %d g_distance_sq %d exists %d %d",
+        pre_global_id, post_global_id, current_state.distance, element_exists,
         current_state.current_controls
         );
     log_debug("pre_x %d pre_y %d", pre_x, pre_y);
