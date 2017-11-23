@@ -121,7 +121,8 @@ static inline update_state_t timing_apply_pre_spike(
 
     log_info("Ca concentration: %12.6k", post_synaptic_additional_input->I_Ca2);
     log_info("Ca alpha: %12.6k", post_synaptic_additional_input->I_alpha);
-    log_info("Ca tau multiplier: %u", post_synaptic_additional_input->exp_TauCa);
+//    log_info("Ca tau multiplier: %u", post_synaptic_additional_input->exp_TauCa);
+    log_info("before drift: %u", w);
 
     if(w>th_w){
     	log_info("drifting up w_drift: %d, dt: %d", w_drift, dt);
@@ -134,6 +135,7 @@ static inline update_state_t timing_apply_pre_spike(
         int32_t min_w = previous_state.weight_region->min_weight;
     	if(w<min_w)w=min_w;
     }
+    log_info("after drift: %u", w);
 
     previous_state.initial_weight = w;
 
