@@ -13,6 +13,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
+import numpy
 import logging
 logger = logging.getLogger(__file__)
 
@@ -71,6 +72,25 @@ class PyNNPopulationCommon(object):
         self._change_requires_mapping = True
         self._has_read_neuron_parameters_this_run = False
 
+        # things for pynn demands
+        self._all_ids = numpy.arange(
+            globals_variables.get_simulator().id_counter,
+            globals_variables.get_simulator().id_counter + size)
+        self._first_id = self._all_ids[0]
+        self._last_id = self._all_ids[-1]
+
+        # update the simulators id_counter for giving a unique id for every
+        # atom
+        globals_variables.get_simulator().id_counter += size
+
+    @property
+    def first_id(self):
+        return self._first_id
+
+    @property
+    def last_id(self):
+        return self._last_id
+
     @property
     def requires_mapping(self):
         return self._change_requires_mapping
@@ -114,13 +134,18 @@ class PyNNPopulationCommon(object):
         raise KeyError("Population does not have a property {}".format(
             parameter_name))
 
-    def id_to_index(self, cell_id):
-        """ Given the ID(s) of cell(s) in the Population, return its (their)\
-            index (order in the Population).
+    def id_to_index(self, id):  # @ReservedAssignment
         """
-
-        # TODO: Need __getitem__
-        raise NotImplementedError
+        Given the ID(s) of cell(s) in the Population, return its (their) index
+        (order in the Population).
+        """
+        if not numpy.iterable(id):
+            if not self._first_id <= id <= self._last_id:
+                raise ValueError(
+                    "id should be in the range [{},{}], actually {}".format(
+                        self._first_id, self._last_id, id))
+            return int(id - self._first_id)  # this assumes ids are consecutive
+        return id - self._first_id
 
     def id_to_local_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -263,6 +288,16 @@ class PyNNPopulationCommon(object):
 
             self._has_read_neuron_parameters_this_run = True
 
+    def get_spike_counts(self, spikes, gather=True):
+        """ Return the number of spikes for each neuron.
+        """
+        n_spikes = {}
+        counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
+                                minlength=self._vertex.n_atoms)
+        for i in range(self._vertex.n_atoms):
+            n_spikes[i] = counts[i]
+        return n_spikes
+
     @property
     def structure(self):
         """ Return the structure for the population.
@@ -383,3 +418,21 @@ class PyNNPopulationCommon(object):
             return self._vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
+
+    def _roundsize(self, size, label):
+        if isinstance(size, int):
+            return size
+        if label is None:
+            label = "None"
+        # Allow a float which has a near int value
+        temp = int(round(size))
+        if abs(temp - size) < 0.001:
+            logger.warning("Size of the popluation with label {} "
+                           "rounded from {} to {} "
+                           "Please use int values for size"
+                           "".format(label, size, temp))
+            return temp
+        else:
+            raise ConfigurationException(
+                "Size of a population with label {} must be an int,"
+                " received {}".format(label, size))

@@ -6,7 +6,8 @@ from pacman.utilities.utility_objs import Field
 
 # spynnaker imports
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-from spynnaker.pyNN.exceptions import SynapticBlockGenerationException
+from spynnaker.pyNN.exceptions import SynapticBlockGenerationException,\
+    SynapseRowTooBigException
 
 # spinn front end common imports
 from spinn_front_end_common.utilities import helpful_functions
@@ -70,8 +71,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         my_repeat_reg = 4
         spec.set_register_value(register_id=my_repeat_reg,
                                 data=MASTER_POPULATION_ENTRIES)
-        spec.write_value(data=0, repeats_register=my_repeat_reg,
-                         data_type=DataType.UINT16)
+        spec.write_repeat_value(data=0, repeats_register=my_repeat_reg,
+                                data_type=DataType.UINT16)
 
         spec.comment("\nWriting Row Length Translation Table:\n")
         for entry in ROW_LEN_TABLE_ENTRIES:
@@ -110,7 +111,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def get_allowed_row_length(self, row_length):
         # Can even the largest valid entry accommodate the given synaptic row?
         if row_length > ROW_LEN_TABLE_ENTRIES[-1]:
-            raise SynapticBlockGenerationException(
+            raise SynapseRowTooBigException(
+                ROW_LEN_TABLE_ENTRIES[-1],
                 "Max row length too long -"
                 " wanted length %d, but max length permitted is %d."
                 % (row_length, ROW_LEN_TABLE_ENTRIES[-1])
