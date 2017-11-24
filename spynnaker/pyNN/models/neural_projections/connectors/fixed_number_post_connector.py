@@ -81,27 +81,28 @@ class FixedNumberPostConnector(AbstractConnector):
             return 0
 
         # Need to edit this
-        n_connections = 0
-        lo = pre_vertex_slice.lo_atom
-        hi = pre_vertex_slice.hi_atom
-        for n in range(0, self._n_pre_neurons):
-            if (n >= lo and n <= hi):
-                n_connections += len(self._post_neurons_in_slice(
-                    post_vertex_slice, n))
+#         n_connections = 0
+#         lo = pre_vertex_slice.lo_atom
+#         hi = pre_vertex_slice.hi_atom
+#         for n in range(0, self._n_pre_neurons):
+#             if (n >= lo and n <= hi):
+#                 n_connections += len(self._post_neurons_in_slice(
+#                     post_vertex_slice, n))
 
         if min_delay is None or max_delay is None:
-            return n_connections
+            return pre_vertex_slice.n_atoms  # n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_post * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._delays, self._n_post * self._n_pre_neurons,
+            pre_vertex_slice.n_atoms, None, min_delay, max_delay)
+#            n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         if not self._is_connected(post_vertex_slice, 0):
             return 0
-        return pre_vertex_slice.n_atoms
+        return self._n_post  # pre_vertex_slice.n_atoms
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
