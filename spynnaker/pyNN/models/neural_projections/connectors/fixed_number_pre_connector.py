@@ -41,12 +41,12 @@ class FixedNumberPreConnector(AbstractConnector):
         return self._get_delay_variance(self._delays, None)
 
     def _get_pre_neurons(self):
-        # if we haven't set the array up yet, do it now
+        # If we haven't set the array up yet, do it now
         if not self._pre_neurons_set:
             self._pre_neurons = [None] * self._n_post_neurons
             self._pre_neurons_set = True
 
-        # loop over all the post neurons
+        # Loop over all the post neurons
         for n in range(0, self._n_post_neurons):
             if self._pre_neurons[n] is None:
                 self._pre_neurons[n] = numpy.random.choice(
@@ -134,10 +134,12 @@ class FixedNumberPreConnector(AbstractConnector):
         if not self._is_connected(pre_vertex_slice, 0):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        # Get number of connections
-        n_connections = 0
+        # Get lo and hi for the post vertex
         lo = post_vertex_slice.lo_atom
         hi = post_vertex_slice.hi_atom
+
+        # Get number of connections
+        n_connections = 0
         for n in range(0, self._n_post_neurons):
             if (n >= lo and n <= hi):
                 n_connections += len(self._pre_neurons_in_slice(

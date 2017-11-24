@@ -10,95 +10,124 @@ class FixedNumberPostConnector(AbstractConnector):
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False):
         AbstractConnector.__init__(self, safe, verbose)
-        self._post_n = n
+        self._n_post = n
         self._allow_self_connections = allow_self_connections
-        self._post_neurons = None
+        self._post_neurons_set = False
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
-            self._delays, self._n_pre_neurons * self._post_n)
+            self._delays, self._n_pre_neurons * self._n_post)
 
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0.0
         return self._get_delay_variance(self._delays, None)
 
     def _get_post_neurons(self):
-        if self._post_neurons is None:
-            n = 0
-            while (n < self._post_n):
-                permutation = numpy.arange(self._n_post_neurons)
-                for i in range(0, self._n_post_neurons - 1):
-                    j = int(self._rng.next(
-                        n=1, distribution="uniform",
-                        parameters=[0, self._n_post_neurons]))
-                    (permutation[i], permutation[j]) = (
-                        permutation[j], permutation[i])
-                n += self._n_post_neurons
-                if self._post_neurons is None:
-                    self._post_neurons = permutation
-                else:
-                    self._post_neurons = numpy.append(
-                        self._post_neurons, permutation)
-            self._post_neurons = self._post_neurons[:self._post_n]
-            self._post_neurons.sort()
+        # If we haven't set the array up yet, do it now
+        if not self._post_neurons_set:
+            self._post_neurons = [None] * self._n_pre_neurons
+            self._post_neurons_set = True
+
+        # Loop over all the pre neurons
+        for m in range(0, self._n_pre_neurons):
+            if self._post_neurons[m] is None:
+                self._post_neurons[m] = numpy.random.choice(
+                    self._n_post_neurons, self._n_post, False)
+                self._post_neurons[m].sort()
+
+                # This looks nice but it doesn't work with PyNN 0.9 ?
+#                 n = 0
+#                 while (n < self._post_n):
+#                     permutation = numpy.arange(self._n_post_neurons)
+#                     for i in range(0, self._n_post_neurons - 1):
+#                         j = int(self._rng.next(
+#                             n=1, distribution="uniform",
+#                             parameters=[0, self._n_post_neurons]))
+#                         (permutation[i], permutation[j]) = (
+#                             permutation[j], permutation[i])
+#                     n += self._n_post_neurons
+#                     if self._post_neurons[m] is None:
+#                         self._post_neurons[m] = permutation
+#                     else:
+#                         self._post_neurons[m] = numpy.append(
+#                             self._post_neurons, permutation)
+#             self._post_neurons[m] = self._post_neurons[m][:self._post_n]
+#             self._post_neurons[m].sort()
         return self._post_neurons
 
-    def _post_neurons_in_slice(self, post_vertex_slice):
+    def _post_neurons_in_slice(self, post_vertex_slice, n):
         post_neurons = self._get_post_neurons()
-        return post_neurons[
+
+        # Get the nth array and get the bits we need for
+        # this post-vertex slice
+        this_post_neuron_array = post_neurons[n]
+
+        return this_post_neuron_array[
             (post_neurons >= post_vertex_slice.lo_atom) &
             (post_neurons <= post_vertex_slice.hi_atom)]
 
-    def _is_connected(self, post_vertex_slice):
-        return self._post_neurons_in_slice(post_vertex_slice).size > 0
+    def _is_connected(self, post_vertex_slice, n):
+        return self._post_neurons_in_slice(post_vertex_slice, n).size > 0
 
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
 
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0
 
-        post_neurons = self._post_neurons_in_slice(post_vertex_slice)
+        # Need to edit this
+        for n in range(0, self._n_pre_neurons):
+            n_connections += len(
+                self._post_neurons_in_slice(post_vertex_slice, n))
+
         if min_delay is None or max_delay is None:
-            return len(post_neurons)
+            return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._post_n * self._n_post_neurons,
-            len(post_neurons), None, min_delay, max_delay)
+            self._delays, self._n_post * self._n_post_neurons,
+            n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0
         return pre_vertex_slice.n_atoms
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0.0
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0.0
-        post_neurons = self._post_neurons_in_slice(post_vertex_slice)
-        n_connections = pre_vertex_slice.n_atoms * len(post_neurons)
+
+        # Get n_connections by adding length of each set of post neurons
+        n_connections = 0
+        lo = pre_vertex_slice.lo_atom
+        hi = pre_vertex_slice.hi_atom
+        for n in range(0, self._n_pre_neurons):
+            if (n >= lo and n <= hi):
+                n_conections += len(self._post_neurons_in_slice(
+                    post_vertex_slice, n))
+
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return 0.0
         return self._get_weight_variance(self._weights, None)
 
@@ -111,35 +140,71 @@ class FixedNumberPostConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        if not self._is_connected(post_vertex_slice):
+        if not self._is_connected(post_vertex_slice, 0):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        post_neurons_in_slice = self._post_neurons_in_slice(post_vertex_slice)
-        n_connections = pre_vertex_slice.n_atoms * len(post_neurons_in_slice)
+
+        # Get lo and hi for the pre vertex
+        lo = pre_vertex_slice.lo_atom
+        hi = pre_vertex_slice.hi_atom
+
+        # Get number of connections
+        n_conections = 0
+        for n in range(0, self._n_pre_neurons):
+            if (n >= lo and n <= hi):
+                n_connections += len(
+                    self._post_neurons_in_slice(post_vertex_slice, n))
+
+        # If self-connections are not allowed then subtract those connections
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
-            n_connections -= len(post_neurons_in_slice)
+            for n in range(0, self._n_pre_neurons):
+                if (n >= lo and n <= hi):
+                    post_neurons = self._post_neurons_in_slice(
+                        post_vertex_slice, n)
+                    for m in range(0, len(post_neurons)):
+                        if (n == post_neurons[m]):
+                            n_connections -= 1
 
+        # Set up the block
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
+        # If self connections not allowed set up source and target accordingly
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
-            block["source"] = [
-                pre_index for pre_index in range(
-                    pre_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-                for post_index in post_neurons_in_slice
-                if pre_index != post_index]
-            block["target"] = [
-                post_index for pre_index in range(
-                    pre_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-                for post_index in post_neurons_in_slice
-                if pre_index != post_index]
+            pre_neurons_in_slice = []
+            post_neurons_in_slice = []
+            pre_vertex_array = numpy.arange(
+                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)
+            for n in range(0, self._n_pre_neurons):
+                if (n >= lo and n <= hi):
+                    post_neurons = self._post_neurons_in_slice(
+                        post_vertex_slice, n)
+                    for m in range(0, len(post_neurons)):
+                        if (n != post_neurons[m]):
+                            post_neurons_in_slice.append(post_neurons[m])
+                            pre_neurons_in_slice.append(
+                                pre_vertex_array[n-pre_vertex_slice.lo_atom])
+
+            block["source"] = pre_neurons_in_slice
+            block["target"] = post_neurons_in_slice
         else:
-            block["source"] = numpy.repeat(numpy.arange(
-                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
-                len(post_neurons_in_slice))
-            block["target"] = numpy.tile(
-                post_neurons_in_slice, pre_vertex_slice.n_atoms)
+            pre_neurons_in_slice = []
+            post_neurons_in_slice = []
+            pre_vertex_array = numpy.arange(
+                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)
+            for n in range(0, self._n_pre_neurons):
+                if (n >= lo and n <= hi):
+                    post_neurons = self._post_neurons_in_slice(
+                        post_vertex_slice, n)
+                    for m in range(0, len(post_neurons)):
+                        post_neurons_in_slice.append(post_neurons[m])
+                        pre_neurons_in_slice.append(
+                            pre_vertex_array[n-pre_vertex_slice.lo_atom])
+
+            block["source"] = pre_neurons_in_slice
+            block["target"] = post_neurons_in_slice
+
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
@@ -148,7 +213,7 @@ class FixedNumberPostConnector(AbstractConnector):
         return block
 
     def __repr__(self):
-        return "FixedNumberPostConnector({})".format(self._post_n)
+        return "FixedNumberPostConnector({})".format(self._n_post)
 
     @property
     def allow_self_connections(self):
