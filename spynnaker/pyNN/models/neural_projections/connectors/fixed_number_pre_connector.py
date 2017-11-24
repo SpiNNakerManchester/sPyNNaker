@@ -169,8 +169,7 @@ class FixedNumberPreConnector(AbstractConnector):
                 if (n >= lo and n <= hi):
                     pre_neurons = self._pre_neurons_in_slice(
                         pre_vertex_slice, n)
-                    print 'pre_neurons size: ', len(pre_neurons)
-                    for m in range (0, len(pre_neurons)):
+                    for m in range(0, len(pre_neurons)):
                         if (n != pre_neurons[m]):
                             pre_neurons_in_slice.append(pre_neurons[m])
                             post_neurons_in_slice.append(
@@ -189,8 +188,7 @@ class FixedNumberPreConnector(AbstractConnector):
                 if (n >= lo and n <= hi):
                     pre_neurons = self._pre_neurons_in_slice(
                         pre_vertex_slice, n)
-                    print 'pre_neurons size: ', len(pre_neurons)
-                    for m in range (0, len(pre_neurons)):
+                    for m in range(0, len(pre_neurons)):
                         pre_neurons_in_slice.append(pre_neurons[m])
                         post_neurons_in_slice.append(
                             post_vertex_array[n-post_vertex_slice.lo_atom])
