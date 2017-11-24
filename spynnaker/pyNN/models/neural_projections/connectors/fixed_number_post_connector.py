@@ -81,6 +81,7 @@ class FixedNumberPostConnector(AbstractConnector):
             return 0
 
         # Need to edit this
+        n_connections = 0
         for n in range(0, self._n_pre_neurons):
             n_connections += len(
                 self._post_neurons_in_slice(post_vertex_slice, n))
@@ -118,7 +119,7 @@ class FixedNumberPostConnector(AbstractConnector):
         hi = pre_vertex_slice.hi_atom
         for n in range(0, self._n_pre_neurons):
             if (n >= lo and n <= hi):
-                n_conections += len(self._post_neurons_in_slice(
+                n_connections += len(self._post_neurons_in_slice(
                     post_vertex_slice, n))
 
         return self._get_weight_maximum(
@@ -148,7 +149,7 @@ class FixedNumberPostConnector(AbstractConnector):
         hi = pre_vertex_slice.hi_atom
 
         # Get number of connections
-        n_conections = 0
+        n_connections = 0
         for n in range(0, self._n_pre_neurons):
             if (n >= lo and n <= hi):
                 n_connections += len(
