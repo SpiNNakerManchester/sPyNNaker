@@ -46,13 +46,14 @@ typedef enum region {
 } region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
+#define BYTE_TO_WORD_CONVERTER 4
 
 typedef enum callback_priorities{
     MULTICAST = -1, SDP = 0, TIMER = 2, DMA = 1
 } callback_priorities;
 
 //! Parameters of the SpikeSourcePoisson
-struct parameters {
+struct global_parameters {
 
     //! True if there is a key to transmit, False otherwise
     bool has_key;
@@ -88,11 +89,11 @@ struct parameters {
     mars_kiss64_seed_t spike_source_seed;
 };
 
-//! The parameters for the sub-population
-static struct parameters parameters;
+//! The global_parameters for the sub-population
+static struct global_parameters global_parameters;
 
 //! global variable which contains all the data for neurons
-static spike_source_t *spike_source_array = NULL;
+static spike_source_t *poisson_parameters = NULL;
 
 //! The number of clock ticks between sending each spike
 static uint32_t time_between_spikes;
@@ -153,7 +154,7 @@ static inline void _reset_spikes() {
 static inline REAL slow_spike_source_get_time_to_spike(
         REAL mean_inter_spike_interval_in_ticks) {
     return exponential_dist_variate(
-            mars_kiss64_seed, parameters.spike_source_seed)
+            mars_kiss64_seed, global_parameters.spike_source_seed)
         * mean_inter_spike_interval_in_ticks;
 }
 
@@ -169,78 +170,96 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     }
     else {
         return poisson_dist_variate_exp_minus_lambda(
-            mars_kiss64_seed, parameters.spike_source_seed, exp_minus_lambda);
+            mars_kiss64_seed,
+            global_parameters.spike_source_seed, exp_minus_lambda);
     }
 }
 
 void print_spike_sources(){
-    for (index_t s = 0; s < parameters.n_spike_sources; s++) {
+    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
         log_info("atom %d", s);
-        log_info("scaled_start = %u", spike_source_array[s].start_ticks);
-        log_info("scaled end = %u", spike_source_array[s].end_ticks);
-        log_info("is_fast_source = %d",
-                 spike_source_array[s].is_fast_source);
-        log_info("exp_minus_lamda = %k",
-                 (REAL)(spike_source_array[s].exp_minus_lambda));
-        log_info("isi_val = %k", spike_source_array[s].mean_isi_ticks);
-        log_info("time_to_spike = %k",
-                 spike_source_array[s].time_to_spike_ticks);
+        log_info("scaled_start = %u", poisson_parameters[s].start_ticks);
+        log_info("scaled end = %u", poisson_parameters[s].end_ticks);
+        log_info("is_fast_source = %d", poisson_parameters[s].is_fast_source);
+        log_info(
+            "exp_minus_lamda = %k",
+            (REAL)(poisson_parameters[s].exp_minus_lambda));
+        log_info("isi_val = %k", poisson_parameters[s].mean_isi_ticks);
+        log_info(
+            "time_to_spike = %k", poisson_parameters[s].time_to_spike_ticks);
     }
 }
 
-//! \entry method for reading the parameters stored in Poisson parameter region
+//! \brief entry method for reading the global parameters stored in Poisson
+//!        parameter region
 //! \param[in] address the absolute SDRAm memory address to which the
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-bool read_poisson_parameters(address_t address) {
+bool read_global_parameters(address_t address) {
 
-    log_info("read_parameters: starting");
+    log_info("read global_parameters: starting");
 
-    spin1_memcpy(&parameters, address, sizeof(parameters));
+    spin1_memcpy(&global_parameters, address, sizeof(global_parameters));
 
     log_info(
         "\t key = %08x, set rate mask = %08x, back off = %u",
-        parameters.key, parameters.set_rate_neuron_id_mask,
-        parameters.random_backoff_us);
+        global_parameters.key, global_parameters.set_rate_neuron_id_mask,
+        global_parameters.random_backoff_us);
 
-    log_info("\t seed = %u %u %u %u", parameters.spike_source_seed[0],
-        parameters.spike_source_seed[1], parameters.spike_source_seed[2],
-        parameters.spike_source_seed[3]);
+    log_info("\t seed = %u %u %u %u", global_parameters.spike_source_seed[0],
+        global_parameters.spike_source_seed[1],
+        global_parameters.spike_source_seed[2],
+        global_parameters.spike_source_seed[3]);
 
-    validate_mars_kiss64_seed(parameters.spike_source_seed);
+    validate_mars_kiss64_seed(global_parameters.spike_source_seed);
 
     log_info(
         "\t spike sources = %u, starting at %u",
-        parameters.n_spike_sources, parameters.first_source_id);
-    log_info("seconds_per_tick = %k\n", (REAL)(parameters.seconds_per_tick));
-    log_info("ticks_per_second = %k\n", parameters.ticks_per_second);
-    log_info("slow_rate_per_tick_cutoff = %k\n",
-        parameters.slow_rate_per_tick_cutoff);
+        global_parameters.n_spike_sources, global_parameters.first_source_id);
+    log_info(
+        "seconds_per_tick = %k\n",
+        (REAL)(global_parameters.seconds_per_tick));
+    log_info("ticks_per_second = %k\n", global_parameters.ticks_per_second);
+    log_info(
+        "slow_rate_per_tick_cutoff = %k\n",
+        global_parameters.slow_rate_per_tick_cutoff);
+
+    log_info("read_global_parameters: completed successfully");
+    return true;
+}
+
+//! \brief method for reading the parameters stored in Poisson parameter region
+//! \param[in] address the absolute SDRAm memory address to which the
+//!            Poisson parameter region starts.
+//! \return a boolean which is True if the parameters were read successfully or
+//!         False otherwise
+static read_poisson_parameters(address_t address) {
 
     // Allocate DTCM for array of spike sources and copy block of data
-    if (parameters.n_spike_sources > 0) {
+    if (global_parameters.n_spike_sources > 0) {
 
         // the first time around, the array is set to NULL, afterwards,
         // assuming all goes well, there's an address here.
-        if (spike_source_array == NULL){
-            spike_source_array = (spike_source_t*) spin1_malloc(
-                parameters.n_spike_sources * sizeof(spike_source_t));
+        if (poisson_parameters == NULL){
+            poisson_parameters = (spike_source_t*) spin1_malloc(
+                global_parameters.n_spike_sources * sizeof(spike_source_t));
         }
 
         // if failed to alloc memory, report and fail.
-        if (spike_source_array == NULL) {
-            log_error("Failed to allocate spike_source_array");
+        if (poisson_parameters == NULL) {
+            log_error("Failed to allocate poisson_parameters");
             return false;
         }
 
+
         // store spike source data into DTCM
-        uint32_t spikes_offset = sizeof(parameters) / 4;
+        uint32_t spikes_offset = sizeof(global_parameters) / 4;
         spin1_memcpy(
-            spike_source_array, &address[spikes_offset],
-            parameters.n_spike_sources * sizeof(spike_source_t));
+            poisson_parameters, &address[spikes_offset],
+            global_parameters.n_spike_sources * sizeof(spike_source_t));
     }
-    log_info("read_parameters: completed successfully");
+    log_info("read_poisson_parameters: completed successfully");
     return true;
 }
 
@@ -265,7 +284,8 @@ static bool initialise_recording(){
 //! data.
 //! \param[out] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
-//! \param[out] update_sdp_port The SDP port on which to listen for rate updates
+//! \param[out] update_sdp_port The SDP port on which to listen for rate
+//!             updates
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
 static bool initialize(uint32_t *timer_period) {
@@ -295,17 +315,22 @@ static bool initialize(uint32_t *timer_period) {
     }
 
     // Setup regions that specify spike source array data
+    if (!read_global_parameters(
+            data_specification_get_region(POISSON_PARAMS, address))) {
+        return false;
+    }
+    
     if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
 
     // Loop through slow spike sources and initialise 1st time to spike
-    for (index_t s = 0; s < parameters.n_spike_sources; s++) {
-        if (!spike_source_array[s].is_fast_source) {
-            spike_source_array[s].time_to_spike_ticks =
+    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
+        if (!poisson_parameters[s].is_fast_source) {
+            poisson_parameters[s].time_to_spike_ticks =
                 slow_spike_source_get_time_to_spike(
-                    spike_source_array[s].mean_isi_ticks);
+                    poisson_parameters[s].mean_isi_ticks);
         }
     }
 
@@ -314,7 +339,8 @@ static bool initialize(uint32_t *timer_period) {
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
-    n_spike_buffer_words = get_bit_field_size(parameters.n_spike_sources);
+    n_spike_buffer_words = get_bit_field_size(
+        global_parameters.n_spike_sources);
     spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
 
     log_info("Initialise: completed successfully");
@@ -349,15 +375,17 @@ bool store_poisson_parameters() {
     address_t address = data_specification_get_data_address();
     address = data_specification_get_region(POISSON_PARAMS, address);
 
-    // Copy the parameters back to SDRAM
-    spin1_memcpy(address, &parameters, sizeof(parameters));
+    // Copy the global_parameters back to SDRAM
+    spin1_memcpy(address, &global_parameters, sizeof(global_parameters));
 
-    // store array of spike sources into sdram for reading by the host
-    if (parameters.n_spike_sources > 0) {
-        uint32_t spikes_offset = sizeof(parameters) / 4;
+    // store spike source parameters into array into sdram for reading by
+    // the host
+    if (global_parameters.n_spike_sources > 0) {
+        uint32_t spikes_offset =
+            sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
         spin1_memcpy(
-            &address[spikes_offset], spike_source_array,
-            parameters.n_spike_sources * sizeof(spike_source_t));
+            &address[spikes_offset], poisson_parameters,
+            global_parameters.n_spike_sources * sizeof(spike_source_t));
     }
 
     log_info("stored_parameters : completed successfully");
@@ -479,7 +507,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Sleep for a random time
-    spin1_delay_us(parameters.random_backoff_us);
+    spin1_delay_us(global_parameters.random_backoff_us);
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
@@ -488,10 +516,10 @@ void timer_callback(uint timer_count, uint unused) {
     out_spikes_reset();
 
     // Loop through spike sources
-    for (index_t s = 0; s < parameters.n_spike_sources; s++) {
+    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
 
         // If this spike source is active this tick
-        spike_source_t *spike_source = &spike_source_array[s];
+        spike_source_t *spike_source = &poisson_parameters[s];
 
         // handle fast spike sources
         if (spike_source->is_fast_source) {
@@ -510,10 +538,10 @@ void timer_callback(uint timer_count, uint unused) {
                     _mark_spike(s, num_spikes);
 
                     // if no key has been given, do not send spike to fabric.
-                    if (parameters.has_key){
+                    if (global_parameters.has_key){
 
                         // Send spikes
-                        const uint32_t spike_key = parameters.key | s;
+                        const uint32_t spike_key = global_parameters.key | s;
                         for (uint32_t index = 0; index < num_spikes; index++) {
                             _send_spike(spike_key);
                         }
@@ -536,10 +564,10 @@ void timer_callback(uint timer_count, uint unused) {
                     _mark_spike(s, 1);
 
                     // if no key has been given, do not send spike to fabric.
-                    if (parameters.has_key) {
+                    if (global_parameters.has_key) {
 
                         // Send package
-                        _send_spike(parameters.key | s);
+                        _send_spike(global_parameters.key | s);
                     }
 
                     // Update time to spike
@@ -566,19 +594,20 @@ void timer_callback(uint timer_count, uint unused) {
 }
 
 void set_spike_source_rate(int id, REAL rate) {
-    if ((id >= parameters.first_source_id) &&
-            ((id - parameters.first_source_id) < parameters.n_spike_sources)) {
-        uint32_t sub_id = id - parameters.first_source_id;
+    if ((id >= global_parameters.first_source_id) &&
+            ((id - global_parameters.first_source_id) <
+             global_parameters.n_spike_sources)) {
+        uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
-        REAL rate_per_tick = rate * parameters.seconds_per_tick;
-        if (rate > parameters.slow_rate_per_tick_cutoff) {
-            spike_source_array[sub_id].is_fast_source = true;
-            spike_source_array[sub_id].exp_minus_lambda =
+        REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
+        if (rate > global_parameters.slow_rate_per_tick_cutoff) {
+            poisson_parameters[sub_id].is_fast_source = true;
+            poisson_parameters[sub_id].exp_minus_lambda =
                 (UFRACT) EXP(-rate_per_tick);
         } else {
-            spike_source_array[sub_id].is_fast_source = false;
-            spike_source_array[sub_id].mean_isi_ticks =
-                rate * parameters.ticks_per_second;
+            poisson_parameters[sub_id].is_fast_source = false;
+            poisson_parameters[sub_id].mean_isi_ticks =
+                rate * global_parameters.ticks_per_second;
         }
     }
 }
@@ -600,7 +629,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
 }
 
 void multicast_packet_callback(uint key, uint payload) {
-    uint32_t id = key & parameters.set_rate_neuron_id_mask;
+    uint32_t id = key & global_parameters.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);
     set_spike_source_rate(id, rate);
 }
