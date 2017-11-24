@@ -168,7 +168,7 @@ address_t synaptogenesis_dynamics_initialise(
     rewiring_data.local_seed[2] = *sp_word++;
     rewiring_data.local_seed[3] = *sp_word++;
 
-    log_info("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
+    log_debug("p_rew %d fast %d exc_weight %d inh_weight %d delay %d s_max %d app_no_atoms %d lo %d hi %d machine_no_atoms %d x %d y %d p_elim_dep %d p_elim_pot %d",
         rewiring_data.p_rew, rewiring_data.fast, rewiring_data.weight[0], rewiring_data.weight[1],
         rewiring_data.delay, rewiring_data.s_max,
         rewiring_data.app_no_atoms, rewiring_data.low_atom, rewiring_data.high_atom, rewiring_data.machine_no_atoms,
@@ -451,7 +451,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    /*ad*/log_info("g_pre_id %d g_post_id %d g_distance_sq %d exists %d %d",
+    /*ad*/log_debug("g_pre_id %d g_post_id %d g_distance_sq %d exists %d %d",
         pre_global_id, post_global_id, current_state.distance, element_exists,
         current_state.current_controls
         );
@@ -536,7 +536,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
                 rewiring_dma_buffer.n_bytes_transferred)){
             log_error("DMA queue full-removal");
          }
-        /*ad*/log_info("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
+        /*ad*/log_debug("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
@@ -596,7 +596,7 @@ bool synaptogenesis_dynamics_formation_rule(){
             log_error("DMA queue full-formation");
                 }
 
-        /*ad*/log_info("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
+        /*ad*/log_debug("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
