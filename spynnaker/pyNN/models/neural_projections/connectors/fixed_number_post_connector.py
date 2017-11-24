@@ -66,8 +66,8 @@ class FixedNumberPostConnector(AbstractConnector):
         this_post_neuron_array = post_neurons[n]
 
         return this_post_neuron_array[
-            (post_neurons >= post_vertex_slice.lo_atom) &
-            (post_neurons <= post_vertex_slice.hi_atom)]
+            (this_post_neuron_array >= post_vertex_slice.lo_atom) &
+            (this_post_neuron_array <= post_vertex_slice.hi_atom)]
 
     def _is_connected(self, post_vertex_slice, n):
         return self._post_neurons_in_slice(post_vertex_slice, n).size > 0
@@ -82,9 +82,12 @@ class FixedNumberPostConnector(AbstractConnector):
 
         # Need to edit this
         n_connections = 0
+        lo = pre_vertex_slice.lo_atom
+        hi = pre_vertex_slice.hi_atom
         for n in range(0, self._n_pre_neurons):
-            n_connections += len(
-                self._post_neurons_in_slice(post_vertex_slice, n))
+            if (n >= lo and n <= hi):
+                n_connections += len(self._post_neurons_in_slice(
+                    post_vertex_slice, n))
 
         if min_delay is None or max_delay is None:
             return n_connections
