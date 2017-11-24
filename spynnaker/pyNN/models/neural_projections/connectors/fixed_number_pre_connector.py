@@ -49,7 +49,6 @@ class FixedNumberPreConnector(AbstractConnector):
         # loop over all the post neurons
         for n in range(0, self._n_post_neurons):
             if self._pre_neurons[n] is None:
-                #print 'pre_neurons is None!'
                 self._pre_neurons[n] = numpy.random.choice(
                     self._n_pre_neurons, self._n_pre, False)
                 self._pre_neurons[n].sort()
@@ -106,9 +105,10 @@ class FixedNumberPreConnector(AbstractConnector):
 
         # Get n_connections by adding length of each set of pre_neurons
         n_connections = 0
+        lo = post_vertex_slice.lo_atom
+        hi = post_vertex_slice.hi_atom
         for n in range(0, self._n_post_neurons):
-            if (n >= post_vertex_slice.lo_atom and
-                n <= post_vertex_slice.hi_atom):
+            if (n >= lo and n <= hi):
                 n_connections += len(self._pre_neurons_in_slice(
                     pre_vertex_slice, n))
 
@@ -136,19 +136,18 @@ class FixedNumberPreConnector(AbstractConnector):
 
         # Get number of connections
         n_connections = 0
+        lo = post_vertex_slice.lo_atom
+        hi = post_vertex_slice.hi_atom
         for n in range(0, self._n_post_neurons):
-            if (n >= post_vertex_slice.lo_atom and
-                n <= post_vertex_slice.hi_atom):
+            if (n >= lo and n <= hi):
                 n_connections += len(self._pre_neurons_in_slice(
                     pre_vertex_slice, n))
 
         # If self connections are not allowed then subtract those connections
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
-            n_self_connections = 0
             for n in range(0, self._n_post_neurons):
-                if (n >= post_vertex_slice.lo_atom and
-                    n <= post_vertex_slice.hi_atom):
+                if (n >= lo and n <= hi):
                     pre_neurons = self._pre_neurons_in_slice(
                         pre_vertex_slice, n)
                     for m in range(0, len(pre_neurons)):
@@ -167,8 +166,7 @@ class FixedNumberPreConnector(AbstractConnector):
             post_vertex_array = numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
             for n in range(0, self._n_post_neurons):
-                if (n >= post_vertex_slice.lo_atom and
-                    n <= post_vertex_slice.hi_atom):
+                if (n >= lo and n <= hi):
                     pre_neurons = self._pre_neurons_in_slice(
                         pre_vertex_slice, n)
                     print 'pre_neurons size: ', len(pre_neurons)
@@ -188,8 +186,7 @@ class FixedNumberPreConnector(AbstractConnector):
             post_vertex_array = numpy.arange(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
             for n in range(0, self._n_post_neurons):
-                if (n >= post_vertex_slice.lo_atom and
-                    n <= post_vertex_slice.hi_atom):
+                if (n >= lo and n <= hi):
                     pre_neurons = self._pre_neurons_in_slice(
                         pre_vertex_slice, n)
                     print 'pre_neurons size: ', len(pre_neurons)
