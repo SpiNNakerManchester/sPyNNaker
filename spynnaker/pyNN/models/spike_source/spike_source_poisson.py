@@ -392,7 +392,7 @@ class SpikeSourcePoisson(
 
         # Write the incoming mask if there is one
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            placement.vertex, constants.CONTROL_PARTITION_ID)
+            placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
             raise ConfigurationException(
                 "Only one control edge can end at a Poisson vertex")

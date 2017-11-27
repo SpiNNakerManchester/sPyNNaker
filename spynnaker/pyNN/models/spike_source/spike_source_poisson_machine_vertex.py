@@ -88,7 +88,7 @@ class SpikeSourcePoissonMachineVertex(
         additional_arguments=["graph"])
     def is_in_injection_mode(self, graph):
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            self, constants.CONTROL_PARTITION_ID)
+            self, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
             raise ConfigurationException(
                 "Poisson source can only have one incoming control")

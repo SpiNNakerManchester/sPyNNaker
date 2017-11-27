@@ -217,7 +217,7 @@ class SpynnakerExternalDevicePluginManager(object):
             receive_port=receive_port, reserve_reverse_ip_tag=True)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
-            controller, vertex, constants.CONTROL_PARTITION_ID)
+            controller, vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,
