@@ -4,6 +4,7 @@ from spinn_front_end_common.utilities.connections.live_event_connection\
 from spinnman.messages.eieio.eieio_type import EIEIOType
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from pacman.model.decorators.overrides import overrides
 from spinnman.messages.eieio.data_messages.eieio_data_message \
     import EIEIODataMessage
 
@@ -45,16 +46,19 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def _control_label(self, label):
         return "{}{}".format(label, self._control_label_extension)
 
+    @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label, start_callback):
         control_label = self._control_label(label)
         LiveEventConnection.add_start_callback(
             self, control_label, start_callback)
 
+    @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
         control_label = self._control_label(label)
         LiveEventConnection.add_init_callback(
             self, control_label, init_callback)
 
+    @overrides(LiveEventConnection.add_receive_callback)
     def add_receive_callback(self, label, live_event_callback):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
