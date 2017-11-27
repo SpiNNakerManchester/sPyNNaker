@@ -65,3 +65,6 @@ SPIKES = 'spikes'
 MEMBRANE_POTENTIAL = "v"
 GSYN_EXCIT = "gsyn_exc"
 GSYN_INHIB = "gsyn_inh"
+
+# The partition ID used for Poisson live control data
+LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"
