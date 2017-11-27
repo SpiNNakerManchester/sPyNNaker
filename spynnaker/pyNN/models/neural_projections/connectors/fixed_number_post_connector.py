@@ -1,4 +1,5 @@
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
 
@@ -6,9 +7,21 @@ logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractConnector):
+    """ Connects a fixed number of post-synaptic neurons selected at random,
+        to all pre-synaptic neurons
+    """
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False):
+        """
+        :param `int` n:
+            number of random post-synaptic neurons connected to output
+        :param `bool` allow_self_connections:
+            if the connector is used to connect a
+            Population to itself, this flag determines whether a neuron is
+            allowed to connect to itself, or only to other neurons in the
+            Population.
+        """
         AbstractConnector.__init__(self, safe, verbose)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
@@ -30,32 +43,44 @@ class FixedNumberPostConnector(AbstractConnector):
         if not self._post_neurons_set:
             self._post_neurons = [None] * self._n_pre_neurons
             self._post_neurons_set = True
+            self._rng_parameters = self.get_rng_parameters(
+                self._n_post_neurons)
 
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
-                self._post_neurons[m] = numpy.random.choice(
-                    self._n_post_neurons, self._n_post, False)
-                self._post_neurons[m].sort()
+                if self.with_replacement:
+                    # We use numpy.random.choice
+                    self._post_neurons[m] = numpy.random.choice(
+                        self._n_post_neurons, self._n_post,
+                        self.with_replacement)
+                elif self._n_post > self._n_post_neurons:
+                    # Throw an exception
+                    raise SpynnakerException(
+                        "FixedNumberPostConnector will not work when "
+                        "with_replacement=False and n > n_post_neurons")
+                else:
+                    # We can't use numpy.random.choice, so we
+                    # use a different method of selection
+                    n = 0
+                    while (n < self._n_post):
+                        permutation = numpy.arange(self._n_post_neurons)
+                        for i in range(0, self._n_post_neurons - 1):
+                            j = int(self._rng.next(
+                                n=1, distribution="uniform",
+                                parameters=self._rng_parameters))
+                            (permutation[i], permutation[j]) = (
+                                permutation[j], permutation[i])
+                        n += self._n_post_neurons
+                        if self._post_neurons[m] is None:
+                            self._post_neurons[m] = permutation
+                        else:
+                            self._post_neurons[m] = numpy.append(
+                                self._post_neurons, permutation)
+                    self._post_neurons[m] = self._post_neurons[m][:self._n_post]
 
-                # This looks nice but it doesn't work with PyNN 0.9 ?
-#                 n = 0
-#                 while (n < self._post_n):
-#                     permutation = numpy.arange(self._n_post_neurons)
-#                     for i in range(0, self._n_post_neurons - 1):
-#                         j = int(self._rng.next(
-#                             n=1, distribution="uniform",
-#                             parameters=[0, self._n_post_neurons]))
-#                         (permutation[i], permutation[j]) = (
-#                             permutation[j], permutation[i])
-#                     n += self._n_post_neurons
-#                     if self._post_neurons[m] is None:
-#                         self._post_neurons[m] = permutation
-#                     else:
-#                         self._post_neurons[m] = numpy.append(
-#                             self._post_neurons, permutation)
-#             self._post_neurons[m] = self._post_neurons[m][:self._post_n]
-#             self._post_neurons[m].sort()
+                # Sort the neurons now that we have them
+                self._post_neurons[m].sort()
         return self._post_neurons
 
     def _post_neurons_in_slice(self, post_vertex_slice, n):

@@ -1,4 +1,5 @@
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
 
@@ -9,10 +10,10 @@ class FixedNumberPreConnector(AbstractConnector):
     """ Connects a fixed number of pre-synaptic neurons selected at random,
         to all post-synaptic neurons
     """
+
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False):
         """
-
         :param `int` n:
             number of random pre-synaptic neurons connected to output
         :param `bool` allow_self_connections:
@@ -20,9 +21,6 @@ class FixedNumberPreConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-
-            dependent weights or delays - not implemented
         """
         AbstractConnector.__init__(self, safe, verbose)
         self._n_pre = n
@@ -45,13 +43,43 @@ class FixedNumberPreConnector(AbstractConnector):
         if not self._pre_neurons_set:
             self._pre_neurons = [None] * self._n_post_neurons
             self._pre_neurons_set = True
+            self._rng_parameters = self.get_rng_parameters(
+                self._n_pre_neurons)
 
         # Loop over all the post neurons
-        for n in range(0, self._n_post_neurons):
-            if self._pre_neurons[n] is None:
-                self._pre_neurons[n] = numpy.random.choice(
-                    self._n_pre_neurons, self._n_pre, False)
-                self._pre_neurons[n].sort()
+        for m in range(0, self._n_post_neurons):
+            if self._pre_neurons[m] is None:
+                if self.with_replacement:
+                    self._pre_neurons[m] = numpy.random.choice(
+                        self._n_pre_neurons, self._n_pre,
+                        self.with_replacement)
+                elif self._n_pre > self._n_pre_neurons:
+                    # Throw an exception
+                    raise SpynnakerException(
+                        "FixedNumberPreConnector will not work when "
+                        "with_replacement=False and n > n_pre_neurons")
+                else:
+                    # We can't use numpy.random.choice, so we
+                    # use a different method of selection
+                    n = 0
+                    while (n < self._n_pre):
+                        permutation = numpy.arange(self._n_pre_neurons)
+                        for i in range(0, self._n_pre_neurons - 1):
+                            j = int(self._rng.next(
+                                n=1, distribution="uniform",
+                                parameters=self._rng_parameters))
+                            (permutation[i], permutation[j]) = (
+                                permutation[j], permutation[i])
+                        n += self._n_pre_neurons
+                        if self._pre_neurons[m] is None:
+                            self._pre_neurons[m] = permutation
+                        else:
+                            self._pre_neurons[m] = numpy.append(
+                                self._post_neurons, permutation)
+                    self._pre_neurons[m] = self._pre_neurons[m][:self._n_pre]
+
+                # Sort the neurons now that we have them
+                self._pre_neurons[m].sort()
         return self._pre_neurons
 
     def _pre_neurons_in_slice(self, pre_vertex_slice, n):
