@@ -57,9 +57,11 @@ class RecordingCommon(object):
             self._set_spikes_recording()
         elif variable == "all":
             self._set_spikes_recording()
-            self._population._vertex.set_recording(variable)
+            self._population._vertex.set_recording(
+                variable, sampling_interval=sampling_interval)
         else:
-            self._population._vertex.set_recording(variable)
+            self._population._vertex.set_recording(
+                variable, sampling_interval=sampling_interval)
 
         # update file writer
         self._write_to_files_indicators[variable] = to_file

@@ -155,7 +155,8 @@ class AbstractPopulationVertex(
 
         # Set up for recording
         self._spike_recorder = SpikeRecorder()
-        self._neuron_recorder = NeuronRecorder(["v", "gsyn_exc", "gsyn_inh"])
+        self._neuron_recorder = NeuronRecorder(
+            ["v", "gsyn_exc", "gsyn_inh"], n_neurons)
 
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
@@ -338,6 +339,8 @@ class AbstractPopulationVertex(
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
                 self._neuron_model
                     .get_sdram_usage_for_global_parameters_in_bytes() +
+                self._neuron_recorder
+                    .get_sdram_usage_for_global_parameters_in_bytes() +
                 (per_neuron_usage * vertex_slice.n_atoms))
 
     def get_sdram_usage_for_atoms(
@@ -439,6 +442,13 @@ class AbstractPopulationVertex(
 
         # Write the size of the incoming spike buffer
         spec.write_value(data=self._incoming_spike_buffer_size)
+
+        # Write the recording rates
+        record_globals = self._neuron_recorder.get_global_parameters(
+            vertex_slice)
+        for param in record_globals:
+            spec.write_value(data=param.get_value(),
+                             data_type=param.get_dataspec_datatype())
 
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
@@ -622,9 +632,10 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
-    def set_recording(self, variable, new_state=True):
+    def set_recording(self, variable, new_state=True, sampling_interval=None):
         self._change_requires_mapping = not self.is_recording(variable)
-        self._neuron_recorder.set_recording(variable, new_state)
+        self._neuron_recorder.set_recording(
+            variable, new_state, sampling_interval)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
