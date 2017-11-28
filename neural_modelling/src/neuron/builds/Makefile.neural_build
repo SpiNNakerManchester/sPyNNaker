@@ -1,3 +1,4 @@
 # THIS FILE IS A STUB FOR A RENAMED VERSION
 # IT IS KEPT FOR BACKWARD COMPATIBILITY ONLY
+$(warning inclusion of Makefile.neural_build instead of neural_build.mk)
 include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))neural_build.mk
