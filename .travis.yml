@@ -28,7 +28,7 @@ before_install:
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/spalloc.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   # C dependencies
-  - git clone --branch v3.1.1 https://github.com/SpiNNakerManchester/spinnaker_tools.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
   - support/gitclone.sh https://github.com/SpiNNakerManchester/spinn_common.git
   - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   - export SPINN_DIRS=$PWD/spinnaker_tools
