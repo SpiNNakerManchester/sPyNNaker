@@ -25,7 +25,7 @@ before_install:
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@master
-  - FECVER=`git ls-remote https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git | grep refs/heads/$TRAVIS_BRANCH && echo $TRAVIS_BRANCH || echo master`
+  - FECVER=`git ls-remote https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git | grep -q refs/heads/$TRAVIS_BRANCH && echo $TRAVIS_BRANCH || echo master`
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$FECVER
   # C dependencies
   - git clone --branch v3.1.1 https://github.com/SpiNNakerManchester/spinnaker_tools.git
