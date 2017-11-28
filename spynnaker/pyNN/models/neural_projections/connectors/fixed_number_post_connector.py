@@ -49,36 +49,44 @@ class FixedNumberPostConnector(AbstractConnector):
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
-                if self.with_replacement:
-                    # We use numpy.random.choice
-                    self._post_neurons[m] = numpy.random.choice(
-                        self._n_post_neurons, self._n_post,
-                        self.with_replacement)
-                elif self._n_post > self._n_post_neurons:
-                    # Throw an exception
+                if not self.with_replacement and self._n_post > self._n_post_neurons:
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False and n > n_post_neurons")
-                else:
-                    # We can't use numpy.random.choice, so we
-                    # use a different method of selection
-                    n = 0
-                    while (n < self._n_post):
-                        permutation = numpy.arange(self._n_post_neurons)
-                        for i in range(0, self._n_post_neurons - 1):
-                            j = int(self._rng.next(
-                                n=1, distribution="uniform",
-                                parameters=self._rng_parameters))
-                            (permutation[i], permutation[j]) = (
-                                permutation[j], permutation[i])
-                        n += self._n_post_neurons
-                        if self._post_neurons[m] is None:
-                            self._post_neurons[m] = permutation
-                        else:
-                            self._post_neurons[m] = numpy.append(
-                                self._post_neurons, permutation)
-                    self._post_neurons[m] = self._post_neurons[
-                        m][:self._n_post]
+
+                self._post_neurons[m] = numpy.random.choice(
+                    self._n_post_neurons, self._n_post, self.with_replacement)
+
+#                 if self.with_replacement:
+#                     # We use numpy.random.choice
+#                     self._post_neurons[m] = numpy.random.choice(
+#                         self._n_post_neurons, self._n_post,
+#                         self.with_replacement)
+#                 elif self._n_post > self._n_post_neurons:
+#                     # Throw an exception
+#                     raise SpynnakerException(
+#                         "FixedNumberPostConnector will not work when "
+#                         "with_replacement=False and n > n_post_neurons")
+#                 else:
+#                     # We can't use numpy.random.choice, so we
+#                     # use a different method of selection
+#                     n = 0
+#                     while (n < self._n_post):
+#                         permutation = numpy.arange(self._n_post_neurons)
+#                         for i in range(0, self._n_post_neurons - 1):
+#                             j = int(self._rng.next(
+#                                 n=1, distribution="uniform",
+#                                 parameters=self._rng_parameters))
+#                             (permutation[i], permutation[j]) = (
+#                                 permutation[j], permutation[i])
+#                         n += self._n_post_neurons
+#                         if self._post_neurons[m] is None:
+#                             self._post_neurons[m] = permutation
+#                         else:
+#                             self._post_neurons[m] = numpy.append(
+#                                 self._post_neurons, permutation)
+#                     self._post_neurons[m] = self._post_neurons[
+#                         m][:self._n_post]
 
                 # Sort the neurons now that we have them
                 self._post_neurons[m].sort()
@@ -107,21 +115,22 @@ class FixedNumberPostConnector(AbstractConnector):
             return 0
 
         # Need to edit this
-#         n_connections = 0
-#         lo = pre_vertex_slice.lo_atom
-#         hi = pre_vertex_slice.hi_atom
-#         for n in range(0, self._n_pre_neurons):
-#             if (n >= lo and n <= hi):
-#                 n_connections += len(self._post_neurons_in_slice(
-#                     post_vertex_slice, n))
+        n_connections = 0
+        lo = pre_vertex_slice.lo_atom
+        hi = pre_vertex_slice.hi_atom
+        for n in range(0, self._n_pre_neurons):
+            if (n >= lo and n <= hi):
+                n_connections = max(n_connections,
+                                    len(self._post_neurons_in_slice(
+                                        post_vertex_slice, n)))
 
         if min_delay is None or max_delay is None:
-            return pre_vertex_slice.n_atoms  # n_connections
+            return n_connections  # pre_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_post * self._n_pre_neurons,
-            pre_vertex_slice.n_atoms, None, min_delay, max_delay)
-#            n_connections, None, min_delay, max_delay)
+#            pre_vertex_slice.n_atoms, None, min_delay, max_delay)
+            n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
