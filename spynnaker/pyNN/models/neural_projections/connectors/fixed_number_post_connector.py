@@ -77,7 +77,8 @@ class FixedNumberPostConnector(AbstractConnector):
                         else:
                             self._post_neurons[m] = numpy.append(
                                 self._post_neurons, permutation)
-                    self._post_neurons[m] = self._post_neurons[m][:self._n_post]
+                    self._post_neurons[m] = self._post_neurons[
+                        m][:self._n_post]
 
                 # Sort the neurons now that we have them
                 self._post_neurons[m].sort()
