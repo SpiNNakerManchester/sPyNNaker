@@ -13,6 +13,7 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 
+
 class IFCurrAlpha(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an alpha-shaped current-based
      input
