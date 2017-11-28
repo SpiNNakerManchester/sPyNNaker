@@ -10,6 +10,9 @@ from spynnaker.pyNN.models.neuron.input_types.input_type_current \
 from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
     import ThresholdTypeStatic
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCurrAlpha(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an alpha-shaped current-based
@@ -17,7 +20,7 @@ class IFCurrAlpha(AbstractPopulationVertex):
     """
 
     # noinspection PyPep8Naming
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0,
@@ -87,5 +90,5 @@ class IFCurrAlpha(AbstractPopulationVertex):
         return IFCurrAlpha._model_based_max_atoms_per_core
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value):
+    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IFCurrAlpha._model_based_max_atoms_per_core = new_value
