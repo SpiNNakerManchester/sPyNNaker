@@ -20,7 +20,7 @@ class IFCurrAlpha(AbstractPopulationVertex):
     """
 
     # noinspection PyPep8Naming
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0,
