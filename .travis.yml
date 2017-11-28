@@ -17,20 +17,20 @@ before_install:
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   # SpiNNakerManchester internal dependencies; development mode
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@master
-  - FECVER=`git ls-remote https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git | grep -q refs/heads/$TRAVIS_BRANCH && echo $TRAVIS_BRANCH || echo master`
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$FECVER
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMan.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/PACMAN.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/DataSpecification.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/spalloc.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   # C dependencies
   - git clone --branch v3.1.1 https://github.com/SpiNNakerManchester/spinnaker_tools.git
-  - git clone --branch 4.0.0 https://github.com/SpiNNakerManchester/spinn_common.git
-  - git clone --branch $FECVER https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinn_common.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   - export SPINN_DIRS=$PWD/spinnaker_tools
   - export NEURAL_MODELLING_DIRS=$PWD/neural_modelling
 
@@ -39,7 +39,6 @@ install:
   - python ./setup.py install
 
 before_script:
-  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   # Initialise builds against spinnaker_tools
   - make -C $SPINN_DIRS
   - make -C spinn_common install
