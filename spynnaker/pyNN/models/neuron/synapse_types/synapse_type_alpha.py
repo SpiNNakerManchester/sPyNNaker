@@ -1,4 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict \
+    import SpynakkerRangeDictionary
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 
@@ -11,12 +13,23 @@ from spynnaker.pyNN.models.neural_properties.neural_parameter \
 from data_specification.enums.data_type import DataType
 from enum import Enum
 
+EXC_RESPONSE = "exc_response"
+EXC_EXP_RESPONSE = "exc_exp_response"
+TAU_SYN_E = "tau_syn_E"
+INH_RESPONSE = "inh_response"
+INH_EXP_RESPONSE = "inh_exp_response"
+TAU_SYN_I = "tau_syn_I"
+
 
 class _COMB_EXP_TYPES(Enum):
-    RESPONSE = (1, DataType.S1615)
-    CONST = (2, DataType.S1615)
-    DECAY = (3, DataType.UINT32)
-    INIT = (4, DataType.UINT32)
+    RESPONSE_EXC = (1, DataType.S1615)
+    RESPONSE_EXC_EXP = (2, DataType.S1615)
+    CONST_EXP = (3, DataType.S1615)
+    DECAY_EXP = (4, DataType.UINT32)
+    RESPONSE_INH = (5, DataType.S1615)
+    RESPONSE_INH_EXP = (6, DataType.S1615)
+    CONST_INH = (7, DataType.S1615)
+    DECAY_INH = (8, DataType.UINT32)
 
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
@@ -35,7 +48,13 @@ class SynapseTypeAlpha(AbstractSynapseType):
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
 
         AbstractSynapseType.__init__(self)
-        self._n_neurons = n_neurons
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data[EXC_RESPONSE] = exc_response
+        self._data[EXC_EXP_RESPONSE] = exc_exp_response
+        self._data[TAU_SYN_E] = tau_syn_E
+        self._data[INH_RESPONSE] = inh_response
+        self._data[INH_EXP_RESPONSE] = inh_exp_response
+        self._data[TAU_SYN_I] = tau_syn_I
 
         self._exc_response = utility_calls.convert_param_to_numpy(
             exc_response, n_neurons)
@@ -53,39 +72,35 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @property
     def exc_response(self):
-        return self._exc_response
+        return self._data[EXC_RESPONSE]
 
     @exc_response.setter
     def exc_response(self, exc_response):
-        self._exc_response = utility_calls.convert_param_to_numpy(
-            exc_response, self._n_neurons)
+        self._data.set_value(key=EXC_RESPONSE, value=exc_response)
 
     @property
     def tau_syn_E(self):
-        return self._tau_syn_E
+        return self._data[TAU_SYN_E]
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, self._n_neurons)
+        self._data.set_value(key=TAU_SYN_E, value=tau_syn_E)
 
     @property
     def inh_response(self):
-        return self._inh_response
+        return self._data[INH_RESPONSE]
 
     @inh_response.setter
     def inh_response(self, inh_response):
-        self._inh_response = utility_calls.convert_param_to_numpy(
-            inh_response, self._n_neurons)
+        self._data.set_value(key=INH_RESPONSE, value=inh_response)
 
     @property
     def tau_syn_I(self):
-        return self._tau_syn_I
+        return self._data[TAU_SYN_I]
 
     @tau_syn_I.setter
     def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_I = utility_calls.convert_param_to_numpy(
-            tau_syn_I, self._n_neurons)
+        self._data.set_value(key=TAU_SYN_I, value=tau_syn_I)
 
     def get_n_synapse_types(self):
         return 2  # EX and IH
@@ -106,37 +121,37 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
-        e_decay, e_init = get_exponential_decay_and_init(
-            self._tau_syn_E, machine_time_step)
+        e_decay, _ = get_exponential_decay_and_init(
+            self._data[TAU_SYN_E], machine_time_step)
 
-        i_decay, i_init = get_exponential_decay_and_init(
-            self._tau_syn_I, machine_time_step)
+        i_decay, _ = get_exponential_decay_and_init(
+            self._data[TAU_SYN_I], machine_time_step)
 
         # pre-multiply constants (convert to millisecond)
-        dt_divided_by_tau_syn_E_sqr = (machine_time_step / 1000) \
-            / (self._tau_syn_E * self._tau_syn_E)
-        dt_divided_by_tau_syn_I_sqr = (machine_time_step / 1000) \
-            / (self._tau_syn_I * self._tau_syn_I)
+        dt_divided_by_tau_syn_E_sqr = self._data[TAU_SYN_E].apply_operation(
+            lambda x: (float(machine_time_step) / 1000.0) / (x * x))
+        dt_divided_by_tau_syn_I_sqr = self._data[TAU_SYN_I].apply_operation(
+            lambda x: (float(machine_time_step) / 1000.0) / (x * x))
 
         return [
             # linear term buffer
-            NeuronParameter(self._exc_response,
-                            _COMB_EXP_TYPES.RESPONSE.data_type),
+            NeuronParameter(self._data[EXC_RESPONSE],
+                            _COMB_EXP_TYPES.RESPONSE_EXC.data_type),
             # exponential term buffer
-            NeuronParameter(self._exc_exp_response,
-                            _COMB_EXP_TYPES.RESPONSE.data_type),
+            NeuronParameter(self._data[EXC_EXP_RESPONSE],
+                            _COMB_EXP_TYPES.RESPONSE_EXC_EXP.data_type),
             # evolution parameters
             NeuronParameter(dt_divided_by_tau_syn_E_sqr,
-                            _COMB_EXP_TYPES.CONST.data_type),
-            NeuronParameter(e_decay, _COMB_EXP_TYPES.DECAY.data_type),
+                            _COMB_EXP_TYPES.CONST_EXC.data_type),
+            NeuronParameter(e_decay, _COMB_EXP_TYPES.DECAY_EXC.data_type),
 
-            NeuronParameter(self._inh_response,
-                            _COMB_EXP_TYPES.RESPONSE.data_type),
-            NeuronParameter(self._inh_exp_response,
-                            _COMB_EXP_TYPES.RESPONSE.data_type),
+            NeuronParameter(self._data[INH_RESPONSE],
+                            _COMB_EXP_TYPES.RESPONSE_INH.data_type),
+            NeuronParameter(self._data[INH_EXP_RESPONSE],
+                            _COMB_EXP_TYPES.RESPONSE_INH_EXP.data_type),
             NeuronParameter(dt_divided_by_tau_syn_I_sqr,
-                            _COMB_EXP_TYPES.CONST.data_type),
-            NeuronParameter(i_decay, _COMB_EXP_TYPES.DECAY.data_type),
+                            _COMB_EXP_TYPES.CONST_INH.data_type),
+            NeuronParameter(i_decay, _COMB_EXP_TYPES.DECAY_INH.data_type),
         ]
 
     def get_synapse_type_parameter_types(self):
