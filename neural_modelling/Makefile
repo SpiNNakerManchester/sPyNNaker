@@ -1,4 +1,4 @@
-BUILDS = spike_source/poisson delay_extension neuron
+BUILDS = spike_source/poisson spike_source/poisson_variable delay_extension neuron
 DIRS = $(BUILDS:%=src/%)
 
 all: $(DIRS)
