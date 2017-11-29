@@ -24,8 +24,8 @@ TAU_SYN_I = "tau_syn_I"
 class _COMB_EXP_TYPES(Enum):
     RESPONSE_EXC = (1, DataType.S1615)
     RESPONSE_EXC_EXP = (2, DataType.S1615)
-    CONST_EXP = (3, DataType.S1615)
-    DECAY_EXP = (4, DataType.UINT32)
+    CONST_EXC = (3, DataType.S1615)
+    DECAY_EXC = (4, DataType.UINT32)
     RESPONSE_INH = (5, DataType.S1615)
     RESPONSE_INH_EXP = (6, DataType.S1615)
     CONST_INH = (7, DataType.S1615)
