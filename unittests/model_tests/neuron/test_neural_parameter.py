@@ -35,16 +35,23 @@ def test_range_list():
     globals_variables.set_simulator(simulator)
 
     spec_writer = FileDataWriter("test.dat")
-    value = SpynakkerRangedList(size=10, value=1.0, key="test")
-    value[2:4] = 2.0
-    param = NeuronParameter(value, DataType.S1615)
     spec = DataSpecificationGenerator(spec_writer, None)
-    iterator = param.iterator_by_slice(0, 5, spec)
-    values = _iterate_parameter_values(iterator, DataType.S1615)
-    spec.end_specification()
-    os.remove("test.dat")
-    assert list(value[0:5]) == values
-    assert isinstance(iterator, _Range_Iterator)
+    try:
+        value = SpynakkerRangedList(size=10, value=1.0, key="test")
+        value[2:4] = 2.0
+        param = NeuronParameter(value, DataType.S1615)
+        iterator = param.iterator_by_slice(0, 5, spec)
+        values = _iterate_parameter_values(iterator, DataType.S1615)
+        assert list(value[0:5]) == values
+        assert isinstance(iterator, _Range_Iterator)
+    finally:
+        spec.end_specification()
+        os.remove("test.dat")
+
+
+def _generator(size):
+    for i in xrange(size):
+        yield i
 
 
 def test_range_list_as_list():
@@ -53,15 +60,17 @@ def test_range_list_as_list():
     globals_variables.set_simulator(simulator)
 
     spec_writer = FileDataWriter("test.dat")
-    value = SpynakkerRangedList(size=10, value=range(10), key="test")
-    param = NeuronParameter(value, DataType.S1615)
     spec = DataSpecificationGenerator(spec_writer, None)
-    iterator = param.iterator_by_slice(0, 5, spec)
-    values = _iterate_parameter_values(iterator, DataType.S1615)
-    spec.end_specification()
-    os.remove("test.dat")
-    assert list(value[0:5]) == values
-    assert isinstance(iterator, _Range_Iterator)
+    try:
+        value = SpynakkerRangedList(size=10, value=_generator(10), key="test")
+        param = NeuronParameter(value, DataType.S1615)
+        iterator = param.iterator_by_slice(0, 5, spec)
+        values = _iterate_parameter_values(iterator, DataType.S1615)
+        assert list(value[0:5]) == values
+        assert isinstance(iterator, _Range_Iterator)
+    finally:
+        spec.end_specification()
+        os.remove("test.dat")
 
 
 def test_real_list():
@@ -70,15 +79,17 @@ def test_real_list():
     globals_variables.set_simulator(simulator)
 
     spec_writer = FileDataWriter("test.dat")
-    value = range(10)
-    param = NeuronParameter(value, DataType.S1615)
     spec = DataSpecificationGenerator(spec_writer, None)
-    iterator = param.iterator_by_slice(0, 5, spec)
-    values = _iterate_parameter_values(iterator, DataType.S1615)
-    spec.end_specification()
-    os.remove("test.dat")
-    assert list(value[0:5]) == values
-    assert isinstance(iterator, _Get_Iterator)
+    try:
+        value = range(10)
+        param = NeuronParameter(value, DataType.S1615)
+        iterator = param.iterator_by_slice(0, 5, spec)
+        values = _iterate_parameter_values(iterator, DataType.S1615)
+        assert list(value[0:5]) == values
+        assert isinstance(iterator, _Get_Iterator)
+    finally:
+        spec.end_specification()
+        os.remove("test.dat")
 
 
 def test_single_value():
@@ -87,12 +98,14 @@ def test_single_value():
     globals_variables.set_simulator(simulator)
 
     spec_writer = FileDataWriter("test.dat")
-    value = 1.0
-    param = NeuronParameter(value, DataType.S1615)
     spec = DataSpecificationGenerator(spec_writer, None)
-    iterator = param.iterator_by_slice(0, 5, spec)
-    values = _iterate_parameter_values(iterator, DataType.S1615)
-    spec.end_specification()
-    os.remove("test.dat")
-    assert [value] * 5 == values
-    assert isinstance(iterator, _SingleValue_Iterator)
+    try:
+        value = 1.0
+        param = NeuronParameter(value, DataType.S1615)
+        iterator = param.iterator_by_slice(0, 5, spec)
+        values = _iterate_parameter_values(iterator, DataType.S1615)
+        assert [value] * 5 == values
+        assert isinstance(iterator, _SingleValue_Iterator)
+    finally:
+        spec.end_specification()
+        os.remove("test.dat")
