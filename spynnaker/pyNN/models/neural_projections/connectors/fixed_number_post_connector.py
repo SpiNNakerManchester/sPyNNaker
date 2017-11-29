@@ -49,7 +49,8 @@ class FixedNumberPostConnector(AbstractConnector):
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
-                if not self.with_replacement and self._n_post > self._n_post_neurons:
+                if (not self.with_replacement and
+                        self._n_post > self._n_post_neurons):
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False and n > n_post_neurons")
@@ -57,6 +58,10 @@ class FixedNumberPostConnector(AbstractConnector):
                 self._post_neurons[m] = numpy.random.choice(
                     self._n_post_neurons, self._n_post, self.with_replacement)
 
+#                 I'm leaving this here to revisit in the future -
+#                 I don't think it's working as intended, but whether
+#                 we want to rely on numpy.random.choice is another question
+#
 #                 if self.with_replacement:
 #                     # We use numpy.random.choice
 #                     self._post_neurons[m] = numpy.random.choice(
@@ -114,7 +119,6 @@ class FixedNumberPostConnector(AbstractConnector):
         if not self._is_connected(post_vertex_slice, 0):
             return 0
 
-        # Need to edit this
         n_connections = 0
         lo = pre_vertex_slice.lo_atom
         hi = pre_vertex_slice.hi_atom
@@ -125,11 +129,10 @@ class FixedNumberPostConnector(AbstractConnector):
                                         post_vertex_slice, n)))
 
         if min_delay is None or max_delay is None:
-            return n_connections  # pre_vertex_slice.n_atoms
+            return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_post * self._n_pre_neurons,
-#            pre_vertex_slice.n_atoms, None, min_delay, max_delay)
             n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
@@ -137,7 +140,7 @@ class FixedNumberPostConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         if not self._is_connected(post_vertex_slice, 0):
             return 0
-        return self._n_post  # pre_vertex_slice.n_atoms
+        return self._n_post
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
