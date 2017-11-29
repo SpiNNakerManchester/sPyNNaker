@@ -1,7 +1,4 @@
-MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_DIR := $(dir $(MAKEFILE_PATH))
-SOURCE_DIR := $(abspath $(CURRENT_DIR))
-SOURCE_DIRS += $(SOURCE_DIR)
-ifndef APP_OUTPUT_DIR
-    APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
-endif
+# THIS FILE IS A STUB FOR A RENAMED VERSION
+# IT IS KEPT FOR BACKWARD COMPATIBILITY ONLY
+$(warning inclusion of Makefile.paths instead of paths.mk)
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))paths.mk
