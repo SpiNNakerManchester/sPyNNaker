@@ -1,9 +1,10 @@
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AbstractAdditionalInput
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
 
 import numpy
 from enum import Enum
@@ -35,7 +36,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         AbstractAdditionalInput.__init__(self)
 
         self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[TAU_CA2] = tau_ca2
         self._data[I_CA2] = i_ca2
         self._data[I_ALPHA] = i_alpha

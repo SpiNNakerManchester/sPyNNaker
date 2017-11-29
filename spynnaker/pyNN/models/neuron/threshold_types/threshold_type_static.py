@@ -2,8 +2,9 @@ from pacman.model.decorators import overrides
 
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
 from .abstract_threshold_type import AbstractThresholdType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 
 from data_specification.enums import DataType
 
@@ -38,7 +39,7 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
         self._units = {V_THRESH: "mV"}
 
         self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[V_THRESH] = v_thresh
 
     @property

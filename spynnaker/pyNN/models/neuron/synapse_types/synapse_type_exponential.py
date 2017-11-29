@@ -2,8 +2,9 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
 from .abstract_synapse_type import AbstractSynapseType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 import numpy
@@ -68,7 +69,7 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
             GSYN_INH: "uS"}
 
         self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[TAU_SYN_E] = tau_syn_E
         self._data[TAU_SYN_I] = tau_syn_I
         self._data[GSYN_EXC] = initial_input_exc

@@ -4,8 +4,9 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
 from .abstract_synapse_type import AbstractSynapseType
-from spinn_utilities.ranged.range_dictionary import RangeDictionary
 from data_specification.enums import DataType
 
 from enum import Enum
@@ -59,7 +60,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             GSYN_INH: "uS"}
 
         self._n_neurons = n_neurons
-        self._data = RangeDictionary(size=n_neurons)
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[TAU_SYN_E] = tau_syn_E
         self._data[TAU_SYN_E2] = tau_syn_E2
         self._data[TAU_SYN_I] = tau_syn_I
