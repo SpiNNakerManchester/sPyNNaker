@@ -2,7 +2,6 @@ from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint
 
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet, AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
@@ -167,8 +166,7 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
-        self._vertex.initialize(variable, utility_calls.convert_param_to_numpy(
-            value, self._vertex.n_atoms))
+        self._vertex.initialize(variable, value)
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
@@ -422,6 +420,9 @@ class PyNNPopulationCommon(object):
     def _roundsize(self, size, label):
         if isinstance(size, int):
             return size
+        # External device population can have a size of None so accept for now
+        if size is None:
+            return None
         if label is None:
             label = "None"
         # Allow a float which has a near int value
