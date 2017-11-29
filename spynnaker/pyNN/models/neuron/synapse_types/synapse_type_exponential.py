@@ -37,23 +37,18 @@ class _EXP_TYPES(Enum):
 
 
 def get_exponential_decay_and_init(tau, machine_time_step):
-    """
-    decay = numpy.exp(numpy.divide(-float(machine_time_step),
-                                   numpy.multiply(1000.0, tau)))
-    decay = numpy.exp(-float(machine_time_step)/ (1000.0 * tau)))
-    init = numpy.multiply(numpy.multiply(tau, numpy.subtract(1.0, decay)),
-                          (1000.0 / float(machine_time_step)))
-    scale = float(pow(2, 32))
-    decay_scaled = numpy.multiply(decay, scale).astype("uint32")
-    init_scaled = numpy.multiply(init, scale).astype("uint32")
-    """
-    return tau.apply_operation(
-        lambda x: int(numpy.exp(-float(machine_time_step)/(1000.0 * x)) *
-                      pow(2, 32))), \
+    ulfract = pow(2, 32)
+    ts = float(machine_time_step) / 1000.0
+    return (
+
+        # decay = e^(-ts / tau) as an unsigned long fract
         tau.apply_operation(
-            lambda x: int(x * (1.0 - numpy.exp(
-                -float(machine_time_step)/(1000.0 * x))) *
-                          (1000.0 / float(machine_time_step)) * pow(2, 32)))
+            lambda x: int(numpy.exp(-ts / x) * ulfract)),
+
+        # init = (tau / ts) * (1 - e^(-ts / tau)) as an unsigned long fract
+        tau.apply_operation(
+            lambda x: int((x / ts) * (1.0 - numpy.exp(-ts / x)) * ulfract))
+    )
 
 
 class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):

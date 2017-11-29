@@ -61,11 +61,15 @@ def convert_param_to_numpy(param, no_atoms):
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
     if len(parameters) == 0:
         return
+
+    # Get an iterator per parameter
     iterators = []
     for param in parameters:
         iterators.append(param.iterator_by_slice(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
-    while True:  # Keep going until you get a StopIteration
+
+    # Iterate through the iterators until a StopIteration is generated
+    while True:
         try:
             for iterator in iterators:
                 (cmd_word_list, cmd_string) = iterator.next()
