@@ -149,6 +149,7 @@ void _reset_record_counter(){
         // Increase one each call so z_index gets to v_rate
         v_increment = 1;
     }
+
     exc_index = 1;
     if (global_record_params->exc_rate == 0){
         exc_increment = 0;
@@ -175,6 +176,8 @@ bool _neuron_load_neuron_parameters(address_t address){
     log_info("loading global record parameters");
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
+
+    _reset_record_counter();
 
     log_info("loading neuron global parameters");
     memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));

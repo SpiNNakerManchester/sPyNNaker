@@ -234,7 +234,8 @@ class AbstractPopulationVertex(
             self._get_buffered_sdram_per_timestep(vertex_slice),
             n_machine_time_steps, self._minimum_buffer_sdram,
             self._maximum_sdram_for_buffering,
-            self._using_auto_pause_and_resume)
+            self._using_auto_pause_and_resume,
+            self._get_extra_buffered_sdram(vertex_slice))
         container.extend(recording_utilities.get_recording_resources(
             recording_sizes, self._receive_buffer_host,
             self._receive_buffer_port))
@@ -255,12 +256,22 @@ class AbstractPopulationVertex(
         return [
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "v", vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "gsyn_exc", vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "gsyn_inh", vertex_slice.n_atoms, 1)
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "v", vertex_slice),
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "gsyn_exc", vertex_slice),
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "gsyn_inh", vertex_slice)
+        ]
+
+    def _get_extra_buffered_sdram(self, vertex_slice):
+        return [
+            0,
+            self._neuron_recorder.get_extra_buffered_sdram("v", vertex_slice),
+            self._neuron_recorder.get_extra_buffered_sdram(
+                "gsyn_exc", vertex_slice),
+            self._neuron_recorder.get_extra_buffered_sdram(
+                "gsyn_inh", vertex_slice)
         ]
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
@@ -275,9 +286,10 @@ class AbstractPopulationVertex(
                        self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
+        extra_buffered_sdram = self._get_extra_buffered_sdram(vertex_slice)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
             buffered_sdram_per_timestep, n_machine_time_steps,
-            self._minimum_buffer_sdram)
+            self._minimum_buffer_sdram, extra_buffered_sdram)
         vertex = PopulationMachineVertex(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints)
@@ -570,7 +582,8 @@ class AbstractPopulationVertex(
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
             n_machine_time_steps,
             self._get_buffered_sdram_per_timestep(vertex_slice),
-            self._maximum_sdram_for_buffering)
+            self._maximum_sdram_for_buffering,
+            self._get_extra_buffered_sdram(vertex_slice))
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
             self._buffer_size_before_receive, ip_tags))
