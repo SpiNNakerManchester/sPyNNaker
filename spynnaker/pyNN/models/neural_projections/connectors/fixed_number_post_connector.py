@@ -25,6 +25,7 @@ class FixedNumberPostConnector(AbstractConnector):
         AbstractConnector.__init__(self, safe, verbose)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
+        self._verbose = verbose
         self._post_neurons_set = False
 
     def get_delay_maximum(self):
@@ -95,6 +96,12 @@ class FixedNumberPostConnector(AbstractConnector):
 
                 # Sort the neurons now that we have them
                 self._post_neurons[m].sort()
+
+                # If verbose then output the list connected to this pre-neuron
+                if self._verbose:
+                    print 'pre-neuron ', m, ' connects to post-neurons '
+                    print self._post_neurons[m]
+
         return self._post_neurons
 
     def _post_neurons_in_slice(self, post_vertex_slice, n):
