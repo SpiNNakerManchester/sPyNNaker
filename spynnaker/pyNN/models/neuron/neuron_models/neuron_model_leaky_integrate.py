@@ -2,13 +2,21 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
 from .abstract_neuron_model import AbstractNeuronModel
-from spynnaker.pyNN.utilities import utility_calls
 
 from data_specification.enums import DataType
 
 import numpy
 from enum import Enum
+
+V_INIT = "v_init"
+V_REST = "v_rest"
+TAU_M = "tau_m"
+CM = "cm"
+I_OFFSET = "i_offset"
+R_MEMBRANE = "r_membrane"
 
 
 class _IF_TYPES(Enum):
@@ -37,78 +45,74 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         AbstractContainsUnits.__init__(self)
 
         self._units = {
-            'v_init': 'mV',
-            'v_rest': 'mV',
-            'tau_m': 'ms',
-            'cm': 'nF',
-            'i_offset': 'nA'}
-
-        if v_init is None:
-            v_init = v_rest
+            V_INIT: 'mV',
+            V_REST: 'mV',
+            TAU_M: 'ms',
+            CM: 'nF',
+            I_OFFSET: 'nA'}
 
         self._n_neurons = n_neurons
-        self._v_init = utility_calls.convert_param_to_numpy(v_init, n_neurons)
-        self._v_rest = utility_calls.convert_param_to_numpy(v_rest, n_neurons)
-        self._tau_m = utility_calls.convert_param_to_numpy(tau_m, n_neurons)
-        self._cm = utility_calls.convert_param_to_numpy(cm, n_neurons)
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, n_neurons)
+        if v_init is None:
+            v_init = v_rest
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data[V_INIT] = v_init
+        self._data[V_REST] = v_rest
+        self._data[TAU_M] = tau_m
+        self._data[CM] = cm
+        self._data[I_OFFSET] = i_offset
+        self._data["r_membrane"] = self._data[TAU_M] / self._data[CM]
 
     def initialize_v(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
-            v_init, self._n_neurons)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     @property
     def v_init(self):
-        return self._v_init
+        return self._data[V_INIT]
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v_init = utility_calls.convert_param_to_numpy(
-            v_init, self._n_neurons)
+        self._data.set_value(key=V_INIT, value=v_init)
 
     @property
     def v_rest(self):
-        return self._v_rest
+        return self._data[V_REST]
 
     @v_rest.setter
     def v_rest(self, v_rest):
-        self._v_rest = utility_calls.convert_param_to_numpy(
-            v_rest, self._n_neurons)
+        self._data.set_value(key=V_REST, value=v_rest)
 
     @property
     def tau_m(self):
-        return self._tau_m
+        return self._data[TAU_M]
 
     @tau_m.setter
     def tau_m(self, tau_m):
-        self._tau_m = utility_calls.convert_param_to_numpy(
-            tau_m, self._n_neurons)
+        self._data.set_value(key=TAU_M, value=tau_m)
 
     @property
     def cm(self):
-        return self._cm
+        return self._data[CM]
 
     @cm.setter
     def cm(self, cm):
-        self._cm = utility_calls.convert_param_to_numpy(cm, self._n_neurons)
+        self._data.set_value(key=CM, value=cm)
 
     @property
     def i_offset(self):
-        return self._i_offset
+        return self._data[I_OFFSET]
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._i_offset = utility_calls.convert_param_to_numpy(
-            i_offset, self._n_neurons)
+        self._data.set_value(key=I_OFFSET, value=i_offset)
 
     @property
     def _r_membrane(self):
-        return self._tau_m / self._cm
+        return self._data[R_MEMBRANE]
 
     def _exp_tc(self, machine_time_step):
-        return numpy.exp(float(-machine_time_step) /
-                         (1000.0 * self._tau_m))
+        return self._data[TAU_M].apply_operation(
+            operation=lambda x: numpy.exp(
+                float(-machine_time_step) / (1000.0 * x)))
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -122,26 +126,29 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
             # membrane voltage [mV]
             # REAL     V_membrane;
-            NeuronParameter(self._v_init, _IF_TYPES.V_INIT.data_type),
+            NeuronParameter(self._data[V_INIT], _IF_TYPES.V_INIT.data_type),
 
             # membrane resting voltage [mV]
             # REAL     V_rest;
-            NeuronParameter(self._v_rest, _IF_TYPES.V_REST.data_type),
+            NeuronParameter(self._data[V_REST], _IF_TYPES.V_REST.data_type),
 
             # membrane resistance [MOhm]
             # REAL     R_membrane;
-            NeuronParameter(self._r_membrane, _IF_TYPES.R_MEMBRANE.data_type),
+            NeuronParameter(self._data[R_MEMBRANE],
+                            _IF_TYPES.R_MEMBRANE.data_type),
 
             # 'fixed' computation parameter - time constant multiplier for
             # closed-form solution
             # exp( -(machine time step in ms)/(R * C) ) [.]
             # REAL     exp_TC;
             NeuronParameter(
-                self._exp_tc(machine_time_step), _IF_TYPES.EXP_TC.data_type),
+                self._exp_tc(machine_time_step),
+                _IF_TYPES.EXP_TC.data_type),
 
             # offset current [nA]
             # REAL     I_offset;
-            NeuronParameter(self._i_offset, _IF_TYPES.I_OFFSET.data_type)
+            NeuronParameter(self._data[I_OFFSET],
+                            _IF_TYPES.I_OFFSET.data_type)
         ]
 
     @overrides(AbstractNeuronModel.get_neural_parameter_types)
@@ -162,7 +169,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._v_init[vertex_slice.as_slice] = neural_parameters[0]
+        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[0]
 
     def get_n_cpu_cycles_per_neuron(self):
 

@@ -1,11 +1,16 @@
 from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
+    SpynakkerRangeDictionary
+
 from .abstract_input_type import AbstractInputType
 
 from enum import Enum
+
+E_REV_E = "e_rev_E"
+E_REV_I = "e_rev_I"
 
 
 class _CONDUCTANTCE_TYPES(Enum):
@@ -30,34 +35,30 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
         AbstractInputType.__init__(self)
         AbstractContainsUnits.__init__(self)
-
         self._units = {
-            "e_rev_I": "mV",
-            "e_rev_E": "mV"}
+            E_REV_E: "mV",
+            E_REV_I: "mV"}
 
         self._n_neurons = n_neurons
-        self._e_rev_E = utility_calls.convert_param_to_numpy(
-            e_rev_E, n_neurons)
-        self._e_rev_I = utility_calls.convert_param_to_numpy(
-            e_rev_I, n_neurons)
+        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data[E_REV_E] = e_rev_E
+        self._data[E_REV_I] = e_rev_I
 
     @property
     def e_rev_E(self):
-        return self._e_rev_E
+        return self._data[E_REV_E]
 
     @e_rev_E.setter
     def e_rev_E(self, e_rev_E):
-        self._e_rev_E = utility_calls.convert_param_to_numpy(
-            e_rev_E, self._n_neurons)
+        self._data.set_value(key=E_REV_E, value=e_rev_E)
 
     @property
     def e_rev_I(self):
-        return self._e_rev_I
+        return self._data[E_REV_I]
 
     @e_rev_I.setter
     def e_rev_I(self, e_rev_I):
-        self._e_rev_I = utility_calls.convert_param_to_numpy(
-            e_rev_I, self._n_neurons)
+        self._data.set_value(key=E_REV_I, value=e_rev_I)
 
     def get_global_weight_scale(self):
         return 1024.0
@@ -68,9 +69,9 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return [
             NeuronParameter(
-                self._e_rev_E, _CONDUCTANTCE_TYPES.E_REV_E.data_type),
+                self._data[E_REV_E], _CONDUCTANTCE_TYPES.E_REV_E.data_type),
             NeuronParameter(
-                self._e_rev_I, _CONDUCTANTCE_TYPES.E_REV_I.data_type)
+                self._data[E_REV_I], _CONDUCTANTCE_TYPES.E_REV_I.data_type)
         ]
 
     def get_input_type_parameter_types(self):
