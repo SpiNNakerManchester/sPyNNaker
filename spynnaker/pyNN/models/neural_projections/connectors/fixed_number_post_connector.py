@@ -48,8 +48,8 @@ class FixedNumberPostConnector(AbstractConnector):
                 self._n_post_neurons)
             # if verbose open a file to output the connectivity
             if self._verbose:
-                filename = self._pre_population.label+'_to_'+\
-                    self._post_population.label+'_fixednumberpost-conn.csv'
+                filename = self._pre_population.label + '_to_' + \
+                    self._post_population.label + '_fixednumberpost-conn.csv'
                 print 'Output post-connectivity to ', filename
                 file_handle = file(filename, 'w')
                 numpy.savetxt(file_handle,
