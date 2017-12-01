@@ -46,6 +46,16 @@ class FixedNumberPostConnector(AbstractConnector):
             self._post_neurons_set = True
             self._rng_parameters = self.get_rng_parameters(
                 self._n_post_neurons)
+            # if verbose open a file to output the connectivity
+            if self._verbose:
+                filename = self._pre_population.label+'_to_'+\
+                    self._post_population.label+'_fixednumberpost-conn.csv'
+                print 'Output post-connectivity to ', filename
+                file_handle = file(filename, 'w')
+                numpy.savetxt(file_handle,
+                              [(self._n_pre_neurons, self._n_post_neurons,
+                                self._n_post)],
+                              fmt="%u,%u,%u")
 
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
@@ -99,8 +109,9 @@ class FixedNumberPostConnector(AbstractConnector):
 
                 # If verbose then output the list connected to this pre-neuron
                 if self._verbose:
-                    print 'pre-neuron ', m, ' connects to post-neurons '
-                    print self._post_neurons[m]
+                    numpy.savetxt(file_handle,
+                                  self._post_neurons[m][None, :],
+                                  fmt=("%u,"*(self._n_post-1)+"%u"))
 
         return self._post_neurons
 
