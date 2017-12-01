@@ -129,9 +129,9 @@ class RecordingCommon(object):
         """
         self._sampling_interval = new_value
 
-    def _get_recorded_variable(self, variable):
+    def _get_recorded_pynn7(self, variable):
         """ method that contains all the safety checks and gets the recorded
-        data from the vertex
+        data from the vertex in P7NN0.7 format
 
         :param variable: the variable name to read. supported variable names
         are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
@@ -171,7 +171,7 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
         else:
             # assuming we got here, everything is ok, so we should go get the
-            # voltages
+            # data
             data = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
@@ -179,6 +179,58 @@ class RecordingCommon(object):
         get_simulator().add_extraction_timing(
             timer.take_sample())
         return data
+
+    def _get_recorded_matrix(self, variable):
+        """ method that contains all the safety checks and gets the recorded
+        data from the vertex in P7NN0.7 format
+
+        :param variable: the variable name to read. supported variable names
+        are :'gsyn_exc', 'gsyn_inh', 'v'
+        :return: the data
+        """
+        timer = Timer()
+        timer.start_timing()
+        data = None
+        sim = get_simulator()
+
+        globals_variables.get_simulator().verify_not_running()
+
+        # check that we're in a state to get voltages
+        if not isinstance(
+                self._population._vertex, AbstractNeuronRecordable):
+            raise ConfigurationException(
+                "This population has not got the capability to record {}"
+                .format(variable))
+
+        if not self._population._vertex.is_recording(variable):
+            raise ConfigurationException(
+                "This population has not been set to record {}"
+                .format(variable))
+
+        if not sim.has_ran:
+            logger.warn(
+                "The simulation has not yet run, therefore {} cannot"
+                " be retrieved, hence the list will be empty".format(
+                    variable))
+            data = numpy.zeros((0, 3))
+
+        if sim.use_virtual_board:
+            logger.warn(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
+            data = numpy.zeros((0, 3))
+            ids = []
+            sampling_interval = None
+        else:
+            # assuming we got here, everything is ok, so we should go get the
+            # data
+            (data, ids, sampling_interval) = self._population._vertex.get_data(
+                variable, sim.no_machine_time_steps, sim.placements,
+                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+
+        get_simulator().add_extraction_timing(
+            timer.take_sample())
+        return (data, ids, sampling_interval)
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
