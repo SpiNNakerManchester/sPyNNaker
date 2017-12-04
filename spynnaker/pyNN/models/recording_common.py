@@ -134,7 +134,7 @@ class RecordingCommon(object):
         n_machine_time_steps = len(data)
         n_neurons = len(ids)
         column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval for i in
+        times = [i * sampling_interval / 1000 for i in
                  xrange(0, n_machine_time_steps)]
         if data2 is None:
             pynn7 = numpy.empty((column_length, 3))
@@ -193,8 +193,7 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
             ids = []
             sampling_interval = None
-
-        if sim.use_virtual_board:
+        elif sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
