@@ -129,56 +129,34 @@ class RecordingCommon(object):
         """
         self._sampling_interval = new_value
 
+    @staticmethod
+    def pynn7_format(data, ids, sampling_interval, data2=None):
+        n_machine_time_steps = len(data)
+        n_neurons = len(ids)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval for i in
+                 xrange(0, n_machine_time_steps)]
+        if data2 is None:
+            pynn7 = numpy.empty((column_length, 3))
+        else:
+            pynn7 = numpy.empty((column_length, 4))
+        pynn7[:, 0] = numpy.repeat(times, n_neurons, 0).\
+            reshape(1, column_length)
+        pynn7[:, 1] = numpy.tile(ids, n_machine_time_steps).\
+            reshape(1, column_length)
+        pynn7[:, 2] = data.reshape(1, column_length)
+        if data2 is not None:
+            pynn7[:, 3] = data.reshape(1, column_length)
+        return pynn7
+
     def _get_recorded_pynn7(self, variable):
-        """ method that contains all the safety checks and gets the recorded
-        data from the vertex in P7NN0.7 format
-
-        :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
-        :return: the data
-        """
-        timer = Timer()
-        timer.start_timing()
-        data = None
-        sim = get_simulator()
-
-        globals_variables.get_simulator().verify_not_running()
         if variable == "spikes":
             data = self._get_spikes()
 
-        # check that we're in a state to get voltages
-        elif not isinstance(
-                self._population._vertex, AbstractNeuronRecordable):
-            raise ConfigurationException(
-                "This population has not got the capability to record {}"
-                .format(variable))
-        elif not self._population._vertex.is_recording(variable):
-            raise ConfigurationException(
-                "This population has not been set to record {}"
-                .format(variable))
-
-        elif not sim.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore {} cannot"
-                " be retrieved, hence the list will be empty".format(
-                    variable))
-            data = numpy.zeros((0, 3))
-
-        elif sim.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
-            data = numpy.zeros((0, 3))
-        else:
-            # assuming we got here, everything is ok, so we should go get the
-            # data
-            data = self._population._vertex.get_data(
-                variable, sim.no_machine_time_steps, sim.placements,
-                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
-
-        get_simulator().add_extraction_timing(
-            timer.take_sample())
-        return data
+        (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
+        return self.pynn7_format(data, ids, sampling_interval)
+        (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
+        return self.pynn7_format(data, ids, sampling_interval)
 
     def _get_recorded_matrix(self, variable):
         """ method that contains all the safety checks and gets the recorded
@@ -213,6 +191,8 @@ class RecordingCommon(object):
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
+            ids = []
+            sampling_interval = None
 
         if sim.use_virtual_board:
             logger.warn(

@@ -191,21 +191,6 @@ class AbstractUInt32Recorder(object):
                 data = numpy.append(data, fragment, axis=1)
         return (data, ids, sampling_interval)
 
-    @staticmethod
-    def pynn7_format(data, ids, sampling_interval):
-        n_machine_time_steps = len(data)
-        n_neurons = len(ids)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval for i in
-                 xrange(0, n_machine_time_steps)]
-        pynn7 = numpy.empty((column_length, 3))
-        pynn7[:, 0] = numpy.repeat(times, n_neurons, 0).\
-            reshape(1, column_length)
-        pynn7[:, 1] = numpy.tile(ids, n_machine_time_steps).\
-            reshape(1, column_length)
-        pynn7[:, 2] = data.reshape(1, column_length)
-        return pynn7
-
 
 if __name__ == '__main__':
     import quantities
