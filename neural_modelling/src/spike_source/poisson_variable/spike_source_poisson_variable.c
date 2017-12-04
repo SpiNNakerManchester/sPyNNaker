@@ -192,15 +192,15 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 void print_next_spike_sources(){
     if (num_spike_sources > 0) {
         for (index_t s = 0; s < num_spike_sources; s++) {
-            log_info("atom %d", s);
-            log_info("scaled_start = %u", next_window_sources[s].start_ticks);
-            log_info("scaled end = %u", next_window_sources[s].end_ticks);
-            log_info("is_fast_source = %d",
+            log_debug("atom %d", s);
+            log_debug("scaled_start = %u", next_window_sources[s].start_ticks);
+            log_debug("scaled end = %u", next_window_sources[s].end_ticks);
+            log_debug("is_fast_source = %d",
                      next_window_sources[s].is_fast_source);
-            log_info("exp_minus_lamda = %k",
+            log_debug("exp_minus_lamda = %k",
                      (REAL)(next_window_sources[s].exp_minus_lambda));
-            log_info("isi_val = %k", next_window_sources[s].mean_isi_ticks);
-            log_info("time_to_spike = %k",
+            log_debug("isi_val = %k", next_window_sources[s].mean_isi_ticks);
+            log_debug("time_to_spike = %k",
                      next_window_sources[s].time_to_spike_ticks);
         }
     }
@@ -209,15 +209,15 @@ void print_next_spike_sources(){
 void print_spike_sources(){
     if (num_spike_sources > 0) {
         for (index_t s = 0; s < num_spike_sources; s++) {
-            log_info("atom %d", s);
-            log_info("scaled_start = %u", spike_source_array[s].start_ticks);
-            log_info("scaled end = %u", spike_source_array[s].end_ticks);
-            log_info("is_fast_source = %d",
+            log_debug("atom %d", s);
+            log_debug("scaled_start = %u", spike_source_array[s].start_ticks);
+            log_debug("scaled end = %u", spike_source_array[s].end_ticks);
+            log_debug("is_fast_source = %d",
                      spike_source_array[s].is_fast_source);
-            log_info("exp_minus_lamda = %k",
+            log_debug("exp_minus_lamda = %k",
                      (REAL)(spike_source_array[s].exp_minus_lambda));
-            log_info("isi_val = %k", spike_source_array[s].mean_isi_ticks);
-            log_info("time_to_spike = %k",
+            log_debug("isi_val = %k", spike_source_array[s].mean_isi_ticks);
+            log_debug("time_to_spike = %k",
                      spike_source_array[s].time_to_spike_ticks);
         }
     }
@@ -230,24 +230,24 @@ void print_spike_sources(){
 //!         False otherwise
 bool read_poisson_parameters(address_t address) {
 
-    log_info("read_parameters for variable source: starting");
+    log_debug("read_parameters for variable source: starting");
 
     has_been_given_key = address[HAS_KEY];
     key = address[TRANSMISSION_KEY];
     random_backoff_us = address[RANDOM_BACKOFF];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
-    log_info("\t key = %08x, back off = %u", key, random_backoff_us);
+    log_debug("\t key = %08x, back off = %u", key, random_backoff_us);
 
     memcpy(spike_source_seed, &address[PARAMETER_SEED_START_POSITION],
         seed_size * sizeof(uint32_t));
 
-    log_info("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
+    log_debug("\tSeed (%u) = %u %u %u %u", seed_size, spike_source_seed[0],
              spike_source_seed[1], spike_source_seed[2], spike_source_seed[3]);
 
     validate_mars_kiss64_seed(spike_source_seed);
 
     num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
-    log_info("\tspike sources = %u", num_spike_sources);
+    log_debug("\tspike sources = %u", num_spike_sources);
 
     memcpy(
         &seconds_per_tick,
@@ -275,11 +275,11 @@ bool read_poisson_parameters(address_t address) {
     	sizeof(uint32_t));
 
 
-    log_info("seconds_per_tick = %k\n", (REAL)(seconds_per_tick));
-    log_info("ticks_per_second = %k\n", ticks_per_second);
-    log_info("slow_rate_per_tick_cutoff = %k\n", slow_rate_per_tick_cutoff);
-    log_info("number of different rates = %u", num_diff_rates);
-    log_info("rate interval duration = %u", rate_interval_duration);
+    log_debug("seconds_per_tick = %k\n", (REAL)(seconds_per_tick));
+    log_debug("ticks_per_second = %k\n", ticks_per_second);
+    log_debug("slow_rate_per_tick_cutoff = %k\n", slow_rate_per_tick_cutoff);
+    log_debug("number of different rates = %u", num_diff_rates);
+    log_debug("rate interval duration = %u", rate_interval_duration);
 
     // Allocate DTCM for array of spike sources and copy block of data
     if (num_spike_sources > 0) {
@@ -307,7 +307,7 @@ bool read_poisson_parameters(address_t address) {
             num_spike_sources * sizeof(spike_source_t));
 
         block_size = num_spike_sources * sizeof(spike_source_t) / 4;
-        log_info("block size = %u", block_size);
+        log_debug("block size = %u", block_size);
 
 
 
@@ -318,7 +318,7 @@ bool read_poisson_parameters(address_t address) {
 
     }
 
-    log_info("read_parameters: completed successfully");
+    log_debug("read_parameters: completed successfully");
     return true;
 }
 
@@ -334,7 +334,7 @@ static bool initialise_recording(){
         SPIKE_HISTORY_REGION, address);
 
     bool success = recording_initialize(recording_region, &recording_flags);
-    log_info("Recording flags = 0x%08x", recording_flags);
+    log_debug("Recording flags = 0x%08x", recording_flags);
 
     return success;
 }
@@ -346,7 +346,7 @@ static bool initialise_recording(){
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
 static bool initialize(uint32_t *timer_period) {
-    log_info("Initialise: started");
+    log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
@@ -402,7 +402,7 @@ static bool initialize(uint32_t *timer_period) {
     // initialise time to change to end of first interval
     time_to_change = rate_interval_duration;
 
-    log_info("Initialise: completed successfully");
+    log_debug("Initialise: completed successfully");
 
     return true;
 }
@@ -439,7 +439,7 @@ void resume_callback() {
 //! host when needed
 //! \return None
 bool store_poisson_parameters(){
-    log_info("stored_parameters: starting");
+    log_debug("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
@@ -447,7 +447,7 @@ bool store_poisson_parameters(){
     uint32_t seed_size = sizeof(mars_kiss64_seed_t) / sizeof(uint32_t);
 
     num_spike_sources = address[PARAMETER_SEED_START_POSITION + seed_size];
-    log_info("\t spike sources = %u", num_spike_sources);
+    log_debug("\t spike sources = %u", num_spike_sources);
 
     // store array of spike sources into sdram for reading by the host
     if (num_spike_sources > 0) {
@@ -462,7 +462,7 @@ bool store_poisson_parameters(){
             num_spike_sources * sizeof(spike_source_t));
     }
 
-    log_info("stored_parameters : completed successfully");
+    log_debug("stored_parameters : completed successfully");
     return true;
 }
 
@@ -592,8 +592,8 @@ void timer_callback(uint timer_count, uint unused) {
 
     // update to new rate if time
     if (time == time_to_change){
-    	log_info("time = %u, changing spike sources", time);
-    	//log_info("before");
+    	log_debug("time = %u, changing spike sources", time);
+    	//log_debug("before");
     	//print_spike_sources();
 
     	// copy contents of next pointer to current
@@ -609,10 +609,10 @@ void timer_callback(uint timer_count, uint unused) {
             }
         }
 
-//    	log_info("after");
+//    	log_debug("after");
 //    	print_spike_sources();
     	time_to_change += rate_interval_duration;
-    	//log_info("+++++++++++++++++++++++++++++++++++");
+    	//log_debug("+++++++++++++++++++++++++++++++++++");
 
     	address_t address = data_specification_get_data_address();
     	address = data_specification_get_region(POISSON_PARAMS, address);
