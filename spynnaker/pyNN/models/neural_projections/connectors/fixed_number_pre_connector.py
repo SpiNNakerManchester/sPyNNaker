@@ -44,8 +44,6 @@ class FixedNumberPreConnector(AbstractConnector):
         if not self._pre_neurons_set:
             self._pre_neurons = [None] * self._n_post_neurons
             self._pre_neurons_set = True
-#            self._rng_parameters = self.get_rng_parameters(
-#                self._n_pre_neurons)
 
             # if verbose open a file to output the connectivity
             if self._verbose:
@@ -94,39 +92,6 @@ class FixedNumberPreConnector(AbstractConnector):
                     self._pre_neurons[m] = numpy.random.choice(
                         self._n_pre_neurons, self._n_pre,
                         self.with_replacement)
-
-#                 I'm leaving this here to revisit in the future -
-#                 I don't think it's working as intended, but whether
-#                 we want to rely on numpy.random.choice is another question
-#
-#                 if self.with_replacement:
-#                     self._pre_neurons[m] = numpy.random.choice(
-#                         self._n_pre_neurons, self._n_pre,
-#                         self.with_replacement)
-#                 elif self._n_pre > self._n_pre_neurons:
-#                     # Throw an exception
-#                     raise SpynnakerException(
-#                         "FixedNumberPreConnector will not work when "
-#                         "with_replacement=False and n > n_pre_neurons")
-#                 else:
-#                     # We can't use numpy.random.choice, so we
-#                     # use a different method of selection
-#                     n = 0
-#                     while (n < self._n_pre):
-#                         permutation = numpy.arange(self._n_pre_neurons)
-#                         for i in range(0, self._n_pre_neurons - 1):
-#                             j = int(self._rng.next(
-#                                 n=1, distribution="uniform",
-#                                 parameters=self._rng_parameters))
-#                             (permutation[i], permutation[j]) = (
-#                                 permutation[j], permutation[i])
-#                         n += self._n_pre_neurons
-#                         if self._pre_neurons[m] is None:
-#                             self._pre_neurons[m] = permutation
-#                         else:
-#                             self._pre_neurons[m] = numpy.append(
-#                                 self._pre_neurons, permutation)
-#                     self._pre_neurons[m] = self._pre_neurons[m][:self._n_pre]
 
                 # Sort the neurons now that we have them
                 self._pre_neurons[m].sort()
@@ -242,63 +207,27 @@ class FixedNumberPreConnector(AbstractConnector):
 
         # Get number of connections
         n_connections = 0
-        for n in range(0, self._n_post_neurons):
-            if (n >= lo and n <= hi):
-                n_connections += len(self._pre_neurons_in_slice(
-                    pre_vertex_slice, n))
-
-        # If self connections are not allowed then subtract those connections
-        if (not self._allow_self_connections and
-                pre_vertex_slice is post_vertex_slice):
-            for n in range(0, self._n_post_neurons):
-                if (n >= lo and n <= hi):
-                    pre_neurons = self._pre_neurons_in_slice(
-                        pre_vertex_slice, n)
-                    for m in range(0, len(pre_neurons)):
-                        if (n == pre_neurons[m]):
-                            n_connections -= 1
+        for n in range(lo, hi + 1):
+            n_connections += len(self._pre_neurons_in_slice(
+                pre_vertex_slice, n))
 
         # Set up the block
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        # If self connections not allowed set up source and target accordingly
-        if (not self._allow_self_connections and
-                pre_vertex_slice is post_vertex_slice):
-            pre_neurons_in_slice = []
-            post_neurons_in_slice = []
-            post_vertex_array = numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-            for n in range(0, self._n_post_neurons):
-                if (n >= lo and n <= hi):
-                    pre_neurons = self._pre_neurons_in_slice(
-                        pre_vertex_slice, n)
-                    for m in range(0, len(pre_neurons)):
-                        if (n != pre_neurons[m]):
-                            pre_neurons_in_slice.append(pre_neurons[m])
-                            post_neurons_in_slice.append(
-                                post_vertex_array[n-post_vertex_slice.lo_atom])
+        # Set up source and target
+        pre_neurons_in_slice = []
+        post_neurons_in_slice = []
+        post_vertex_array = numpy.arange(lo, hi + 1)
+        for n in range(lo, hi + 1):
+            pre_neurons = self._pre_neurons_in_slice(
+                pre_vertex_slice, n)
+            for m in range(0, len(pre_neurons)):
+                pre_neurons_in_slice.append(pre_neurons[m])
+                post_neurons_in_slice.append(post_vertex_array[n-lo])
 
-            block["source"] = pre_neurons_in_slice
-            block["target"] = post_neurons_in_slice
-        else:
-            # self connections are allowed, loop over everything and add
-            # to source and target
-            pre_neurons_in_slice = []
-            post_neurons_in_slice = []
-            post_vertex_array = numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-            for n in range(0, self._n_post_neurons):
-                if (n >= lo and n <= hi):
-                    pre_neurons = self._pre_neurons_in_slice(
-                        pre_vertex_slice, n)
-                    for m in range(0, len(pre_neurons)):
-                        pre_neurons_in_slice.append(pre_neurons[m])
-                        post_neurons_in_slice.append(
-                            post_vertex_array[n-post_vertex_slice.lo_atom])
-
-            block["source"] = pre_neurons_in_slice
-            block["target"] = post_neurons_in_slice
+        block["source"] = pre_neurons_in_slice
+        block["target"] = post_neurons_in_slice
 
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
