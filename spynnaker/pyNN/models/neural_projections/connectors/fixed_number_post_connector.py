@@ -44,8 +44,9 @@ class FixedNumberPostConnector(AbstractConnector):
         if not self._post_neurons_set:
             self._post_neurons = [None] * self._n_pre_neurons
             self._post_neurons_set = True
-            self._rng_parameters = self.get_rng_parameters(
-                self._n_post_neurons)
+#            self._rng_parameters = self.get_rng_parameters(
+#                self._n_post_neurons)
+
             # if verbose open a file to output the connectivity
             if self._verbose:
                 filename = self._pre_population.label + '_to_' + \
@@ -61,13 +62,38 @@ class FixedNumberPostConnector(AbstractConnector):
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
                 if (not self.with_replacement and
-                        self._n_post > self._n_post_neurons):
+                    self._n_post > self._n_post_neurons):
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False and n > n_post_neurons")
 
-                self._post_neurons[m] = numpy.random.choice(
-                    self._n_post_neurons, self._n_post, self.with_replacement)
+                if (not self.with_replacement and
+                    not self._allow_self_connections and
+                    self._n_post == self._n_post_neurons):
+                    raise SpynnakerException(
+                        "FixedNumberPostConnector will not work when "
+                        "with_replacement=False, allow_self_connections=False "
+                        "and n = n_post_neurons")
+
+                # If the pre and post populations are the same
+                # then deal with allow_self_connections=False
+                if (self._pre_population is self._post_population and
+                    not self.with_replacement and
+                    not self._allow_self_connections):
+                    # Exclude the current pre-neuron from the post-neuron list
+                    no_self_post_neurons = []
+                    for n in range(0, self._n_post_neurons):
+                        if (m != n):
+                            no_self_post_neurons.append(n)
+
+                    # Now use this list in the random choice
+                    self._post_neurons[m] = numpy.random.choice(
+                        no_self_post_neurons, self._n_post,
+                        self.with_replacement)
+                else:
+                    self._post_neurons[m] = numpy.random.choice(
+                        self._n_post_neurons, self._n_post,
+                        self.with_replacement)
 
 #                 I'm leaving this here to revisit in the future -
 #                 I don't think it's working as intended, but whether
