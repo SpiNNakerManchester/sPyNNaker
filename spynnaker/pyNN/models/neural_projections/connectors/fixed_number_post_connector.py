@@ -60,14 +60,14 @@ class FixedNumberPostConnector(AbstractConnector):
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
                 if (not self.with_replacement and
-                    self._n_post > self._n_post_neurons):
+                        self._n_post > self._n_post_neurons):
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False and n > n_post_neurons")
 
                 if (not self.with_replacement and
-                    not self._allow_self_connections and
-                    self._n_post == self._n_post_neurons):
+                        not self._allow_self_connections and
+                        self._n_post == self._n_post_neurons):
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False, allow_self_connections=False "
@@ -76,8 +76,8 @@ class FixedNumberPostConnector(AbstractConnector):
                 # If the pre and post populations are the same
                 # then deal with allow_self_connections=False
                 if (self._pre_population is self._post_population and
-                    not self.with_replacement and
-                    not self._allow_self_connections):
+                        not self.with_replacement and
+                        not self._allow_self_connections):
                     # Exclude the current pre-neuron from the post-neuron list
                     no_self_post_neurons = []
                     for n in range(0, self._n_post_neurons):
