@@ -25,7 +25,12 @@ class NeuronRecorder(object):
     def neurons_recording(self, variable, vertex_slice):
         return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
 
-    def sampling_interval(self, variable):
+    def get_sampling_interval(self, variable):
+        """
+        Returns the current sampling interval for this variable
+        :param variable: PyNN name of the variable
+        :return: Sampling interval in micro seconds
+        """
         return globals_variables.get_simulator().machine_time_step
 
     def get_matrix_data(
@@ -49,7 +54,7 @@ class NeuronRecorder(object):
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
                 vertices, "Getting {} for {}".format(variable, label))
-        sampling_interval = self.sampling_interval(variable)
+        sampling_interval = self.get_sampling_interval(variable)
         missing_str = ""
         data = None
         ids = []

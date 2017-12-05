@@ -140,13 +140,13 @@ class RecordingCommon(object):
             pynn7 = numpy.empty((column_length, 3))
         else:
             pynn7 = numpy.empty((column_length, 4))
-        pynn7[:, 0] = numpy.repeat(times, n_neurons, 0).\
+        pynn7[:, 0] = numpy.repeat(ids, n_machine_time_steps, 0).\
             reshape(1, column_length)
-        pynn7[:, 1] = numpy.tile(ids, n_machine_time_steps).\
+        pynn7[:, 1] = numpy.tile(times, n_neurons).\
             reshape(1, column_length)
-        pynn7[:, 2] = data.reshape(1, column_length)
+        pynn7[:, 2] = numpy.transpose(data).reshape(1, column_length)
         if data2 is not None:
-            pynn7[:, 3] = data.reshape(1, column_length)
+            pynn7[:, 3] = numpy.transpose(data2).reshape(1, column_length)
         return pynn7
 
     def _get_recorded_pynn7(self, variable):
@@ -192,14 +192,16 @@ class RecordingCommon(object):
                     variable))
             data = numpy.zeros((0, 3))
             ids = []
-            sampling_interval = None
+            sampling_interval = self._population._vertex.\
+                get_sampling_interval(variable)
         elif sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
             ids = []
-            sampling_interval = None
+            sampling_interval = self._population._vertex.\
+                get_sampling_interval(variable)
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data

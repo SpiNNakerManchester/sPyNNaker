@@ -53,3 +53,11 @@ class AbstractNeuronRecordable(object):
         :param machine_time_step:
         :return:
         """
+
+    @abstractmethod
+    def get_sampling_interval(self, variable):
+        """
+        Returns the current sampling interval for this variable
+        :param variable: PyNN name of the variable
+        :return: Sampling interval in micro seconds
+        """
