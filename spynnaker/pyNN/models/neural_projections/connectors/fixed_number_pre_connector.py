@@ -163,16 +163,22 @@ class FixedNumberPreConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        if not self._is_connected(pre_vertex_slice, 0):
-            return 0
-
-        n_connections = 0
+        # Get lo and hi for the post vertex
         lo = post_vertex_slice.lo_atom
         hi = post_vertex_slice.hi_atom
-        for n in range(0, self._n_post_neurons):
-            if (n >= lo and n <= hi):
-                n_connections += len(self._pre_neurons_in_slice(
-                    pre_vertex_slice, n))
+
+        # Only return zero here if *every* neuron is not connected
+        n_not_connected = 0
+        for n in range(lo, hi + 1):
+            if not self._is_connected(pre_vertex_slice, n):
+                n_not_connected += 1
+
+        if (n_not_connected == post_vertex_slice.n_atoms):            return 0
+
+        n_connections = 0
+        for n in range(lo, hi + 1):
+            n_connections += len(self._pre_neurons_in_slice(
+                pre_vertex_slice, n))
 
         return n_connections
 
