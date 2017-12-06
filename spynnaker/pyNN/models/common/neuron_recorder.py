@@ -134,7 +134,7 @@ class NeuronRecorder(object):
                 else:
                     step = globals_variables.get_simulator().\
                                machine_time_step / 1000
-                    rate = int(sampling_interval // step)
+                    rate = int(sampling_interval / step)
                     if sampling_interval != rate * step:
                         msg = "sampling_interval {} is not an an integer " \
                               "multiple of the simulation timestep {}" \
