@@ -100,7 +100,7 @@ class SpikeRecorder(object):
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
 
-    def get_sampling_interval(self):
+    def get_spikes_sampling_interval(self):
         """
         Returns the current sampling interval for this variable
          :return: Sampling interval in micro seconds
