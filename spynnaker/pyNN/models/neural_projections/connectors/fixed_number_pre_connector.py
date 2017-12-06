@@ -147,11 +147,12 @@ class FixedNumberPreConnector(AbstractConnector):
 
         # the number of max connections is either n_pre
         # or post_vertex_slice.n_atoms
-        n_connections = 0
-        if self._n_pre > post_vertex_slice.n_atoms:
-            n_connections = self._n_pre
-        else:
-            n_connections = post_vertex_slice.n_atoms
+        n_connections = self._n_pre
+#         n_connections = 0
+#         if self._n_pre > post_vertex_slice.n_atoms:
+#             n_connections = self._n_pre
+#         else:
+#             n_connections = post_vertex_slice.n_atoms
 
         if min_delay is None or max_delay is None:
             return n_connections  # self._n_pre  # post_vertex_slice.n_atoms
@@ -173,7 +174,8 @@ class FixedNumberPreConnector(AbstractConnector):
             if not self._is_connected(pre_vertex_slice, n):
                 n_not_connected += 1
 
-        if (n_not_connected == post_vertex_slice.n_atoms):            return 0
+        if (n_not_connected == post_vertex_slice.n_atoms):
+            return 0
 
         n_connections = 0
         for n in range(lo, hi + 1):

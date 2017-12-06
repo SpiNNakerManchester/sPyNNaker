@@ -146,8 +146,6 @@ class FixedNumberPostConnector(AbstractConnector):
             return 0
 
         n_connections = 0
-        lo = pre_vertex_slice.lo_atom
-        hi = pre_vertex_slice.hi_atom
         for n in range(lo, hi + 1):
             n_connections = max(n_connections,
                                 len(self._post_neurons_in_slice(
@@ -212,8 +210,6 @@ class FixedNumberPostConnector(AbstractConnector):
 
         # Get n_connections by adding length of each set of post neurons
         n_connections = 0
-        lo = pre_vertex_slice.lo_atom
-        hi = pre_vertex_slice.hi_atom
         for n in range(lo, hi + 1):
             n_connections += len(self._post_neurons_in_slice(
                 post_vertex_slice, n))
@@ -259,10 +255,6 @@ class FixedNumberPostConnector(AbstractConnector):
 
         if (n_not_connected == pre_vertex_slice.n_atoms):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-
-        # Get lo and hi for the pre vertex
-        lo = pre_vertex_slice.lo_atom
-        hi = pre_vertex_slice.hi_atom
 
         # Get number of connections
         n_connections = 0
