@@ -41,7 +41,7 @@ class RecordingCommon(object):
         self._indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval, to_file):
+    def _record(self, variable, new_ids, sampling_interval=None, to_file=None):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
