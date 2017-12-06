@@ -32,7 +32,7 @@ class NeuronRecorder(object):
     def neurons_recording(self, variable, vertex_slice):
         return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
 
-    def get_sampling_interval(self, variable):
+    def get_neuron_sampling_interval(self, variable):
         """
         Returns the current sampling interval for this variable
         :param variable: PyNN name of the variable

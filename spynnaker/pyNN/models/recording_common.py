@@ -203,7 +203,7 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
             ids = []
             sampling_interval = self._population._vertex.\
-                get_sampling_interval(variable)
+                get_neuron_sampling_interval(variable)
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
