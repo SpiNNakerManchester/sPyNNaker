@@ -76,7 +76,6 @@ class FixedNumberPreConnector(AbstractConnector):
                 # If the pre and post populations are the same
                 # then deal with allow_self_connections=False
                 if (self._pre_population is self._post_population and
-                        not self.with_replacement and
                         not self._allow_self_connections):
                     # Exclude the current pre-neuron from the post-neuron list
                     no_self_pre_neurons = []
