@@ -54,7 +54,7 @@ class NeuronRecorder(object):
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
                 vertices, "Getting {} for {}".format(variable, label))
-        sampling_interval = self.get_sampling_interval(variable)
+        sampling_interval = self.get_neuron_sampling_interval(variable)
         missing_str = ""
         data = None
         ids = []
