@@ -1,4 +1,5 @@
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
@@ -27,10 +28,11 @@ class FixedNumberPostConnector(AbstractConnector):
         self._allow_self_connections = allow_self_connections
         self._verbose = verbose
         self._post_neurons_set = False
+        self._p_connect = 1.0  # used for getting maxima
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post)
+            self._delays, self._get_n_connections(self._n_post))
 
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
@@ -127,6 +129,11 @@ class FixedNumberPostConnector(AbstractConnector):
     def _is_connected(self, post_vertex_slice, n):
         return self._post_neurons_in_slice(post_vertex_slice, n).size > 0
 
+    def _get_n_connections(self, out_of):
+        return utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post, out_of,
+            self._p_connect)
+
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -145,11 +152,8 @@ class FixedNumberPostConnector(AbstractConnector):
         if (n_not_connected == pre_vertex_slice.n_atoms):
             return 0
 
-        n_connections = 0
-        for n in range(lo, hi + 1):
-            n_connections = max(n_connections,
-                                len(self._post_neurons_in_slice(
-                                    post_vertex_slice, n)))
+        # Get probable max number of connections
+        n_connections = self._get_n_connections(self._n_post)
 
         if min_delay is None or max_delay is None:
             return n_connections
@@ -173,7 +177,8 @@ class FixedNumberPostConnector(AbstractConnector):
 
         if (n_not_connected == pre_vertex_slice.n_atoms):
             return 0
-        return self._n_post
+
+        return self._get_n_connections(self._n_pre_neurons)
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
@@ -270,7 +275,7 @@ class FixedNumberPostConnector(AbstractConnector):
         pre_neurons_in_slice = []
         post_neurons_in_slice = []
         pre_vertex_array = numpy.arange(lo, hi + 1)
-        for n in range(lo, hi + 1):  # 0, self._n_pre_neurons):
+        for n in range(lo, hi + 1):
             post_neurons = self._post_neurons_in_slice(
                 post_vertex_slice, n)
             for m in range(0, len(post_neurons)):

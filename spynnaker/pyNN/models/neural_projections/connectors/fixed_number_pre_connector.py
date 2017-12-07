@@ -1,4 +1,5 @@
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
@@ -27,6 +28,7 @@ class FixedNumberPreConnector(AbstractConnector):
         self._allow_self_connections = allow_self_connections
         self._verbose = verbose
         self._pre_neurons_set = False
+        self._p_connect = 1.0  # for setting maxima later
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -127,6 +129,11 @@ class FixedNumberPreConnector(AbstractConnector):
     def _is_connected(self, pre_vertex_slice, n):
         return self._pre_neurons_in_slice(pre_vertex_slice, n).size > 0
 
+    def _get_n_connections(self, out_of):
+        return utility_calls.get_probable_maximum_selected(
+            self._n_pre * self._n_post_neurons, out_of,
+            self._p_connect)
+
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -145,17 +152,11 @@ class FixedNumberPreConnector(AbstractConnector):
         if (n_not_connected == post_vertex_slice.n_atoms):
             return 0
 
-        # the number of max connections is either n_pre
-        # or post_vertex_slice.n_atoms
-        n_connections = self._n_pre
-#         n_connections = 0
-#         if self._n_pre > post_vertex_slice.n_atoms:
-#             n_connections = self._n_pre
-#         else:
-#             n_connections = post_vertex_slice.n_atoms
+        # Get the probable max number of connections
+        n_connections = self._get_n_connections(self._n_pre_neurons)
 
         if min_delay is None or max_delay is None:
-            return n_connections  # self._n_pre  # post_vertex_slice.n_atoms
+            return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre * self._n_post_neurons,
@@ -177,12 +178,7 @@ class FixedNumberPreConnector(AbstractConnector):
         if (n_not_connected == post_vertex_slice.n_atoms):
             return 0
 
-        n_connections = 0
-        for n in range(lo, hi + 1):
-            n_connections += len(self._pre_neurons_in_slice(
-                pre_vertex_slice, n))
-
-        return n_connections
+        return self._get_n_connections(self._n_pre)
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
@@ -259,7 +255,7 @@ class FixedNumberPreConnector(AbstractConnector):
         lo = post_vertex_slice.lo_atom
         hi = post_vertex_slice.hi_atom
 
-        # Only return zero here if *every* neuron is not connected
+        # Only return zero array here if *every* neuron is not connected
         n_not_connected = 0
         for n in range(lo, hi + 1):
             if not self._is_connected(pre_vertex_slice, n):
@@ -305,3 +301,11 @@ class FixedNumberPreConnector(AbstractConnector):
 
     def __repr__(self):
         return "FixedNumberPreConnector({})".format(self._n_pre)
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value
