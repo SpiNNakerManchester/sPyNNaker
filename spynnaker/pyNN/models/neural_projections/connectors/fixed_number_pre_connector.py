@@ -13,7 +13,8 @@ class FixedNumberPreConnector(AbstractConnector):
     """
 
     def __init__(
-            self, n, allow_self_connections=True, safe=True, verbose=False):
+            self, n, allow_self_connections=True, with_replacement=False,
+            safe=True, verbose=False):
         """
         :param `int` n:
             number of random pre-synaptic neurons connected to output
@@ -22,10 +23,18 @@ class FixedNumberPreConnector(AbstractConnector):
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
+        :param `bool` with_replacement:
+            this flag determines how the random selection of pre-synaptic
+            neurons is performed; if true, then every pre-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a pre-
+            synaptic neuron has been connected to a post-neuron, it can't be
+            connected again
         """
         AbstractConnector.__init__(self, safe, verbose)
         self._n_pre = n
         self._allow_self_connections = allow_self_connections
+        self._with_replacement = with_replacement
         self._verbose = verbose
         self._pre_neurons_set = False
         self._p_connect = 1.0  # for setting maxima later
@@ -70,14 +79,14 @@ class FixedNumberPreConnector(AbstractConnector):
         # Loop over all the post neurons
         for m in range(0, self._n_post_neurons):
             if self._pre_neurons[m] is None:
-                if (not self.with_replacement and
+                if (not self._with_replacement and
                         self._n_pre > self._n_pre_neurons):
                     # Throw an exception
                     raise SpynnakerException(
                         "FixedNumberPreConnector will not work when "
                         "with_replacement=False and n > n_pre_neurons")
 
-                if (not self.with_replacement and
+                if (not self._with_replacement and
                         not self._allow_self_connections and
                         self._n_pre == self._n_pre_neurons):
                     raise SpynnakerException(
@@ -98,11 +107,11 @@ class FixedNumberPreConnector(AbstractConnector):
                     # Now use this list in the random choice
                     self._pre_neurons[m] = numpy.random.choice(
                         no_self_pre_neurons, self._n_pre,
-                        self.with_replacement)
+                        self._with_replacement)
                 else:
                     self._pre_neurons[m] = numpy.random.choice(
                         self._n_pre_neurons, self._n_pre,
-                        self.with_replacement)
+                        self._with_replacement)
 
                 # Sort the neurons now that we have them
                 self._pre_neurons[m].sort()

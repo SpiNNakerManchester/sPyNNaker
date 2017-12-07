@@ -13,19 +13,28 @@ class FixedNumberPostConnector(AbstractConnector):
     """
 
     def __init__(
-            self, n, allow_self_connections=True, safe=True, verbose=False):
+            self, n, allow_self_connections=True, with_replacement=False,
+            safe=True, verbose=False):
         """
         :param `int` n:
-            number of random post-synaptic neurons connected to output
+            number of random post-synaptic neurons connected to pre-neurons
         :param `bool` allow_self_connections:
             if the connector is used to connect a
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
+        :param `bool` with_replacement:
+            this flag determines how the random selection of post-synaptic
+            neurons is performed; if true, then every post-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a post-
+            synaptic neuron has been connected to a pre-neuron, it can't be
+            connected again
         """
         AbstractConnector.__init__(self, safe, verbose)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
+        self._with_replacement = with_replacement
         self._verbose = verbose
         self._post_neurons_set = False
         self._p_connect = 1.0  # used for getting maxima
@@ -71,13 +80,13 @@ class FixedNumberPostConnector(AbstractConnector):
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
             if self._post_neurons[m] is None:
-                if (not self.with_replacement and
+                if (not self._with_replacement and
                         self._n_post > self._n_post_neurons):
                     raise SpynnakerException(
                         "FixedNumberPostConnector will not work when "
                         "with_replacement=False and n > n_post_neurons")
 
-                if (not self.with_replacement and
+                if (not self._with_replacement and
                         not self._allow_self_connections and
                         self._n_post == self._n_post_neurons):
                     raise SpynnakerException(
@@ -98,11 +107,11 @@ class FixedNumberPostConnector(AbstractConnector):
                     # Now use this list in the random choice
                     self._post_neurons[m] = numpy.random.choice(
                         no_self_post_neurons, self._n_post,
-                        self.with_replacement)
+                        self._with_replacement)
                 else:
                     self._post_neurons[m] = numpy.random.choice(
                         self._n_post_neurons, self._n_post,
-                        self.with_replacement)
+                        self._with_replacement)
 
                 # Sort the neurons now that we have them
                 self._post_neurons[m].sort()
