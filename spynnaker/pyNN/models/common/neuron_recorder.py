@@ -1,10 +1,10 @@
 from __future__ import division
 from collections import OrderedDict
-from fractions import gcd
 import logging
+import math
+import numpy
 
 from spinn_utilities.progress_bar import ProgressBar
-import numpy
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
@@ -62,7 +62,8 @@ class NeuronRecorder(object):
         progress = ProgressBar(
                 vertices, "Getting {} for {}".format(variable, label))
         sampling_interval = self._sampling_rates[variable]
-        expected_rows = n_machine_time_steps // sampling_interval
+        expected_rows = int(math.ceil(
+            n_machine_time_steps / sampling_interval))
         missing_str = ""
         data = None
         ids = []
@@ -91,8 +92,9 @@ class NeuronRecorder(object):
                 # Start the fragment for this slice empty
                 fragment = numpy.empty((expected_rows, n_neurons))
                 for i in xrange(0, expected_rows):
+                    time = i * sampling_interval
                     # Check if there is data for this timestep
-                    indexes = numpy.where(record[:, 0] == i)
+                    indexes = numpy.where(record[:, 0] == time)
                     if len(indexes[0]) > 0:
                         # Set row to data for that timestep
                         fragment[i] = record[indexes[0][0], 1:]

@@ -139,30 +139,35 @@ static inline void _print_neuron_parameters() {
 
 
 void _reset_record_counter(){
-    // Using 1 base here so first call is 1 second 2 ect
-    v_index = 1;
     if (global_record_params->v_rate == 0){
         // Setting increment to zero means v_index will never equal v_rate
         v_increment = 0;
+        // Index is not rate so does not record
+        v_index = 1;
+
     }
     else {
         // Increase one each call so z_index gets to v_rate
         v_increment = 1;
+        // Using rate base here first zero time is record
+        v_index = global_record_params->v_rate;
     }
 
-    exc_index = 1;
     if (global_record_params->exc_rate == 0){
         exc_increment = 0;
+        exc_index = 1;
     }
     else {
         exc_increment = 1;
+        exc_index = global_record_params->exc_rate;
     }
-    inh_index = 1;
     if (global_record_params->inh_rate == 0){
         inh_increment = 0;
+        inh_index = 1;
     }
     else {
         inh_increment = 1;
+        inh_index = global_record_params->inh_rate;
     }
 }
 
