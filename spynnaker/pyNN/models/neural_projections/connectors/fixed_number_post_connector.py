@@ -147,7 +147,6 @@ class FixedNumberPostConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
         # Get lo and hi for the pre vertex
         lo = pre_vertex_slice.lo_atom
         hi = pre_vertex_slice.hi_atom

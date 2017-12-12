@@ -224,12 +224,9 @@ class FixedNumberPreConnector(AbstractConnector):
 
         # Get n_connections by adding length of each set of pre_neurons
         n_connections = 0
-        lo = post_vertex_slice.lo_atom
-        hi = post_vertex_slice.hi_atom
-        for n in range(0, self._n_post_neurons):
-            if (n >= lo and n <= hi):
-                n_connections += len(self._pre_neurons_in_slice(
-                    pre_vertex_slice, n))
+        for n in range(lo, hi + 1):
+            n_connections += len(self._pre_neurons_in_slice(
+                pre_vertex_slice, n))
 
         return self._get_weight_maximum(
             self._weights, n_connections, None)
@@ -272,10 +269,6 @@ class FixedNumberPreConnector(AbstractConnector):
 
         if (n_not_connected == post_vertex_slice.n_atoms):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-
-        # Get lo and hi for the post vertex
-        lo = post_vertex_slice.lo_atom
-        hi = post_vertex_slice.hi_atom
 
         # Get number of connections
         n_connections = 0
