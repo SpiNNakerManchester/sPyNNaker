@@ -108,8 +108,8 @@ class RecordingCommon(object):
         n_machine_time_steps = len(data)
         n_neurons = len(ids)
         column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval / 1000 for i in
-                 xrange(0, n_machine_time_steps)]
+        times = [i * sampling_interval
+                 for i in xrange(0, n_machine_time_steps)]
         if data2 is None:
             pynn7 = numpy.empty((column_length, 3))
         else:
