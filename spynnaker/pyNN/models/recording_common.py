@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
-    def __init__(self, population, sampling_interval=None):
+    def __init__(self, population):
         """ object to hold recording behaviour
 
         :param population: the population to record for
@@ -24,10 +24,6 @@ class RecordingCommon(object):
         """
 
         self._population = population
-
-        self._sampling_interval = None
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
 
         # file flags, allows separate files for the recorded variables
         self._write_to_files_indicators = {
@@ -56,9 +52,7 @@ class RecordingCommon(object):
         if variable == "spikes":
             self._set_spikes_recording()
         elif variable == "all":
-            self._set_spikes_recording()
-            self._population._vertex.set_recording(
-                variable, sampling_interval=sampling_interval)
+            raise Exception("Illegal call with all")
         else:
             self._population._vertex.set_recording(
                 variable, sampling_interval=sampling_interval)
@@ -68,10 +62,6 @@ class RecordingCommon(object):
 
         # Get bit array of indices to record for this variable
         indices = self._indices_to_record[variable]
-
-        # update sampling interval
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
 
         # Loop through the new ids
         for new_id in new_ids:
@@ -112,24 +102,6 @@ class RecordingCommon(object):
             raise Exception(
                 "This population does not support the recording of spikes!")
         self._population._vertex.set_recording_spikes()
-
-    @property
-    def sampling_interval(self):
-        """ forced by the public nature of pynn variables
-
-        :return:
-        """
-
-        return self._sampling_interval
-
-    @sampling_interval.setter
-    def sampling_interval(self, new_value):
-        """ forced by the public nature of pynn variables
-
-        :param new_value: new value for the sampling_interval
-        :return: None
-        """
-        self._sampling_interval = new_value
 
     @staticmethod
     def pynn7_format(data, ids, sampling_interval, data2=None):
