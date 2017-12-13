@@ -205,9 +205,10 @@ class RecordingCommon(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            (data, indexes, sampling_interval) = self._population._vertex.get_data(
+            results = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
