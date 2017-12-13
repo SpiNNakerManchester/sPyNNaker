@@ -165,7 +165,7 @@ class RecordingCommon(object):
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
-            ids = []
+            indexes = []
             sampling_interval = self._population._vertex.\
                 get_sampling_interval(variable)
         elif sim.use_virtual_board:
@@ -173,19 +173,20 @@ class RecordingCommon(object):
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
-            ids = []
+            indexes = []
             sampling_interval = self._population._vertex.\
                 get_neuron_sampling_interval(variable)
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            (data, ids, sampling_interval) = self._population._vertex.get_data(
+            results = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
-        return (data, ids, sampling_interval)
+        return (data, indexes, sampling_interval)
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
