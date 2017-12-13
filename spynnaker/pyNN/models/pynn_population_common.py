@@ -27,7 +27,7 @@ class PyNNPopulationCommon(object):
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
         if initial_values is not None:
-            for name, value in initial_values:
+            for name, value in initial_values.iteritems():
                 self._vertex.set_value(name, value)
 
         self._vertex = vertex
