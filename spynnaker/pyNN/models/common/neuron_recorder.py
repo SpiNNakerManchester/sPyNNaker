@@ -66,13 +66,13 @@ class NeuronRecorder(object):
             n_machine_time_steps / sampling_interval))
         missing_str = ""
         data = None
-        ids = []
+        indexes = []
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
             neurons = self.neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
-            ids.extend(neurons)
+            indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data = \
                 buffer_manager.get_data_for_vertex(
@@ -109,7 +109,7 @@ class NeuronRecorder(object):
             else:
                 # Add the slice fragment on axis 1 which is ids/ channel_index
                 data = numpy.append(data, fragment, axis=1)
-        return (data, ids, sampling_interval)
+        return (data, indexes, sampling_interval)
 
     def get_recordable_variables(self):
         return self._sampling_rates.keys()
