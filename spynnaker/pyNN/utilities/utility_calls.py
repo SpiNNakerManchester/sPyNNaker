@@ -231,7 +231,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                     (min_time <= time) and
                     (time < max_time)):
                 data.append([neuron_id, time])
-    data.sort
+    data.sort()
     return numpy.array(data)
 
 
