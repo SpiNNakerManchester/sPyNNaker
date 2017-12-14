@@ -536,7 +536,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
                 rewiring_dma_buffer.n_bytes_transferred)){
             log_error("DMA queue full-removal");
          }
-        /*ad*/log_info("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
+        /*ad*/log_debug("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
@@ -589,7 +589,7 @@ bool synaptogenesis_dynamics_formation_rule(){
             log_error("DMA queue full-formation");
                 }
 
-        /*ad*/log_info("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
+        /*ad*/log_debug("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
