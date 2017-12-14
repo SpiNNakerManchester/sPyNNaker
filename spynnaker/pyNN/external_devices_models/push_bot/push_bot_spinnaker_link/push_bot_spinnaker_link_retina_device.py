@@ -26,8 +26,8 @@ class PushBotSpiNNakerLinkRetinaDevice(
         if n_neurons is not None and n_neurons != resolution.value.n_neurons:
             logger.warn(
                 "The specified number of neurons for the push bot retina"
-                " device has been ignored {} will be used instead"
-                .format(resolution.value.n_neurons))
+                " device has been ignored %d will be used instead",
+                resolution.value.n_neurons)
 
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(

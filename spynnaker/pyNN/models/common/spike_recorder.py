@@ -90,8 +90,8 @@ class SpikeRecorder(object):
 
         if missing_str != "":
             logger.warn(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                "Population %s is missing spike data in region %s from the"
+                " following cores: %s", label, region, missing_str)
 
         if not spike_ids:
             return numpy.zeros((0, 2), dtype="float")

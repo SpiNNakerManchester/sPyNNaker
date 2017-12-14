@@ -132,9 +132,8 @@ class RecordingCommon(object):
 
         elif not sim.has_ran:
             logger.warn(
-                "The simulation has not yet run, therefore {} cannot"
-                " be retrieved, hence the list will be empty".format(
-                    variable))
+                "The simulation has not yet run, therefore %s cannot be "
+                "retrieved, hence the list will be empty", variable)
             data = numpy.zeros((0, 3))
 
         elif sim.use_virtual_board:

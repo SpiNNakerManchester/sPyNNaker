@@ -83,8 +83,8 @@ class EIEIOSpikeRecorder(object):
 
         if missing_str != "":
             logger.warn(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                "Population %s is missing spike data in region %s from the"
+                " following cores: %s", label, region, missing_str)
         if not results:
             return []
         result = numpy.vstack(results)

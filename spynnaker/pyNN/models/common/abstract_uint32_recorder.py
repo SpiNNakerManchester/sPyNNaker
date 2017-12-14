@@ -101,9 +101,8 @@ class AbstractUInt32Recorder(object):
 
         if missing_str != "":
             logger.warn(
-                "Population {} is missing {} data in region {}"
-                " from the following cores: {}".format(
-                    label, variable, region, missing_str))
+                "Population %s is missing %s data in region %s from the "
+                "following cores: %s", label, variable, region, missing_str)
         data = numpy.vstack(data)
         order = numpy.lexsort((data[:, 1], data[:, 0]))
         result = data[order]

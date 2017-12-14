@@ -132,12 +132,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             timestep, min_delay, max_delay, self.config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
-        logger.info("Setting time scale factor to {}."
-                    .format(self._time_scale_factor))
+        logger.info("Setting time scale factor to %f.",
+                    self._time_scale_factor)
 
         # get the machine time step
-        logger.info("Setting machine time step to {} micro-seconds."
-                    .format(self._machine_time_step))
+        logger.info("Setting machine time step to %f micro-seconds.",
+                    self._machine_time_step)
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
@@ -191,11 +191,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 logger.warn(
                     "A timestep was entered that has forced sPyNNaker "
                     "to automatically slow the simulation down from "
-                    "real time by a factor of {}. To remove this "
+                    "real time by a factor of %f. To remove this "
                     "automatic behaviour, please enter a "
-                    "timescaleFactor value in your .{}".format(
-                        self._time_scale_factor,
-                        self.CONFIG_FILE_NAME))
+                    "timescaleFactor value in your .%s",
+                    self._time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
         if self._machine_time_step * self._time_scale_factor < 1000:
@@ -337,8 +336,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 if previous < max_permitted:
                     logger.warning(
                         "Attempt to increase number_of_neurons_per_core "
-                        "from {} to {} ignored".format(previous,
-                                                       max_permitted))
+                        "from %d to %d ignored", previous, max_permitted)
                     return
             neuron_type.set_model_max_atoms_per_core(max_permitted)
             self._neurons_per_core_set.add(neuron_type)
