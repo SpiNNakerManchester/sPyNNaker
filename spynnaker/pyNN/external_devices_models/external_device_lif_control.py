@@ -88,13 +88,13 @@ class ExternalDeviceLifControl(
             be provided if the dev is to be controlled over Ethernet.
         """
 
+        if not devices:
+            raise ConfigurationException("No devices specified")
+
         # Verify that there are the correct number of neurons
         if n_neurons != len(devices):
             raise ConfigurationException(
                 "The number of neurons must match the number of devices")
-
-        if len(devices) == 0:
-            raise ConfigurationException("No devices specified")
 
         # Create a partition to key map
         self._partition_id_to_key = OrderedDict(

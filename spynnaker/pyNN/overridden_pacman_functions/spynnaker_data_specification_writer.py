@@ -20,6 +20,7 @@ class SpynnakerDataSpecificationWriter(
             self, placements, graph, hostname,
             report_default_directory, write_text_specs,
             app_data_runtime_folder, machine, graph_mapper=None):
+        # pylint: disable=too-many-arguments
 
         # Keep the results
         dsg_targets = dict()
@@ -30,7 +31,7 @@ class SpynnakerDataSpecificationWriter(
         plist = list(placements.placements)
 
         # create a progress bar for end users
-        progress_bar = ProgressBar(
+        progress = ProgressBar(
             plist, "Generating sPyNNaker data specifications")
 
         for placement in plist:
@@ -45,16 +46,13 @@ class SpynnakerDataSpecificationWriter(
                     placement, associated_vertex, dsg_targets, hostname,
                     report_default_directory, write_text_specs,
                     app_data_runtime_folder, machine)
-                progress_bar.update()
+                progress.update()
 
-        for placement, associated_vertex in delay_extension_placements:
+        for placement, associated_vertex in progress.over(
+                delay_extension_placements):
             self._generate_data_spec_for_vertices(
                 placement, associated_vertex, dsg_targets, hostname,
                 report_default_directory, write_text_specs,
                 app_data_runtime_folder, machine)
-            progress_bar.update()
-
-        # finish the progress bar
-        progress_bar.end()
 
         return dsg_targets

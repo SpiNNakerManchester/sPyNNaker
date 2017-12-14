@@ -2,7 +2,8 @@ import logging
 import math
 import random
 
-from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.utilities.constants import \
+    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
@@ -21,17 +22,18 @@ from spinn_front_end_common.abstract_models import \
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
-from spynnaker.pyNN.models.utility_models.delay_block import DelayBlock
 from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
-from spynnaker.pyNN.models.utility_models.delay_extension_machine_vertex \
-    import DelayExtensionMachineVertex
+from .delay_block import DelayBlock
+from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
 
 _DELAY_PARAM_HEADER_WORDS = 7
 _DEFAULT_MALLOCS_USED = 2
+_DELAY_EXTENSION_REGIONS = \
+    DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 
 
 class DelayExtensionVertex(
@@ -112,8 +114,8 @@ class DelayExtensionVertex(
         if key not in self._delay_blocks:
             self._delay_blocks[key] = DelayBlock(
                 self._n_delay_stages, self._delay_per_stage, vertex_slice)
-        [self._delay_blocks[key].add_delay(source_id, stage)
-            for (source_id, stage) in zip(source_ids, stages)]
+        for (source_id, stage) in zip(source_ids, stages):
+            self._delay_blocks[key].add_delay(source_id, stage)
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -146,16 +148,12 @@ class DelayExtensionVertex(
                  (self._n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
-            region=(
-                DelayExtensionMachineVertex.
-                _DELAY_EXTENSION_REGIONS.SYSTEM.value),
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            region=_DELAY_EXTENSION_REGIONS.SYSTEM.value,
+            size=SYSTEM_BYTES_REQUIREMENT,
             label='setup')
 
         spec.reserve_memory_region(
-            region=(
-                DelayExtensionMachineVertex.
-                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value),
+            region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
         vertex.reserve_provenance_data_region(spec)
@@ -191,8 +189,7 @@ class DelayExtensionVertex(
     def write_setup_info(self, spec, machine_time_step, time_scale_factor):
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(
-            DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(_DELAY_EXTENSION_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
@@ -208,10 +205,7 @@ class DelayExtensionVertex(
                      .format(vertex_slice.n_atoms))
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(
-            region=(
-                DelayExtensionMachineVertex.
-                _DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value))
+        spec.switch_write_focus(_DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:
@@ -244,12 +238,9 @@ class DelayExtensionVertex(
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self):
-        size_of_mallocs = (
-            _DEFAULT_MALLOCS_USED *
-            common_constants.SARK_PER_MALLOC_SDRAM_USAGE)
-        return (
-            size_of_mallocs + common_constants.SYSTEM_BYTES_REQUIREMENT +
-            DelayExtensionMachineVertex.get_provenance_data_size(0))
+        return (_DEFAULT_MALLOCS_USED * SARK_PER_MALLOC_SDRAM_USAGE +
+                SYSTEM_BYTES_REQUIREMENT +
+                DelayExtensionMachineVertex.get_provenance_data_size(0))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

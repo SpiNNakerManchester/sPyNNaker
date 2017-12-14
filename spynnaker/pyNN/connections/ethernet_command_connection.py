@@ -47,7 +47,7 @@ class EthernetCommandConnection(DatabaseConnection):
             raise Exception(
                 "Each command container must be an instance of"
                 " AbstractSendMeMulticastCommandsVertex")
-        if len(command_container.timed_commands) > 0:
+        if command_container.timed_commands:
             raise Exception("Timed commands cannot be handled by this class")
         self._command_containers.append(command_container)
 

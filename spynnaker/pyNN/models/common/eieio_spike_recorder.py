@@ -81,13 +81,11 @@ class EIEIOSpikeRecorder(object):
                 offset += length + 8
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
-        if len(missing_str) > 0:
+        if missing_str != "":
             logger.warn(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
-        if len(results) != 0:
-            result = numpy.vstack(results)
-            result = result[numpy.lexsort((result[:, 1], result[:, 0]))]
-        else:
-            result = []
-        return result
+        if not results:
+            return []
+        result = numpy.vstack(results)
+        return result[numpy.lexsort((result[:, 1], result[:, 0]))]

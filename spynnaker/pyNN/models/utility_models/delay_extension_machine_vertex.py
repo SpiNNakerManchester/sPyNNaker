@@ -53,6 +53,7 @@ class DelayExtensionMachineVertex(
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
     def get_provenance_data_from_machine(self, transceiver, placement):
+        # pylint: disable=too-many-locals
         provenance_data = self._read_provenance_data(transceiver, placement)
         provenance_items = self._read_basic_provenance_items(
             provenance_data, placement)

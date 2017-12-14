@@ -57,10 +57,10 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         data_all = numpy.fromstring(data, numpy.uint8).astype(numpy.uint32)
         ascii_index = numpy.where(data_all[::_RETINA_PACKET_SIZE] < 0x80)[0]
         offset = 0
-        while len(ascii_index) > 0:
+        while ascii_index:
             index = ascii_index[0] * _RETINA_PACKET_SIZE
             stop_index = numpy.where(data_all[index:] >= 0x80)[0]
-            if len(stop_index) > 0:
+            if stop_index:
                 stop_index = index + stop_index[0]
             else:
                 stop_index = len(data)
@@ -72,11 +72,11 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
                 data_all[::_RETINA_PACKET_SIZE] < 0x80)[0]
 
         extra = len(data_all) % _RETINA_PACKET_SIZE
-        if extra != 0:
+        if extra:
             self._old_data = data[-extra:]
             data_all = data_all[:-extra]
 
-        if len(data_all) > 0:
+        if data_all:
 
             # now process those retina events
             xs = (data_all[::_RETINA_PACKET_SIZE] & 0x7f) >> self._pixel_shift

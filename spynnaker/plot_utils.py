@@ -1,6 +1,7 @@
 # Imports
 import numpy as np
 import sys
+# pylint: disable=consider-using-enumerate, disable=import-error
 
 try:
     import matplotlib.pyplot as plt
@@ -10,7 +11,7 @@ except Exception as e:
 
 
 def _precheck(data, title):
-    if data is None or len(data) == 0:
+    if not data:
         if title is None:
             print "NO Data"
         else:

@@ -41,8 +41,7 @@ def convert_param_to_numpy(param, no_atoms):
         param_value = param.next(n=no_atoms)
         if hasattr(param_value, '__iter__'):
             return numpy.array(param_value, dtype="float")
-        else:
-            return numpy.array([param_value], dtype="float")
+        return numpy.array([param_value], dtype="float")
 
     # Deal with a single value by exploding to multiple values
     if not hasattr(param, '__iter__'):
@@ -59,14 +58,14 @@ def convert_param_to_numpy(param, no_atoms):
 
 
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
-    if len(parameters) == 0:
+    if not parameters:
         return
 
     # Get an iterator per parameter
-    iterators = []
-    for param in parameters:
-        iterators.append(param.iterator_by_slice(
-            vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
+    iterators = [
+        param.iterator_by_slice(
+            vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec)
+        for param in parameters]
 
     # Iterate through the iterators until a StopIteration is generated
     while True:
@@ -89,7 +88,7 @@ def translate_parameters(types, byte_array, offset, vertex_slice):
     """
 
     # If there are no parameters, return an empty list
-    if len(types) == 0:
+    if not types:
         return numpy.zeros((0, 0), dtype="float"), offset
 
     # Get the single-struct format
@@ -116,7 +115,7 @@ def translate_parameters(types, byte_array, offset, vertex_slice):
         (vertex_slice.n_atoms, len(types))).swapaxes(0, 1)
 
     # Get the size of the parameters read
-    parameter_size = sum([param_type.size for param_type in types])
+    parameter_size = sum(param_type.size for param_type in types)
 
     return sorted_parameters, offset + (parameter_size * vertex_slice.n_atoms)
 
@@ -128,10 +127,7 @@ def get_parameters_size_in_bytes(parameters):
     :return: size of all the parameters in bytes
     :rtype: int
     """
-    total = 0
-    for parameter in parameters:
-        total += parameter.get_dataspec_datatype().size
-    return total
+    return sum(param.get_dataspec_datatype().size for param in parameters)
 
 
 def set_slice_values(arrays, values, vertex_slice):
@@ -160,17 +156,15 @@ def read_in_data_from_file(
     times = list()
     atom_ids = list()
     data_items = list()
-
-    with open(file_path, 'r') as fsource:
-        read_data = fsource.readlines()
-
     evaluator = SafeEval()
-    for line in read_data:
-        if not line.startswith('#'):
-            values = line.split("\t")
-            neuron_id = int(evaluator.eval(values[1]))
-            time = float(evaluator.eval(values[0]))
-            data_value = float(evaluator.eval(values[2]))
+    with open(file_path, 'r') as f:
+        for line in f.readlines():
+            if line.startswith('#'):
+                continue
+            time, neuron_id, data_value = line.split("\t")
+            time = float(evaluator.eval(time))
+            neuron_id = int(evaluator.eval(neuron_id))
+            data_value = float(evaluator.eval(data_value))
             if (min_atom <= neuron_id < max_atom and
                     min_time <= time < max_time):
                 times.append(time)
@@ -180,8 +174,7 @@ def read_in_data_from_file(
                 print "failed to enter {}:{}".format(neuron_id, time)
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
-    result = result[numpy.lexsort((times, atom_ids))]
-    return result
+    return result[numpy.lexsort((times, atom_ids))]
 
 
 def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
@@ -205,6 +198,8 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
         spike times.
     :rtype: numpy array of (int, int)
     """
+    # pylint: disable=too-many-arguments
+
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
@@ -222,15 +217,14 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
     evaluator = SafeEval()
     for line in read_data:
-        if not line.startswith('#'):
-            values = line.split(split_value)
-            time = float(evaluator.eval(values[0]))
-            neuron_id = float(evaluator.eval(values[1]))
-            if ((min_atom <= neuron_id) and
-                    (neuron_id < max_atom) and
-                    (min_time <= time) and
-                    (time < max_time)):
-                data.append([neuron_id, time])
+        if line.startswith('#'):
+            continue
+        values = line.split(split_value)
+        time = float(evaluator.eval(values[0]))
+        neuron_id = float(evaluator.eval(values[1]))
+        if (min_atom <= neuron_id < max_atom and
+                min_time <= time < max_time):
+            data.append([neuron_id, time])
     data.sort()
     return numpy.array(data)
 
@@ -322,7 +316,6 @@ def validate_mars_kiss_64_seed(seed):
     """ Update the seed to make it compatible with the rng algorithm
     """
     if seed[1] == 0:
-
         # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
         seed[1] = 13031301
 

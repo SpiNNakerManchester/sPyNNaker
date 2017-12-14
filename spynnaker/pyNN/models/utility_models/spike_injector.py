@@ -5,7 +5,7 @@ from pacman.model.constraints.key_allocator_constraints \
 from spinn_front_end_common.abstract_models \
     import AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 from spynnaker.pyNN.models.common \
     import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
@@ -31,8 +31,8 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             spike_buffer_max_size=None, buffer_size_before_receive=None,
             time_between_requests=None, buffer_notification_ip_address=None,
             buffer_notification_port=None):
-
-        config = globals_variables.get_simulator().config
+        # pylint: disable=too-many-arguments
+        config = get_simulator().config
         if buffer_notification_ip_address is None:
             buffer_notification_ip_address = config.get(
                 "Buffers", "receive_buffer_host")

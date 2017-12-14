@@ -211,7 +211,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
-        if len(undelayed_connections) > 0:
+        if undelayed_connections:
 
             # Get which row each connection will go into
             undelayed_row_indices = (
@@ -229,7 +229,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_delayed_row_length = 0
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
-        if len(delayed_connections) > 0:
+        if delayed_connections:
 
             # Get the delay stages and which row each delayed connection will
             # go into
@@ -295,10 +295,10 @@ class SynapseIORowBased(AbstractSynapseIO):
         row_stage = None
         connection_min_delay = None
         connection_source_extra = None
-        if data is not None and len(data) > 0:
+        if data is not None and data:
             row_data = numpy.frombuffer(data, dtype="<u4").reshape(
                 -1, (max_row_length + _N_HEADER_WORDS))
-        if delayed_data is not None and len(delayed_data) > 0:
+        if delayed_data is not None and delayed_data:
             delayed_row_data = numpy.frombuffer(
                 delayed_data, dtype="<u4").reshape(
                     -1, (delayed_max_row_length + _N_HEADER_WORDS))
@@ -308,13 +308,13 @@ class SynapseIORowBased(AbstractSynapseIO):
         if isinstance(dynamics, AbstractStaticSynapseDynamics):
 
             # Read static data
-            if row_data is not None and len(row_data) > 0:
+            if row_data is not None and row_data:
                 ff_size, ff_data = self._get_static_data(row_data, dynamics)
                 undelayed_connections = dynamics.read_static_synaptic_data(
                     post_vertex_slice, n_synapse_types, ff_size, ff_data)
                 undelayed_connections["source"] += pre_vertex_slice.lo_atom
                 connections.append(undelayed_connections)
-            if delayed_row_data is not None and len(delayed_row_data) > 0:
+            if delayed_row_data is not None and delayed_row_data:
                 ff_size, ff_data = self._get_static_data(
                     delayed_row_data, dynamics)
                 delayed_connections = dynamics.read_static_synaptic_data(
@@ -378,7 +378,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 connections.append(delayed_connections)
 
         # Join the connections into a single list
-        if len(connections) > 0:
+        if connections:
             connections = numpy.concatenate(connections)
 
             # Return the delays values to milliseconds

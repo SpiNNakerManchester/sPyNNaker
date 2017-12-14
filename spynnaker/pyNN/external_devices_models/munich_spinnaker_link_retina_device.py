@@ -49,6 +49,7 @@ class MunichRetinaDevice(
 
     LEFT_RETINA = "LEFT"
     RIGHT_RETINA = "RIGHT"
+    _RETINAS = frozenset((LEFT_RETINA, RIGHT_RETINA))
 
     default_parameters = {
         'label': "MunichRetinaDevice",
@@ -60,6 +61,7 @@ class MunichRetinaDevice(
             label=default_parameters['label'], n_neurons=None,
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
+        # pylint: disable=too-many-arguments
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY
 
@@ -86,8 +88,7 @@ class MunichRetinaDevice(
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         ProvidesKeyToAtomMappingImpl.__init__(self)
 
-        if (self._position != self.RIGHT_RETINA and
-           self._position != self.LEFT_RETINA):
+        if self._position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this _position")
 

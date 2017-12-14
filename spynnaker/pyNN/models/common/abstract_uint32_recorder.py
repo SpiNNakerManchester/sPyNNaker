@@ -99,7 +99,7 @@ class AbstractUInt32Recorder(object):
                 missing_values = numpy.reshape(missing_values, [-1, 3])
                 data.append(missing_values)
 
-        if len(missing_str) > 0:
+        if missing_str != "":
             logger.warn(
                 "Population {} is missing {} data in region {}"
                 " from the following cores: {}".format(

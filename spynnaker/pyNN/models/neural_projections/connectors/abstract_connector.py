@@ -329,7 +329,7 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if len(weights) == 0:
+            if not weights:
                 logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(

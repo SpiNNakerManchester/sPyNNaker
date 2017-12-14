@@ -70,7 +70,7 @@ class MunichMotorDevice(
             label=default_parameters['label']):
         """
         """
-
+        # pylint: disable=too-many-arguments
         if n_neurons != 6:
             logger.warn("The specified number of neurons for the munich motor"
                         " device has been ignored; 6 will be used instead")

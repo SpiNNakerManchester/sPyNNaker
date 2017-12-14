@@ -54,11 +54,10 @@ class SpYNNakerSynapticMatrixReport(object):
     def _write_file(self, file_name, connection_holder, edge):
         # open writer
         try:
-            with open(file_name, "w") as output:
+            with open(file_name, "w") as f:
                 # write all data for all synapse_information's in same file
                 for info in edge.synapse_information:
-                    this_connection_holder = connection_holder[edge, info]
-                    output.write("{}".format(this_connection_holder))
+                    f.write("{}".format(connection_holder[edge, info]))
         except IOError:
             logger.error("Generate_placement_reports: Can't open file"
-                         " {} for writing.".format(file_name))
+                         " %s for writing.", file_name, exc_info=True)

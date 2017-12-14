@@ -641,7 +641,7 @@ class SynapticManager(object):
 
                     rinfo = routing_info.get_routing_info_for_edge(
                         m_edge)
-                    if len(row_data) > 0:
+                    if row_data:
                         if (row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
                                 (next_single_start_position + len(row_data)) <=
@@ -682,8 +682,7 @@ class SynapticManager(object):
                         pre_vertex_slice.hi_atom)
                     if delay_key in self._delay_key_index:
                         rinfo = self._delay_key_index[delay_key]
-                    if len(delayed_row_data) > 0:
-
+                    if delayed_row_data:
                         if (delayed_row_length == 1 and isinstance(
                                 synapse_info.connector, OneToOneConnector) and
                                 (next_single_start_position +
@@ -725,7 +724,7 @@ class SynapticManager(object):
 
         # Write the size and data of single synapses to the end of the region
         spec.switch_write_focus(synaptic_matrix_region)
-        if len(single_synapses) > 0:
+        if single_synapses:
             single_data = numpy.concatenate(single_synapses)
             spec.write_value(len(single_data) * 4)
             spec.write_array(single_data)

@@ -11,13 +11,13 @@ class FromListConnector(AbstractConnector):
     """ Make connections according to a list.
 
     :param: conn_list:
-        a list of tuples, one tuple for each connection. Each
+        a list of tuples, one tuple for each connection. Each\
         tuple should contain::
 
          (pre_idx, post_idx, weight, delay)
 
-        where pre_idx is the index (i.e. order in the Population,
-        not the ID) of the presynaptic neuron, and post_idx is
+        where pre_idx is the index (i.e. order in the Population,\
+        not the ID) of the presynaptic neuron, and post_idx is\
         the index of the postsynaptic neuron.
     """
 
@@ -30,7 +30,7 @@ class FromListConnector(AbstractConnector):
         Creates a new FromListConnector.
         """
         AbstractConnector.__init__(self, safe, verbose)
-        if conn_list is None or len(conn_list) == 0:
+        if conn_list is None or not conn_list:
             raise exceptions.InvalidParameterType(
                 "The connection list for the FromListConnector must contain"
                 " at least a list of tuples, each of which should contain:"
@@ -82,7 +82,7 @@ class FromListConnector(AbstractConnector):
         other_element_column_names = list()
         for element in element_index:
             other_element_column_names.append(column_names[element])
-        if len(element_index) != 0:
+        if element_index:
             other_conn_list = conn_list[:, element_index]
             other_conn_list.dtype.names = other_element_column_names
 
@@ -90,8 +90,8 @@ class FromListConnector(AbstractConnector):
         return source_destination_conn_list, weights, delays, other_conn_list
 
     def set_weights_and_delays(self, weights, delays):
-        """ allows setting of the weights and delays at seperate times to the
-        init, also sets the dtypes correctly.....
+        """ allows setting of the weights and delays at separate times to the\
+            init, also sets the dtypes correctly.....
 
         :param weights:
         :param delays:

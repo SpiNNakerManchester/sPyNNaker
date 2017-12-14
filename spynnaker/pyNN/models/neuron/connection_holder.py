@@ -115,7 +115,7 @@ class ConnectionHolder(object):
         connections = numpy.concatenate(self._connections)
 
         # If there are additional fixed values, merge them in
-        if self._fixed_values is not None and len(self._fixed_values) > 0:
+        if self._fixed_values is not None and self._fixed_values:
 
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
@@ -144,7 +144,7 @@ class ConnectionHolder(object):
             # There are no specific items to return, so just get
             # all the data
             if (self._data_items_to_return is None or
-                    len(self._data_items_to_return) == 0):
+                    not self._data_items_to_return):
                 self._data_items = connections[order]
 
             # There is more than one item to return, so let numpy do its magic

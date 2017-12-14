@@ -18,6 +18,7 @@ from spinn_utilities.progress_bar import ProgressBar
 
 import logging
 import math
+# pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
 _delay_extension_max_supported_delay = (
