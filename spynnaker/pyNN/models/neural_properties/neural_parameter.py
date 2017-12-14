@@ -34,11 +34,10 @@ class _Range_Iterator(object):
         self._index += 1
         if self._index < self._stop_range:
             return (self._cmd_word_list, self._cmd_string)
-        else:
-            (self._index, self._stop_range, current) = self._iterator.next()
-            (self._cmd_word_list, self._cmd_string) = self._spec.create_cmd(
-                data=current, data_type=self._datatype)
-            return (self._cmd_word_list, self._cmd_string)
+        (self._index, self._stop_range, current) = self._iterator.next()
+        (self._cmd_word_list, self._cmd_string) = self._spec.create_cmd(
+            data=current, data_type=self._datatype)
+        return (self._cmd_word_list, self._cmd_string)
 
 
 class _Get_Iterator(object):

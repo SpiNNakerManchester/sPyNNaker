@@ -78,9 +78,11 @@ class _PoissonStruct(Enum):
     TIME_TO_SPIKE = (5, DataType.S1615)
 
     def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     def __init__(self, value, data_type, doc=""):

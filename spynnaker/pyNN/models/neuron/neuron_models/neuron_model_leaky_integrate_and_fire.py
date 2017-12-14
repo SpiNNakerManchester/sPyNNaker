@@ -104,5 +104,4 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
     def get_units(self, variable):
         if variable in self._my_units:
             return self._my_units[variable]
-        else:
-            return NeuronModelLeakyIntegrate.get_units(variable)
+        return NeuronModelLeakyIntegrate.get_units(variable)

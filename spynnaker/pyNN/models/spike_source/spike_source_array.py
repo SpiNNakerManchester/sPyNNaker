@@ -3,8 +3,6 @@ import sys
 
 from pacman.model.decorators import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utilities.constants \
     import MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
 from spinn_front_end_common.utilities import exceptions
@@ -100,7 +98,6 @@ class SpikeSourceArray(
             buffer_notification_tag=tag)
 
         AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         SimplePopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         ProvidesKeyToAtomMappingImpl.__init__(self)
