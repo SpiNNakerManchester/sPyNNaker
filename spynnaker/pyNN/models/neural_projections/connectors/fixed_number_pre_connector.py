@@ -9,22 +9,30 @@ class FixedNumberPreConnector(AbstractConnector):
     """ Connects a fixed number of pre-synaptic neurons selected at random,
         to all post-synaptic neurons
     """
+
+    __slots__ = [
+        "_allow_self_connections",
+        "_n_pre",
+        "_pre_neurons"]
+
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False):
         """
 
-        :param `int` n:
+        :param n:
             number of random pre-synaptic neurons connected to output
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
-            Population.
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-
-            dependent weights or delays - not implemented
+        :type n: int
+        :param allow_self_connections:
+            if the connector is used to connect a Population to itself, this\
+            flag determines whether a neuron is allowed to connect to itself,\
+            or only to other neurons in the Population.
+        :type allow_self_connections: bool
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        # :param space:
+        # a Space object, needed if you wish to specify distance-dependent\
+        # weights or delays - not implemented
+        # :type space: pyNN.Space
+        super(FixedNumberPreConnector, self).__init__(safe, verbose)
         self._n_pre = n
         self._allow_self_connections = allow_self_connections
         self._pre_neurons = None
@@ -112,15 +120,14 @@ class FixedNumberPreConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         if not self._is_connected(pre_vertex_slice):
-            return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         pre_neurons_in_slice = self._pre_neurons_in_slice(pre_vertex_slice)
 
         n_connections = len(pre_neurons_in_slice) * post_vertex_slice.n_atoms
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
             n_connections -= len(pre_neurons_in_slice)
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
 
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):

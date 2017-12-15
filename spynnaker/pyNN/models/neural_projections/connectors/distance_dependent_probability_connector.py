@@ -22,6 +22,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
     """
 
+    __slots__ = [
+        "_allow_self_connections",
+        "_d_expression",
+        "_probs"]
+
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
@@ -43,7 +48,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         :param `int` n_connections:
             The number of efferent synaptic connections per neuron.
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(DistanceDependentProbabilityConnector, self).__init__(
+            safe, verbose)
         self._d_expression = d_expression
         self._allow_self_connections = allow_self_connections
 
@@ -143,7 +149,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         n_connections = numpy.sum(present)
 
         block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+            n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
             (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (

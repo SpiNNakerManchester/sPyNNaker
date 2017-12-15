@@ -4,17 +4,18 @@ from .abstract_connector import AbstractConnector
 
 class OneToOneConnector(AbstractConnector):
     """
-    Where the pre- and postsynaptic populations have the same size, connect
-    cell i in the presynaptic pynn_population.py to cell i in the postsynaptic
-    pynn_population.py for all i.
+    Where the pre- and postsynaptic populations have the same size, connect\
+    cell i in the presynaptic pynn_population.py to cell i in the\
+    postsynaptic pynn_population.py for all i.
     """
+    __slots__ = ["_random_number_class"]
 
     def __init__(
             self, random_number_class, safe=True, verbose=False):
         """
         """
         self._random_number_class = random_number_class
-        AbstractConnector.__init__(self, safe, verbose)
+        super(OneToOneConnector, self).__init__(safe, verbose)
 
     def set_weights_and_delays(self, weights, delays):
         """ sets the weights and delays as needed
@@ -140,10 +141,9 @@ class OneToOneConnector(AbstractConnector):
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
         n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
         if n_connections <= 0:
-            return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(

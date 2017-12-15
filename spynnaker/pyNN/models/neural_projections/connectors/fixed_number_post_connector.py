@@ -6,10 +6,14 @@ logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractConnector):
+    __slots__ = [
+        "_allow_self_connections",
+        "_post_n",
+        "_post_neurons"]
 
     def __init__(
             self, n, allow_self_connections=True, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose)
         self._post_n = n
         self._allow_self_connections = allow_self_connections
         self._post_neurons = None
@@ -28,7 +32,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def _get_post_neurons(self):
         if self._post_neurons is None:
             n = 0
-            while (n < self._post_n):
+            while n < self._post_n:
                 permutation = numpy.arange(self._n_post_neurons)
                 for i in range(0, self._n_post_neurons - 1):
                     j = int(self._rng.next(

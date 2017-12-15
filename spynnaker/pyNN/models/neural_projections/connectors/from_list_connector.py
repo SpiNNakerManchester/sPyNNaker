@@ -1,6 +1,6 @@
 from .abstract_connector import AbstractConnector
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 import logging
 import numpy
 
@@ -20,6 +20,9 @@ class FromListConnector(AbstractConnector):
         not the ID) of the presynaptic neuron, and post_idx is\
         the index of the postsynaptic neuron.
     """
+    __slots__ = [
+        "_conn_list",
+        "_converted_weights_and_delays"]
 
     CONN_LIST_DTYPE = numpy.dtype([
         ("source", numpy.uint32), ("target", numpy.uint32),
@@ -29,9 +32,9 @@ class FromListConnector(AbstractConnector):
         """
         Creates a new FromListConnector.
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(FromListConnector, self).__init__(safe, verbose)
         if conn_list is None or not conn_list:
-            raise exceptions.InvalidParameterType(
+            raise InvalidParameterType(
                 "The connection list for the FromListConnector must contain"
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
@@ -100,10 +103,10 @@ class FromListConnector(AbstractConnector):
         # set the data if not already set (supports none overriding via
         # synapse data)
         if self._weights is None:
-            self._weights = utility_calls.convert_param_to_numpy(
+            self._weights = convert_param_to_numpy(
                 weights, len(self._conn_list))
         if self._delays is None:
-            self._delays = utility_calls.convert_param_to_numpy(
+            self._delays = convert_param_to_numpy(
                 delays, len(self._conn_list))
 
         # if got data, build connlist with correct dtypes
@@ -222,8 +225,7 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
         items = self._conn_list[mask]
-        block = numpy.zeros(
-            items.size, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(items.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = items["source"]
         block["target"] = items["target"]
         block["weight"] = items["weight"]

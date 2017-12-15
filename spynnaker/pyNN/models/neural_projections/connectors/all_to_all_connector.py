@@ -10,6 +10,9 @@ class AllToAllConnector(AbstractConnector):
         the postsynaptic population
     """
 
+    __slots__ = [
+        "_allow_self_connections"]
+
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
 
@@ -19,7 +22,7 @@ class AllToAllConnector(AbstractConnector):
             allowed to connect to itself, or only to other neurons in the
             Population.
     """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
         self._weights = None
         self._delays = None

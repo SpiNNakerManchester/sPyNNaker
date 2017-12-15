@@ -6,25 +6,30 @@ import numpy
 
 
 class FixedProbabilityConnector(AbstractConnector):
+    __slots__ = [
+        "_allow_self_connections",
+        "_p_connect"]
+
     """
     For each pair of pre-post cells, the connection probability is constant.
 
-    :param `float` p_connect:
-        a float between zero and one. Each potential connection
-        is created with this probability.
-    :param `bool` allow_self_connections:
-        if the connector is used to connect a
-        Population to itself, this flag determines whether a neuron is
-        allowed to connect to itself, or only to other neurons in the
-        Population.
+    :param p_connect:
+        a float between zero and one. Each potential connection is created\
+        with this probability.
+    :type p_connect: float
+    :param allow_self_connections:
+        if the connector is used to connect a Population to itself, this flag\
+        determines whether a neuron is allowed to connect to itself, or only\
+        to other neurons in the Population.
+    :type allow_self_connections: bool
     :param `pyNN.Space` space:
-        a Space object, needed if you wish to specify distance-
-        dependent weights or delays - not implemented
+        a Space object, needed if you wish to specify distance-dependent\
+        weights or delays - not implemented
     """
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
             verbose=False):
-        AbstractConnector.__init__(self, safe, verbose)
+        super(FixedProbabilityConnector, self).__init__(safe, verbose)
         self._p_connect = p_connect
         self._allow_self_connections = allow_self_connections
 
@@ -106,8 +111,7 @@ class FixedProbabilityConnector(AbstractConnector):
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
             (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (

@@ -6,22 +6,22 @@ import numpy.random
 
 class MultapseConnector(AbstractConnector):
     """
-    Create a multapse connector. The size of the source and destination
-    populations are obtained when the projection is connected. The number of
-    synapses is specified. when instantiated, the required number of synapses
-    is created by selecting at random from the source and target populations
+    Create a multapse connector. The size of the source and destination\
+    populations are obtained when the projection is connected. The number of\
+    synapses is specified. when instantiated, the required number of synapses\
+    is created by selecting at random from the source and target populations\
     with replacement. Uniform selection probability is assumed.
-
-    :param num_synapses:
-        Integer. This is the total number of synapses in the connection.
-
     """
     def __init__(
             self, num_synapses, safe=True, verbose=False):
         """
         Creates a new connector.
+
+        :param num_synapses:
+            This is the total number of synapses in the connection.
+        :type num_synapses: int
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(MultapseConnector, self).__init__(safe, verbose)
         self._num_synapses = num_synapses
         self._pre_slices = None
         self._post_slices = None
@@ -183,12 +183,10 @@ class MultapseConnector(AbstractConnector):
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
         if n_connections == 0:
-            return numpy.zeros(
-                0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = numpy.random.choice(
             numpy.arange(
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),

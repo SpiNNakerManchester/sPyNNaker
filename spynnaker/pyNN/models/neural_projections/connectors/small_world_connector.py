@@ -3,11 +3,16 @@ import numpy
 
 
 class SmallWorldConnector(AbstractConnector):
+    __slots__ = [
+        "_degree",
+        "_mask",
+        "_n_connections",
+        "_rewiring"]
 
     def __init__(
             self, degree, rewiring, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
-        AbstractConnector.__init__(self, safe, verbose)
+        super(SmallWorldConnector, self).__init__(safe, verbose)
         self._rewiring = rewiring
 
         if n_connections is not None:
@@ -94,8 +99,7 @@ class SmallWorldConnector(AbstractConnector):
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
         n_connections = numpy.sum(ids)
 
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
             (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
