@@ -32,8 +32,8 @@ logger = logging.getLogger(__name__)
 
 _DELAY_PARAM_HEADER_WORDS = 7
 _DEFAULT_MALLOCS_USED = 2
-_DELAY_EXTENSION_REGIONS = \
-    DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
+# pylint: disable=protected-access
+_DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 
 
 class DelayExtensionVertex(
@@ -148,12 +148,12 @@ class DelayExtensionVertex(
                  (self._n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
-            region=_DELAY_EXTENSION_REGIONS.SYSTEM.value,
+            region=_DELEXT_REGIONS.SYSTEM.value,
             size=SYSTEM_BYTES_REQUIREMENT,
             label='setup')
 
         spec.reserve_memory_region(
-            region=_DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value,
+            region=_DELEXT_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
         vertex.reserve_provenance_data_region(spec)
@@ -189,7 +189,7 @@ class DelayExtensionVertex(
     def write_setup_info(self, spec, machine_time_step, time_scale_factor):
 
         # Write this to the system region (to be picked up by the simulation):
-        spec.switch_write_focus(_DELAY_EXTENSION_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
@@ -205,7 +205,7 @@ class DelayExtensionVertex(
                      .format(vertex_slice.n_atoms))
 
         # Set the focus to the memory region 2 (delay parameters):
-        spec.switch_write_focus(_DELAY_EXTENSION_REGIONS.DELAY_PARAMS.value)
+        spec.switch_write_focus(_DELEXT_REGIONS.DELAY_PARAMS.value)
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:

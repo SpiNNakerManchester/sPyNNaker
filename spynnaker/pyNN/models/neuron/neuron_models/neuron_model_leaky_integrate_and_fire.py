@@ -18,10 +18,12 @@ class _LIF_TYPES(Enum):
     V_RESET = (2, DataType.S1615)
     TAU_REFRACT = (3, DataType.INT32)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

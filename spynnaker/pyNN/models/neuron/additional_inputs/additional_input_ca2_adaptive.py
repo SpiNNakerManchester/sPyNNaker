@@ -19,10 +19,12 @@ class _CA2_TYPES(Enum):
     I_CA2 = (2, DataType.S1615)
     I_ALPHA = (3, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

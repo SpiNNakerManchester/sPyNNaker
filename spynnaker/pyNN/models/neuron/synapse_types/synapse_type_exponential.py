@@ -25,10 +25,12 @@ class _EXP_TYPES(Enum):
     INITIAL_EXC = (5, DataType.S1615)
     INITIAL_INH = (6, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

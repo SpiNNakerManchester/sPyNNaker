@@ -22,6 +22,7 @@ class WeightDependenceMultiplicative(
         return self._w_max
 
     def is_same_as(self, weight_dependence):
+        # pylint: disable=protected-access
         if not isinstance(weight_dependence, WeightDependenceMultiplicative):
             return False
         return (

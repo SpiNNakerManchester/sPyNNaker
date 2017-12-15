@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
 
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import \
     AbstractSynapseType
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
 
@@ -31,10 +31,12 @@ class _COMB_EXP_TYPES(Enum):
     CONST_INH = (7, DataType.S1615)
     DECAY_INH = (8, DataType.UINT32)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -46,6 +48,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
+        # pylint: disable=too-many-arguments
 
         AbstractSynapseType.__init__(self)
         self._data = SpynakkerRangeDictionary(size=n_neurons)
@@ -56,19 +59,15 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self._data[INH_EXP_RESPONSE] = inh_exp_response
         self._data[TAU_SYN_I] = tau_syn_I
 
-        self._exc_response = utility_calls.convert_param_to_numpy(
-            exc_response, n_neurons)
-        self._exc_exp_response = utility_calls.convert_param_to_numpy(
+        self._exc_response = convert_param_to_numpy(exc_response, n_neurons)
+        self._exc_exp_response = convert_param_to_numpy(
             exc_exp_response, n_neurons)
-        self._tau_syn_E = utility_calls.convert_param_to_numpy(
-            tau_syn_E, n_neurons)
+        self._tau_syn_E = convert_param_to_numpy(tau_syn_E, n_neurons)
 
-        self._inh_response = utility_calls.convert_param_to_numpy(
-            inh_response, n_neurons)
-        self._inh_exp_response = utility_calls.convert_param_to_numpy(
+        self._inh_response = convert_param_to_numpy(inh_response, n_neurons)
+        self._inh_exp_response = convert_param_to_numpy(
             inh_exp_response, n_neurons)
-        self._tau_syn_I = utility_calls.convert_param_to_numpy(
-            tau_syn_I, n_neurons)
+        self._tau_syn_I = convert_param_to_numpy(tau_syn_I, n_neurons)
 
     @property
     def exc_response(self):

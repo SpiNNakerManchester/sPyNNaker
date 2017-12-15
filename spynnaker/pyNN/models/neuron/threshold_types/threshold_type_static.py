@@ -16,10 +16,12 @@ V_THRESH = "v_thresh"
 class _STATIC_TYPES(Enum):
     V_THRESH = (1, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

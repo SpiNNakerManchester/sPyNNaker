@@ -12,10 +12,12 @@ class _THRESHOLD_TYPE_MULTICAST(Enum):
     DEVICE_CONTROL_TIMESTEPS_BETWEEN_SENDING = (5, DataType.UINT32)
     DEVICE_STATE = (6, DataType.UINT32)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

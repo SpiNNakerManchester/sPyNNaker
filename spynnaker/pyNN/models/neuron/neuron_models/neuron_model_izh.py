@@ -28,10 +28,12 @@ class _IZH_TYPES(Enum):
     I_OFFSET = (7, DataType.S1615)
     THIS_H = (8, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -42,10 +44,12 @@ class _IZH_TYPES(Enum):
 class _IZH_GLOBAL_TYPES(Enum):
     TIMESTEP = (1, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -116,7 +120,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(I_OFFSET. i_offset)
+        self._data.set_value(key=I_OFFSET, value=i_offset)
 
     @property
     def v_init(self):

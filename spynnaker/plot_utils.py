@@ -1,7 +1,7 @@
 # Imports
 import numpy as np
 import sys
-# pylint: disable=consider-using-enumerate, disable=import-error
+# pylint: disable=consider-using-enumerate, import-error
 
 try:
     import matplotlib.pyplot as plt

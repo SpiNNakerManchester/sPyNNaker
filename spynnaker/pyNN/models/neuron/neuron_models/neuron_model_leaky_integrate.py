@@ -27,10 +27,12 @@ class _IF_TYPES(Enum):
     EXP_TC = (4, DataType.S1615)
     I_OFFSET = (5, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property

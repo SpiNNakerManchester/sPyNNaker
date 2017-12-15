@@ -44,10 +44,11 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         return self._tau_minus
 
     def is_same_as(self, timing_dependence):
+        # pylint: disable=protected-access
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
-        return ((self._tau_plus == timing_dependence._tau_plus) and
-                (self._tau_minus == timing_dependence._tau_minus))
+        return (self._tau_plus == timing_dependence._tau_plus and
+                self._tau_minus == timing_dependence._tau_minus)
 
     @property
     def vertex_executable_suffix(self):

@@ -29,8 +29,7 @@ class SynapseDynamicsSTDP(
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
         self._change_requires_mapping = True
 
-        if (self._dendritic_delay_fraction < 0.5 or
-                self._dendritic_delay_fraction > 1.0):
+        if not (0.5 <= self._dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
@@ -100,6 +99,7 @@ class SynapseDynamicsSTDP(
         self._dendritic_delay_fraction = new_value
 
     def is_same_as(self, synapse_dynamics):
+        # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
