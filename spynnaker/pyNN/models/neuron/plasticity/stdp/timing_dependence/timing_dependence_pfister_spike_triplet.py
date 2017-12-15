@@ -20,6 +20,16 @@ LOOKUP_TAU_Y_SHIFT = 2
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    __slots__ = [
+        "_synapse_structure",
+        "_tau_minus",
+        "_tau_minus_last_entry",
+        "_tau_plus",
+        "_tau_plus_last_entry",
+        "_tau_x",
+        "_tau_x_last_entry",
+        "_tau_y",
+        "_tau_y_last_entry"]
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):

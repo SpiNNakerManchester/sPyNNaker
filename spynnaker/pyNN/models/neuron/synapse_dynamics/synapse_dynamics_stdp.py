@@ -5,7 +5,7 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
@@ -17,6 +17,11 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
+    __slots__ = [
+        "_change_requires_mapping",
+        "_dendritic_delay_fraction",
+        "_timing_dependence",
+        "_weight_dependence"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
@@ -65,7 +70,7 @@ class SynapseDynamicsSTDP(
         for obj in [self._timing_dependence, self._weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
-        raise exceptions.InvalidParameterType(
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPopulationSettable.set_value)
@@ -79,7 +84,8 @@ class SynapseDynamicsSTDP(
             if hasattr(obj, key):
                 setattr(obj, key, value)
                 self._change_requires_mapping = True
-        raise exceptions.InvalidParameterType(
+                return
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @property

@@ -3,8 +3,7 @@ import math
 from data_specification.enums import DataType
 
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
-    import AbstractTimingDependence
+from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
     import SynapseStructureWeightAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
@@ -12,6 +11,13 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    __slots__ = [
+        "accumulator_depression_plus_one",
+        "accumulator_potentiation_minus_one",
+        "dual_fsm",
+        "mean_post_window",
+        "mean_pre_window",
+        "_synapse_structure"]
 
     default_parameters = {
         'accumulator_depression': -6, 'accumulator_potentiation': 6,

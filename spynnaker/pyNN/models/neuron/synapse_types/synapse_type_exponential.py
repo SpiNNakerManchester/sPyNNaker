@@ -54,6 +54,11 @@ def get_exponential_decay_and_init(tau, machine_time_step):
 
 
 class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
+
     def __init__(self, n_neurons, tau_syn_E, tau_syn_I,
                  initial_input_exc=0.0, initial_input_inh=0.0):
         AbstractSynapseType.__init__(self)

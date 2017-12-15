@@ -47,6 +47,10 @@ class _DUAL_EXP_TYPES(Enum):
 
 
 class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
                  tau_syn_I, initial_input_exc, initial_input_exc2,

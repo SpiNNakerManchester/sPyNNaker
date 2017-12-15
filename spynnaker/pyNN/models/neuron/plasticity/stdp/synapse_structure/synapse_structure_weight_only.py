@@ -3,6 +3,7 @@ import numpy
 
 
 class SynapseStructureWeightOnly(AbstractSynapseStructure):
+    __slots__ = ()
 
     def __init__(self):
         AbstractSynapseStructure.__init__(self)

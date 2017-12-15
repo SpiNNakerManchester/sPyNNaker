@@ -1,12 +1,10 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
     import SynapseStructureWeightOnly
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
-    import TimingDependenceSpikePair
+from .abstract_timing_dependence import AbstractTimingDependence
+from .timing_dependence_spike_pair import TimingDependenceSpikePair
 
 import logging
 
@@ -19,6 +17,12 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
+    __slots__ = [
+        "_synapse_structure",
+        "_tau_minus",
+        "_tau_minus_last_entry",
+        "_tau_plus",
+        "_tau_plus_last_entry"]
 
     default_parameters = {'tau_plus': 20.0, 'tau_minus': 20.0}
 

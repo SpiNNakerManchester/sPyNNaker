@@ -30,9 +30,12 @@ class _STATIC_TYPES(Enum):
 
 
 class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
-
     """ A threshold that is a static value
     """
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, v_thresh):
         AbstractThresholdType.__init__(self)

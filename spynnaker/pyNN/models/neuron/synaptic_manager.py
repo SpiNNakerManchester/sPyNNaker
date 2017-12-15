@@ -53,6 +53,18 @@ _ONE_WORD = struct.Struct("<I")
 class SynapticManager(object):
     """ Deals with synapses
     """
+    __slots__ = [
+        "_delay_key_index",
+        "_one_to_one_connection_dtcm_max_bytes",
+        "_poptable_type",
+        "_pre_run_connection_holders",
+        "_retrieved_blocks",
+        "_ring_buffer_sigma",
+        "_spikes_per_second",
+        "_synapse_dynamics", 
+        "_synapse_io",
+        "_synapse_type",
+        "_weight_scales"]
 
     def __init__(self, synapse_type, ring_buffer_sigma,
                  spikes_per_second, config, population_table_type=None,

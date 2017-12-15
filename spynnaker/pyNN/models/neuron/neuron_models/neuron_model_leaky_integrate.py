@@ -41,6 +41,10 @@ class _IF_TYPES(Enum):
 
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
         AbstractNeuronModel.__init__(self)

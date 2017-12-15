@@ -8,6 +8,11 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
 
 class WeightDependenceAdditiveTriplet(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
+    __slots__ = [
+        "_a3_minus",
+        "_a3_plus",
+        "_w_max",
+        "_w_min"]
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
                           'A3_minus': 0.01}
@@ -59,11 +64,10 @@ class WeightDependenceAdditiveTriplet(
 
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
-        if n_weight_terms == 2:
-            return (6 * 4) * n_synapse_types
-        else:
+        if n_weight_terms != 2:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
+        return (6 * 4) * n_synapse_types
 
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):

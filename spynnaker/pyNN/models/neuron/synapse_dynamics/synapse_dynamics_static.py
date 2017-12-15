@@ -11,6 +11,8 @@ from spynnaker.pyNN import exceptions
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
+    __slots__ = [
+        "_change_requires_mapping"]
 
     def __init__(self):
         AbstractStaticSynapseDynamics.__init__(self)

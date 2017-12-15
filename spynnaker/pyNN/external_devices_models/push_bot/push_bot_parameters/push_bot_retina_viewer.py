@@ -91,6 +91,7 @@ class PushBotRetinaViewer(Thread):
         return [self._image]
 
     def run(self):
+        # pylint: disable=import-error
         from matplotlib import pyplot
         from matplotlib import animation
 

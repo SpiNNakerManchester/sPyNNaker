@@ -34,6 +34,9 @@ class _MAASS_TYPES(Enum):
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
     """ A stochastic threshold
     """
+    __slots__ = [
+        "_data",
+        "_n_neurons"]
 
     def __init__(self, n_neurons, du_th, tau_th, v_thresh):
         AbstractThresholdType.__init__(self)

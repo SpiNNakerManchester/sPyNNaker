@@ -33,6 +33,10 @@ class _CONDUCTANTCE_TYPES(Enum):
 class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     """ The conductance input type
     """
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
         AbstractInputType.__init__(self)

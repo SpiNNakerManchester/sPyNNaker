@@ -6,6 +6,9 @@ from .abstract_weight_dependence import AbstractWeightDependence
 
 class WeightDependenceAdditive(
         AbstractWeightDependence, AbstractHasAPlusAMinus):
+    __slots__ = [
+        "_w_max",
+        "_w_min"]
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
@@ -37,15 +40,13 @@ class WeightDependenceAdditive(
 
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
-        if n_weight_terms == 1:
-            return (4 * 4) * n_synapse_types
-        else:
+        if n_weight_terms != 1:
             raise NotImplementedError(
                 "Additive weight dependence only supports one term")
+        return (4 * 4) * n_synapse_types
 
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
-
         # Loop through each synapse type's weight scale
         for w in weight_scales:
 

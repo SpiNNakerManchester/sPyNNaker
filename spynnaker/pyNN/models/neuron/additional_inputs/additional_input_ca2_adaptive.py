@@ -33,6 +33,9 @@ class _CA2_TYPES(Enum):
 
 
 class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
+    __slots__ = [
+        "_data",
+        "_n_neurons"]
 
     def __init__(self, n_neurons, tau_ca2, i_ca2, i_alpha):
         AbstractAdditionalInput.__init__(self)

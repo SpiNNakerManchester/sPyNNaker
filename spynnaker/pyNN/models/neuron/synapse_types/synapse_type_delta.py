@@ -11,6 +11,8 @@ INITIAL_INPUT_INH = "initial_input_inh"
 class SynapseTypeDelta(AbstractSynapseType):
     """ This represents a synapse type with two delta synapses
     """
+    __slots__ = [
+        "_data"]
 
     def __init__(self, n_neurons, initial_input_exc, initial_input_inh):
         AbstractSynapseType.__init__(self)

@@ -58,6 +58,10 @@ class _IZH_GLOBAL_TYPES(Enum):
 
 
 class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
         AbstractNeuronModel.__init__(self)

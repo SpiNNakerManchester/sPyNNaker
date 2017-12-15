@@ -17,6 +17,10 @@ LOOKUP_TAU_SHIFT = 0
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
+    __slots__ = [
+        "_alpha",
+        "_synapse_structure",
+        "_tau"]
 
     default_parameters = {'tau': 20.0}
 

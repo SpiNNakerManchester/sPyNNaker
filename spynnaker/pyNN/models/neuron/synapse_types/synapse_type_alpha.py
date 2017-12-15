@@ -45,6 +45,14 @@ class _COMB_EXP_TYPES(Enum):
 
 
 class SynapseTypeAlpha(AbstractSynapseType):
+    __slots__ = [
+        "_data",
+        "_exc_exp_response",
+        "_exc_response",
+        "_inh_exp_response",
+        "_inh_response",
+        "_tau_syn_E",
+        "_tau_syn_I"]
 
     def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
