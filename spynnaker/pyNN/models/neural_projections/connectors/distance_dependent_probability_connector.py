@@ -31,21 +31,19 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, d_expression, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
         """
-
-        :param `string` d_expression:
-            the right-hand side of a valid python expression for
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
-            that can be parsed by eval(), that computes the distance
+        :param `string` d_expression:\
+            the right-hand side of a valid python expression for\
+            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
+            that can be parsed by eval(), that computes the distance\
             dependent distribution
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
-            Population.
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-
-            dependent weights or delays
-        :param `int` n_connections:
+        :param `bool` allow_self_connections:\
+            if the connector is used to connect a Population to itself, this\
+            flag determines whether a neuron is allowed to connect to itself,\
+            or only to other neurons in the Population.
+        :param `pyNN.Space` space:\
+            a Space object, needed if you wish to specify distance-dependent\
+            weights or delays
+        :param `int` n_connections:\
             The number of efferent synaptic connections per neuron.
         """
         super(DistanceDependentProbabilityConnector, self).__init__(
@@ -78,6 +76,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
@@ -91,6 +90,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             post_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
@@ -104,17 +104,20 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_n_connections(
             pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
             pre_vertex_slice, post_vertex_slice)
@@ -124,6 +127,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
     def generate_on_machine(self):
@@ -133,7 +137,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
+        # pylint: disable=too-many-arguments
         probs = self._probs[
             pre_slice_index.to_slice, post_slice_index.to_slice]
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms

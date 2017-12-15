@@ -133,6 +133,7 @@ class FromListConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -146,7 +147,7 @@ class FromListConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         mask = None
         if min_delay is None or max_delay is None:
             mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
@@ -168,6 +169,7 @@ class FromListConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -180,6 +182,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -192,6 +195,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -204,6 +208,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
@@ -220,6 +225,7 @@ class FromListConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &

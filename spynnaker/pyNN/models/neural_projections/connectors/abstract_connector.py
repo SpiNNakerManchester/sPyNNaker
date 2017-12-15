@@ -159,6 +159,7 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the delays for this connection
         """
+        # pylint: disable=too-many-arguments
 
     @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -168,6 +169,7 @@ class AbstractConnector(object):
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
+        # pylint: disable=too-many-arguments
         if get_simulator().is_a_pynn_random(delays):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
@@ -203,6 +205,7 @@ class AbstractConnector(object):
             and max_delay (inclusive) if both specified\
             (otherwise all connections)
         """
+        # pylint: disable=too-many-arguments
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(
@@ -212,6 +215,7 @@ class AbstractConnector(object):
             neurons in the post_vertex_slice from neurons in the\
             pre_vertex_slice
         """
+        # pylint: disable=too-many-arguments
 
     @staticmethod
     def _get_weight_mean(weights, connection_slices):
@@ -269,6 +273,7 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
 
     @staticmethod
     def _get_weight_variance(weights, connection_slices):
@@ -290,6 +295,7 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
 
     def _expand_distances(self, d_expression):
         """ Check if a distance expression contains at least one term d[x]. \
@@ -405,6 +411,7 @@ class AbstractConnector(object):
             synapse_type):
         """ Create a synaptic block from the data
         """
+        # pylint: disable=too-many-arguments
 
     def get_provenance_data(self):
         name = "{}_{}_{}".format(

@@ -12,8 +12,7 @@ class MultapseConnector(AbstractConnector):
     is created by selecting at random from the source and target populations\
     with replacement. Uniform selection probability is assumed.
     """
-    def __init__(
-            self, num_synapses, safe=True, verbose=False):
+    def __init__(self, num_synapses, safe=True, verbose=False):
         """
         Creates a new connector.
 
@@ -87,7 +86,7 @@ class MultapseConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
 
         n_total_connections = self._get_n_connections(
@@ -120,6 +119,7 @@ class MultapseConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_total_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -140,6 +140,7 @@ class MultapseConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -152,6 +153,7 @@ class MultapseConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -165,6 +167,7 @@ class MultapseConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
@@ -179,6 +182,7 @@ class MultapseConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)

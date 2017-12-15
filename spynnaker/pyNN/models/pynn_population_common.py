@@ -134,9 +134,8 @@ class PyNNPopulationCommon(object):
             parameter_name))
 
     def id_to_index(self, id):  # @ReservedAssignment
-        """
-        Given the ID(s) of cell(s) in the Population, return its (their) index
-        (order in the Population).
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population).
         """
         if not numpy.iterable(id):
             if not self._first_id <= id <= self._last_id:
@@ -215,15 +214,16 @@ class PyNNPopulationCommon(object):
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a
-        string giving the parameter name, in which case value is the parameter
-        value. value can be a numeric value, or list of such
+        param can be a dict, in which case value should not be supplied, or a\
+        string giving the parameter name, in which case value is the parameter\
+        value. value can be a numeric value, or list of such\
         (e.g. for setting spike times)::
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
 
         :param parameter: the parameter to set
+        :type parameter: str or dict
         :param value: the value of the parameter to set.
         """
         if not self._vertex_population_settable:
@@ -236,14 +236,14 @@ class PyNNPopulationCommon(object):
                 "This population does not support changes to settings after"
                 " run has been called")
 
-        if type(parameter) is str:
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
 
-        if type(parameter) is not dict:
+        if not isinstance(parameter, dict):
             raise Exception(
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
@@ -338,7 +338,7 @@ class PyNNPopulationCommon(object):
         """ Add a placement constraint - for backwards compatibility
 
         :param constraint_dict: A dictionary containing "x", "y" and\
-                    optionally "p" as keys, and ints as values
+            optionally "p" as keys, and ints as values
         :type constraint_dict: dict of str->int
         """
         globals_variables.get_simulator().verify_not_running()

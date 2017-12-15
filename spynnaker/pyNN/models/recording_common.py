@@ -2,7 +2,6 @@ from spinn_utilities import logger_utils
 from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
@@ -39,14 +38,14 @@ class RecordingCommon(object):
     def _record(self, variable, new_ids, sampling_interval, to_file):
         """ tells the vertex to record data
 
-        :param variable: the variable to record, valued variables to record
-        are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param variable: the variable to record. Supported recordable\
+            variables are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param new_ids:  ids to record
         :param sampling_interval: the interval to record them
         :return:  None
         """
 
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
             self._set_spikes_recording()
@@ -103,11 +102,11 @@ class RecordingCommon(object):
         self._population._vertex.set_recording_spikes()
 
     def _get_recorded_variable(self, variable):
-        """ method that contains all the safety checks and gets the recorded
-        data from the vertex
+        """ method that contains all the safety checks and gets the recorded\
+            data from the vertex
 
-        :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param variable: the variable name to read. Supported variable names\
+            are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :return: the data
         """
         timer = Timer()
@@ -115,7 +114,7 @@ class RecordingCommon(object):
         data = None
         sim = get_simulator()
 
-        globals_variables.get_simulator().verify_not_running()
+        sim.verify_not_running()
         if variable == "spikes":
             data = self._get_spikes()
 
@@ -148,8 +147,7 @@ class RecordingCommon(object):
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
 
-        get_simulator().add_extraction_timing(
-            timer.take_sample())
+        sim.add_extraction_timing(timer.take_sample())
         return data
 
     def _get_spikes(self):

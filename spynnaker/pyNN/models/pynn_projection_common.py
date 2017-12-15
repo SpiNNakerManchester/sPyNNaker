@@ -29,10 +29,10 @@ _delay_extension_max_supported_delay = (
 # noinspection PyProtectedMember
 class PyNNProjectionCommon(object):
     """ A container for all the connections of a given type (same synapse type\
-            and plasticity mechanisms) between two populations, together with\
-            methods to set parameters of those connections, including of\
-            plasticity mechanisms.
-        """
+        and plasticity mechanisms) between two populations, together with\
+        methods to set parameters of those connections, including of\
+        plasticity mechanisms.
+    """
 
     # noinspection PyUnusedLocal
 
@@ -160,11 +160,11 @@ class PyNNProjectionCommon(object):
             edge which has the same post and pre vertex
 
         :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex: instance of\
-                pacman.model.graph.application.ApplicationVertex
+        :type pre_synaptic_vertex: \
+            pacman.model.graph.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex: instance of\
-                pacman.model.graph.application.ApplicationVertex
+        :type post_synaptic_vertex: \
+            pacman.model.graph.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
 

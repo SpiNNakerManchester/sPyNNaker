@@ -25,6 +25,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0.0
         return self._get_delay_variance(self._delays, None)
@@ -63,7 +64,7 @@ class FixedNumberPostConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0
 
@@ -78,6 +79,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0
         return pre_vertex_slice.n_atoms
@@ -85,6 +87,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0.0
         return self._get_weight_mean(self._weights, None)
@@ -92,6 +95,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0.0
         post_neurons = self._post_neurons_in_slice(post_vertex_slice)
@@ -102,6 +106,7 @@ class FixedNumberPostConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return 0.0
         return self._get_weight_variance(self._weights, None)
@@ -115,6 +120,7 @@ class FixedNumberPostConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        # pylint: disable=too-many-arguments
         if not self._is_connected(post_vertex_slice):
             return numpy.zeros(0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         post_neurons_in_slice = self._post_neurons_in_slice(post_vertex_slice)

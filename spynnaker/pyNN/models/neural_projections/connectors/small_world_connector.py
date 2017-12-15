@@ -12,6 +12,7 @@ class SmallWorldConnector(AbstractConnector):
     def __init__(
             self, degree, rewiring, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
+        # pylint: disable=too-many-arguments
         super(SmallWorldConnector, self).__init__(safe, verbose)
         self._rewiring = rewiring
 
@@ -36,6 +37,7 @@ class SmallWorldConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
@@ -46,7 +48,7 @@ class SmallWorldConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         n_connections = numpy.amax([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
             for i in range(
@@ -62,21 +64,22 @@ class SmallWorldConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = numpy.amax([
+        # pylint: disable=too-many-arguments
+        return numpy.amax([
             numpy.sum(self._mask[pre_vertex_slice.as_slice, i])
             for i in range(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
 
-        return n_connections
-
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_maximum(
@@ -85,6 +88,7 @@ class SmallWorldConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
     def generate_on_machine(self):
@@ -94,7 +98,7 @@ class SmallWorldConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
+        # pylint: disable=too-many-arguments
         ids = numpy.where(self._mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
         n_connections = numpy.sum(ids)
