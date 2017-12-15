@@ -12,6 +12,8 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class MultiSpikeRecorder(object):
+    __slots__ = [
+        "_record"]
 
     def __init__(self):
         self._record = False

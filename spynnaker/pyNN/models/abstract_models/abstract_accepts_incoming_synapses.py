@@ -1,14 +1,14 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractproperty
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
 
 @add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection
     """
+    __slots__ = ()
 
     @abstractproperty
     def synapse_type(self):

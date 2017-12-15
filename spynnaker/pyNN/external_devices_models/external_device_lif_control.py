@@ -34,6 +34,12 @@ class ExternalDeviceLifControl(
         but without spikes, and using the voltage as the output to the various\
         devices
     """
+    __slots__ = [
+        "_dependent_vertices",
+        "_devices",
+        "_message_translator",
+        "_partition_id_to_atom",
+        "_partition_id_to_key"]
 
     _model_based_max_atoms_per_core = 15
 

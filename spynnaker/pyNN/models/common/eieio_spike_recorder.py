@@ -12,6 +12,8 @@ _ONE_WORD = struct.Struct("<I")
 class EIEIOSpikeRecorder(object):
     """ Records spikes using EIEIO format
     """
+    __slots__ = [
+        "_record"]
 
     def __init__(self):
         self._record = False

@@ -78,6 +78,29 @@ class AbstractPopulationVertex(
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
+    __slots__ = [
+        "_additional_input",
+        "_binary",
+        "_buffer_size_before_receive",
+        "_change_requires_mapping",
+        "_change_requires_neuron_parameters_reload",
+        "_incoming_spike_buffer_size",
+        "_input_type",
+        "_maximum_sdram_for_buffering",
+        "_minimum_buffer_sdram",
+        "_model_name",
+        "_n_atoms",
+        "_n_profile_samples",
+        "_neuron_model",
+        "_neuron_recorder",
+        "_receive_buffer_host",
+        "_receive_buffer_port",
+        "_spike_recorder",
+        "_synapse_manager",
+        "_threshold_type",
+        "_time_between_requests",
+        "_units",
+        "_using_auto_pause_and_resume"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -114,17 +137,9 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             model_name, neuron_model, input_type, synapse_type, threshold_type,
             additional_input=None, constraints=None):
-
-        ApplicationVertex.__init__(
-            self, label, constraints, max_atoms_per_core)
-        AbstractSpikeRecordable.__init__(self)
-        AbstractNeuronRecordable.__init__(self)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        AbstractProvidesIncomingPartitionConstraints.__init__(self)
-        AbstractPopulationInitializable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
-        AbstractHasGlobalMaxAtoms.__init__(self)
-        AbstractAcceptsIncomingSynapses.__init__(self)
+        # pylint: disable=too-many-arguments
+        super(AbstractPopulationVertex, self).__init__(
+            label, constraints, max_atoms_per_core)
         ProvidesKeyToAtomMappingImpl.__init__(self)
         AbstractContainsUnits.__init__(self)
 
@@ -281,7 +296,7 @@ class AbstractPopulationVertex(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints)
 
-        self._n_vertices += 1
+        AbstractPopulationVertex._n_vertices += 1
 
         # return machine vertex
         return vertex
@@ -417,12 +432,12 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
-        spec.write_value(random.randint(0, self._n_vertices))
+        spec.write_value(random.randint(
+            0, AbstractPopulationVertex._n_vertices))
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) /
-            (n_atoms * 2.0))
+            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it

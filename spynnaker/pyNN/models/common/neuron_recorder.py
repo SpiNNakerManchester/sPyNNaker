@@ -7,6 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class NeuronRecorder(AbstractUInt32Recorder):
+    __slots__ = [
+        "_record"]
 
     def __init__(self, allowed_variables):
         AbstractUInt32Recorder.__init__(self)

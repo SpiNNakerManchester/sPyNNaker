@@ -9,6 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class GsynInhibitoryRecorder(AbstractUInt32Recorder):
+    __slots__ = [
+        "_record_gsyn_inhibitory"]
+
     def __init__(self):
         AbstractUInt32Recorder.__init__(self)
         self._record_gsyn_inhibitory = False

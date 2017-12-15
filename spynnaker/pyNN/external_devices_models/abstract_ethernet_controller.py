@@ -9,6 +9,7 @@ class AbstractEthernetController(object):
     """ A controller that can send multicast packets which can be received\
         over Ethernet and translated to control an external device
     """
+    __slots__ = ()
 
     @abstractmethod
     def get_message_translator(self):
