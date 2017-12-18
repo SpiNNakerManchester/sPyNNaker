@@ -41,7 +41,7 @@ class RecordingCommon(object):
         self._indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval, to_file):
+    def _record(self, variable, new_ids, sampling_interval=None, to_file=None):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
@@ -137,24 +137,22 @@ class RecordingCommon(object):
         times = [i * sampling_interval / 1000 for i in
                  xrange(0, n_machine_time_steps)]
         if data2 is None:
-            pynn7 = numpy.empty((column_length, 3))
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
         else:
-            pynn7 = numpy.empty((column_length, 4))
-        pynn7[:, 0] = numpy.repeat(ids, n_machine_time_steps, 0).\
-            reshape(1, column_length)
-        pynn7[:, 1] = numpy.tile(times, n_neurons).\
-            reshape(1, column_length)
-        pynn7[:, 2] = numpy.transpose(data).reshape(1, column_length)
-        if data2 is not None:
-            pynn7[:, 3] = numpy.transpose(data2).reshape(1, column_length)
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length),
+                numpy.transpose(data2).reshape(column_length)))
         return pynn7
 
     def _get_recorded_pynn7(self, variable):
         if variable == "spikes":
             data = self._get_spikes()
 
-        (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
-        return self.pynn7_format(data, ids, sampling_interval)
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
         return self.pynn7_format(data, ids, sampling_interval)
 
