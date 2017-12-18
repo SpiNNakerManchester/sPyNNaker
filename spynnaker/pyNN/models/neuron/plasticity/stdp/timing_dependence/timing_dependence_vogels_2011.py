@@ -37,7 +37,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self._tau
 
     def is_same_as(self, other):
-        # pylint: disable=protected-access
+        # pylint: disable=protected-access, arguments-differ
         if other is None or not isinstance(other, TimingDependenceVogels2011):
             return False
         return self._tau == other._tau and self._alpha == other._alpha

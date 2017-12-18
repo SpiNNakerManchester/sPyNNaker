@@ -786,6 +786,7 @@ class AbstractPopulationVertex(
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
+        # pylint: disable=arguments-differ
         self._synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 

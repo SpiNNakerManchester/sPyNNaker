@@ -43,8 +43,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._synapse_structure = SynapseStructureWeightAccumulator()
 
     def is_same_as(self, other):
-        if (other is None) or (not isinstance(
-                other, TimingDependenceRecurrent)):
+        # pylint: disable=arguments-differ
+        if other is None or not isinstance(other, TimingDependenceRecurrent):
             return False
         return ((self.accumulator_depression_plus_one ==
                  other.accumulator_depression_plus_one) and

@@ -169,7 +169,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param master_pop_table_region:
         :param is_single: True if this is a single synapse, False otherwise
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # Which core has this projection arrived from?
         key = key_and_mask.key

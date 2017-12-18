@@ -190,7 +190,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             Flag that states if the entry is a direct entry for a single row.
         :rtype: None
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask)
@@ -259,7 +259,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def extract_synaptic_matrix_data_location(
             self, incoming_key_combo, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # get entries in master pop
         count_data = txrx.read_memory(

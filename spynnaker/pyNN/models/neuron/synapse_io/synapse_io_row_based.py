@@ -53,7 +53,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             machine_time_step, in_edge):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -172,7 +172,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -261,7 +261,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
             machine_time_step):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # Translate the data into rows
         row_data = None

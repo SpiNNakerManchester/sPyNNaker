@@ -148,6 +148,7 @@ class ExternalDeviceLifControl(
         return ExternalDeviceLifControl._model_based_max_atoms_per_core
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
+        # pylint: disable=arguments-differ
         key = self._partition_id_to_key[partition.identifier]
         atom = self._partition_id_to_atom[partition.identifier]
         return [(atom, key)]

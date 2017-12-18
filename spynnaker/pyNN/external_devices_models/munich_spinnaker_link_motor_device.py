@@ -128,7 +128,7 @@ class MunichMotorDevice(
     def generate_data_specification(
             self, spec, placement, routing_info,
             machine_time_step, time_scale_factor):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
         self.reserve_memory_regions(spec)

@@ -218,6 +218,7 @@ class AbstractConnector(object):
             pre_vertex_slice
         """
         # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_mean(weights, connection_slices):
@@ -239,6 +240,8 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_maximum(weights, n_connections, connection_slices):
@@ -276,6 +279,7 @@ class AbstractConnector(object):
         """ Get the maximum of the weights for this connection
         """
         # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_variance(weights, connection_slices):
@@ -298,6 +302,7 @@ class AbstractConnector(object):
         """ Get the variance of the weights for this connection
         """
         # pylint: disable=too-many-arguments
+        pass
 
     def _expand_distances(self, d_expression):
         """ Check if a distance expression contains at least one term d[x]. \
@@ -405,6 +410,7 @@ class AbstractConnector(object):
         """ Determines if the connector generation is supported on the machine\
             or if the connector must be generated on the host
         """
+        pass
 
     @abstractmethod
     def create_synaptic_block(
@@ -414,6 +420,7 @@ class AbstractConnector(object):
         """ Create a synaptic block from the data
         """
         # pylint: disable=too-many-arguments
+        pass
 
     def get_provenance_data(self):
         name = "{}_{}_{}".format(

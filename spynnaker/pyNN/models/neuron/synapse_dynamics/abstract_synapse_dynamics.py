@@ -70,6 +70,7 @@ class AbstractSynapseDynamics(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance in delay for the synapses
         """
+        # pylint: disable=too-many-arguments
         return connector.get_delay_variance(
             n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice)

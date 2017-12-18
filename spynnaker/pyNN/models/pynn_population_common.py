@@ -47,13 +47,14 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "A population cannot have a negative or zero size.")
 
+        self._vertex = vertex
+
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
         if initial_values is not None:
             for name, value in initial_values.iteritems():
                 self._vertex.set_value(name, value)
 
-        self._vertex = vertex
         # Introspect properties of the vertex
         self._vertex_population_settable = \
             isinstance(self._vertex, AbstractPopulationSettable)

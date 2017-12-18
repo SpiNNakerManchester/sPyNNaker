@@ -128,6 +128,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         e_decay, _ = get_exponential_decay_and_init(
             self._data[TAU_SYN_E], machine_time_step)
 

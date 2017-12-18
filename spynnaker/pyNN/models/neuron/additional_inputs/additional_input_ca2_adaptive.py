@@ -80,13 +80,13 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         return [
             NeuronParameter(
                 self._exp_tau_ca2(machine_time_step),
                 _CA2_TYPES.EXP_TAU_CA2.data_type),
             NeuronParameter(self._data[I_CA2], _CA2_TYPES.I_CA2.data_type),
-            NeuronParameter(self._data[I_ALPHA], _CA2_TYPES.I_ALPHA.data_type)
-        ]
+            NeuronParameter(self._data[I_ALPHA], _CA2_TYPES.I_ALPHA.data_type)]
 
     def get_parameter_types(self):
         return [item.data_type for item in _CA2_TYPES]
