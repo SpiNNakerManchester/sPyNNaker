@@ -48,7 +48,7 @@ class IFCondExpBase(AbstractPopulationVertex):
             v_init=none_pynn_default_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)

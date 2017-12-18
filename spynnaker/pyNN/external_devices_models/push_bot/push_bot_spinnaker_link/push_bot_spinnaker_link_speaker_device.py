@@ -39,7 +39,7 @@ class PushBotSpiNNakerLinkSpeakerDevice(
         :param start_frequency: The "frequency" to set at the start
         :param start_melody: The "melody" to set at the start
         """
-
+        # pylint: disable=too-many-arguments
         PushBotEthernetSpeakerDevice.__init__(
             self, speaker, protocol, start_active_time,
             start_total_period, start_frequency, start_melody)

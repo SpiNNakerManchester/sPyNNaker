@@ -39,14 +39,13 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import SpikeRecorder, NeuronRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron.population_machine_vertex \
-    import PopulationMachineVertex
+from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
-from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 import logging
 import os
@@ -137,7 +136,7 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             model_name, neuron_model, input_type, synapse_type, threshold_type,
             additional_input=None, constraints=None):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
         ProvidesKeyToAtomMappingImpl.__init__(self)
@@ -284,7 +283,7 @@ class AbstractPopulationVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
-
+        # pylint: disable=too-many-arguments
         is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
                        self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
@@ -422,7 +421,7 @@ class AbstractPopulationVertex(
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
-
+        # pylint: disable=too-many-arguments
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
             n_atoms))
@@ -492,7 +491,7 @@ class AbstractPopulationVertex(
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info):
-
+        # pylint: disable=too-many-arguments
         vertex_slice = graph_mapper.get_slice(placement.vertex)
 
         # reserve the neuron parameters data region
@@ -544,6 +543,7 @@ class AbstractPopulationVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
             tags, n_machine_time_steps):
+        # pylint: disable=too-many-arguments
         vertex = placement.vertex
 
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
@@ -795,6 +795,7 @@ class AbstractPopulationVertex(
             sender_extra_monitor_core_placement=None,
             extra_monitor_cores_for_router_timeout=None,
             handle_time_out_configuration=True):
+        # pylint: disable=too-many-arguments
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
             routing_infos, synapse_information, machine_time_step,

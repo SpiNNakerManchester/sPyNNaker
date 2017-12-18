@@ -31,6 +31,7 @@ class PushBotEthernetLaserDevice(
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """
+        # pylint: disable=too-many-arguments
         if not isinstance(laser, PushBotLaser):
             raise ConfigurationException(
                 "laser parameter must be a PushBotLaser value")

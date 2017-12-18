@@ -33,6 +33,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     def _get_max_row_bytes(
             self, size, dynamics, population_table, in_edge, row_length):
+        # pylint: disable=too-many-arguments
         try:
             return population_table.get_allowed_row_length(size) * 4
         except SynapseRowTooBigException as e:
@@ -52,6 +53,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             machine_time_step, in_edge):
+        # pylint: disable=too-many-arguments
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -121,11 +123,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
             n_synapse_types, population_table, synapse_dynamics):
-
-        ff_data, ff_size = None, None
-        fp_data, pp_data, fp_size, pp_size = None, None, None, None
+        # pylint: disable=too-many-arguments
         if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
-
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
                 connections, row_indices, n_rows, post_vertex_slice,
@@ -137,7 +136,6 @@ class SynapseIORowBased(AbstractSynapseIO):
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         else:
-
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             ff_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
@@ -174,6 +172,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step):
+        # pylint: disable=too-many-arguments
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -262,6 +261,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
             machine_time_step):
+        # pylint: disable=too-many-arguments
+
         # Translate the data into rows
         row_data = None
         delayed_row_data = None
@@ -317,6 +318,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
         """Read static data"""
+        # pylint: disable=too-many-arguments
         connections = []
 
         if row_data is not None and row_data:
@@ -372,6 +374,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_plastic_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
         """Read plastic data"""
+        # pylint: disable=too-many-arguments
         connections = []
 
         if row_data is not None:

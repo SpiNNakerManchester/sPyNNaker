@@ -5,6 +5,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractSynapseIO(object):
+    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 

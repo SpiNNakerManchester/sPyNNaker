@@ -19,6 +19,7 @@ class ArbitraryFPGADevice(
             self, n_neurons, fpga_link_id, fpga_id,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
+        # pylint: disable=too-many-arguments
         ApplicationFPGAVertex.__init__(
             self, n_neurons, fpga_id, fpga_link_id, board_address, label)
         ProvidesKeyToAtomMappingImpl.__init__(self)

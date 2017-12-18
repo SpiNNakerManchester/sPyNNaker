@@ -41,6 +41,7 @@ class PushBotSpiNNakerLinkLEDDevice(
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
         """
+        # pylint: disable=too-many-arguments
         PushBotEthernetLEDDevice.__init__(
             self, led, protocol, start_active_time_front,
             start_active_time_back, start_total_period, start_frequency)

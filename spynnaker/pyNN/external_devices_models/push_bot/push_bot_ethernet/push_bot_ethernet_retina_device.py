@@ -15,7 +15,7 @@ class PushBotEthernetRetinaDevice(
             self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,
             injector_port=None, local_host=None, local_port=None,
             retina_injector_label="PushBotRetinaInjector"):
-
+        # pylint: disable=too-many-arguments
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
             pushbot_ip_address, pushbot_port)

@@ -42,7 +42,7 @@ class IzkCondExpBase(AbstractPopulationVertex):
             e_rev_I=default_parameters['e_rev_I'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelIzh(
             n_neurons, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(

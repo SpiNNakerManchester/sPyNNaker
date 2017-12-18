@@ -88,3 +88,13 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
     if buffer_max < space_needed:
         return buffer_max
     return space_needed
+
+
+def make_missing_string(missing):
+    missing_str = ""
+    separator = ""
+    for placement in missing:
+        missing_str += "{}({}, {}, {})".format(
+            separator, placement.x, placement.y, placement.p)
+        separator = "; "
+    return missing_str

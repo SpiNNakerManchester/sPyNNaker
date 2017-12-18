@@ -3,6 +3,7 @@ import logging
 
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
+from spynnaker.pyNN.models.common import recording_utils
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,11 @@ class AbstractUInt32Recorder(object):
         :param n_machine_time_steps:
         :return:
         """
-
+        # pylint: disable=too-many-arguments
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         ms_per_tick = machine_time_step / 1000.0
         data = list()
-        missing_str = ""
+        missing = []
         all_times = numpy.arange(0, n_machine_time_steps)
 
         progress = ProgressBar(
@@ -49,16 +50,11 @@ class AbstractUInt32Recorder(object):
             vertex_slice = graph_mapper.get_slice(vertex)
             placement = placements.get_placement_of_vertex(vertex)
 
-            x = placement.x
-            y = placement.y
-            p = placement.p
-
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data = \
-                buffer_manager.get_data_for_vertex(
-                    placement, region)
+                buffer_manager.get_data_for_vertex(placement, region)
             if missing_data:
-                missing_str += "({}, {}, {}); ".format(x, y, p)
+                missing.append(placement)
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
             n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
@@ -101,7 +97,8 @@ class AbstractUInt32Recorder(object):
                 missing_values = numpy.reshape(missing_values, [-1, 3])
                 data.append(missing_values)
 
-        if missing_str != "":
+        if missing:
+            missing_str = recording_utils.make_missing_string(missing)
             logger.warn(
                 "Population %s is missing %s data in region %s from the "
                 "following cores: %s", label, variable, region, missing_str)

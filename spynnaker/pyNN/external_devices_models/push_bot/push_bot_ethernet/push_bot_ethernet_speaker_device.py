@@ -31,6 +31,7 @@ class PushBotEthernetSpeakerDevice(
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """
+        # pylint: disable=too-many-arguments
         if not isinstance(speaker, PushBotSpeaker):
             raise ConfigurationException(
                 "speaker parameter must be a PushBotSpeaker value")

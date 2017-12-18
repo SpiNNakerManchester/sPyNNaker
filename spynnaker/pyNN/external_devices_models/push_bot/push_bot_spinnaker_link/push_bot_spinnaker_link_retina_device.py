@@ -22,7 +22,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             self, n_neurons, spinnaker_link_id, protocol, resolution,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
-
+        # pylint: disable=too-many-arguments
         if n_neurons is not None and n_neurons != resolution.value.n_neurons:
             logger.warn(
                 "The specified number of neurons for the push bot retina"

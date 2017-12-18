@@ -32,7 +32,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
     def translate_control_packet(self, multicast_packet):
-
+        # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
 
         # disable retina

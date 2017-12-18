@@ -28,7 +28,7 @@ class PushBotSpiNNakerLinkMotorDevice(
         :param board_address:\
             The IP address of the board that the device is connected to
         """
-
+        # pylint: disable=too-many-arguments
         PushBotEthernetMotorDevice.__init__(self, motor, protocol)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,

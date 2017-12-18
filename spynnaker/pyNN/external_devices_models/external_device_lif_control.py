@@ -78,10 +78,8 @@ class ExternalDeviceLifControl(
             i_offset=default_parameters['i_offset'],
             v_init=none_pynn_default_parameters['v_init'],
             isyn_inh=default_parameters['isyn_inh'],
-            isyn_exc=default_parameters['isyn_exc']
-    ):
+            isyn_exc=default_parameters['isyn_exc']):
         """
-
         :param n_neurons: The number of neurons in the population
         :param devices:\
             The AbstractMulticastControllableDevice instances to be controlled\
@@ -93,6 +91,7 @@ class ExternalDeviceLifControl(
             Translator to be used when used for Ethernet communication.  Must\
             be provided if the dev is to be controlled over Ethernet.
         """
+        # pylint: disable=too-many-arguments, too-many-locals
 
         if not devices:
             raise ConfigurationException("No devices specified")
@@ -131,9 +130,8 @@ class ExternalDeviceLifControl(
         if create_edges:
             self._dependent_vertices = devices
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons,
-            binary="external_device_lif_control.aplx",
+        super(ExternalDeviceLifControl, self).__init__(
+            n_neurons=n_neurons, binary="external_device_lif_control.aplx",
             label=label,
             max_atoms_per_core=(
                 ExternalDeviceLifControl._model_based_max_atoms_per_core),
@@ -157,12 +155,9 @@ class ExternalDeviceLifControl(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        constraints = list()
-        constraints.append(FixedKeyAndMaskConstraint(
-            [BaseKeyAndMask(
-                self._partition_id_to_key[partition.identifier],
-                self._DEFAULT_COMMAND_MASK)]))
-        return constraints
+        return [FixedKeyAndMaskConstraint([BaseKeyAndMask(
+            self._partition_id_to_key[partition.identifier],
+            self._DEFAULT_COMMAND_MASK)])]
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):

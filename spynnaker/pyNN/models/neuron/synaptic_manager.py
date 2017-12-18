@@ -69,6 +69,7 @@ class SynapticManager(object):
     def __init__(self, synapse_type, ring_buffer_sigma,
                  spikes_per_second, config, population_table_type=None,
                  synapse_io=None):
+        # pylint: disable=too-many-arguments
         self._synapse_type = synapse_type
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
@@ -195,7 +196,7 @@ class SynapticManager(object):
             graph_mapper, in_edges, machine_time_step):
         """ Get the exact size all of the synaptic blocks
         """
-
+        # pylint: disable=too-many-arguments
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         # Go through the edges and add up the memory
@@ -267,6 +268,7 @@ class SynapticManager(object):
             self, synapse_information, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
             n_delay_stages, machine_time_step, in_edge):
+        # pylint: disable=too-many-arguments
         memory_size = 0
         for synapse_info in synapse_information:
             undelayed_size, delayed_size = \
@@ -304,7 +306,7 @@ class SynapticManager(object):
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
             machine_graph, all_syn_block_sz, graph_mapper):
-
+        # pylint: disable=too-many-arguments
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(vertex_slice),
@@ -337,28 +339,28 @@ class SynapticManager(object):
             weight_mean, weight_std_dev, spikes_per_second,
             machine_timestep, n_synapses_in, sigma):
         """
-        Provides expected upper bound on accumulated values in a ring buffer
+        Provides expected upper bound on accumulated values in a ring buffer\
         element.
 
         Requires an assessment of maximum Poisson input rate.
 
-        Assumes knowledge of mean and SD of weight distribution, fan-in
+        Assumes knowledge of mean and SD of weight distribution, fan-in\
         & timestep.
 
-        All arguments should be assumed real values except n_synapses_in
+        All arguments should be assumed real values except n_synapses_in\
         which will be an integer.
 
-        weight_mean - Mean of weight distribution (in either nA or
+        weight_mean - Mean of weight distribution (in either nA or\
                       microSiemens as required)
         weight_std_dev - SD of weight distribution
         spikes_per_second - Maximum expected Poisson rate in Hz
         machine_timestep - in us
         n_synapses_in - No of connected synapses
-        sigma - How many SD above the mean to go for upper bound;
-                a good starting choice is 5.0.  Given length of simulation we
+        sigma - How many SD above the mean to go for upper bound;\
+                a good starting choice is 5.0.  Given length of simulation we\
                 can set this for approximate number of saturation events
-
         """
+        # pylint: disable=too-many-arguments
 
         # E[ number of spikes ] in a timestep
         # x /1000000.0 = conversion between microsecond to second
@@ -413,6 +415,7 @@ class SynapticManager(object):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
+        # pylint: disable=too-many-arguments
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self._synapse_type.get_n_synapse_types()
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
@@ -539,6 +542,7 @@ class SynapticManager(object):
             self, spec, machine_vertex, machine_graph, graph_mapper,
             post_slices, post_slice_index, post_vertex_slice, input_type,
             machine_time_step):
+        # pylint: disable=too-many-arguments
 
         # Get the ring buffer shifts and scaling factors
         weight_scale = input_type.get_global_weight_scale()
@@ -586,6 +590,7 @@ class SynapticManager(object):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
+        # pylint: disable=too-many-arguments
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
 
@@ -751,6 +756,7 @@ class SynapticManager(object):
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
             graph_mapper, input_type, machine_time_step):
+        # pylint: disable=too-many-arguments
 
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
@@ -802,6 +808,7 @@ class SynapticManager(object):
             sender_extra_monitor_core_placement=None,
             extra_monitor_cores_for_router_timeout=None,
             handle_time_out_configuration=True):
+        # pylint: disable=too-many-arguments
         app_edge = graph_mapper.get_application_edge(machine_edge)
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -875,6 +882,7 @@ class SynapticManager(object):
         """ Read in a synaptic block from a given processor and vertex on\
             the machine
         """
+        # pylint: disable=too-many-arguments
 
         # See if we have already got this block
         if (placement, key, index) in self._retrieved_blocks:
@@ -976,9 +984,9 @@ class SynapticManager(object):
             synapse_params, vertex_slice)
 
     def regenerate_data_specification(
-            self, spec,
-            placement, machine_time_step, time_scale_factor,  # @UnusedVariable
+            self, spec, placement, machine_time_step, time_scale_factor,
             vertex_slice):
+        # pylint: disable=too-many-arguments
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(vertex_slice),
