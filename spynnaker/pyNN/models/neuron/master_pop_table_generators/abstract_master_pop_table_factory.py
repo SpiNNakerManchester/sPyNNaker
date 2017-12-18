@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 @add_metaclass(AbstractBase)
 class AbstractMasterPopTableFactory(object):
+    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 
@@ -17,8 +18,8 @@ class AbstractMasterPopTableFactory(object):
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
         """
-        :param incoming_key: the source key which the synaptic matrix needs to\
-                    be mapped to
+        :param incoming_key: \
+            the source key which the synaptic matrix needs to be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
         :param txrx: the transceiver object from spinnman
         :param chip_y: the y coordinate of the chip of this master pop
@@ -41,12 +42,12 @@ class AbstractMasterPopTableFactory(object):
         :param block_start_addr: the start address of the row in the region
         :param row_length: the row length of this entry
         :param keys_and_masks: list of key_and_mask objects containing the\
-                    keys and masks for a given edge that will require being\
-                    received to be stored in the master pop table
+            keys and masks for a given edge that will require being received\
+            to be stored in the master pop table
         :type keys_and_masks: list of\
             :py:class:`pacman.model.routing_info.KeyAndMask`
-        :param master_pop_table_region: the region to which the master pop\
-                    table is being stored
+        :param master_pop_table_region: \
+            The region to which the master pop table is being stored
         :param is_single: True if this is a single synapse, False otherwise
         """
 

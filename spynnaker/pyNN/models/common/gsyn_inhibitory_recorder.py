@@ -44,7 +44,7 @@ class GsynInhibitoryRecorder(AbstractUInt32Recorder):
     def get_gsyn_inhibitory(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step):
-
+        # pylint: disable=too-many-arguments
         return self.get_data(
             label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step, "gsyn_inhibitory")

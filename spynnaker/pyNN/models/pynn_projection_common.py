@@ -40,6 +40,7 @@ class PyNNProjectionCommon(object):
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
+        # pylint: disable=too-many-arguments
         self._spinnaker_control = spinnaker_control
         self._projection_edge = None
         self._host_based_synapse_list = None
@@ -184,6 +185,7 @@ class PyNNProjectionCommon(object):
             timescale_factor):
         """ Instantiate delay extension component
         """
+        # pylint: disable=too-many-arguments
 
         # Create a delay extension vertex to do the extra delays
         delay_vertex = pre_synaptic_population._internal_delay_vertex
@@ -230,6 +232,7 @@ class PyNNProjectionCommon(object):
     def _get_synaptic_data(
             self, as_list, data_to_get, fixed_values=None, notify=None,
             handle_time_out_configuration=True):
+        # pylint: disable=too-many-arguments
         post_vertex = self._projection_edge.post_vertex
         pre_vertex = self._projection_edge.pre_vertex
 

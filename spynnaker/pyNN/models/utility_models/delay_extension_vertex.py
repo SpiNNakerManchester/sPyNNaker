@@ -50,9 +50,9 @@ class DelayExtensionVertex(
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
                  label="DelayExtension"):
+        """Creates a new DelayExtension Object.
         """
-        Creates a new DelayExtension Object.
-        """
+        # pylint: disable=too-many-arguments
         ApplicationVertex.__init__(self, label, constraints, 256)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)
         AbstractProvidesNKeysForPartition.__init__(self)
@@ -94,7 +94,7 @@ class DelayExtensionVertex(
 
     @property
     def n_delay_stages(self):
-        """ The maximum number of delay stages required by any connection
+        """ The maximum number of delay stages required by any connection\
             out of this delay extension vertex
         """
         return self._n_delay_stages
@@ -133,6 +133,7 @@ class DelayExtensionVertex(
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             machine_graph, graph_mapper, routing_infos):
+        # pylint: disable=too-many-arguments, arguments-differ
 
         vertex = placement.vertex
 
@@ -199,6 +200,7 @@ class DelayExtensionVertex(
             n_vertices, machine_time_step, time_scale_factor):
         """ Generate Delay Parameter data
         """
+        # pylint: disable=too-many-arguments
 
         # Write spec with commands to construct required delay region:
         spec.comment("\nWriting Delay Parameters for {} Neurons:\n"

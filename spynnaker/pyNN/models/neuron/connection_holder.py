@@ -62,6 +62,7 @@ class ConnectionHolder(object):
             This should accept a single parameter, which will contain the\
             data requested
         """
+        # pylint: disable=too-many-arguments
         self._data_items_to_return = data_items_to_return
         self._as_list = as_list
         self._n_pre_atoms = n_pre_atoms

@@ -55,6 +55,7 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
     def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
                  tau_syn_I, initial_input_exc, initial_input_exc2,
                  initial_input_inh):
+        # pylint: disable=too-many-arguments
         AbstractSynapseType.__init__(self)
         AbstractContainsUnits.__init__(self)
 

@@ -39,6 +39,7 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
     def __init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac):
+        # pylint: disable=too-many-arguments
         super(NeuronModelLeakyIntegrateAndFire, self).__init__(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset)
         self._data[V_RESET] = v_reset

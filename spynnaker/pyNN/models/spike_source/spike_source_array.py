@@ -67,7 +67,7 @@ class SpikeSourceArray(
                 'spike_recorder_buffer_size'],
             buffer_size_before_receive=none_pynn_default_parameters[
                 'buffer_size_before_receive']):
-
+        # pylint: disable=too-many-arguments
         self._model_name = "SpikeSourceArray"
 
         config = globals_variables.get_simulator().config
@@ -81,11 +81,10 @@ class SpikeSourceArray(
         if spike_times is None:
             spike_times = []
 
-        ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, label=label,
-            constraints=constraints,
-            max_atoms_per_core=(SpikeSourceArray.
-                                _model_based_max_atoms_per_core),
+        super(SpikeSourceArray, self).__init__(
+            n_keys=n_neurons, label=label, constraints=constraints,
+            max_atoms_per_core=(
+                SpikeSourceArray._model_based_max_atoms_per_core),
             board_address=board_address,
             receive_port=None, receive_tag=None,
             virtual_key=None, prefix=None, prefix_type=None, check_keys=False,
@@ -202,15 +201,14 @@ class SpikeSourceArray(
         return SpikeSourceArray._model_based_max_atoms_per_core
 
     def describe(self):
-        """
-        Returns a human-readable description of the cell or synapse type.
+        """ Returns a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template
-        together with an associated template engine
+        The output may be customised by specifying a different template\
+        together with an associated template engine\
         (see ``pyNN.descriptions``).
 
-        If template is None, then a dictionary containing the template context
-        will be returned.
+        If template is None, then a dictionary containing the template\
+        context will be returned.
         """
 
         parameters = dict()

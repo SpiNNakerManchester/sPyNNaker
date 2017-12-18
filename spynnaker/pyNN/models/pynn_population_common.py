@@ -18,8 +18,31 @@ logger = logging.getLogger(__file__)
 
 
 class PyNNPopulationCommon(object):
+    __slots__ = [
+        "_all_ids",
+        "_change_requires_mapping",
+        "_delay_vertex",
+        "_first_id",
+        "_has_read_neuron_parameters_this_run",
+        "_last_id",
+        "_positions",
+        "_record_gsyn_file",
+        "_record_spike_file",
+        "_record_v_file",
+        "_size",
+        "_spinnaker_control",
+        "_structure",
+        "_vertex",
+        "_vertex_changeable_after_run",
+        "_vertex_contains_units",
+        "_vertex_has_set_max_atoms_per_core",
+        "_vertex_population_initializable",
+        "_vertex_population_settable",
+        "_vertex_read_parameters_before_set"]
+
     def __init__(
             self, spinnaker_control, size, vertex, structure, initial_values):
+        # pylint: disable=too-many-arguments
         if size is not None and size <= 0:
             raise ConfigurationException(
                 "A population cannot have a negative or zero size.")

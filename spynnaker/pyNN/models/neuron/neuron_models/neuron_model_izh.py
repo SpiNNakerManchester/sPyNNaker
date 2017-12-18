@@ -64,6 +64,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
         "_units"]
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
+        # pylint: disable=too-many-arguments
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
 
@@ -156,8 +157,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         return [
-
             # REAL A
             NeuronParameter(self._data[A], _IZH_TYPES.A.data_type),
 
@@ -199,11 +200,10 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_global_parameters,
                additional_arguments={'machine_time_step'})
     def get_global_parameters(self, machine_time_step):
-        return [
-            NeuronParameter(
-                machine_time_step / 1000.0,
-                _IZH_GLOBAL_TYPES.TIMESTEP.data_type)
-        ]
+        # pylint: disable=arguments-differ
+        return [NeuronParameter(
+            machine_time_step / 1000.0,
+            _IZH_GLOBAL_TYPES.TIMESTEP.data_type)]
 
     @overrides(AbstractNeuronModel.get_global_parameter_types)
     def get_global_parameter_types(self):

@@ -47,6 +47,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         "_units"]
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
+        # pylint: disable=too-many-arguments
         AbstractNeuronModel.__init__(self)
         AbstractContainsUnits.__init__(self)
 
@@ -128,6 +129,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         return [
 
             # membrane voltage [mV]

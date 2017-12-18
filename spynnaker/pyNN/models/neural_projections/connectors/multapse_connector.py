@@ -49,6 +49,7 @@ class MultapseConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)

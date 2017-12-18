@@ -16,6 +16,7 @@ class _Range_Iterator(object):
         :param spec: The data specification to write to
         :type spec: DataSpecificationGenerator
         """
+        # pylint: disable=too-many-arguments
         self._iterator = value.iter_ranges_by_slice(slice_start, slice_stop)
 
         # Initially the index will be out of range which will force the
@@ -53,6 +54,7 @@ class _Get_Iterator(object):
         :param spec: The data specification to write to
         :type spec: DataSpecificationGenerator
         """
+        # pylint: disable=too-many-arguments
         self._value = value
         self._datatype = datatype
         self._index = slice_start
@@ -85,6 +87,7 @@ class _SingleValue_Iterator(object):
         :param spec: The data specification to write to
         :type spec: DataSpecificationGenerator
         """
+        # pylint: disable=too-many-arguments
         (self._cmd_word_list, self._cmd_string) = spec.create_cmd(
             data=value, data_type=datatype)
         self._index = slice_start

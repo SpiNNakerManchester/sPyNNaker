@@ -79,6 +79,7 @@ class AbstractSynapseDynamics(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean weight for the synapses
         """
+        # pylint: disable=too-many-arguments
         return connector.get_weight_mean(
             n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice)
@@ -88,6 +89,7 @@ class AbstractSynapseDynamics(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum weight for the synapses
         """
+        # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(
             n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice)
@@ -97,6 +99,7 @@ class AbstractSynapseDynamics(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance in weight for the synapses
         """
+        # pylint: disable=too-many-arguments
         return connector.get_weight_variance(
             n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice)
@@ -108,8 +111,7 @@ class AbstractSynapseDynamics(object):
         """
         return [
             data[connection_row_indices == i].reshape(-1)
-            for i in range(n_rows)
-        ]
+            for i in range(n_rows)]
 
     def get_n_items(self, rows, item_size):
         """ Get the number of items in each row as 4-byte values, given the\

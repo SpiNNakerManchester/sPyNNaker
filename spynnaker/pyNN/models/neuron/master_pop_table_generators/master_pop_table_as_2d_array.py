@@ -81,14 +81,16 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def extract_synaptic_matrix_data_location(
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
+        # pylint: disable=too-many-arguments
+
         # locate address of the synaptic block
         pre_x = get_x_from_key(incoming_key)
         pre_y = get_y_from_key(incoming_key)
         pre_p = get_p_from_key(incoming_key)
         table_slot_addr = self._get_table_address_from_coords(
             pre_x, pre_y, pre_p)
-        master_table_pop_entry_address = (table_slot_addr +
-                                          master_pop_base_mem_address)
+        master_table_pop_entry_address = (
+            table_slot_addr + master_pop_base_mem_address)
 
         # read in entry
         master_pop_entry = helpful_functions.read_data(
@@ -146,7 +148,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
         """
-        Writes an entry in the Master Population Table for the newly
+        Writes an entry in the Master Population Table for the newly\
         created synaptic block.
 
         An entry in the table is a 16-bit value, with the following structure:
@@ -166,7 +168,9 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param key_and_mask:
         :param master_pop_table_region:
         :param is_single: True if this is a single synapse, False otherwise
-         """
+        """
+        # pylint: disable=too-many-arguments
+
         # Which core has this projection arrived from?
         key = key_and_mask.key
         x = get_x_from_key(key)

@@ -7,6 +7,7 @@ from six import add_metaclass
 
 @add_metaclass(AbstractBase)
 class FromFileConnector(FromListConnector):
+    # pylint: disable=redefined-builtin
     __slots__ = ["_file"]
 
     def __init__(

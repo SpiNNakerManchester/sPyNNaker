@@ -54,6 +54,7 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram_usage,
             buffered_sdram_per_timestep, label, constraints=None):
+        # pylint: disable=too-many-arguments
         super(PopulationMachineVertex, self).__init__(label, constraints)
         self._is_recording = is_recording
         self._resources = resources_required

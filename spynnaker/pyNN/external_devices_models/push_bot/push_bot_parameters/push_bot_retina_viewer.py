@@ -18,6 +18,7 @@ class PushBotRetinaViewer(Thread):
             self, resolution, port=0, display_max=_DISPLAY_MAX,
             frame_time_ms=_FRAME_TIME_MS,
             decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
+        # pylint: disable=too-many-arguments
         try:
             import matplotlib  # @UnusedImport # NOQA
         except Exception:

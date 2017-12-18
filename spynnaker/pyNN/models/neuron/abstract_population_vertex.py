@@ -233,6 +233,7 @@ class AbstractPopulationVertex(
     def get_resources_used_by_atoms(
             self, vertex_slice, graph, n_machine_time_steps,
             machine_time_step):
+        # pylint: disable=arguments-differ
 
         # set resources required from this object
         container = ResourceContainer(
@@ -283,7 +284,7 @@ class AbstractPopulationVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
         is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
                        self._spike_recorder.record
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
@@ -491,7 +492,7 @@ class AbstractPopulationVertex(
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = graph_mapper.get_slice(placement.vertex)
 
         # reserve the neuron parameters data region
@@ -543,7 +544,7 @@ class AbstractPopulationVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
             tags, n_machine_time_steps):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
@@ -644,6 +645,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
                  graph_mapper, buffer_manager, machine_time_step):
+        # pylint: disable=too-many-arguments
         return self._neuron_recorder.get_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
             placements, graph_mapper, self, machine_time_step,

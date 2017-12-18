@@ -46,6 +46,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         :param `int` n_connections:\
             The number of efferent synaptic connections per neuron.
         """
+        # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
             safe, verbose)
         self._d_expression = d_expression

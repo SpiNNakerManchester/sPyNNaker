@@ -33,8 +33,9 @@ class SpikeSourcePoissonMachineVertex(
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, constraints=None, label=None):
-        MachineVertex.__init__(self, label, constraints=constraints)
-        AbstractRecordable.__init__(self)
+        # pylint: disable=too-many-arguments
+        super(SpikeSourcePoissonMachineVertex, self).__init__(
+            label, constraints=constraints)
         self._is_recording = is_recording
         self._resources = resources_required
         self._minimum_buffer_sdram = minimum_buffer_sdram
@@ -87,6 +88,7 @@ class SpikeSourcePoissonMachineVertex(
         AbstractSupportsDatabaseInjection.is_in_injection_mode,
         additional_arguments=["graph"])
     def is_in_injection_mode(self, graph):
+        # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
