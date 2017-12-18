@@ -73,8 +73,6 @@ class SpikeRecorder(object):
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
-                split_record = numpy.array_split(raw_data, [1, 1], 1)
-
                 record_time = raw_data[0][0] * float(sampling_interval)
                 spikes = raw_data[0][1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
