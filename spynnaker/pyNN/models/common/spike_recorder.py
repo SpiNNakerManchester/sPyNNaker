@@ -46,7 +46,7 @@ class SpikeRecorder(object):
 
         spike_times = list()
         spike_ids = list()
-        sampling_interval = self.get_spikes_sampling_interval()
+        ms_per_tick = machine_time_step / 1000.0
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
@@ -55,6 +55,11 @@ class SpikeRecorder(object):
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
+
+            x = placement.x
+            y = placement.y
+            p = placement.p
+            lo_atom = vertex_slice.lo_atom
 
             # Read the spikes
             n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
@@ -66,24 +71,22 @@ class SpikeRecorder(object):
                 buffer_manager.get_data_for_vertex(
                     placement, region)
             if data_missing:
-                missing_str += "({}, {}, {}); ".format(
-                    placement.x, placement.y, placement.p)
+                missing_str += "({}, {}, {}); ".format(x, y, p)
             record_raw = neuron_param_region_data_pointer.read_all()
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
                 split_record = numpy.array_split(raw_data, [1, 1], 1)
-
-                record_time = raw_data[0][0] * float(sampling_interval)
-                spikes = raw_data[0][1:].byteswap().view("uint8")
+                record_time = split_record[0] * float(ms_per_tick)
+                spikes = split_record[2].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
-                indices = numpy.where(bits == 1)[1]
-                times = numpy.repeat(record_time, len(indices))
-                indices = indices + vertex_slice.lo_atom
-                spike_ids.extend(indices)
-                spike_times.extend(times)
+                time_indices, indices = numpy.where(bits == 1)
+                times = record_time[time_indices].reshape((-1))
+                indices = indices + lo_atom
+                spike_ids.append(indices)
+                spike_times.append(times)
 
         if len(missing_str) > 0:
             logger.warn(
@@ -92,8 +95,9 @@ class SpikeRecorder(object):
 
         if len(spike_ids) == 0:
             return numpy.zeros((0, 2), dtype="float")
-
-        result = numpy.column_stack((spike_ids, spike_times))
+        spike_ids = numpy.hstack(spike_ids)
+        spike_times = numpy.hstack(spike_times)
+        result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
 
     def get_spikes_sampling_interval(self):
@@ -101,4 +105,4 @@ class SpikeRecorder(object):
         Returns the current sampling interval for this variable
          :return: Sampling interval in micro seconds
         """
-        return globals_variables.get_simulator().machine_time_step / 1000
+        return globals_variables.get_simulator().machine_time_step
