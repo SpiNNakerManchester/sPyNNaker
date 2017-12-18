@@ -557,10 +557,9 @@ void neuron_do_timestep_update(timer_t time) {
     // Record any spikes this timestep
     if (recording_is_channel_enabled(
             recording_flags, SPIKE_RECORDING_CHANNEL)) {
-        if (!out_spikes_is_empty()) {
+        if (out_spikes_record(
+                SPIKE_RECORDING_CHANNEL, time, recording_done_callback)) {
             n_recordings_outstanding += 1;
-            out_spikes_record(
-                SPIKE_RECORDING_CHANNEL, time, recording_done_callback);
         }
     }
 
