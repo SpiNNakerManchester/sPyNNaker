@@ -104,6 +104,8 @@ def test_connectors(
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
+    max_target = 0
+    max_source = 0
     for seed in range(1000):
         numpy.random.seed(seed)
         connector = create_connector()
@@ -148,6 +150,10 @@ def test_connectors(
             max(synaptic_block["weight"]) if len(synaptic_block) > 0 else 0)
         matrix_max_delay = (
             max(synaptic_block["delay"]) if len(synaptic_block) > 0 else 0)
+
+        max_source = max((max(source_histogram), max_source))
+        max_target = max((max(target_histogram), max_target))
+
         try:
             assert max(source_histogram) <= max_row_length
             assert max(target_histogram) <= max_col_length
@@ -160,3 +166,5 @@ def test_connectors(
             print max_weight, matrix_max_weight, synaptic_block["weight"]
             print max_delay, matrix_max_delay, synaptic_block["delay"]
             raise
+    print connector.__class__.__name__, max_row_length, max_source, max_col_length, max_target
+

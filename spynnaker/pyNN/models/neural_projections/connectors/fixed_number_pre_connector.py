@@ -123,9 +123,9 @@ class FixedNumberPreConnector(AbstractConnector):
             (this_pre_neuron_array >= pre_vertex_slice.lo_atom) &
             (this_pre_neuron_array <= pre_vertex_slice.hi_atom)]
 
-    def _get_n_connections(self, out_of, n_pre):
+    def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
-                self._n_post_neurons, self._n_pre * self._n_post_neurons,
+                self._n_post_neurons, self._n_pre * out_of,
                 1.0 / self._n_pre_neurons, chance=(1.0 / 100000.0))
 
     def get_n_connections_from_pre_vertex_maximum(
@@ -134,8 +134,7 @@ class FixedNumberPreConnector(AbstractConnector):
             min_delay=None, max_delay=None):
 
         # Get the probable max number of connections
-        n_connections = self._get_n_connections(
-            post_vertex_slice.n_atoms, pre_vertex_slice.n_atoms)
+        n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -158,8 +157,7 @@ class FixedNumberPreConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            post_vertex_slice.n_atoms, pre_vertex_slice.n_atoms)
+        n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
         return self._get_weight_maximum(self._weights, n_connections, None)
 
     def get_weight_variance(

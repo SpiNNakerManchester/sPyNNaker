@@ -125,7 +125,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
-                self._n_pre_neurons, self._n_post * self._n_pre_neurons,
+                self._n_pre_neurons, self._n_post * out_of,
                 1.0 / self._n_post_neurons, chance=(1.0 / 100000.0))
 
     def get_n_connections_from_pre_vertex_maximum(
