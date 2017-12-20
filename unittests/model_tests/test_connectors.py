@@ -154,6 +154,23 @@ def test_connectors(
         max_source = max((max(source_histogram), max_source))
         max_target = max((max(target_histogram), max_target))
 
+        if len(post_slices) > post_slice_index + 1:
+            test_post_slice = post_slices[post_slice_index + 1]
+            test_synaptic_block = connector.create_synaptic_block(
+                pre_slices, pre_slice_index, post_slices, post_slice_index + 1,
+                pre_vertex_slice, test_post_slice, synapse_type)
+            if len(test_synaptic_block) > 0:
+                assert not numpy.array_equal(
+                    test_synaptic_block, synaptic_block)
+        if len(pre_slices) > pre_slice_index + 1:
+            test_pre_slice = pre_slices[pre_slice_index + 1]
+            test_synaptic_block = connector.create_synaptic_block(
+                pre_slices, pre_slice_index + 1, post_slices, post_slice_index,
+                test_pre_slice, post_vertex_slice, synapse_type)
+            if len(test_synaptic_block) > 0:
+                assert not numpy.array_equal(
+                    test_synaptic_block, synaptic_block)
+
         try:
             assert max(source_histogram) <= max_row_length
             assert max(target_histogram) <= max_col_length
