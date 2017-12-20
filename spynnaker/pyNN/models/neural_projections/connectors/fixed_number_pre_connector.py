@@ -198,7 +198,7 @@ class FixedNumberPreConnector(AbstractConnector):
                 pre_vertex_slice, n)
             for m in range(0, len(pre_neurons)):
                 pre_neurons_in_slice.append(pre_neurons[m])
-                post_neurons_in_slice.append(post_vertex_array[n] - lo)
+                post_neurons_in_slice.append(post_vertex_array[n-lo])
 
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
