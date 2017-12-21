@@ -519,12 +519,12 @@ bool synaptogenesis_dynamics_elimination_rule(){
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
     log_debug("elim_prob r %u ctrl %d", r, current_state.current_controls);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ? rewiring_data.weight[current_state.current_controls] : rewiring_data.weight[0];
-    if( current_state.sp_data.weight < (appr_scaled_weight >> 1) && r > rewiring_data.p_elim_dep ){
+    if( current_state.sp_data.weight < (appr_scaled_weight / 2) && r > rewiring_data.p_elim_dep ){
         log_debug("\t| FAIL DEP %d", current_state.current_time);
         return false;
     }
     // otherwise use probability 2
-    if ( current_state.sp_data.weight >= (appr_scaled_weight >> 1) && r > rewiring_data.p_elim_pot ){
+    if ( current_state.sp_data.weight >= (appr_scaled_weight / 2) && r > rewiring_data.p_elim_pot ){
         log_debug("\t| FAIL POT %d", current_state.current_time);
         return false;
     }
