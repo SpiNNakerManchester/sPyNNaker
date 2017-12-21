@@ -1,4 +1,5 @@
 from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.abstract_list import AbstractList
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -39,16 +40,18 @@ class _EXP_TYPES(Enum):
 def get_exponential_decay_and_init(tau, machine_time_step):
     ulfract = pow(2, 32)
     ts = float(machine_time_step) / 1000.0
-    return (
-
-        # decay = e^(-ts / tau) as an unsigned long fract
-        tau.apply_operation(
-            lambda x: int(numpy.exp(-ts / x) * ulfract)),
-
-        # init = (tau / ts) * (1 - e^(-ts / tau)) as an unsigned long fract
-        tau.apply_operation(
-            lambda x: int((x / ts) * (1.0 - numpy.exp(-ts / x)) * ulfract))
-    )
+    # decay = e^(-ts / tau) as an unsigned long fract
+    decay = lambda x: int(numpy.exp(-ts / x) * ulfract)  # noqa E731
+    # init = (tau / ts) * (1 - e^(-ts / tau)) as unsigned long fract
+    init = lambda x: int((x / ts) * (1.0 - numpy.exp(-ts / x)) * ulfract)  # noqa E731,
+    if isinstance(tau, AbstractList):
+        return (
+            tau.apply_operation(decay),
+            tau.apply_operation(init)
+        )
+    else:
+        # For backward compatability in case tau is just rawa collection
+        return (map(decay, tau), map(init, tau))
 
 
 class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
