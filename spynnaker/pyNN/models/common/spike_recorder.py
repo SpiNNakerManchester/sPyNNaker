@@ -1,6 +1,7 @@
 from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
+from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
 import numpy
@@ -9,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class SpikeRecorder(object):
+class SpikeRecorder(AbstractSpikeRecorder):
 
     def __init__(self):
         self._record = False

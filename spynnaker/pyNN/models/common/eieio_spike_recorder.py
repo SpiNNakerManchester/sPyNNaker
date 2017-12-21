@@ -1,5 +1,6 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
+from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import numpy
 import struct
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 _ONE_WORD = struct.Struct("<I")
 
 
-class EIEIOSpikeRecorder(object):
+class EIEIOSpikeRecorder(AbstractSpikeRecorder):
     """ Records spikes using EIEIO format
     """
 

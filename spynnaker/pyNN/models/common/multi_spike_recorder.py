@@ -1,6 +1,7 @@
 from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
+from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
 import numpy
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
 
 
-class MultiSpikeRecorder(object):
+class MultiSpikeRecorder(AbstractSpikeRecorder):
 
     def __init__(self):
         self._record = False
