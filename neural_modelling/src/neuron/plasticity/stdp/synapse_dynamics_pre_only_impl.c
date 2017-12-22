@@ -23,9 +23,9 @@ static synapse_param_t *neuron_synapse_shaping_params;
 */
 
 // Get access to the neuron data
-static neuron_pointer_t *neuron_array_stdp;
-static additional_input_pointer_t *additional_input_array_stdp;
-static threshold_type_pointer_t *threshold_type_array_stdp;
+static neuron_pointer_t neuron_array_stdp;
+static additional_input_pointer_t additional_input_array_stdp;
+static threshold_type_pointer_t threshold_type_array_stdp;
 
 //---------------------------------------
 // Macros
@@ -379,8 +379,12 @@ void neuron_set_neuron_synapse_shaping_params(
 }
 */
 
-void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t *neuron_array){
+void synapse_dynamics_stdp_mad_set_neuron_array(neuron_pointer_t neuron_array){
+	//log_info("size of %d", sizeof(neuron_t));
 	neuron_array_stdp = neuron_array;
+//    log_info("Neuron Voltage 2: %11.4k", neuron_model_get_membrane_voltage(&neuron_array[2]));
+//    log_info("Neuron Voltage 3: %11.4k", neuron_model_get_membrane_voltage(&neuron_array_stdp[2]));
+
 }
 
 void synapse_dynamics_stdp_mad_set_threshold_array(threshold_type_pointer_t threshold_type_array){
