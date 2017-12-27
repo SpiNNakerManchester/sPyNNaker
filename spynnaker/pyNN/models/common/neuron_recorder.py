@@ -132,6 +132,7 @@ class NeuronRecorder(object):
         elif variable in self._sampling_rates:
             if new_state:
                 if sampling_interval is None:
+                    # Record every tick
                     self._sampling_rates[variable] = 1
                 else:
                     step = globals_variables.get_simulator().\
