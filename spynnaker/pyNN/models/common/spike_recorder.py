@@ -22,7 +22,6 @@ class SpikeRecorder(AbstractSpikeRecorder):
     def record(self):
         return self._record
 
-
     @overrides(AbstractSpikeRecorder.set_recording)
     def set_recording(self, new_state, sampling_interval):
         self._record = new_state
@@ -80,8 +79,8 @@ class SpikeRecorder(AbstractSpikeRecorder):
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
-                record_time = raw_data[:,0] * float(sampling_interval)
-                spikes = raw_data[:,1].byteswap().view("uint8")
+                record_time = raw_data[:, 0] * float(sampling_interval)
+                spikes = raw_data[:, 1].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, indices = numpy.where(bits == 1)

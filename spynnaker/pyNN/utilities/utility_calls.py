@@ -347,4 +347,3 @@ def check_sampling_interval(sampling_interval):
               "".format(sampling_interval, step * MAX_RATE)
         raise ConfigurationException(msg)
     return sampling_interval
-
