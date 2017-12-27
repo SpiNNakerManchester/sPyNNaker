@@ -79,12 +79,12 @@ class SpikeRecorder(AbstractSpikeRecorder):
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
-                record_time = raw_data[0][0] * float(sampling_interval)
-                spikes = raw_data[0][1:].byteswap().view("uint8")
+                record_time = raw_data[:,0] * float(sampling_interval)
+                spikes = raw_data[:,1].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
-                indices = numpy.where(bits == 1)[1]
-                times = numpy.repeat(record_time, len(indices))
+                time_indices, indices = numpy.where(bits == 1)
+                times = record_time[time_indices].reshape((-1))
                 indices = indices + vertex_slice.lo_atom
                 spike_ids.extend(indices)
                 spike_times.extend(times)
