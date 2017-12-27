@@ -26,7 +26,8 @@ class SpikeRecorder(AbstractSpikeRecorder):
     @overrides(AbstractSpikeRecorder.set_recording)
     def set_recording(self, new_state, sampling_interval):
         self._record = new_state
-        self._sampling_interval = utility_calls.check_sampling_interval(sampling_interval)
+        self._sampling_interval = utility_calls.check_sampling_interval(
+            sampling_interval)
 
     def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
         if not self._record:

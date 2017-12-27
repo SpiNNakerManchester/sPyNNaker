@@ -333,7 +333,7 @@ def validate_mars_kiss_64_seed(seed):
 
 
 def check_sampling_interval(sampling_interval):
-    step = globals_variables.get_simulator().machine_time_step
+    step = globals_variables.get_simulator().machine_time_step / 1000
     if sampling_interval is None:
         return step
     rate = int(sampling_interval / step)
