@@ -13,20 +13,29 @@ class AbstractSpikeRecorder(object):
     __slots__ = ()
 
     @abstractmethod
-    def record(self, record):
-        pass
+    def set_recording(self, new_state, sampling_interval):
+        """ Sets spikes to being recorded
 
-    @abstractmethod
-    def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
-        pass
+        If new_state is false all other paramteres are ignored.
 
-    @abstractmethod
-    def get_dtcm_usage_in_bytes(self):
-        pass
+        :param new_state: Set if the spikes are recording or not
+        :type new_state: bool
+        :param sampling_interval: The interval at which spikes are recorded.\
+            Must be a whole multiple of the timestep
+            None will be taken as the timestep
+        """
 
-    @abstractmethod
-    def get_n_cpu_cycles(self, n_neurons):
-        pass
+#    @abstractmethod
+#    def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
+#        pass
+
+#    @abstractmethod
+#    def get_dtcm_usage_in_bytes(self):
+#        pass
+
+#    @abstractmethod
+#    def get_n_cpu_cycles(self, n_neurons):
+#        pass
 
     @abstractmethod
     def get_spikes(
@@ -34,6 +43,6 @@ class AbstractSpikeRecorder(object):
             application_vertex, machine_time_step):
         pass
 
-    @abstractmethod
-    def get_spikes_sampling_interval(self):
-        pass
+#    @abstractmethod
+#    def get_spikes_sampling_interval(self):
+#        pass

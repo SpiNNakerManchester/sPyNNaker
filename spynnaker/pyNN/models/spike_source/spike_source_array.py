@@ -167,7 +167,10 @@ class SpikeSourceArray(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True):
+    def set_recording_spikes(self, new_state=True, sampling_interval=None):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval current not sopported for "
+                           "SpikeSourceArray so being ignored")
         self.enable_recording(
             self._spike_recorder_buffer_size,
             self._buffer_size_before_receive)

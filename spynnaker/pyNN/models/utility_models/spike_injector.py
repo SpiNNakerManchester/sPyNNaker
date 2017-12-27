@@ -1,3 +1,5 @@
+import logging
+
 from pacman.model.decorators import overrides
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
@@ -10,6 +12,8 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common \
     import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
     SimplePopulationSettable
+
+logger = logging.getLogger(__name__)
 
 
 class SpikeInjector(ReverseIpTagMultiCastSource,
@@ -84,7 +88,10 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True):
+    def set_recording_spikes(self, new_state=True, sampling_interval=None):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval current not sopported for "
+                           "SpikeSourceArray so being ignored")
         self.enable_recording(
             self._spike_buffer_max_size, self._buffer_size_before_receive,
             self._time_between_requests)

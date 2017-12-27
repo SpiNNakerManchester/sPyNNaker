@@ -1,6 +1,8 @@
+from pacman.model.decorators import overrides
 from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.utilities import utility_calls
 from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
@@ -14,14 +16,17 @@ class SpikeRecorder(AbstractSpikeRecorder):
 
     def __init__(self):
         self._record = False
+        self._sampling_interval = None
 
     @property
     def record(self):
         return self._record
 
-    @record.setter
-    def record(self, record):
-        self._record = record
+
+    @overrides(AbstractSpikeRecorder.set_recording)
+    def set_recording(self, new_state, sampling_interval):
+        self._record = new_state
+        self._sampling_interval = utility_calls.check_sampling_interval(sampling_interval)
 
     def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
         if not self._record:

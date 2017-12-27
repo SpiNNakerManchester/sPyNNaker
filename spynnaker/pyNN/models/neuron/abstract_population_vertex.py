@@ -625,9 +625,9 @@ class AbstractPopulationVertex(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True):
+    def set_recording_spikes(self, new_state=True, sampling_interval=None):
         self._change_requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+        self._spike_recorder.set_recording(new_state, sampling_interval)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

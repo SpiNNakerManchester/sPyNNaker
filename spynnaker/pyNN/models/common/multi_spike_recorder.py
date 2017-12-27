@@ -1,3 +1,4 @@
+from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
@@ -21,9 +22,12 @@ class MultiSpikeRecorder(AbstractSpikeRecorder):
     def record(self):
         return self._record
 
-    @record.setter
-    def record(self, record):
-        self._record = record
+    @overrides(AbstractSpikeRecorder.set_recording)
+    def set_recording(self, new_state, sampling_interval):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval current not sopported for "
+                           "SpikeSourceArray so being ignored")
+        self._record = new_state
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, spikes_per_timestep, n_machine_time_steps):
