@@ -166,7 +166,7 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
             indexes = []
             sampling_interval = self._population._vertex.\
-                get_sampling_interval(variable)
+                get_neuron_sampling_interval(variable)
         elif sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
