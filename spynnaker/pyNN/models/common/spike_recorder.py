@@ -59,7 +59,7 @@ class SpikeRecorder(AbstractSpikeRecorder):
 
         spike_times = list()
         spike_ids = list()
-        sampling_interval = self.get_spikes_sampling_interval()
+        ms_per_tick = machine_time_step / 1000.0
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
@@ -86,7 +86,7 @@ class SpikeRecorder(AbstractSpikeRecorder):
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * float(sampling_interval)
+                record_time = raw_data[:, 0] * float(ms_per_tick)
                 spikes = raw_data[:, 1].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
