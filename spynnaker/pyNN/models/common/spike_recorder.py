@@ -1,10 +1,6 @@
-from data_specification.enums import DataType
 from pacman.model.decorators import overrides
-from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities import utility_calls
 from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
@@ -14,6 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 BYTES_PER_WORD = 4
+
 
 class SpikeRecorder(AbstractSpikeRecorder):
 
