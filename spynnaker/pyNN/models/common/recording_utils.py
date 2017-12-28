@@ -137,7 +137,7 @@ def compute_interval(sampling_rate):
     :return:
     """
     step = globals_variables.get_simulator().machine_time_step / 1000
-    return sampling_rate *  step
+    return sampling_rate * step
 
 
 def rate_parameter(sampling_rate):
