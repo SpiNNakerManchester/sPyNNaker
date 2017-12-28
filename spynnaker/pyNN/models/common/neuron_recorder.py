@@ -158,10 +158,10 @@ class NeuronRecorder(object):
 
     def get_extra_buffered_sdram(self, variable, slice):
         """
-        Returns the maximun extra sdram where sampling is used.
+        Returns the maximum extra sdram where sampling is used.
 
-        The assumpt here is that the there has been a previous run which stop
-        just before the recording timestep.
+        The assumption here is that the there has been a previous run which
+        stopped just before the recording timestep.
 
         Then it is run for one timestep so a whole row of data must fit.
         This method returns the cost for a whole row

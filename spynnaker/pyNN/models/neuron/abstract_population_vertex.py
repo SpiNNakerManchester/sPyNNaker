@@ -266,7 +266,7 @@ class AbstractPopulationVertex(
 
     def _get_extra_buffered_sdram(self, vertex_slice):
         return [
-            0,
+            self._spike_recorder.get_extra_buffered_sdram(),
             self._neuron_recorder.get_extra_buffered_sdram("v", vertex_slice),
             self._neuron_recorder.get_extra_buffered_sdram(
                 "gsyn_exc", vertex_slice),

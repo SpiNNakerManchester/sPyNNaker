@@ -34,10 +34,30 @@ class SpikeRecorder(AbstractSpikeRecorder):
         return recording_utils.get_recording_region_size_in_bytes(
             n_machine_time_steps, out_spike_bytes)
 
+    def get_extra_buffered_sdram(self):
+        """
+        Returns the maximum extra sdram where sampling is used.
+
+        The assumption here is that the there has been a previous run which
+        stopped just before the recording timestep.
+
+        Then it is run for one timestep so a whole row of data must fit.
+        This method returns the cost for a whole row
+        minus the average returned by get_buffered_sdram_per_timestep
+
+        :return:
+        """
+        rate = self._sampling_rate
+        if rate <= 1:
+            # No sampling so get_buffered_sdram_per_timestep was correct
+            return 0
+        data_size = self.N_BYTES_PER_NEURON * slice.n_atom
+        return BYTES_PER_WORD / rate * (rate - 1)
+
     def get_dtcm_usage_in_bytes(self):
         if self._sampling_rate == 0:
             return 0
-        return BYTES_PER_WORD
+        return BYTES_PER_WORD / self._sampling_rate
 
     def get_n_cpu_cycles(self, n_neurons):
         if self._sampling_rate == 0:
