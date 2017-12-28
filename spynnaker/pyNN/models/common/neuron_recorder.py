@@ -6,8 +6,7 @@ import numpy
 
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.common import compute_interval, compute_rate, \
-    global_parameter
+from spynnaker.pyNN.models.common import recording_utils
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
 
 logger = logging.getLogger(__name__)
@@ -36,7 +35,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        return compute_interval(self._sampling_rates[variable])
+        return recording_utils.compute_interval(self._sampling_rates[variable])
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -128,11 +127,8 @@ class NeuronRecorder(object):
             for key in self._sampling_rates.keys():
                 self.set_recording(key, new_state, sampling_interval)
         elif variable in self._sampling_rates:
-            if new_state:
-                self._sampling_rates[variable] = \
-                    compute_rate(sampling_interval)
-            else:
-                self._sampling_rates[variable] = 0
+            self._sampling_rates[variable] = \
+                    recording_utils.compute_rate(new_state, sampling_interval)
         else:
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
@@ -196,7 +192,8 @@ class NeuronRecorder(object):
     def get_global_parameters(self, slice):
         params = []
         for variable in self._sampling_rates:
-            params.append(global_parameter(self._sampling_rates[variable]))
+            params.append(recording_utils.rate_parameter(
+                self._sampling_rates[variable]))
         return params
 
     def get_indexes_for_slice(self, variable, slice):
