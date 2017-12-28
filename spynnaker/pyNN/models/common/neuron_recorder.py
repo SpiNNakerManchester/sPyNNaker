@@ -6,13 +6,11 @@ import numpy
 
 from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.models.common import compute_interval, compute_rate, \
+    global_parameter
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
-from spinn_front_end_common.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
-
-MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
 
 class NeuronRecorder(object):
@@ -38,7 +36,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        return self._sampling_rates[variable]
+        return compute_interval(self._sampling_rates[variable])
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -131,23 +129,8 @@ class NeuronRecorder(object):
                 self.set_recording(key, new_state, sampling_interval)
         elif variable in self._sampling_rates:
             if new_state:
-                if sampling_interval is None:
-                    self._sampling_rates[variable] = 1
-                else:
-                    step = globals_variables.get_simulator().\
-                               machine_time_step / 1000
-                    rate = int(sampling_interval / step)
-                    if sampling_interval != rate * step:
-                        msg = "sampling_interval {} is not an an integer " \
-                              "multiple of the simulation timestep {}" \
-                              "".format(sampling_interval, step)
-                        raise fec_excceptions.ConfigurationException(msg)
-                    if rate > MAX_RATE:
-                        msg = "sampling_interval {} higher than max allowed " \
-                              "which is {}" \
-                              "".format(sampling_interval, step * MAX_RATE)
-                        raise fec_excceptions.ConfigurationException(msg)
-                    self._sampling_rates[variable] = rate
+                self._sampling_rates[variable] = \
+                    compute_rate(sampling_interval)
             else:
                 self._sampling_rates[variable] = 0
         else:
@@ -213,8 +196,7 @@ class NeuronRecorder(object):
     def get_global_parameters(self, slice):
         params = []
         for variable in self._sampling_rates:
-            params.append(NeuronParameter(
-                self._sampling_rates[variable], DataType.UINT32))
+            params.append(global_parameter(self._sampling_rates[variable]))
         return params
 
     def get_indexes_for_slice(self, variable, slice):
