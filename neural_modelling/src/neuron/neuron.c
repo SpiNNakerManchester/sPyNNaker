@@ -58,7 +58,7 @@ static uint32_t recording_flags;
 static synapse_param_t *neuron_synapse_shaping_params;
 
 typedef struct global_record_params_t {
-
+    uint32_t spike_rate;
     uint32_t v_rate;
     uint32_t exc_rate;
     uint32_t inh_rate;
@@ -69,6 +69,8 @@ typedef struct global_record_params_t* global_record_params_pointer_t;
 
 static global_record_params_pointer_t global_record_params;
 
+uint32_t spike_index;
+uint32_t spike_increment;
 uint32_t v_index;
 uint32_t v_increment;
 uint32_t exc_index;
@@ -139,6 +141,20 @@ static inline void _print_neuron_parameters() {
 
 
 void _reset_record_counter(){
+    if (global_record_params->spike_rate == 0){
+        // Setting increment to zero means v_index will never equal v_rate
+        spike_increment = 0;
+        // Index is not rate so does not record. Nor one so we never reset
+        spike_index = 2;
+    }
+    else {
+        // Increase one each call so z_index gets to v_rate
+        spike_increment = 1;
+        // Using rate base here first zero time is record
+        spike_index = global_record_params->spike_rate;
+        // Reset as first pass we record no matter what the rate is
+        out_spikes_reset();
+    }
     if (global_record_params->v_rate == 0){
         // Setting increment to zero means v_index will never equal v_rate
         v_increment = 0;
@@ -420,8 +436,10 @@ void neuron_do_timestep_update(timer_t time) {
         spin1_wfi();
     }
 
-    // Reset the out spikes before starting
-    out_spikes_reset();
+    // Reset the out spikes before starting if a beginning of recording
+    if (spike_index == 1) {
+        out_spikes_reset();
+    }
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -555,13 +573,16 @@ void neuron_do_timestep_update(timer_t time) {
     _print_neurons();
 
     // Record any spikes this timestep
-    if (recording_is_channel_enabled(
-            recording_flags, SPIKE_RECORDING_CHANNEL)) {
+    // record neuron inputs (inhibitory) if needed
+    if (spike_index == global_record_params->spike_rate) {
+        spike_index = 1;
         if (out_spikes_record(
                 SPIKE_RECORDING_CHANNEL, time, recording_done_callback)) {
             n_recordings_outstanding += 1;
         }
-    }
+   } else {
+        spike_index += spike_increment;
+   }
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);

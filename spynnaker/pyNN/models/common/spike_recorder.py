@@ -1,7 +1,9 @@
+from data_specification.enums import DataType
 from pacman.model.decorators import overrides
 from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_spike_recorder import AbstractSpikeRecorder
 
@@ -11,6 +13,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+BYTES_PER_WORD = 4
 
 class SpikeRecorder(AbstractSpikeRecorder):
 
@@ -32,19 +35,25 @@ class SpikeRecorder(AbstractSpikeRecorder):
         if not self._record:
             return 0
 
-        out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
+        out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * BYTES_PER_WORD
         return recording_utils.get_recording_region_size_in_bytes(
             n_machine_time_steps, out_spike_bytes)
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:
             return 0
-        return 4
+        return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
         if not self._record:
             return 0
         return n_neurons * 4
+
+    def get_sdram_usage_for_global_parameters_in_bytes(self):
+        return BYTES_PER_WORD
+
+    def get_global_parameters(self, vertex_slice):
+        return NeuronParameter(self._sampling_rate(), DataType.UINT32)
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -64,7 +73,7 @@ class SpikeRecorder(AbstractSpikeRecorder):
 
             # Read the spikes
             n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
-            n_bytes = n_words * 4
+            n_bytes = n_words * BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager

@@ -349,6 +349,8 @@ class AbstractPopulationVertex(
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+                self._spike_recorder
+                    .get_sdram_usage_for_global_parameters_in_bytes() +
                 self._neuron_model
                     .get_sdram_usage_for_global_parameters_in_bytes() +
                 self._neuron_recorder
@@ -456,6 +458,10 @@ class AbstractPopulationVertex(
         spec.write_value(data=self._incoming_spike_buffer_size)
 
         # Write the recording rates
+        spike_globals = self._spike_recorder.get_global_parameters(
+            vertex_slice)
+        spec.write_value(data=spike_globals.get_value(),
+                         data_type=spike_globals.get_dataspec_datatype())
         record_globals = self._neuron_recorder.get_global_parameters(
             vertex_slice)
         for param in record_globals:
