@@ -100,7 +100,7 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
     return space_needed
 
 
-def compute_rate(self, sampling_interval):
+def compute_rate(new_state, sampling_interval):
     """
     Converts a simpling interval into a rate
 
@@ -109,21 +109,25 @@ def compute_rate(self, sampling_interval):
     :param sampling_interval: interval between samples in micro seconds
     :return: rate
     """
-    if sampling_interval is None:
-        return 1
+    if new_state:
+        if sampling_interval is None:
+            return 1
 
-    step = globals_variables.get_simulator().machine_time_step / 1000
-    rate = int(sampling_interval / step)
-    if sampling_interval != rate * step:
-        msg = "sampling_interval {} is not an an integer " \
-              "multiple of the simulation timestep {}" \
-              "".format(sampling_interval, step)
-        raise fec_excceptions.ConfigurationException(msg)
-    if rate > MAX_RATE:
-        msg = "sampling_interval {} higher than max allowed which is {}" \
-              "".format(sampling_interval, step * MAX_RATE)
-        raise fec_excceptions.ConfigurationException(msg)
-    return rate
+        step = globals_variables.get_simulator().machine_time_step / 1000
+        rate = int(sampling_interval / step)
+        if sampling_interval != rate * step:
+            msg = "sampling_interval {} is not an an integer " \
+                  "multiple of the simulation timestep {}" \
+                  "".format(sampling_interval, step)
+            raise fec_excceptions.ConfigurationException(msg)
+        if rate > MAX_RATE:
+            msg = "sampling_interval {} higher than max allowed which is {}" \
+                  "".format(sampling_interval, step * MAX_RATE)
+            raise fec_excceptions.ConfigurationException(msg)
+        return rate
+
+    else:
+        return 0
 
 
 def compute_interval(sampling_rate):
@@ -136,5 +140,5 @@ def compute_interval(sampling_rate):
     return sampling_rate *  step
 
 
-def global_parameter(sampling_rate):
+def rate_parameter(sampling_rate):
     return NeuronParameter(sampling_rate, DataType.UINT32)
