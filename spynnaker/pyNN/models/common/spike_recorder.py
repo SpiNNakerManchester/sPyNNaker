@@ -18,21 +18,19 @@ BYTES_PER_WORD = 4
 class SpikeRecorder(AbstractSpikeRecorder):
 
     def __init__(self):
-        self._record = False
-        self._sampling_interval = None
+        self._sampling_rate = 0
 
     @property
     def record(self):
-        return self._record
+        return self._sampling_rate != 0
 
     @overrides(AbstractSpikeRecorder.set_recording)
-    def set_recording(self, new_state, sampling_interval):
-        self._record = new_state
-        self._sampling_interval = utility_calls.check_sampling_interval(
-            sampling_interval)
+    def set_recording(self, new_state, sampling_interval=None):
+        self._sampling_rate = recording_utils.compute_rate(
+            new_state, sampling_interval)
 
     def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
-        if not self._record:
+        if self._sampling_rate == 0:
             return 0
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * BYTES_PER_WORD
@@ -40,12 +38,12 @@ class SpikeRecorder(AbstractSpikeRecorder):
             n_machine_time_steps, out_spike_bytes)
 
     def get_dtcm_usage_in_bytes(self):
-        if not self._record:
+        if self._sampling_rate == 0:
             return 0
         return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
-        if not self._record:
+        if self._sampling_rate == 0:
             return 0
         return n_neurons * 4
 
@@ -53,7 +51,7 @@ class SpikeRecorder(AbstractSpikeRecorder):
         return BYTES_PER_WORD
 
     def get_global_parameters(self, vertex_slice):
-        return NeuronParameter(self._sampling_rate(), DataType.UINT32)
+        return recording_utils.rate_parameter(self._sampling_rate)
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -114,4 +112,4 @@ class SpikeRecorder(AbstractSpikeRecorder):
         Returns the current sampling interval for this variable
          :return: Sampling interval in micro seconds
         """
-        return globals_variables.get_simulator().machine_time_step / 1000
+        return recording_utils.compute_interval(self._sampling_rate)

@@ -23,9 +23,9 @@ class EIEIOSpikeRecorder(AbstractSpikeRecorder):
         return self._record
 
     @overrides(AbstractSpikeRecorder.set_recording)
-    def set_recording(self, new_state, sampling_interval):
+    def set_recording(self, new_state, sampling_interval=None):
         if sampling_interval is not None:
-            logger.warning("Sampling interval current not sopported for "
+            logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
         self._record = new_state
 

@@ -13,7 +13,7 @@ class AbstractSpikeRecorder(object):
     __slots__ = ()
 
     @abstractmethod
-    def set_recording(self, new_state, sampling_interval):
+    def set_recording(self, new_state, sampling_interval=None):
         """ Sets spikes to being recorded
 
         If new_state is false all other paramteres are ignored.
