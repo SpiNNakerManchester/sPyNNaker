@@ -651,10 +651,11 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
-    def set_recording(self, variable, new_state=True, sampling_interval=None):
+    def set_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
         self._change_requires_mapping = not self.is_recording(variable)
         self._neuron_recorder.set_recording(
-            variable, new_state, sampling_interval)
+            variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,

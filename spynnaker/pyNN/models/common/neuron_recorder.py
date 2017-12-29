@@ -19,15 +19,27 @@ class NeuronRecorder(object):
 
     def __init__(self, allowed_variables, n_neurons):
         self._sampling_rates = OrderedDict()
+        self._indexes = dict()
         self._n_neurons = n_neurons
         for variable in allowed_variables:
             self._sampling_rates[variable] = 0
+            self._indexes[variable] = None
 
-    def n_neurons_recording(self, variable, vertex_slice):
-        return vertex_slice.n_atoms
+    def _count_recording_per_slice(self, variable, slice):
+        if self._sampling_rates[variable] == 0:
+            return 0
+        if self._indexes[variable] is None:
+            return slice.n_atoms
+        return sum((index >= slice.lo_atom and index <= slice.hi_atom)
+                   for index in self._indexes[variable])
 
-    def neurons_recording(self, variable, vertex_slice):
-        return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+    def _neurons_recording(self, variable, slice):
+        if self._sampling_rates[variable] == 0:
+            return []
+        if self._indexes[variable] is None:
+            return range(slice.lo_atom, slice.hi_atom+1)
+        return [(index >= slice.lo_atom and index <= slice.hi_atom)
+                   for index in self._indexes[variable]]
 
     def get_neuron_sampling_interval(self, variable):
         """
@@ -67,7 +79,7 @@ class NeuronRecorder(object):
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
-            neurons = self.neurons_recording(variable, vertex_slice)
+            neurons = self._neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
@@ -122,21 +134,18 @@ class NeuronRecorder(object):
                 results.append(key)
         return results
 
-    def set_recording(self, variable, new_state, sampling_interval=None):
+    def set_recording(self, variable, new_state, sampling_interval=None,
+                      indexes=None):
         if variable == "all":
             for key in self._sampling_rates.keys():
-                self.set_recording(key, new_state, sampling_interval)
+                self.set_recording(key, new_state, sampling_interval, indexes)
         elif variable in self._sampling_rates:
             self._sampling_rates[variable] = \
                     recording_utils.compute_rate(new_state, sampling_interval)
+            self._indexes[variable] = indexes
         else:
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
-
-    def _count_recording_per_slice(self, variable, slice):
-        if self._sampling_rates[variable] == 0:
-            return 0
-        return slice.n_atoms
 
     def get_buffered_sdram_per_timestep(self, variable, slice):
         """
@@ -196,14 +205,3 @@ class NeuronRecorder(object):
                 self._sampling_rates[variable]))
         return params
 
-    def get_indexes_for_slice(self, variable, slice):
-        neuron_count = self._count_recording_per_slice(variable, slice)
-        indexes = numpy.empty(slice.n_atoms)
-        index = 0
-        for neuron in xrange(slice.lo_atom, slice.hi_atom+1):
-            if self._sampling_rates[variable] > 0:
-                indexes[neuron-slice.lo_atom] = index
-                index += 1
-            else:
-                indexes[neuron-slice.lo_atom] = neuron_count
-        return indexes

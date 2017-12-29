@@ -77,6 +77,8 @@ uint32_t exc_index;
 uint32_t exc_increment;
 uint32_t inh_index;
 uint32_t inh_increment;
+//CYAB
+index_t v_indexes[5] = {0,3,1,3,2};
 
 //! storage for neuron state with timestamp
 static timed_state_t *voltages;
@@ -361,8 +363,12 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     recording_flags = recording_flags_param;
 
-    voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
-    voltages = (timed_state_t *) spin1_malloc(voltages_size);
+    //CYAB  voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
+    // Size of recording indexes
+    voltages_size = sizeof(uint32_t) + sizeof(state_t) * 3;
+    //CYAB voltages = (timed_state_t *) spin1_malloc(voltages_size);
+    // if size of recording indexes less than n_neurons one extra for overflow
+    voltages = (timed_state_t *) spin1_malloc(voltages_size + 1);
     input_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
     inputs_excitatory = (timed_input_t *) spin1_malloc(input_size);
     inputs_inhibitory = (timed_input_t *) spin1_malloc(input_size);
@@ -454,7 +460,8 @@ void neuron_do_timestep_update(timer_t time) {
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // record this neuron parameter. Just as cheap to set then to gate
-        voltages->states[neuron_index] = voltage;
+        //CYAB voltages->states[neuron_index] = voltage;
+        voltages->states[v_indexes[neuron_index]] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input

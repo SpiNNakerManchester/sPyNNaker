@@ -25,7 +25,8 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def set_recording(self, variable, new_state=True, sampling_interval=None):
+    def set_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
         """ Sets v to being recorded
         """
 

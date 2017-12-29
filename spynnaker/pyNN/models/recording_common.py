@@ -37,7 +37,8 @@ class RecordingCommon(object):
         self._indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval=None, to_file=None):
+    def _record(self, variable, new_ids, sampling_interval=None, to_file=None,
+                indexes=None):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
@@ -50,12 +51,17 @@ class RecordingCommon(object):
         globals_variables.get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
+            if indexes is not None:
+                msg = "Due to the efficient way spikes are recorded on " \
+                      "spinnaker there is n gain by recording spikes on " \
+                      "only some neurons so indexes parameter is ignored."
+                logger.warning(msg)
             self._set_spikes_recording(sampling_interval)
         elif variable == "all":
             raise Exception("Illegal call with all")
         else:
             self._population._vertex.set_recording(
-                variable, sampling_interval=sampling_interval)
+                variable, sampling_interval=sampling_interval,indexes=indexes)
 
         # update file writer
         self._write_to_files_indicators[variable] = to_file
