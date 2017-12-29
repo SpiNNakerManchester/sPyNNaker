@@ -262,7 +262,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if isinstance(vertex_to_add, CommandSender):
             self._command_sender = vertex_to_add
 
-        self._application_graph.add_vertex(vertex_to_add)
+        AbstractSpinnakerBase.add_application_vertex(self, vertex_to_add)
 
     @staticmethod
     def _count_unique_keys(commands):
