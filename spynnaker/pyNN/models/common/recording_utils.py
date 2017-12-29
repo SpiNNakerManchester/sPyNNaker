@@ -142,3 +142,6 @@ def compute_interval(sampling_rate):
 
 def rate_parameter(sampling_rate):
     return NeuronParameter(sampling_rate, DataType.UINT32)
+
+def n_recording_parameter(n_recording):
+    return NeuronParameter(n_recording, DataType.UINT32)

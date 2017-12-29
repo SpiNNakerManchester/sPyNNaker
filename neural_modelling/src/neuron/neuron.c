@@ -60,8 +60,11 @@ static synapse_param_t *neuron_synapse_shaping_params;
 typedef struct global_record_params_t {
     uint32_t spike_rate;
     uint32_t v_rate;
+    uint32_t v_recording;
     uint32_t exc_rate;
+    uint32_t exc_recording;
     uint32_t inh_rate;
+    uint32_t inh_recording;
 
 } global_record_params_t;
 
@@ -87,7 +90,8 @@ uint32_t voltages_size;
 //! storage for neuron input with timestamp
 static timed_input_t *inputs_excitatory;
 static timed_input_t *inputs_inhibitory;
-uint32_t input_size;
+uint32_t exc_size;
+uint32_t inh_size;
 
 //! The number of clock ticks to back off before starting the timer, in an
 //! attempt to avoid overloading the network
@@ -363,15 +367,42 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     recording_flags = recording_flags_param;
 
-    //CYAB  voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
     // Size of recording indexes
-    voltages_size = sizeof(uint32_t) + sizeof(state_t) * 3;
-    //CYAB voltages = (timed_state_t *) spin1_malloc(voltages_size);
-    // if size of recording indexes less than n_neurons one extra for overflow
-    voltages = (timed_state_t *) spin1_malloc(voltages_size + 1);
-    input_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
-    inputs_excitatory = (timed_input_t *) spin1_malloc(input_size);
-    inputs_inhibitory = (timed_input_t *) spin1_malloc(input_size);
+    if (global_record_params->v_recording == n_neurons){
+        voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
+        voltages = (timed_state_t *) spin1_malloc(voltages_size);
+    }
+    else {
+        voltages_size = sizeof(uint32_t) +
+            sizeof(state_t) * global_record_params->v_recording;
+        // one extra for overflow
+        voltages = (timed_state_t *) spin1_malloc(
+            voltages_size + sizeof(state_t));
+    }
+
+    if (global_record_params->exc_recording == n_neurons){
+        exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
+        inputs_excitatory = (timed_input_t *) spin1_malloc(exc_size);
+    }
+    else {
+        exc_size = sizeof(uint32_t) +
+            sizeof(input_struct_t) * global_record_params->exc_recording;
+        // one extra for overflow
+        inputs_excitatory = (timed_input_t *) spin1_malloc(
+            exc_size + sizeof(input_struct_t));
+    }
+
+    if (global_record_params->inh_recording == n_neurons){
+        exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
+        inputs_inhibitory = (timed_input_t *) spin1_malloc(exc_size);
+    }
+    else {
+        inh_size = sizeof(uint32_t) +
+            sizeof(input_struct_t) * global_record_params->inh_recording;
+        // one extra for overflow
+        inputs_inhibitory = (timed_input_t *) spin1_malloc(
+            inh_size + sizeof(input_struct_t));
+    }
 
     _print_neuron_parameters();
 
@@ -557,7 +588,7 @@ void neuron_do_timestep_update(timer_t time) {
         n_recordings_outstanding += 1;
         inputs_excitatory->time = time;
         recording_record_and_notify(
-            GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, input_size,
+            GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, exc_size,
             recording_done_callback);
     } else {
         exc_index += exc_increment;
@@ -569,7 +600,7 @@ void neuron_do_timestep_update(timer_t time) {
         n_recordings_outstanding += 1;
         inputs_inhibitory->time = time;
         recording_record_and_notify(
-            GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, input_size,
+            GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, inh_size,
             recording_done_callback);
     } else {
         inh_index += inh_increment;

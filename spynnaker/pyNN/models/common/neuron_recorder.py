@@ -196,12 +196,14 @@ class NeuronRecorder(object):
                 len(self.recording_variables)
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
-        return len(self._sampling_rates) * 4
+        return len(self._sampling_rates) * 4 * 2
 
     def get_global_parameters(self, slice):
         params = []
         for variable in self._sampling_rates:
             params.append(recording_utils.rate_parameter(
                 self._sampling_rates[variable]))
+            n_recording = self._count_recording_per_slice(variable, slice)
+            params.append(recording_utils.n_recording_parameter(n_recording))
         return params
 
