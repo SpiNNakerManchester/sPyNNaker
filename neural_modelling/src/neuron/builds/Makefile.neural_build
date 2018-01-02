@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # If SPINN_DIRS is not defined, this is an error!
 ifndef SPINN_DIRS
     $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
@@ -136,3 +137,9 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
 	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+=======
+# THIS FILE IS A STUB FOR A RENAMED VERSION
+# IT IS KEPT FOR BACKWARD COMPATIBILITY ONLY
+$(warning inclusion of Makefile.neural_build instead of neural_build.mk)
+include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))neural_build.mk
+>>>>>>> master

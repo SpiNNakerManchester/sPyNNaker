@@ -16,19 +16,13 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
-    def __init__(self, population, sampling_interval=None):
+    def __init__(self, population):
         """ object to hold recording behaviour
 
         :param population: the population to record for
-        :param simulator: the spinnaker control class
         """
 
         self._population = population
-
-        self._sampling_interval = None
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
-
         # file flags, allows separate files for the recorded variables
         self._write_to_files_indicators = {
             'spikes': None,
@@ -36,8 +30,10 @@ class RecordingCommon(object):
             'gsyn_inh': None,
             'v': None}
 
-        # Create default dictionary of population-size filters
-        self._indices_to_record = self._create_full_filter_list(0)
+        # Create a dict of variable name -> bool array of indices in population
+        # that are recorded (initially all False)
+        self._indices_to_record = defaultdict(
+            lambda: numpy.repeat(False, population.size))
 
     def _record(self, variable, new_ids, sampling_interval, to_file):
         """ tells the vertex to record data
@@ -64,10 +60,6 @@ class RecordingCommon(object):
 
         # Get bit array of indices to record for this variable
         indices = self._indices_to_record[variable]
-
-        # update sampling interval
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
 
         # Loop through the new ids
         for new_id in new_ids:
@@ -108,24 +100,6 @@ class RecordingCommon(object):
             raise Exception(
                 "This population does not support the recording of spikes!")
         self._population._vertex.set_recording_spikes()
-
-    @property
-    def sampling_interval(self):
-        """ forced by the public nature of pynn variables
-
-        :return:
-        """
-
-        return self._sampling_interval
-
-    @sampling_interval.setter
-    def sampling_interval(self, new_value):
-        """ forced by the public nature of pynn variables
-
-        :param new_value: new value for the sampling_interval
-        :return: None
-        """
-        self._sampling_interval = new_value
 
     def _get_recorded_variable(self, variable):
         """ method that contains all the safety checks and gets the recorded
@@ -210,12 +184,6 @@ class RecordingCommon(object):
         return self._population._vertex.get_spikes(
             sim.placements, sim.graph_mapper, sim.buffer_manager,
             sim.machine_time_step)
-
-    def _create_full_filter_list(self, filter_value):
-        # Create default dictionary of population-size boolean arrays
-        return defaultdict(
-            lambda: numpy.repeat(filter_value, self._population.size).astype(
-                "bool"))
 
     def _turn_off_all_recording(self):
         """
