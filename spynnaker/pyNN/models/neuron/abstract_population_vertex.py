@@ -334,6 +334,8 @@ class AbstractPopulationVertex(
         per_neuron_usage = (
             self._input_type.get_sdram_usage_per_neuron_in_bytes() +
             self._threshold_type.get_sdram_usage_per_neuron_in_bytes() +
+            self._spike_recorder.get_sdram_usage_per_neuron_in_bytes() +
+            self._neuron_recorder.get_sdram_usage_per_neuron_in_bytes() +
             self._neuron_model.get_sdram_usage_per_neuron_in_bytes())
         if self._additional_input is not None:
             per_neuron_usage += \
@@ -473,6 +475,13 @@ class AbstractPopulationVertex(
         for param in record_globals:
             spec.write_value(data=param.get_value(),
                              data_type=param.get_dataspec_datatype())
+
+        # Write the index parameters
+        indexes = []
+        indexes.append(self._spike_recorder.get_index_parameters())
+        indexes.extend(self._neuron_recorder.get_index_parameters())
+        utility_calls.write_parameters_per_neuron(
+            spec, vertex_slice, indexes)
 
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()

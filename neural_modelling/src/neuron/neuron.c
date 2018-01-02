@@ -72,6 +72,17 @@ typedef struct global_record_params_t* global_record_params_pointer_t;
 
 static global_record_params_pointer_t global_record_params;
 
+typedef struct indexes_t {
+    uint8_t spike;
+    uint8_t v;
+    uint8_t exc;
+    uint8_t inh;
+} indexes_t;
+
+typedef struct indexes_t* indexes_pointer_t;
+
+static indexes_pointer_t indexes_array;
+
 uint32_t spike_index;
 uint32_t spike_increment;
 uint32_t v_index;
@@ -80,8 +91,6 @@ uint32_t exc_index;
 uint32_t exc_increment;
 uint32_t inh_index;
 uint32_t inh_increment;
-//CYAB
-index_t v_indexes[5] = {0,3,1,3,2};
 
 //! storage for neuron state with timestamp
 static timed_state_t *voltages;
@@ -203,30 +212,43 @@ void _reset_record_counter(){
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
-    log_info("loading global record parameters");
+    log_info("loading parameters");
+    //log_info("loading global record parameters");
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
     _reset_record_counter();
 
-    log_info("loading neuron global parameters");
+    //log_info("loading indexes parameters");
+    memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
+    next += (n_neurons * sizeof(indexes_t)) / 4;
+
+    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+        indexes_pointer_t indexes = &indexes_array[neuron_index];
+        log_info("neuron = %u, spike index = %u, v index = %u,"
+            "exc index = %u, inh index = %u", neuron_index,
+            indexes->spike, indexes->v,
+            indexes->exc, indexes->inh);
+    }
+
+    //log_info("loading neuron global parameters");
     memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
-    log_info("loading neuron local parameters");
+    //log_info("loading neuron local parameters");
     memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
-    log_info("loading input type parameters");
+    //log_info("loading input type parameters");
     memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
-    log_info("loading additional input type parameters");
+    //log_info("loading additional input type parameters");
     memcpy(additional_input_array, &address[next],
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
-    log_info("loading threshold type parameters");
+    //log_info("loading threshold type parameters");
     memcpy(threshold_type_array, &address[next],
            n_neurons * sizeof(threshold_type_t));
 
@@ -304,6 +326,16 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         if (global_record_params == NULL) {
             log_error("Unable to allocate global record parameters"
                       "- Out of DTCM");
+            return false;
+        }
+    }
+
+    // Allocate DTCM for indexes
+    if (sizeof(index_t) != 0) {
+        indexes_array = (indexes_t *) spin1_malloc(
+            n_neurons * sizeof(indexes_t));
+        if (indexes_array == NULL) {
+            log_error("Unable to allocate neuron array - Out of DTCM");
             return false;
         }
     }
@@ -419,9 +451,14 @@ void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
+    log_info("writing parameters");
     //log_info("writing gobal recordi parameters");
     memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
+
+    //log_info("writing index local parameters");
+    memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
+    next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //log_info("writing neuron global parameters");
     memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
@@ -495,8 +532,8 @@ void neuron_do_timestep_update(timer_t time) {
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // record this neuron parameter. Just as cheap to set then to gate
-        //voltages->states[neuron_index] = voltage;
-        voltages->states[v_indexes[neuron_index]] = voltage;
+        voltages->states[neuron_index] = voltage;
+        //voltages->states[v_indexes[neuron_index]] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
@@ -622,7 +659,6 @@ void neuron_do_timestep_update(timer_t time) {
                 SPIKE_RECORDING_CHANNEL, time, recording_done_callback)) {
             n_recordings_outstanding += 1;
         }
-        out_spike_info_print();
    } else {
         spike_index += spike_increment;
    }

@@ -27,6 +27,13 @@ class SpikeRecorder(AbstractSpikeRecorder):
             new_state, sampling_interval)
 
     def get_sdram_usage_in_bytes(self, n_neurons, n_machine_time_steps):
+        """
+        Returns the SDRAM usage for recording
+
+        :param n_neurons:
+        :param n_machine_time_steps:
+        :return:
+        """
         if self._sampling_rate == 0:
             return 0
 
@@ -67,8 +74,18 @@ class SpikeRecorder(AbstractSpikeRecorder):
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         return BYTES_PER_WORD
 
+    def get_sdram_usage_per_neuron_in_bytes(self):
+        """
+        Get the sdram usage for indexing and other controls
+        :return:
+        """
+        return 1
+
     def get_global_parameters(self, vertex_slice):
         return recording_utils.rate_parameter(self._sampling_rate)
+
+    def get_index_parameters(self):
+        return recording_utils.index_parameter()
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,

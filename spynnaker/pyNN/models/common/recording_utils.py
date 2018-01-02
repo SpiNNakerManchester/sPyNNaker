@@ -8,6 +8,7 @@ from spinn_front_end_common.utilities import exceptions as fec_excceptions
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.helpful_functions \
     import locate_memory_region_for_placement
+from spinn_utilities.index_is_value import IndexIsValue
 from spynnaker.pyNN.exceptions import MemReadException
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
@@ -142,6 +143,9 @@ def compute_interval(sampling_rate):
 
 def rate_parameter(sampling_rate):
     return NeuronParameter(sampling_rate, DataType.UINT32)
+
+def index_parameter():
+    return NeuronParameter(IndexIsValue(), DataType.UINT8)
 
 def n_recording_parameter(n_recording):
     return NeuronParameter(n_recording, DataType.UINT32)
