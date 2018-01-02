@@ -348,6 +348,12 @@ class AbstractPopulationVertex(
         """
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
+        spike_usage = self._spike_recorder\
+            .get_sdram_usage_for_global_parameters_in_bytes()
+        neuron_usage = self._neuron_model\
+           .get_sdram_usage_for_global_parameters_in_bytes()
+        recorder_usage = self._neuron_recorder\
+            .get_sdram_usage_for_global_parameters_in_bytes()
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
                 self._spike_recorder
                     .get_sdram_usage_for_global_parameters_in_bytes() +
