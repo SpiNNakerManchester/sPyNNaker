@@ -423,6 +423,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         voltages = (timed_state_t *) spin1_malloc(
             voltages_size + sizeof(state_t));
     }
+    log_info("voltage_size = %u", voltages_size);
 
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -435,6 +436,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_excitatory = (timed_input_t *) spin1_malloc(
             exc_size + sizeof(input_struct_t));
     }
+    log_info("exc_size = %u", exc_size);
 
     if (global_record_params->inh_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -447,6 +449,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_inhibitory = (timed_input_t *) spin1_malloc(
             inh_size + sizeof(input_struct_t));
     }
+    log_info("inh_size = %u", inh_size);
 
     _print_neuron_parameters();
 

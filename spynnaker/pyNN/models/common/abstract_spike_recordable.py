@@ -19,7 +19,8 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def set_recording_spikes(self, new_state=True, sampling_interval=None):
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
         """ Sets spikes to being recorded
 
         If new_state is false all other paramteres are ignored.
@@ -29,6 +30,8 @@ class AbstractSpikeRecordable(object):
         :param sampling_interval: The interval at which spikes are recorded.\
             Must be a whole multiple of the timestep
             None will be taken as the timestep
+        :param indexes: The indexes of the neurons that will record spikes.
+            If None the assumption is all neurons are recording
         """
 
     @abstractmethod

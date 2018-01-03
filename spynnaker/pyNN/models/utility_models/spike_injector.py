@@ -88,10 +88,14 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True, sampling_interval=None):
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
         if sampling_interval is not None:
-            logger.warning("Sampling interval current not sopported for "
-                           "SpikeSourceArray so being ignored")
+            logger.warning("Sampling interval currently not supported "
+                           "so being ignored")
+        if indexes is not None:
+            logger.warning("Indexes currently not supported "
+                           "so being ignored")
         self.enable_recording(
             self._spike_buffer_max_size, self._buffer_size_before_receive,
             self._time_between_requests)

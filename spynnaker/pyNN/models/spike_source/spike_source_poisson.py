@@ -527,9 +527,13 @@ class SpikeSourcePoisson(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True, sampling_interval=None):
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+        if indexes is not None:
+            logger.warning("indexes not supported for "
                            "SpikeSourcePoisson so being ignored")
         self._spike_recorder.record = new_state
 

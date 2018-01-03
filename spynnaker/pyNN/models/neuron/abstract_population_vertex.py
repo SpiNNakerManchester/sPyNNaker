@@ -459,7 +459,7 @@ class AbstractPopulationVertex(
                              data_type=param.get_dataspec_datatype())
 
         # Write the index parameters
-        indexes = self._neuron_recorder.get_index_parameters()
+        indexes = self._neuron_recorder.get_index_parameters(vertex_slice)
         utility_calls.write_parameters_per_neuron(
             spec, vertex_slice, indexes)
 
@@ -626,8 +626,9 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.is_recording("spikes")
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True, sampling_interval=None):
-        self.set_recording("spikes", new_state, sampling_interval, indexes=None)
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
+        self.set_recording("spikes", new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

@@ -4,10 +4,12 @@ import logging
 import math
 import numpy
 
-from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.common import recording_utils
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
+from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.progress_bar import ProgressBar
+from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +43,12 @@ class NeuronRecorder(object):
             return []
         if self._indexes[variable] is None:
             return range(slice.lo_atom, slice.hi_atom+1)
-        return [(index >= slice.lo_atom and index <= slice.hi_atom)
-                   for index in self._indexes[variable]]
+        recording = []
+        indexes = self._indexes[variable]
+        for index in xrange(slice.lo_atom, slice.hi_atom+1):
+            if index in indexes:
+                recording.append(index)
+        return recording
 
     def get_neuron_sampling_interval(self, variable):
         """
@@ -163,11 +169,19 @@ class NeuronRecorder(object):
                 spikes = raw_data[:, 1].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
-                time_indices, indices = numpy.where(bits == 1)
-                times = record_time[time_indices].reshape((-1))
-                indices = indices + vertex_slice.lo_atom
-                spike_ids.extend(indices)
-                spike_times.extend(times)
+                time_indices, local_indices = numpy.where(bits == 1)
+                if self._indexes[SPIKES] is None:
+                    indices = local_indices + vertex_slice.lo_atom
+                    times = record_time[time_indices].reshape((-1))
+                    spike_ids.extend(indices)
+                    spike_times.extend(times)
+                else:
+                    neurons = self._neurons_recording(SPIKES, vertex_slice)
+                    n_neurons = len(neurons)
+                    for time_indice, local in zip(time_indices, local_indices):
+                        if local < n_neurons:
+                            spike_ids.append(neurons[local])
+                            spike_times.append(record_time[time_indice])
 
         if len(missing_str) > 0:
             logger.warn(
@@ -286,14 +300,34 @@ class NeuronRecorder(object):
     def get_global_parameters(self, slice):
         params = []
         for variable in self._sampling_rates:
-            params.append(recording_utils.rate_parameter(
-                self._sampling_rates[variable]))
+            params.append(NeuronParameter(
+                self._sampling_rates[variable], DataType.UINT32))
             n_recording = self._count_recording_per_slice(variable, slice)
-            params.append(recording_utils.n_recording_parameter(n_recording))
+            params.append(NeuronParameter(n_recording, DataType.UINT32))
         return params
 
-    def get_index_parameters(self):
+    def get_index_parameters(self, vertex_slice):
         params = []
         for variable in self._sampling_rates:
-            params.append(recording_utils.index_parameter())
+            if self._sampling_rates[variable] > 0:
+                if self._indexes[variable] is None:
+                    local_indexes = IndexIsValue()
+                else:
+                    local_indexes = []
+                    n_recording = sum((index >= vertex_slice.lo_atom and
+                                       index <= vertex_slice.hi_atom)
+                                      for index in self._indexes[variable])
+                    indexes = self._indexes[variable]
+                    local_index = 0
+                    for index in xrange(
+                            vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+                        if index in indexes:
+                            local_indexes.append(local_index)
+                            local_index += 1
+                        else:
+                            # write to one beyond recording range
+                            local_indexes.append(n_recording)
+            else:
+                local_indexes = 0
+            params.append(NeuronParameter(local_indexes, DataType.UINT8))
         return params
