@@ -168,7 +168,7 @@ class PyNNProjectionCommon(object):
         """
 
         # Find edges ending at the postsynaptic vertex
-        graph_edges = self._spinnaker_control.application_graph.\
+        graph_edges = self._spinnaker_control.original_application_graph.\
             get_edges_ending_at_vertex(post_synaptic_vertex)
 
         # Search the edges for any that start at the presynaptic vertex
