@@ -24,6 +24,8 @@ import math
 import os
 
 # global objects
+from spynnaker.pyNN.utilities.extracted_data import ExtractedData
+
 logger = logging.getLogger(__name__)
 
 
@@ -54,6 +56,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._populations = list()
         self._projections = list()
         self._edge_count = 0
+        self._id_counter = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
@@ -259,7 +262,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if isinstance(vertex_to_add, CommandSender):
             self._command_sender = vertex_to_add
 
-        self._application_graph.add_vertex(vertex_to_add)
+        AbstractSpinnakerBase.add_application_vertex(self, vertex_to_add)
 
     @staticmethod
     def _count_unique_keys(commands):
@@ -345,3 +348,112 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def reset_number_of_neurons_per_core(self):
         for neuron_type in self._neurons_per_core_set:
             neuron_type.set_model_max_atoms_per_core()
+
+    def get_projections_data(self, projection_to_attribute_map):
+        """ common data extractor for projection data. Allows fully \
+        exploitation of the
+
+        :param projection_to_attribute_map: the projection to attributes \
+        mapping
+        :type projection_to_attribute_map: dict of projection with set of \
+        attributes
+        :return: a extracted data object with get method for getting the data
+        :rtype ExtractedData object
+        """
+
+        # build data structure for holding data
+        mother_lode = ExtractedData()
+
+        # acquire data objects from front end
+        using_extra_monitor_functionality = \
+            self._last_run_outputs["UsingAdvancedMonitorSupport"]
+
+        # if using extra monitor functionality, locate extra data items
+        receivers = list()
+        if using_extra_monitor_functionality:
+            receivers = self._locate_receivers_from_projections(
+                projection_to_attribute_map.keys(),
+                self.get_generated_output(
+                    "MemoryMCGatherVertexToEthernetConnectedChipMapping"),
+                self.get_generated_output(
+                    "MemoryExtraMonitorToChipMapping"))
+
+        # set up the router timeouts to stop packet loss
+        if using_extra_monitor_functionality:
+            for data_receiver, extra_monitor_cores in receivers:
+                data_receiver.set_cores_for_data_extraction(
+                    self._txrx, list(extra_monitor_cores), self._placements)
+
+        # acquire the data
+        for projection in projection_to_attribute_map:
+            for attribute in projection_to_attribute_map[projection]:
+                data = projection._get_synaptic_data(
+                    as_list=True, data_to_get=attribute,
+                    fixed_values=None, notify=None,
+                    handle_time_out_configuration=False)
+                mother_lode.set(projection, attribute, data)
+
+        # reset time outs for the receivers
+        if using_extra_monitor_functionality:
+            for data_receiver, extra_monitor_cores in receivers:
+                data_receiver.unset_cores_for_data_extraction(
+                    self._txrx, list(extra_monitor_cores), self._placements)
+
+        # return data items
+        return mother_lode
+
+    def _locate_receivers_from_projections(
+            self, projections, gatherers, extra_monitors_per_chip):
+        """ locates receivers and their corresponding monitor cores for \
+        setting router time outs
+
+        :param projections: the projections going to be read
+        :param gatherers: the gathers per ethernet chip
+        :param extra_monitors_per_chip: the extra monitor cores per chip
+        :return: list of tupels with gatherer and its extra monitor cores
+        """
+        important_gathers = set()
+
+        # iterate though projections
+        for projection in projections:
+
+            # iteration though the projections machine edges to locate chips
+            edges = self._graph_mapper.get_machine_edges(
+                projection._projection_edge)
+
+            for edge in edges:
+                placement = self._placements.get_placement_of_vertex(
+                    edge.post_vertex)
+                chip = self._machine.get_chip_at(placement.x, placement.y)
+
+                # locate extra monitor cores on the board of this chip
+                extra_monitor_cores_on_board = set()
+                for chip_key in self._machine.get_chips_on_board(chip):
+                    extra_monitor_cores_on_board.add(
+                        extra_monitors_per_chip[chip_key])
+
+                # map gatherer to extra monitor cores for board
+                important_gathers.add(
+                    (gatherers[(chip.nearest_ethernet_x,
+                                chip.nearest_ethernet_y)],
+                     frozenset(extra_monitor_cores_on_board)))
+        return list(important_gathers)
+
+    @property
+    def id_counter(self):
+        """ property for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :return:
+        """
+        return self._id_counter
+
+    @id_counter.setter
+    def id_counter(self, new_value):
+        """ setter for id_counter, currently used by the populations.
+        (maybe it could live in the pop class???)
+
+        :param new_value: new value for id_counter
+        :return:
+        """
+        self._id_counter = new_value
