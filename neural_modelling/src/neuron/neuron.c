@@ -59,6 +59,7 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 typedef struct global_record_params_t {
     uint32_t spike_rate;
+    uint32_t spike_recording;
     uint32_t v_rate;
     uint32_t v_recording;
     uint32_t exc_rate;
@@ -397,7 +398,14 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     }
 
     // Set up the out spikes array
-    if (!out_spikes_initialize(n_neurons)) {
+    size_t spike_size;
+    if (global_record_params->spike_recording == n_neurons){
+        spike_size = n_neurons;
+    }
+    else {
+        spike_size = global_record_params->spike_recording + 1;
+    }
+    if (!out_spikes_initialize(spike_size)) {
         return false;
     }
 
@@ -522,6 +530,8 @@ void neuron_do_timestep_update(timer_t time) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
+        indexes_pointer_t indexes = &indexes_array[neuron_index];
+
         // Get the parameters for this neuron
         neuron_pointer_t neuron = &neuron_array[neuron_index];
         input_type_pointer_t input_type = &input_type_array[neuron_index];
@@ -532,7 +542,7 @@ void neuron_do_timestep_update(timer_t time) {
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // record this neuron parameter. Just as cheap to set then to gate
-        voltages->states[neuron_index] = voltage;
+        voltages->states[indexes->v] = voltage;
         //voltages->states[v_indexes[neuron_index]] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
@@ -557,8 +567,8 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // record these neuron parameter. Just as cheap to set then to gate
-        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
-        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
+        inputs_excitatory->inputs[indexes->exc].input = exc_input_value;
+        inputs_inhibitory->inputs[indexes->inh].input = inh_input_value;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
@@ -581,7 +591,7 @@ void neuron_do_timestep_update(timer_t time) {
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             // Record the spike
-            out_spikes_set_spike(neuron_index);
+            out_spikes_set_spike(indexes->spike);
 
             if (use_key) {
 
