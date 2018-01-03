@@ -262,6 +262,9 @@ bool synapse_dynamics_process_plastic_synapses(
                 		&additional_input_array_stdp[index];
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_stdp[index];
 
+        // for integration test
+
+
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
