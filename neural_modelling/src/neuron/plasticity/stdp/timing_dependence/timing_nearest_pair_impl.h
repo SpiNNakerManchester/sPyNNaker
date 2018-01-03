@@ -112,11 +112,21 @@ static inline update_state_t timing_apply_post_spike(
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
+    uint32_t time_since_last_post = time - last_post_time;
+
     if (time_since_last_pre > 0) {
         int32_t decayed_r1 = DECAY_LOOKUP_TAU_PLUS(time_since_last_pre);
 
         log_debug("\t\t\ttime_since_last_pret=%u, decayed_r1=%d\n",
                   time_since_last_pre, decayed_r1);
+
+        log_debug("\t\t\ttime_since_last_post=%u, decayed_r1=%d\n",
+                  time_since_last_post, decayed_r1);
+
+        if (time_since_last_post < time_since_last_pre){
+            log_debug("\t\t\tSetting trace to zero as not first pre-post pairing");
+            decayed_r1 = 0;
+        }
 
         // Apply potentiation to state (which is a weight_state)
         return weight_one_term_apply_potentiation(previous_state, decayed_r1);
