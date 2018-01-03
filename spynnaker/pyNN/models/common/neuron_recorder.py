@@ -210,12 +210,7 @@ class NeuronRecorder(object):
         for variable in self._sampling_rates:
             params.append(recording_utils.rate_parameter(
                 self._sampling_rates[variable]))
-            if variable == "v":
-                n_recording = 3
-            else:
-                n_recording = 5
-                #  n_recording = self._count_recording_per_slice(variable, slice)
-
+            n_recording = self._count_recording_per_slice(variable, slice)
             params.append(recording_utils.n_recording_parameter(n_recording))
         return params
 
