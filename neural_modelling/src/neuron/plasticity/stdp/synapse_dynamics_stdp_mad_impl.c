@@ -313,7 +313,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
-void synapse_dynamics_set_neuron_array(neuron_pointer_t *neuron_array){
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_stdp = neuron_array;
 }
 
