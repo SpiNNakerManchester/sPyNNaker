@@ -1,7 +1,6 @@
 from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import numpy
 import struct
@@ -11,7 +10,7 @@ logger = logging.getLogger(__name__)
 _ONE_WORD = struct.Struct("<I")
 
 
-class EIEIOSpikeRecorder(AbstractSpikeRecorder):
+class EIEIOSpikeRecorder(object):
     """ Records spikes using EIEIO format
     """
 
@@ -22,7 +21,6 @@ class EIEIOSpikeRecorder(AbstractSpikeRecorder):
     def record(self):
         return self._record
 
-    @overrides(AbstractSpikeRecorder.set_recording)
     def set_recording(self, new_state, sampling_interval=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "

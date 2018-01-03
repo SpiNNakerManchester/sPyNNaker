@@ -1,7 +1,6 @@
 from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
-from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
 import numpy
@@ -12,7 +11,7 @@ logger = logging.getLogger(__name__)
 BYTES_PER_WORD = 4
 
 
-class SpikeRecorder(AbstractSpikeRecorder):
+class SpikeRecorder(object):
 
     def __init__(self):
         self._sampling_rate = 0
@@ -21,7 +20,6 @@ class SpikeRecorder(AbstractSpikeRecorder):
     def record(self):
         return self._sampling_rate != 0
 
-    @overrides(AbstractSpikeRecorder.set_recording)
     def set_recording(self, new_state, sampling_interval=None):
         self._sampling_rate = recording_utils.compute_rate(
             new_state, sampling_interval)
