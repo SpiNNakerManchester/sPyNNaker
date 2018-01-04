@@ -324,7 +324,7 @@ class AbstractPopulationVertex(
                 self._additional_input.get_dtcm_usage_per_neuron_in_bytes()
         return (_NEURON_BASE_DTCM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
-                self._neuron_recorder.get_dtcm_usage_in_bytes() +
+                self._neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
                 self._synapse_manager.get_dtcm_usage_in_bytes())
 
     def _get_sdram_usage_for_neuron_params_per_neuron(self):

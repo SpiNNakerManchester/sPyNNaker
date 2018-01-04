@@ -59,13 +59,13 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 typedef struct global_record_params_t {
     uint32_t spike_rate;
-    uint32_t spike_recording;
     uint32_t v_rate;
-    uint32_t v_recording;
     uint32_t exc_rate;
-    uint32_t exc_recording;
     uint32_t inh_rate;
-    uint32_t inh_recording;
+    uint8_t spike_recording;
+    uint8_t v_recording;
+    uint8_t exc_recording;
+    uint8_t inh_recording;
 
 } global_record_params_t;
 
