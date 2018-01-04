@@ -201,8 +201,6 @@ void _reset_record_counter(){
         inh_increment = 1;
         inh_index = global_record_params->inh_rate;
     }
-    log_info("global_record_params->inh_recording %u",
-       global_record_params->inh_recording);
 
 }
 
@@ -224,13 +222,13 @@ bool _neuron_load_neuron_parameters(address_t address){
     memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
-    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-        indexes_pointer_t indexes = &indexes_array[neuron_index];
-        log_info("neuron = %u, spike index = %u, v index = %u,"
-            "exc index = %u, inh index = %u", neuron_index,
-            indexes->spike, indexes->v,
-            indexes->exc, indexes->inh);
-    }
+    //for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+    //    indexes_pointer_t indexes = &indexes_array[neuron_index];
+    //    log_info("neuron = %u, spike index = %u, v index = %u,"
+    //        "exc index = %u, inh index = %u", neuron_index,
+    //        indexes->spike, indexes->v,
+    //        indexes->exc, indexes->inh);
+    //}
 
     //log_info("loading neuron global parameters");
     memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
@@ -323,7 +321,6 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     if (sizeof(global_record_params_t) > 0) {
         global_record_params = (global_record_params_t *)
             spin1_malloc(sizeof(global_record_params_t));
-        log_info("Size of global %u", sizeof(global_record_params_t));
         if (global_record_params == NULL) {
             log_error("Unable to allocate global record parameters"
                       "- Out of DTCM");
@@ -423,7 +420,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         voltages = (timed_state_t *) spin1_malloc(
             voltages_size + sizeof(state_t));
     }
-    log_info("voltage_size = %u", voltages_size);
+    //log_info("voltage_size = %u", voltages_size);
 
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -436,7 +433,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_excitatory = (timed_input_t *) spin1_malloc(
             exc_size + sizeof(input_struct_t));
     }
-    log_info("exc_size = %u", exc_size);
+    //log_info("exc_size = %u", exc_size);
 
     if (global_record_params->inh_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -449,7 +446,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_inhibitory = (timed_input_t *) spin1_malloc(
             inh_size + sizeof(input_struct_t));
     }
-    log_info("inh_size = %u", inh_size);
+    //log_info("inh_size = %u", inh_size);
 
     _print_neuron_parameters();
 
@@ -582,7 +579,7 @@ void neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
-            log_info("neuron %u spiked at time %u", neuron_index, time);
+            //log_info("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);
@@ -614,8 +611,10 @@ void neuron_do_timestep_update(timer_t time) {
 
 
         } else {
-            log_debug("the neuron %d has been determined to not spike",
-                      neuron_index);
+            #if LOG_LEVEL >= LOG_DEBUG
+                log_debug("the neuron %d has been determined to not spike",
+                          neuron_index);
+            #endif // LOG_LEVEL >= LOG_DEBUG
         }
     }
 
