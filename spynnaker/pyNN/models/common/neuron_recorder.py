@@ -216,7 +216,13 @@ class NeuronRecorder(object):
         return self._sampling_rates.keys()
 
     def is_recording(self, variable):
-        return self._sampling_rates[variable] > 0
+        try:
+            return self._sampling_rates[variable] > 0
+        except KeyError:
+            msg = "Variable {} is not supported. Supported variables are {}" \
+                  "".format(variable, self.get_recordable_variables())
+            raise fec_excceptions.ConfigurationException(msg)
+
 
     @property
     def recording_variables(self):
