@@ -152,8 +152,18 @@ class NeuronRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
+            if self._indexes[SPIKES] is None:
+                neurons_recording = vertex_slice.n_atoms
+            else:
+                neurons_recording = sum(
+                    (index >= vertex_slice.lo_atom and
+                     index <= vertex_slice.hi_atom)
+                     for index in self._indexes[SPIKES])
+                if neurons_recording < vertex_slice.n_atoms:
+                    # For spikes the overflow position is also returned
+                    neurons_recording += 1
             # Read the spikes
-            n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
+            n_words = int(math.ceil(neurons_recording / 32.0))
             n_bytes = n_words * self.N_BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
@@ -165,12 +175,16 @@ class NeuronRecorder(object):
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
             record_raw = neuron_param_region_data_pointer.read_all()
+            size = len(record_raw)
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
                 record_time = raw_data[:, 0] * float(ms_per_tick)
-                spikes = raw_data[:, 1].byteswap().view("uint8")
+                spikes = raw_data[:, 1:].byteswap().view("uint8")
+                temp = numpy.unpackbits(spikes).reshape((-1, 32))
+                temp2 = numpy.fliplr(numpy.unpackbits(spikes).reshape(
+                    (-1, 32)))
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)

@@ -461,7 +461,7 @@ class AbstractPopulationVertex(
         # Write the index parameters
         indexes = self._neuron_recorder.get_index_parameters(vertex_slice)
         utility_calls.write_parameters_per_neuron(
-            spec, vertex_slice, indexes)
+            spec, vertex_slice, indexes, slice_paramaters=True)
 
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
