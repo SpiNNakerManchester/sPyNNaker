@@ -105,7 +105,9 @@ final_state_t _update_on_pre_only(
 			post_synaptic_additional_input);
 
 	// update the weight and return
-	return synapse_structure_get_final_state(current_state);
+	final_state_t final = synapse_structure_get_final_state(current_state);
+
+	return final;
 }
 
 static inline final_state_t _plasticity_update_synapse(

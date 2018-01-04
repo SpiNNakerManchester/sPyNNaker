@@ -7,7 +7,7 @@
 typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include "../synapse_structure/synapse_structure_weight_impl.h"
+#include "../synapse_structure/synapse_structure_weight_step_impl.h"
 #include "timing.h"
 #include "../weight_dependence/weight_one_term.h"
 #include "../../../additional_inputs/additional_input_ca2_concentration_impl.h"

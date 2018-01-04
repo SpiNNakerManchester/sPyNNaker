@@ -43,6 +43,7 @@ extern plasticity_weight_region_data_t
 //---------------------------------------
 static inline weight_state_t weight_get_initial(weight_t weight,
                                                 index_t synapse_type) {
+	log_info("weight %d", weight);
 
     return (weight_state_t ) {
         .initial_weight = (int32_t) weight,
