@@ -283,7 +283,7 @@ void update_goal_posts(uint32_t time) {
     current_state.cb_total_size = circular_buffer_real_size(current_state.cb);
 
     current_state.my_cb_output = current_state.my_cb_input;
-    current_state.my_cb_input = (circular_buffer_input(current_state.cb)-1)&current_state.cb_total_size;
+    current_state.my_cb_input = (circular_buffer_input(current_state.cb))&current_state.cb_total_size;
 
      current_state.no_spike_in_interval = (current_state.my_cb_input >= current_state.my_cb_output?
         current_state.my_cb_input - current_state.my_cb_output:
@@ -337,6 +337,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
         // Retrieve the last spike
         if (received_any_spike()){
             _spike = select_last_spike();
+//              _spike = get_last_spike();
         }
         //    log_debug("spike key %d", _spike);
         if (_spike==-1) {
@@ -451,7 +452,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    /*ad*/log_debug("g_pre_id %d g_post_id %d g_distance_sq %d exists %d %d",
+    /*ad*/log_info("g_pre_id %d g_post_id %d g_distance_sq %d exists %d %d",
         pre_global_id, post_global_id, current_state.distance, element_exists,
         current_state.current_controls
         );
@@ -536,7 +537,7 @@ bool synaptogenesis_dynamics_elimination_rule(){
                 rewiring_dma_buffer.n_bytes_transferred)){
             log_error("DMA queue full-removal");
          }
-        /*ad*/log_debug("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
+        /*ad*/log_info("\t| RM pre %d post %d # elems %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
@@ -552,7 +553,7 @@ bool synaptogenesis_dynamics_formation_rule(){
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
     uint no_elems = number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row));
-    if (no_elems == rewiring_data.s_max) {
+    if (no_elems >= rewiring_data.s_max) {
         log_error("row is full");
         return false;
     }
@@ -589,7 +590,7 @@ bool synaptogenesis_dynamics_formation_rule(){
             log_error("DMA queue full-formation");
                 }
 
-        /*ad*/log_debug("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
+        /*ad*/log_info("\t| FORM pre %d post %d # elems %d dist %d rec_conn %d @ %d",
             current_state.global_pre_syn_id,
             current_state.global_post_syn_id,
             number_of_connections_in_row(synapse_row_fixed_region(rewiring_dma_buffer.row)),
