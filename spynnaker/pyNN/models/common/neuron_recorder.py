@@ -288,7 +288,7 @@ class NeuronRecorder(object):
         if rate <= 1:
             # No sampling so get_buffered_sdram_per_timestep was correct
             return 0
-        per_timestep = self.get_buffered_sdram(variable, slice)
+        per_timestep = self.get_buffered_sdram_per_timestep(variable, slice)
         return per_timestep / rate * (rate - 1)
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
