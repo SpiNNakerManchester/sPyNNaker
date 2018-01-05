@@ -436,7 +436,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     //log_info("exc_size = %u", exc_size);
 
     if (global_record_params->inh_recording == n_neurons){
-        exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
+        inh_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
         inputs_inhibitory = (timed_input_t *) spin1_malloc(exc_size);
     }
     else {
