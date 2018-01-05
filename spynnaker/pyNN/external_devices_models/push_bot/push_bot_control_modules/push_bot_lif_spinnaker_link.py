@@ -33,7 +33,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
             v_reset=_extern_defaults['v_reset'],
             tau_syn_E=_extern_defaults['tau_syn_E'],
             tau_syn_I=_extern_defaults['tau_syn_I'],
-            tau_refrac=_extern_defaults[ 'tau_refrac'],
+            tau_refrac=_extern_defaults['tau_refrac'],
             i_offset=_extern_defaults['i_offset'],
             v_init=non_pynn_default_parameters['v_init']):
         # pylint: disable=too-many-arguments, too-many-locals

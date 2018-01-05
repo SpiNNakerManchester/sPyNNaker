@@ -372,7 +372,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         )
 
     def _read_plastic_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
-                          n_synapse_types, row_data, delayed_row_data):
+                           n_synapse_types, row_data, delayed_row_data):
         """Read plastic data"""
         # pylint: disable=too-many-arguments
         connections = []

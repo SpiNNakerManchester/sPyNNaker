@@ -61,7 +61,7 @@ class SynapticManager(object):
         "_retrieved_blocks",
         "_ring_buffer_sigma",
         "_spikes_per_second",
-        "_synapse_dynamics", 
+        "_synapse_dynamics",
         "_synapse_io",
         "_synapse_type",
         "_weight_scales"]
