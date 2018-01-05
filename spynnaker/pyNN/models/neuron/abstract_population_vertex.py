@@ -26,7 +26,7 @@ from spinn_front_end_common.abstract_models.impl\
 from spinn_front_end_common.utilities import constants as common_constants
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
@@ -597,7 +597,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -634,7 +634,7 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.get_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
             placements, graph_mapper, self, machine_time_step,
-            self.VARIABLE_LONG[variable])
+            self.VARIABLE_LONG[variable], n_machine_time_steps)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
@@ -774,12 +774,21 @@ class AbstractPopulationVertex(
         self._synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 
+    @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step):
+            self, transceiver, placement, edge, graph_mapper, routing_infos,
+            synapse_information, machine_time_step, using_extra_monitor_cores,
+            placements=None, data_receiver=None,
+            sender_extra_monitor_core_placement=None,
+            extra_monitor_cores_for_router_timeout=None,
+            handle_time_out_configuration=True):
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step, self._max_feasible_atoms_per_core)
+            routing_infos, synapse_info, machine_time_step, self._max_feasible_atoms_per_core,
+            using_extra_monitor_cores, placements, data_receiver,
+            sender_extra_monitor_core_placement,
+            extra_monitor_cores_for_router_timeout,
+            handle_time_out_configuration)
 
     def clear_connection_cache(self):
         self._synapse_manager.clear_connection_cache()

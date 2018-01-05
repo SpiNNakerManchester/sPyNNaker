@@ -59,13 +59,23 @@ def convert_param_to_numpy(param, no_atoms):
 
 
 def write_parameters_per_neuron(spec, vertex_slice, parameters):
-    for atom in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-        for param in parameters:
-            value = param.get_value()
-            if hasattr(value, "__len__"):
-                value = value[atom] if len(value) > 1 else value[0]
-            spec.write_value(data=value,
-                             data_type=param.get_dataspec_datatype())
+    if len(parameters) == 0:
+        return
+
+    # Get an iterator per parameter
+    iterators = []
+    for param in parameters:
+        iterators.append(param.iterator_by_slice(
+            vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
+
+    # Iterate through the iterators until a StopIteration is generated
+    while True:
+        try:
+            for iterator in iterators:
+                (cmd_word_list, cmd_string) = iterator.next()
+                spec.write_command_to_files(cmd_word_list, cmd_string)
+        except StopIteration:
+            return
 
 
 def translate_parameters(types, byte_array, offset, vertex_slice):
