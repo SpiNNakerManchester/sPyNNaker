@@ -9,6 +9,8 @@ from data_specification.enums import DataType
 import numpy
 from enum import Enum
 
+V_HIST = "v_hist"
+
 class _LIFVHist_TYPES(Enum):
     V_HIST = (1, DataType.S1615)
 
@@ -33,26 +35,26 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac)
 
-        self._v_hist = utility_calls.convert_param_to_numpy(
-            v_hist, n_neurons)
-        self._my_units = {'v_hist': 'mV'}
+#         self._v_hist = utility_calls.convert_param_to_numpy(
+#             v_hist, n_neurons)
+        self._data[V_HIST] = v_hist
+        self._my_units = {V_HIST: 'mV'}
 
     @property
     def v_hist(self):
-        return self._v_hist
+        return self._data[V_HIST]
 
     @v_hist.setter
     def v_hist(self, v_hist):
-        self._v_hist = utility_calls.convert_param_to_numpy(
-            v_hist, self._n_neurons)
+        self._data.set_value(key=V_HIST, value=v_hist)
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)
     def get_n_neural_parameters(self):
         return NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters(self) + 1
 
-    def _tau_refrac_timesteps(self, machine_time_step):
-        return numpy.ceil(self._tau_refrac /
-                          (machine_time_step / 1000.0))
+#     def _tau_refrac_timesteps(self, machine_time_step):
+#         return numpy.ceil(self._tau_refrac /
+#                           (machine_time_step / 1000.0))
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_neural_parameters(self, machine_time_step):
@@ -60,7 +62,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
         params.extend([
             # V history parameter (S1615)
             NeuronParameter(
-                self._v_hist,
+                self._data[V_HIST],
                 _LIFVHist_TYPES.V_HIST.data_type),
         ])
         return params
