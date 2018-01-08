@@ -79,7 +79,7 @@ static inline final_state_t _plasticity_update_synapse(
         const post_event_history_t *post_event_history, const uint32_t type,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
-		threshold_type_pointer_t post_synaptic_threshold,
+		threshold_type_pointer_t post_synaptic_threshold
 		) {
 
     // Apply axonal delay to time of last presynaptic spike
@@ -352,7 +352,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
 #endif  // SYNAPSE_BENCHMARK
 }
 
-void synapse_dynamics_set_neuron_array(neuron_pointer_t *neuron_array){
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_stdp = neuron_array;
 }
 
