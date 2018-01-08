@@ -79,8 +79,8 @@ static inline final_state_t _plasticity_update_synapse(
         const post_event_history_t *post_event_history, const uint32_t type,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
-		threshold_type_pointer_t post_synaptic_threshold, 
-        const uint32_t backpropDelay) {
+		threshold_type_pointer_t post_synaptic_threshold,
+		) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -89,7 +89,7 @@ static inline final_state_t _plasticity_update_synapse(
     const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
         (delayed_last_pre_time - delay_dendritic) : 0;
 
-    const uint32_t window_end_time = time + delay_axonal - backpropDelay; // was delay_dendritic
+    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
 
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
@@ -218,8 +218,6 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
-    uint32_t backpropDelay = 5;
-
     uint32_t syn_type = 0;
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
@@ -291,12 +289,14 @@ bool synapse_dynamics_process_plastic_synapses(
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(*plastic_words, type);
 
-        /*if (type == 3) 
-           backpropDelay = 0; // Inhib-2 synapses connect direct to the soma, so no backprop delay
-        else
-           backpropDelay = 5; // Other synapse-types suffer a 1 ms delay at 200ms per timestep.
-        */
-        backpropDelay = 1;
+        uint32_t full_delay = delay_dendritic;
+
+        if (type == 3){
+           delay_dendritic = 1; // Inhib-2 synapses connect direct to the soma, so no backprop delay
+        }else {
+           delay_dendritic = 5; // Other synapse-types suffer a 1 ms delay at 200 micro s per timestep.
+    	};
+
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
@@ -305,11 +305,12 @@ bool synapse_dynamics_process_plastic_synapses(
             &post_event_history[index], type,
 			post_synaptic_neuron,
 			post_synaptic_additional_input,
-			post_synaptic_threshold, backpropDelay);
+			post_synaptic_threshold
+			);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index);
+                delay_axonal + full_delay + time, type_index);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
