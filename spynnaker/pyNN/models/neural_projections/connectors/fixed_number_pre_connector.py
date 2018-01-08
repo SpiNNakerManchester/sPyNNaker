@@ -1,32 +1,46 @@
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
+import math
 
 logger = logging.getLogger(__file__)
 
 
 class FixedNumberPreConnector(AbstractConnector):
-    """ Connects a fixed number of pre-synaptic neurons selected at random,
+    """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons
     """
 
     __slots__ = [
         "_allow_self_connections",
         "_n_pre",
-        "_pre_neurons"]
+        "_pre_neurons",
+        "_pre_neurons_set",
+        "_with_replacement"]
 
     def __init__(
-            self, n, allow_self_connections=True, safe=True, verbose=False):
+            self, n, allow_self_connections=True, with_replacement=False,
+            safe=True, verbose=False):
         """
-
-        :param n:
+        :param n: \
             number of random pre-synaptic neurons connected to output
         :type n: int
-        :param allow_self_connections:
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
-            or only to other neurons in the Population.
+        :param allow_self_connections: \
+            if the connector is used to connect a\
+            Population to itself, this flag determines whether a neuron is\
+            allowed to connect to itself, or only to other neurons in the\
+            Population.
         :type allow_self_connections: bool
+        :param with_replacement:
+            this flag determines how the random selection of pre-synaptic\
+            neurons is performed; if true, then every pre-synaptic neuron\
+            can be chosen on each occasion, and so multiple connections\
+            between neuron pairs are possible; if false, then once a\
+            pre-synaptic neuron has been connected to a post-neuron, it\
+            can't be connected again
+        :type with_replacement: bool
         """
         # :param space:
         # a Space object, needed if you wish to specify distance-dependent\
@@ -35,7 +49,25 @@ class FixedNumberPreConnector(AbstractConnector):
         super(FixedNumberPreConnector, self).__init__(safe, verbose)
         self._n_pre = n
         self._allow_self_connections = allow_self_connections
-        self._pre_neurons = None
+        self._with_replacement = with_replacement
+        self._verbose = verbose
+        self._pre_neurons_set = False
+
+    def set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step):
+        AbstractConnector.set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step)
+        if (not self._with_replacement and self._n_pre > self._n_pre_neurons):
+            raise SpynnakerException(
+                "FixedNumberPreConnector will not work when "
+                "with_replacement=False and n > n_pre_neurons")
+
+        if (not self._with_replacement and not self._allow_self_connections and
+                self._n_pre == self._n_pre_neurons):
+            raise SpynnakerException(
+                "FixedNumberPreConnector will not work when "
+                "with_replacement=False, allow_self_connections=False "
+                "and n = n_pre_neurons")
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -45,74 +77,111 @@ class FixedNumberPreConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0.0
         return self._get_delay_variance(self._delays, None)
 
     def _get_pre_neurons(self):
-        if self._pre_neurons is None:
-            self._pre_neurons = numpy.random.choice(
-                self._n_pre_neurons, self._n_pre, False)
-            self._pre_neurons.sort()
+        # If we haven't set the array up yet, do it now
+        if not self._pre_neurons_set:
+            self._pre_neurons = [None] * self._n_post_neurons
+            self._pre_neurons_set = True
+
+            # if verbose open a file to output the connectivity
+            if self._verbose:
+                filename = self._pre_population.label + '_to_' + \
+                    self._post_population.label + '_fixednumberpre-conn.csv'
+                file_handle = file(filename, 'w')
+                numpy.savetxt(file_handle,
+                              [(self._n_pre_neurons, self._n_post_neurons,
+                                self._n_pre)],
+                              fmt="%u,%u,%u")
+
+            # Loop over all the post neurons
+            for m in range(0, self._n_post_neurons):
+
+                # If the pre and post populations are the same
+                # then deal with allow_self_connections=False
+                if (self._pre_population is self._post_population and
+                        not self._allow_self_connections):
+                    # Exclude the current pre-neuron from the post-neuron
+                    # list
+                    no_self_pre_neurons = [
+                        n for n in range(self._n_pre_neurons) if n != m]
+
+                    # Now use this list in the random choice
+                    self._pre_neurons[m] = numpy.random.choice(
+                        no_self_pre_neurons, self._n_pre,
+                        self._with_replacement)
+                else:
+                    self._pre_neurons[m] = numpy.random.choice(
+                        self._n_pre_neurons, self._n_pre,
+                        self._with_replacement)
+
+                # Sort the neurons now that we have them
+                self._pre_neurons[m].sort()
+
+                # If verbose then output the list connected to this
+                # post-neuron
+                if self._verbose:
+                    numpy.savetxt(file_handle,
+                                  self._pre_neurons[m][None, :],
+                                  fmt=("%u,"*(self._n_pre-1)+"%u"))
+
         return self._pre_neurons
 
-    def _pre_neurons_in_slice(self, pre_vertex_slice):
+    def _pre_neurons_in_slice(self, pre_vertex_slice, n):
         pre_neurons = self._get_pre_neurons()
-        return pre_neurons[
-            (pre_neurons >= pre_vertex_slice.lo_atom) &
-            (pre_neurons <= pre_vertex_slice.hi_atom)]
 
-    def _is_connected(self, pre_vertex_slice):
-        return self._pre_neurons_in_slice(pre_vertex_slice).size > 0
+        # Take the nth array and get the bits from it we need
+        # for this pre-vertex slice
+        this_pre_neuron_array = pre_neurons[n]
+        return this_pre_neuron_array[
+            (this_pre_neuron_array >= pre_vertex_slice.lo_atom) &
+            (this_pre_neuron_array <= pre_vertex_slice.hi_atom)]
+
+    def _get_n_connections(self, out_of):
+        return utility_calls.get_probable_maximum_selected(
+                self._n_post_neurons, self._n_pre * out_of,
+                1.0 / self._n_pre_neurons, chance=(1.0 / 100000.0))
 
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0
+
+        # Get the probable max number of connections
+        n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
 
         if min_delay is None or max_delay is None:
-            return post_vertex_slice.n_atoms
+            return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre * self._n_post_neurons,
-            post_vertex_slice.n_atoms, None, min_delay, max_delay)
+            n_connections, None, min_delay, max_delay)
 
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0
         return self._n_pre
 
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0.0
         return self._get_weight_mean(self._weights, None)
 
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0.0
-        pre_neurons = self._pre_neurons_in_slice(pre_vertex_slice)
-        n_connections = len(pre_neurons) * post_vertex_slice.n_atoms
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
+        n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
+        return self._get_weight_maximum(self._weights, n_connections, None)
 
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return 0.0
         return self._get_weight_variance(self._weights, None)
 
     def generate_on_machine(self):
@@ -125,34 +194,35 @@ class FixedNumberPreConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
-        if not self._is_connected(pre_vertex_slice):
-            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        pre_neurons_in_slice = self._pre_neurons_in_slice(pre_vertex_slice)
 
-        n_connections = len(pre_neurons_in_slice) * post_vertex_slice.n_atoms
-        if (not self._allow_self_connections and
-                pre_vertex_slice is post_vertex_slice):
-            n_connections -= len(pre_neurons_in_slice)
-        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        # Get lo and hi for the post vertex
+        lo = post_vertex_slice.lo_atom
+        hi = post_vertex_slice.hi_atom
 
-        if (not self._allow_self_connections and
-                pre_vertex_slice is post_vertex_slice):
-            block["source"] = [
-                pre_index for pre_index in pre_neurons_in_slice
-                for post_index in range(
-                    post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-                if pre_index != post_index]
-            block["target"] = [
-                post_index for pre_index in pre_neurons_in_slice
-                for post_index in range(
-                    post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-                if pre_index != post_index]
-        else:
-            block["source"] = numpy.repeat(
-                pre_neurons_in_slice, post_vertex_slice.n_atoms)
-            block["target"] = numpy.tile(numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
-                len(pre_neurons_in_slice))
+        # Get number of connections
+        n_connections = 0
+        for n in range(lo, hi + 1):
+            n_connections += len(self._pre_neurons_in_slice(
+                pre_vertex_slice, n))
+
+        # Set up the block
+        block = numpy.zeros(
+            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+
+        # Set up source and target
+        pre_neurons_in_slice = []
+        post_neurons_in_slice = []
+        post_vertex_array = numpy.arange(lo, hi + 1)
+        for n in range(lo, hi + 1):
+            pre_neurons = self._pre_neurons_in_slice(
+                pre_vertex_slice, n)
+            for m in range(0, len(pre_neurons)):
+                pre_neurons_in_slice.append(pre_neurons[m])
+                post_neurons_in_slice.append(post_vertex_array[n-lo])
+
+        block["source"] = pre_neurons_in_slice
+        block["target"] = post_neurons_in_slice
+
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
@@ -162,3 +232,11 @@ class FixedNumberPreConnector(AbstractConnector):
 
     def __repr__(self):
         return "FixedNumberPreConnector({})".format(self._n_pre)
+
+    @property
+    def allow_self_connections(self):
+        return self._allow_self_connections
+
+    @allow_self_connections.setter
+    def allow_self_connections(self, new_value):
+        self._allow_self_connections = new_value
