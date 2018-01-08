@@ -9,9 +9,9 @@
 #include "../threshold_types/threshold_type.h"
 
 // Get access to the neuron data
-static neuron_pointer_t *neuron_array_stdp;
-static additional_input_pointer_t *additional_input_array_stdp;
-static threshold_type_pointer_t *threshold_type_array_stdp;
+static neuron_pointer_t neuron_array_stdp;
+static additional_input_pointer_t additional_input_array_stdp;
+static threshold_type_pointer_t threshold_type_array_stdp;
 
 bool synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
@@ -36,7 +36,7 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
-void synapse_dynamics_set_neuron_array(neuron_pointer_t *neuron_array);
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array);
 
 void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array);
 

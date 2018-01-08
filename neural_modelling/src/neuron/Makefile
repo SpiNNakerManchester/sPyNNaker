@@ -24,9 +24,9 @@ MODELS = IF_curr_exp \
          IF_curr_comb_exp_4E4I \
          IF_curr_comb_exp_5E5I \
          IF_curr_comb_exp_7E7I \
-	 IF_cond_exp_stdp_mad_nearest_pair_additive \
-	 IF_curr_alpha\
-         IZK_curr_comb_exp_4E4I
+	 	 IF_cond_exp_stdp_mad_nearest_pair_additive \
+	 	 IF_curr_alpha
+         
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all: $(BUILD_DIRS)

@@ -262,6 +262,9 @@ bool synapse_dynamics_process_plastic_synapses(
                 		&additional_input_array_stdp[index];
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_stdp[index];
 
+        // for integration test
+        log_info("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k", time, index, post_synaptic_threshold->threshold_value, post_synaptic_neuron->V_membrane);
+
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
@@ -313,7 +316,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
-void synapse_dynamics_set_neuron_array(neuron_pointer_t *neuron_array){
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_stdp = neuron_array;
 }
 
