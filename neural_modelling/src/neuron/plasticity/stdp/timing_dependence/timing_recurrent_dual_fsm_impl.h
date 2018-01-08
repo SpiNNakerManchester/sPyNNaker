@@ -76,6 +76,9 @@ static inline post_trace_t timing_get_initial_post_trace() {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+
+	// can't create post windows here, as don't have access to synapse type.
+
     return 0; // Return window_length;
 }
 
@@ -183,7 +186,7 @@ static inline update_state_t timing_apply_pre_spike_sd(
 }
 
 // This routine has different functionality depending on synapse type.
-// For inhib-2-type synapses, it performs potentiation if the pre/post 
+// For inhib-2-type synapses, it performs potentiation if the pre/post
 // pair occur close together. This subroutine is concerned only with the pre-post pair.
 // For other types it has two major responsibilities:
 // 1) Generate the window size for this post spike and extend the window closure time
