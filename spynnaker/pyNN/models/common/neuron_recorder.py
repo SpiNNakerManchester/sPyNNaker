@@ -263,7 +263,7 @@ class NeuronRecorder(object):
         if variable == SPIKES:
             out_spike_words = int(math.ceil(n_neurons / 32.0))
             out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
-            return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
+            data_size = self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
             data_size = self.N_BYTES_FOR_TIMESTAMP + \
                         n_neurons * self.N_BYTES_PER_VALUE
