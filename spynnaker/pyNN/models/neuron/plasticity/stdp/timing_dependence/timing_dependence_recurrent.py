@@ -155,6 +155,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps_excit2)
         self._write_exp_dist_lut(spec, mean_pre_timesteps_inhib)
         self._write_exp_dist_lut(spec, mean_post_timesteps_inhib)
+        #self._write_exp_dist_lut_print(spec, mean_pre_timesteps_inhib2)
         self._write_exp_dist_lut(spec, mean_pre_timesteps_inhib2)
         self._write_exp_dist_lut(spec, mean_post_timesteps_inhib2)
 
@@ -194,6 +195,21 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             p_float = math.log(1.0 - x_float) * -mean
 
             p = round(p_float)
+            spec.write_value(data=p, data_type=DataType.UINT16)
+
+    def _write_exp_dist_lut_print(self, spec, mean):
+        count = 0
+        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
+
+            # Calculate inverse CDF
+            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
+            p_float = math.log(1.0 - x_float) * -mean
+
+            p = round(p_float)
+            if count == 5:
+               print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
+               count = 0
+            count += 1
             spec.write_value(data=p, data_type=DataType.UINT16)
 
     @property

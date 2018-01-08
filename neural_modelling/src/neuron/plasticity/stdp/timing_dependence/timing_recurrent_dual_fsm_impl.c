@@ -87,11 +87,19 @@ uint32_t *timing_initialise(address_t address) {
 
     //log_info("lut_address: %u", lut_address);
     memcpy(recurrentSeed, lut_address, 4 * sizeof(uint32_t));
-    log_info("%d %d %d %d", recurrentSeed[0], recurrentSeed[1], recurrentSeed[2], recurrentSeed[3]);
+    //log_info("%d %d %d %d", recurrentSeed[0], recurrentSeed[1], recurrentSeed[2], recurrentSeed[3]);
     lut_address += 4;
     validate_mars_kiss64_seed(recurrentSeed);
 
     log_info("timing_initialise: completed successfully");
 
+    /*log_info("Pre exp table, I2:");
+    for(int u = 0; u< 2048; u+=5) {
+        log_info("Idx: %d,   Val: %d", u, pre_exp_dist_lookup_inhib2[u]);
+    }
+    log_info("Post exp table, I2:");
+    for(int u = 0; u< 2048; u+=5) {
+        log_info("Idx: %d,   Val: %d", u, post_exp_dist_lookup_inhib2[u]);
+    } */
     return lut_address;
 }

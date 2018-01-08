@@ -75,6 +75,8 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
+        # First three synapse types use rules that are multiplicative. The A+/A- values are NOT scaled
+        # to match the weights, but shifted left by 15 to conform to S15.16 format:
         spec.write_value( data=int(round(self._w_min_excit * weight_scales[0]   )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_excit * weight_scales[0]   )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._A_plus_excit* 32768   )), data_type=DataType.INT32)
@@ -90,10 +92,12 @@ class WeightDependenceRecurrent(AbstractWeightDependence):
         spec.write_value( data=int(round(self._A_plus_inhib * 32768  )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._A_minus_inhib * 32768 )), data_type=DataType.INT32)
 
+        # Inhib-2 synapse now uses a special additive learning rule so the A+/A- params must be scaled
+        # to match the weight value:
         spec.write_value( data=int(round(self._w_min_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
         spec.write_value( data=int(round(self._w_max_inhib2 * weight_scales[3]  )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_plus_inhib2 * 32768 )), data_type=DataType.INT32)
-        spec.write_value( data=int(round(self._A_minus_inhib2* 32768 )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_plus_inhib2 * weight_scales[3] )), data_type=DataType.INT32)
+        spec.write_value( data=int(round(self._A_minus_inhib2* weight_scales[3] )), data_type=DataType.INT32)
 
 
     @property
