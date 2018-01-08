@@ -161,6 +161,7 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
         """
+        # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
             if not self._first_id <= id <= self._last_id:
                 raise ValueError(
@@ -274,8 +275,8 @@ class PyNNPopulationCommon(object):
 
         # set new parameters
         self._read_parameters_before_set()
-        for (key, value) in parameter.iteritems():
-            self._vertex.set_value(key, value)
+        for _key, _value in parameter.iteritems():
+            self._vertex.set_value(_key, _value)
 
     def _read_parameters_before_set(self):
         """ Reads parameters from the machine before "set" completes

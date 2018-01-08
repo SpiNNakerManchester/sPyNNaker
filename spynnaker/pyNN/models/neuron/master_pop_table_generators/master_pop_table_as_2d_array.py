@@ -115,22 +115,20 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         if row_length > ROW_LEN_TABLE_ENTRIES[-1]:
             raise SynapseRowTooBigException(
                 ROW_LEN_TABLE_ENTRIES[-1],
-                "Max row length too long -"
-                " wanted length %d, but max length permitted is %d."
-                % (row_length, ROW_LEN_TABLE_ENTRIES[-1])
-            )
+                "Max row length too long; wanted length {}, but max length "
+                "permitted is {}.".format(
+                    row_length, ROW_LEN_TABLE_ENTRIES[-1]))
 
         # Search up the list until we find one entry big enough:
-        for i in range(len(ROW_LEN_TABLE_ENTRIES)):
-            if row_length <= ROW_LEN_TABLE_ENTRIES[i]:
-
+        for length in ROW_LEN_TABLE_ENTRIES:
+            if row_length <= length:
                 # This row length is big enough. Choose it and exit:
-                return ROW_LEN_TABLE_ENTRIES[i]
+                return length
         raise Exception("Should not get here!")
 
     def _get_row_length_table_index(self, row_length):
-        for i in range(len(ROW_LEN_TABLE_ENTRIES)):
-            if row_length <= ROW_LEN_TABLE_ENTRIES[i]:
+        for i, length in enumerate(ROW_LEN_TABLE_ENTRIES):
+            if row_length <= length:
                 return i
         raise Exception("Should not get here!")
 
@@ -213,11 +211,11 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         # |8 bits >= 0 and <= 7|8 bits >= 0 and <= 7|5 bits >= 0 and <= 17|
         # |11 remaining bits|
         # This is because this table was designed for a 48-chip board
-        constraints = list()
-        fields = list()
-        fields.append(Field(0, 7, 0xFF000000))
-        fields.append(Field(0, 7, 0x00FF0000))
-        fields.append(Field(0, 17, 0x0000F800))
-        constraints.append(FixedMaskConstraint(0xFFFFF800))
-        constraints.append(FixedKeyFieldConstraint(fields))
+        fields = [
+            Field(0, 7, 0xFF000000),
+            Field(0, 7, 0x00FF0000),
+            Field(0, 17, 0x0000F800)]
+        constraints = [
+            FixedMaskConstraint(0xFFFFF800),
+            FixedKeyFieldConstraint(fields)]
         return constraints

@@ -22,6 +22,10 @@ _TWO_WORDS = struct.Struct("<II")
 class _MasterPopEntry(object):
     """ internal class that contains a master pop entry
     """
+    __slots__ = [
+        "_addresses_and_row_lengths",
+        "_mask",
+        "_routing_key"]
 
     MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
@@ -61,9 +65,12 @@ class _MasterPopEntry(object):
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
+    """ binary search master pop class.
     """
-    binary search master pop class.
-    """
+    __slots__ = [
+        "_entries",
+        "_n_addresses",
+        "_n_single_entries"]
 
     # Switched ordering of count and start as numpy will switch them back
     # when asked for view("<4")

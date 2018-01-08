@@ -49,11 +49,9 @@ def get_exponential_decay_and_init(tau, machine_time_step):
     if isinstance(tau, AbstractList):
         return (
             tau.apply_operation(decay),
-            tau.apply_operation(init)
-        )
-    else:
-        # For backward compatability in case tau is just rawa collection
-        return (map(decay, tau), map(init, tau))
+            tau.apply_operation(init))
+    # For backward compatibility in case tau is just raw collection
+    return (map(decay, tau), map(init, tau))
 
 
 class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
