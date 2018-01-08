@@ -20,11 +20,9 @@ class MultiSpikeRecorder(object):
     def record(self):
         return self._record
 
-    def set_recording(self, new_state, sampling_interval=None):
-        if sampling_interval is not None:
-            logger.warning("Sampling interval currently not supported "
-                           "so being ignored")
-        self._record = new_state
+    @record.setter
+    def record(self, record):
+        self._record = record
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, spikes_per_timestep, n_machine_time_steps):
