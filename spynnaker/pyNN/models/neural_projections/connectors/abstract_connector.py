@@ -352,7 +352,7 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if not weights:
+            if not weights.size:
                 logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
@@ -374,7 +374,7 @@ class AbstractConnector(object):
             if delays < self._min_delay:
                 delays = self._min_delay
         else:
-            if delays.size > 0:
+            if delays.size:
                 delays[delays < self._min_delay] = self._min_delay
         return delays
 
