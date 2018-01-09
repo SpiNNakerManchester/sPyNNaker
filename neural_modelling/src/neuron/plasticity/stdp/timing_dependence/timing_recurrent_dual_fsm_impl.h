@@ -283,8 +283,8 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
    old_w = state.weight;
    int32_t scale = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
-                   state.weight_region->a2_plus, 15);
-                   //state.weight_region->a2_plus, state.weight_multiply_right_shift);
+                   //state.weight_region->a2_plus, 15);
+                   state.weight_region->a2_plus, state.weight_multiply_right_shift);
 
    // Multiply scale by potentiation and add
    // **NOTE** using standard STDP fixed-point format handles format conversion
@@ -297,8 +297,8 @@ static inline weight_state_t weight_one_term_apply_depression_sd(
 
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
-                   state.weight_region->a2_minus, 15);
-                   //state.weight_region->a2_minus, state.weight_multiply_right_shift);
+                   //state.weight_region->a2_minus, 15);
+                   state.weight_region->a2_minus, state.weight_multiply_right_shift);
 
     // Multiply scale by depression and subtract
     // **NOTE** using standard STDP fixed-point format handles format conversion
