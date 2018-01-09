@@ -15,14 +15,6 @@ from spinn_front_end_common.utilities import helpful_functions
 # dsg imports
 from data_specification.enums import DataType
 
-
-# general imports
-import logging
-import math
-
-
-logger = logging.getLogger(__name__)
-
 # Fixed row sizes allowed in this table
 ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
 ROW_LEN_TABLE_SIZE = 4 * len(ROW_LEN_TABLE_ENTRIES)
@@ -84,11 +76,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         # pylint: disable=too-many-arguments
 
         # locate address of the synaptic block
-        pre_x = get_x_from_key(incoming_key)
-        pre_y = get_y_from_key(incoming_key)
-        pre_p = get_p_from_key(incoming_key)
-        table_slot_addr = self._get_table_address_from_coords(
-            pre_x, pre_y, pre_p)
+        table_slot_addr = self._get_table_address_from_key(incoming_key)
         master_table_pop_entry_address = (
             table_slot_addr + master_pop_base_mem_address)
 
@@ -135,9 +123,14 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def get_next_allowed_address(self, next_address):
         # Addresses should be 1K offset
         if (next_address & 0x3FF) != 0:
-
             return (next_address & 0xFFFFFC00) + 0x400
         return next_address
+
+    def _get_table_address_from_key(self, key):
+        x = get_x_from_key(key)
+        y = get_y_from_key(key)
+        p = get_p_from_key(key)
+        return self._get_table_address_from_coords(x, y, p)
 
     def _get_table_address_from_coords(self, x, y, p):
         return (p + (18 * y) + (18 * 8 * x)) * 2
@@ -169,18 +162,18 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
-        # Which core has this projection arrived from?
+        # Where has this projection arrived from?
         key = key_and_mask.key
-        x = get_x_from_key(key)
-        y = get_y_from_key(key)
-        p = get_p_from_key(key)
 
         # Calculate the index into the master pynn_population.py table for
         # a projection from the given core:
-        table_slot_addr = self._get_table_address_from_coords(x, y, p)
+        table_slot_addr = self._get_table_address_from_key(key)
         row_index = self._get_row_length_table_index(row_length)
 
         # What is the write address in the table for this index?
+        x = get_x_from_key(key)
+        y = get_y_from_key(key)
+        p = get_p_from_key(key)
         spec.comment("\nUpdate entry in master pynn_population.py table for "
                      "incoming connection from {}, {}, {}:\n".format(x, y, p))
 
@@ -189,7 +182,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         if (block_start_addr & 0x3FF) != 0:
             raise SynapticBlockGenerationException(
                 "Synaptic Block start address is not aligned to a 1K boundary")
-        assert(block_start_addr < math.pow(2, 32))
+        assert(block_start_addr < 2 ** 32)
 
         # moves by 7 to tack on at the end the row_length information
         # which resides in the last 3 bits

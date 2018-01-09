@@ -266,7 +266,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def extract_synaptic_matrix_data_location(
             self, incoming_key_combo, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # get entries in master pop
         count_data = txrx.read_memory(

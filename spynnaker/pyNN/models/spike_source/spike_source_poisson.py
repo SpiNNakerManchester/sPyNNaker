@@ -376,7 +376,7 @@ class SpikeSourcePoisson(
             the scaling between machine time step and real time
         :return: None
         """
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
         spec.comment("\nWriting Neuron Parameters for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
 

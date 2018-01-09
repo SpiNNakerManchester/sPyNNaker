@@ -53,7 +53,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             machine_time_step, in_edge):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -123,7 +123,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
             n_synapse_types, population_table, synapse_dynamics):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
+        row_ids = range(n_rows)
         if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
             # Get the static data
             ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
@@ -131,14 +132,14 @@ class SynapseIORowBased(AbstractSynapseIO):
                 n_synapse_types)
 
             # Blank the plastic data
-            fp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
-            pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
-            fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-            pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
+            fp_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
+            pp_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
+            fp_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]
+            pp_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]
         else:
             # Blank the static data
-            ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
-            ff_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
+            ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
+            ff_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]
 
             # Get the plastic data
             fp_data, pp_data, fp_size, pp_size = \
@@ -149,7 +150,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Add some padding
         row_lengths = [
             3 + pp_data[i].size + fp_data[i].size + ff_data[i].size
-            for i in range(n_rows)]
+            for i in row_ids]
         max_length = max(row_lengths) - _N_HEADER_WORDS
         max_row_length = population_table.get_allowed_row_length(max_length)
         padding = [
@@ -172,7 +173,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -261,7 +262,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
             machine_time_step):
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Translate the data into rows
         row_data = None
@@ -318,7 +319,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
         """Read static data"""
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
         connections = []
 
         if row_data is not None and row_data:
@@ -336,18 +337,19 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
+            synapse_ids = range(len(n_synapses))
             row_stage = numpy.array([
                 (i / pre_vertex_slice.n_atoms)
-                for i in range(len(n_synapses))], dtype="uint32")
+                for i in synapse_ids], dtype="uint32")
             row_min_delay = (row_stage + 1) * 16
             connection_min_delay = numpy.concatenate([
                 numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in range(len(n_synapses))])
+                for i in synapse_ids])
             connection_source_extra = numpy.concatenate([
                 numpy.repeat(
                     row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
                     n_synapses[i])
-                for i in range(len(n_synapses))])
+                for i in synapse_ids])
             delayed_connections["source"] -= connection_source_extra
             delayed_connections["source"] += pre_vertex_slice.lo_atom
             delayed_connections["delay"] += connection_min_delay
@@ -364,17 +366,18 @@ class SynapseIORowBased(AbstractSynapseIO):
         fp_words = dynamics.get_n_fixed_plastic_words_per_row(fp_size)
         fp_start = pp_size + _N_HEADER_WORDS
         fp_end = fp_start + fp_words
+        row_ids = range(n_rows)
         return (
             pp_size,
-            [row_data[row, 1:pp_words[row] + 1] for row in range(n_rows)],
+            [row_data[row, 1:pp_words[row] + 1] for row in row_ids],
             fp_size,
-            [row_data[row, fp_start[row]:fp_end[row]] for row in range(n_rows)]
-        )
+            [row_data[row, fp_start[row]:fp_end[row]] for row in row_ids])
 
-    def _read_plastic_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
-                           n_synapse_types, row_data, delayed_row_data):
+    def _read_plastic_data(
+            self, dynamics, pre_vertex_slice, post_vertex_slice,
+            n_synapse_types, row_data, delayed_row_data):
         """Read plastic data"""
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
         connections = []
 
         if row_data is not None:
@@ -395,17 +398,18 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
+            synapse_ids = range(len(n_synapses))
             row_stage = numpy.array([
                 (i / pre_vertex_slice.n_atoms)
-                for i in range(len(n_synapses))], dtype="uint32")
+                for i in synapse_ids], dtype="uint32")
             row_min_delay = (row_stage + 1) * 16
             connection_min_delay = numpy.concatenate([
                 numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in range(len(n_synapses))])
+                for i in synapse_ids])
             connection_source_extra = numpy.concatenate([
                 numpy.repeat(
                     row_stage[i] * pre_vertex_slice.n_atoms, n_synapses[i])
-                for i in range(len(n_synapses))])
+                for i in synapse_ids])
 
             delayed_connections["source"] -= connection_source_extra
             delayed_connections["source"] += pre_vertex_slice.lo_atom
