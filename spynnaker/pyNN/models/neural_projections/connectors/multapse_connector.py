@@ -65,9 +65,8 @@ class MultapseConnector(AbstractConnector):
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
                 for pre in pre_slices for post in post_slices]
-            self._synapses_per_edge = self._rng.next(
-                1, distribution="multinomial", parameters=[
-                    self._num_synapses, prob_connect])
+            self._synapses_per_edge = self.get_rng_next(
+                self._num_synapses, prob_connect)
             self._pre_slices = pre_slices
             self._post_slices = post_slices
 
@@ -182,6 +181,7 @@ class MultapseConnector(AbstractConnector):
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
+        print 'n_connections: ', n_connections
         if n_connections == 0:
             return numpy.zeros(
                 0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
