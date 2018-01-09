@@ -70,7 +70,7 @@ int32_t old_w;
 // Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace() {
-    return -9999;
+    return 0;
 }
 
 //---------------------------------------
