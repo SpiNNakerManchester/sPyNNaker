@@ -2,6 +2,9 @@
 #define _TIMING_H_
 
 #include "../synapse_structure/synapse_structure.h"
+#include "../../../models/neuron_model.h"
+#include "../../../additional_inputs/additional_input.h"
+#include "../../../threshold_types/threshold_type.h"
 
 address_t timing_initialise(address_t address);
 
@@ -16,11 +19,17 @@ static pre_trace_t timing_add_pre_spike(uint32_t time, uint32_t last_time,
 static update_state_t timing_apply_pre_spike(
     uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
     pre_trace_t last_pre_trace,  uint32_t last_post_time,
-    post_trace_t last_post_trace, update_state_t previous_state);
+    post_trace_t last_post_trace, update_state_t previous_state,
+	neuron_pointer_t post_synaptic_neuron,
+	additional_input_pointer_t post_synaptic_additional_input,
+    threshold_type_pointer_t post_synaptic_threshold);
 
 static update_state_t timing_apply_post_spike(
     uint32_t time, post_trace_t trace, uint32_t last_pre_time,
     pre_trace_t last_pre_trace, uint32_t last_post_time,
-    post_trace_t last_post_trace, update_state_t previous_state);
+    post_trace_t last_post_trace, update_state_t previous_state,
+	neuron_pointer_t post_synaptic_neuron,
+	additional_input_pointer_t post_synaptic_additional_input,
+    threshold_type_pointer_t post_synaptic_threshold);
 
 #endif // _TIMING_H_
