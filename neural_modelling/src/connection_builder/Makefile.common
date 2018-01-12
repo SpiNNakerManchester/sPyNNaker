@@ -1,0 +1,244 @@
+##------------------------------------------------------------------------------
+##
+## Makefile        Makefile for a SpiNNaker application
+##
+## Copyright (C)   The University of Manchester - 2013
+##
+## (Heavily) based on a Makefile by Steve Temple.
+## Bastardised by Andrew Mundy, then some more by James Knight
+##
+##------------------------------------------------------------------------------
+
+## =============================================================================
+##
+## Usage
+##
+## =============================================================================
+##
+## This Makefile is intended to be included in an another Makefile.  It will
+## build the target APP_DIR/APP.aplx when the following variables are set:
+##
+##  - APP - the name of the APLX file to build
+##  - APP_DIR - the directory in which to place the APLX
+##  - SOURCES - all the C files which are required to build the APLX
+##
+## For sample usage please see `test_aplx/Makefile`.
+##
+## =============================================================================
+
+# Configuration options
+
+# Set to 1 for GNU tools, 0 for ARM
+
+GNU := 1
+
+# Set to 1 if using SARK/API (0 for SARK)
+
+API := 1
+
+# Set to 1 to make Thumb code (0 for ARM)
+
+THUMB := 0
+
+# Prefix for GNU tool binaries
+
+GP  := arm-none-eabi
+
+# Set to 1 if making a library (advanced!)
+
+LIB := 0
+
+# If SPINN_DIRS is defined, use that to find include and lib directories
+# otherwise look two levels up
+
+ifdef SPINN_DIRS
+  LIB_DIR := $(SPINN_DIRS)/lib
+  INC_DIR := $(SPINN_DIRS)/include
+  TOOLS_DIR := $(SPINN_DIRS)/tools
+else
+  LIB_DIR := ../../lib
+  INC_DIR := ../../include
+  TOOLS_DIR := ../../tools
+endif
+
+ifdef PROFILER_ENABLED
+	BUILDDIR = build_profiled
+	CFLAGS += -DPROFILER_ENABLED
+	APP = $(PYNN_APP)_profiled
+else
+	BUILDDIR = build
+	APP = $(PYNN_APP)
+endif
+
+ifdef LOG_LEVEL
+	CFLAGS += -DLOG_LEVEL=$(LOG_LEVEL)
+endif
+
+#-------------------------------------------------------------------------------
+
+# Set up the various compile/link options for GNU and ARM tools
+
+# GNU tool setup
+
+ifeq ($(GNU),1)
+  AS := $(GP)-as --defsym GNU=1 -mthumb-interwork -march=armv5te
+
+  CA := $(GP)-gcc -c -Ofast -mthumb-interwork -march=armv5te \
+	-I $(INC_DIR)
+  CT := $(CA) -mthumb -DTHUMB
+
+ifeq ($(LIB),1)
+  CFLAGS += -fdata-sections -ffunction-sections
+endif
+
+ifeq ($(API),1)
+#  LIBRARY := -L$(LIB_DIR) -lspin1_api
+  LIBRARY := $(LIB_DIR)/libspin1_api.a
+else
+#  LIBRARY := -L$(LIB_DIR) -lsark
+  LIBRARY := $(LIB_DIR)/libsark.a
+endif
+
+  SCRIPT := $(TOOLS_DIR)/sark.lnk
+
+  LD := $(GP)-gcc -T$(SCRIPT) -Wl,-e,cpu_reset -Wl,--gc-sections -Wl,--use-blx 
+
+  AR := $(GP)-ar -rcs
+  OC := $(GP)-objcopy
+  OD := $(GP)-objdump -dxt > $(APP).txt
+  NM := $(GP)-nm
+
+# ARM tool setup
+
+else
+  AS := armasm --keep --cpu=5te --apcs /interwork
+
+  CA := armcc -c --c99 --cpu=5te --apcs /interwork --min_array_alignment=4 \
+	-I $(INC_DIR)
+
+  CT := $(CA) --thumb -DTHUMB
+
+ifeq ($(LIB),1)
+  CFLAGS += --split_sections
+endif
+
+ifeq ($(API),1)
+  LIBRARY := $(LIB_DIR)/spin1_api.a
+else
+  LIBRARY := $(LIB_DIR)/sark.a
+endif
+
+  SCRIPT := $(TOOLS_DIR)/sark.sct
+
+  LD := armlink --scatter=$(SCRIPT) --remove --entry cpu_reset
+
+  AR := armar -rcs
+  OC := fromelf
+  OD := fromelf -cds --output $(APP).txt
+  NM := nm
+endif
+
+ifeq ($(THUMB),1)
+  CC := $(CT)
+else
+  CC := $(CA)
+endif
+
+CAT := \cat
+CP  := \cp
+RM  := \rm -f
+LS  := \ls -l
+
+
+# Find Rig CPP common directory
+RIG_CPP_COMMON := $(shell rig_cpp_common_path)
+RIG_CPP_COMMON_RUNTIME = $(RIG_CPP_COMMON)/runtime
+
+# Get absolute path of THIS make file i.e. the runtime directory
+PYNN_RUNTIME := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+
+# Get absolute paths of sources
+ABSOLUTE_PYNN_SOURCES = $(abspath $(PYNN_SOURCES))
+
+# Make these relative to the spinnaker_components directory
+RELATIVE_PYNN_SOURCES := $(ABSOLUTE_PYNN_SOURCES:$(PYNN_RUNTIME)/%.cpp=%.cpp)
+
+# Construct the list of objects to build - in subdirectories beneath $(BUILDDIR)
+OBJECTS = $(RELATIVE_PYNN_SOURCES:%.cpp=$(BUILDDIR)/pynn_spinnaker/%.o)
+OBJECTS += $(RIG_CPP_COMMON_SOURCES:%.cpp=$(BUILDDIR)/rig_cpp_common/%.o)
+
+# Set standard libraries and C flags
+LIBRARIES = -lspin1_api
+CFLAGS += -Wall -Wextra -Ofast -ffreestanding -fno-rtti -fno-exceptions -I $(RIG_CPP_COMMON_RUNTIME)
+LFLAGS += -nodefaultlibs  -nostartfiles
+
+# If it is not set already, use standard app directory
+APP_DIR := ../../../spinn_front_end_common/connection_builder/connection_builder_app/
+# APP_DIR ?= $(PYNN_RUNTIME)/../../standardmodels/binaries
+
+# Primary target is an APLX file - built from the ELF
+
+#  1) Create a binary file which is the concatenation of RO and RW sections
+#  2) Make an APLX header from the ELF file with "mkaplx" and concatenate
+#     that with the binary to make the APLX file
+#  3) Remove temporary files and "ls" the APLX file
+
+$(APP).aplx: $(APP).elf
+ifeq ($(GNU),1)
+	$(OC) -O binary -j RO_DATA -j .ARM.exidx $(APP).elf RO_DATA.bin
+	$(OC) -O binary -j RW_DATA $(APP).elf RW_DATA.bin
+	mkbin RO_DATA.bin RW_DATA.bin > $(APP).bin
+else
+	$(OC) --bin --output $(APP).bin $(APP).elf
+endif
+	$(NM) $(APP).elf > $(APP).nm
+	mkaplx $(APP).nm | $(CAT) - $(APP).bin > $(APP).aplx
+	$(RM) $(APP).bin RO_DATA.bin RW_DATA.bin
+	-mkdir -p $(APP_DIR)
+	$(CP) $(APP).aplx $(APP_DIR)/
+	$(LS) $(APP_DIR)/$(APP).aplx
+
+
+# Build the ELF file
+
+#  1) Make a "sark_build.c" file containing app. name and build time
+#     with "mkbuild" and compile it
+#  2) Link application object(s), build file and library to make the ELF
+#  3) Tidy up temporaries and create a list file
+
+$(APP).elf: $(OBJECTS) $(SCRIPT) $(LIBRARY)
+	mkbuild $(APP) > sark_build.c
+	$(CC) sark_build.c -std=gnu99
+	$(LD) $(LFLAGS) $(OBJECTS) sark_build.o $(LIBRARY) -o $(APP).elf
+	$(RM) sark_build.c sark_build.o
+	$(OD) $(APP).elf
+
+# Build PyNN SpiNNaker  C source files into object files
+$(BUILDDIR)/pynn_spinnaker/%.o: $(PYNN_RUNTIME)/%.c $(INC_DIR)/spinnaker.h $(INC_DIR)/sark.h $(INC_DIR)/spin1_api.h
+	-mkdir -p $(dir $@)
+	$(CC) -std=gnu99 $(CFLAGS) $< -o $@
+
+# Build PyNN SpiNNaker C++ source files into object files
+$(BUILDDIR)/pynn_spinnaker/%.o: $(PYNN_RUNTIME)/%.cpp $(INC_DIR)/spinnaker.h $(INC_DIR)/sark.h $(INC_DIR)/spin1_api.h
+	-mkdir -p $(dir $@)
+	$(CC) -std=c++11 $(CFLAGS) $< -o $@
+
+# Build Rig CPP common C source files into object files
+$(BUILDDIR)/rig_cpp_common/%.o: $(RIG_CPP_COMMON_RUNTIME)/%.c $(INC_DIR)/spinnaker.h $(INC_DIR)/sark.h $(INC_DIR)/spin1_api.h
+	-mkdir -p $(dir $@)
+	$(CC) -std=gnu99 $(CFLAGS) $< -o $@
+
+# Build Rig CPP common C++ source files into object files
+$(BUILDDIR)/rig_cpp_common/%.o: $(RIG_CPP_COMMON_RUNTIME)/%.cpp $(INC_DIR)/spinnaker.h $(INC_DIR)/sark.h $(INC_DIR)/spin1_api.h
+	-mkdir -p $(dir $@)
+	$(CC) -std=c++11 $(CFLAGS) $< -o $@
+
+
+# Tidy and cleaning dependencies
+
+tidy:
+	$(RM) $(OBJECTS) $(APP).elf $(APP).txt $(APP).aplx $(APP).nm
+clean: tidy
+	$(RM) $(APP_DIR)/$(APP).aplx
+
+#-------------------------------------------------------------------------------
