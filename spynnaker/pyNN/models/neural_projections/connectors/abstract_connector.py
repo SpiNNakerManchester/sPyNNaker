@@ -31,11 +31,11 @@ class AbstractConnector(object):
     __slots__ = [
         "_delays",
         "_min_delay",
-        "_n_clipped_delays",
-        "_n_pre_neurons",
-        "_n_post_neurons",
         "_pre_population",
         "_post_population",
+        "_n_clipped_delays",
+        "_n_post_neurons",
+        "_n_pre_neurons",
         "_rng",
         "_safe",
         "_space",
@@ -462,3 +462,11 @@ class AbstractConnector(object):
     @verbose.setter
     def verbose(self, new_value):
         self._verbose = new_value
+
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def post_population(self):
+        return self._post_population
