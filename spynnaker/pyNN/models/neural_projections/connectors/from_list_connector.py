@@ -247,3 +247,6 @@ class FromListConnector(AbstractConnector):
         for index in self._conn_list:
             for (source, dest) in self._conn_list[index]:  # @UnusedVariable
                 pass
+
+    def gen_on_machine_info(self):
+        return []

@@ -10,11 +10,13 @@ class OneToOneConnector(AbstractConnector):
     """
 
     def __init__(
-            self, random_number_class, safe=True, verbose=False):
+            self, random_number_class, safe=True, verbose=False,
+            generate_on_machine=False):
         """
         """
         self._random_number_class = random_number_class
-        AbstractConnector.__init__(self, safe, verbose)
+        AbstractConnector.__init__(self, safe, verbose,
+                                   generate_on_machine=generate_on_machine)
 
     def set_weights_and_delays(self, weights, delays):
         """ sets the weights and delays as needed
@@ -126,9 +128,9 @@ class OneToOneConnector(AbstractConnector):
         return self._get_weight_variance(self._weights, [connection_slice])
 
     def generate_on_machine(self):
-        return (
-            not self._generate_lists_on_host(self._weights) and
-            not self._generate_lists_on_host(self._delays))
+        return (self._gen_on_spinn and \
+                self._generate_lists_on_machine(self._weights) and \
+                self._generate_lists_on_machine(self._delays))
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -155,3 +157,6 @@ class OneToOneConnector(AbstractConnector):
 
     def __repr__(self):
         return "OneToOneConnector()"
+
+    def gen_on_machine_info(self):
+        return []

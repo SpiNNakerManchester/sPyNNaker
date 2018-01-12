@@ -131,13 +131,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = 0
+        n_vertices = len(in_edges)
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
-            n_vertices += 1
 
         # Multiply by 2 to get an upper bound
         return (
@@ -237,6 +236,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             pop_table[i]["count"] = count
             for j, (address, row_length, is_single) in enumerate(
                     entry.addresses_and_row_lengths):
+                address = numpy.uint32(address)
                 single_bit = 0
                 if is_single:
                     single_bit = \
@@ -252,9 +252,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
 
+        self._entries.clear()
         del self._entries
         self._entries = None
         self._n_addresses = 0
+
+        return pop_table, address_list
 
     def extract_synaptic_matrix_data_location(
             self, incoming_key_combo, master_pop_base_mem_address, txrx,

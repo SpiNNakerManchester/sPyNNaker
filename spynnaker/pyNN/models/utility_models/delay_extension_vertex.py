@@ -120,17 +120,18 @@ class DelayExtensionVertex(
         "time_scale_factor": "TimeScaleFactor",
         "machine_graph": "MemoryMachineGraph",
         "graph_mapper": "MemoryGraphMapper",
-        "routing_infos": "MemoryRoutingInfos"
+        "routing_infos": "MemoryRoutingInfos",
+        "app_graph": "MemoryApplicationGraph",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "machine_graph",
-            "graph_mapper", "routing_infos"
+            "graph_mapper", "routing_infos", "app_graph",
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            machine_graph, graph_mapper, routing_infos):
+            machine_graph, graph_mapper, routing_infos, app_graph):
 
         vertex = placement.vertex
 
@@ -172,6 +173,7 @@ class DelayExtensionVertex(
         incoming_edges = machine_graph.get_edges_ending_at_vertex(
             vertex)
 
+        generate_on_spinnaker = False
         for incoming_edge in incoming_edges:
             incoming_slice = graph_mapper.get_slice(
                 incoming_edge.pre_vertex)
@@ -181,9 +183,25 @@ class DelayExtensionVertex(
                 incoming_key = r_info.first_key
                 incoming_mask = r_info.first_mask
 
+                app_edge = graph_mapper.get_application_edge(incoming_edge)
+                pre_vtx = app_edge.pre_vertex
+                post_vtx = app_edge.post_vertex
+                out_edges = app_graph.get_edges_starting_at_vertex(post_vtx)
+                for out_edge in out_edges:
+                    for in_edg in app_graph.get_edges_ending_at_vertex\
+                                                        (out_edge.post_vertex):
+                        if pre_vtx == in_edg.pre_vertex and \
+                            hasattr(in_edg, 'synapse_information'):
+                            for sinfo in in_edg.synapse_information:
+                                generate_on_spinnaker = \
+                                    sinfo.connector.generate_on_machine()
+
+                break # we've found THE one, why continue?
+
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
-            self._n_vertices, machine_time_step, time_scale_factor)
+            self._n_vertices, machine_time_step, time_scale_factor,
+            generate_on_spinnaker)
 
         # End-of-Spec:
         spec.end_specification()
@@ -199,7 +217,8 @@ class DelayExtensionVertex(
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_vertices, machine_time_step, time_scale_factor):
+            n_vertices, machine_time_step, time_scale_factor,
+            generate_on_spinnaker):
         """ Generate Delay Parameter data
         """
 
@@ -235,9 +254,10 @@ class DelayExtensionVertex(
             (spikes_per_timestep * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
-        # Write the actual delay blocks
-        spec.write_array(array_values=self._delay_blocks[(
-            vertex_slice.lo_atom, vertex_slice.hi_atom)].delay_block)
+        # Write the actual delay blocks if not being generated on machine
+        if not generate_on_spinnaker:
+            spec.write_array(array_values=self._delay_blocks[(
+                vertex_slice.lo_atom, vertex_slice.hi_atom)].delay_block)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

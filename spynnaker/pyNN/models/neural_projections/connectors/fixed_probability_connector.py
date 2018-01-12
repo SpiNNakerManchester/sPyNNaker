@@ -23,8 +23,10 @@ class FixedProbabilityConnector(AbstractConnector):
     """
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False):
-        AbstractConnector.__init__(self, safe, verbose)
+            verbose=False, generate_on_machine=False):
+        AbstractConnector.__init__(self, safe, verbose, 
+                                   generate_on_machine=generate_on_machine)
+
         self._p_connect = p_connect
         self._allow_self_connections = allow_self_connections
 
@@ -85,9 +87,9 @@ class FixedProbabilityConnector(AbstractConnector):
         return self._get_weight_variance(self._weights, None)
 
     def generate_on_machine(self):
-        return (
-            not self._generate_lists_on_host(self._weights) and
-            not self._generate_lists_on_host(self._delays))
+        return (self._gen_on_spinn and \
+                self._generate_lists_on_machine(self._weights) and \
+                self._generate_lists_on_machine(self._delays))
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -121,3 +123,7 @@ class FixedProbabilityConnector(AbstractConnector):
 
     def __repr__(self):
         return "FixedProbabilityConnector({})".format(self._p_connect)
+
+    def gen_on_machine_info(self):
+        return [self._allow_self_connections,
+                numpy.uint32(numpy.floor(self._p_connect * float(1 << 31)))]

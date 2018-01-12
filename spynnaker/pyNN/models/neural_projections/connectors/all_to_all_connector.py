@@ -10,7 +10,8 @@ class AllToAllConnector(AbstractConnector):
         the postsynaptic population
     """
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, verbose=None,
+                 generate_on_machine=False):
         """
 
         :param `bool` allow_self_connections:
@@ -19,7 +20,8 @@ class AllToAllConnector(AbstractConnector):
             allowed to connect to itself, or only to other neurons in the
             Population.
     """
-        AbstractConnector.__init__(self, safe, verbose)
+        AbstractConnector.__init__(self, safe, verbose, 
+                                   generate_on_machine=generate_on_machine)
         self._allow_self_connections = allow_self_connections
         self._weights = None
         self._delays = None
@@ -129,9 +131,9 @@ class AllToAllConnector(AbstractConnector):
         return self._get_weight_variance(self._weights, connection_slices)
 
     def generate_on_machine(self):
-        return (
-            not self._generate_lists_on_host(self._weights) and
-            not self._generate_lists_on_host(self._delays))
+        return (self._gen_on_spinn and \
+                self._generate_lists_on_machine(self._weights) and \
+                self._generate_lists_on_machine(self._delays))
 
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -180,3 +182,6 @@ class AllToAllConnector(AbstractConnector):
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self._allow_self_connections = new_value
+
+    def gen_on_machine_info(self):
+        return [self.allow_self_connections]

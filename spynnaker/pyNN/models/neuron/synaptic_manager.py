@@ -1,4 +1,5 @@
 import math
+import binascii
 import scipy.stats  # @UnresolvedImport
 import struct
 import sys
@@ -37,6 +38,27 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_maximum_probable_value, write_parameters_per_neuron, \
     translate_parameters
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+
+
+TIME_STAMP_BYTES = 4
+
+DEFAULT_CONN_PARAMS_KEYS = {'uniform': ['low', 'high'],
+                            'normal':  ['mean', 'std_dev'],
+                            'normal_clipped': ['mean', 'std_dev', 'low',
+                                               'high'],
+                            'exponential': ['beta']
+                           }
+
+DEFAULT_CONN_PARAMS_VALS = {'constants': {'values': 1.},
+                            'uniform': {'low': 0., 'high': 1.},
+                            'normal':  {'mean': 0., 'std_dev': 1.},
+                            'normal_clipped': {'mean': 0., 'std_dev': 1.,
+                                               'low':  0., 'high': 0.5},
+                            'exponential': {'beta': 1.}
+                           }
+STATIC_HASH  = numpy.uint32(binascii.crc32("StaticSynapticMatrix"))
+PLASTIC_HASH  = numpy.uint32(binascii.crc32("PlasticSynapticMatrix"))
+MAX_32 = numpy.uint32(0xFFFFFFFF)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -102,6 +124,14 @@ class SynapticManager(object):
 
         # TODO: Hard-coded to 0 to disable as currently broken!
         self._one_to_one_connection_dtcm_max_bytes = 0
+
+        self._max_per_pre = 0
+        self._pop_table = None
+        self._address_list = None
+        self._any_gen_on_machine = False
+        self._matrix_size = 0
+        self._num_post_targets = {}
+        self._num_words_per_weight = {}
 
     @property
     def synapse_dynamics(self):
@@ -462,7 +492,7 @@ class SynapticManager(object):
                     if isinstance(app_edge.pre_vertex, SpikeSourcePoisson):
                         spikes_per_second = app_edge.pre_vertex.rate
                         if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = max(spikes_per_second)
+                            spikes_per_second = numpy.max(spikes_per_second)
                         elif get_simulator().is_a_pynn_random(
                                 spikes_per_second):
                             spikes_per_second = get_maximum_probable_value(
@@ -473,6 +503,11 @@ class SynapticManager(object):
                             (1000000.0 / float(machine_timestep)))
                         spikes_per_tick = scipy.stats.poisson.ppf(
                             prob, spikes_per_tick)
+
+                        if n_connections == 1 and spikes_per_tick == 0.:
+                            spikes_per_tick = 1.
+
+
                     rate_stats[synapse_type].add_items(
                         spikes_per_second, 0, n_connections)
                     total_weights[synapse_type] += spikes_per_tick * (
@@ -498,14 +533,14 @@ class SynapticManager(object):
                     max_weights[synapse_type], biggest_weight[synapse_type])
 
         # Convert these to powers
-        max_weight_powers = (0 if w <= 0
+        max_weight_powers = (0 if w <= 1
                              else int(math.ceil(max(0, math.log(w, 2))))
                              for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
-        max_weight_powers = (w + 1 if (2 ** w) <= a else w
-                             for w, a in zip(max_weight_powers, max_weights))
+        max_weight_powers = (p + 1 if (2 ** p) <= w else p
+                             for p, w in zip(max_weight_powers, max_weights))
 
         # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows
@@ -594,6 +629,9 @@ class SynapticManager(object):
         spec.write_value(0)
         next_single_start_position = 0
 
+        gen_in_spinn = False
+        max_row_length = 0
+
         # For each machine edge in the vertex, create a synaptic list
         for m_edge in in_edges:
             app_edge = graph_mapper.get_application_edge(m_edge)
@@ -608,6 +646,117 @@ class SynapticManager(object):
 
                 for synapse_info in app_edge.synapse_information:
 
+                    conn = synapse_info.connector
+                    gen_in_spinn = conn.generate_on_machine()
+                    self._any_gen_on_machine |= gen_in_spinn
+
+                    # print("\n\n%s\n"%synapse_info.connector)
+                    # If connector is being built on SpiNNaker, compute PopulationTable
+                    # sizes only.
+                    if gen_in_spinn:
+                        # print("\n\n******************Faking data!!!***************\n")
+
+                        # 32-bit words required by each pre neuron to connect to
+                        # X post neurons
+                        conns_per_row = conn.get_n_connections_from_pre_vertex_maximum\
+                                                 (pre_slices, pre_slice_idx,
+                                                  post_slices, post_slice_index,
+                                                  pre_vertex_slice, post_vertex_slice)
+                        # print("MAX ROW LENGTH %d"%(max_row_length))
+                        if conns_per_row == 0:
+                            continue
+
+                        self._num_post_targets[synapse_info] = conns_per_row
+
+                        if synapse_info.synapse_dynamics.is_plastic:
+                            # print("does syn_dyn have n_header_words?")
+                            # print(dir(syn_info.synapse_dynamics))
+                            try:
+                                header_bytes = synapse_info.\
+                                                        synapse_dynamics._n_header_bytes
+                            except:
+                                # print("aparently not!")
+                                header_bytes = 0
+
+                            n_32bit_header_words = numpy.uint32(
+                                                   header_bytes // 4 +
+                                                   (1 if header_bytes % 4 > 0 else 0) )
+                            # print("number of 32-bit header words: "
+                            #       "%d"%n_32bit_header_words)
+
+                            bytes_per_weight = synapse_info.synapse_dynamics.\
+                                                 timing_dependence._synapse_structure.\
+                                                 get_n_bytes_per_connection()
+
+                            half_words_per_weight = bytes_per_weight//2 + \
+                                                    bytes_per_weight%2
+                            half_words_per_row = half_words_per_weight*conns_per_row
+                            weight_words_per_row = half_words_per_row//2 + \
+                                                   half_words_per_row%2
+                            self._num_words_per_weight[synapse_info] = \
+                                                                    half_words_per_weight
+                            # 16-bit control vars in 32-bit words
+                            control_words_per_row = \
+                                        (conns_per_row//2 + conns_per_row % 2)
+
+                            max_row_length = weight_words_per_row
+                            max_row_length += control_words_per_row
+                            max_row_length += n_32bit_header_words
+                        else:
+                            max_row_length = conns_per_row
+                            self._num_words_per_weight[synapse_info] = 0
+
+                        max_conn_delay = synapse_info.connector.get_delay_maximum()
+
+                        #todo: get 16 from global config
+                        n_stages = max_conn_delay // 16
+
+                        if (max_conn_delay % 16) == 0:
+                            n_stages -= 1
+
+                        n_stages = max(1, n_stages)
+
+                        # print("next block address 0x%08x"%next_block_start_address)
+                        # print("num stages = %d"%n_stages)
+                        # 32-bit words needed for the entire connection
+                        # plus num plastic-plastic, num static, num fixed-plastic
+
+                        # num_pre = synapse_info.connector._n_pre_neurons
+                        num_pre = pre_vertex_slice.n_atoms*n_stages
+                        # print("should have %d"%(num_pre * n_stages))
+                        # num_pre = num_pre * stages
+                        # print("Num pre = %d"%num_pre)
+                        # print("Max row length = %d"%max_row_length)
+                        #add 3 due to format of matrix
+                        data_length = num_pre * (max_row_length + 3)
+                        # print("Data length = %d"%data_length)
+
+                        next_block_start_address = self._write_padding(
+                                                        spec, synaptic_matrix_region,
+                                                        next_block_start_address)
+                        # print("next block address after padding = %d"%
+                        #       next_block_start_address)
+                        key_and_mask = self._get_key_mask_for_edge(
+                                             m_edge, graph_mapper, routing_info)
+
+                        self._poptable_type.update_master_population_table(
+                                                        spec, next_block_start_address,
+                                                        max_row_length, key_and_mask,
+                                                        master_pop_table_region)
+
+                        next_block_start_address += (data_length * 4) #bytes
+
+                        if next_block_start_address > all_syn_block_sz:
+                            raise Exception(
+                                "Too much synaptic memory has been written:"
+                                " {} of {} ".format(
+                                    next_block_start_address, all_syn_block_sz))
+
+                        # SKIP DATA GENERATION IF IT'S ANYWAYS HAPPENING ON SPINNAKER
+                        # print("\n------------------------------ done faking data ---")
+                        continue
+
+                    ### GENERATE SYNAPTIC DATA only IF NEEDED ###
                     (row_data, row_length, delayed_row_data,
                      delayed_row_length, delayed_source_ids, delay_stages) = \
                         self._synapse_io.get_synapses(
@@ -714,14 +863,19 @@ class SynapticManager(object):
                             master_pop_table_region)
                     del delayed_row_data
 
+                    if max_row_length < (row_length + delayed_row_length):
+                        max_row_length = (row_length + delayed_row_length)
+
                     if next_block_start_address > all_syn_block_sz:
                         raise Exception(
                             "Too much synaptic memory has been written:"
                             " {} of {} ".format(
                                 next_block_start_address, all_syn_block_sz))
 
-        self._poptable_type.finish_master_pop_table(
-            spec, master_pop_table_region)
+        pt, al = self._poptable_type.finish_master_pop_table(
+                                                  spec, master_pop_table_region)
+        self._pop_table = pt
+        self._address_list = al
 
         # Write the size and data of single synapses to the end of the region
         spec.switch_write_focus(synaptic_matrix_region)
@@ -736,10 +890,13 @@ class SynapticManager(object):
         spec.set_write_pointer(0)
         spec.write_value(next_block_start_address)
 
+        self._max_per_pre = max_row_length
+        self._matrix_size = next_block_start_address
+
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, input_type, machine_time_step):
+            graph_mapper, input_type, machine_time_step, placements):
 
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
@@ -780,6 +937,19 @@ class SynapticManager(object):
             machine_time_step, weight_scales)
 
         self._weight_scales[placement] = weight_scales
+
+        on_machine_dict = {}
+        flags, n_edges = self._generate_on_machine_flags(in_edges, graph_mapper)
+        on_machine_dict['flags'] = flags
+        on_machine_dict['n_edges'] = n_edges
+        on_machine_dict['delay_placement'] = self._get_placements_for_delayed(
+                                                   in_edges, graph_mapper, placements)
+        on_machine_dict['weight_scales'] = weight_scales
+        on_machine_dict['data_block'] = self._generate_on_machine_params(
+                                              machine_vertex, in_edges, graph_mapper,
+                                              routing_info, placements, weight_scales)
+
+        self._write_on_machine_data_spec(spec, on_machine_dict, post_vertex_slice)
 
     def clear_connection_cache(self):
         self._retrieved_blocks = dict()
@@ -976,3 +1146,461 @@ class SynapticManager(object):
         write_parameters_per_neuron(
             spec, vertex_slice,
             self._synapse_type.get_synapse_type_parameters())
+
+    def _generate_on_machine_flags(self, in_edges, graph_mapper):
+        if not self._any_gen_on_machine:
+            return None, None
+
+        syn_infos = []
+        for edg in in_edges:
+            app_edge = graph_mapper.get_application_edge(edg)
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    syn_infos.append(synapse_info)
+
+        num_edges = len(syn_infos)
+        num_words = int(numpy.ceil(num_edges/32.))
+        flags = numpy.zeros(num_words, dtype=numpy.uint32)
+        e = 0
+        for syn_info in syn_infos:
+            # syn_info = edg.synapse_information[0]
+            conn = syn_info.connector
+            word = e//32
+            shift = e%32
+            if conn.generate_on_machine():
+                flags[word] |= 1 << shift
+            e += 1
+
+        return flags, num_edges
+
+    def _get_placements_for_delayed(self, in_edges, graph_mapper, placements):
+        if not self._any_gen_on_machine:
+            return None
+
+        places = []
+
+        for edg in in_edges:
+            app_edge = graph_mapper.get_application_edge(edg)
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                place = placements.get_placement_of_vertex(edg.pre_vertex)
+                for synapse_info in app_edge.synapse_information:
+                    if self._is_delayed(synapse_info):
+                        if place not in places:
+                            places.append(place)
+
+        return places
+
+
+    def _get_place_for_delay_edge(self, app_edge, graph_mapper, placements):
+        if not self._any_gen_on_machine:
+            return None, None
+
+        if hasattr(app_edge, 'delay_edge') and app_edge.delay_edge is not None:
+            vertices = graph_mapper.get_machine_vertices(
+                                             app_edge.delay_edge.pre_vertex)
+            delayed_placements = []
+            delayed_slices     = []
+            for machine_vertex in vertices:
+                delayed_slices.append(
+                            graph_mapper.get_slice(machine_vertex))
+                delayed_placements.append(
+                            placements.get_placement_of_vertex(machine_vertex))
+
+            return delayed_placements, delayed_slices
+
+        return [], []
+
+
+    def _get_key_mask_for_edge(self, mch_edge, graph_mapper, routing_infos):
+        if not self._any_gen_on_machine:
+            return None
+
+        app_edge = graph_mapper.get_application_edge(mch_edge)
+        slice = graph_mapper.get_slice(mch_edge.pre_vertex)
+        if hasattr(app_edge, 'delay_edge') and app_edge.delay_edge is not None:
+            dly_mch_edges = graph_mapper.get_machine_edges(app_edge.delay_edge)
+
+            for de in dly_mch_edges:
+                s = graph_mapper.get_slice(de.pre_vertex)
+
+                if s.as_slice == slice.as_slice:
+                    ri = routing_infos.get_routing_info_for_edge(de)
+
+                    return ri.first_key_and_mask
+        else:
+            routing_info = routing_infos.get_routing_info_for_edge(mch_edge)
+            return routing_info.first_key_and_mask
+
+
+    def _generate_on_machine_params(self, machine_post_vertex, in_edges, graph_mapper,
+                                    routing_infos, placements, weight_scales):
+        if not self._any_gen_on_machine:
+            return None
+
+        #TODO:   This should probably be merged with another loop so we don't visit
+        #todo:   the same data many times
+        # print("\n\nPopulation Table / Address List")
+        # print(self._pop_table)
+        # print(self._address_list)
+        addresses   = [(a & 0x7FFFFF00) >> 8 for a in self._address_list]
+        row_lengths = [(a & 0xFF) for a in self._address_list]
+        # print("Addresses")
+        # print(addresses)
+        # print("Row Lengths")
+        # print(row_lengths)
+
+        syn_infos = []
+        param_block = []
+        slices = []
+        delayed_places = []
+        delayed_slices = []
+        keys = []
+        masks = []
+        num_seeds = 4
+        post_slice = graph_mapper.get_slice(machine_post_vertex)
+        any_delayed = False
+        for edg in in_edges:
+            app_edge = graph_mapper.get_application_edge(edg)
+
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                pre_vertex_slice = graph_mapper.get_slice(edg.pre_vertex)
+                dplaces, dslices = self._get_place_for_delay_edge(app_edge,
+                                                                graph_mapper,
+                                                                placements)
+                key_and_mask = self._get_key_mask_for_edge(edg, graph_mapper,
+                                                           routing_infos)
+                key  = key_and_mask.key
+                mask = key_and_mask.mask
+                for synapse_info in app_edge.synapse_information:
+                    keys.append(numpy.uint32(key))
+                    masks.append(numpy.uint32(mask))
+                    delayed_places.append(dplaces)
+                    delayed_slices.append(dslices)
+                    syn_infos.append(synapse_info)
+                    slices.append(pre_vertex_slice)
+                    any_delayed |= (synapse_info.connector.get_delay_maximum() > 16)
+
+        conn = None
+        dist = None
+        max_per_dyn_type = [0, 0]
+        n_32bit_header_words = 0
+        max_n_pre_neurons = 0
+        for i in range(len(syn_infos)):
+
+            syn_info = syn_infos[i]
+
+            slice_start = numpy.uint32(slices[i].lo_atom)
+            slice_count = numpy.uint32(slices[i].n_atoms)
+            key = keys[i]
+            mask = masks[i]
+
+            address_delta = 0
+            row_len = 0
+            # print(key, mask)
+            # print(self._pop_table)
+            for addr_idx in range(len(self._pop_table)):
+
+                if key == self._pop_table[addr_idx][0] and \
+                   mask == self._pop_table[addr_idx][1]:
+                    # print("key curr %s == pop %s" % (key, self._pop_table[addr_idx][0]))
+                    address_delta = addresses[addr_idx]
+                    row_len = row_lengths[addr_idx]
+                    # print("\n*********++++++++++++++++++++++++++++++++++")
+                    # print(address_delta, row_len)
+                    # print("\n*********++++++++++++++++++++++++++++++++++")
+                    break
+
+            address_delta = numpy.uint32(address_delta)
+            conn = syn_info.connector
+            direct = numpy.uint32(isinstance(syn_info.connector, OneToOneConnector))
+            # WRONG! should be 16*machine_time_step/1000.0
+            delayed = self._is_delayed(syn_info)
+            num_delayed = len(delayed_places[i])
+            dly_places = [self._placement_to_uint32(dp) for dp in delayed_places[i]]
+            dly_slices = [ds for ds in delayed_slices[i]]
+
+            # max_conns = numpy.uint32(conn.get_max_num_connections(slices[i], post_slice))
+            dyn_type = STATIC_HASH if syn_info.synapse_dynamics.is_static \
+                       else PLASTIC_HASH
+            # print("syn_info.synapse_type", syn_info.synapse_type)
+            syn_type = numpy.uint32(syn_info.synapse_type)
+
+            int_dyn_type = numpy.uint32(syn_info.synapse_dynamics.is_plastic)
+            # max_per_pre = numpy.uint32(conn.get_max_per_neuron_connections(
+            #                                                      slices[i], post_slice))
+            n_pre_neurons = numpy.uint32(conn._n_pre_neurons)
+            if max_n_pre_neurons < n_pre_neurons:
+                max_n_pre_neurons = n_pre_neurons
+
+            max_per_pre = numpy.uint32(self._max_per_pre)
+            # if isinstance(conn, FixedProbabilityConnector):
+            #     max_per_pre -= 1
+
+
+            # if max_per_dyn_type[int_dyn_type] < max_per_pre:
+            #     max_per_dyn_type[int_dyn_type] = max_per_pre
+
+            if conn.generate_on_machine() and syn_info in self._num_post_targets :#\
+               # and self._num_post_targets[synapse_info] > 0 \
+               # and row_len > 0:
+
+                for _ in range(num_seeds):
+                    rnd_int = numpy.random.randint(1323, 2 ** 32)
+                    param_block.append(numpy.uint32(rnd_int))
+
+                param_block.append(conn.name_hash())
+                param_block.append(key)#todo: don't need?
+                param_block.append(mask)#todo: don't need?
+                param_block.append(address_delta)
+                param_block.append(row_len)
+                param_block.append(n_pre_neurons)
+                param_block.append(numpy.uint32(self._num_post_targets[syn_info]))
+                param_block.append(numpy.uint32(self._num_words_per_weight[syn_info]))
+                param_block.append(slice_start)
+                param_block.append(slice_count)
+                param_block.append(direct)
+                param_block.append(delayed)
+                param_block.append(num_delayed)
+
+                for i in range(num_delayed):
+                    param_block.append(dly_places[i])
+
+                for i in range(num_delayed):
+                    param_block.append(dly_slices[i].lo_atom)
+
+                for i in range(num_delayed):
+                    param_block.append(dly_slices[i].n_atoms)
+
+
+                # hash names of synapse, weights and delay types
+                param_block.append(dyn_type) #static or plastic
+                param_block.append(syn_type) #inhibitory, excitatory, etc.
+                param_block.append(conn._param_hash(conn._weights)) #const, random, etc.
+                param_block.append(conn._param_hash(conn._delays))  #const, random, etc.
+
+                # using signed weights or not (kernel yes, everything else no)
+                if isinstance(conn, KernelConnector) and \
+                   isinstance(conn._weights, ConvolutionKernel):
+                    use_signed_weights = numpy.uint32(True)
+                else:
+                    use_signed_weights = numpy.uint32(False)
+
+                param_block.append(use_signed_weights)
+
+
+                # header words for synapse row
+                if syn_info.synapse_dynamics.is_plastic:
+                    # print("does syn_dyn have n_header_words?")
+                    # print(dir(syn_info.synapse_dynamics))
+                    try:
+                        header_bytes = syn_info.synapse_dynamics._n_header_bytes
+                    except:
+                        # print("aparently not!")
+                        header_bytes = 0
+
+                    n_32bit_header_words = numpy.uint32(header_bytes//4 +
+                                                        (1 if header_bytes%4 > 0 else 0))
+                    # print("\n\nheader bytes: %d"%header_bytes)
+                    # print("number of 32-bit header words: %d\n\n"%n_32bit_header_words)
+                else:
+                    n_32bit_header_words = 0
+
+                param_block.append(n_32bit_header_words)
+
+
+                #TODO: add a gen_on_machine_info method per connector
+                # connector-specific data
+                param_block += conn.gen_on_machine_info()
+
+                #weights in u1616 or s1516 fixed-point
+                if numpy.isscalar(conn._weights):
+                    ws  = float(weight_scales[syn_type])
+                    ws *= float(conn._weights)
+                    w = numpy.uint32(ws)
+                    w = w << 16
+                    param_block.append(w)
+
+                elif isinstance(conn, KernelConnector) and \
+                     isinstance(conn._weights, ConvolutionKernel):
+
+                    param_block += conn.gen_on_machine_info()
+
+                    for r in range(conn._weights.shape[0]):
+                        for c in range(conn._weights.shape[1]):
+                            w = numpy.int32(float(conn._weights[r, c]) * (1 << 16))
+                            param_block.append(w)
+                else:
+                    dist = conn._weights.name
+
+                    for i in range(len(DEFAULT_CONN_PARAMS_KEYS[dist])):
+                        # stupid non-named parameters!
+                        if i < len(conn._weights.parameters):
+                            v = conn._weights.parameters[i]
+                        else:
+                            p = DEFAULT_CONN_PARAMS_KEYS[dist][i]
+                            v = DEFAULT_CONN_PARAMS_VALS[dist][p]
+
+                        param_block.append(v)
+
+                #delays (needed to be in
+                if numpy.isscalar(conn._delays):
+                    param_block.append(numpy.uint32(conn._delays)<<16)
+
+                elif isinstance(conn, KernelConnector) and \
+                     isinstance(conn._delays, ConvolutionKernel):
+                    param_block += conn.gen_on_machine_info()
+                    for r in range(conn._delays.shape[0]):
+                        for c in range(conn._delays.shape[1]):
+                            d = numpy.uint32(conn._delays[r, c])
+                            d = d << 16
+                            param_block.append(d)
+                else:
+                    dist = conn._delays.name
+
+                    for i in range(len(DEFAULT_CONN_PARAMS_KEYS[dist])):
+                        # stupid non-named parameters!
+                        if i < len(conn._delays.parameters):
+                            v = float(conn._delays.parameters[i])
+                        else:
+                            p = DEFAULT_CONN_PARAMS_KEYS[dist][i]
+                            v = DEFAULT_CONN_PARAMS_VALS[dist][p]
+
+                        param_block.append(v)
+
+        # print(max_per_dyn_type)
+        # sys.exit(0)
+        # param_block = max_per_dyn_type + param_block
+
+        # print("in generate_on_machine_params:")
+        # print("\t- param_block -")
+        # for i in param_block:
+        #     if isinstance(i, numpy.uint32) or isinstance(i, (int, long)):
+        #         print("\t\t%010u" % i)
+        #     else:
+        #         print("\t\t%f" % i)
+
+        return param_block
+
+    def _placement_to_uint32(self, placement):
+        if placement is None:
+            return 0
+
+        # [  placement x  |  placement y   |  placement p  ]
+        # [    13 bit     |     13 bit     |     6 bit     ]
+        PBITS  = 6
+        XYBITS = (32 - PBITS)//2
+        plc = numpy.uint32(0)
+        plc  = numpy.uint32(placement.p & ((1 << PBITS) - 1))       | \
+               numpy.uint32((placement.y & ((1 << XYBITS) - 1)) << PBITS) | \
+               numpy.uint32((placement.x & ((1 << XYBITS) - 1)) << (XYBITS+PBITS))
+        # print("==============_placement_to_uint32-=================")
+        # print("{0:d}, {1:d}, {2:d} == 0x{3:08x}".format(
+        #       placement.x, placement.y, placement.p, plc ))
+        return plc
+
+
+    def _is_delayed(self, synapse_info):
+        conn = synapse_info.connector
+        return numpy.uint32(conn.get_delay_maximum() > 16)
+
+    def _write_on_machine_data_spec(self, spec, conn_dict, post_vertex_slice):
+        """dictionary keys mean
+        'n_edges': how many edges in total land in this vertex
+        'flags': which of the edges requires on machine generation, encoded as bits
+                 in 32-bit words
+        'delay_placements': if the delays are larger than max per core, we need to
+                            know the delay extension cores (unused here!)
+        'data_block': data needed to generate connections, weights and delays
+        'weight_scales': shifts from U88 fixed point to make better use of bits
+        """
+        if not self._any_gen_on_machine:
+            return
+
+        # print("WEIGHT SCALES ----------------------------------")
+        # print(conn_dict['weight_scales'])
+        # print("post count")
+        # print( post_vertex_slice.n_atoms )
+        # print("------------------------------------------------")
+        if numpy.sum(conn_dict['flags']) == 0:
+            return
+
+        word_count = len(conn_dict['flags']) + len(conn_dict['data_block']) + \
+                     len(conn_dict['weight_scales'])
+
+        total_count = word_count + 2 + 1 + 1 + 1 + 1 + 1
+                     # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
+                     # 1 for n_edges
+                     # 1 for size of data_block
+                     # 1 for num_synapse_types
+                     # 1 for synapse_bits
+                     # 1 for num header words for plastic weights
+        # print("in _write_on_machine_data_spec")
+        # print(total_count)
+        # print("Reserving connector builder region")
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value,
+            size=total_count*4, label="ConnectorBuilderRegion")
+
+        #TODO: all 32-bit words =( we can compress many of these!!!
+
+        # print("Writing connector builder region")
+        # print("Reserved a total of %u bytes"%(total_count*4))
+        spec.switch_write_focus(
+            region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
+
+        spec.write_value(numpy.uint32(conn_dict['n_edges']), data_type=DataType.UINT32)
+        for w in conn_dict['flags']:
+            spec.write_value(w, data_type=DataType.UINT32)
+
+        spec.write_value(post_vertex_slice.lo_atom, data_type=DataType.UINT32)
+        spec.write_value(post_vertex_slice.n_atoms, data_type=DataType.UINT32)
+
+        #how many synapse types do we have
+        spec.write_value(len(conn_dict['weight_scales']), data_type=DataType.UINT32)
+
+        #how many bits needed to encode all synapse types
+        spec.write_value(int(numpy.ceil(numpy.log2(len(conn_dict['weight_scales'])))),
+                         data_type=DataType.UINT32)
+
+        #what are the weight scales for each synapse type
+        for w in conn_dict['weight_scales']:
+            # print("Weights scales %f"%w)
+            v = numpy.log2(w)
+            if v < 0:
+                v = 0.
+            else:
+                v = numpy.ceil(v)
+            v = numpy.int32(v)
+            spec.write_value(v, data_type=DataType.INT32)
+
+        # how many bytes we need to copy the data-block
+        spec.write_value(len(conn_dict['data_block'])*4, data_type=DataType.UINT32)
+
+        for i in range(len(conn_dict['data_block'])):
+            w = conn_dict['data_block'][i]
+            if numpy.issubdtype(type(w), numpy.integer):
+                conn_dict['data_block'][i] = w#numpy.int32(w)
+            else:
+                conn_dict['data_block'][i] = numpy.int32(numpy.abs(
+                                                numpy.round(w*(1<<16))))
+
+        spec.write_array(conn_dict['data_block'])
+
+        # for w in conn_dict['data_block']:
+        #     if numpy.issubdtype(type(w), numpy.integer):
+        #         spec.write_value(int(w), data_type=DataType.UINT32)
+        #     else:
+        #         spec.write_value(w, data_type=DataType.U1616)
+
+
+        conn_dict['data_block'][:] = []
+        del conn_dict['data_block']
+
+        del conn_dict['weight_scales']
+
+        del conn_dict['flags']
+
+        conn_dict.clear()
+        del conn_dict
+
+        # print("Writing connector builder region --- finished")
