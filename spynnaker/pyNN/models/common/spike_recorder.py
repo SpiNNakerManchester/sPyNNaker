@@ -43,50 +43,26 @@ class SpikeRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, too-many-locals
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = machine_time_step / 1000.0
+        ms_per_tick = float(machine_time_step / 1000.0)
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing = []
-        progress = ProgressBar(vertices,
-                               "Getting spikes for {}".format(label))
+        progress = ProgressBar(
+            vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
-
-            # Read the spikes
-            n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
-            n_bytes = n_words * 4
-            n_words_with_timestamp = n_words + 1
-
-            # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, data_missing = \
-                buffer_manager.get_data_for_vertex(placement, region)
-            if data_missing:
-                missing.append(placement)
-            record_raw = neuron_param_region_data_pointer.read_all()
-            raw_data = (numpy.asarray(record_raw, dtype="uint8").
-                        view(dtype="<i4")).reshape([
-                            -1, n_words_with_timestamp])
-            if raw_data.size:
-                split_record = numpy.array_split(raw_data, [1, 1], 1)
-                record_time = split_record[0] * float(ms_per_tick)
-                spikes = split_record[2].byteswap().view("uint8")
-                bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                    (-1, 32))).reshape((-1, n_bytes * 8))
-                time_indices, indices = numpy.where(bits == 1)
-                times = record_time[time_indices].reshape((-1))
-                indices = indices + vertex_slice.lo_atom
-                spike_ids.append(indices)
-                spike_times.append(times)
+            missing.extend(self._read_vertex_spikes(
+                buffer_manager, region, ms_per_tick,
+                placements.get_placement_of_vertex(vertex),
+                graph_mapper.get_slice(vertex), spike_ids, spike_times))
 
         if missing:
-            missing_str = recording_utils.make_missing_string(missing)
             logger.warn(
                 "Population %s is missing spike data in region %s from the"
-                " following cores: %s", label, region, missing_str)
+                " following cores: %s", label, region,
+                recording_utils.make_missing_string(missing))
 
         if not spike_ids:
             return numpy.zeros((0, 2), dtype="float")
@@ -94,3 +70,30 @@ class SpikeRecorder(object):
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
+
+    def _read_vertex_spikes(
+            self, buffer_manager, region, ms_per_tick, placement, vertex_slice,
+            spike_ids, spike_times):
+        # pylint: disable=too-many-arguments, too-many-locals
+
+        # Read the spikes from the buffer manager
+        n_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
+        neuron_param_region, data_missing = \
+            buffer_manager.get_data_for_vertex(placement, region)
+        raw_data = numpy.asarray(
+            neuron_param_region.read_all(), dtype="uint8").view(
+                dtype="<i4").reshape([-1, n_words + 1])
+
+        # If we have the data, build it into the form that PyNN expects
+        if raw_data.size:
+            split_record = numpy.array_split(raw_data, [1, 1], 1)
+            record_time = split_record[0] * ms_per_tick
+            spikes = split_record[2].byteswap().view("uint8")
+            bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
+                (-1, 32))).reshape((-1, n_words * 32))
+            time_indices, indices = numpy.where(bits == 1)
+            spike_ids.append(indices + vertex_slice.lo_atom)
+            spike_times.append(record_time[time_indices].reshape((-1)))
+
+        # If data was missing, ask for this placement to be reported as such
+        return [placement] if data_missing else []

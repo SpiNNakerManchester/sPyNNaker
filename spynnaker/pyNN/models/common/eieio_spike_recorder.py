@@ -56,30 +56,9 @@ class EIEIOSpikeRecorder(object):
                 buffer_manager.get_data_for_vertex(placement, region)
             if data_missing:
                 missing.append(placement)
-            spike_data = str(raw_spike_data.read_all())
-            number_of_bytes_written = len(spike_data)
-
-            offset = 0
-            while offset < number_of_bytes_written:
-                length = _ONE_WORD.unpack_from(spike_data, offset)[0]
-                time = _ONE_WORD.unpack_from(spike_data, offset + 4)[0]
-                time *= ms_per_tick
-                data_offset = offset + 8
-                eieio_header = EIEIODataHeader.from_bytestring(
-                    spike_data, data_offset)
-                if eieio_header.eieio_type.payload_bytes > 0:
-                    raise Exception("Can only read spikes as keys")
-                data_offset += eieio_header.size
-                timestamps = numpy.repeat([time], eieio_header.count)
-                key_bytes = eieio_header.eieio_type.key_bytes
-                keys = numpy.frombuffer(
-                    spike_data, dtype="<u{}".format(key_bytes),
-                    count=eieio_header.count, offset=data_offset)
-
-                neuron_ids = ((keys - base_key_function(vertex)) +
-                              vertex_slice.lo_atom)
-                offset += length + 8
-                results.append(numpy.dstack((neuron_ids, timestamps))[0])
+            self._process_spike_data(
+                vertex_slice, raw_spike_data.read_all(), ms_per_tick,
+                base_key_function(vertex), results)
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -90,3 +69,31 @@ class EIEIOSpikeRecorder(object):
             return []
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
+
+    @staticmethod
+    def _process_spike_data(
+            vertex_slice, spike_data, ms_per_tick, base_key, results):
+        spike_data = str(spike_data)
+        number_of_bytes_written = len(spike_data)
+        offset = 0
+        while offset < number_of_bytes_written:
+            length = _ONE_WORD.unpack_from(spike_data, offset)[0]
+            time = _ONE_WORD.unpack_from(spike_data, offset + 4)[0]
+            time *= ms_per_tick
+            data_offset = offset + 8
+
+            eieio_header = EIEIODataHeader.from_bytestring(
+                spike_data, data_offset)
+            if eieio_header.eieio_type.payload_bytes > 0:
+                raise Exception("Can only read spikes as keys")
+
+            data_offset += eieio_header.size
+            timestamps = numpy.repeat([time], eieio_header.count)
+            key_bytes = eieio_header.eieio_type.key_bytes
+            keys = numpy.frombuffer(
+                spike_data, dtype="<u{}".format(key_bytes),
+                count=eieio_header.count, offset=data_offset)
+
+            neuron_ids = (keys - base_key) + vertex_slice.lo_atom
+            offset += length + 8
+            results.append(numpy.dstack((neuron_ids, timestamps))[0])

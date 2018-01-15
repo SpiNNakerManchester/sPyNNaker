@@ -32,7 +32,7 @@ class NeuronRecorder(AbstractUInt32Recorder):
 
     def set_recording(self, variable, new_state):
         if variable == "all":
-            for key in self._record.keys():
+            for key in self._record:
                 self._record[key] = new_state
         elif variable in self._record:
             self._record[variable] = new_state
