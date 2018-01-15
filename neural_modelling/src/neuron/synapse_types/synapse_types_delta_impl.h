@@ -15,6 +15,7 @@
 #include "../../common/neuron-typedefs.h"
 #include "synapse_types.h"
 
+
 //---------------------------------------
 // Macros
 //---------------------------------------
