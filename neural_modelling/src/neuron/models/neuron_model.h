@@ -31,9 +31,10 @@ void neuron_model_set_global_neuron_params(
 //!     all the parameters for a specific neuron
 //! \return state_t which is the value to be compared with a threshold value
 //!     to determine if the neuron has spiked
-state_t neuron_model_state_update(int num_excitatory_inputs,
-    input_t* exc_input, int num_inhibitory_inputs, input_t* inh_input, input_t external_bias,
-    neuron_pointer_t neuron);
+state_t neuron_model_state_update(
+		uint16_t num_excitatory_inputs, input_t* exc_input,
+		uint16_t num_inhibitory_inputs, input_t* inh_input,
+		input_t external_bias, neuron_pointer_t neuron);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in] neuron pointer to a neuron parameter struct which contains all
