@@ -6,9 +6,9 @@ import numpy
 
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities import exceptions as fec_excceptions
+from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.progress_bar import ProgressBar
-from spynnaker.pyNN.models.common import recording_utils
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,7 @@ class NeuronRecorder(object):
     N_BYTES_PER_SIZE = 4
     N_CPU_CYCLES_PER_NEURON = 8
     N_BYTES_PER_WORD = 4
+    MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(self, allowed_variables, n_neurons):
         self._sampling_rates = OrderedDict()
@@ -59,7 +60,8 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        return recording_utils.compute_interval(self._sampling_rates[variable])
+        step = globals_variables.get_simulator().machine_time_step / 1000
+        return self._sampling_rates[variable] * step
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -175,16 +177,12 @@ class NeuronRecorder(object):
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
             record_raw = neuron_param_region_data_pointer.read_all()
-            size = len(record_raw)
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
             if len(raw_data) > 0:
                 record_time = raw_data[:, 0] * float(ms_per_tick)
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
-                temp = numpy.unpackbits(spikes).reshape((-1, 32))
-                temp2 = numpy.fliplr(numpy.unpackbits(spikes).reshape(
-                    (-1, 32)))
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)
@@ -232,6 +230,35 @@ class NeuronRecorder(object):
                 results.append(key)
         return results
 
+    def _compute_rate(self, new_state, sampling_interval):
+        """
+        Converts a simpling interval into a rate
+
+        Remember machine time step is in nano seconds
+
+        :param sampling_interval: interval between samples in micro seconds
+        :return: rate
+        """
+        if new_state:
+            if sampling_interval is None:
+                return 1
+
+            step = globals_variables.get_simulator().machine_time_step / 1000
+            rate = int(sampling_interval / step)
+            if sampling_interval != rate * step:
+                msg = "sampling_interval {} is not an an integer " \
+                      "multiple of the simulation timestep {}" \
+                      "".format(sampling_interval, step)
+                raise fec_excceptions.ConfigurationException(msg)
+            if rate > self.MAX_RATE:
+                msg = "sampling_interval {} higher than max allowed which is {}" \
+                      "".format(sampling_interval, step * self.MAX_RATE)
+                raise fec_excceptions.ConfigurationException(msg)
+            return rate
+
+        else:
+            return 0
+
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):
         if variable == "all":
@@ -239,7 +266,7 @@ class NeuronRecorder(object):
                 self.set_recording(key, new_state, sampling_interval, indexes)
         elif variable in self._sampling_rates:
             self._sampling_rates[variable] = \
-                    recording_utils.compute_rate(new_state, sampling_interval)
+                    self._compute_rate(new_state, sampling_interval)
             self._indexes[variable] = indexes
         else:
             msg = "Variable {} is not supported ".format(variable)
@@ -296,6 +323,12 @@ class NeuronRecorder(object):
         if n_machine_time_steps % rate > 0:
             records = records + 1
         return data_size * records
+
+    def is_sampling(self):
+        for rate in self._sampling_rates.itervalues():
+            if rate != 1:
+                return True
+        return False
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         return len(self._sampling_rates) * \
