@@ -28,7 +28,32 @@ class AbstractConnector(object):
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
 
-    __slots__ = ()
+    __slots__ = [
+        "_safe",
+
+        "_space",
+
+        "_verbose",
+
+        "_pre_population",
+
+        "_post_population",
+
+        "_n_pre_neurons",
+
+        "_n_post_neurons",
+
+        "_rng",
+
+        "_n_clipped_delays",
+
+        "_min_delay",
+
+        "_weights",
+
+        "_delays"
+
+        ]
 
     def __init__(self, safe=True, verbose=False):
         self._safe = safe
@@ -113,7 +138,9 @@ class AbstractConnector(object):
             high = utility_calls.high(delays)
             if high is None:
                 return max_estimated_delay
-            return max(max_estimated_delay, high)
+
+            # The maximum is the minimum of the possible maximums
+            return min(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -436,3 +463,11 @@ class AbstractConnector(object):
     @verbose.setter
     def verbose(self, new_value):
         self._verbose = new_value
+
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def post_population(self):
+        return self._post_population

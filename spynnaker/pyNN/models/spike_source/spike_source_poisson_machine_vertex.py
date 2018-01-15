@@ -1,4 +1,8 @@
 from pacman.model.decorators import overrides
+from pacman.executor.injection_decorator import inject_items
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.abstract_models \
+    import AbstractSupportsDatabaseInjection
 from spinn_front_end_common.utilities.helpful_functions \
     import locate_memory_region_for_placement
 from pacman.model.graphs.machine import MachineVertex
@@ -10,12 +14,15 @@ from spinn_front_end_common.interface.buffer_management.buffer_models \
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 
+from spynnaker.pyNN.utilities import constants
+
 from enum import Enum
 
 
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
-        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable):
+        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
+        AbstractSupportsDatabaseInjection):
     POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
@@ -74,3 +81,15 @@ class SpikeSourcePoissonMachineVertex(
             placement,
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
+
+    @inject_items({"graph": "MemoryMachineGraph"})
+    @overrides(
+        AbstractSupportsDatabaseInjection.is_in_injection_mode,
+        additional_arguments=["graph"])
+    def is_in_injection_mode(self, graph):
+        in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
+            self, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+        if len(in_edges) > 1:
+            raise ConfigurationException(
+                "Poisson source can only have one incoming control")
+        return len(in_edges) == 1

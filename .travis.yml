@@ -5,38 +5,47 @@ dist: trusty
 addons:
   apt:
     packages:
+      - libc6:i386
       - vera++
       - libxml2-utils
-      #- gcc-arm-none-eabi
-      #- libnewlib-arm-none-eabi
-
-virtualenv:
-  system_site_packages: true
-
-env:
-  - READTHEDOCS=True
+      - gcc-arm-none-eabi
+      - libnewlib-arm-none-eabi
 
 cache: pip
 
 before_install:
+  # Work around ludicrous Travis bug
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
+  - python support/travis_blocking_stdout.py
+  # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy numpy scipy
   # SpiNNakerManchester internal dependencies; development mode
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMan.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/PACMAN.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/DataSpecification.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@${TRAVIS_BRANCH} || pip install --upgrade git+git://github.com/SpiNNakerManchester/spalloc.git@master
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git@master
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMan.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/PACMAN.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/DataSpecification.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/spalloc.git
+  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+  # C dependencies
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinn_common.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+  - export SPINN_DIRS=$PWD/spinnaker_tools
+  - export NEURAL_MODELLING_DIRS=$PWD/neural_modelling
 
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
-  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
 
 before_script:
+  # Initialise builds against spinnaker_tools
+  - make -C $SPINN_DIRS
+  - make -C spinn_common install
+  - make -C SpiNNFrontEndCommon/c_common install
+  # Make a test config
   - echo '[Machine]' > ~/.spynnaker.cfg
   - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
   - echo "version = ${SPINNAKER_BOARD_VERSION:-5}" >> ~/.spynnaker.cfg
@@ -45,13 +54,16 @@ before_script:
   - echo '[Buffers]' >> ~/.spynnaker.cfg
 
 script:
+  # Python
   - py.test unittests
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
-  # DISABLED BECAUSE THEY'RE JUST *SO* BROKEN!
-  # - flake8 integration_tests
+  # XML
+  - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
+  # C 
+  - make -C neural_modelling
   - support/run-vera.sh neural_modelling
-  - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh 
+  # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
   - support/travis-sphinx.sh singlehtml -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
