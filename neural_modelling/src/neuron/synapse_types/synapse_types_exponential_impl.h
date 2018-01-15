@@ -11,10 +11,6 @@
 #ifndef _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
 #define _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
 
-#include "../decay.h"
-#include <debug.h>
-#include "synapse_types.h"
-
 
 //---------------------------------------
 // Macros
@@ -25,6 +21,10 @@
 #define NUM_EXCITATORY_RECEPTORS 1
 #define NUM_INHIBITORY_RECEPTORS 1
 #define NUM_NEUROMODULATORS 0
+
+#include "../decay.h"
+#include <debug.h>
+#include "synapse_types.h"
 
 
 //---------------------------------------
