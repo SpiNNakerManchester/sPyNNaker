@@ -8,10 +8,9 @@
 * time-constants (and thus propogators) are identical.
 */
 
-
-
 #ifndef _SYNAPSE_TYPES_DUAL_EXCITATORY_EXPONENTIAL_IMPL_H_
 #define _SYNAPSE_TYPES_DUAL_EXCITATORY_EXPONENTIAL_IMPL_H_
+
 
 //---------------------------------------
 // Macros
@@ -19,12 +18,21 @@
 #define SYNAPSE_TYPE_BITS 2
 #define SYNAPSE_TYPE_COUNT 3
 
+#define NUM_EXCITATORY_RECEPTORS 2
+#define NUM_INHIBITORY_RECEPTORS 1
+#define NUM_NEUROMODULATORS 0
+
 #include "../decay.h"
 #include <debug.h>
+#include "synapse_types.h"
+
 
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
+
 typedef struct synapse_param_t {
     decay_t exc_decay;
     decay_t exc_init;
@@ -36,16 +44,6 @@ typedef struct synapse_param_t {
     input_t input_buffer_excitatory2_value;
     input_t input_buffer_inhibitory_value;
 } synapse_param_t;
-
-#include "synapse_types.h"
-
-
-#define NUM_EXCITATORY_RECEPTORS 2
-#define NUM_INHIBITORY_RECEPTORS 1
-#define NUM_NEUROMODULATORS 0
-
-input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
-input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
@@ -113,7 +111,7 @@ static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
 	excitatory_response[0] = parameter->input_buffer_excitatory_value;
 	excitatory_response[1] = parameter->input_buffer_excitatory2_value;
-    return excitatory_response;
+    return &excitatory_response[0];
 }
 
 //! \brief extracts the inhibitory input buffers from the buffers available
@@ -123,7 +121,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
 	inhibitory_response[0] = parameter->input_buffer_inhibitory_value;
-    return inhibitory_response;
+    return &inhibitory_response[0];
 }
 
 //! \brief returns a human readable character for the type of synapse.
