@@ -13,7 +13,7 @@
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 2
 #define SYNAPSE_TYPE_COUNT 4
-#define SYNAPSE_INDEX_BITS 6
+#define SYNAPSE_INDEX_BITS 5
 
 #define NUM_EXCITATORY_RECEPTORS 2
 #define NUM_INHIBITORY_RECEPTORS 2

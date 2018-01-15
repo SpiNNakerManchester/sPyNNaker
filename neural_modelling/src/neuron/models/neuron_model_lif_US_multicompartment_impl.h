@@ -40,7 +40,6 @@ typedef struct neuron_t {
 
     // Two separate 'compartments' (see struct above)
     compartment_t comp1;
-    compartment_t comp2;
 
 } neuron_t;
 

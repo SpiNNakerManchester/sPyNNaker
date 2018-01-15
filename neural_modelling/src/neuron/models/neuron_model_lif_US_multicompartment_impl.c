@@ -3,8 +3,14 @@
 #include <debug.h>
 
 // update single compartment
-static inline void _update_compartment(input_t current, compartment_t* comp){
-	comp->V_compartment = current * comp->C_compartment;
+static inline void _update_compartment(input_t* exc_input, input_t* inh_input,
+		compartment_t* comp){
+
+	log_info("Dendritic input: excitatory: %k, inhibitory: %k", exc_input[1], inh_input[1]);
+	log_info("Dendritic properties: V: %k, C: %k",
+	comp->V_compartment, comp->C_compartment);
+
+
 }
 
 
@@ -31,14 +37,16 @@ state_t neuron_model_state_update(
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
 		input_t external_bias, neuron_pointer_t neuron) {
 
+	// assume that exc_input[0] and inh_inout[0] are to the soma, and
+	// exc_input[1] and inh_input[1] are to the dendrite
+
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
-    	_update_compartment(exc_input[0], &neuron->comp1);
-    	_update_compartment(exc_input[1], &neuron->comp2);
+    	_update_compartment(exc_input, inh_input, &neuron->comp1);
 
         // Get the input in nA
         input_t input_this_timestep =
