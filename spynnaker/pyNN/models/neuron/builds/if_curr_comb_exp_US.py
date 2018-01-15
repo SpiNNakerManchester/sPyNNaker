@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.neuron.neuron_models\
-    .neuron_model_leaky_integrate_and_fire \
-    import NeuronModelLeakyIntegrateAndFire
+    .neuron_model_leaky_integrate_and_fire_US \
+    import NeuronModelLeakyIntegrateAndFireUS
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_2E2I\
     import SynapseTypeCombExp2E2I
 from spynnaker.pyNN.models.neuron.input_types.input_type_current \
@@ -34,7 +34,7 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
         'tau_refrac': 0.1,
         'i_offset': 0,
 
-        ##### synapse parameters #####
+        ##### synapse defaults #####
         # excitatory
         'exc_a_response':0,
         'exc_a_A':1,
@@ -64,11 +64,17 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
         'inh2_b_B':-1,
         'inh2_b_tau': 1,
 
-       # Compartement defaults
-        'V_compartment1': -65.0, "C_compartment1": 1.0,
-        'V_compartment2': -64.0, "C_compartment2": 1.0,
+       # #### Compartement defaults ####
+        'V_compartment1': -65.0,
+        'C_compartment1': 1.0,
         }
-        ##############################
+
+    none_pynn_default_parameters = {'v_init': None,
+                                   'exc_response': 0,  # Internal Parameter
+                                   'exc_exp_response': 0,  # Internal Parameter
+                                   'inh_response': 0,  # Internal Parameter
+                                   'inh_exp_response': 0,  # Internal Parameter
+                                   }
 
 
     def __init__(
@@ -115,9 +121,7 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
             i_offset=default_parameters['i_offset'], v_init=None,
 
             V_compartment1=default_parameters['V_compartment1'],
-            C_compartment1=default_parameters['C_compartment1'],
-            V_compartment2=default_parameters['V_compartment2'],
-            C_compartment2=default_parameters['C_compartment2']
+            C_compartment1=default_parameters['C_compartment1']
             ):
 
 
@@ -125,8 +129,7 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
         neuron_model = NeuronModelLeakyIntegrateAndFireUS(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac,
-            V_compartment1, C_compartment1,
-            V_compartment2, C_compartment2)
+            V_compartment1, C_compartment1)
 
         synapse_type = SynapseTypeCombExp2E2I(
                 n_neurons,
