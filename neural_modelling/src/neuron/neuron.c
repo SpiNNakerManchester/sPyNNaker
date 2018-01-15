@@ -26,14 +26,20 @@ void spin1_wfi();
 
 #ifndef NUM_EXCITATORY_RECEPTORS
 #define NUM_EXCITATORY_RECEPTORS 1
+#error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
+       shaping include
 #endif
 
 #ifndef NUM_INHIBITORY_RECEPTORS
 #define NUM_INHIBITORY_RECEPTORS 1
+#error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
+       shaping include
 #endif
 
 #ifndef NUM_NEUROMODULATORS
 #define NUM_NEUROMODULATORS 0
+#error NUM_NEUROMODULATORS was undefined.  It should be defined by a synapse\
+       shaping include
 #endif
 
 //! Array of neuron states
@@ -377,25 +383,29 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
-        input_t* exc_syn_input = synapse_types_get_excitatory_input(&(neuron_synapse_shaping_params[neuron_index]));
-        input_t* inh_syn_input = synapse_types_get_inhibitory_input(&(neuron_synapse_shaping_params[neuron_index]));
-        input_t exc_input[NUM_EXCITATORY_RECEPTORS];
-        input_t inh_input[NUM_INHIBITORY_RECEPTORS];
+        input_t* exc_syn_input =
+        		synapse_types_get_excitatory_input(
+        				&(neuron_synapse_shaping_params[neuron_index]));
+        input_t* inh_syn_input =
+        		synapse_types_get_inhibitory_input(
+        				&(neuron_synapse_shaping_params[neuron_index]));
+
+        // Potential to combine these calls with functions above
+        exc_syn_input = input_type_convert_excitatory_input_to_current(
+        		exc_syn_input, input_type, voltage);
+        inh_syn_input = input_type_convert_inhibitory_input_to_current(
+        		inh_syn_input, input_type, voltage);
+
         REAL total_exc = 0;
         REAL total_inh = 0;
 
+        // Sum input to fit with current recording strategy - could upgrade to
+        // record separate receptor inputs in the future.
         for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        	exc_syn_input[i] = input_type_get_input_value(exc_syn_input[i], input_type);
-        	exc_input[i] = input_type_convert_excitatory_input_to_current(
-                    exc_syn_input[i], input_type, voltage);
-        	total_exc += exc_input[i];
+        	total_exc += exc_syn_input[i];
         }
-
         for (int i=0; i< NUM_INHIBITORY_RECEPTORS; i++){
-        	inh_syn_input[i] = input_type_get_input_value(inh_syn_input[i], input_type);
-        	inh_input[i] = input_type_convert_inhibitory_input_to_current(
-        	            inh_syn_input[i], input_type, voltage);
-        	total_inh += inh_input[i];
+        	total_inh += inh_syn_input[i];
         }
 
         // Get external bias from any source of intrinsic plasticity
@@ -411,8 +421,8 @@ void neuron_do_timestep_update(timer_t time) {
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
-            NUM_EXCITATORY_RECEPTORS, exc_input,
-			NUM_INHIBITORY_RECEPTORS, inh_input,
+            NUM_EXCITATORY_RECEPTORS, exc_syn_input,
+			NUM_INHIBITORY_RECEPTORS, inh_syn_input,
 			external_bias, neuron);
 
         // determine if a spike should occur
