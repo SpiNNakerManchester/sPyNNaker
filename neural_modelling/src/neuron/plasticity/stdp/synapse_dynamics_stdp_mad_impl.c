@@ -107,8 +107,8 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state,  post_synaptic_neuron, post_synaptic_additional_input,
-			post_synaptic_threshold);
+            current_state,  syn_type, post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -122,7 +122,7 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state,
+        post_window.prev_time, post_window.prev_trace, current_state, syn_type,
 		post_synaptic_neuron, post_synaptic_additional_input,
 		post_synaptic_threshold);
 
