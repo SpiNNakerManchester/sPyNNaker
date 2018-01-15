@@ -31,7 +31,10 @@ typedef struct input_type_t {
 } input_type_t;
 
 // Receptor-independent shifts enabling individual scaling for different receptors
-// ToDO Write these in input_type_t struct from Python to remove requirement to set manually
+// ToDO Write these in input_type_t struct from Python to remove requirement to
+// set manually.
+// Note that this will cause problems if these arrays are not explicitly initialised
+// when using multiple non-zero shifts.
 uint16_t excitatory_shifts[NUM_EXCITATORY_RECEPTORS] = {10};
 uint16_t inhibitory_shifts[NUM_INHIBITORY_RECEPTORS] = {10};
 
