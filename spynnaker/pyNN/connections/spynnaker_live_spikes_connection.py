@@ -12,6 +12,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
     """ A connection for receiving and sending live spikes from and to\
         SpiNNaker
     """
+    __slots__ = []
 
     def __init__(self, receive_labels=None, send_labels=None, local_host=None,
                  local_port=19999,
@@ -34,8 +35,8 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
 
         """
         # pylint: disable=too-many-arguments
-        LiveEventConnection.__init__(
-            self, live_packet_gather_label, receive_labels, send_labels,
+        super(SpynnakerLiveSpikesConnection, self).__init__(
+            live_packet_gather_label, receive_labels, send_labels,
             local_host, local_port)
 
     def send_spike(self, label, neuron_id, send_full_keys=False):

@@ -14,6 +14,8 @@ class PushBotEthernetMotorDevice(
         PushBotEthernetDevice):
     """ The motor of a PushBot
     """
+    __slots__ = [
+        "_command_protocol"]
 
     def __init__(self, motor, protocol, timesteps_between_send=None):
         """

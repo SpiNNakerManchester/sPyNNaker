@@ -9,6 +9,7 @@ class PushBotSpiNNakerLinkLaserDevice(
         PushBotEthernetLaserDevice, ApplicationSpiNNakerLinkVertex):
     """ The Laser of a PushBot
     """
+    __slots__ = []
 
     default_parameters = {
         'n_neurons': 1, 'label': None, 'board_address': None,

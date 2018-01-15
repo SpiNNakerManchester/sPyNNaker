@@ -6,6 +6,7 @@ from spinn_utilities.abstract_base import abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractEthernetSensor(object):
+    __slots__ = []
 
     @abstractmethod
     def get_n_neurons(self):

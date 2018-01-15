@@ -13,6 +13,11 @@ from spinn_utilities.abstract_base import abstractmethod
 class PushBotEthernetDevice(AbstractMulticastControllableDevice):
     """ An arbitrary PushBot device
     """
+    __slots__ = [
+        "_device",
+        "_protocol",
+        "_time_between_send",
+        "_uses_payload"]
 
     def __init__(
             self, protocol, device, uses_payload, time_between_send):

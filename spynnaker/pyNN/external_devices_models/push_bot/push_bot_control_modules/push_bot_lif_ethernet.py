@@ -13,6 +13,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
+    __slots__ = []
 
     non_pynn_default_parameters = {'v_init': None}
 

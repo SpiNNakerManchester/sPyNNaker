@@ -10,6 +10,11 @@ from spynnaker.pyNN.external_devices_models.push_bot \
 
 class PushBotEthernetRetinaDevice(
         AbstractPushBotRetinaDevice, AbstractEthernetSensor):
+    __slots__ = [
+        "_database_connection",
+        "_injector_port",
+        "_retina_injector_label",
+        "_translator"]
 
     def __init__(
             self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,

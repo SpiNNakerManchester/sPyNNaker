@@ -57,6 +57,10 @@ class ExternalFPGARetinaDevice(
         ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
+    __slots__ = [
+        "_fixed_key",
+        "_fixed_mask",
+        "_polarity"]
 
     MODE_128 = "128"
     MODE_64 = "64"

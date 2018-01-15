@@ -7,6 +7,9 @@ class EthernetCommandConnection(DatabaseConnection):
     """ A connection that can send commands to a device at the start and end\
         of a simulation
     """
+    __slots__ = [
+        "_command_containers",
+        "_translator"]
 
     def __init__(
             self, translator, command_containers=None, local_host=None,
@@ -24,8 +27,8 @@ class EthernetCommandConnection(DatabaseConnection):
             The optional port to listen on for the stop/pause message
         """
 
-        DatabaseConnection.__init__(
-            self, start_resume_callback_function=self._start_resume_callback,
+        super(EthernetCommandConnection, self).__init__(
+            start_resume_callback_function=self._start_resume_callback,
             stop_pause_callback_function=self._stop_pause_callback,
             local_host=local_host, local_port=local_port)
 

@@ -18,6 +18,15 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         spike injector in SpiNNaker.  Note that this assumes a packet format\
         of 16-bits per retina event.
     """
+    __slots__ = [
+        "_lock",
+        "_old_data",
+        "_p_shift",
+        "_pixel_shift",
+        "_pushbot_listener",
+        "_retina_injector_label",
+        "_x_shift",
+        "_y_shift"]
 
     def __init__(
             self, retina_injector_label, pushbot_wifi_connection,

@@ -1,17 +1,16 @@
-from spinn_front_end_common.utilities.connections.live_event_connection\
-    import LiveEventConnection
-
-from spinnman.messages.eieio.eieio_type import EIEIOType
-from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinnman.messages.eieio import EIEIOType
+from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from pacman.model.decorators.overrides import overrides
-from spinnman.messages.eieio.data_messages.eieio_data_message \
-    import EIEIODataMessage
+from spinnman.messages.eieio.data_messages import EIEIODataMessage
 
 _MAX_RATES_PER_PACKET = 32
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
+    __slots__ = [
+        "_control_label_extension"]
 
     def __init__(
             self, poisson_labels=None, local_host=None, local_port=19999,
@@ -37,8 +36,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             for label in poisson_labels
         ]
 
-        LiveEventConnection.__init__(
-            self, live_packet_gather_label=None, send_labels=control_labels,
+        super(SpynnakerPoissonControlConnection, self).__init__(
+            live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
         self._control_label_extension = control_label_extension

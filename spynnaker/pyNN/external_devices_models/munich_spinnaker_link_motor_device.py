@@ -29,23 +29,31 @@ MOTOR_PARTITION_ID = "MOTOR"
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
+    __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):
-
-        ApplicationSpiNNakerLinkVertex.__init__(
-            self, n_atoms=6, spinnaker_link_id=spinnaker_link_id,
+        super(_MunichMotorDevice, self).__init__(
+            n_atoms=6, spinnaker_link_id=spinnaker_link_id,
             label="External Munich Motor", max_atoms_per_core=6,
             board_address=board_address)
 
 
 class MunichMotorDevice(
-        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
+        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
     """ An Omnibot motor control device - has a real vertex and an external\
         device vertex
     """
+    __slots__ = [
+        "_continue_if_not_different",
+        "_delay_time",
+        "_delta_threshold",
+        "_dependent_vertices",
+        "_sample_time",
+        "_speed",
+        "_update_time"]
 
     SYSTEM_REGION = 0
     PARAMS_REGION = 1
@@ -75,8 +83,7 @@ class MunichMotorDevice(
             logger.warn("The specified number of neurons for the munich motor"
                         " device has been ignored; 6 will be used instead")
 
-        ApplicationVertex.__init__(self, label)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
+        super(MunichMotorDevice, self).__init__(label)
         ProvidesKeyToAtomMappingImpl.__init__(self)
 
         self._speed = speed

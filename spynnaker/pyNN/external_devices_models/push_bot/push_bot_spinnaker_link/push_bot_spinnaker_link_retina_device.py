@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 @supports_injection
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
+    __slots__ = [
+        "_graph_mapper",
+        "_new_key_command",
+        "_routing_infos"]
 
     default_parameters = {'label': None, 'board_address': None}
 

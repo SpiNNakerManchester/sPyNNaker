@@ -8,6 +8,9 @@ from pacman.model.decorators import overrides
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl):
+    __slots__ = [
+        "_protocol",
+        "_resolution"]
 
     def __init__(self, protocol, resolution):
         ProvidesKeyToAtomMappingImpl.__init__(self)

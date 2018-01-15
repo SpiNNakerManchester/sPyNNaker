@@ -11,6 +11,7 @@ from spinn_front_end_common.abstract_models.impl\
 @add_metaclass(AbstractBase)
 class ArbitraryFPGADevice(
         ApplicationFPGAVertex, ProvidesKeyToAtomMappingImpl):
+    __slots__ = []
 
     default_parameters = {
         'board_address': None, 'label': "ArbitraryFPGADevice"}

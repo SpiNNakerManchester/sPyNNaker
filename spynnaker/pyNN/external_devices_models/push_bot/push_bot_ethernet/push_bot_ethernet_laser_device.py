@@ -14,6 +14,11 @@ class PushBotEthernetLaserDevice(
         PushBotEthernetDevice):
     """ The Laser of a PushBot
     """
+    __slots__ = [
+        "_command_protocol",
+        "_start_active_time",
+        "_start_frequency",
+        "_start_total_period"]
 
     def __init__(
             self, laser, protocol,

@@ -14,6 +14,12 @@ class PushBotEthernetLEDDevice(
         PushBotEthernetDevice):
     """ The LED of a PushBot
     """
+    __slots__ = [
+        "_command_protocol",
+        "_start_active_time_back",
+        "_start_active_time_front",
+        "_start_frequency",
+        "_start_total_period"]
 
     def __init__(
             self, led, protocol,
