@@ -19,8 +19,8 @@ static input_t input_type_get_input_value(
 //! \param[in] input_type The input type pointer to the parameters
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return The excitatory input current
-static input_t input_type_convert_excitatory_input_to_current(
-    input_t exc_input, input_type_pointer_t input_type,
+static input_t* input_type_convert_excitatory_input_to_current(
+    input_t* exc_input, input_type_pointer_t input_type,
     state_t membrane_voltage);
 
 //! \brief Converts an inhibitory input into an inhibitory current
@@ -29,8 +29,8 @@ static input_t input_type_convert_excitatory_input_to_current(
 //! \param[in] input_type The input type pointer to the parameters
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return The inhibitory input current
-static input_t input_type_convert_inhibitory_input_to_current(
-    input_t inh_input, input_type_pointer_t input_type,
+static input_t* input_type_convert_inhibitory_input_to_current(
+    input_t* inh_input, input_type_pointer_t input_type,
     state_t membrane_voltage);
 
 #endif // _INPUT_TYPE_H_
