@@ -230,8 +230,8 @@ class SpikeSourcePoisson(
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                self._N_POPULATION_RECORDING_REGIONS)],
-            n_machine_time_steps, self._minimum_buffer_sdram,
+                self._N_POPULATION_RECORDING_REGIONS) * n_machine_time_steps],
+            self._minimum_buffer_sdram,
             self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
         container.extend(recording_utilities.get_recording_resources(
@@ -260,7 +260,7 @@ class SpikeSourcePoisson(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step), 1)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
-            [buffered_sdram_per_timestep], n_machine_time_steps,
+            [buffered_sdram_per_timestep * n_machine_time_steps],
             self._minimum_buffer_sdram)
         return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
@@ -714,11 +714,10 @@ class SpikeSourcePoisson(
             SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
             .SPIKE_HISTORY_REGION.value)
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            n_machine_time_steps,
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                1)],
+                n_machine_time_steps)],
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,

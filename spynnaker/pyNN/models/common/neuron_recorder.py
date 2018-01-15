@@ -245,6 +245,25 @@ class NeuronRecorder(object):
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
 
+    def get_buffered_sdram_per_record(self, variable, slice):
+        """
+        Returns the sdram used per record
+
+        :param variable:
+        :param slice:
+        :return:
+        """
+        n_neurons = self._count_recording_per_slice(variable, slice)
+        if n_neurons == 0:
+            return 0
+        if variable == SPIKES:
+            out_spike_words = int(math.ceil(n_neurons / 32.0))
+            out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
+            return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
+        else:
+            return self.N_BYTES_FOR_TIMESTAMP + \
+                        n_neurons * self.N_BYTES_PER_VALUE
+
     def get_buffered_sdram_per_timestep(self, variable, slice):
         """
         Returns the sdram used per timestep
@@ -256,40 +275,27 @@ class NeuronRecorder(object):
         :param slice:
         :return:
         """
-        n_neurons = self._count_recording_per_slice(variable, slice)
-        if n_neurons == 0:
-            return 0
+        data_size = self.get_buffered_sdram_per_record(variable, slice)
         rate = self._sampling_rates[variable]
-        if variable == SPIKES:
-            out_spike_words = int(math.ceil(n_neurons / 32.0))
-            out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
-            data_size = self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
-        else:
-            data_size = self.N_BYTES_FOR_TIMESTAMP + \
-                        n_neurons * self.N_BYTES_PER_VALUE
         return data_size / rate
 
-    def get_extra_buffered_sdram(self, variable, slice):
+    def get_buffered_sdram(self, variable, slice, n_machine_time_steps):
         """
-        Returns the maximum extra sdram where sampling is used.
+        Returns the sdram used per timestep
 
-        The assumption here is that the there has been a previous run which
-        stopped just before the recording timestep.
-
-        Then it is run for one timestep so a whole row of data must fit.
-        This method returns the cost for a whole row
-        minus the average returned by get_buffered_sdram_per_timestep
+        In the case where sampling is used it returns the average
+        for recording and none recording based on the recording rate
 
         :param variable:
         :param slice:
         :return:
         """
+        data_size = self.get_buffered_sdram_per_record(variable, slice)
         rate = self._sampling_rates[variable]
-        if rate <= 1:
-            # No sampling so get_buffered_sdram_per_timestep was correct
-            return 0
-        per_timestep = self.get_buffered_sdram_per_timestep(variable, slice)
-        return per_timestep / rate * (rate - 1)
+        records = n_machine_time_steps / rate
+        if n_machine_time_steps % rate > 0:
+            records = records + 1
+        return data_size * records
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         return len(self._sampling_rates) * \
