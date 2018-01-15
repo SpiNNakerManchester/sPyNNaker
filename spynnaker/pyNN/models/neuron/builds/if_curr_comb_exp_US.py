@@ -171,13 +171,14 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
 
         AbstractPopulationVertex.__init__(
             self, n_neurons=n_neurons, binary="IF_curr_comb_exp_US.aplx", label=label,
-            max_atoms_per_core=IFCurrCombExp2E2I._model_based_max_atoms_per_core,
+            max_atoms_per_core=IFCurrCombExpUS._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_curr_comb_exp_US", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints, max_feasible_atoms_per_core=IFCurrCombExp2E2I._max_feasible_max_atoms_per_core)
+            threshold_type=threshold_type, constraints=constraints,
+            max_feasible_atoms_per_core=IFCurrCombExpUS._max_feasible_max_atoms_per_core)
 
     @staticmethod
     def set_model_max_atoms_per_core(
@@ -187,5 +188,5 @@ class IFCurrCombExpUS(AbstractPopulationVertex):
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrCombExp2E2I._model_based_max_atoms_per_core
+        return IFCurrCombExpUS._model_based_max_atoms_per_core
 

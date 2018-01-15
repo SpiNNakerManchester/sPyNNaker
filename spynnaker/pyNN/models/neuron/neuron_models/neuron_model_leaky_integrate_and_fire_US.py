@@ -23,17 +23,17 @@ class _LIF_US_TYPES(Enum):
 
     @property
     def data_type(self):
-        return self._data_typ
+        return self._data_type
 
 class NeuronModelLeakyIntegrateAndFireUS(NeuronModelLeakyIntegrateAndFire):
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac, V_compartment1, C_compartment1):
 
-        NeuronModelLeakyIntegrateAndFire(self, n_neurons, v_init,
+        NeuronModelLeakyIntegrateAndFire.__init__(self, n_neurons, v_init,
             v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
 
         self._data[V_COMPARTMENT1] = V_compartment1
-        sdelf._data[C_COMPARTMENT1] = C_compartment1
+        self._data[C_COMPARTMENT1] = C_compartment1
 
         self._my_units = {'V_compartment1': 'mV', 'C_compartment1': 'nF'}
 
@@ -41,17 +41,17 @@ class NeuronModelLeakyIntegrateAndFireUS(NeuronModelLeakyIntegrateAndFire):
     def V_compartment1(self):
         return self._data['V_compartment1']
 
-    @V_compartmemt1.setter
-    def V_compartment1(self, V_compartmemt1):
-        self._data.set_value(key=V_COMPARTMENT1, value=V_compartmemt1)
+    @V_compartment1.setter
+    def V_compartment1(self, V_compartment1):
+        self._data.set_value(key=V_COMPARTMENT1, value=V_compartment1)
 
     @property
     def C_compartment1(self):
         return self._data['C_compartment1']
 
-    @C_compartmemt1.setter
-    def C_compartment1(self, C_compartmemt1):
-        self._data.set_value(key=C_COMPARTMENT1, value=C_compartmemt1)
+    @C_compartment1.setter
+    def C_compartment1(self, C_compartment1):
+        self._data.set_value(key=C_COMPARTMENT1, value=C_compartment1)
 
     @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -61,8 +61,10 @@ class NeuronModelLeakyIntegrateAndFireUS(NeuronModelLeakyIntegrateAndFire):
     def get_neural_parameters(self, machine_time_step):
         params = NeuronModelLeakyIntegrateAndFire.get_neural_parameters(self)
         params.extend([
-            NeuronParameter(self._V_compartment1, _LIF_US_TYPES.V_COMPARTMENT.data_type),
-            NeuronParameter(self._C_compartment1, _LIF_US_TYPES.C_COMPARTMENT.data_type),
+            NeuronParameter(self._data[V_COMPARTMENT1],
+                            _LIF_US_TYPES.V_COMPARTMENT.data_type),
+            NeuronParameter(self._data[C_COMPARTMENT1],
+                            _LIF_US_TYPES.C_COMPARTMENT.data_type),
         ])
         return params
 
