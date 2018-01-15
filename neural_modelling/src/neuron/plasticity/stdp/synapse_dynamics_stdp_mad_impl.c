@@ -280,6 +280,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
+            
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(

@@ -5,23 +5,17 @@
 #include "../../synapses.h"
 #include "../synapse_dynamics.h"
 
-
 // Plasticity common includes
 #include "../common/maths.h"
 #include "../common/post_events.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
+
 #include <string.h>
 #include <debug.h>
 
-//// include neuron model to access struct parameters
-//#include "../../models/neuron_model_lif_v_hist_impl.h"
-//#include "../../threshold_types/threshold_type_static.h"
-
-#ifdef SYNAPSE_BENCHMARK
-  uint32_t num_plastic_pre_synaptic_events = 0;
-#endif  // SYNAPSE_BENCHMARK
+uint32_t num_plastic_pre_synaptic_events = 0;
 
 //---------------------------------------
 // Macros
@@ -73,7 +67,6 @@ static neuron_pointer_t neuron_array_plasticity;
 static additional_input_pointer_t additional_input_array_plasticity;
 static threshold_type_pointer_t threshold_type_array_plasticity;
 
-
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
@@ -82,12 +75,11 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history,
 		const uint32_t syn_type,
+        const post_event_history_t *post_event_history,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
-		threshold_type_pointer_t post_synaptic_threshold
-		) {
+        threshold_type_pointer_t post_synaptic_threshold) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -95,32 +87,36 @@ static inline final_state_t _plasticity_update_synapse(
     // Get the post-synaptic window of events to be processed
     const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
         (delayed_last_pre_time - delay_dendritic) : 0;
-
     const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
-
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
-    //log_info("Deferred syn update @t:%u", time);
-    //log_info("t:%d Ax.dly: %u, Den.dly: %u, win strt:%u, end:%u, prev t:%u, #evnts:%u", time,
-    //    delay_axonal, delay_dendritic, window_begin_time, window_end_time, post_window.prev_time,
-    //    post_window.num_events);
+    log_debug("\tPerforming deferred synapse update at time:%u", time);
+    log_debug("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
+        window_begin_time, window_end_time, post_window.prev_time,
+        post_window.num_events);
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
-        const uint32_t delayed_post_time = *post_window.next_time + delay_dendritic;
+        const uint32_t delayed_post_time = *post_window.next_time
+                                           + delay_dendritic;
+        log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
+              delayed_post_time);
+
         // Apply spike to state
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state, syn_type, post_synaptic_neuron, post_synaptic_additional_input,
-            post_synaptic_threshold);
+            current_state,  syn_type, post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
+    log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+              delayed_pre_time, post_window.prev_time);
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
@@ -143,9 +139,11 @@ static inline plastic_synapse_t* _plastic_synapses(
         sizeof(pre_event_history_t) / sizeof(uint32_t);
     static_assert(pre_event_history_size_words * sizeof(uint32_t)
                   == sizeof(pre_event_history_t),
-                  "pre_event_history_t structure sz not int 32-bit");
+                  "Size of pre_event_history_t structure should be a multiple"
+                  " of 32-bit words");
 
-    return (plastic_synapse_t*) (&plastic_region_address[pre_event_history_size_words]);
+    return (plastic_synapse_t*)
+        (&plastic_region_address[pre_event_history_size_words]);
 }
 
 //---------------------------------------
@@ -238,9 +236,7 @@ bool synapse_dynamics_process_plastic_synapses(
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
 
-#ifdef SYNAPSE_BENCHMARK
     num_plastic_pre_synaptic_events += plastic_synapse;
-#endif  // SYNAPSE_BENCHMARK
 
     // Get event history from synaptic row
     pre_event_history_t *event_history = _plastic_event_history(
@@ -261,9 +257,6 @@ bool synapse_dynamics_process_plastic_synapses(
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike_sd(time, last_pre_time,
                                                      last_pre_trace, syn_type);
-
-    //update_state_t current_state = synapse_structure_get_update_state(*plastic_words, 0);
-    //setup_params_sd(current_state);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -286,14 +279,14 @@ bool synapse_dynamics_process_plastic_synapses(
                 		&additional_input_array_plasticity[index];
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
 
-
-        // test to check variable assignment
-        log_debug("Current V = %12.6k, V_hist = %12.6k",
-        		post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
-        log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
+        // for integration test
+        log_info("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
+        		time, index, post_synaptic_threshold->threshold_value,
+				post_synaptic_neuron->V_membrane);
 
         // Create update state from the plastic synaptic word
-        update_state_t current_state = synapse_structure_get_update_state(*plastic_words, type);
+        update_state_t current_state = synapse_structure_get_update_state(
+        	*plastic_words, type);
 
         uint32_t full_delay = delay_dendritic;
 
@@ -307,12 +300,9 @@ bool synapse_dynamics_process_plastic_synapses(
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
-            delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index], type,
-			post_synaptic_neuron,
-			post_synaptic_additional_input,
-			post_synaptic_threshold
-			);
+            delay_dendritic, delay_axonal, current_state, type,
+            &post_event_history[index], post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -351,11 +341,7 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
-#ifdef SYNAPSE_BENCHMARK
     return num_plastic_pre_synaptic_events;
-#else
-    return 0;
-#endif  // SYNAPSE_BENCHMARK
 }
 
 void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
