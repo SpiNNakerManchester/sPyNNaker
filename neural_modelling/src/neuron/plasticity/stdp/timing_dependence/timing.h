@@ -20,6 +20,7 @@ static update_state_t timing_apply_pre_spike(
     uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
     pre_trace_t last_pre_trace,  uint32_t last_post_time,
     post_trace_t last_post_trace, update_state_t previous_state,
+	uint32_t syn_type,
 	neuron_pointer_t post_synaptic_neuron,
 	additional_input_pointer_t post_synaptic_additional_input,
     threshold_type_pointer_t post_synaptic_threshold);
@@ -28,6 +29,7 @@ static update_state_t timing_apply_post_spike(
     uint32_t time, post_trace_t trace, uint32_t last_pre_time,
     pre_trace_t last_pre_trace, uint32_t last_post_time,
     post_trace_t last_post_trace, update_state_t previous_state,
+	uint32_t syn_type,
 	neuron_pointer_t post_synaptic_neuron,
 	additional_input_pointer_t post_synaptic_additional_input,
     threshold_type_pointer_t post_synaptic_threshold);
