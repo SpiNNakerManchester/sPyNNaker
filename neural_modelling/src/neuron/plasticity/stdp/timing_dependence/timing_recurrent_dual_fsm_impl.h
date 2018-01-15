@@ -21,6 +21,9 @@ typedef uint16_t pre_trace_t;
 #include "../../common/stdp_typedefs.h"
 #include "random.h"
 
+// include neuron model to access struct parameters
+#include "../../../models/neuron_model_lif_v_hist_impl.h"
+
 typedef struct {
     int32_t accum_decay_per_ts;
     int32_t accum_dep_plus_one[4];
@@ -119,7 +122,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 static inline update_state_t timing_apply_pre_spike_sd(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type, uint32_t postNeuronIndex) {
+        post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type) {
     use(&trace);
     use(&last_pre_time);
     use(&last_pre_trace);
@@ -201,7 +204,9 @@ static inline update_state_t timing_apply_pre_spike_sd(
 static inline update_state_t timing_apply_post_spike_sd(
    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
    pre_trace_t last_pre_trace, uint32_t last_post_time,
-   post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type, uint32_t postNeuronIndex) {
+   post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type, 
+   additional_input_pointer_t post_synaptic_additional_input,
+   threshold_type_pointer_t post_synaptic_threshold) {
    use(&trace);
    use(&last_post_time);
    use(&last_post_trace);
@@ -253,6 +258,12 @@ static inline update_state_t timing_apply_post_spike_sd(
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
          } else {
              previous_state.accumulator = 0;
+             // SD Only update weight if we are not yet getting enough potential
+             // to fire neuron without teaching input:
+             //log_debug("Current V = %12.6k, V_hist = %12.6k",
+                   //post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
+             //log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
+
              previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                                         syn_type, STDP_FIXED_POINT_ONE);
          }

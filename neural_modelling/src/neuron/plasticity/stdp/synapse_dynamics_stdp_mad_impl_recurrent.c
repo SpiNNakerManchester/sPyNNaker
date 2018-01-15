@@ -106,7 +106,8 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike_sd(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state, type, (uint32_t) 0);
+            current_state, type, post_synaptic_additional_input, 
+            post_synaptic_threshold);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -118,7 +119,7 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike_sd(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state, type, (uint32_t) 0);
+        post_window.prev_time, post_window.prev_trace, current_state, type);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -245,11 +246,6 @@ bool synapse_dynamics_process_plastic_synapses(
         // Get the synapse type from the first synapse in the row:
         syn_type = synapse_row_sparse_type(*control_words);
     }
-
-    // XXX SD reduce number of times inhib-2 synapaes get updated:
-    //if (syn_type == 3 && mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1)>(accum)0.01)
-    //if (syn_type == 3)
-    //   return true;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
