@@ -304,7 +304,10 @@ class NeuronRecorder(object):
         """
         data_size = self.get_buffered_sdram_per_record(variable, slice)
         rate = self._sampling_rates[variable]
-        return data_size / rate
+        if rate == 0:
+            return 0
+        else:
+            return data_size / rate
 
     def get_buffered_sdram(self, variable, slice, n_machine_time_steps):
         """
@@ -317,8 +320,10 @@ class NeuronRecorder(object):
         :param slice:
         :return:
         """
-        data_size = self.get_buffered_sdram_per_record(variable, slice)
         rate = self._sampling_rates[variable]
+        if rate == 0:
+            return 0
+        data_size = self.get_buffered_sdram_per_record(variable, slice)
         records = n_machine_time_steps / rate
         if n_machine_time_steps % rate > 0:
             records = records + 1
