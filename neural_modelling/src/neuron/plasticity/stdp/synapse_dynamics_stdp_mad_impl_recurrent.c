@@ -15,9 +15,9 @@
 #include <string.h>
 #include <debug.h>
 
-// include neuron model to access struct parameters
-#include "../../models/neuron_model_lif_v_hist_impl.h"
-#include "../../threshold_types/threshold_type_static.h"
+//// include neuron model to access struct parameters
+//#include "../../models/neuron_model_lif_v_hist_impl.h"
+//#include "../../threshold_types/threshold_type_static.h"
 
 #ifdef SYNAPSE_BENCHMARK
   uint32_t num_plastic_pre_synaptic_events = 0;
@@ -82,7 +82,8 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history, const uint32_t type,
+        const post_event_history_t *post_event_history,
+		const uint32_t syn_type,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
 		threshold_type_pointer_t post_synaptic_threshold
@@ -109,10 +110,10 @@ static inline final_state_t _plasticity_update_synapse(
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time + delay_dendritic;
         // Apply spike to state
-        current_state = timing_apply_post_spike_sd(
+        current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state, type, post_synaptic_additional_input,
+            current_state, syn_type, post_synaptic_neuron, post_synaptic_additional_input,
             post_synaptic_threshold);
 
         // Go onto next event
@@ -123,9 +124,11 @@ static inline final_state_t _plasticity_update_synapse(
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
-    current_state = timing_apply_pre_spike_sd(
+    current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state, type);
+        post_window.prev_time, post_window.prev_trace, current_state, syn_type,
+		post_synaptic_neuron, post_synaptic_additional_input,
+		post_synaptic_threshold);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);

@@ -75,7 +75,7 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-		uint16_t syn_type,
+		const uint32_t syn_type,
         const post_event_history_t *post_event_history,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
@@ -107,8 +107,8 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state,  post_synaptic_neuron, post_synaptic_additional_input,
-			post_synaptic_threshold);
+            current_state,  syn_type, post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -122,7 +122,7 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state,
+        post_window.prev_time, post_window.prev_trace, current_state, syn_type,
 		post_synaptic_neuron, post_synaptic_additional_input,
 		post_synaptic_threshold);
 
@@ -284,7 +284,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
-            delay_dendritic, delay_axonal, current_state,
+            delay_dendritic, delay_axonal, current_state, type,
             &post_event_history[index], post_synaptic_neuron,
 			post_synaptic_additional_input, post_synaptic_threshold);
 

@@ -11,7 +11,6 @@ typedef uint16_t pre_trace_t;
 
 #include "timing.h"
 #include "../weight_dependence/weight_one_term.h"
-#include "../../../threshold_types/threshold_type_static.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -21,8 +20,6 @@ typedef uint16_t pre_trace_t;
 #include "../../common/stdp_typedefs.h"
 #include "random.h"
 
-// include neuron model to access struct parameters
-#include "../../../models/neuron_model_lif_v_hist_impl.h"
 
 typedef struct {
     int32_t accum_decay_per_ts;
@@ -79,7 +76,9 @@ static inline post_trace_t timing_get_initial_post_trace() {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-
+	use(&time);
+	use(&last_time);
+	use(&last_trace);
 	// can't create post windows here, as don't have access to synapse type.
 
     return 0; // Return window_length;
@@ -119,10 +118,11 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 // 3) Check if there was a post-spike window open at the time that this pre-spike was detected
 //    in which case we decrement the accumulator and perhaps perform synaptic depression.
 
-static inline update_state_t timing_apply_pre_spike_sd(
+static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type,
+        post_trace_t last_post_trace, update_state_t previous_state,
+        uint32_t syn_type,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
         threshold_type_pointer_t post_synaptic_threshold){
@@ -130,6 +130,11 @@ static inline update_state_t timing_apply_pre_spike_sd(
     use(&trace);
     use(&last_pre_time);
     use(&last_pre_trace);
+    use(&last_post_trace);
+    use(&syn_type);
+    use(&post_synaptic_neuron);
+    use(&post_synaptic_additional_input);
+    use(&post_synaptic_threshold);
 
 	// Decay accum value so that long periods without spikes cause it to forget:
     uint32_t time_since_last_event = time - last_event_time;
@@ -205,16 +210,22 @@ static inline update_state_t timing_apply_pre_spike_sd(
 //               c) set the pre_found_post flag, equivalent to clearing the pore_waiting_post
 //                  state machine back to idle (later post spikes will not cause an accum increment
 //                  until a new pre-spike has arrived).
-static inline update_state_t timing_apply_post_spike_sd(
+static inline update_state_t timing_apply_post_spike(
+
    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
    pre_trace_t last_pre_trace, uint32_t last_post_time,
-   post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type,
+   post_trace_t last_post_trace, update_state_t previous_state,
+    uint32_t syn_type,
    neuron_pointer_t post_synaptic_neuron,
    additional_input_pointer_t post_synaptic_additional_input,
    threshold_type_pointer_t post_synaptic_threshold) {
    use(&trace);
    use(&last_post_time);
    use(&last_post_trace);
+   use(&syn_type);
+   use(&post_synaptic_neuron);
+   use(&post_synaptic_additional_input);
+   use(&post_synaptic_threshold);
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
@@ -295,7 +306,7 @@ static inline weight_t weight_update_sub( weight_state_t state) {
 
 static inline weight_state_t weight_one_term_apply_potentiation_sd(
    weight_state_t state, uint32_t syn_type, int32_t potentiation) {
-
+   use(&syn_type);
    old_w = state.weight;
    int32_t scale = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
@@ -310,7 +321,7 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
 
 static inline weight_state_t weight_one_term_apply_depression_sd(
    weight_state_t state, uint32_t syn_type, int32_t depression) {
-
+   use(&syn_type);
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
                    //state.weight_region->a2_minus, 15);

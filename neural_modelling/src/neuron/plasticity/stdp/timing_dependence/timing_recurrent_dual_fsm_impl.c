@@ -1,5 +1,6 @@
 #include "timing_recurrent_dual_fsm_impl.h"
 #include "random.h"
+#include <string.h>
 
 //---------------------------------------
 // Globals
