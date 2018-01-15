@@ -8,10 +8,7 @@
 #include "../additional_inputs/additional_input.h"
 #include "../threshold_types/threshold_type.h"
 
-// Get access to the neuron data
-static neuron_pointer_t neuron_array_stdp;
-static additional_input_pointer_t additional_input_array_stdp;
-static threshold_type_pointer_t threshold_type_array_stdp;
+
 
 bool synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,

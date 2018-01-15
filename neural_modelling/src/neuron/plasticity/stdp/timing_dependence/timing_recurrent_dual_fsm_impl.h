@@ -58,8 +58,8 @@ extern uint32_t last_spike;
 
 extern uint32_t recurrentSeed[4];
 
-extern accum *last_voltage;
-extern accum *voltage_before_last_spike;
+//extern accum *last_voltage;
+//extern accum *voltage_before_last_spike;
 extern threshold_type_pointer_t threshold_type_array;
 
 int32_t old_w;
@@ -122,7 +122,11 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 static inline update_state_t timing_apply_pre_spike_sd(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type) {
+        post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type,
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input,
+        threshold_type_pointer_t post_synaptic_threshold){
+
     use(&trace);
     use(&last_pre_time);
     use(&last_pre_trace);
@@ -204,7 +208,8 @@ static inline update_state_t timing_apply_pre_spike_sd(
 static inline update_state_t timing_apply_post_spike_sd(
    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
    pre_trace_t last_pre_trace, uint32_t last_post_time,
-   post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type, 
+   post_trace_t last_post_trace, update_state_t previous_state, uint32_t syn_type,
+   neuron_pointer_t post_synaptic_neuron,
    additional_input_pointer_t post_synaptic_additional_input,
    threshold_type_pointer_t post_synaptic_threshold) {
    use(&trace);
