@@ -11,7 +11,6 @@ class NeuronRecorder(AbstractUInt32Recorder):
         "_record"]
 
     def __init__(self, allowed_variables):
-        AbstractUInt32Recorder.__init__(self)
         self._record = dict()
         for variable in allowed_variables:
             self._record[variable] = False

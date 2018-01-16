@@ -14,23 +14,20 @@ class AbstractUInt32Recorder(object):
     N_BYTES_PER_NEURON = 4
     N_CPU_CYCLES_PER_NEURON = 4
 
-    def __init__(self):
-        pass
-
     @staticmethod
     def get_data(
             label, buffer_manager, region, placements, graph_mapper,
             application_vertex, machine_time_step, variable,
             n_machine_time_steps):
         """ method for reading a uint32 mapped to time and neuron ids from\
-        the SpiNNaker machine
+            the SpiNNaker machine
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
         :param region: the dsg region id used for this data
         :param placements: the placements object
-        :param graph_mapper: the mapping between application and machine\
-            vertices
+        :param graph_mapper: \
+            the mapping between application and machine vertices
         :param application_vertex:
         :param machine_time_step:
         :param variable:
@@ -51,51 +48,14 @@ class AbstractUInt32Recorder(object):
             placement = placements.get_placement_of_vertex(vertex)
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_data = \
-                buffer_manager.get_data_for_vertex(placement, region)
-            if missing_data:
-                missing.append(placement)
-            record_raw = neuron_param_region_data_pointer.read_all()
-            record_length = len(record_raw)
-            n_rows = record_length / ((vertex_slice.n_atoms + 1) * 4)
-            record = (numpy.asarray(record_raw, dtype="uint8").
-                      view(dtype="<i4")).reshape((n_rows,
-                                                  (vertex_slice.n_atoms + 1)))
-            split_record = numpy.array_split(record, [1, 1], 1)
-            record_time = numpy.repeat(
-                split_record[0] * float(ms_per_tick), vertex_slice.n_atoms, 1)
-            record_ids = numpy.tile(
-                numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
-                len(record_time)).reshape((-1, vertex_slice.n_atoms))
-            record_membrane_potential = (
-                split_record[2] / float(DataType.S1615.scale))
-
-            part_data = numpy.dstack(
-                [record_ids, record_time, record_membrane_potential])
-            part_data = numpy.reshape(part_data, [-1, 3])
-            data.append(part_data)
+            split_record, missing_data = AbstractUInt32Recorder._read_data(
+                buffer_manager, vertex_slice, placement, region, ms_per_tick,
+                data, missing)
 
             # Fill in any missing data
             if missing_data:
-                records_without_data = all_times[numpy.invert(
-                    numpy.isin(all_times, split_record[0].flatten()))]
-                times_without_data = numpy.repeat(
-                    records_without_data, vertex_slice.n_atoms).reshape(
-                        (-1, vertex_slice.n_atoms))
-                ids_without_data = numpy.tile(
-                    numpy.arange(
-                        vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
-                    len(records_without_data)).reshape(
-                            (-1, vertex_slice.n_atoms))
-                values_without_data = numpy.repeat(
-                    numpy.nan,
-                    len(records_without_data) * vertex_slice.n_atoms).reshape(
-                        (-1, vertex_slice.n_atoms))
-                missing_values = numpy.dstack(
-                    [ids_without_data, times_without_data,
-                     values_without_data])
-                missing_values = numpy.reshape(missing_values, [-1, 3])
-                data.append(missing_values)
+                data.append(AbstractUInt32Recorder._fill_in_missing_data(
+                    vertex_slice, all_times, split_record))
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
@@ -106,3 +66,47 @@ class AbstractUInt32Recorder(object):
         order = numpy.lexsort((data[:, 1], data[:, 0]))
         result = data[order]
         return result
+
+    @staticmethod
+    def _read_data(
+            buffer_manager, vertex_slice, placement, region, ms_per_tick,
+            data, missing):
+        neuron_param_region, missing_data = \
+            buffer_manager.get_data_for_vertex(placement, region)
+        if missing_data:
+            missing.append(placement)
+        record_raw = neuron_param_region.read_all()
+        n_rows = len(record_raw) / ((vertex_slice.n_atoms + 1) * 4)
+        record = numpy.asarray(record_raw, dtype="uint8").view(
+            dtype="<i4").reshape((n_rows, vertex_slice.n_atoms + 1))
+        split_record = numpy.array_split(record, [1, 1], 1)
+        record_time = numpy.repeat(
+            split_record[0] * float(ms_per_tick), vertex_slice.n_atoms, 1)
+        record_ids = numpy.tile(
+            numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
+            len(record_time)).reshape((-1, vertex_slice.n_atoms))
+        record_membrane_potential = (
+            split_record[2] / float(DataType.S1615.scale))
+
+        part_data = numpy.dstack(
+            [record_ids, record_time, record_membrane_potential])
+        data.append(numpy.reshape(part_data, [-1, 3]))
+        return split_record, missing_data
+
+    @staticmethod
+    def _fill_in_missing_data(vertex_slice, all_times, split_record):
+        records_without_data = all_times[numpy.invert(
+            numpy.isin(all_times, split_record[0].flatten()))]
+        times_without_data = numpy.repeat(
+            records_without_data, vertex_slice.n_atoms).reshape(
+                (-1, vertex_slice.n_atoms))
+        ids_without_data = numpy.tile(
+            numpy.arange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1),
+            len(records_without_data)).reshape((-1, vertex_slice.n_atoms))
+        values_without_data = numpy.repeat(
+            numpy.nan,
+            len(records_without_data) * vertex_slice.n_atoms).reshape(
+                (-1, vertex_slice.n_atoms))
+        missing_values = numpy.dstack(
+            [ids_without_data, times_without_data, values_without_data])
+        return numpy.reshape(missing_values, [-1, 3])
