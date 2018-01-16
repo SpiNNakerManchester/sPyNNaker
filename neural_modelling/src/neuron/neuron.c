@@ -52,8 +52,6 @@ static uint32_t n_neurons;
 //! The recording flags
 static uint32_t recording_flags;
 
-//static uint32_t cyab_counter;
-
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
@@ -129,7 +127,7 @@ typedef enum parmeters_in_neuron_parameter_data_region {
 static inline void _print_neurons() {
 
 //! only if the models are compiled in debug mode will this method contain
-//! said lines.neuron_t
+//! said lines
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
