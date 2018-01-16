@@ -134,10 +134,10 @@ class RecordingCommon(object):
 
     def _get_recorded_matrix(self, variable):
         """ method that contains all the safety checks and gets the recorded
-        data from the vertex in matrix format
+            data from the vertex in matrix format
 
         :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v'
+            are :'gsyn_exc', 'gsyn_inh', 'v'
         :return: the data
         """
         timer = Timer()
