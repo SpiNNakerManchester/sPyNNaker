@@ -59,7 +59,11 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def get_spikes_sampling_interval(self):
-        """
-        Returns the current sampling interval for spikes
+        """ Returns the current sampling interval for spikes
         :return: Sampling interval in micro seconds
+
+        if self.is_recording_spikes():
+            return globals_variables.get_simulator().machine_time_step / 1000
+        else:
+            return 0
         """

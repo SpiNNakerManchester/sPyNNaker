@@ -37,14 +37,14 @@ class RecordingCommon(object):
         self._indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval=None, to_file=None,
+    def _record(self, variable, sampling_interval=None, to_file=None,
                 indexes=None):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
         are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
-        :param new_ids:  ids to record
         :param sampling_interval: the interval to record them
+        :param indexes: List of indexes to record or None for all
         :return:  None
         """
 
@@ -63,14 +63,6 @@ class RecordingCommon(object):
 
         # Get bit array of indices to record for this variable
         indices = self._indices_to_record[variable]
-
-        # Loop through the new ids
-        for new_id in new_ids:
-            # Convert to index
-            new_index = self._population.id_to_index(new_id)
-
-            # Set this bit in indices
-            indices[new_index] = True
 
         if variable == "gsyn_exc":
             if not isinstance(self._population._vertex.input_type,

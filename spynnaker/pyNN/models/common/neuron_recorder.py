@@ -67,7 +67,7 @@ class NeuronRecorder(object):
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, n_machine_time_steps):
         """ method for reading a uint32 mapped to time and neuron ids from\
-        the SpiNNaker machine
+            the SpiNNaker machine
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
@@ -113,7 +113,10 @@ class NeuronRecorder(object):
             record = (numpy.asarray(record_raw, dtype="uint8").
                       view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
             # Check if you have the expected data
-            if missing_data or n_rows != expected_rows:
+            if not missing_data and n_rows == expected_rows:
+                # Just cut the timestamps off to get the fragment
+                fragment = (record[:, 1:] / float(DataType.S1615.scale))
+            else:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
                 # Start the fragment for this slice empty
@@ -128,9 +131,6 @@ class NeuronRecorder(object):
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
-            else:
-                # Just cut the timestamps off to get the fragment
-                fragment = (record[:, 1:] / float(DataType.S1615.scale))
             if data is None:
                 data = fragment
             else:
@@ -232,32 +232,31 @@ class NeuronRecorder(object):
 
     def _compute_rate(self, new_state, sampling_interval):
         """
-        Converts a simpling interval into a rate
+        Converts a sampling interval into a rate
 
         Remember machine time step is in nano seconds
 
         :param sampling_interval: interval between samples in micro seconds
         :return: rate
         """
-        if new_state:
-            if sampling_interval is None:
-                return 1
-
-            step = globals_variables.get_simulator().machine_time_step / 1000
-            rate = int(sampling_interval / step)
-            if sampling_interval != rate * step:
-                msg = "sampling_interval {} is not an an integer " \
-                      "multiple of the simulation timestep {}" \
-                      "".format(sampling_interval, step)
-                raise fec_excceptions.ConfigurationException(msg)
-            if rate > self.MAX_RATE:
-                msg = "sampling_interval {} higher than max allowed which is {}" \
-                      "".format(sampling_interval, step * self.MAX_RATE)
-                raise fec_excceptions.ConfigurationException(msg)
-            return rate
-
-        else:
+        if not new_state:
             return 0
+
+        step = globals_variables.get_simulator().machine_time_step / 1000
+        if sampling_interval is None:
+            return step
+
+        rate = int(sampling_interval / step)
+        if sampling_interval != rate * step:
+            msg = "sampling_interval {} is not an an integer " \
+                  "multiple of the simulation timestep {}" \
+                  "".format(sampling_interval, step)
+            raise fec_excceptions.ConfigurationException(msg)
+        if rate > self.MAX_RATE:
+            msg = "sampling_interval {} higher than max allowed which is {}" \
+                  "".format(sampling_interval, step * self.MAX_RATE)
+            raise fec_excceptions.ConfigurationException(msg)
+        return rate
 
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):
@@ -272,18 +271,22 @@ class NeuronRecorder(object):
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)
 
-    def get_buffered_sdram_per_record(self, variable, slice):
+    def get_buffered_sdram_per_record(self, variable, vertex_slice):
         """
         Returns the sdram used per record
 
         :param variable:
-        :param slice:
+        :param vertex_slice:
         :return:
         """
-        n_neurons = self._count_recording_per_slice(variable, slice)
+        n_neurons = self._count_recording_per_slice(variable, vertex_slice)
         if n_neurons == 0:
             return 0
         if variable == SPIKES:
+            if n_neurons < vertex_slice.n_atoms:
+                # Indexing is used rather than gating to dettermine recording
+                # Non recoding neurons write to an extra slot
+                n_neurons += 1
             out_spike_words = int(math.ceil(n_neurons / 32.0))
             out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
@@ -291,7 +294,7 @@ class NeuronRecorder(object):
             return self.N_BYTES_FOR_TIMESTAMP + \
                         n_neurons * self.N_BYTES_PER_VALUE
 
-    def get_buffered_sdram_per_timestep(self, variable, slice):
+    def get_buffered_sdram_per_timestep(self, variable, vertex_slice):
         """
         Returns the sdram used per timestep
 
@@ -299,17 +302,17 @@ class NeuronRecorder(object):
         for recording and none recording based on the recording rate
 
         :param variable:
-        :param slice:
+        :param vertex_slice:
         :return:
         """
-        data_size = self.get_buffered_sdram_per_record(variable, slice)
+        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
         rate = self._sampling_rates[variable]
         if rate == 0:
             return 0
         else:
             return data_size / rate
 
-    def get_buffered_sdram(self, variable, slice, n_machine_time_steps):
+    def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
         """
         Returns the sdram used per timestep
 
@@ -317,13 +320,13 @@ class NeuronRecorder(object):
         for recording and none recording based on the recording rate
 
         :param variable:
-        :param slice:
+        :param vertex_slice:
         :return:
         """
         rate = self._sampling_rates[variable]
         if rate == 0:
             return 0
-        data_size = self.get_buffered_sdram_per_record(variable, slice)
+        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
         records = n_machine_time_steps / rate
         if n_machine_time_steps % rate > 0:
             records = records + 1
@@ -375,13 +378,13 @@ class NeuronRecorder(object):
         return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
                 len(self.recording_variables)
 
-    def get_global_parameters(self, slice):
+    def get_global_parameters(self, vertex_slice):
         params = []
         for variable in self._sampling_rates:
             params.append(NeuronParameter(
                 self._sampling_rates[variable], DataType.UINT32))
         for variable in self._sampling_rates:
-            n_recording = self._count_recording_per_slice(variable, slice)
+            n_recording = self._count_recording_per_slice(variable, vertex_slice)
             params.append(NeuronParameter(n_recording, DataType.UINT8))
         return params
 
