@@ -4,6 +4,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from pacman.model.decorators.overrides import overrides
 from spinnman.messages.eieio.data_messages import EIEIODataMessage
+from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
 _MAX_RATES_PER_PACKET = 32
 
@@ -13,18 +14,18 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         "_control_label_extension"]
 
     def __init__(
-            self, poisson_labels=None, local_host=None, local_port=19999,
+            self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,
             control_label_extension="_control"):
         """
 
         :param poisson_labels: Labels of Poisson populations to be controlled
         :type poisson_labels: iterable of str
         :param local_host: Optional specification of the local hostname or\
-                    ip address of the interface to listen on
+            IP address of the interface to listen on
         :type local_host: str
         :param local_port: Optional specification of the local port to listen\
-                    on.  Must match the port that the toolchain will send the\
-                    notification on (19999 by default)
+            on.  Must match the port that the toolchain will send the\
+            notification on (19999 by default)
         :type local_port: int
         :param control_label_extension:\
             The extra name added to the label of each Poisson source

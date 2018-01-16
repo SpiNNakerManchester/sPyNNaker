@@ -1,5 +1,6 @@
 from spinn_front_end_common.abstract_models \
     import AbstractSendMeMulticastCommandsVertex
+from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 from spinn_front_end_common.utilities.database import DatabaseConnection
 
 
@@ -13,7 +14,7 @@ class EthernetCommandConnection(DatabaseConnection):
 
     def __init__(
             self, translator, command_containers=None, local_host=None,
-            local_port=19999):
+            local_port=NOTIFY_PORT):
         """
 
         :param translator:\

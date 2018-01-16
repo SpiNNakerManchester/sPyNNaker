@@ -1,4 +1,5 @@
 from spinn_front_end_common.utilities.connections import LiveEventConnection
+from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
 
 # The maximum number of 32-bit keys that will fit in a packet
@@ -15,7 +16,7 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
     __slots__ = []
 
     def __init__(self, receive_labels=None, send_labels=None, local_host=None,
-                 local_port=19999,
+                 local_port=NOTIFY_PORT,
                  live_packet_gather_label="LiveSpikeReceiver"):
         """
 
