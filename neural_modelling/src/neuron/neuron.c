@@ -67,9 +67,7 @@ typedef struct global_record_params_t {
 
 } global_record_params_t;
 
-typedef struct global_record_params_t* global_record_params_pointer_t;
-
-static global_record_params_pointer_t global_record_params;
+static global_record_params_t* global_record_params;
 
 typedef struct indexes_t {
     uint8_t spike;
@@ -78,9 +76,7 @@ typedef struct indexes_t {
     uint8_t inh;
 } indexes_t;
 
-typedef struct indexes_t* indexes_pointer_t;
-
-static indexes_pointer_t indexes_array;
+static indexes_t* indexes_array;
 
 uint32_t spike_index;
 uint32_t spike_increment;
@@ -225,7 +221,7 @@ bool _neuron_load_neuron_parameters(address_t address){
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-    //    indexes_pointer_t indexes = &indexes_array[neuron_index];
+    //    indexes_t indexes = &indexes_array[neuron_index];
     //    log_info("neuron = %u, spike index = %u, v index = %u,"
     //        "exc index = %u, inh index = %u", neuron_index,
     //        indexes->spike, indexes->v,
@@ -535,7 +531,7 @@ void neuron_do_timestep_update(timer_t time) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
-        indexes_pointer_t indexes = &indexes_array[neuron_index];
+        indexes_t* indexes = &indexes_array[neuron_index];
 
         // Get the parameters for this neuron
         neuron_pointer_t neuron = &neuron_array[neuron_index];
