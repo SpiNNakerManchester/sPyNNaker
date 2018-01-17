@@ -119,10 +119,10 @@ class SynapticManager(object):
             pass
 
         # Otherwise, the dynamics must be equal
-        #elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
-        #    raise exceptions.SynapticConfigurationException(
-        #        "Synapse dynamics must match exactly when using multiple edges"
-        #        "to the same population")
+        elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
+            raise SynapticConfigurationException(
+                "Synapse dynamics must match exactly when using multiple edges"
+                "to the same population")
 
     @property
     def synapse_type(self):
@@ -506,6 +506,9 @@ class SynapticManager(object):
         # power, as range is 0 - (just under 2^max_weight_power)!
         max_weight_powers = (w + 1 if (2 ** w) <= a else w
                              for w, a in zip(max_weight_powers, max_weights))
+
+        max_weight_powers = (12 if w >= 12 else w
+                             for w in max_weight_powers)
 
         # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows
