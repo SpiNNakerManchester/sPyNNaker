@@ -102,6 +102,10 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = new_state
 
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return globals_variables.get_simulator().machine_time_step
+
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
@@ -123,6 +127,7 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeInjector.SPIKE_RECORDING_REGION_ID)
+
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

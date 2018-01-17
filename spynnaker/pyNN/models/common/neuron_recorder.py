@@ -258,6 +258,30 @@ class NeuronRecorder(object):
             raise fec_excceptions.ConfigurationException(msg)
         return rate
 
+    def check_indexes(self, indexes):
+        if indexes is None:
+            return
+
+        if len(indexes) == 0:
+            msg = "Empty indexes list"
+            raise fec_excceptions.ConfigurationException(msg)
+
+        found = False
+        warning = None
+        for index in indexes:
+            if index < 0:
+                msg = "Negative indexes are not supported"
+                raise fec_excceptions.ConfigurationException(msg)
+            elif index >= self._n_neurons:
+                warning = "Ignoring indexes greater than population size."
+            else:
+                found = True
+            if warning is not None:
+                logger.warning(warning)
+        if not found:
+            msg = "All indexes larger than population size"
+            raise fec_excceptions.ConfigurationException(msg)
+
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):
         if variable == "all":
@@ -266,6 +290,7 @@ class NeuronRecorder(object):
         elif variable in self._sampling_rates:
             self._sampling_rates[variable] = \
                     self._compute_rate(new_state, sampling_interval)
+            self.check_indexes(indexes)
             self._indexes[variable] = indexes
         else:
             msg = "Variable {} is not supported ".format(variable)
