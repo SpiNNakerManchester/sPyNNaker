@@ -139,8 +139,6 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-        AbstractContainsUnits.__init__(self)
 
         self._units = {
             'spikes': 'spikes',

@@ -6,11 +6,7 @@ from spinn_utilities.abstract_base import \
 
 @add_metaclass(AbstractBase)
 class AbstractWeightDependence(object):
-
     __slots__ = ()
-
-    def __init__(self):
-        pass
 
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data

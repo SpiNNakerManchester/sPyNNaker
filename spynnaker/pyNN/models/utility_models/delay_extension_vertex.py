@@ -26,7 +26,7 @@ from spinn_front_end_common.abstract_models \
     import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 logger = logging.getLogger(__name__)
 
@@ -44,6 +44,12 @@ class DelayExtensionVertex(
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
+    __slots__ = [
+        "_delay_blocks",
+        "_delay_per_stage",
+        "_n_atoms",
+        "_n_delay_stages",
+        "_source_vertex"]
 
     _n_vertices = 0
 
@@ -53,9 +59,7 @@ class DelayExtensionVertex(
         """Creates a new DelayExtension Object.
         """
         # pylint: disable=too-many-arguments
-        ApplicationVertex.__init__(self, label, constraints, 256)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        AbstractProvidesNKeysForPartition.__init__(self)
+        super(DelayExtensionVertex, self).__init__(label, constraints, 256)
 
         self._source_vertex = source_vertex
         self._n_delay_stages = 0
@@ -144,9 +148,8 @@ class DelayExtensionVertex(
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_slice(vertex)
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = \
-            4 * (_DELAY_PARAM_HEADER_WORDS +
-                 (self._n_delay_stages * n_words_per_stage))
+        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
+                               (self._n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
@@ -164,7 +167,7 @@ class DelayExtensionVertex(
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
         key = routing_infos.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
+            vertex, SPIKE_PARTITION_ID)
 
         incoming_key = None
         incoming_mask = None

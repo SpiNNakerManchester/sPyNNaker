@@ -49,7 +49,7 @@ class PopulationMachineVertex(
         3: "PROCESS_FIXED_SYNAPSES",
         4: "PROCESS_PLASTIC_SYNAPSES"}
 
-    N_ADDITIONAL_PROVENANCE_DATA_ITEMS = 4
+    N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram_usage,

@@ -38,8 +38,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         "_n_neurons"]
 
     def __init__(self, n_neurons, tau_ca2, i_ca2, i_alpha):
-        AbstractAdditionalInput.__init__(self)
-
         self._n_neurons = n_neurons
         self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[TAU_CA2] = tau_ca2

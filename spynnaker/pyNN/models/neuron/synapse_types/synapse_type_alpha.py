@@ -57,8 +57,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         # pylint: disable=too-many-arguments
-
-        AbstractSynapseType.__init__(self)
         self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[EXC_RESPONSE] = exc_response
         self._data[EXC_EXP_RESPONSE] = exc_exp_response

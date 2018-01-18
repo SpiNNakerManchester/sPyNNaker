@@ -5,9 +5,6 @@ import numpy
 class SynapseStructureWeightOnly(AbstractSynapseStructure):
     __slots__ = ()
 
-    def __init__(self):
-        AbstractSynapseStructure.__init__(self)
-
     def get_n_bytes_per_connection(self):
         return 2
 

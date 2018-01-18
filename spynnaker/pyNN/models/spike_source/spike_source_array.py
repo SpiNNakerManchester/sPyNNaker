@@ -96,11 +96,6 @@ class SpikeSourceArray(
             buffer_notification_port=self._port,
             buffer_notification_tag=tag)
 
-        AbstractSpikeRecordable.__init__(self)
-        SimplePopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-
         # handle recording
         self._spike_recorder = EIEIOSpikeRecorder()
         self._spike_recorder_buffer_size = spike_recorder_buffer_size

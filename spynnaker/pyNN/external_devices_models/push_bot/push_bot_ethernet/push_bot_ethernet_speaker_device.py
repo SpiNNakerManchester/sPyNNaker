@@ -10,8 +10,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
 
 
 class PushBotEthernetSpeakerDevice(
-        AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl,
-        PushBotEthernetDevice):
+        PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex,
+        ProvidesKeyToAtomMappingImpl):
     """ The Speaker of a PushBot
     """
     __slots__ = [
@@ -42,9 +42,8 @@ class PushBotEthernetSpeakerDevice(
             raise ConfigurationException(
                 "speaker parameter must be a PushBotSpeaker value")
 
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-        PushBotEthernetDevice.__init__(
-            self, protocol, speaker, True, timesteps_between_send)
+        super(PushBotEthernetSpeakerDevice, self).__init__(
+            protocol, speaker, True, timesteps_between_send)
 
         # protocol specific data items
         self._command_protocol = protocol
@@ -83,16 +82,10 @@ class PushBotEthernetSpeakerDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        commands = list()
-        commands.append(
-            self._command_protocol.push_bot_speaker_config_total_period(
-                total_period=0))
-        commands.append(
-            self._command_protocol.push_bot_speaker_config_active_time(
-                active_time=0))
-        commands.append(self._command_protocol.push_bot_speaker_set_tone(
-            frequency=0))
-        return commands
+        return [
+            self._command_protocol.push_bot_speaker_config_total_period(0),
+            self._command_protocol.push_bot_speaker_config_active_time(0),
+            self._command_protocol.push_bot_speaker_set_tone(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

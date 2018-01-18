@@ -15,7 +15,6 @@ class SynapseTypeDelta(AbstractSynapseType):
         "_data"]
 
     def __init__(self, n_neurons, initial_input_exc, initial_input_inh):
-        AbstractSynapseType.__init__(self)
         self._data = SpynakkerRangeDictionary(size=n_neurons)
         self._data[INITIAL_INPUT_EXC] = initial_input_exc
         self._data[INITIAL_INPUT_INH] = initial_input_inh

@@ -91,7 +91,7 @@ class ExternalFPGARetinaDevice(
         self._polarity = polarity
         self._fixed_key = (retina_key & 0xFFFF) << 16
         self._fixed_mask = 0xFFFF8000
-        if polarity == ExternalFPGARetinaDevice.UP_POLARITY:
+        if polarity == self.UP_POLARITY:
             self._fixed_key |= 0x4000
 
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
@@ -99,14 +99,12 @@ class ExternalFPGARetinaDevice(
 
         if fixed_n_neurons != n_neurons and n_neurons is not None:
             logger.warn("The specified number of neurons for the FPGA retina"
-                        " device has been ignored %d will be used instead",
+                        " device has been ignored; %d will be used instead",
                         fixed_n_neurons)
-        ApplicationSpiNNakerLinkVertex.__init__(
-            self, n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+        super(ExternalFPGARetinaDevice, self).__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, max_atoms_per_core=fixed_n_neurons,
             board_address=board_address)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
 
     def _get_mask(self, mode):
         if mode == ExternalFPGARetinaDevice.MODE_128:
@@ -149,15 +147,13 @@ class ExternalFPGARetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
         return [MultiCastCommand(
-            key=0x0000FFFF, payload=1, repeat=5,
-            delay_between_repeats=100)]
+            key=0x0000FFFF, payload=1, repeat=5, delay_between_repeats=100)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [MultiCastCommand(
-            key=0x0000FFFE, payload=0, repeat=5,
-            delay_between_repeats=100)]
+            key=0x0000FFFE, payload=0, repeat=5, delay_between_repeats=100)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
@@ -165,5 +161,5 @@ class ExternalFPGARetinaDevice(
         return []
 
     def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint(
-            [BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
+        return [FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]

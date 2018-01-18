@@ -24,8 +24,8 @@ class EthernetControlConnection(EIEIOConnection):
         :param local_host: The optional host to listen on
         :param local_port: The optional port to listen on
         """
-        EIEIOConnection.__init__(
-            self, local_host=local_host, local_port=local_port)
+        super(EthernetControlConnection, self).__init__(
+            local_host=local_host, local_port=local_port)
         thread = Thread(name="Ethernet Control Connection on {}:{}".format(
             self.local_ip_address, self.local_port), target=self.run)
         thread.daemon = True

@@ -10,8 +10,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
 
 
 class PushBotEthernetLaserDevice(
-        AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl,
-        PushBotEthernetDevice):
+        PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex,
+        ProvidesKeyToAtomMappingImpl):
     """ The Laser of a PushBot
     """
     __slots__ = [
@@ -41,9 +41,8 @@ class PushBotEthernetLaserDevice(
             raise ConfigurationException(
                 "laser parameter must be a PushBotLaser value")
 
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-        PushBotEthernetDevice.__init__(
-            self, protocol, laser, True, timesteps_between_send)
+        super(PushBotEthernetLaserDevice, self).__init__(
+            protocol, laser, True, timesteps_between_send)
 
         # protocol specific data items
         self._command_protocol = protocol
@@ -81,17 +80,10 @@ class PushBotEthernetLaserDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        commands = list()
-        commands.append(
-            self._command_protocol.push_bot_laser_config_total_period(
-                total_period=0))
-        commands.append(
-            self._command_protocol.push_bot_laser_config_active_time(
-                active_time=0))
-        commands.append(
-            self._command_protocol.push_bot_laser_set_frequency(
-                frequency=0))
-        return commands
+        return [
+            self._command_protocol.push_bot_laser_config_total_period(0),
+            self._command_protocol.push_bot_laser_config_active_time(0),
+            self._command_protocol.push_bot_laser_set_frequency(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

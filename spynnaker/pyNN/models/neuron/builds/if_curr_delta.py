@@ -50,9 +50,8 @@ class IFCurrDelta(AbstractPopulationVertex):
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_delta.aplx",
-            label=label,
+        super(IFCurrDelta, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_delta.aplx", label=label,
             max_atoms_per_core=IFCurrDelta._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

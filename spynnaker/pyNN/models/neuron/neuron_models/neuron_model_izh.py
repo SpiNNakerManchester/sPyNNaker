@@ -65,9 +65,6 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
         # pylint: disable=too-many-arguments
-        AbstractNeuronModel.__init__(self)
-        AbstractContainsUnits.__init__(self)
-
         self._units = {
             A: "ms",
             B: "ms",

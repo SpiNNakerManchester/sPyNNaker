@@ -5,7 +5,7 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 
 class SynapseDynamicsStatic(
@@ -15,9 +15,6 @@ class SynapseDynamicsStatic(
         "_change_requires_mapping"]
 
     def __init__(self):
-        AbstractStaticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
         self._change_requires_mapping = True
 
     def is_same_as(self, synapse_dynamics):
@@ -105,7 +102,7 @@ class SynapseDynamicsStatic(
         """
         if hasattr(self, key):
             return getattr(self, key)
-        raise exceptions.InvalidParameterType(
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractPopulationSettable.set_value)
@@ -118,7 +115,7 @@ class SynapseDynamicsStatic(
         if hasattr(self, key):
             setattr(self, key, value)
             self._change_requires_mapping = True
-        raise exceptions.InvalidParameterType(
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)

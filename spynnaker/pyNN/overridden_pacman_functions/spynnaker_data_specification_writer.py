@@ -13,9 +13,6 @@ class SpynnakerDataSpecificationWriter(
 
     __slots__ = ()
 
-    def __init__(self):
-        GraphDataSpecificationWriter.__init__(self)
-
     def __call__(
             self, placements, graph, hostname,
             report_default_directory, write_text_specs,

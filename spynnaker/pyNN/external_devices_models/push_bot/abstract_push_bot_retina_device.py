@@ -13,7 +13,6 @@ class AbstractPushBotRetinaDevice(
         "_resolution"]
 
     def __init__(self, protocol, resolution):
-        ProvidesKeyToAtomMappingImpl.__init__(self)
         self._protocol = protocol
         self._resolution = resolution
 

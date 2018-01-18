@@ -33,8 +33,8 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             resolution=PushBotRetinaResolution.NATIVE_128_X_128,
             local_host=None, local_port=None):
         # pylint: disable=too-many-arguments
-        SpynnakerLiveSpikesConnection.__init__(
-            self, send_labels=[retina_injector_label], local_host=local_host,
+        super(PushBotRetinaConnection, self).__init__(
+            send_labels=[retina_injector_label], local_host=local_host,
             local_port=local_port)
         self._retina_injector_label = retina_injector_label
         self._pushbot_listener = ConnectionListener(

@@ -84,7 +84,6 @@ class MunichMotorDevice(
                         " device has been ignored; 6 will be used instead")
 
         super(MunichMotorDevice, self).__init__(label)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         self._speed = speed
         self._sample_time = sample_time

@@ -32,8 +32,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             mean_post_window=default_parameters['mean_post_window'],
             dual_fsm=default_parameters['dual_fsm']):
         # pylint: disable=too-many-arguments
-        AbstractTimingDependence.__init__(self)
-
         self.accumulator_depression_plus_one = accumulator_depression + 1
         self.accumulator_potentiation_minus_one = accumulator_potentiation - 1
         self.mean_pre_window = mean_pre_window

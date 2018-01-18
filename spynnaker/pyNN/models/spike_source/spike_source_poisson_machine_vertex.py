@@ -14,7 +14,7 @@ from spinn_front_end_common.interface.buffer_management.buffer_models \
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import LIVE_POISSON_CONTROL_PARTITION_ID
 
 from enum import Enum
 
@@ -90,7 +90,7 @@ class SpikeSourcePoissonMachineVertex(
     def is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            self, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+            self, LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
             raise ConfigurationException(
                 "Poisson source can only have one incoming control")

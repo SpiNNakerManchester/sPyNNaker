@@ -39,8 +39,6 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
         "_units"]
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
-        AbstractInputType.__init__(self)
-        AbstractContainsUnits.__init__(self)
         self._units = {
             E_REV_E: "mV",
             E_REV_I: "mV"}

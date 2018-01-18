@@ -20,4 +20,3 @@ class ExternalCochleaDevice(
             n_atoms=n_neurons, spinnaker_link_id=spinnaker_link,
             label=label, max_atoms_per_core=n_neurons,
             board_address=board_address)
-        ProvidesKeyToAtomMappingImpl.__init__(self)

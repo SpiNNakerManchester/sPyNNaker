@@ -32,7 +32,6 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     __slots__ = ["_devices"]
 
     def __init__(self, devices):
-        AbstractThresholdType.__init__(self)
         self._devices = devices
 
     def get_n_threshold_parameters(self):

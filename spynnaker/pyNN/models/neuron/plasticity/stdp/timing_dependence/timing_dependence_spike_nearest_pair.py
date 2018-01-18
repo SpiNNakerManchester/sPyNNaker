@@ -28,8 +28,6 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     def __init__(self, tau_plus=default_parameters['tau_plus'],
                  tau_minus=default_parameters['tau_minus']):
-
-        AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 

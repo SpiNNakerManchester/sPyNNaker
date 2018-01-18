@@ -38,9 +38,6 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
         "_units"]
 
     def __init__(self, n_neurons, v_thresh):
-        AbstractThresholdType.__init__(self)
-        AbstractContainsUnits.__init__(self)
-
         self._units = {V_THRESH: "mV"}
 
         self._n_neurons = n_neurons

@@ -10,8 +10,8 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
 
 
 class PushBotEthernetMotorDevice(
-        AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl,
-        PushBotEthernetDevice):
+        PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex,
+        ProvidesKeyToAtomMappingImpl):
     """ The motor of a PushBot
     """
     __slots__ = [
@@ -31,9 +31,8 @@ class PushBotEthernetMotorDevice(
             raise ConfigurationException(
                 "motor parameter must be a PushBotMotor value")
 
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-        PushBotEthernetDevice.__init__(
-            self, protocol, motor, True, timesteps_between_send)
+        super(PushBotEthernetMotorDevice, self).__init__(
+            protocol, motor, True, timesteps_between_send)
         self._command_protocol = protocol
 
     def set_command_protocol(self, command_protocol):

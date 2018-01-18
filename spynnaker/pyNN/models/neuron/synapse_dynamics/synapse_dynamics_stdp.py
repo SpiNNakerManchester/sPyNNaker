@@ -26,9 +26,6 @@ class SynapseDynamicsSTDP(
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0):
-        AbstractPlasticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)

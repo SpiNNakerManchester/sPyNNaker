@@ -133,13 +133,8 @@ class SpikeSourcePoisson(
             duration=default_parameters['duration'],
             seed=none_pynn_default_parameters['seed']):
         # pylint: disable=too-many-arguments
-        ApplicationVertex.__init__(
-            self, label, constraints, self._model_based_max_atoms_per_core)
-        AbstractSpikeRecordable.__init__(self)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
-        SimplePopulationSettable.__init__(self)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
+        super(SpikeSourcePoisson, self).__init__(
+            label, constraints, self._model_based_max_atoms_per_core)
 
         config = globals_variables.get_simulator().config
 

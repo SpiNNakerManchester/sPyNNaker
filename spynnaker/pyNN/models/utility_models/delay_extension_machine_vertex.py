@@ -13,6 +13,8 @@ from enum import Enum
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+    __slots__ = [
+        "_resources"]
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -30,8 +32,8 @@ class DelayExtensionMachineVertex(
                ("N_DELAYS", 5)])
 
     def __init__(self, resources_required, label, constraints=None):
-        MachineVertex.__init__(
-            self, label, constraints=constraints)
+        super(DelayExtensionMachineVertex, self).__init__(
+            label, constraints=constraints)
         self._resources = resources_required
 
     @property

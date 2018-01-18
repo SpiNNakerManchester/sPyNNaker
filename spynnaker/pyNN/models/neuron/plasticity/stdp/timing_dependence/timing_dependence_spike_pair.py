@@ -24,7 +24,6 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         "_tau_plus_last_entry"]
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0):
-        AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 

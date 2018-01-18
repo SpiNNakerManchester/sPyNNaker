@@ -85,7 +85,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     ADDRESS_MASK = 0x7FFFFF00
 
     def __init__(self):
-        AbstractMasterPopTableFactory.__init__(self)
         self._entries = None
         self._n_addresses = 0
 

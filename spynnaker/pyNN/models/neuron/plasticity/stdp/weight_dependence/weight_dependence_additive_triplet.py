@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
 
 
 class WeightDependenceAdditiveTriplet(
-        AbstractWeightDependence, AbstractHasAPlusAMinus):
+        AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
         "_a3_minus",
         "_a3_plus",
@@ -23,9 +23,7 @@ class WeightDependenceAdditiveTriplet(
             w_max=default_parameters['w_max'],
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
-
-        AbstractWeightDependence.__init__(self)
-        AbstractHasAPlusAMinus.__init__(self)
+        super(WeightDependenceAdditiveTriplet, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
         self._a3_plus = A3_plus

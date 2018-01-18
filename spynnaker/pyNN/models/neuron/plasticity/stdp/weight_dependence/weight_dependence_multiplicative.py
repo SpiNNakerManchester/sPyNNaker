@@ -5,14 +5,13 @@ from .abstract_weight_dependence import AbstractWeightDependence
 
 
 class WeightDependenceMultiplicative(
-        AbstractWeightDependence, AbstractHasAPlusAMinus):
+        AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
         "_w_max",
         "_w_min"]
 
     def __init__(self, w_min=0.0, w_max=1.0):
-        AbstractWeightDependence.__init__(self)
-        AbstractHasAPlusAMinus.__init__(self)
+        super(WeightDependenceMultiplicative, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
 

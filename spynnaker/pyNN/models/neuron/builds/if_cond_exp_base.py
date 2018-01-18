@@ -57,8 +57,8 @@ class IFCondExpBase(AbstractPopulationVertex):
         input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_cond_exp.aplx", label=label,
+        super(IFCondExpBase, self).__init__(
+            n_neurons=n_neurons, binary="IF_cond_exp.aplx", label=label,
             max_atoms_per_core=IFCondExpBase._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

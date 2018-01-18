@@ -18,6 +18,14 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
+    __slots__ = [
+        "_buffer_size_before_receive",
+        "_receive_port",
+        "_requires_mapping",
+        "_spike_buffer_max_size",
+        "_spike_recorder",
+        "_time_between_requests",
+        "_virtual_key"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -40,13 +48,11 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             buffer_notification_port = config.get_int(
                 "Buffers", "receive_buffer_port")
 
-        ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, label=label, receive_port=port,
+        super(SpikeInjector, self).__init__(
+            n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key, reserve_reverse_ip_tag=True,
             buffer_notification_ip_address=buffer_notification_ip_address,
             buffer_notification_port=buffer_notification_port)
-
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
 
         # Set up for recording
         self._spike_recorder = EIEIOSpikeRecorder()

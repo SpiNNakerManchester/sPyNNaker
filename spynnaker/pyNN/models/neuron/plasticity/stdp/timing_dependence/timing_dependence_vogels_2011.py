@@ -25,8 +25,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     default_parameters = {'tau': 20.0}
 
     def __init__(self, alpha, tau=default_parameters['tau']):
-        AbstractTimingDependence.__init__(self)
-
         self._alpha = alpha
         self._tau = tau
 

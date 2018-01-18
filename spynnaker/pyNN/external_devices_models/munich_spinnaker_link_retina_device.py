@@ -86,12 +86,10 @@ class MunichRetinaDevice(
         self._polarity = polarity
         self._position = position
 
-        ApplicationSpiNNakerLinkVertex.__init__(
-            self, n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
+        super(MunichRetinaDevice, self).__init__(
+            n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
 
         if self._position not in self._RETINAS:
             raise SpynnakerException(
@@ -102,8 +100,8 @@ class MunichRetinaDevice(
                 fixed_n_neurons))
 
     def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint(
-            [BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
+        return [FixedKeyAndMaskConstraint([
+            BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -134,20 +132,19 @@ class MunichRetinaDevice(
             key=enable_command, payload=1, repeat=5,
             delay_between_repeats=1000))
 
+        return commands
+
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        commands = list()
-
         # disable retina
         if self._position == self.RIGHT_RETINA:
             disable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_DISABLE
         else:
             disable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_DISABLE
 
-        commands.append(MultiCastCommand(
-            key=disable_command, payload=0, repeat=5,
-            delay_between_repeats=1000))
+        return [MultiCastCommand(
+            disable_command, payload=0, repeat=5, delay_between_repeats=1000)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

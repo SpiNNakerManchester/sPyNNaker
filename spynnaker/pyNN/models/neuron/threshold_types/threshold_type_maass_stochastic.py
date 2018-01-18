@@ -39,7 +39,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         "_n_neurons"]
 
     def __init__(self, n_neurons, du_th, tau_th, v_thresh):
-        AbstractThresholdType.__init__(self)
         self._n_neurons = n_neurons
 
         self._data = SpynakkerRangeDictionary(size=n_neurons)

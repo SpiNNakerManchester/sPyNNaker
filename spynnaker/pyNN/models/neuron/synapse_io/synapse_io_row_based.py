@@ -20,11 +20,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     """
     __slots__ = []
 
-    def __init__(self):
-        AbstractSynapseIO.__init__(self)
-
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
-
         # There are 16 slots, one per time step
         return 16 * (machine_time_step / 1000.0)
 
