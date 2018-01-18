@@ -4,10 +4,6 @@
 //   #include <data_specification.h>
 // }
 
-// Rig CPP common includes
-#include "rig_cpp_common/log.h"
-#include "rig_cpp_common/random/mars_kiss64.h"
-
 // Common includes
 #include "./common/key_lookup_binary_search.h"
 
@@ -342,9 +338,9 @@ bool ReadSynapticMatrixRegion(uint32_t *region, uint32_t)
   return true;
 }
 //-----------------------------------------------------------------------------
-bool ReadConnectionBuilderRegion(uint32_t **in_region, 
-                                 uint32_t *synaptic_matrix_region, 
-                                 uint32_t post_slice_start, 
+bool ReadConnectionBuilderRegion(uint32_t **in_region,
+                                 uint32_t *synaptic_matrix_region,
+                                 uint32_t post_slice_start,
                                  uint32_t post_slice_count,
                                  int32_t *weight_scales,
                                  uint32_t num_synapse_bits,
@@ -387,10 +383,10 @@ bool ReadConnectionBuilderRegion(uint32_t **in_region,
 
   const uint32_t matrix_type_hash    = *region++;
   const uint32_t synapse_type        = *region++;
-  
+
   const uint32_t weight_type_hash    = *region++;
   const uint32_t delay_type_hash     = *region++;
-    
+
 
   // Create RNG with this seed for this matrix
   MarsKiss64 rng(seed);
@@ -427,15 +423,15 @@ bool ReadConnectionBuilderRegion(uint32_t **in_region,
                                    matrix_type_hash, region,
                                    g_MatrixGeneratorBuffer);
 
-  const auto connectorGenerator = g_ConnectorGeneratorFactory.Create(connector_type_hash, 
+  const auto connectorGenerator = g_ConnectorGeneratorFactory.Create(connector_type_hash,
                                                      region, g_ConnectorGeneratorBuffer);
 
   LOG_PRINT(LOG_LEVEL_INFO, "\t\tWeight");
-  const auto weightGenerator = g_ParamGeneratorFactory.Create(weight_type_hash, 
+  const auto weightGenerator = g_ParamGeneratorFactory.Create(weight_type_hash,
                                          region, g_WeightParamGeneratorBuffer);
 
   LOG_PRINT(LOG_LEVEL_INFO, "\t\tDelay");
-  const auto delayGenerator = g_ParamGeneratorFactory.Create(delay_type_hash, 
+  const auto delayGenerator = g_ParamGeneratorFactory.Create(delay_type_hash,
                                          region, g_DelayParamGeneratorBuffer);
 
   *in_region = region;
