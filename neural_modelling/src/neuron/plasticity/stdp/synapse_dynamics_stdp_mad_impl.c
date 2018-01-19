@@ -3,6 +3,7 @@
 
 // sPyNNaker neural modelling includes
 #include "../../synapses.h"
+#include "../synapse_dynamics.h"
 
 // Plasticity common includes
 #include "../common/maths.h"
@@ -10,6 +11,7 @@
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
+
 #include <string.h>
 #include <debug.h>
 
@@ -60,6 +62,11 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+static additional_input_pointer_t additional_input_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
+
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
@@ -68,7 +75,11 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+		const uint32_t syn_type,
+        const post_event_history_t *post_event_history,
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input,
+        threshold_type_pointer_t post_synaptic_threshold) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -96,7 +107,8 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state);
+            current_state,  syn_type, post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -110,7 +122,9 @@ static inline final_state_t _plasticity_update_synapse(
     // **NOTE** dendritic delay is subtracted
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state);
+        post_window.prev_time, post_window.prev_trace, current_state, syn_type,
+		post_synaptic_neuron, post_synaptic_additional_input,
+		post_synaptic_threshold);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -252,6 +266,17 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t index = synapse_row_sparse_index(control_word);
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
 
+        // Get data structures for this synapse's post-synaptic neuron
+        neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
+        additional_input_pointer_t post_synaptic_additional_input =
+                		&additional_input_array_plasticity[index];
+        threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
+
+        // for integration test
+        log_info("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
+        		time, index, post_synaptic_threshold->threshold_value,
+				post_synaptic_neuron->V_membrane);
+
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
@@ -259,8 +284,9 @@ bool synapse_dynamics_process_plastic_synapses(
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
-            delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index]);
+            delay_dendritic, delay_axonal, current_state, type,
+            &post_event_history[index], post_synaptic_neuron,
+			post_synaptic_additional_input, post_synaptic_threshold);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -300,4 +326,16 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
+}
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
+	neuron_array_plasticity = neuron_array;
+}
+
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_plasticity = threshold_type_array;
+}
+
+void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_plasticity = additional_input_array;
 }

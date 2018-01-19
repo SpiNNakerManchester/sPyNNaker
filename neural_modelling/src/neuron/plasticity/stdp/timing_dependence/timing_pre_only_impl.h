@@ -107,12 +107,17 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state,
+		uint32_t syn_type,
 		neuron_pointer_t post_synaptic_neuron,
-		additional_input_pointer_t post_synaptic_additional_input) {
+		additional_input_pointer_t post_synaptic_additional_input,
+	    threshold_type_pointer_t post_synaptic_threshold) {
 
     use(&trace);
     use(last_pre_time);
     use(&last_pre_trace);
+    use(&syn_type);
+    use(&post_synaptic_additional_input);
+    use(&post_synaptic_threshold);
 
     int dt = time - last_pre_time;
     int32_t w =  previous_state.initial_weight;
@@ -174,10 +179,18 @@ static inline update_state_t timing_apply_pre_spike(
 static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state, neuron_pointer_t post_synaptic_neuron) {
+        post_trace_t last_post_trace, update_state_t previous_state,
+		uint32_t syn_type,
+		neuron_pointer_t post_synaptic_neuron,
+		additional_input_pointer_t post_synaptic_additional_input,
+	    threshold_type_pointer_t post_synaptic_threshold) {
     use(&trace);
     use(last_post_time);
     use(&last_post_trace);
+    use(&syn_type);
+    use(&post_synaptic_neuron);
+    use(&post_synaptic_additional_input);
+    use(&post_synaptic_threshold);
 //
 //    // Get time of event relative to last pre-synaptic event
 //    uint32_t time_since_last_pre = time - last_pre_time;
