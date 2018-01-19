@@ -404,7 +404,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 for i in synapse_ids])
             connection_source_extra = numpy.concatenate([
                 numpy.repeat(
-                    row_stage[i] * pre_vertex_slice.n_atoms, n_synapses[i])
+                    row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
+                    n_synapses[i])
                 for i in synapse_ids])
 
             delayed_connections["source"] -= connection_source_extra

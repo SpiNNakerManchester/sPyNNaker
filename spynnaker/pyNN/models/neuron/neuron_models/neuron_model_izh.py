@@ -208,8 +208,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._v_init[vertex_slice.as_slice] = neural_parameters[4]
-        self._u_init[vertex_slice.as_slice] = neural_parameters[5]
+        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[4]
+        self._data[U_INIT][vertex_slice.as_slice] = neural_parameters[5]
 
     def get_n_cpu_cycles_per_neuron(self):
 
