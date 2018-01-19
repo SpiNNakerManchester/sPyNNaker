@@ -3,7 +3,7 @@ utility class containing simple helper methods
 """
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities import exceptions
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 import numpy
 import os
@@ -50,8 +50,7 @@ def convert_param_to_numpy(param, no_atoms):
 
     # Deal with multiple values, but not the correct number of them
     if len(param) != no_atoms:
-
-        raise exceptions.ConfigurationException(
+        raise ConfigurationException(
             "The number of params does not equal with the number of atoms in"
             " the vertex")
 
@@ -287,6 +286,26 @@ def get_variance(dist):
     simulator = globals_variables.get_simulator()
     stats = simulator.get_distribution_to_stats()[dist.name]
     return stats.var(dist)
+
+
+def high(dist):
+    """ Gets the high or max boundry value for this distribution
+
+    Could return None
+    """
+    simulator = globals_variables.get_simulator()
+    stats = simulator.get_distribution_to_stats()[dist.name]
+    return stats.high(dist)
+
+
+def low(dist):
+    """ Gets the high or min boundry value for this distribution
+
+    Could return None
+    """
+    simulator = globals_variables.get_simulator()
+    stats = simulator.get_distribution_to_stats()[dist.name]
+    return stats.low(dist)
 
 
 def validate_mars_kiss_64_seed(seed):

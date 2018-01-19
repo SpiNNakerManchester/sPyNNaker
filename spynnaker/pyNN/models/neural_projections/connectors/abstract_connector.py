@@ -1,7 +1,6 @@
 from six import add_metaclass
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.utility_objs\
-    .provenance_data_item import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities import utility_calls
@@ -241,9 +240,11 @@ class AbstractConnector(object):
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
                     weights, n_connections)
-                if weights.boundaries is not None:
-                    return abs(min(max_weight, max(weights.boundaries)))
-                return abs(max_weight)
+                high = utility_calls.high(weights)
+                if high is None:
+                    return abs(max_weight)
+                else:
+                    return abs(min(max_weight, high))
 
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -296,14 +297,15 @@ class AbstractConnector(object):
     def _generate_values(self, values, n_connections, connection_slices):
         if globals_variables.get_simulator().is_a_pynn_random(values):
             if n_connections == 1:
-                return numpy.array([values.next(n_connections)])
+                return numpy.array([values.next(n_connections)],
+                                   dtype="float64")
             return values.next(n_connections)
         elif numpy.isscalar(values):
-            return numpy.repeat([values], n_connections)
+            return numpy.repeat([values], n_connections).astype("float64")
         elif hasattr(values, "__getitem__"):
             return numpy.concatenate([
                 values[connection_slice]
-                for connection_slice in connection_slices])
+                for connection_slice in connection_slices]).astype("float64")
         elif isinstance(values, basestring) or callable(values):
             if self._space is None:
                 raise Exception(
@@ -358,6 +360,7 @@ class AbstractConnector(object):
     def _generate_delays(self, values, n_connections, connection_slices):
         """ Generate valid delay values
         """
+
         delays = self._generate_values(
             values, n_connections, connection_slices)
 

@@ -1,8 +1,7 @@
 import math
 import numpy
 
-from spinn_front_end_common.abstract_models. \
-    abstract_changable_after_run import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
@@ -16,8 +15,9 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
-    AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
-    AbstractChangableAfterRun):
+        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+        AbstractChangableAfterRun):
+
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
@@ -32,7 +32,7 @@ class SynapseDynamicsSTDP(
         self._pad_to_length = pad_to_length
 
         if (self._dendritic_delay_fraction < 0.5 or
-                    self._dendritic_delay_fraction > 1.0):
+                self._dendritic_delay_fraction > 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
@@ -311,3 +311,12 @@ class SynapseDynamicsSTDP(
             prov_data.extend(self._weight_dependence.get_provenance_data(
                 pre_population_label, post_population_label))
         return prov_data
+
+    @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
+    def get_parameter_names(self):
+        names = ['weight', 'delay']
+        if self._timing_dependence is not None:
+            names.extend(self._timing_dependence.get_parameter_names())
+        if self._weight_dependence is not None:
+            names.extend(self._weight_dependence.get_parameter_names())
+        return names

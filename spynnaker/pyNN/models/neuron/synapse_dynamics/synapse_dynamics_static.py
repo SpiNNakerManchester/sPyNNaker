@@ -1,8 +1,7 @@
 import numpy
 import math
 
-from spinn_front_end_common.abstract_models. \
-    abstract_changable_after_run import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
@@ -12,12 +11,12 @@ from spynnaker.pyNN import exceptions
 class SynapseDynamicsStatic(
     AbstractStaticSynapseDynamics, AbstractPopulationSettable,
     AbstractChangableAfterRun):
+
     def __init__(self, pad_to_length=None):
         AbstractStaticSynapseDynamics.__init__(self)
         AbstractPopulationSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         self._change_requires_mapping = True
-
         self._pad_to_length = pad_to_length
 
     def is_same_as(self, synapse_dynamics):
@@ -145,3 +144,7 @@ class SynapseDynamicsStatic(
             self._change_requires_mapping = True
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
+
+    @overrides(AbstractStaticSynapseDynamics.get_parameter_names)
+    def get_parameter_names(self):
+        return ['weight', 'delay']

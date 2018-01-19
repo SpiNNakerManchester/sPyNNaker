@@ -54,7 +54,7 @@ class AllToAllConnector(AbstractConnector):
             slice(n + post_vertex_slice.lo_atom, n + stop_atom)
             for n in range(
                 pre_vertex_slice.lo_atom * n_post_neurons,
-                (pre_vertex_slice.hi_atom + 1 * n_post_neurons),
+                (pre_vertex_slice.hi_atom + 1) * n_post_neurons,
                 n_post_neurons)]
 
     def get_delay_maximum(self):

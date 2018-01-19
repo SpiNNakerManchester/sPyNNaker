@@ -244,6 +244,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
         if len(delayed_connections) > 0:
+
             # Get the delay stages and which row each delayed connection will
             # go into
             stages = numpy.floor((numpy.round(
@@ -350,14 +351,10 @@ class SynapseIORowBased(AbstractSynapseIO):
                                                              for i in range(
                         len(n_synapses))])
                 connection_source_extra = numpy.concatenate([
-                                                                numpy.repeat(
-                                                                    row_stage[
-                                                                        i] * pre_vertex_slice.n_atoms,
-                                                                    n_synapses[
-                                                                        i])
-                                                                for i in range(
-                        len(n_synapses))])
-
+                    numpy.repeat(
+                        row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
+                        n_synapses[i])
+                    for i in range(len(n_synapses))])
                 delayed_connections["source"] -= connection_source_extra
                 delayed_connections["source"] += pre_vertex_slice.lo_atom
                 delayed_connections["delay"] += connection_min_delay

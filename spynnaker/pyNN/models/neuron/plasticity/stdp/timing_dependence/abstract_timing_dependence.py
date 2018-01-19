@@ -44,6 +44,13 @@ class AbstractTimingDependence(object):
         """ Get the synaptic structure of the plastic part of the rows
         """
 
+    @abstractmethod
+    def get_parameter_names(self):
+        """ get the params from the timing dependencies
+
+        :return: iterable of basestring
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data
         """
