@@ -1,6 +1,6 @@
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
-from data_specification.exceptions import DataSpecificationUnknownTypeException
+from data_specification.exceptions import UnknownTypeException
 
 
 class _Range_Iterator(object):
@@ -123,7 +123,7 @@ class NeuronParameter(object):
     def __init__(self, value, data_type):
         self._value = value
         if data_type not in DataType:
-            raise DataSpecificationUnknownTypeException(
+            raise UnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
         self._data_type = data_type
 
