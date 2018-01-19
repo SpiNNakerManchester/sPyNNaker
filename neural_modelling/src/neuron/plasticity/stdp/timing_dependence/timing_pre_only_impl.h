@@ -119,23 +119,23 @@ static inline update_state_t timing_apply_pre_spike(
     int32_t th_w = previous_state.weight_region->th_weight;
     int32_t w_drift = previous_state.weight_region->weight_drift;
 
-    log_info("Ca conc: %12.6k", post_synaptic_additional_input->I_Ca2);
-    log_info("Ca alpha: %12.6k", post_synaptic_additional_input->I_alpha);
+//    log_info("Ca conc: %12.6k", post_synaptic_additional_input->I_Ca2);
+//    log_info("Ca alpha: %12.6k", post_synaptic_additional_input->I_alpha);
 //    log_info("Ca tau multiplier: %u", post_synaptic_additional_input->exp_TauCa);
-    log_info("before drift: %u", w);
+//    log_info("before drift: %u", w);
 
     if(w>th_w){
-    	log_info("drift up w_drift: %d, dt: %d", w_drift, dt);
+    	//log_info("drift up w_drift: %d, dt: %d", w_drift, dt);
     	w += w_drift * dt;
         int32_t max_w = previous_state.weight_region->max_weight;
     	if(w>max_w)w=max_w;
     }else{
-    	log_info("drift down w_drift: %d, dt: %d", w_drift, dt);
+    	//log_info("drift down w_drift: %d, dt: %d", w_drift, dt);
     	w -= w_drift * dt;
         int32_t min_w = previous_state.weight_region->min_weight;
     	if(w<min_w)w=min_w;
     }
-    log_info("after drift: %u", w);
+    //log_info("after drift: %u", w);
 
     previous_state.initial_weight = w;
 
@@ -144,15 +144,15 @@ static inline update_state_t timing_apply_pre_spike(
     //log_info("Ca: %12.6k, dn_l:  %12.6k, dn_h:  %12.6k", I_Ca2, th_ca_dn_l, th_ca_dn_h);
 
     if (neuron_model_get_membrane_voltage(post_synaptic_neuron) > th_v_mem && I_Ca2 > th_ca_up_l && I_Ca2 < th_ca_up_h ){
-    	log_info("above threshold, in ca range");
+    	//log_info("above threshold, in ca range");
     	return weight_one_term_apply_potentiation(previous_state, last_pre_trace);
 
     } else if (neuron_model_get_membrane_voltage(post_synaptic_neuron) <= th_v_mem && I_Ca2 > th_ca_dn_l && I_Ca2 < th_ca_dn_h ){
-    	log_info("below threshold, in ca range");
+    	//log_info("below threshold, in ca range");
     	return weight_one_term_apply_depression(previous_state, last_pre_trace);
 
     } else {
-    	log_info("not in the ca range");
+    	//log_info("not in the ca range");
 
     }
     // get V_post(t_pre)

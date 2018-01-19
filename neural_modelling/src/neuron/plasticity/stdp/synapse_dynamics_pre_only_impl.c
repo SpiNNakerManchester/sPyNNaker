@@ -310,7 +310,7 @@ bool synapse_dynamics_process_plastic_synapses(
             *plastic_words, type);
 
         //neuron_pointer_t neuron = neuron_array_stdp;
-        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(post_synaptic_neuron));
+        //log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(post_synaptic_neuron));
 
 
         final_state_t final_state = _update_on_pre_only(time, last_pre_time,

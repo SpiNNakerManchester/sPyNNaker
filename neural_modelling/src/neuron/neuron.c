@@ -361,7 +361,7 @@ void neuron_do_timestep_update(timer_t time) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         //log_info("neuron %u  time %u", neuron_index, time);
-        log_info("%u neuron %u  time %u",  sv_vcpu[sark_core_id()].time, neuron_index, time);
+        //log_info("%u neuron %u  time %u",  sv_vcpu[sark_core_id()].time, neuron_index, time);
         // Get the parameters for this neuron
         neuron_pointer_t neuron = &neuron_array[neuron_index];
         input_type_pointer_t input_type = &input_type_array[neuron_index];
