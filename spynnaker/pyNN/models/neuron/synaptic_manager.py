@@ -507,7 +507,7 @@ class SynapticManager(object):
         max_weight_powers = (w + 1 if (2 ** w) <= a else w
                              for w, a in zip(max_weight_powers, max_weights))
 
-        max_weight_powers = (10 if w >= 10 else w
+        max_weight_powers = (3 if w >= 3 else w
                              for w in max_weight_powers)
 
         # If we have synapse dynamics that uses signed weights,
