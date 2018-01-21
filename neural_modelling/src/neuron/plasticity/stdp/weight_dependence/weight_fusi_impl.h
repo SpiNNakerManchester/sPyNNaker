@@ -93,8 +93,9 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
               new_state.initial_weight, new_state.a2_plus, new_state.a2_minus,
               new_weight);
     */
-    log_info( " new_weight: %u",
-              new_weight);
+#ifdef _LOG_FIG1_
+    log_info( " new_weight: %u",  new_weight);
+#endif
 
     return (weight_t) new_weight;
 }

@@ -29,7 +29,9 @@ static input_t additional_input_get_input_value_as_current(
     // Decay Ca2 trace
     //additional_input->I_Ca2 *= additional_input->exp_TauCa;
 	additional_input->I_Ca2 = decay_s1615(additional_input->I_Ca2, additional_input->exp_TauCa);
+#ifdef _LOG_FIG1_
     log_info("ca = %12.6k", additional_input->I_Ca2);
+#endif
 
     // Return 0.0 current contribution from the Ca2
     return ZERO;
