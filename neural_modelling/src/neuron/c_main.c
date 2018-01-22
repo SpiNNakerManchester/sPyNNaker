@@ -6,7 +6,8 @@
  *
  *
  * This is the main entrance class for most of the neural models. The following
- * Figure shows how all of the c code interacts with each other and what classes
+ * Figure shows how all of the c code
+ * interacts with each other and what classes
  * are used to represent over arching logic
  * (such as plasticity, spike processing, utilities, synapse types, models)
  *
@@ -184,7 +185,8 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
     // Set up the synapse dynamics
-    address_t synapse_dynamics_region_address = data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+    address_t synapse_dynamics_region_address =
+        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address,
             n_neurons, ring_buffer_to_input_buffer_left_shifts);
@@ -194,7 +196,8 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address && !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+    if (synapse_dynamics_region_address &&
+        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
 
@@ -285,7 +288,8 @@ void timer_callback(uint timer_count, uint unused) {
 
     uint cpsr = 0;
     // Do rewiring
-    if (rewiring && ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast()))
+    if (rewiring &&
+    ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast()))
     {
         update_goal_posts(time);
         last_rewiring_time = 0;

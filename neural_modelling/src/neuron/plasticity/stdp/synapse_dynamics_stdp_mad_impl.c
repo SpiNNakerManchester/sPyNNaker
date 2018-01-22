@@ -75,8 +75,8 @@ static inline final_state_t _plasticity_update_synapse(
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
     // Get the post-synaptic window of events to be processed
-    const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
-        (delayed_last_pre_time - delay_dendritic) : 0;
+    const uint32_t window_begin_time = (delayed_last_pre_time >=
+        delay_dendritic) ? (delayed_last_pre_time - delay_dendritic) : 0;
     const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
@@ -173,7 +173,8 @@ void synapse_dynamics_print_plastic_synapses(
             weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                   synapse_row_sparse_delay(control_word),
-                  synapse_types_get_type_char(synapse_row_sparse_type(control_word)),
+                  synapse_types_get_type_char(
+                    synapse_row_sparse_type(control_word)),
                   synapse_row_sparse_index(control_word), SYNAPSE_DELAY_MASK,
                   SYNAPSE_TYPE_INDEX_BITS);
     }
@@ -294,7 +295,8 @@ void synapse_dynamics_process_post_synaptic_event(
                                                          last_post_trace));
 }
 
-input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
+        index_t neuron_index) {
     use(time);
     use(neuron_index);
     return 0.0k;
@@ -314,10 +316,12 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
  * are recorded in sp_data.
  * returns: true iff neuron with id is in synaptic row
  */
-bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+bool find_plastic_neuron_with_id(uint32_t id, address_t row,
+        structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
-    plastic_synapse_t *plastic_words = _plastic_synapses(plastic_region_address);
+    plastic_synapse_t *plastic_words =
+        _plastic_synapses(plastic_region_address);
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     plastic_synapse_t weight;
@@ -337,9 +341,10 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
     }
 
     if (found){
-        // TODO AGDR: Nominate someone to make methods to extract components from plastic_synapse_ts
+        // TODO make methods to extract components from plastic_synapse_t
         sp_data -> weight = weight;
-        sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
+        sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) -
+            plastic_synapse;
         sp_data -> delay  = delay;
         return true;
         }
@@ -360,7 +365,8 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
  */
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
-    plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+    plastic_synapse_t *plastic_words =
+        _plastic_synapses(synapse_row_plastic_region(row));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     // Delete weight at offset
@@ -382,7 +388,8 @@ static inline plastic_synapse_t _weight_conversion(uint32_t weight){
 
 static inline control_t _control_conversion(uint32_t id, uint32_t delay,
                                             uint32_t type){
-    control_t new_control = ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
+    control_t new_control =
+        ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
     new_control |= (type & ((1<<SYNAPSE_TYPE_BITS) - 1)) << SYNAPSE_INDEX_BITS;
     new_control |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
     return new_control;
@@ -394,12 +401,14 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay,
  * in order to make space for the extra information.
  * return: true iff the addition and expansion have succeeded
  */
-bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type){
+bool add_plastic_neuron_with_id(uint32_t id, address_t row,
+        uint32_t weight, uint32_t delay, uint32_t type){
     plastic_synapse_t new_weight = _weight_conversion(weight);
     control_t new_control = _control_conversion(id, delay, type);
 
     address_t fixed_region = synapse_row_fixed_region(row);
-    plastic_synapse_t *plastic_words = _plastic_synapses(synapse_row_plastic_region(row));
+    plastic_synapse_t *plastic_words =
+        _plastic_synapses(synapse_row_plastic_region(row));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     // Add weight at offset

@@ -26,7 +26,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                  sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * 10 ** -4,
-                 grid=np.array([16, 16]), lateral_inhibition=0, random_partner=False,
+                 grid=np.array([16, 16]), lateral_inhibition=0,
+                 random_partner=False,
                  seed=None):
 
         AbstractSynapseDynamicsStructural.__init__(self)
@@ -81,7 +82,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_parameter_names(self):
         # TODO
         return []
-
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]), type='euclidian'):
         x0 = np.asarray(x0)
@@ -177,8 +177,10 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                          data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
         spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
-        spec.write_value(data=int(self._lateral_inhibition), data_type=DataType.INT32)
-        spec.write_value(data=int(self._random_partner), data_type=DataType.INT32)
+        spec.write_value(data=int(self._lateral_inhibition),
+                         data_type=DataType.INT32)
+        spec.write_value(data=int(self._random_partner),
+                         data_type=DataType.INT32)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
         # write local low, high and number of atoms
@@ -252,8 +254,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     vertex, constants.SPIKE_PARTITION_ID).first_key,
                  graph_mapper.get_slice(vertex)[2],
                  graph_mapper.get_slice(vertex)[0],
-                routing_info.get_routing_info_from_pre_vertex(
-                    vertex, constants.SPIKE_PARTITION_ID).first_mask))
+                 routing_info.get_routing_info_from_pre_vertex(
+                     vertex, constants.SPIKE_PARTITION_ID).first_mask))
 
         for subpopulation_list in \
                 population_to_subpopulation_information.itervalues():
@@ -296,7 +298,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             # Ensure the following values are written in ascending
             # order of low_atom (implicit)
             dt = np.dtype(
-                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int'), ('mask', 'uint')])
+                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int'),
+                 ('mask', 'uint')])
             structured_array = np.array(subpopulation_list, dtype=dt)
             sorted_info_list = np.sort(structured_array, order='lo_atom')
             for subpopulation_info in sorted_info_list:
@@ -342,7 +345,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     pre_vertex_id = source - pre_vertex_slice.lo_atom
                     masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
                     # Select population index
-                    pop_index = population_to_subpopulation_information.keys().index(
+                    pop_index = population_to_subpopulation_information.\
+                        keys().index(
                         row[1].pre_vertex)
                     masked_pop_index = pop_index & (2 ** 9 - 1)
                     # Select subpopulation index
@@ -354,23 +358,26 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                             row[1].pre_vertex], dtype=dt)
                     sorted_info_list = np.sort(structured_array,
                                                order='lo_atom')
-                    # find index where lo_atom equals the one in pre_vertex_slice
-                    subpop_index = np.argwhere(sorted_info_list[
-                                                   'lo_atom'] == pre_vertex_slice.lo_atom).ravel()[
+                    # find index where lo_atom equals the one in
+                    # pre_vertex_slice
+                    subpop_index = np.argwhere(
+                        sorted_info_list['lo_atom'] ==
+                        pre_vertex_slice.lo_atom).ravel()[
                         0]
                     masked_sub_pop_index = subpop_index & (2 ** 9 - 1)
                     # identifier combines the vertex, pop and subpop
                     # into 1 x 32 bit word
                     identifier = (masked_pop_index << (32 - 8)) | (
-                    masked_sub_pop_index << 16) | masked_pre_vertex_id
+                        masked_sub_pop_index << 16) | masked_pre_vertex_id
                     try:
-                        synaptic_entry = np.argmax(post_to_pre_table[
-                                                       target - post_slice.lo_atom] == -1).ravel()[
-                            0]
+                        synaptic_entry = np.argmax(
+                            post_to_pre_table[target - post_slice.lo_atom] ==
+                            -1).ravel()[0]
                     except:
                         break
                     post_to_pre_table[
-                        target - post_slice.lo_atom, synaptic_entry] = identifier
+                        target - post_slice.lo_atom, synaptic_entry] = \
+                        identifier
 
         spec.write_array(post_to_pre_table.ravel())
 
@@ -454,15 +461,20 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
-            self._actual_row_max_length = self.super.get_n_words_for_plastic_connections(
+            self._actual_row_max_length = \
+                self.super.get_n_words_for_plastic_connections(
                 n_connections)
             return self._actual_row_max_length
         except:
-            self._actual_row_max_length = self.super.get_n_words_for_static_connections(n_connections)
+            self._actual_row_max_length = \
+                self.super.get_n_words_for_static_connections(
+                n_connections)
             return self._actual_row_max_length
 
     def get_n_words_for_static_connections(self, n_connections):
-        self._actual_row_max_length = self.super.get_n_words_for_static_connections(n_connections)
+        self._actual_row_max_length = \
+            self.super.get_n_words_for_static_connections(
+            n_connections)
         return self._actual_row_max_length
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
