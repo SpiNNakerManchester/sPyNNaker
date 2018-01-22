@@ -88,9 +88,6 @@ void _setup_synaptic_dma_read() {
             setup_done = true;
         }
 
-
-
-
         // If there's more rows to process from the previous spike
         while (!setup_done && population_table_get_next_address(
                 &row_address, &n_bytes_to_transfer)) {
@@ -211,8 +208,6 @@ void _dma_complete_callback(uint unused, uint tag) {
     uint32_t current_buffer_index = buffer_being_read;
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
-
-
     // Process synaptic row repeatedly
     bool subsequent_spikes;
     do {
@@ -225,8 +220,7 @@ void _dma_complete_callback(uint unused, uint tag) {
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
         if (!synapses_process_synaptic_row(time, current_buffer->row,
-                                      !subsequent_spikes,
-                                      current_buffer_index)) {
+        	!subsequent_spikes, current_buffer_index)) {
             log_error(
                 "Error processing spike 0x%.8x for address 0x%.8x"
                 "(local=0x%.8x)",

@@ -132,7 +132,6 @@ static REAL slow_rate_per_tick_cutoff;
 static bool recording_in_progress = false;
 
 
-
 //! \brief ??????????????
 //! \param[in] n ?????????????????
 //! \return bit field of the ???????????????
@@ -309,8 +308,6 @@ bool read_poisson_parameters(address_t address) {
         block_size = num_spike_sources * sizeof(spike_source_t) / 4;
         log_debug("block size = %u", block_size);
 
-
-
         current_spike_source_count +=1;
         memcpy(
             next_window_sources, &address[_calc_memory_loc()],
@@ -375,8 +372,6 @@ static bool initialize(uint32_t *timer_period) {
     current_spike_source_count = 0;
     first_poisson_struct = PARAMETER_SEED_START_POSITION + seed_size + 6;
 
-
-
     // Setup regions that specify spike source array data
     if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))) {
@@ -429,7 +424,7 @@ void resume_callback() {
         rt_error(RTE_SWERR);
     }
 
-//    time_to_change = 0;
+    // time_to_change = 0;
 
     // print spike sources for debug purposes
     print_spike_sources();
@@ -451,12 +446,12 @@ bool store_poisson_parameters(){
 
     // store array of spike sources into sdram for reading by the host
     if (num_spike_sources > 0) {
-//        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 4;
-//        memcpy(
-//            &address[spikes_offset], spike_source_array,
-//            num_spike_sources * sizeof(spike_source_t));
-//        // store spike source data into DTCM
-//        uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 6;
+	// uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 4;
+	// memcpy(
+	//     &address[spikes_offset], spike_source_array,
+	//     num_spike_sources * sizeof(spike_source_t));
+	// // store spike source data into DTCM
+	// uint32_t spikes_offset = PARAMETER_SEED_START_POSITION + seed_size + 6;
         memcpy(
             &address[_calc_memory_loc()], spike_source_array,
             num_spike_sources * sizeof(spike_source_t));
@@ -609,8 +604,8 @@ void timer_callback(uint timer_count, uint unused) {
             }
         }
 
-//    	log_debug("after");
-//    	print_spike_sources();
+    	// log_debug("after");
+    	// print_spike_sources();
     	time_to_change += rate_interval_duration;
     	//log_debug("+++++++++++++++++++++++++++++++++++");
 
@@ -618,25 +613,21 @@ void timer_callback(uint timer_count, uint unused) {
     	address = data_specification_get_region(POISSON_PARAMS, address);
 
     	// check if reached the end of the cycle
-    	if (current_spike_source_count != num_diff_rates -1){
-
-    		current_spike_source_count += 1;
-    	   	// kick_off dma to retrieve next source spikes
-    	    spin1_dma_transfer(0, &address[_calc_memory_loc()], next_window_sources,
-    	    	        	        		0, num_spike_sources * sizeof(spike_source_t));
-
-
+    	if (current_spike_source_count != num_diff_rates -1) {
+    	    current_spike_source_count += 1;
+    	    // kick_off dma to retrieve next source spikes
+    	    spin1_dma_transfer(
+    		    0, &address[_calc_memory_loc()], next_window_sources,
+		    0, num_spike_sources * sizeof(spike_source_t));
     	} else{
-    		// reset pointer back to beginning
-    		current_spike_source_count = 0;
+    	    // reset pointer back to beginning
+    	    current_spike_source_count = 0;
 
-    	    spin1_dma_transfer(0, &address[_calc_memory_loc()], next_window_sources,
-    	    	        	        		0, num_spike_sources * sizeof(spike_source_t));
+    	    spin1_dma_transfer(
+    		    0, &address[_calc_memory_loc()], next_window_sources,
+    		    0, num_spike_sources * sizeof(spike_source_t));
     	}
-
-
-
-     }
+    }
 
     // Loop through spike sources
     for (index_t s = 0; s < num_spike_sources; s++) {
@@ -700,7 +691,6 @@ void timer_callback(uint timer_count, uint unused) {
 
                 // Subtract tick
                 spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
-
             }
         }
     }
