@@ -110,15 +110,16 @@ static inline bool unpack_post_to_pre(
     return true;
 }
 
-static inline int pack(pop_index, subpop_index, neuron_index) {
-    int value, masked_pop_index, masked_subpop_index, masked_neuron_index;
+static inline int pack(
+	uint32_t pop_index, uint32_t subpop_index, uint32_t neuron_index) {
+    uint32_t value, masked_pop_index, masked_subpop_index, masked_neuron_index;
     masked_pop_index    = pop_index    & 0xFF;
     masked_subpop_index = subpop_index & 0xFF;
     masked_neuron_index = neuron_index & 0xFFFF;
     value = (masked_pop_index << 24) |
             (masked_subpop_index << 16) |
              masked_neuron_index;
-    return value;
+    return (int) value;
 }
 
 //---------------------------------------
@@ -367,7 +368,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
         // Identify pop, subpop and lo and hi atoms
         // Amazing linear search inc.
         // Loop over all populations
-        bool found=false;
         for (int i=0; i< rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
             // Loop over all subpopulations and check if the KEY matches
             // (with neuron id masked out)
@@ -384,7 +384,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
                     choice = _spike &
                 	    ~rewiring_data.pre_pop_info_table.subpop_info[i]
                             .key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3];
-                    found = true;
                 }
             }
         }
