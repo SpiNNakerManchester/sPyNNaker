@@ -4,10 +4,8 @@ import math
 import random
 import numpy
 from enum import Enum
-from pacman.model.constraints.key_allocator_constraints.contiguous_key_range_constraint import \
+from pacman.model.constraints.key_allocator_constraints import \
    ContiguousKeyRangeContraint
-# from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint import \
-#     KeyAllocatorContiguousRangeContraint
 
 from data_specification.enums.data_type import DataType
 

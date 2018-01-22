@@ -125,13 +125,12 @@ class SynapseIORowBased(AbstractSynapseIO):
             connections, row_indices, n_rows, post_vertex_slice,
             n_synapse_types, population_table, synapse_dynamics,
             app_edge, machine_edge):
-
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
         if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics) or \
                 (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-                     isinstance(synapse_dynamics.super,
-                                AbstractStaticSynapseDynamics)):
+                 isinstance(synapse_dynamics.super,
+                            AbstractStaticSynapseDynamics)):
 
             # Get the static data
             if isinstance(synapse_dynamics, SynapseDynamicsStructural):
@@ -151,7 +150,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         elif isinstance(synapse_dynamics, SynapseDynamicsSTDP) or \
                 (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-                     isinstance(synapse_dynamics.super, SynapseDynamicsSTDP)):
+                 isinstance(synapse_dynamics.super, SynapseDynamicsSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -394,11 +393,11 @@ class SynapseIORowBased(AbstractSynapseIO):
                     for i in range(len(n_synapses))],
                     dtype="uint32")
                 row_min_delay = (row_stage + 1) * 16
-                connection_min_delay = numpy.concatenate(
-                    [numpy.repeat(row_min_delay[i], n_synapses[i])
+                connection_min_delay = numpy.concatenate([
+                    numpy.repeat(row_min_delay[i], n_synapses[i])
                     for i in range(len(n_synapses))])
-                connection_source_extra = numpy.concatenate(
-                    [numpy.repeat(
+                connection_source_extra = numpy.concatenate([
+                    numpy.repeat(
                         row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
                         n_synapses[i])
                     for i in range(len(n_synapses))])

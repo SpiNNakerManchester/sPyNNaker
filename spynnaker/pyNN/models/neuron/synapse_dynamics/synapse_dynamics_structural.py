@@ -332,7 +332,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                                     dtype=np.int32) * -1
         for row in self._connections[post_slice.lo_atom]:
             if row[0].size > 0:
-                for source, target, weight, delay, syn_type in row[0]:
+                for source, target, _weight, _delay, _syn_type in row[0]:
                     # Select pre vertex
                     pre_vertex_slice = graph_mapper._slice_by_machine_vertex[
                         row[2].pre_vertex]
@@ -422,7 +422,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_plastic_synaptic_data(self, connections, connection_row_indices,
                                   n_rows, post_vertex_slice,
                                   n_synapse_types, app_edge, machine_edge):
-        if not post_vertex_slice.lo_atom in self._connections.keys():
+        if post_vertex_slice.lo_atom not in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
@@ -437,7 +437,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     def get_static_synaptic_data(self, connections, connection_row_indices,
                                  n_rows, post_vertex_slice,
                                  n_synapse_types, app_edge, machine_edge):
-        if not post_vertex_slice.lo_atom in self._connections.keys():
+        if post_vertex_slice.lo_atom not in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
