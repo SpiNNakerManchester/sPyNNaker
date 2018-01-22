@@ -9,8 +9,8 @@ from spynnaker.pyNN import exceptions
 
 
 class SynapseDynamicsStatic(
-    AbstractStaticSynapseDynamics, AbstractPopulationSettable,
-    AbstractChangableAfterRun):
+        AbstractStaticSynapseDynamics, AbstractPopulationSettable,
+        AbstractChangableAfterRun):
 
     def __init__(self, pad_to_length=None):
         AbstractStaticSynapseDynamics.__init__(self)

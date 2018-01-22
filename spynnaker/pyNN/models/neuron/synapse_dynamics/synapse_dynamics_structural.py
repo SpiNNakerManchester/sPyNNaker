@@ -4,19 +4,12 @@ import collections
 from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-
-from spynnaker.pyNN.models.neural_projections.projection_machine_edge import \
-    ProjectionMachineEdge
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    abstract_plastic_synapse_dynamics \
-    import AbstractPlasticSynapseDynamics
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    abstract_synapse_dynamics_structural import \
+from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
+from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_synapse_dynamics_structural import \
     AbstractSynapseDynamicsStructural
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
-    import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static \
-    import SynapseDynamicsStatic
+from .synapse_dynamics_stdp import SynapseDynamicsSTDP
+from .synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities import constants
 
 
@@ -83,7 +76,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         # TODO
         return []
 
-    def distance(self, x0, x1, grid=np.asarray([16, 16]), type='euclidian'):
+    def distance(self, x0, x1, grid=np.asarray([16, 16]),
+                 type='euclidian'):  # @ReservedAssignment
         x0 = np.asarray(x0)
         x1 = np.asarray(x1)
         delta = np.abs(x0 - x1)
@@ -286,8 +280,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
             # currently, controls = 1 if the subvertex (on the current core)
             # is part of this population
-            controls = 1 if current_key in np.asarray(subpopulation_list)[:,
-                                           0] else 0
+            controls = int(
+                current_key in np.asarray(subpopulation_list)[:, 0])
             spec.write_value(data=controls, data_type=DataType.UINT16)
 
             spec.write_value(
@@ -346,8 +340,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
                     # Select population index
                     pop_index = population_to_subpopulation_information.\
-                        keys().index(
-                        row[1].pre_vertex)
+                        keys().index(row[1].pre_vertex)
                     masked_pop_index = pop_index & (2 ** 9 - 1)
                     # Select subpopulation index
                     dt = np.dtype(
@@ -356,14 +349,13 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     structured_array = np.array(
                         population_to_subpopulation_information[
                             row[1].pre_vertex], dtype=dt)
-                    sorted_info_list = np.sort(structured_array,
-                                               order='lo_atom')
+                    sorted_info_list = np.sort(
+                        structured_array, order='lo_atom')
                     # find index where lo_atom equals the one in
                     # pre_vertex_slice
                     subpop_index = np.argwhere(
                         sorted_info_list['lo_atom'] ==
-                        pre_vertex_slice.lo_atom).ravel()[
-                        0]
+                        pre_vertex_slice.lo_atom).ravel()[0]
                     masked_sub_pop_index = subpop_index & (2 ** 9 - 1)
                     # identifier combines the vertex, pop and subpop
                     # into 1 x 32 bit word
@@ -373,7 +365,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                         synaptic_entry = np.argmax(
                             post_to_pre_table[target - post_slice.lo_atom] ==
                             -1).ravel()[0]
-                    except:
+                    except Exception:
                         break
                     post_to_pre_table[
                         target - post_slice.lo_atom, synaptic_entry] = \
@@ -408,8 +400,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         total_size += (80 * 4)
         pop_size = 0
         # approximate the size of the pop -> subpop table
-        if in_edges is not None and isinstance(in_edges[0],
-                                               ProjectionApplicationEdge):
+        if (in_edges is not None and
+                isinstance(in_edges[0], ProjectionApplicationEdge)):
             # Approximation gets computed here based on number of
             # afferent edges
             # How many afferent application vertices?
@@ -422,8 +414,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                             edge.pre_vertex.n_atoms / 32.)
             no_pre_vertices_estimate *= 4
             pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
-        elif in_edges is not None and isinstance(in_edges[0],
-                                                 ProjectionMachineEdge):
+        elif (in_edges is not None and
+                isinstance(in_edges[0], ProjectionMachineEdge)):
             pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
         return int(self.fudge_factor * (total_size + pop_size))  # bytes
 
@@ -435,17 +427,12 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
         if isinstance(self.super, AbstractPlasticSynapseDynamics):
-            return self.super.get_plastic_synaptic_data(connections,
-                                                        connection_row_indices,
-                                                        n_rows,
-                                                        post_vertex_slice,
-                                                        n_synapse_types)
-        else:
-            return self.super.get_static_synaptic_data(connections,
-                                                       connection_row_indices,
-                                                       n_rows,
-                                                       post_vertex_slice,
-                                                       n_synapse_types)
+            return self.super.get_plastic_synaptic_data(
+                connections, connection_row_indices, n_rows,
+                post_vertex_slice, n_synapse_types)
+        return self.super.get_static_synaptic_data(
+            connections, connection_row_indices, n_rows, post_vertex_slice,
+            n_synapse_types)
 
     def get_static_synaptic_data(self, connections, connection_row_indices,
                                  n_rows, post_vertex_slice,
@@ -454,47 +441,39 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
-        return self.super.get_static_synaptic_data(connections,
-                                                   connection_row_indices,
-                                                   n_rows, post_vertex_slice,
-                                                   n_synapse_types)
+        return self.super.get_static_synaptic_data(
+            connections, connection_row_indices, n_rows, post_vertex_slice,
+            n_synapse_types)
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
             self._actual_row_max_length = \
-                self.super.get_n_words_for_plastic_connections(
-                n_connections)
-            return self._actual_row_max_length
-        except:
+                self.super.get_n_words_for_plastic_connections(n_connections)
+        except Exception:
             self._actual_row_max_length = \
-                self.super.get_n_words_for_static_connections(
-                n_connections)
-            return self._actual_row_max_length
+                self.super.get_n_words_for_static_connections(n_connections)
+        return self._actual_row_max_length
 
     def get_n_words_for_static_connections(self, n_connections):
         self._actual_row_max_length = \
-            self.super.get_n_words_for_static_connections(
-            n_connections)
+            self.super.get_n_words_for_static_connections(n_connections)
         return self._actual_row_max_length
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         if fp_size is not None:
             return self.super.get_n_synapses_in_rows(pp_size, fp_size)
-        else:
-            return self.super.get_n_synapses_in_rows(pp_size)
+        return self.super.get_n_synapses_in_rows(pp_size)
 
     def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                    pp_size, pp_data, fp_size, fp_data):
-        return self.super.read_plastic_synaptic_data(post_vertex_slice,
-                                                     n_synapse_types, pp_size,
-                                                     pp_data, fp_size,
-                                                     fp_data)
+        return self.super.read_plastic_synaptic_data(
+            post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size,
+            fp_data)
 
     def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                   ff_size, ff_data):
-        return self.super.read_static_synaptic_data(post_vertex_slice,
-                                                    n_synapse_types, ff_size,
-                                                    ff_data)
+        return self.super.read_static_synaptic_data(
+            post_vertex_slice, n_synapse_types, ff_size, ff_data)
 
     def get_n_fixed_plastic_words_per_row(self, fp_size):
         return self.super.get_n_fixed_plastic_words_per_row(fp_size)

@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 import logging
 
-from spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural import \
+from spynnaker.pyNN.models.neuron.synapse_dynamics import \
     AbstractSynapseDynamicsStructural
 
 logger = logging.getLogger(__name__)
@@ -76,7 +76,8 @@ class GraphEdgeFilter(object):
         app_edge = graph_mapper.get_application_edge(edge)
         if hasattr(app_edge, "synapse_information"):
             for syn_info in app_edge.synapse_information:
-                if isinstance(syn_info.synapse_dynamics, AbstractSynapseDynamicsStructural):
+                if isinstance(syn_info.synapse_dynamics,
+                              AbstractSynapseDynamicsStructural):
                     return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)

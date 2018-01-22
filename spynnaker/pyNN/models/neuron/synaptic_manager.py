@@ -27,7 +27,8 @@ from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.models.neuron.synapse_dynamics \
+    import SynapseDynamicsStatic, SynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
@@ -37,9 +38,6 @@ from spynnaker.pyNN.utilities.utility_calls \
     import get_maximum_probable_value, write_parameters_per_neuron, \
     translate_parameters
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural import \
-    SynapseDynamicsStructural
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
@@ -279,7 +277,8 @@ class SynapticManager(object):
                                              in_edges=None):
         """ Get the size of the synapse dynamics region
         """
-        # Does the size of the parameters area depend on presynaptic connections in any way?
+        # Does the size of the parameters area depend on presynaptic
+        # connections in any way?
         try:
             # Yes!
             return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(

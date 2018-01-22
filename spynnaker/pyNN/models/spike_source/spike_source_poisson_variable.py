@@ -40,8 +40,7 @@ from spinn_front_end_common.abstract_models\
 from spinn_front_end_common.abstract_models.impl\
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs.executable_start_type \
-    import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spynnaker.pyNN.models.common.abstract_spike_recordable \
     import AbstractSpikeRecordable
@@ -75,7 +74,8 @@ RANDOM_SEED_WORDS = 4
 # has key, key, random_back off, time_between_spikes,
 # seed1, seed2, seed3 , seed4,
 # n_sources, seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
-START_OF_POISSON_GENERATOR_PARAMETERS = (PARAMS_BASE_WORDS + PARAMS_VARIABLE + RANDOM_SEED_WORDS) * 4
+START_OF_POISSON_GENERATOR_PARAMETERS = (
+    PARAMS_BASE_WORDS + PARAMS_VARIABLE + RANDOM_SEED_WORDS) * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
@@ -135,7 +135,8 @@ class SpikeSourcePoissonVariable(
     _n_poisson_machine_vertices = 0
 
     # parameters expected by PyNN
-    default_parameters = {'rate_interval_duration':10,
+    default_parameters = {
+        'rate_interval_duration': 10,
         'start': 0.0, 'duration': None, 'rate': 1.0}
 
     # parameters expected by spinnaker
@@ -170,15 +171,12 @@ class SpikeSourcePoissonVariable(
         self._change_requires_mapping = True
         self._change_requires_neuron_parameters_reload = False
 
-        self._rate_interval_duration = rate_interval_duration
-        self._rate = []
-        self._num_rates = len(rate)
-
         # Store the parameters
-        for block in rate:
-            self._rate.append(utility_calls.convert_param_to_numpy(block, self._n_atoms))
-
-
+        self._rate_interval_duration = rate_interval_duration
+        self._rate = [
+            utility_calls.convert_param_to_numpy(block, self._n_atoms)
+            for block in rate]
+        self._num_rates = len(rate)
 
         self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
         self._duration = utility_calls.convert_param_to_numpy(
@@ -300,9 +298,9 @@ class SpikeSourcePoissonVariable(
 
     @rate.setter
     def rate(self, rate):
-        self._rate = []
-        for block in rate:
-            self._rate.append(utility_calls.convert_param_to_numpy(block, self._n_atoms))
+        self._rate = [
+            utility_calls.convert_param_to_numpy(block, self._n_atoms)
+            for block in rate]
 
     @property
     def start(self):
@@ -338,14 +336,14 @@ class SpikeSourcePoissonVariable(
     def get_max_atoms_per_core():
         return SpikeSourcePoissonVariable._model_based_max_atoms_per_core
 
-    #@staticmethod
     def get_params_bytes(self, vertex_slice):
         """ Gets the size of the poisson parameters in bytes
 
         :param vertex_slice:
         """
         return (RANDOM_SEED_WORDS + PARAMS_BASE_WORDS + PARAMS_VARIABLE +
-                (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON * self._num_rates)) * 4
+                (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON *
+                 self._num_rates)) * 4
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for poisson source parameters and output\
@@ -376,8 +374,8 @@ class SpikeSourcePoissonVariable(
         placement.vertex.reserve_provenance_data_region(spec)
 
     def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
-        """ does the allocation for the poisson params region itself, as
-        it can be reused for setters after an initial run
+        """ does the allocation for the poisson params region itself, as\
+            it can be reused for setters after an initial run
 
         :param placement: the location on machine for this vertex
         :param graph_mapper: the mapping between machine and application graphs
@@ -433,8 +431,6 @@ class SpikeSourcePoissonVariable(
         for block in self._rate:
             block_rates.append(numpy.sum(block))
 
-        total_mean_rate = max(block_rates)
-
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
         if total_mean_rate > 0:
@@ -480,7 +476,8 @@ class SpikeSourcePoissonVariable(
         spec.write_value(data=self._num_rates, data_type=DataType.UINT32)
 
         # Write the interval duration before changing rates
-        spec.write_value(data=self._rate_interval_duration, data_type = DataType.UINT32)
+        spec.write_value(data=self._rate_interval_duration,
+                         data_type=DataType.UINT32)
 
         # Compute the start times in machine time steps
         start = self._start[vertex_slice.as_slice]
@@ -509,15 +506,16 @@ class SpikeSourcePoissonVariable(
             is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
 
             # Compute the e^-(spikes_per_tick) for fast sources to allow fast
-            # computation of the Poisson distribution to get the number of spikes
-            # per timestep
+            # computation of the Poisson distribution to get the number of
+            # spikes per timestep
             exp_minus_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
             exp_minus_lambda[is_fast_source] = numpy.exp(
                 -1.0 * spikes_per_tick[is_fast_source])
-            # Compute the inter-spike-interval for slow sources to get the average
-            # number of timesteps between spikes
+            # Compute the inter-spike-interval for slow sources to get the
+            # average number of timesteps between spikes
             isi_val = numpy.zeros(len(spikes_per_tick), dtype="float")
-            elements = numpy.logical_not(is_fast_source) & (spikes_per_tick > 0)
+            elements = numpy.logical_not(is_fast_source) & (
+                spikes_per_tick > 0)
             isi_val[elements] = 1.0 / spikes_per_tick[elements]
 
             # Get the time to spike value
@@ -708,7 +706,8 @@ class SpikeSourcePoissonVariable(
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
 
-        spec.comment("\n*** Spec for SpikeSourcePoissonVariable Instance ***\n\n")
+        spec.comment(
+            "\n*** Spec for SpikeSourcePoissonVariable Instance ***\n\n")
 
         # Reserve SDRAM space for memory areas:
         self.reserve_memory_regions(spec, placement, graph_mapper)
@@ -752,7 +751,7 @@ class SpikeSourcePoissonVariable(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
