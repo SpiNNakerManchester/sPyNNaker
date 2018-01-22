@@ -175,8 +175,9 @@ address_t synaptogenesis_dynamics_initialise(
     // Need to malloc space for subpop_info, i.e. an array
     // containing information for each pre-synaptic
     // application vertex
-    if (rewiring_data.pre_pop_info_table.no_pre_pops==0)
+    if (rewiring_data.pre_pop_info_table.no_pre_pops == 0) {
         return NULL;
+    }
 
     rewiring_data.pre_pop_info_table.subpop_info = (subpopulation_info_t*) sark_alloc(
 	    rewiring_data.pre_pop_info_table.no_pre_pops, sizeof(subpopulation_info_t));
@@ -302,8 +303,9 @@ void update_goal_posts(uint32_t time) {
 }
 
 static inline spike_t select_last_spike () {
-    if (current_state.no_spike_in_interval == 0)
+    if (current_state.no_spike_in_interval == 0) {
         return -1;
+    }
     uint32_t offset=ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
 	    current_state.no_spike_in_interval;
     return circular_buffer_value_at_index(
@@ -418,8 +420,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
                 .key_atom_info[pre_sub_pop * KEY_INFO_CONSTANTS + 0] | choice;
     }
 
-
-
     address_t synaptic_row_address;
     size_t n_bytes;
 
@@ -473,11 +473,13 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
     delta_x = my_abs(pre_x - post_x);
     delta_y = my_abs(pre_y - post_y);
 
-    if( delta_x > rewiring_data.grid_x>>1 && rewiring_data.grid_x > 1)
+    if (delta_x > rewiring_data.grid_x >> 1 && rewiring_data.grid_x > 1) {
         delta_x -= rewiring_data.grid_x;
+    }
 
-    if( delta_y > rewiring_data.grid_y>>1 && rewiring_data.grid_y > 1)
+    if (delta_y > rewiring_data.grid_y >> 1 && rewiring_data.grid_y > 1) {
         delta_y -= rewiring_data.grid_y;
+    }
 
     current_state.distance = delta_x * delta_x + delta_y * delta_y;
     current_state.global_pre_syn_id = pre_global_id;
@@ -611,8 +613,7 @@ bool synaptogenesis_dynamics_formation_rule(void) {
     } else {
         probability = rewiring_data.lat_probabilities[current_state.distance];
     }
-    uint16_t r =
-        ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
+    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
     if (r > probability) {
         log_debug("\t| NO FORM %d", current_state.current_time);
         return false;
