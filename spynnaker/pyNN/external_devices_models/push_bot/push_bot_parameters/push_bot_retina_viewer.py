@@ -24,7 +24,7 @@ class PushBotRetinaViewer(Thread):
         except Exception:
             raise Exception("matplotlib must be installed to use this viewer")
 
-        Thread.__init__(self, name="PushBotRetinaViewer")
+        super(PushBotRetinaViewer, self).__init__(name="PushBotRetinaViewer")
         self._display_max = display_max
         self._frame_time_ms = frame_time_ms
 
