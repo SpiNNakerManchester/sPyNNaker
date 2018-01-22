@@ -530,3 +530,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
             np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
         )
+
+    def get_max_synapses(self, n_words):
+        return self.super.get_max_synapses(n_words)

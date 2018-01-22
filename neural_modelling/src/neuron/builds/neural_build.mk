@@ -100,8 +100,8 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
     STDP_ENABLED = 1
 endif
 
-include ../../../Makefile.common
-#include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+#include ../../../Makefile.common
+include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
