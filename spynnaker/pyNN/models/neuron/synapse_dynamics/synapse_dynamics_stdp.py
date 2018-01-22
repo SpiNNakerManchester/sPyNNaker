@@ -161,9 +161,9 @@ class SynapseDynamicsSTDP(
         if self._pad_to_length is not None and \
                         n_connections < self._pad_to_length:
             n_connections = self._pad_to_length
-
-        fp_size_words = \
-            n_connections if n_connections % 2 == 0 else n_connections + 1
+        fp_size_words = (
+            n_connections / 2 if n_connections % 2 == 0
+            else (n_connections + 1) / 2)
         pp_size_bytes = (
             self._n_header_bytes +
             (synapse_structure.get_n_bytes_per_connection() * n_connections))
@@ -260,9 +260,8 @@ class SynapseDynamicsSTDP(
         n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         data_fixed = numpy.concatenate([
-                                           fp_data[i].view(dtype="uint16")[
-                                           0:fp_size[i]]
-                                           for i in range(n_rows)])
+            fp_data[i].view(dtype="uint16")[0:fp_size[i]]
+            for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
@@ -320,3 +319,27 @@ class SynapseDynamicsSTDP(
         if self._weight_dependence is not None:
             names.extend(self._weight_dependence.get_parameter_names())
         return names
+
+    @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
+    def get_max_synapses(self, n_words):
+
+        # Subtract the header size that will always exist
+        n_header_words = self._n_header_bytes / 4
+        n_words_space = n_words - n_header_words
+
+        # Get plastic plastic size per connection
+        synapse_structure = self._timing_dependence.synaptic_structure
+        bytes_per_pp = synapse_structure.get_n_bytes_per_connection()
+
+        # The fixed plastic size per connection is 2 bytes
+        bytes_per_fp = 2
+
+        # Maximum possible connections, ignoring word alignment
+        n_connections = (n_words_space * 4) / (bytes_per_pp + bytes_per_fp)
+
+        # Reduce until correct
+        while (self.get_n_words_for_plastic_connections(n_connections) >
+               n_words):
+            n_connections -= 1
+
+        return n_connections

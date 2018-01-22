@@ -28,7 +28,32 @@ class AbstractConnector(object):
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
 
-    __slots__ = ()
+    __slots__ = [
+        "_safe",
+
+        "_space",
+
+        "_verbose",
+
+        "_pre_population",
+
+        "_post_population",
+
+        "_n_pre_neurons",
+
+        "_n_post_neurons",
+
+        "_rng",
+
+        "_n_clipped_delays",
+
+        "_min_delay",
+
+        "_weights",
+
+        "_delays"
+
+        ]
 
     def __init__(self, safe=True, verbose=False):
         self._safe = safe
@@ -110,14 +135,12 @@ class AbstractConnector(object):
         if globals_variables.get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
-            if hasattr(delays, "boundaries"):
-                if delays.boundaries is not None:
-                    return min(max(delays.boundaries), max_estimated_delay)
-            elif isinstance(delays.parameters, dict):
-                if "max" in delays.parameters:
-                    return delays.parameters['max']
+            high = utility_calls.high(delays)
+            if high is None:
+                return max_estimated_delay
 
-            return max_estimated_delay
+            # The maximum is the minimum of the possible maximums
+            return min(max_estimated_delay, high)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -234,17 +257,17 @@ class AbstractConnector(object):
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
                     weights, n_connections)
-                if weights.boundaries is not None:
-                    return abs(max(min_weight, min(weights.boundaries)))
-                return abs(min_weight)
+                low = utility_calls.low(weights)
+                if low is None:
+                    return abs(min_weight)
+                return abs(max(min_weight, low))
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
                     weights, n_connections)
                 high = utility_calls.high(weights)
                 if high is None:
                     return abs(max_weight)
-                else:
-                    return abs(min(max_weight, high))
+                return abs(min(max_weight, high))
 
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -440,3 +463,11 @@ class AbstractConnector(object):
     @verbose.setter
     def verbose(self, new_value):
         self._verbose = new_value
+
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def post_population(self):
+        return self._post_population

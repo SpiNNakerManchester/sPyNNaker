@@ -59,7 +59,7 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, SDP_AND_DMA_AND_USER = 0, TIMER_AND_BUFFERING = 2
+    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -137,7 +137,7 @@ static bool initialise(uint32_t *timer_period) {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, address),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP_AND_DMA_AND_USER, SDP_AND_DMA_AND_USER)) {
+            &infinite_run, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
@@ -205,7 +205,7 @@ static bool initialise(uint32_t *timer_period) {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, SDP_AND_DMA_AND_USER,
+            row_max_n_words, MC, USER,
             incoming_spike_buffer_size)) {
         return false;
     }
@@ -352,7 +352,7 @@ void c_main(void) {
     spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
-    spin1_callback_on(TIMER_TICK, timer_callback, TIMER_AND_BUFFERING);
+    spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
     simulation_run();
 }

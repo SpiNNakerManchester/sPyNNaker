@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.neural_projections.connectors \
 from spynnaker.pyNN.models.neuron.synapse_dynamics. \
     abstract_synapse_dynamics_structural import \
     AbstractSynapseDynamicsStructural
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from .abstract_synapse_io import AbstractSynapseIO
 from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp \
     import SynapseDynamicsSTDP
@@ -38,11 +39,27 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _n_words(self, n_bytes):
         return math.ceil(float(n_bytes) / 4.0)
 
+    def _get_max_row_bytes(
+            self, size, dynamics, population_table, in_edge, row_length):
+        try:
+            return population_table.get_allowed_row_length(size) * 4
+        except SynapseRowTooBigException as e:
+            max_synapses = dynamics.get_max_synapses(e.max_size)
+            raise SynapseRowTooBigException(
+                max_synapses,
+                "The connection between {} and {} has more synapses ({}) than"
+                " can currently be supported on this implementation of PyNN"
+                " ({} for this connection type)."
+                " Please reduce the size of the target population, or reduce"
+                " the number of neurons per core.".format(
+                    in_edge.pre_vertex, in_edge.post_vertex, row_length,
+                    max_synapses))
+
     def get_sdram_usage_in_bytes(
             self, synapse_info, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            machine_time_step):
+            machine_time_step, in_edge):
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -56,20 +73,20 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_delay_supported + numpy.finfo(numpy.double).tiny)
 
         # row length for the non-delayed synaptic matrix
-        max_undelayed_row_length = synapse_info.connector \
+        max_undelayed_row_length = synapse_info.connector\
             .get_n_connections_from_pre_vertex_maximum(
-            n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            0, max_delay_supported)
+                n_pre_slices, pre_slice_index, n_post_slices,
+                post_slice_index, pre_vertex_slice, post_vertex_slice,
+                0, max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_row_length = 0
         if n_delay_stages > 0:
-            max_delayed_row_length = synapse_info.connector \
+            max_delayed_row_length = synapse_info.connector\
                 .get_n_connections_from_pre_vertex_maximum(
-                n_pre_slices, pre_slice_index, n_post_slices,
-                post_slice_index, pre_vertex_slice, post_vertex_slice,
-                min_delay_for_delay_extension, max_delay)
+                    n_pre_slices, pre_slice_index, n_post_slices,
+                    post_slice_index, pre_vertex_slice, post_vertex_slice,
+                    min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
         dynamics = synapse_info.synapse_dynamics
@@ -89,10 +106,12 @@ class SynapseIORowBased(AbstractSynapseIO):
                 max_delayed_row_length)
 
         # Adjust for the allowed row lengths from the population table
-        undelayed_max_bytes = population_table.get_allowed_row_length(
-            undelayed_size) * 4
-        delayed_max_bytes = population_table.get_allowed_row_length(
-            delayed_size) * 4
+        undelayed_max_bytes = self._get_max_row_bytes(
+            undelayed_size, dynamics, population_table, in_edge,
+            max_undelayed_row_length)
+        delayed_max_bytes = self._get_max_row_bytes(
+            delayed_size, dynamics, population_table, in_edge,
+            max_delayed_row_length)
 
         # Add on the header words and multiply by the number of rows in the
         # block
@@ -387,20 +406,12 @@ class SynapseIORowBased(AbstractSynapseIO):
                                         dtype="uint32")
                 row_min_delay = (row_stage + 1) * 16
                 connection_min_delay = numpy.concatenate(
-                    [numpy.repeat(
-                            row_min_delay[
-                                i],
-                            n_synapses[i])
-                        for i in range(
-                        len(n_synapses))])
+                    [numpy.repeat(row_min_delay[i], n_synapses[i])
+                    for i in range(len(n_synapses))])
                 connection_source_extra = numpy.concatenate(
                     [numpy.repeat(
-                            row_stage[
-                                i] * pre_vertex_slice.n_atoms,
-                            n_synapses[
-                                i])
-                        for i in range(
-                        len(n_synapses))])
+                        row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms), n_synapses[i])
+                    for i in range(len(n_synapses))])
 
                 delayed_connections["source"] -= connection_source_extra.astype("uint32")
                 delayed_connections["source"] += pre_vertex_slice.lo_atom

@@ -155,16 +155,19 @@ class TestSynapticManager(unittest.TestCase):
         first_block, row_len_1 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0)
+            direct_synapses_address=0, key=key, n_rows=1, index=0,
+            using_extra_monitor_cores=False)
         same_block, row_len_1_2 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0)
+            direct_synapses_address=0, key=key, n_rows=1, index=0,
+            using_extra_monitor_cores=False)
         synaptic_manager.clear_connection_cache()
         different_block, row_len_2 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0)
+            direct_synapses_address=0, key=key, n_rows=1, index=0,
+            using_extra_monitor_cores=False)
 
         # Check that the row lengths are all the same
         assert row_len_1 == row_len_1_2
@@ -206,11 +209,13 @@ class TestSynapticManager(unittest.TestCase):
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=n_rows, index=0)
+            direct_synapses_address=0, key=key, n_rows=n_rows, index=0,
+            using_extra_monitor_cores=False)
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=n_rows, index=1)
+            direct_synapses_address=0, key=key, n_rows=n_rows, index=1,
+            using_extra_monitor_cores=False)
 
         # Row lengths should be 1
         assert row_len_1 == 1
@@ -345,7 +350,9 @@ class TestSynapticManager(unittest.TestCase):
         # the second is potentially direct, but has been restricted by the
         # restriction on the size of the direct matrix
         assert len(items) == 3
-        assert items[0][2]
+
+        # TODO: This has been changed because direct matrices are disabled!
+        assert not items[0][2]
         assert not items[1][2]
         assert not items[2][2]
 
@@ -354,7 +361,8 @@ class TestSynapticManager(unittest.TestCase):
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=0)
+            n_rows=pre_vertex_slice.n_atoms, index=0,
+            using_extra_monitor_cores=False)
         connections_1 = synaptic_manager._synapse_io.read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
             row_len_1, 0, 2, weight_scales, data_1, None,
@@ -373,7 +381,8 @@ class TestSynapticManager(unittest.TestCase):
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=1)
+            n_rows=pre_vertex_slice.n_atoms, index=1,
+            using_extra_monitor_cores=False)
         connections_2 = synaptic_manager._synapse_io.read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
             row_len_2, 0, 2, weight_scales, data_2, None,
@@ -392,7 +401,8 @@ class TestSynapticManager(unittest.TestCase):
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=2)
+            n_rows=pre_vertex_slice.n_atoms, index=2,
+            using_extra_monitor_cores=False)
         connections_3 = synaptic_manager._synapse_io.read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
