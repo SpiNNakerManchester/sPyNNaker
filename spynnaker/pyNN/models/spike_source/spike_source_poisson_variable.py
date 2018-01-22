@@ -4,14 +4,15 @@ import math
 import random
 import numpy
 from enum import Enum
-# from pacman.model.constraints.key_allocator_constraints.contiguous_key_range_constraint import \
-#    ContiguousKeyRangeContraint
+from pacman.model.constraints.key_allocator_constraints.contiguous_key_range_constraint import \
+   ContiguousKeyRangeContraint
+# from pacman.model.constraints.key_allocator_constraints.key_allocator_contiguous_range_constraint import \
+#     KeyAllocatorContiguousRangeContraint
 
 from data_specification.enums.data_type import DataType
 
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints \
-    import KeyAllocatorContiguousRangeContraint
+
 from pacman.model.decorators.overrides import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
@@ -764,7 +765,7 @@ class SpikeSourcePoissonVariable(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        return [KeyAllocatorContiguousRangeContraint()]
+        return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

@@ -57,12 +57,16 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
 endif
 
+SYNGEN_ENABLED = 1
+
 ifndef SYNAPTOGENESIS_DYNAMICS_H
     SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
+    SYNGEN_ENABLED = 0
 endif
 
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNGEN_ENABLED = 0
 endif
 
 NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
@@ -109,6 +113,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) \
 	      -DSTDP_ENABLED=$(STDP_ENABLED) \
+	      -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) \
 	      -include $$(SYNAPSE_TYPE_H) \
 	      -include $$(WEIGHT_DEPENDENCE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<

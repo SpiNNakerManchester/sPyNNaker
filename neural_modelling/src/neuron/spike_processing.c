@@ -37,6 +37,8 @@ static uint32_t single_fixed_synapse[4];
 // Last spike
 //spike_t last_spike;
 //uint32_t buffer_real_size;
+//spike_t last_spike=-1;
+
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
@@ -170,7 +172,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 // Called when a multicast packet is received
 void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
-
+//    last_spike = key;
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
     // If there was space to add spike to incoming spike queue
@@ -308,6 +310,7 @@ uint32_t spike_processing_get_buffer_overflows() {
 //    spike_t temp_spike = last_spike;
 //    last_spike = -1;
 //    return temp_spike;
+//    return last_spike;
 //}
 
 //uint32_t get_buffer_real_size() {

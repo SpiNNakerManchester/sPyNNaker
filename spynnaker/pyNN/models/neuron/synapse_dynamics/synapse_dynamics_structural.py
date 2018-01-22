@@ -1,6 +1,7 @@
 import numpy as np
 import collections
 
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
@@ -45,7 +46,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._random_partner = random_partner
         self._connections = {}
 
-        self.fudge_factor = 1.3
+        self.fudge_factor = 1.5
         self._actual_row_max_length = self._s_max
 
         if stdp_model is not None:
@@ -75,6 +76,12 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self.generate_distance_probability_array(
                 self._p_form_lateral,
                 self._sigma_form_lateral)
+
+    @overrides(AbstractSynapseDynamicsStructural.get_parameter_names)
+    def get_parameter_names(self):
+        # TODO
+        return []
+
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]), type='euclidian'):
         x0 = np.asarray(x0)
@@ -110,7 +117,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
-            np.e ** (-(squared_distances) / (2 * (sigma ** 2))))
+            np.exp(-(squared_distances) / (2 * (sigma ** 2))))
         quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
         # Quantize probabilities and cast as uint16 / short
         unfiltered_probabilities = quantised_probabilities.astype(

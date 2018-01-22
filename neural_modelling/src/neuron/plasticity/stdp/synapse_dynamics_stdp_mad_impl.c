@@ -304,6 +304,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
+
+#if SYNGEN_ENABLED == 1
+
 /*
  * Function that searches the synaptic row for the existence
  * of the neuron with the required id. If such a synapse
@@ -313,7 +316,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
  */
 bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
-    plastic_synapse_t plastic_region_address = synapse_row_plastic_region(row);
+    address_t plastic_region_address = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = _plastic_synapses(plastic_region_address);
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
@@ -334,6 +337,7 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plastici
     }
 
     if (found){
+        // TODO AGDR: Nominate someone to make methods to extract components from plastic_synapse_ts
         sp_data -> weight = weight;
         sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
         sp_data -> delay  = delay;
@@ -407,3 +411,4 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight, uin
     fixed_region[1] = fixed_region[1] + 1;
     return true;
 }
+#endif
