@@ -17,12 +17,15 @@ class MultapseConnector(AbstractConnector):
 
     """
     def __init__(
-            self, num_synapses, safe=True, verbose=False):
+            self, num_synapses, allow_self_connections=True,
+            with_replacement=True, safe=True, verbose=False):
         """
         Creates a new connector.
         """
         AbstractConnector.__init__(self, safe, verbose)
         self._num_synapses = num_synapses
+        self._allow_self_connections = allow_self_connections
+        self._with_replacement = with_replacement
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
