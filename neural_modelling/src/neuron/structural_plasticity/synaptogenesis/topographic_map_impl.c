@@ -72,15 +72,21 @@ static circular_buffer current_state_queue;
 //! ::current_state_queue
 static circular_buffer free_states;
 
-void print_post_to_pre_entry(void) {
-    uint32_t n_elements =
-            rewiring_data.s_max * rewiring_data.machine_no_atoms;
+//! \brief Mark an expression as being probably false for optimisation.
+//! \details Used to guard conditions leading to rt_error(), as those represent
+//!     catastrophic failure states and those are thankfully ultra-rare.
+//! \param expr: The boolean expression
+//! \return The expression
+#define UNLIKELY(expr)  __builtin_expect((expr), 0)
 
-    for (uint32_t i=0; i < n_elements; i++) {
+void print_post_to_pre_entry(void) {
+    uint32_t n_elements = rewiring_data.s_max * rewiring_data.machine_no_atoms;
+
+    for (uint32_t i = 0; i < n_elements; i++) {
+        post_to_pre_entry *pp_entry = &post_to_pre_table[i];
         log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
-                i, post_to_pre_table[i].pop_index,
-                post_to_pre_table[i].sub_pop_index,
-                post_to_pre_table[i].neuron_index);
+                i, pp_entry->pop_index, pp_entry->sub_pop_index,
+                pp_entry->neuron_index);
     }
 }
 
@@ -88,8 +94,7 @@ void print_post_to_pre_entry(void) {
 // Access helpers for circular buffers
 //-----------------------------------------------------------------------------
 static inline void _queue_state(current_state_t *state) {
-    if (__builtin_expect(
-            !circular_buffer_add(current_state_queue, (uint32_t) state), 0)) {
+    if (UNLIKELY(!circular_buffer_add(current_state_queue, (uint32_t) state))) {
         log_error("Could not add state (0x%08x) to queued states", state);
         rt_error(RTE_SWERR);
     }
@@ -97,9 +102,8 @@ static inline void _queue_state(current_state_t *state) {
 
 static inline current_state_t *_get_state(void) {
     current_state_t *state;
-    if (__builtin_expect(
-            !circular_buffer_get_next(current_state_queue, (uint32_t *) &state),
-            0)) {
+    if (UNLIKELY(!circular_buffer_get_next(
+            current_state_queue, (uint32_t *) &state))) {
         log_error("Could not read a state!");
         rt_error(RTE_SWERR);
     }
@@ -107,8 +111,7 @@ static inline current_state_t *_get_state(void) {
 }
 
 static inline void _free_state(current_state_t *state) {
-    if (__builtin_expect(
-            !circular_buffer_add(free_states, (uint32_t) state), 0)) {
+    if (UNLIKELY(!circular_buffer_add(free_states, (uint32_t) state))) {
         log_error("Could not add state (0x%08x) to free states", state);
         rt_error(RTE_SWERR);
     }
@@ -116,8 +119,7 @@ static inline void _free_state(current_state_t *state) {
 
 static inline current_state_t *_alloc_state(void) {
     current_state_t *state;
-    if (__builtin_expect(
-            !circular_buffer_get_next(free_states, (uint32_t *) &state), 0)) {
+    if (UNLIKELY(!circular_buffer_get_next(free_states, (uint32_t *) &state))) {
         log_error("Ran out of states!");
         rt_error(RTE_SWERR);
     }
@@ -143,17 +145,18 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
             rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
-    if (current_state_queue == NULL) {
+    if (UNLIKELY(current_state_queue == NULL)) {
         log_error("Could not allocate current state queue");
         rt_error(RTE_SWERR);
     }
     // Add one to number of states as buffer wastes an entry
     free_states = circular_buffer_initialize(n_states + 1);
-    if (free_states == NULL) {
+    if (UNLIKELY(free_states == NULL)) {
         log_error("Could not allocate free state queue");
+        rt_error(RTE_SWERR);
     }
     current_state_t *states = spin1_malloc(n_states * sizeof(current_state_t));
-    if (states == NULL) {
+    if (UNLIKELY(states == NULL)) {
         log_error("Could not allocate states");
         rt_error(RTE_SWERR);
     }
@@ -165,7 +168,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 
     formation_params = spin1_malloc(
             rewiring_data.no_pre_pops * sizeof(struct formation_params *));
-    if (formation_params == NULL) {
+    if (UNLIKELY(formation_params == NULL)) {
         log_error("Could not initialise formation parameters");
         rt_error(RTE_SWERR);
     }
@@ -175,7 +178,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 
     elimination_params = spin1_malloc(
             rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
-    if (elimination_params == NULL) {
+    if (UNLIKELY(elimination_params == NULL)) {
         log_error("Could not initialise elimination parameters");
         rt_error(RTE_SWERR);
     }
@@ -224,20 +227,19 @@ bool synaptogenesis_dynamics_rewire(
         m_pop_index = key_atom_info->m_pop_index;
     }
 
-    if (!population_table_get_first_address(
-            *spike, synaptic_row_address, n_bytes)) {
+    if (UNLIKELY(!population_table_get_first_address(
+            *spike, synaptic_row_address, n_bytes))) {
         log_error("FAIL@key %d", *spike);
         rt_error(RTE_SWERR);
     }
-    uint32_t index = 0;
-    while (index < m_pop_index) {
-        if (!population_table_get_next_address(
-                spike, synaptic_row_address, n_bytes)) {
+
+    for (uint32_t index = 0; index < m_pop_index; index++) {
+        if (UNLIKELY(!population_table_get_next_address(
+                spike, synaptic_row_address, n_bytes))) {
             log_error("FAIL@key %d, index %d (failed at %d)",
                     *spike, m_pop_index, index);
             rt_error(RTE_SWERR);
         }
-        index++;
     }
 
     // Saving current state
@@ -257,39 +259,46 @@ bool synaptogenesis_dynamics_rewire(
     return true;
 }
 
-bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row) {
-    current_state_t *current_state = _get_state();
-
+//! \brief Performs the actual restructuring of a row
+//! \details Supporting function for synaptogenesis_row_restructure()
+//! \param[in] time: The time of the restructure
+//! \param[in] row: The row to restructure
+//! \param[in] current_state: The current state of the world
+//! \return True if the row was changed and needs to be written back
+static inline bool row_restructure(
+        uint32_t time, synaptic_row_t row,
+        current_state_t *restrict current_state) {
     // the selected pre- and postsynaptic IDs are in current_state
-    bool return_value;
     if (current_state->element_exists) {
         // find the offset of the neuron in the current row
-        if (synapse_dynamics_find_neuron(
+        if (!synapse_dynamics_find_neuron(
                 current_state->post_syn_id, row,
                 &current_state->weight, &current_state->delay,
                 &current_state->offset, &current_state->synapse_type)) {
-            return_value = synaptogenesis_elimination_rule(current_state,
-                    elimination_params[current_state->post_to_pre.pop_index],
-                    time, row);
-        } else {
-            log_debug("Post neuron %d not in row",
-                    current_state->post_syn_id);
-            return_value = false;
+            log_debug("Post neuron %d not in row", current_state->post_syn_id);
+            return false;
         }
+        return synaptogenesis_elimination_rule(current_state,
+                elimination_params[current_state->post_to_pre.pop_index],
+                time, row);
     } else {
         // Can't form if the row is full
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
                 synapse_row_fixed_region(row));
         if (no_elems >= rewiring_data.s_max) {
             log_debug("row is full");
-            return_value = false;
-        } else {
-            return_value = synaptogenesis_formation_rule(current_state,
-                    formation_params[current_state->post_to_pre.pop_index],
-                    time, row);
+            return false;
         }
+        return synaptogenesis_formation_rule(current_state,
+                formation_params[current_state->post_to_pre.pop_index],
+                time, row);
     }
+}
 
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row) {
+    // Manages the state; row_restructure() does the work
+    current_state_t *current_state = _get_state();
+    bool return_value = row_restructure(time, row, current_state);
     _free_state(current_state);
     return return_value;
 }
