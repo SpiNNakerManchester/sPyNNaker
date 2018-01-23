@@ -197,7 +197,7 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up structural plasticity dynamics
     if (synapse_dynamics_region_address &&
-        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+	    !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
         return false;
     }
 
@@ -256,7 +256,6 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-
         log_debug("Completed a run");
 
         // rewrite neuron params to sdram for reading out if needed

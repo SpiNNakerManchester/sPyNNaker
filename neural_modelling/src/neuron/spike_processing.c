@@ -46,7 +46,6 @@ bool any_spike = false;
 
 static inline void _do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
-
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
@@ -58,11 +57,10 @@ static inline void _do_dma_read(
     // buffer
     buffer_being_read = next_buffer_to_fill;
     spin1_dma_transfer(
-        DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
-        n_bytes_to_transfer);
+            DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row,
+            DMA_READ, n_bytes_to_transfer);
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
-
 
 static inline void _do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
@@ -70,7 +68,6 @@ static inline void _do_direct_row(address_t row_address) {
 }
 
 void _setup_synaptic_dma_read() {
-
     // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;
@@ -79,7 +76,6 @@ void _setup_synaptic_dma_read() {
     bool finished = false;
     uint cpsr = 0;
     while (!setup_done && !finished) {
-
         // If rewiring needs doing on synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
         //    n_bytes)) {
         if (number_of_rewires) {
@@ -91,7 +87,6 @@ void _setup_synaptic_dma_read() {
         // If there's more rows to process from the previous spike
         while (!setup_done && population_table_get_next_address(
                 &row_address, &n_bytes_to_transfer)) {
-
             // This is a direct row to process
             if (n_bytes_to_transfer == 0) {
                 _do_direct_row(row_address);
@@ -110,7 +105,6 @@ void _setup_synaptic_dma_read() {
             // Decode spike to get address of destination synaptic row
             if (population_table_get_first_address(
                     spike, &row_address, &n_bytes_to_transfer)) {
-
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
                     _do_direct_row(row_address);
@@ -138,23 +132,22 @@ void _setup_synaptic_dma_read() {
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
-
     // Get pointer to current buffer
     dma_buffer *buffer = &dma_buffers[dma_buffer_index];
 
     // Get the number of plastic bytes and the write back address from the
     // synaptic row
     size_t n_plastic_region_bytes =
-        synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
+            synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
 
     log_debug("Writing back %u bytes of plastic region to %08x",
-              n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
+            n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
 
     // Start transfer
     spin1_dma_transfer(
-        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
-        synapse_row_plastic_region(buffer->row),
-        DMA_WRITE, n_plastic_region_bytes);
+            DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
+            synapse_row_plastic_region(buffer->row),
+            DMA_WRITE, n_plastic_region_bytes);
 
     // Start transfer of the entire row, not just PP
 //    spin1_dma_transfer(
@@ -162,7 +155,6 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 //        buffer->row,
 //        DMA_WRITE, buffer->n_bytes_transferred);
 }
-
 
 /* CALLBACK FUNCTIONS - cannot be static */
 
@@ -211,11 +203,10 @@ void _dma_complete_callback(uint unused, uint tag) {
     // Process synaptic row repeatedly
     bool subsequent_spikes;
     do {
-
         // Are there any more incoming spikes from the same pre-synaptic
         // neuron?
         subsequent_spikes = in_spikes_is_next_spike_equal(
-            current_buffer->originating_spike);
+                current_buffer->originating_spike);
 
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
@@ -238,7 +229,6 @@ void _dma_complete_callback(uint unused, uint tag) {
         }
     } while (subsequent_spikes);
 
-
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
 }
@@ -249,17 +239,15 @@ void _dma_complete_callback(uint unused, uint tag) {
 bool spike_processing_initialise(
         size_t row_max_n_words, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size) {
-
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
-        dma_buffers[i].row = (uint32_t*) spin1_malloc(
+        dma_buffers[i].row = (uint32_t *) spin1_malloc(
                 row_max_n_words * sizeof(uint32_t));
         if (dma_buffers[i].row == NULL) {
             log_error("Could not initialise DMA buffers");
             return false;
         }
-        log_info(
-            "DMA buffer %u allocated at 0x%08x", i, dma_buffers[i].row);
+        log_info("DMA buffer %u allocated at 0x%08x", i, dma_buffers[i].row);
     }
     dma_busy = false;
     next_buffer_to_fill = 0;
@@ -282,7 +270,7 @@ bool spike_processing_initialise(
     spin1_callback_on(MC_PACKET_RECEIVED,
             _multicast_packet_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
-        DMA_TAG_READ_SYNAPTIC_ROW, _dma_complete_callback);
+            DMA_TAG_READ_SYNAPTIC_ROW, _dma_complete_callback);
     spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
 
     return true;
