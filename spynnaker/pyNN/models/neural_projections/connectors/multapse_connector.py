@@ -181,7 +181,6 @@ class MultapseConnector(AbstractConnector):
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
-        print 'n_connections: ', n_connections
         if n_connections == 0:
             return numpy.zeros(
                 0, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
