@@ -532,6 +532,10 @@ class SpikeSourcePoisson(
             self._spike_recorder.record != new_state)
         self._spike_recorder.record = new_state
 
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return globals_variables.get_simulator().machine_time_step
+
     def get_sdram_usage_for_atoms(self, vertex_slice):
         """ calculates total sdram usage for a set of atoms
 

@@ -45,3 +45,10 @@ class AbstractSpikeRecordable(object):
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
                 ordered by time
         """
+
+    @abstractmethod
+    def get_spikes_sampling_interval(self):
+        """
+        Returns the current sampling interval for spikes
+        :return: Sampling interval in micro seconds
+        """

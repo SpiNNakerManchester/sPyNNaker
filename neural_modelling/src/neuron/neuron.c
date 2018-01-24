@@ -52,8 +52,29 @@ static uint32_t n_neurons;
 //! The recording flags
 static uint32_t recording_flags;
 
+//static uint32_t cyab_counter;
+
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
+
+typedef struct global_record_params_t {
+
+    uint32_t v_rate;
+    uint32_t exc_rate;
+    uint32_t inh_rate;
+
+} global_record_params_t;
+
+typedef struct global_record_params_t* global_record_params_pointer_t;
+
+static global_record_params_pointer_t global_record_params;
+
+uint32_t v_index;
+uint32_t v_increment;
+uint32_t exc_index;
+uint32_t exc_increment;
+uint32_t inh_index;
+uint32_t inh_increment;
 
 //! storage for neuron state with timestamp
 static timed_state_t *voltages;
@@ -90,7 +111,7 @@ typedef enum parmeters_in_neuron_parameter_data_region {
 static inline void _print_neurons() {
 
 //! only if the models are compiled in debug mode will this method contain
-//! said lines.
+//! said lines.neuron_t
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -116,12 +137,52 @@ static inline void _print_neuron_parameters() {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+
+void _reset_record_counter(){
+    if (global_record_params->v_rate == 0){
+        // Setting increment to zero means v_index will never equal v_rate
+        v_increment = 0;
+        // Index is not rate so does not record
+        v_index = 1;
+
+    }
+    else {
+        // Increase one each call so z_index gets to v_rate
+        v_increment = 1;
+        // Using rate base here first zero time is record
+        v_index = global_record_params->v_rate;
+    }
+
+    if (global_record_params->exc_rate == 0){
+        exc_increment = 0;
+        exc_index = 1;
+    }
+    else {
+        exc_increment = 1;
+        exc_index = global_record_params->exc_rate;
+    }
+    if (global_record_params->inh_rate == 0){
+        inh_increment = 0;
+        inh_index = 1;
+    }
+    else {
+        inh_increment = 1;
+        inh_index = global_record_params->inh_rate;
+    }
+}
+
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
+
+    log_info("loading global record parameters");
+    memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
+    next += sizeof(global_record_params_t) / 4;
+
+    _reset_record_counter();
 
     log_info("loading neuron global parameters");
     memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
@@ -210,6 +271,17 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         *incoming_spike_buffer_size, sizeof(neuron_t),
         sizeof(input_type_t), sizeof(threshold_type_t));
 
+    // allocate DTCM for the global record details
+    if (sizeof(global_record_params_t) > 0) {
+        global_record_params = (global_record_params_t *) spin1_malloc(
+            sizeof(global_record_params_t));
+        if (global_record_params == NULL) {
+            log_error("Unable to allocate global record parameters"
+                      "- Out of DTCM");
+            return false;
+        }
+    }
+
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t) > 0) {
         global_parameters = (global_neuron_params_t *) spin1_malloc(
@@ -290,6 +362,9 @@ void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
+    log_info("writing gobal recordi parameters");
+    memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
+    next += sizeof(global_record_params_t) / 4;
 
     log_info("writing neuron global parameters");
     memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
@@ -360,7 +435,7 @@ void neuron_do_timestep_update(timer_t time) {
             &additional_input_array[neuron_index];
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
-        // If we should be recording potential, record this neuron parameter
+        // record this neuron parameter. Just as cheap to set then to gate
         voltages->states[neuron_index] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
@@ -384,7 +459,7 @@ void neuron_do_timestep_update(timer_t time) {
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
 
-        // If we should be recording input, record the values
+        // record these neuron parameter. Just as cheap to set then to gate
         inputs_excitatory->inputs[neuron_index].input = exc_input_value;
         inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
 
@@ -438,33 +513,41 @@ void neuron_do_timestep_update(timer_t time) {
     uint cpsr = 0;
     cpsr = spin1_int_disable();
 
-    // record neuron state (membrane potential) if needed
-    if (recording_is_channel_enabled(recording_flags, V_RECORDING_CHANNEL)) {
+    if (v_index == global_record_params->v_rate) {
+        v_index = 1;
+        // record neuron state (membrane potential) if needed
         n_recordings_outstanding += 1;
         voltages->time = time;
         recording_record_and_notify(
             V_RECORDING_CHANNEL, voltages, voltages_size,
             recording_done_callback);
+    } else {
+        // if not recording v_increment is 0 so v_index remains as 1 forever
+        v_index += v_increment;
     }
 
     // record neuron inputs (excitatory) if needed
-    if (recording_is_channel_enabled(
-            recording_flags, GSYN_EXCITATORY_RECORDING_CHANNEL)) {
+    if (exc_index == global_record_params->exc_rate) {
+        exc_index = 1;
         n_recordings_outstanding += 1;
         inputs_excitatory->time = time;
         recording_record_and_notify(
             GSYN_EXCITATORY_RECORDING_CHANNEL, inputs_excitatory, input_size,
             recording_done_callback);
+    } else {
+        exc_index += exc_increment;
     }
 
     // record neuron inputs (inhibitory) if needed
-    if (recording_is_channel_enabled(
-            recording_flags, GSYN_INHIBITORY_RECORDING_CHANNEL)) {
+    if (inh_index == global_record_params->inh_rate) {
+        inh_index = 1;
         n_recordings_outstanding += 1;
         inputs_inhibitory->time = time;
         recording_record_and_notify(
             GSYN_INHIBITORY_RECORDING_CHANNEL, inputs_inhibitory, input_size,
             recording_done_callback);
+    } else {
+        inh_index += inh_increment;
     }
 
     // do logging stuff if required
