@@ -629,10 +629,17 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
                  graph_mapper, buffer_manager, machine_time_step):
-        return self._neuron_recorder.get_data(
+        return self._neuron_recorder.get_matrix_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
-            placements, graph_mapper, self, machine_time_step,
-            self.VARIABLE_LONG[variable], n_machine_time_steps)
+            placements, graph_mapper, self, variable, n_machine_time_steps)
+
+    @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
+    def get_neuron_sampling_interval(self, variable):
+        return self._neuron_recorder.get_neuron_sampling_interval(variable)
+
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return self._spike_recorder.get_spikes_sampling_interval()
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):

@@ -1,5 +1,5 @@
+from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.progress_bar import ProgressBar
-
 from spynnaker.pyNN.models.common import recording_utils
 
 import math
@@ -99,3 +99,10 @@ class SpikeRecorder(object):
         spike_times = numpy.hstack(spike_times)
         result = numpy.dstack((spike_ids, spike_times))[0]
         return result[numpy.lexsort((spike_times, spike_ids))]
+
+    def get_spikes_sampling_interval(self):
+        """
+        Returns the current sampling interval for this variable
+         :return: Sampling interval in micro seconds
+        """
+        return globals_variables.get_simulator().machine_time_step

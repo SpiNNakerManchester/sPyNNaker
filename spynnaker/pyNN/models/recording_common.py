@@ -16,13 +16,19 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
-    def __init__(self, population):
+    def __init__(self, population, sampling_interval=None):
         """ object to hold recording behaviour
 
         :param population: the population to record for
+        :param simulator: the spinnaker control class
         """
 
         self._population = population
+
+        self._sampling_interval = None
+        if sampling_interval is not None:
+            self._sampling_interval = sampling_interval
+
         # file flags, allows separate files for the recorded variables
         self._write_to_files_indicators = {
             'spikes': None,
@@ -35,7 +41,7 @@ class RecordingCommon(object):
         self._indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval, to_file):
+    def _record(self, variable, new_ids, sampling_interval=None, to_file=None):
         """ tells the vertex to record data
 
         :param variable: the variable to record, valued variables to record
@@ -60,6 +66,10 @@ class RecordingCommon(object):
 
         # Get bit array of indices to record for this variable
         indices = self._indices_to_record[variable]
+
+        # update sampling interval
+        if sampling_interval is not None:
+            self._sampling_interval = sampling_interval
 
         # Loop through the new ids
         for new_id in new_ids:
@@ -101,12 +111,57 @@ class RecordingCommon(object):
                 "This population does not support the recording of spikes!")
         self._population._vertex.set_recording_spikes()
 
-    def _get_recorded_variable(self, variable):
+    @property
+    def sampling_interval(self):
+        """ forced by the public nature of pynn variables
+
+        :return:
+        """
+
+        return self._sampling_interval
+
+    @sampling_interval.setter
+    def sampling_interval(self, new_value):
+        """ forced by the public nature of pynn variables
+
+        :param new_value: new value for the sampling_interval
+        :return: None
+        """
+        self._sampling_interval = new_value
+
+    @staticmethod
+    def pynn7_format(data, ids, sampling_interval, data2=None):
+        n_machine_time_steps = len(data)
+        n_neurons = len(ids)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval / 1000 for i in
+                 xrange(0, n_machine_time_steps)]
+        if data2 is None:
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
+        else:
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length),
+                numpy.transpose(data2).reshape(column_length)))
+        return pynn7
+
+    def _get_recorded_pynn7(self, variable):
+        if variable == "spikes":
+            data = self._get_spikes()
+
+        (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
+        return self.pynn7_format(data, ids, sampling_interval)
+
+    def _get_recorded_matrix(self, variable):
         """ method that contains all the safety checks and gets the recorded
-        data from the vertex
+        data from the vertex in matrix format
 
         :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        are :'gsyn_exc', 'gsyn_inh', 'v'
         :return: the data
         """
         timer = Timer()
@@ -115,42 +170,47 @@ class RecordingCommon(object):
         sim = get_simulator()
 
         globals_variables.get_simulator().verify_not_running()
-        if variable == "spikes":
-            data = self._get_spikes()
 
         # check that we're in a state to get voltages
-        elif not isinstance(
+        if not isinstance(
                 self._population._vertex, AbstractNeuronRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record {}"
                 .format(variable))
-        elif not self._population._vertex.is_recording(variable):
+
+        if not self._population._vertex.is_recording(variable):
             raise ConfigurationException(
                 "This population has not been set to record {}"
                 .format(variable))
 
-        elif not sim.has_ran:
+        if not sim.has_ran:
             logger.warn(
                 "The simulation has not yet run, therefore {} cannot"
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
-
+            indexes = []
+            sampling_interval = self._population._vertex.\
+                get_sampling_interval(variable)
         elif sim.use_virtual_board:
             logger.warn(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = self._population._vertex.\
+                get_neuron_sampling_interval(variable)
         else:
             # assuming we got here, everything is ok, so we should go get the
-            # voltages
-            data = self._population._vertex.get_data(
+            # data
+            results = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
-        return data
+        return (data, indexes, sampling_interval)
 
     def _get_spikes(self):
         """ method for getting spikes from a vertex
