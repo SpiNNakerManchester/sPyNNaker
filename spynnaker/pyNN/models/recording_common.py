@@ -61,9 +61,6 @@ class RecordingCommon(object):
         # update file writer
         self._write_to_files_indicators[variable] = to_file
 
-        # Get bit array of indices to record for this variable
-        indices = self._indices_to_record[variable]
-
         if variable == "gsyn_exc":
             if not isinstance(self._population._vertex.input_type,
                               InputTypeConductance):

@@ -128,7 +128,6 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
                 placement.x, placement.y, placement.p,
                 SpikeInjector.SPIKE_RECORDING_REGION_ID)
 
-
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):

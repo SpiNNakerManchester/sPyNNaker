@@ -106,7 +106,7 @@ class NeuronRecorder(object):
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
-                         n_neurons * self.N_BYTES_PER_VALUE
+                n_neurons * self.N_BYTES_PER_VALUE
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
             # Converts bytes to ints and make a matrix
@@ -160,7 +160,7 @@ class NeuronRecorder(object):
                 neurons_recording = sum(
                     (index >= vertex_slice.lo_atom and
                      index <= vertex_slice.hi_atom)
-                     for index in self._indexes[SPIKES])
+                    for index in self._indexes[SPIKES])
                 if neurons_recording < vertex_slice.n_atoms:
                     # For spikes the overflow position is also returned
                     neurons_recording += 1
@@ -220,7 +220,6 @@ class NeuronRecorder(object):
             msg = "Variable {} is not supported. Supported variables are {}" \
                   "".format(variable, self.get_recordable_variables())
             raise fec_excceptions.ConfigurationException(msg)
-
 
     @property
     def recording_variables(self):
@@ -409,7 +408,8 @@ class NeuronRecorder(object):
             params.append(NeuronParameter(
                 self._sampling_rates[variable], DataType.UINT32))
         for variable in self._sampling_rates:
-            n_recording = self._count_recording_per_slice(variable, vertex_slice)
+            n_recording = self._count_recording_per_slice(
+                variable, vertex_slice)
             params.append(NeuronParameter(n_recording, DataType.UINT8))
         return params
 

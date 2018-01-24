@@ -1,4 +1,3 @@
-from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.common import recording_utils
 

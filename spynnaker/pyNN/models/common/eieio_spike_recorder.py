@@ -1,4 +1,3 @@
-from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 
