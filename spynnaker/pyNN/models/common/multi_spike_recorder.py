@@ -1,6 +1,8 @@
+from pacman.model.decorators import overrides
 from spinn_utilities.progress_bar import ProgressBar
 
 from spynnaker.pyNN.models.common import recording_utils
+from .abstract_spike_recorder import AbstractSpikeRecorder
 
 import math
 import numpy
@@ -11,7 +13,7 @@ logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
 
 
-class MultiSpikeRecorder(object):
+class MultiSpikeRecorder(AbstractSpikeRecorder):
 
     def __init__(self):
         self._record = False
@@ -20,9 +22,12 @@ class MultiSpikeRecorder(object):
     def record(self):
         return self._record
 
-    @record.setter
-    def record(self, record):
-        self._record = record
+    @overrides(AbstractSpikeRecorder.set_recording)
+    def set_recording(self, new_state, sampling_interval=None):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval currently not supported "
+                           "so being ignored")
+        self._record = new_state
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, spikes_per_timestep, n_machine_time_steps):

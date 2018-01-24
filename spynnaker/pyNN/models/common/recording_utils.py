@@ -1,10 +1,18 @@
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
-from spynnaker.pyNN.exceptions import MemReadException
-
+from __future__ import division
 import struct
 import logging
 import numpy
+
+from data_specification.enums import DataType
+from spinn_front_end_common.utilities import exceptions as fec_excceptions
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
+from spynnaker.pyNN.exceptions import MemReadException
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+
+
+MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
 logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
@@ -90,3 +98,47 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
     if buffer_max < space_needed:
         return buffer_max
     return space_needed
+
+
+def compute_rate(new_state, sampling_interval):
+    """
+    Converts a simpling interval into a rate
+
+    Remember machine time step is in nano seconds
+
+    :param sampling_interval: interval between samples in micro seconds
+    :return: rate
+    """
+    if new_state:
+        if sampling_interval is None:
+            return 1
+
+        step = globals_variables.get_simulator().machine_time_step / 1000
+        rate = int(sampling_interval / step)
+        if sampling_interval != rate * step:
+            msg = "sampling_interval {} is not an an integer " \
+                  "multiple of the simulation timestep {}" \
+                  "".format(sampling_interval, step)
+            raise fec_excceptions.ConfigurationException(msg)
+        if rate > MAX_RATE:
+            msg = "sampling_interval {} higher than max allowed which is {}" \
+                  "".format(sampling_interval, step * MAX_RATE)
+            raise fec_excceptions.ConfigurationException(msg)
+        return rate
+
+    else:
+        return 0
+
+
+def compute_interval(sampling_rate):
+    """
+
+    :param sampling_rate:
+    :return:
+    """
+    step = globals_variables.get_simulator().machine_time_step / 1000
+    return sampling_rate * step
+
+
+def rate_parameter(sampling_rate):
+    return NeuronParameter(sampling_rate, DataType.UINT32)
