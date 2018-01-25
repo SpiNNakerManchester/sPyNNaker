@@ -20,6 +20,11 @@ class EIEIOSpikeRecorder(object):
     def record(self):
         return self._record
 
+    @record.setter
+    def record(self, new_state):
+        """ Old method assumed to be spikes """
+        self._record = new_state
+
     def set_recording(self, new_state, sampling_interval=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
