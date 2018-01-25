@@ -329,12 +329,41 @@ class NeuronRecorder(object):
         :param vertex_slice:
         :return:
         """
-        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
         rate = self._sampling_rates[variable]
         if rate == 0:
             return 0
+
+        data_size = self.get_buffered_sdram_per_record(
+            variable,  vertex_slice)
+        if rate == 1:
+            return data_size
         else:
             return data_size / rate
+
+    def get_sampling_overflow_sdram(self, vertex_slice):
+        """
+        Gets the extra sdram that should be reserved if using per_timestep
+
+        This is the extra that must be reserved if per_timestep is an average
+        rather than fixed for every timestep.
+
+        When sampling the average * time_steps may not be quite enough
+        This returns the extra space in the worst case
+        where time_steps is a multiple of sampling rate + 1
+        And recording is done in the first and last time_step
+
+        :param vertex_slice:
+        :return: Highest possible overflow needed
+        """
+        overflow = 0
+        for variable, rate in self._sampling_rates.iteritems():
+            # If rate is 0 no recording so no overflow
+            # If rate is 1 there is no overflow as average is exact
+            if rate > 1:
+                data_size = self.get_buffered_sdram_per_record(
+                    variable,  vertex_slice)
+                overflow += data_size / rate * (rate - 1)
+        return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
         """
@@ -355,12 +384,6 @@ class NeuronRecorder(object):
         if n_machine_time_steps % rate > 0:
             records = records + 1
         return data_size * records
-
-    def is_sampling(self):
-        for rate in self._sampling_rates.itervalues():
-            if rate != 1:
-                return True
-        return False
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         return len(self._sampling_rates) * \

@@ -288,10 +288,11 @@ class AbstractPopulationVertex(
             vertex_slice, n_machine_time_steps)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
             buffered_sdram, self._minimum_buffer_sdram)
-        sampling = self._neuron_recorder.is_sampling()
+        overflow_sdram = self._neuron_recorder.get_sampling_overflow_sdram(
+            vertex_slice)
         vertex = PopulationMachineVertex(
             resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, label, constraints, sampling)
+            buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
         self._n_vertices += 1
 
