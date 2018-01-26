@@ -283,13 +283,13 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     // Initialise pointers to Neuron parameters in STDP code
     synapse_dynamics_set_neuron_array(neuron_array);
-    log_info("set pointer to neuron array in stdp code");
+    log_debug("set pointer to neuron array in stdp code");
 
     synapse_dynamics_set_additional_input_array(additional_input_array);
-    log_info("set pointer to additional input array in stdp code");
+    log_debug("set pointer to additional input array in stdp code");
 
     synapse_dynamics_set_threshold_array(threshold_type_array);
-    log_info("set pointer to threshold type array in stdp code");
+    log_debug("set pointer to threshold type array in stdp code");
 
     return true;
 }
@@ -361,7 +361,7 @@ void neuron_do_timestep_update(timer_t time) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
         //log_info("neuron %u  time %u", neuron_index, time);
-        log_info("%u neuron %u  time %u",  sv_vcpu[sark_core_id()].time, neuron_index, time);
+        log_debug("%u neuron %u  time %u",  sv_vcpu[sark_core_id()].time, neuron_index, time);
         // Get the parameters for this neuron
         neuron_pointer_t neuron = &neuron_array[neuron_index];
         input_type_pointer_t input_type = &input_type_array[neuron_index];

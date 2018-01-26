@@ -256,7 +256,7 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
-    log_info("time: %d ", time);
+    log_debug("time: %d ", time);
 
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
@@ -314,7 +314,7 @@ bool synapse_dynamics_process_plastic_synapses(
             *plastic_words, type);
 
         //neuron_pointer_t neuron = neuron_array_stdp;
-        log_info("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(post_synaptic_neuron));
+        log_debug("Neuron Voltage: %11.4k", neuron_model_get_membrane_voltage(post_synaptic_neuron));
 
 
         final_state_t final_state = _update_on_pre_only(time, last_pre_time,
