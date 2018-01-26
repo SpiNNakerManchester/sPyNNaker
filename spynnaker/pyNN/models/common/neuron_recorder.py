@@ -229,7 +229,7 @@ class NeuronRecorder(object):
                 results.append(key)
         return results
 
-    def _compute_rate(self, new_state, sampling_interval):
+    def _compute_rate(self, sampling_interval):
         """
         Converts a sampling interval into a rate
 
@@ -238,13 +238,10 @@ class NeuronRecorder(object):
         :param sampling_interval: interval between samples in micro seconds
         :return: rate
         """
-        if not new_state:
-            return 0
+        if sampling_interval is None:
+            return 1
 
         step = globals_variables.get_simulator().machine_time_step / 1000
-        if sampling_interval is None:
-            return step
-
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer " \
@@ -281,16 +278,76 @@ class NeuronRecorder(object):
             msg = "All indexes larger than population size"
             raise fec_excceptions.ConfigurationException(msg)
 
+    def _turn_off_recording(self, variable, sampling_interval, remove_indexes):
+        if self._sampling_rates[variable] == 0:
+            # Already off so ignore other parameters
+            return
+
+        if remove_indexes is None:
+            # turning all off so ignoring sampling interval
+            self._sampling_rates[variable] = 0
+            self._indexes[variable] = None
+            return
+
+        # No good reason to specify_interval when turning off
+        if sampling_interval is not None:
+            rate = self._compute_rate(sampling_interval)
+            # But if they do make sure it is the same as before
+            if rate != self._sampling_rates[variable]:
+                msg = "Illegal sampling_interval parameter while turning " \
+                      "off recorinding"
+                raise fec_excceptions.ConfigurationException(msg)
+
+        if self._indexes[variable] is None:
+            # start with all indexes
+            self._indexes[variable] = range(self._n_neurons)
+
+        # remove the indexes not recording
+        self._indexes[variable] = \
+            [index for index in self._indexes[variable]
+            if index not in remove_indexes]
+
+        # Check is at least one index still recording
+        if len(self._indexes[variable]) == 0:
+            self._sampling_rates[variable] = 0
+            self._indexes[variable] = None
+
+    def _turn_on_recording(self, variable, sampling_interval, indexes):
+
+        rate = self._compute_rate(sampling_interval)
+        if self._sampling_rates[variable] == 0:
+            self._sampling_rates[variable] = rate
+        elif rate != self._sampling_rates[variable]:
+            msg = "Current implementaion does not support multiple " \
+                  "sampling_intervals for {} on one polulation. " \
+                .format(variable)
+            raise fec_excceptions.ConfigurationException(msg)
+        # else rate not changed so no action
+
+        if indexes is None:
+            # previous recording indexes does not matter as now all (None)
+            self._indexes[variable] = None
+        else:
+            self.check_indexes(indexes)
+            if self._indexes[variable] is None:
+                # just use the new indexes
+                self._indexes[variable] = indexes
+            else:
+                # merge the two indexes
+                self._indexes[variable] = \
+                    list(set(self._indexes[variable] + indexes))
+                self._indexes[variable].sort()
+
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):
         if variable == "all":
             for key in self._sampling_rates.keys():
                 self.set_recording(key, new_state, sampling_interval, indexes)
         elif variable in self._sampling_rates:
-            self._sampling_rates[variable] = \
-                    self._compute_rate(new_state, sampling_interval)
-            self.check_indexes(indexes)
-            self._indexes[variable] = indexes
+            if new_state:
+                self._turn_on_recording(variable, sampling_interval, indexes)
+            else:
+                self._turn_off_recording(variable, sampling_interval, indexes)
         else:
             msg = "Variable {} is not supported ".format(variable)
             raise fec_excceptions.ConfigurationException(msg)

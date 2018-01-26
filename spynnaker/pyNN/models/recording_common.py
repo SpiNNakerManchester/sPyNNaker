@@ -218,8 +218,10 @@ class RecordingCommon(object):
 
         # check for standard record
         if isinstance(self._population._vertex, AbstractNeuronRecordable):
-            self._population._vertex.set_recording("all", False)
+            variables = self._population._vertex.get_recordable_variables()
+            for variable in variables:
+                self._population._vertex.set_recording(variable, False)
 
         # check for spikes
-        if isinstance(self._population._vertex, AbstractSpikeRecordable):
+        elif isinstance(self._population._vertex, AbstractSpikeRecordable):
             self._population._vertex.set_recording_spikes(False)
