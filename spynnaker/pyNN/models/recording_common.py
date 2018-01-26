@@ -51,10 +51,19 @@ class RecordingCommon(object):
         globals_variables.get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
-            self._set_spikes_recording(sampling_interval, indexes)
+            if not isinstance(self._population._vertex,
+                              AbstractSpikeRecordable):
+                raise Exception("This population does not support the "
+                                "recording of spikes!")
+            self._population._vertex.set_recording_spikes(
+                sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
             raise Exception("Illegal call with all")
         else:
+            if not isinstance(self._population._vertex,
+                              AbstractNeuronRecordable):
+                raise Exception("This population does not support the "
+                                "recording of {}!".format(variable))
             self._population._vertex.set_recording(
                 variable, sampling_interval=sampling_interval, indexes=indexes)
 
@@ -88,11 +97,6 @@ class RecordingCommon(object):
 
         :return: None
         """
-        if not isinstance(self._population._vertex, AbstractSpikeRecordable):
-            raise Exception(
-                "This population does not support the recording of spikes!")
-        self._population._vertex.set_recording_spikes(
-            sampling_interval=sampling_interval, indexes=indexes)
 
     @staticmethod
     def pynn7_format(data, ids, sampling_interval, data2=None):
