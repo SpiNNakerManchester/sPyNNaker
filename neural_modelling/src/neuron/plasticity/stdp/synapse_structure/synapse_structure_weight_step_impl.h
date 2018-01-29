@@ -44,10 +44,8 @@ static inline weight_t synapse_structure_get_final_weight(
 	int32_t max_weight = final_state.weight_region->max_weight;
 	// calculate final weight
 	weight_t w = final_state.weight;
-	log_info("before step: %d", w);
 	if(w > th_weight){
 		w = max_weight;
-		log_info("stepup %d", w);
 	}else
 		w = min_weight;
 	//log_info("after step function: %d", w);
