@@ -32,6 +32,6 @@ static update_state_t timing_apply_post_spike(
 	uint32_t syn_type,
 	neuron_pointer_t post_synaptic_neuron,
 	additional_input_pointer_t post_synaptic_additional_input,
-    threshold_type_pointer_t post_synaptic_threshold);
+    threshold_type_pointer_t post_synaptic_threshold, input_t post_synaptic_mem_V);
 
 #endif // _TIMING_H_

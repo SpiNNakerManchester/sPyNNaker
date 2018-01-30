@@ -7,7 +7,7 @@
 
 // Plasticity common includes
 #include "../common/maths.h"
-#include "../common/post_events.h"
+#include "../common/post_events_inc_v.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
@@ -96,6 +96,12 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
+//    print_event_history(post_event_history);
+////    log_info("##");
+//    print_delayed_window_events(post_event_history, window_begin_time,
+//    		window_end_time, delay_dendritic);
+//    log_info("#######");
+
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
@@ -108,7 +114,7 @@ static inline final_state_t _plasticity_update_synapse(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
             current_state,  syn_type, post_synaptic_neuron,
-			post_synaptic_additional_input, post_synaptic_threshold);
+			post_synaptic_additional_input, post_synaptic_threshold, *post_window.next_post_synaptic_v);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -280,9 +286,9 @@ bool synapse_dynamics_process_plastic_synapses(
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
 
         // for integration test
-        //log_info("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
-        //		time, index, post_synaptic_threshold->threshold_value,
-	//			post_synaptic_neuron->V_membrane);
+        log_debug("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
+        		time, index, post_synaptic_threshold->threshold_value,
+				post_synaptic_neuron->V_membrane);
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
@@ -330,8 +336,17 @@ void synapse_dynamics_process_post_synaptic_event(
     const uint32_t last_post_time = history->times[history->count_minus_one];
     const post_trace_t last_post_trace =
         history->traces[history->count_minus_one];
-    post_events_add(time, history, timing_add_post_spike(time, last_post_time,
-                                                         last_post_trace));
+    post_events_add_inc_v(time, history, timing_add_post_spike(
+    		time, last_post_time, last_post_trace),
+    		neuron_array_plasticity[neuron_index].V_mem_hist);
+
+    // either set here in the post-synaptic history so we can log the membrane
+    // potential a few timesteps before - i.e. before teacher input caused spike
+    // but how do we know how long before spike we need? Do we assume that the
+    // teacher input causes a spike in literally the next timestep? Is it better
+    // record the potential immediately before the teacher input begins to have effect?
+    // history->v_before_last_teacher_pre = neuron_array_plasticity[neuron_index].V_mem_hist;
+
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
