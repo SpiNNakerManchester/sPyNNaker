@@ -218,7 +218,7 @@ static inline update_state_t timing_apply_post_spike(
     uint32_t syn_type,
    neuron_pointer_t post_synaptic_neuron,
    additional_input_pointer_t post_synaptic_additional_input,
-   threshold_type_pointer_t post_synaptic_threshold) {
+   threshold_type_pointer_t post_synaptic_threshold, input_t post_synaptic_mem_V) {
    use(&trace);
    use(&last_post_time);
    use(&last_post_trace);
@@ -226,6 +226,9 @@ static inline update_state_t timing_apply_post_spike(
    use(&post_synaptic_neuron);
    use(&post_synaptic_additional_input);
    use(&post_synaptic_threshold);
+   use(&post_synaptic_mem_V);
+
+//   log_info("Post_synaptic_potential from within apply post spike: %k", post_synaptic_mem_V);
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
