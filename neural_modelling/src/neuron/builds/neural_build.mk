@@ -122,7 +122,10 @@ $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
-	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+	        -include $(WEIGHT_DEPENDENCE_H) \
+	        -include $(NEURON_MODEL_H) \
+	        -include $(THRESHOLD_TYPE_H) \
+	        -include $(ADDITIONAL_INPUT_H) -o $@ $<
 
 $(NEURON_MODEL_O): $(NEURON_MODEL)
 	-mkdir -p $(dir $@)
