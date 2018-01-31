@@ -46,7 +46,7 @@ static inline input_t* input_type_convert_excitatory_input_to_current(
     use(input_type);
     use(membrane_voltage);
 
-    for(int i=0; i < NUM_EXCITATORY_RECEPTORS; i++){
+    for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++){
     	exc_input[i] = exc_input[i] >> //input_type->
         			excitatory_shifts[i];
     }
@@ -60,7 +60,7 @@ static inline input_t* input_type_convert_inhibitory_input_to_current(
     use(input_type);
     use(membrane_voltage);
 
-    for(int i=0; i < NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++){
     	inh_input[i] = inh_input[i] >> //input_type->
         	    	inhibitory_shifts[i];
     }
