@@ -83,6 +83,6 @@ class IFCurrExpCa2Concentration(AbstractPopulationVertex):
         return IFCurrExpCa2Concentration._model_based_max_atoms_per_core
 
     @staticmethod
-    def set_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
+    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IFCurrExpCa2Concentration._model_based_max_atoms_per_core = new_value
 
