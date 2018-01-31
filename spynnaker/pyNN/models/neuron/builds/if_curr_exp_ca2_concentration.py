@@ -7,6 +7,8 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AdditionalInputCa2Concentration
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
 
 class IFCurrExpCa2Concentration(AbstractPopulationVertex):
     """
@@ -81,6 +83,6 @@ class IFCurrExpCa2Concentration(AbstractPopulationVertex):
         return IFCurrExpCa2Concentration._model_based_max_atoms_per_core
 
     @staticmethod
-    def set_max_atoms_per_core(new_value):
+    def set_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
         IFCurrExpCa2Concentration._model_based_max_atoms_per_core = new_value
 
