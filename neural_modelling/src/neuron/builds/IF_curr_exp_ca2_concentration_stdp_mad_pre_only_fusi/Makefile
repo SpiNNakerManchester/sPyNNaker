@@ -13,6 +13,6 @@ TIMING_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/tim
 WEIGHT_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_fusi_impl.c
 WEIGHT_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_fusi_impl.h
 
-CFLAGS += -D_LOG_FIG1_
+#CFLAGS += -D_LOG_FIG1_
 
 include ../Makefile.common

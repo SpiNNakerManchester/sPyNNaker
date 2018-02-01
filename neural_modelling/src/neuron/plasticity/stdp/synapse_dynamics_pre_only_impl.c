@@ -345,7 +345,9 @@ bool synapse_dynamics_process_plastic_synapses(
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
             final_state);
     }
+#ifdef _LOG_FIG1_
     log_info("time: %d ", time);
+#endif
 
     return true;
 }
