@@ -43,11 +43,11 @@ uint16_t inhibitory_shifts[NUM_INHIBITORY_RECEPTORS] = {10};
 //---------------------------------------
 // Deprecated - no longer required as scaling is applied when getting array of
 // synaptic input.
-static inline input_t input_type_get_input_value(
-        input_t value, input_type_pointer_t input_type) {
-    use(input_type);
-    return value >> 10;
-}
+//static inline input_t input_type_get_input_value(
+//        input_t value, input_type_pointer_t input_type) {
+//    use(input_type);
+//    return value >> 10;
+//}
 
 static inline input_t* input_type_convert_excitatory_input_to_current(
         input_t* exc_input, input_type_pointer_t input_type,
