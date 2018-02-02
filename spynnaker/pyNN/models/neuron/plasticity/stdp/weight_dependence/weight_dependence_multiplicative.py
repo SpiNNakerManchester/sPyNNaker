@@ -23,6 +23,7 @@ class WeightDependenceMultiplicative(
     def w_max(self):
         return self._w_max
 
+    @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         # pylint: disable=protected-access
         if not isinstance(weight_dependence, WeightDependenceMultiplicative):
@@ -37,6 +38,7 @@ class WeightDependenceMultiplicative(
     def vertex_executable_suffix(self):
         return "multiplicative"
 
+    @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 1:
@@ -45,6 +47,7 @@ class WeightDependenceMultiplicative(
 
         return (4 * 4) * n_synapse_types
 
+    @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
         if n_weight_terms != 1:

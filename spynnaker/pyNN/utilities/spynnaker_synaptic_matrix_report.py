@@ -7,11 +7,12 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 logger = logging.getLogger(__name__)
+_DIRNAME = "synaptic_matrix_reports"
+_TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
-    """
-    generates the synaptic matrix for reporting purposes
+    """ generates the synaptic matrix for reporting purposes
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):
@@ -24,12 +25,11 @@ class SpYNNakerSynapticMatrixReport(object):
 
         if dsg_targets is None:
             raise SynapticConfigurationException(
-                "dsg targets should not be none, used as a check for "
+                "dsg_targets should not be none, used as a check for "
                 "connection holder data to be generated")
 
         # generate folder for synaptic reports
-        top_level_folder = os.path.join(
-            report_folder, "synaptic_matrix_reports")
+        top_level_folder = os.path.join(report_folder, _DIRNAME)
         if not os.path.exists(top_level_folder):
             os.mkdir(top_level_folder)
 
@@ -43,9 +43,7 @@ class SpYNNakerSynapticMatrixReport(object):
             if isinstance(edge, ProjectionApplicationEdge):
                 # figure new file name
                 file_name = os.path.join(
-                    top_level_folder,
-                    "synaptic_matrix_for_application_edge_{}"
-                    .format(edge.label))
+                    top_level_folder, _TMPL_FILENAME.format(edge.label))
                 self._write_file(file_name, connection_holder, edge)
 
         # Reset the print options

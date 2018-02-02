@@ -13,7 +13,7 @@ class AbstractWeightDependence(object):
 
         :param pre_population_label: label of pre.
         :param post_population_label:label of post.
-        :return the provenance data of the weight dependency
+        :return: the provenance data of the weight dependency
         """
         return list()
 

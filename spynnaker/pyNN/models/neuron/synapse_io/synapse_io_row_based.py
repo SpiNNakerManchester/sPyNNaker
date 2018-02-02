@@ -1,5 +1,6 @@
 import numpy
 import math
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractSynapseDynamics, AbstractStaticSynapseDynamics
@@ -20,6 +21,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     """
     __slots__ = []
 
+    @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         # There are 16 slots, one per time step
         return 16 * (machine_time_step / 1000.0)
@@ -44,6 +46,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     in_edge.pre_vertex, in_edge.post_vertex, row_length,
                     max_synapses))
 
+    @overrides(AbstractSynapseIO.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(
             self, synapse_info, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
@@ -164,6 +167,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Return the data
         return max_row_length, row_data
 
+    @overrides(AbstractSynapseIO.get_synapses)
     def get_synapses(
             self, synapse_info, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice,
@@ -253,6 +257,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         return (row_data, max_row_length, delayed_row_data,
                 max_delayed_row_length, delayed_source_ids, stages)
 
+    @overrides(AbstractSynapseIO.read_synapses)
     def read_synapses(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
@@ -415,5 +420,6 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         return connections
 
+    @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
         return ((_N_HEADER_WORDS + max_row_length) * 4) * n_rows

@@ -335,33 +335,31 @@ class SynapticManager(object):
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
             machine_timestep, n_synapses_in, sigma):
-        """
-        Provides expected upper bound on accumulated values in a ring buffer\
-        element.
+        """ Provides expected upper bound on accumulated values in a ring\
+            buffer element.
 
         Requires an assessment of maximum Poisson input rate.
 
         Assumes knowledge of mean and SD of weight distribution, fan-in\
-        & timestep.
+        and timestep.
 
         All arguments should be assumed real values except n_synapses_in\
         which will be an integer.
 
-        weight_mean - Mean of weight distribution (in either nA or\
-                      microSiemens as required)
-        weight_std_dev - SD of weight distribution
-        spikes_per_second - Maximum expected Poisson rate in Hz
-        machine_timestep - in us
-        n_synapses_in - No of connected synapses
-        sigma - How many SD above the mean to go for upper bound;\
-                a good starting choice is 5.0.  Given length of simulation we\
-                can set this for approximate number of saturation events
+        :param weight_mean: Mean of weight distribution (in either nA or\
+            microSiemens as required)
+        :param weight_std_dev: SD of weight distribution
+        :param spikes_per_second: Maximum expected Poisson rate in Hz
+        :param machine_timestep: in us
+        :param n_synapses_in: No of connected synapses
+        :param sigma: How many SD above the mean to go for upper bound; a\
+            good starting choice is 5.0. Given length of simulation we can\
+            set this for approximate number of saturation events.
         """
         # E[ number of spikes ] in a timestep
-        # x /1000000.0 = conversion between microsecond to second
+        steps_per_second = 1000000.0 / machine_timestep
         average_spikes_per_timestep = (
-            float(n_synapses_in * spikes_per_second) *
-            (float(machine_timestep) / 1000000.0))
+            float(n_synapses_in * spikes_per_second) / steps_per_second)
 
         # Exact variance contribution from inherent Poisson variation
         poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
@@ -418,6 +416,7 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+        steps_per_second = 1000000.0 / machine_timestep
 
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
 
@@ -464,9 +463,7 @@ class SynapticManager(object):
                         biggest_weight[synapse_type], weight_max)
 
                     spikes_per_tick = max(
-                        1.0,
-                        self._spikes_per_second /
-                        (1000000.0 / float(machine_timestep)))
+                        1.0, self._spikes_per_second / steps_per_second)
                     spikes_per_second = self._spikes_per_second
                     if isinstance(app_edge.pre_vertex, SpikeSourcePoisson):
                         spikes_per_second = app_edge.pre_vertex.rate
@@ -477,9 +474,7 @@ class SynapticManager(object):
                             spikes_per_second = get_maximum_probable_value(
                                 spikes_per_second, pre_vertex_slice.n_atoms)
                         prob = 1.0 - ((1.0 / 100.0) / pre_vertex_slice.n_atoms)
-                        spikes_per_tick = (
-                            spikes_per_second /
-                            (1000000.0 / float(machine_timestep)))
+                        spikes_per_tick = spikes_per_second / steps_per_second
                         spikes_per_tick = scipy.stats.poisson.ppf(
                             prob, spikes_per_tick)
                     rate_stats[synapse_type].add_items(

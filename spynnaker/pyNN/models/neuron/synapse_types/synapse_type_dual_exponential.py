@@ -1,5 +1,5 @@
-from pacman.executor.injection_decorator import inject_items
 from spinn_utilities.overrides import overrides
+from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
@@ -120,9 +120,11 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
     def isyn_exc2(self, new_value):
         self._data.set_value(key=INITIAL_INPUT_EXC2, value=new_value)
 
+    @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
         return 3
 
+    @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
         if target == "excitatory":
             return 0
@@ -132,9 +134,11 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             return 2
         return None
 
+    @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self):
         return "excitatory", "excitatory2", "inhibitory"
 
+    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
     def get_n_synapse_type_parameters(self):
         return 9
 
@@ -166,9 +170,11 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
                 _DUAL_EXP_TYPES.INITIAL_INH.data_type)
         ]
 
+    @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
     def get_synapse_type_parameter_types(self):
         return [item.data_type for item in _DUAL_EXP_TYPES]
 
+    @overrides(AbstractSynapseType.get_n_cpu_cycles_per_neuron)
     def get_n_cpu_cycles_per_neuron(self):
 
         # A guess

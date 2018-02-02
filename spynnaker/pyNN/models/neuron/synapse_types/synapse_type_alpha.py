@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict \
     import SpynakkerRangeDictionary
@@ -107,9 +108,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def tau_syn_I(self, tau_syn_I):
         self._data.set_value(key=TAU_SYN_I, value=tau_syn_I)
 
+    @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
         return 2  # EX and IH
 
+    @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
 
         if target == "excitatory":
@@ -118,9 +121,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
             return 1
         return None
 
+    @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self):
-        return "excitatory",  "inhibitory"
+        return "excitatory", "inhibitory"
 
+    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
     def get_n_synapse_type_parameters(self):
         return 8
 
@@ -160,9 +165,11 @@ class SynapseTypeAlpha(AbstractSynapseType):
             NeuronParameter(i_decay, _COMB_EXP_TYPES.DECAY_INH.data_type),
         ]
 
+    @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
     def get_synapse_type_parameter_types(self):
         return [item.data_type for item in DataType]
 
+    @overrides(AbstractSynapseType.get_n_cpu_cycles_per_neuron)
     def get_n_cpu_cycles_per_neuron(self):
         # a guess
         return 100

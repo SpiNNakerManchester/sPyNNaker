@@ -40,6 +40,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
         self._synapse_structure = SynapseStructureWeightAccumulator()
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, other):
         # pylint: disable=arguments-differ
         if other is None or not isinstance(other, TimingDependenceRecurrent):
@@ -64,6 +65,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         # otherwise it's in the synapse
         return 2 if self.dual_fsm else 0
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
 
         # 2 * 32-bit parameters
@@ -74,6 +76,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Write parameters

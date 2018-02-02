@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+    SpynakkerRangeDictionary as SpynnakerRangeDictionary
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
 
@@ -70,7 +70,7 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
             GSYN_INH: "uS"}
 
         self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[TAU_SYN_E] = tau_syn_E
         self._data[TAU_SYN_I] = tau_syn_I
         self._data[GSYN_EXC] = initial_input_exc
@@ -108,9 +108,11 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
     def isyn_inh(self, new_value):
         self._data.set_value(key=GSYN_INH, value=new_value)
 
+    @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
         return 2
 
+    @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
         if target == "excitatory":
             return 0
@@ -118,9 +120,11 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
             return 1
         return None
 
+    @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self):
         return "excitatory", "inhibitory"
 
+    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
     def get_n_synapse_type_parameters(self):
         return 6
 
@@ -143,9 +147,11 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
                 self._data[GSYN_INH], _EXP_TYPES.INITIAL_INH.data_type)
         ]
 
+    @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
     def get_synapse_type_parameter_types(self):
         return [item.data_type for item in _EXP_TYPES]
 
+    @overrides(AbstractSynapseType.get_n_cpu_cycles_per_neuron)
     def get_n_cpu_cycles_per_neuron(self):
 
         # A guess

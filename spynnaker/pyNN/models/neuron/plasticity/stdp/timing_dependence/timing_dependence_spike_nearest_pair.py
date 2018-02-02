@@ -45,6 +45,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         # pylint: disable=protected-access
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
@@ -63,6 +64,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         # Neighbours are considered and, a single 16-bit R1 trace
         return 0
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
 
@@ -70,6 +72,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Check timestep is valid
@@ -89,6 +92,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def synaptic_structure(self):
         return self._synapse_structure
 
+    @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(

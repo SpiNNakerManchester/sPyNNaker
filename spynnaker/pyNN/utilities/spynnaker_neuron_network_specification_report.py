@@ -12,19 +12,19 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """
     """
 
-    def _get_diagram(self, label):
+    @staticmethod
+    def _get_diagram(label):
         # pylint: disable=import-error
         try:
             import graphviz  # @UnresolvedImport
         except Exception:
             raise SpynnakerException(
-                "graphviz is required to use this report.  Please install"
-                " graphviz if you want to use this report.")
+                "graphviz is required to use this report.  "
+                "Please install graphviz if you want to use this report.")
         return graphviz.Digraph(comment=label)
 
     def __call__(self, report_folder, application_graph):
         """
-
         :param report_folder: the report folder to put figure into
         :param application_graph: the app graph
         :rtype: None

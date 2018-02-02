@@ -1,9 +1,7 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
-    import AbstractHasAPlusAMinus
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
-    import AbstractWeightDependence
+from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
+from .abstract_weight_dependence import AbstractWeightDependence
 
 
 class WeightDependenceAdditiveTriplet(
@@ -45,6 +43,7 @@ class WeightDependenceAdditiveTriplet(
     def A3_minus(self):
         return self._a3_minus
 
+    @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceAdditiveTriplet):
             return False
@@ -60,6 +59,7 @@ class WeightDependenceAdditiveTriplet(
     def vertex_executable_suffix(self):
         return "additive"
 
+    @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 2:
@@ -67,6 +67,7 @@ class WeightDependenceAdditiveTriplet(
                 "Additive weight dependence only supports one or two terms")
         return (6 * 4) * n_synapse_types
 
+    @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
 

@@ -28,7 +28,7 @@ class AbstractMasterPopTableFactory(object):
         :type master_pop_base_mem_address: int
         :type chip_y: int
         :type chip_x: int
-        :type txrx: spinnman.transceiver.Transceiver object
+        :type txrx: spinnman.transceiver.Transceiver
         :return: a synaptic matrix memory position.
         """
 
@@ -56,8 +56,8 @@ class AbstractMasterPopTableFactory(object):
         """ completes the master pop table in the spec
 
         :param spec: the spec to write the master pop entry to
-        :param master_pop_table_region: the region to which the master pop\
-                    table is being stored
+        :param master_pop_table_region: \
+            the region to which the master pop table is being stored
         """
 
     @abstractmethod

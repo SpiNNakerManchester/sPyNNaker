@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -48,10 +49,12 @@ class FixedNumberPostConnector(AbstractConnector):
         self._verbose = verbose
         self._post_neurons_set = False
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, self._get_n_connections(self._n_post))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -138,6 +141,7 @@ class FixedNumberPostConnector(AbstractConnector):
                 self._n_pre_neurons, self._n_post * out_of,
                 1.0 / self._n_post_neurons, chance=(1.0 / 100000.0))
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -154,6 +158,7 @@ class FixedNumberPostConnector(AbstractConnector):
             self._delays, self._n_post * self._n_pre_neurons,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -161,12 +166,14 @@ class FixedNumberPostConnector(AbstractConnector):
         return int(math.ceil(
             self._get_n_connections(pre_vertex_slice.n_atoms)))
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -175,17 +182,20 @@ class FixedNumberPostConnector(AbstractConnector):
             self._n_post * self._n_pre_neurons)
         return self._get_weight_maximum(self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return (
             not self._generate_lists_on_host(self._weights) and
             not self._generate_lists_on_host(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,

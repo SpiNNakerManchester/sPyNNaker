@@ -90,7 +90,7 @@ class MunichMotorDevice(
         self._update_time = update_time
         self._delay_time = delay_time
         self._delta_threshold = delta_threshold
-        self._continue_if_not_different = continue_if_not_different
+        self._continue_if_not_different = bool(continue_if_not_different)
         self._dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
@@ -163,10 +163,7 @@ class MunichMotorDevice(
         spec.write_value(data=self._update_time)
         spec.write_value(data=self._delay_time)
         spec.write_value(data=self._delta_threshold)
-        if self._continue_if_not_different:
-            spec.write_value(data=1)
-        else:
-            spec.write_value(data=0)
+        spec.write_value(data=int(self._continue_if_not_different))
 
         # End-of-Spec:
         spec.end_specification()
@@ -180,8 +177,7 @@ class MunichMotorDevice(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def reserve_memory_regions(self, spec):
-        """
-        Reserve SDRAM space for memory areas:
+        """ Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
         2) area for start commands
         3) area for end commands
@@ -190,13 +186,10 @@ class MunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=self.SYSTEM_REGION,
-            size=SYSTEM_BYTES_REQUIREMENT,
-            label='setup')
+            self.SYSTEM_REGION, SYSTEM_BYTES_REQUIREMENT, label='setup')
 
-        spec.reserve_memory_region(region=self.PARAMS_REGION,
-                                   size=self.PARAMS_SIZE,
-                                   label='params')
+        spec.reserve_memory_region(
+            self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):

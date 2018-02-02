@@ -34,6 +34,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def tau(self):
         return self._tau
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, other):
         # pylint: disable=protected-access, arguments-differ
         if other is None or not isinstance(other, TimingDependenceVogels2011):
@@ -50,6 +51,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         # Trace entries consist of a single 16-bit number
         return 2
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return 4 + (2 * LOOKUP_TAU_SIZE)
 
@@ -57,6 +59,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Check timestep is valid

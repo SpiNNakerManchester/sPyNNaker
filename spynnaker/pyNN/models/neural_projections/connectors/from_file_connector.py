@@ -44,8 +44,7 @@ class FromFileConnector(FromListConnector):
 
     @abstractmethod
     def get_reader(self, file):  # @ReservedAssignment
-        """
-        get a filereader object probably using the pynn methods.
+        """ Get a filereader object, probably using the pynn methods.
 
         For example calling:
 

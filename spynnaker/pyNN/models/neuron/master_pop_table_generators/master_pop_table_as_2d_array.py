@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
@@ -66,6 +67,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         for entry in ROW_LEN_TABLE_ENTRIES:
             spec.write_value(data=entry)
 
+    @overrides(
+        AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
@@ -90,6 +93,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         max_row_length = ROW_LEN_TABLE_ENTRIES[max_row_length_index]
         return [(max_row_length, synaptic_block_base_address_offset)]
 
+    @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         # 2 bytes per entry + row length table
         return (2 * MASTER_POPULATION_ENTRIES) + ROW_LEN_TABLE_SIZE
@@ -131,6 +135,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def _get_table_address_from_coords(self, x, y, p):
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
@@ -192,9 +197,11 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         spec.set_write_pointer(address=table_slot_addr)
         spec.write_value(data=new_entry, data_type=DataType.INT16)
 
+    @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
         pass
 
+    @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
         # This allocator requires each edge to have keys of the form
         # |8 bits >= 0 and <= 7|8 bits >= 0 and <= 7|5 bits >= 0 and <= 17|

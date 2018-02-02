@@ -3,6 +3,7 @@
 import struct
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
@@ -88,6 +89,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries = None
         self._n_addresses = 0
 
+    @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
 
@@ -153,7 +155,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_allowed_row_length(self, row_length):
         """
-
         :param row_length: the row length being considered
         :return: the row length available
         """
@@ -164,7 +165,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_next_allowed_address(self, next_address):
         """
-
         :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
         """
@@ -173,21 +173,22 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def initialise_table(self, spec, master_population_table_region):
         """ Initialises the master pop data structure
 
-        :param spec: the dsg writer
-        :param master_population_table_region: the region in memory that the\
-            master pop table will be written in
+        :param spec: the DSG writer
+        :param master_population_table_region: \
+            the region in memory that the master pop table will be written in
         :rtype: None
         """
         self._entries = dict()
         self._n_addresses = 0
         self._n_single_entries = 0
 
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
         """ Adds a entry in the binary search to deal with the synaptic matrix
 
-        :param spec: the writer for dsg
+        :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
@@ -209,10 +210,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             start_addr, row_length, is_single)
         self._n_addresses += 1
 
+    @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Completes any operations required after all entries have been added
 
-        :param spec: the writer for the dsg
+        :param spec: the writer for the DSG
         :param master_pop_table_region: \
             the region to which the master pop resides in
         :rtype: None
@@ -262,6 +264,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 (row_length & self.ROW_LENGTH_MASK))
         return count
 
+    @overrides(
+        AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
             self, incoming_key_combo, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
@@ -333,6 +337,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 imax = imid
         return None
 
+    @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
         """ Returns any constraints placed on the edges because of having this\
             master pop table implemented in the cores.

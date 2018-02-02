@@ -23,6 +23,7 @@ import logging
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
+_apv_defs = AbstractPopulationVertex.none_pynn_default_parameters
 
 
 class ExternalDeviceLifControl(
@@ -57,16 +58,11 @@ class ExternalDeviceLifControl(
             self, n_neurons, devices, create_edges, translator=None,
 
             # standard neuron stuff
-            spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
-                'label'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.
-            none_pynn_default_parameters['constraints'],
+            spikes_per_second=_apv_defs['spikes_per_second'],
+            label=_apv_defs['label'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
 
             # default params for the neuron model type
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],

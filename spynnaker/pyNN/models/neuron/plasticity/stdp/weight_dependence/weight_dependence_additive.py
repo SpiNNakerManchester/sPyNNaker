@@ -24,6 +24,7 @@ class WeightDependenceAdditive(
     def w_max(self):
         return self._w_max
 
+    @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceAdditive):
             return False
@@ -37,6 +38,7 @@ class WeightDependenceAdditive(
     def vertex_executable_suffix(self):
         return "additive"
 
+    @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 1:
@@ -44,6 +46,7 @@ class WeightDependenceAdditive(
                 "Additive weight dependence only supports one term")
         return (4 * 4) * n_synapse_types
 
+    @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
         # Loop through each synapse type's weight scale

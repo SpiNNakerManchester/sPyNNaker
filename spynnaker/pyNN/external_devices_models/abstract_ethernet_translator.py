@@ -1,7 +1,6 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
@@ -19,5 +18,5 @@ class AbstractEthernetTranslator(object):
 
         :param multicast_packet: A received multicast packet
         :type multicast_packet:\
-            :py:class:`spinnman.messages.eieio.data_messages.abstract_eieio_data_element.AbstractEIEIODataElement`
+            :py:class:`spinnman.messages.eieio.data_messages.AbstractEIEIODataElement`
         """

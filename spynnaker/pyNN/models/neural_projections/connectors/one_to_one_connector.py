@@ -1,4 +1,5 @@
 import numpy
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 
 
@@ -17,6 +18,7 @@ class OneToOneConnector(AbstractConnector):
         self._random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, verbose)
 
+    @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
         """ sets the weights and delays as needed
 
@@ -34,10 +36,12 @@ class OneToOneConnector(AbstractConnector):
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -51,6 +55,7 @@ class OneToOneConnector(AbstractConnector):
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_delay_variance(self._delays, [connection_slice])
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -60,6 +65,7 @@ class OneToOneConnector(AbstractConnector):
             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
         min_hi_atom = min(
             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+
         if min_hi_atom < max_lo_atom:
             return 0
         if min_delay is None or max_delay is None:
@@ -70,14 +76,15 @@ class OneToOneConnector(AbstractConnector):
             if self._delays >= min_delay and self._delays <= max_delay:
                 return 1
             return 0
-        else:
-            connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-            slice_min_delay = min(self._delays[connection_slice])
-            slice_max_delay = max(self._delays[connection_slice])
-            if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
-                return 1
-            return 0
 
+        connection_slice = slice(max_lo_atom, min_hi_atom + 1)
+        slice_min_delay = min(self._delays[connection_slice])
+        slice_max_delay = max(self._delays[connection_slice])
+        if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
+            return 1
+        return 0
+
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -90,6 +97,7 @@ class OneToOneConnector(AbstractConnector):
             return 0
         return 1
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -104,6 +112,7 @@ class OneToOneConnector(AbstractConnector):
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_mean(self._weights, [connection_slice])
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -119,6 +128,7 @@ class OneToOneConnector(AbstractConnector):
         return self._get_weight_maximum(
             self._weights, n_connections, [connection_slice])
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -132,11 +142,13 @@ class OneToOneConnector(AbstractConnector):
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_variance(self._weights, [connection_slice])
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return (
             not self._generate_lists_on_host(self._weights) and
             not self._generate_lists_on_host(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,

@@ -1,7 +1,6 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)

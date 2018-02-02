@@ -67,6 +67,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
         # Check timestep is valid
         if machine_time_step != 1000:
@@ -85,6 +86,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def synaptic_structure(self):
         return self._synapse_structure
 
+    @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(

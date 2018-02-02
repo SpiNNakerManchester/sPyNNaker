@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
@@ -92,6 +93,7 @@ class FromListConnector(AbstractConnector):
         # hand over splitted data
         return source_destination_conn_list, weights, delays, other_conn_list
 
+    @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
         """ allows setting of the weights and delays at separate times to the\
             init, also sets the dtypes correctly.....
@@ -127,9 +129,11 @@ class FromListConnector(AbstractConnector):
                                             dtype=self.CONN_LIST_DTYPE)
             self._converted_weights_and_delays = True
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return numpy.max(self._conn_list["delay"])
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -143,6 +147,7 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.var(delays)
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -166,6 +171,7 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.max(numpy.bincount(sources.view('int32')))
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -179,6 +185,7 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.max(numpy.bincount(targets.view('int32')))
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -192,6 +199,7 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.mean(weights)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -205,6 +213,7 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.max(weights)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -218,9 +227,11 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.var(weights)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return False
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,

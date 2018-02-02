@@ -1,5 +1,6 @@
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
     SpynakkerRangeDictionary
@@ -82,9 +83,11 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def _tau_th_inv(self):
         return self._data[TAU_TH_INV]
 
+    @overrides(AbstractThresholdType.get_n_threshold_parameters)
     def get_n_threshold_parameters(self):
         return 3
 
+    @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
         return [
             NeuronParameter(
@@ -95,8 +98,10 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
                 self._data[V_THRESH], _MAASS_TYPES.V_THRESH.data_type)
         ]
 
+    @overrides(AbstractThresholdType.get_threshold_parameter_types)
     def get_threshold_parameter_types(self):
         return [item.data_type for item in _MAASS_TYPES]
 
+    @overrides(AbstractThresholdType.get_n_cpu_cycles_per_neuron)
     def get_n_cpu_cycles_per_neuron(self):
         return 30

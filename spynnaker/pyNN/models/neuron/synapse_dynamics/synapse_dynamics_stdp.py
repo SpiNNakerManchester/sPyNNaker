@@ -209,22 +209,28 @@ class SynapseDynamicsSTDP(
 
         return (fp_data, pp_data, fp_size, pp_size)
 
+    @overrides(
+        AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row)
     def get_n_plastic_plastic_words_per_row(self, pp_size):
 
         # pp_size is in words, so return
         return pp_size
 
+    @overrides(
+        AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row)
     def get_n_fixed_plastic_words_per_row(self, fp_size):
 
         # fp_size is in half-words
         return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
 
+    @overrides(AbstractPlasticSynapseDynamics.get_n_synapses_in_rows)
     def get_n_synapses_in_rows(self, pp_size, fp_size):
 
         # Each fixed-plastic synapse is a half-word and fp_size is in half
         # words so just return it
         return fp_size
 
+    @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
             fp_size, fp_data):
