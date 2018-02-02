@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
 from .push_bot_translator import PushBotTranslator

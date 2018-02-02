@@ -5,12 +5,13 @@ import random
 import numpy
 from enum import Enum
 
+from spinn_utilities.overrides import overrides
+
 from data_specification.enums import DataType
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
-from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource

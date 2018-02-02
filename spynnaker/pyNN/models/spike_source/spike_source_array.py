@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities.constants \
     import MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP

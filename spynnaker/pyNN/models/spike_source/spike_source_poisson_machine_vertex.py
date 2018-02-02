@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models \
@@ -14,7 +14,8 @@ from spinn_front_end_common.interface.buffer_management.buffer_models \
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 
-from spynnaker.pyNN.utilities.constants import LIVE_POISSON_CONTROL_PARTITION_ID
+from spynnaker.pyNN.utilities.constants \
+    import LIVE_POISSON_CONTROL_PARTITION_ID
 
 from enum import Enum
 

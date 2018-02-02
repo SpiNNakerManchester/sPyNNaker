@@ -2,6 +2,8 @@ import logging
 import math
 import random
 
+from spinn_utilities.overrides import overrides
+
 from spinn_front_end_common.utilities.constants import \
     SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT
 
@@ -10,7 +12,6 @@ from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.model.constraints.partitioner_constraints \
     import SameAtomsAsVertexConstraint
-from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource

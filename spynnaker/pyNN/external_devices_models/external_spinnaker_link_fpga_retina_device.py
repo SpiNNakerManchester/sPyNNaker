@@ -1,8 +1,8 @@
 import logging
 
+from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
-from pacman.model.decorators import overrides
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
 from spinn_front_end_common.abstract_models import \

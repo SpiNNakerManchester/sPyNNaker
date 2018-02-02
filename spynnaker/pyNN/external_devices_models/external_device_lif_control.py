@@ -1,10 +1,11 @@
+from spinn_utilities.overrides import overrides
+
 from .threshold_type_multicast_device_control \
     import ThresholdTypeMulticastDeviceControl
 from .abstract_ethernet_controller import AbstractEthernetController
 
 from pacman.model.constraints.key_allocator_constraints import \
     FixedKeyAndMaskConstraint
-from pacman.model.decorators import overrides
 from pacman.model.routing_info import BaseKeyAndMask
 
 from spinn_front_end_common.abstract_models import \

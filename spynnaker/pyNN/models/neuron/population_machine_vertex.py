@@ -1,6 +1,6 @@
+from spinn_utilities.overrides import overrides
 
 # pacman imports
-from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import MachineVertex
 
 # spinn front end common imports

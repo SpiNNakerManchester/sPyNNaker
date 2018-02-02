@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 

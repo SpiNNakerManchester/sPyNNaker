@@ -1,10 +1,10 @@
 # spynnaker imports
 import logging
 
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
     import FixedMaskConstraint
-from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application \
     import ApplicationSpiNNakerLinkVertex, ApplicationVertex

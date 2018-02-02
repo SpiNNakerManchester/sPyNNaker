@@ -1,9 +1,9 @@
+from spinn_utilities.overrides import overrides
 
 # pacman imports
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
-from pacman.model.decorators import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex

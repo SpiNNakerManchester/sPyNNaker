@@ -1,5 +1,5 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .neuron_model_leaky_integrate import NeuronModelLeakyIntegrate
 

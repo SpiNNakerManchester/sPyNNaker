@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models \
     import AbstractSendMeMulticastCommandsVertex
 from spinn_front_end_common.abstract_models.impl import \

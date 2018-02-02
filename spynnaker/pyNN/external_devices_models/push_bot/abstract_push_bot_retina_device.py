@@ -3,7 +3,7 @@ from spinn_front_end_common.abstract_models.impl \
 from spinn_front_end_common.abstract_models \
     import AbstractSendMeMulticastCommandsVertex
 
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 
 class AbstractPushBotRetinaDevice(
