@@ -18,15 +18,11 @@
 //---------------------------------------
 typedef struct {
     uint32_t count_minus_one;
-
     uint32_t times[MAX_POST_SYNAPTIC_EVENTS];
-    post_global_state_t traces[MAX_POST_SYNAPTIC_EVENTS];
 } post_event_history_t;
 
 typedef struct {
-    post_global_state_t prev_trace;
     uint32_t prev_time;
-    const post_global_state_t *next_trace;
     const uint32_t *next_time;
     uint32_t num_events;
 } post_event_window_t;
@@ -53,7 +49,6 @@ static inline post_event_history_t *post_events_init_buffers(
 
         // Add initial placeholder entry to buffer
         post_event_history[n].times[0] = 0;
-        post_event_history[n].traces[0] = timing_get_initial_post_trace();
         post_event_history[n].count_minus_one = 0;
     }
 
@@ -66,7 +61,6 @@ static inline post_event_window_t post_events_get_window(
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
-    const post_global_state_t *end_event_trace = events->traces + count;
     const uint32_t *event_time = end_event_time;
     post_event_window_t window;
     do {
@@ -86,10 +80,6 @@ static inline post_event_window_t post_events_get_window(
 
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
-
-    // Using num_events, find next and previous traces
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
 
     // Return window
     return window;
@@ -128,11 +118,6 @@ static inline post_event_window_t post_events_get_window_delayed(
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
 
-    // Using num_events, find next and previous traces
-    const post_global_state_t *end_event_trace = events->traces + count;
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
-
     // Return window
     return window;
 }
@@ -142,7 +127,6 @@ static inline post_event_window_t post_events_next(post_event_window_t window) {
 
     // Update previous time and increment next time
     window.prev_time = *window.next_time++;
-    window.prev_trace = *window.next_trace++;
 
     // Decrement remaining events
     window.num_events--;
@@ -155,7 +139,6 @@ static inline post_event_window_t post_events_next_delayed(
 
     // Update previous time and increment next time
     window.prev_time = delayed_time;
-    window.prev_trace = *window.next_trace++;
 
     // Go onto next event
     window.next_time++;
@@ -166,8 +149,8 @@ static inline post_event_window_t post_events_next_delayed(
 }
 
 //---------------------------------------
-static inline void post_events_add(uint32_t time, post_event_history_t *events,
-                                   post_global_state_t trace) {
+static inline void post_events_add(
+        uint32_t time, post_event_history_t *events) {
 
     if (events->count_minus_one < (MAX_POST_SYNAPTIC_EVENTS - 1)) {
 
@@ -175,19 +158,16 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
         // and increment count minus 1
         const uint32_t new_index = ++events->count_minus_one;
         events->times[new_index] = time;
-        events->traces[new_index] = trace;
     } else {
 
         // Otherwise Shuffle down elements
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t e = 2; e < MAX_POST_SYNAPTIC_EVENTS; e++) {
             events->times[e - 1] = events->times[e];
-            events->traces[e - 1] = events->traces[e];
         }
 
         // Stick new time at end
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
-        events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
     }
 }
 

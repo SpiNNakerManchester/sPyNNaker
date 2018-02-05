@@ -28,6 +28,9 @@ static weight_t ring_buffers[RING_BUFFER_SIZE];
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
 
+// The weight scales per synapse type
+static accum weight_scales[SYNAPSE_TYPE_COUNT];
+
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
@@ -219,8 +222,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t synaptic_matrix_address,
         uint32_t n_neurons_value,
         synapse_param_t **neuron_synapse_shaping_params_value,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *indirect_synapses_address,
+        accum **synapse_weight_scales, address_t *indirect_synapses_address,
         address_t *direct_synapses_address) {
 
     log_info("synapses_initialise: starting");
@@ -263,7 +265,19 @@ bool synapses_initialise(
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }
-    *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
+
+    // Get the weight scales
+    uint32_t weight_scales_base = ((n_neurons * sizeof(accum)) / 4);
+    weight_scales_base += ring_buffer_input_left_shifts_base;
+    for (index_t synapse_index = 0; synapse_index < SYNAPSE_TYPE_COUNT;
+            synapse_index++) {
+        weight_scales[synapse_index] =
+            synapse_params_address[weight_scales_base + synapse_index];
+        log_info("synapse type %s, weight scale %k",
+                 synapse_types_get_type_char(synapse_index),
+                 weight_scales[synapse_index]);
+    }
+    *synapse_weight_scales = weight_scales;
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM

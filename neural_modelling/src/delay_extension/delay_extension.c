@@ -266,6 +266,8 @@ void timer_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
 
+    uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff_us;
+
     // Process all the spikes from the last timestep
     spike_process();
 
@@ -293,11 +295,13 @@ void timer_callback(uint unused0, uint unused1) {
         return;
     }
 
-    // Sleep for a random time
-    spin1_delay_us(random_backoff_us);
+    while (tc[T1_COUNT] > random_backoff_time) {
+
+        // Do Nothing
+    }
 
     // Set the next expected time to wait for between spike sending
-    expected_time = tc[T1_COUNT] - time_between_spikes;
+    expected_time = random_backoff_time - time_between_spikes;
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {

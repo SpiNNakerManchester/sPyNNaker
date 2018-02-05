@@ -545,6 +545,10 @@ class SynapticManager(object):
         weight_scales = numpy.array([
             self._get_weight_scale(r) * weight_scale
             for r in ring_buffer_shifts])
+
+        for value in weight_scales:
+            spec.write_value(value, data_type=DataType.S1615)
+
         return weight_scales
 
     def _write_padding(

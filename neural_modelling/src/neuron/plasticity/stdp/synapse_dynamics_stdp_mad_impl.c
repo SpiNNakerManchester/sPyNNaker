@@ -1,15 +1,12 @@
-// Spinn_common includes
-#include "static-assert.h"
 
 // sPyNNaker neural modelling includes
 #include "../../synapses.h"
 
 // Plasticity common includes
 #include "../common/maths.h"
-#include "../common/post_events.h"
 
-#include "weight_dependence/weight.h"
-#include "timing_dependence/timing.h"
+#include "post_events.h"
+#include "stdp_rule.h"
 #include <string.h>
 #include <debug.h>
 
@@ -50,25 +47,23 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 #error "Not enough bits for axonal synaptic delay bits"
 #endif
 
-//---------------------------------------
-// Structures
-//---------------------------------------
-typedef struct {
-    pre_trace_t prev_trace;
-    uint32_t prev_time;
-} pre_event_history_t;
-
+// Post-event history - array of one per post-synaptic neuron (on this core).
 post_event_history_t *post_event_history;
+
+// Scaling of weights - one value per synapse type
+accum *weight_scales;
+
+// For calculating the time in milliseconds
+accum time_step_ms;
 
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
-static inline final_state_t _plasticity_update_synapse(
-        uint32_t time,
-        const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
-        const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
-        const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+static inline void _plasticity_update_synapse(
+        const uint32_t time, const uint32_t last_pre_time,
+        const post_event_history_t *post_event_history,
+        const uint32_t delay_dendritic, const uint32_t delay_axonal,
+        const plastic_synapse_t *plastic_synapse) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -87,16 +82,14 @@ static inline final_state_t _plasticity_update_synapse(
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
-        const uint32_t delayed_post_time = *post_window.next_time
-                                           + delay_dendritic;
+        const uint32_t delayed_post_time =
+                *post_window.next_time + delay_dendritic;
         log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
-        // Apply spike to state
-        current_state = timing_apply_post_spike(
-            delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
-            last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state);
+        // Run on_post_synaptic_spike event handler
+        stdp_on_postsynaptic_spike(
+            plastic_synapse, delayed_post_time * time_step_ms);
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -106,36 +99,19 @@ static inline final_state_t _plasticity_update_synapse(
     log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
 
-    // Apply spike to state
+    // Run on_presynaptic_spike event handler
     // **NOTE** dendritic delay is subtracted
-    current_state = timing_apply_pre_spike(
-        delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-        post_window.prev_time, post_window.prev_trace, current_state);
+    stdp_on_presynaptic_spike(
+        plastic_synapse, delayed_pre_time * time_step_ms);
 
-    // Return final synaptic word and weight
-    return synapse_structure_get_final_state(current_state);
+    // Apply boolean rules
+    stdp_do_boolean_checks(plastic_synapse);
 }
 
-//---------------------------------------
-// Synaptic row plastic-region implementation
-//---------------------------------------
+// Plastic row starts with the last pre-synaptic spike time
 static inline plastic_synapse_t* _plastic_synapses(
         address_t plastic_region_address) {
-    const uint32_t pre_event_history_size_words =
-        sizeof(pre_event_history_t) / sizeof(uint32_t);
-    static_assert(pre_event_history_size_words * sizeof(uint32_t)
-                  == sizeof(pre_event_history_t),
-                  "Size of pre_event_history_t structure should be a multiple"
-                  " of 32-bit words");
-
-    return (plastic_synapse_t*)
-        (&plastic_region_address[pre_event_history_size_words]);
-}
-
-//---------------------------------------
-static inline pre_event_history_t *_plastic_event_history(
-        address_t plastic_region_address) {
-    return (pre_event_history_t*) (&plastic_region_address[0]);
+    return &(plastic_region_address[1]);
 }
 
 void synapse_dynamics_print_plastic_synapses(
@@ -153,8 +129,6 @@ void synapse_dynamics_print_plastic_synapses(
         fixed_region_address);
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
-    const pre_event_history_t *event_history = _plastic_event_history(
-        plastic_region_address);
 
     log_debug("Plastic region %u synapses\n", plastic_synapse);
 
@@ -185,21 +159,18 @@ static inline index_t _sparse_axonal_delay(uint32_t x) {
 
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        accum* synapse_type_weight_scales) {
 
-    // Load timing dependence data
-    address_t weight_region_address = timing_initialise(address);
-    if (address == NULL) {
-        return false;
-    }
+    // Copy the weight scales
+    weight_scales = synapse_type_weight_scales;
 
-    // Load weight dependence data
-    address_t weight_result = weight_initialise(
-        weight_region_address, ring_buffer_to_input_buffer_left_shifts);
-    if (weight_result == NULL) {
-        return false;
-    }
+    // Copy the time step
+    spin1_memcpy(&time_step_ms, address, sizeof(accum));
 
+    // Initialise the rule
+    stdp_init(&address[1]);
+
+    // Initialise the post-even history
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
         return false;
@@ -214,6 +185,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
+    uint32_t last_pre_time = plastic_region_address[0];
+    plastic_region_address[0] = time;
     plastic_synapse_t *plastic_words = _plastic_synapses(
         plastic_region_address);
     const control_t *control_words = synapse_row_plastic_controls(
@@ -222,20 +195,6 @@ bool synapse_dynamics_process_plastic_synapses(
         fixed_region_address);
 
     num_plastic_pre_synaptic_events += plastic_synapse;
-
-    // Get event history from synaptic row
-    pre_event_history_t *event_history = _plastic_event_history(
-        plastic_region_address);
-
-    // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
-
-    // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -252,15 +211,10 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t index = synapse_row_sparse_index(control_word);
         uint32_t type_index = synapse_row_sparse_type_index(control_word);
 
-        // Create update state from the plastic synaptic word
-        update_state_t current_state = synapse_structure_get_update_state(
-            *plastic_words, type);
-
         // Update the synapse state
-        final_state_t final_state = _plasticity_update_synapse(
-            time, last_pre_time, last_pre_trace, event_history->prev_trace,
-            delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index]);
+        _plasticity_update_synapse(
+            time, last_pre_time, &post_event_history[index],
+            delay_dendritic, delay_axonal, &(plastic_words[0]));
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -269,12 +223,11 @@ bool synapse_dynamics_process_plastic_synapses(
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
-        ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
-            final_state);
+        accum weight = stdp_get_weight(&(plastic_words[0]));
+        ring_buffers[ring_buffer_index] += weight * weight_scales[type];
 
-        // Write back updated synaptic word to plastic region
-        *plastic_words++ = synapse_structure_get_final_synaptic_word(
-            final_state);
+        // Move to the next plastic word
+        plastic_words++;
     }
     return true;
 }
@@ -286,10 +239,7 @@ void synapse_dynamics_process_post_synaptic_event(
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
     const uint32_t last_post_time = history->times[history->count_minus_one];
-    const post_trace_t last_post_trace =
-        history->traces[history->count_minus_one];
-    post_events_add(time, history, timing_add_post_spike(time, last_post_time,
-                                                         last_post_trace));
+    post_events_add(time, history);
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {

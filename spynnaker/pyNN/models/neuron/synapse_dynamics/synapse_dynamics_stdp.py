@@ -114,7 +114,7 @@ class SynapseDynamicsSTDP(
         return False
 
     def get_vertex_executable_suffix(self):
-        name = "_stdp_mad"
+        name = "_stdp"
         name += "_" + self._timing_dependence.vertex_executable_suffix
         name += "_" + self._weight_dependence.vertex_executable_suffix
         return name

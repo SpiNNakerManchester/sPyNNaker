@@ -2,11 +2,10 @@
 #include <debug.h>
 
 bool synapse_dynamics_initialise(
-        address_t address, uint32_t n_neurons,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        address_t address, uint32_t n_neurons, accum *weight_scales) {
     use(address);
     use(n_neurons);
-    use(ring_buffer_to_input_buffer_left_shifts);
+    use(weight_scales);
     return true;
 }
 

@@ -146,15 +146,15 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up the synapses
     synapse_param_t *neuron_synapse_shaping_params;
-    uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    accum *weight_scales;
     address_t indirect_synapses_address;
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
             n_neurons, &neuron_synapse_shaping_params,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &indirect_synapses_address, &direct_synapses_address)) {
+            &weight_scales, &indirect_synapses_address,
+            &direct_synapses_address)) {
         return false;
     }
 
@@ -173,7 +173,7 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the synapse dynamics
     if (!synapse_dynamics_initialise(
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address),
-            n_neurons, ring_buffer_to_input_buffer_left_shifts)) {
+            n_neurons, weight_scales)) {
         return false;
     }
 
