@@ -16,6 +16,12 @@ logger = logging.getLogger(__name__)
 
 
 class RecordingCommon(object):
+    # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
+    # __slots__ = [
+    #     "_indices_to_record",
+    #     "_population",
+    #     "_write_to_files_indicators"]
+
     def __init__(self, population):
         """ object to hold recording behaviour
 
