@@ -234,7 +234,7 @@ bool read_global_parameters(address_t address) {
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-static read_poisson_parameters(address_t address) {
+static bool read_poisson_parameters(address_t address) {
 
     // Allocate DTCM for array of spike sources and copy block of data
     if (global_parameters.n_spike_sources > 0) {
@@ -593,7 +593,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 }
 
-void set_spike_source_rate(int id, REAL rate) {
+void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id >= global_parameters.first_source_id) &&
             ((id - global_parameters.first_source_id) <
              global_parameters.n_spike_sources)) {
