@@ -305,7 +305,7 @@ class NeuronRecorder(object):
         # remove the indexes not recording
         self._indexes[variable] = \
             [index for index in self._indexes[variable]
-            if index not in remove_indexes]
+                if index not in remove_indexes]
 
         # Check is at least one index still recording
         if len(self._indexes[variable]) == 0:
