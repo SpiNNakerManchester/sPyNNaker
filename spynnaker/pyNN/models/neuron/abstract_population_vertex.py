@@ -39,6 +39,8 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import SpikeRecorder, NeuronRecorder
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
+    SpynakkerRangedList
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
@@ -643,6 +645,29 @@ class AbstractPopulationVertex(
                             " parameter {}".format(variable))
         initialize_attr(value)
         self._change_requires_neuron_parameters_reload = True
+
+    @property
+    @overrides(AbstractPopulationInitializable.initial_values)
+    def initial_values(self):
+        """A dict containing the initial values of the state variables."""
+        results = dict()
+        all_methods = dir(self._neuron_model)
+        for method in all_methods:
+            if method.startswith("initialize_"):
+                variable = method[11:]
+                key = "%s_init" % variable
+                if hasattr(self._neuron_model, key):
+                    getter = key
+                elif hasattr(self._neuron_model, variable):
+                    getter = variable
+                else:
+                    raise Exception("Vertex does not support getting of"
+                                    " parameter {}".format(variable))
+                value = self.get_value(getter)
+                if isinstance(value, SpynakkerRangedList):
+                    value = value.get_value_s()
+                results[variable] = value
+        return results
 
     @property
     def input_type(self):

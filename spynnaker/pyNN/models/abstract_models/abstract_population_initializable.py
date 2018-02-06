@@ -1,6 +1,7 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod, \
+    abstractproperty
 
 
 @add_metaclass(AbstractBase)
@@ -17,3 +18,7 @@ class AbstractPopulationInitializable(object):
             in this population.
 
         """
+
+    @abstractproperty
+    def initial_values(self):
+        """A dict containing the initial values of the state variables."""
