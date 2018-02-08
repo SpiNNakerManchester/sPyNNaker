@@ -523,6 +523,15 @@ class SynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
+    @staticmethod
+    def _get_precision_based_weight_scale(precision=1):
+        """ Return the amount to scale the weights by when using
+            precision-based scaling.
+        """
+        precision = 0.000035
+        return int(1/precision)
+
+
     def _write_synapse_parameters(
             self, spec, machine_vertex, machine_graph, graph_mapper,
             post_slices, post_slice_index, post_vertex_slice, input_type,
@@ -530,10 +539,11 @@ class SynapticManager(object):
 
         # Get the ring buffer shifts and scaling factors
         weight_scale = input_type.get_global_weight_scale()
-        ring_buffer_shifts = self._get_ring_buffer_to_input_left_shifts(
-            machine_vertex, machine_graph, graph_mapper, post_slices,
-            post_slice_index, post_vertex_slice, machine_time_step,
-            weight_scale)
+        ring_buffer_shifts = [14,14]
+#         self._get_ring_buffer_to_input_left_shifts(
+#             machine_vertex, machine_graph, graph_mapper, post_slices,
+#             post_slice_index, post_vertex_slice, machine_time_step,
+#             weight_scale)
 
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         write_parameters_per_neuron(
@@ -543,8 +553,11 @@ class SynapticManager(object):
         spec.write_array(ring_buffer_shifts)
 
         weight_scales = numpy.array([
-            self._get_weight_scale(r) * weight_scale
+            self._get_precision_based_weight_scale() * weight_scale
             for r in ring_buffer_shifts])
+
+        print weight_scales
+
         return weight_scales
 
     def _write_padding(
