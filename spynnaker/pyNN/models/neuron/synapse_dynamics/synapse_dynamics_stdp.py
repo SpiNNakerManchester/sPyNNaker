@@ -3,7 +3,7 @@ import numpy
 
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from spynnaker.pyNN import exceptions
 
@@ -15,14 +15,14 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+        AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun):
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0):
         AbstractPlasticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
+        AbstractSettable.__init__(self)
         AbstractChangableAfterRun.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
@@ -59,7 +59,7 @@ class SynapseDynamicsSTDP(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractPopulationSettable.get_value)
+    @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -69,7 +69,7 @@ class SynapseDynamicsSTDP(
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractPopulationSettable.set_value)
+    @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 

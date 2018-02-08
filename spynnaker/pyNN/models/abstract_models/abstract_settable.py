@@ -6,17 +6,24 @@ from spinn_utilities.ranged.ranged_list import RangedList
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
     SpynakkerRangedList
 
-from .abstract_settable import AbstractSettable
-
 
 @add_metaclass(AbstractBase)
-class AbstractPopulationSettable(AbstractSettable):
+class AbstractSettable(object):
     """ Indicates that some properties of this object can be accessed from\
         the PyNN population set and get methods
     """
 
     __slots__ = ()
 
-    @abstractproperty
-    def n_atoms(self):
-        """" See ApplicationVertex.n_atoms """
+    @abstractmethod
+    def get_value(self, key):
+        """ Get a property
+        """
+
+    @abstractmethod
+    def set_value(self, key, value):
+        """ Set a property
+
+        :param key: the name of the parameter to change
+        :param value: the new value of the parameter to assign
+        """
