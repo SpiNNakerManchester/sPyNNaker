@@ -53,7 +53,7 @@ static inline void input_type_convert_inhibitory_input_to_current(
 
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++){
     	inh_input[i] = -(inh_input[i] >>
-        	    	inhibitory_shifts) *
+        	    	inhibitory_shift) *
 					(input_type->V_rev_I - membrane_voltage);
     }
 

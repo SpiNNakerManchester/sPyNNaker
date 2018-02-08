@@ -407,9 +407,9 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
-        exc_syn_input = input_type_convert_excitatory_input_to_current(
+        input_type_convert_excitatory_input_to_current(
         		exc_syn_input, input_type, voltage);
-        inh_syn_input = input_type_convert_inhibitory_input_to_current(
+        input_type_convert_inhibitory_input_to_current(
         		inh_syn_input, input_type, voltage);
 
         // Get external bias from any source of intrinsic plasticity
