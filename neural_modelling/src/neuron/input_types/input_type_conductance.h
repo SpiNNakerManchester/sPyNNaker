@@ -30,49 +30,33 @@ typedef struct input_type_t {
     REAL     V_rev_I;
 } input_type_t;
 
-// Receptor-independent shifts enabling individual scaling for different receptors
-// ToDO Write these in input_type_t struct from Python to remove requirement to
+// ToDO Write these in synapse_type struct from Python to remove requirement to
 // set manually.
-// Note that this will cause problems if these arrays are not explicitly initialised
-// when using multiple non-zero shifts.
-uint16_t excitatory_shifts[NUM_EXCITATORY_RECEPTORS] = {10};
-uint16_t inhibitory_shifts[NUM_INHIBITORY_RECEPTORS] = {10};
+uint16_t excitatory_shift = 10;
+uint16_t inhibitory_shift = 10;
 
-//---------------------------------------
-// Functions called from timestep update in neuron.c
-//---------------------------------------
-// Deprecated - no longer required as scaling is applied when getting array of
-// synaptic input.
-//static inline input_t input_type_get_input_value(
-//        input_t value, input_type_pointer_t input_type) {
-//    use(input_type);
-//    return value >> 10;
-//}
-
-static inline input_t* input_type_convert_excitatory_input_to_current(
+static inline void input_type_convert_excitatory_input_to_current(
         input_t* exc_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
 
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++){
-    	exc_input[i] = (exc_input[i] >> //input_type->
-        			excitatory_shifts[i]) *
+    	exc_input[i] = (exc_input[i] >>
+        			excitatory_shift) *
 					(input_type->V_rev_E - membrane_voltage);
     }
 
-    return &exc_input[0];
 }
 
-static inline input_t* input_type_convert_inhibitory_input_to_current(
+static inline void input_type_convert_inhibitory_input_to_current(
         input_t* inh_input, input_type_pointer_t input_type,
         state_t membrane_voltage) {
 
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++){
-    	inh_input[i] = -(inh_input[i] >> //input_type->
-        	    	inhibitory_shifts[i]) *
+    	inh_input[i] = -(inh_input[i] >>
+        	    	inhibitory_shifts) *
 					(input_type->V_rev_I - membrane_voltage);
     }
 
-    return &inh_input[0];
 }
 
 #endif // _INPUT_TYPE_CONDUCTANCE_H_

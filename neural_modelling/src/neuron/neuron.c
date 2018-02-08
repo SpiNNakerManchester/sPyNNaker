@@ -390,17 +390,10 @@ void neuron_do_timestep_update(timer_t time) {
         		synapse_types_get_inhibitory_input(
         				&(neuron_synapse_shaping_params[neuron_index]));
 
-        // Potential to combine these calls with functions above
-        exc_syn_input = input_type_convert_excitatory_input_to_current(
-        		exc_syn_input, input_type, voltage);
-        inh_syn_input = input_type_convert_inhibitory_input_to_current(
-        		inh_syn_input, input_type, voltage);
-
+        // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
         REAL total_inh = 0;
 
-        // Sum input to fit with current recording strategy - could upgrade to
-        // record separate receptor inputs in the future.
         for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
         	total_exc += exc_syn_input[i];
         }
@@ -408,24 +401,30 @@ void neuron_do_timestep_update(timer_t time) {
         	total_inh += inh_syn_input[i];
         }
 
+         // If we should be recording input, record the values
+        inputs_excitatory->inputs[neuron_index].input = total_exc;
+        inputs_inhibitory->inputs[neuron_index].input = total_inh;
+
+        // Perform conversion of g_syn to current, including evaluation of
+        // voltage-dependent inputs
+        exc_syn_input = input_type_convert_excitatory_input_to_current(
+        		exc_syn_input, input_type, voltage);
+        inh_syn_input = input_type_convert_inhibitory_input_to_current(
+        		inh_syn_input, input_type, voltage);
+
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
 
-        // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = total_exc;
-        inputs_inhibitory->inputs[neuron_index].input = total_inh;
-
-
-        // update neuron parameters
+        // Update neuron parameters
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
 			NUM_INHIBITORY_RECEPTORS, inh_syn_input,
 			external_bias, neuron);
 
-        // determine if a spike should occur
+        // Determine if a spike should occur
         bool spike = threshold_type_is_above_threshold(result, threshold_type);
 
         // If the neuron has spiked

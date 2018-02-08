@@ -19,7 +19,7 @@ typedef struct input_type_t* input_type_pointer_t;
 //! \param[in] input_type The input type pointer to the parameters
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return The excitatory input current
-static input_t* input_type_convert_excitatory_input_to_current(
+static void input_type_convert_excitatory_input_to_current(
     input_t* exc_input, input_type_pointer_t input_type,
     state_t membrane_voltage);
 
@@ -29,7 +29,7 @@ static input_t* input_type_convert_excitatory_input_to_current(
 //! \param[in] input_type The input type pointer to the parameters
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return The inhibitory input current
-static input_t* input_type_convert_inhibitory_input_to_current(
+static void input_type_convert_inhibitory_input_to_current(
     input_t* inh_input, input_type_pointer_t input_type,
     state_t membrane_voltage);
 
