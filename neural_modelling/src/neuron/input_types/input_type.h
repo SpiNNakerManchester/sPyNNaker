@@ -10,8 +10,9 @@ typedef struct input_type_t* input_type_pointer_t;
 //! \param[in] value The value of the input before scaling
 //! \param[in] input_type The input type pointer to the parameters
 //! \return The value of the input after scaling
-//static input_t input_type_get_input_value(
-//    input_t value, input_type_pointer_t input_type);
+static input_t* input_type_get_input_value(
+    input_t* value, input_type_pointer_t input_type,
+	uint16_t num_receptors);
 
 //! \brief Converts an excitatory input into an excitatory current
 //! \param[in] exc_input The total excitatory input this timestep - note that

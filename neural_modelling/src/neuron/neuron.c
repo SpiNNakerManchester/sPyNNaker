@@ -377,12 +377,14 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
-        input_t* exc_syn_input =
+        input_t* exc_syn_input = input_type_get_input_value(
         		synapse_types_get_excitatory_input(
-        				&(neuron_synapse_shaping_params[neuron_index]));
-        input_t* inh_syn_input =
+        				&(neuron_synapse_shaping_params[neuron_index])),
+						input_type, NUM_EXCITATORY_RECEPTORS);
+        input_t* inh_syn_input = input_type_get_input_value(
         		synapse_types_get_inhibitory_input(
-        				&(neuron_synapse_shaping_params[neuron_index]));
+        				&(neuron_synapse_shaping_params[neuron_index])),
+						input_type, NUM_INHIBITORY_RECEPTORS);
 
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
