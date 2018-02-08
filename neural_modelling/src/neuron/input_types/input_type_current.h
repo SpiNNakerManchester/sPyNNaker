@@ -13,12 +13,6 @@
        shaping include
 #endif
 
-#ifndef NUM_NEUROMODULATORS
-#define NUM_NEUROMODULATORS 0
-#error NUM_NEUROMODULATORS was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
 #include "input_type.h"
 
 typedef struct input_type_t {

@@ -20,7 +20,6 @@
 
 #define NUM_EXCITATORY_RECEPTORS 2
 #define NUM_INHIBITORY_RECEPTORS 1
-#define NUM_NEUROMODULATORS 0
 
 #include "../decay.h"
 #include <debug.h>

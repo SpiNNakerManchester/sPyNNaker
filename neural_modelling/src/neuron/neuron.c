@@ -36,12 +36,6 @@ void spin1_wfi();
        shaping include
 #endif
 
-#ifndef NUM_NEUROMODULATORS
-#define NUM_NEUROMODULATORS 0
-#error NUM_NEUROMODULATORS was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
