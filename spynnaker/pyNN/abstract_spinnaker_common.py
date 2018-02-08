@@ -381,7 +381,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         # set up the router timeouts to stop packet loss
         if using_extra_monitor_functionality:
             for data_receiver, extra_monitor_cores in receivers:
-                data_receiver.set_cores_for_data_extraction(
+                data_receiver.set_cores_for_data_streaming(
                     self._txrx, list(extra_monitor_cores), self._placements)
 
         # acquire the data
@@ -396,7 +396,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         # reset time outs for the receivers
         if using_extra_monitor_functionality:
             for data_receiver, extra_monitor_cores in receivers:
-                data_receiver.unset_cores_for_data_extraction(
+                data_receiver.unset_cores_for_data_streaming(
                     self._txrx, list(extra_monitor_cores), self._placements)
 
         # return data items

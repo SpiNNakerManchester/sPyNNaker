@@ -885,7 +885,7 @@ class SynapticManager(object):
             # if exploiting the extra monitor cores, need to set the machine
             # for data extraction mode
             if using_extra_monitor_cores and handle_time_out_configuration:
-                data_receiver.set_cores_for_data_extraction(
+                data_receiver.set_cores_for_data_streaming(
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
 
@@ -930,7 +930,7 @@ class SynapticManager(object):
                 max_row_length = 1
 
             if using_extra_monitor_cores and handle_time_out_configuration:
-                data_receiver.unset_cores_for_data_extraction(
+                data_receiver.unset_cores_for_data_streaming(
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
 
