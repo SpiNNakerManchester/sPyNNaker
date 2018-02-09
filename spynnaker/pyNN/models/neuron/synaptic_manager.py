@@ -897,7 +897,7 @@ class SynapticManager(object):
                 # read in the synaptic block
                 if using_extra_monitor_cores:
                     block = data_receiver.get_data(
-                        transceiver, sender_extra_monitor_core_placement,
+                        sender_extra_monitor_core_placement,
                         indirect_synapses_address + synaptic_block_offset,
                         synaptic_block_size)
                 else:
@@ -913,7 +913,7 @@ class SynapticManager(object):
                 if using_extra_monitor_cores:
                     # read in the synaptic row data
                     single_block = numpy.asarray(data_receiver.get_data(
-                        transceiver, sender_extra_monitor_core_placement,
+                        sender_extra_monitor_core_placement,
                         direct_synapses_address + synaptic_block_offset,
                         synaptic_block_size), dtype="uint8").view("uint32")
                 else:
