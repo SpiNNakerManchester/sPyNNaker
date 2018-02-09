@@ -125,13 +125,31 @@ class PyNNPopulationCommon(object):
         raise NotImplementedError
 
     def get(self, parameter_name, gather=False):
+        """
+
+        """
         """ Get the values of a parameter for every local cell in the\
             population.
+
+            :param parameter_name: Name of parameter
+            :return: 
         """
         if self._vertex_population_settable:
             return self._vertex.get_value(parameter_name)
-        raise KeyError("Population does not have a property {}".format(
-            parameter_name))
+        raise KeyError("Population does not support setting")
+
+    # NONE PYNN API CALL
+    def get_by_selector(self, selector, parameter_name):
+        """ Get the values of a parameter for the selected cell in the\
+            population.
+
+        :param parameter_name: Name of parameter
+        :param selector: See RangedList.set_value_by_selector as this is just \
+            a pass through method
+        """
+        if self._vertex_population_settable:
+            return self._vertex.get_value_by_selector(selector, parameter_name)
+        raise KeyError("Population does not support setting")
 
     def id_to_index(self, id):  # @ReservedAssignment
         """
@@ -212,6 +230,29 @@ class PyNNPopulationCommon(object):
         # Doesn't make much sense on SpiNNaker
         return self._size
 
+    def _set_check(self, parameter, value):
+        """
+        checks for various set methods
+        """
+        if not self._vertex_population_settable:
+            raise KeyError("Population does not have property {}".format(
+                parameter))
+
+        if globals_variables.get_not_running_simulator().has_ran \
+                and not self._vertex_changeable_after_run:
+            raise Exception(
+                " run has been called")
+
+        if type(parameter) is str:
+            if value is None:
+                raise Exception("A value (not None) must be specified")
+        elif type(parameter) is not dict:
+            raise Exception(
+                "Parameter must either be the name of a single parameter to"
+                " set, or a dict of parameter: value items to set")
+
+        self._read_parameters_before_set()
+
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
 
@@ -226,32 +267,42 @@ class PyNNPopulationCommon(object):
         :param parameter: the parameter to set
         :param value: the value of the parameter to set.
         """
-        if not self._vertex_population_settable:
-            raise KeyError("Population does not have property {}".format(
-                parameter))
-
-        if globals_variables.get_not_running_simulator().has_ran \
-                and not self._vertex_changeable_after_run:
-            raise Exception(
-                "This population does not support changes to settings after"
-                " run has been called")
-
-        if type(parameter) is str:
-            if value is None:
-                raise Exception("A value (not None) must be specified")
-            self._read_parameters_before_set()
-            self._vertex.set_value(parameter, value)
-            return
-
-        if type(parameter) is not dict:
-            raise Exception(
-                "Parameter must either be the name of a single parameter to"
-                " set, or a dict of parameter: value items to set")
+        self._set_check(parameter, value)
 
         # set new parameters
-        self._read_parameters_before_set()
-        for (key, value) in parameter.iteritems():
-            self._vertex.set_value(key, value)
+        if type(parameter) is str:
+            self._vertex.set_value(parameter, value)
+            return
+        else:
+            for (key, value) in parameter.iteritems():
+                self._vertex.set_value(key, value)
+
+    # NONE PYNN API CALL
+    def set_by_selector(self, selector, parameter, value=None):
+        """ Set one or more parameters for selected cell in the population.
+
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
+        value. value can be a numeric value, or list of such
+        (e.g. for setting spike times)::
+
+          p.set("tau_m", 20.0).
+          p.set({'tau_m':20, 'v_rest':-65})
+
+        :param selector: See RangedList.set_value_by_selector as this is just \
+            a pass through method
+        :param parameter: the parameter to set
+        :param value: the value of the parameter to set.
+        """
+        self._set_check(parameter, value)
+
+        # set new parameters
+        if type(parameter) is str:
+            self._vertex.set_value_by_selector(selector, parameter, value)
+            return
+        else:
+            for (key, value) in parameter.iteritems():
+                self._vertex.set_value_by_selector(selector, key, value)
 
     def _read_parameters_before_set(self):
         """ Reads parameters from the machine before "set" completes
