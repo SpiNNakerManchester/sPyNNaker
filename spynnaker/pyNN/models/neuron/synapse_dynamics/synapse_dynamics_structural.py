@@ -45,7 +45,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._random_partner = random_partner
         self._connections = {}
 
-        self.fudge_factor = 1.3
+        self.fudge_factor = 1.5
         self._actual_row_max_length = self._s_max
 
         if stdp_model is not None:
