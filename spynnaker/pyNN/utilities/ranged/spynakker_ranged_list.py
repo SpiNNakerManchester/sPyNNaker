@@ -24,9 +24,3 @@ class SpynakkerRangedList(RangedList):
             return value.next(n=size)
 
         return RangedList.as_list(value, size)
-
-    def get_value_s(self):
-        try:
-            return self.get_value_all()
-        except MultipleValuesException:
-            return list(self)

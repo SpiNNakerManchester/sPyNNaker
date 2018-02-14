@@ -665,7 +665,7 @@ class AbstractPopulationVertex(
                                     " parameter {}".format(variable))
                 value = self.get_value(getter)
                 if isinstance(value, SpynakkerRangedList):
-                    value = value.get_value_s()
+                    value = value.get_values()
                 results[variable] = value
         return results
 

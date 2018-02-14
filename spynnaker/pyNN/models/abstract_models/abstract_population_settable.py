@@ -38,7 +38,7 @@ class AbstractPopulationSettable(AbstractSettable):
                 size=self.n_atoms, value=old_values)
             # Now that we have created a RangedList why not use it.
             self.set_value(key, ranged_list)
-        return ranged_list.get_value_by_selector(selector)
+        return ranged_list.get_values(selector)
 
     def set_value_by_selector(self, selector, key, value):
         """
