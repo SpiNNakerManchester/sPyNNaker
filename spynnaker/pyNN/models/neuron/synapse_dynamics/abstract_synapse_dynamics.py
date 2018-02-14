@@ -46,6 +46,15 @@ class AbstractSynapseDynamics(object):
         :return: iterable list of basestring
         """
 
+    @abstractmethod
+    def get_max_synapses(self, n_words):
+        """ Get the maximum number of synapses that can be held in the given\
+            number of words
+
+        :param n_words: The number of words the synapses must fit in
+        :rtype: int
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """

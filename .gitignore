@@ -1,7 +1,7 @@
 /.project
 /.pydevproject
 /.idea
-/.settings
+.settings/
 /doc/build
 *.pyc
 *reports/
@@ -11,3 +11,5 @@
 *egg-info/
 MANIFEST
 /.cache/
+.DS_Store
+.coverage
