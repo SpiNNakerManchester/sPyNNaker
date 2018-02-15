@@ -50,6 +50,8 @@ uint32_t num_plastic_pre_synaptic_events = 0;
   #error "Not enough bits for axonal synaptic delay bits"
 #endif
 
+#define SMULBB_STDP_FIXED(a, b) (__smulbb(a, b) >> STDP_FIXED_POINT)
+
 //---------------------------------------
 // Structures
 //---------------------------------------
@@ -117,13 +119,14 @@ static inline void correlation_apply_post_spike(
 
     if (last_dopamine_trace != 0) {
         // Evaluate weight function
-        uint32_t weight_change = __smulbb(
-                __smulbb(last_dopamine_trace, *previous_state) >> STDP_FIXED_POINT,
-                __smulbb(weight_update_constant_component,
-                   (__smulbb(decay_eligibility_trace, decay_dopamine_trace) >> STDP_FIXED_POINT)
-                   - STDP_FIXED_POINT_ONE) >> STDP_FIXED_POINT) >> STDP_FIXED_POINT;
+        uint32_t temp = SMULBB_STDP_FIXED(
+            SMULBB_STDP_FIXED(last_dopamine_trace, *previous_state),
+            SMULBB_STDP_FIXED(
+                decay_eligibility_trace, decay_dopamine_trace)
+                 - STDP_FIXED_POINT_ONE);
 
-        *weight_update += weight_change;
+        *weight_update += maths_fixed_mul32(weight_update_constant_component,
+                                                   temp, STDP_FIXED_POINT);
     }
 
     int32_t decayed_eligibility_trace =
@@ -169,13 +172,14 @@ static inline void correlation_apply_pre_spike(
 
     if (last_dopamine_trace != 0) {
         // Evaluate weight function
-        uint32_t weight_change = __smulbb(
-                __smulbb(last_dopamine_trace, *previous_state) >> STDP_FIXED_POINT,
-                __smulbb(weight_update_constant_component,
-                   (__smulbb(decay_eligibility_trace, decay_dopamine_trace) >> STDP_FIXED_POINT)
-                   - STDP_FIXED_POINT_ONE) >> STDP_FIXED_POINT) >> STDP_FIXED_POINT;
+        uint32_t temp = SMULBB_STDP_FIXED(
+            SMULBB_STDP_FIXED(last_dopamine_trace, *previous_state),
+            SMULBB_STDP_FIXED(
+                decay_eligibility_trace, decay_dopamine_trace)
+                 - STDP_FIXED_POINT_ONE);
 
-        *weight_update += weight_change;
+        *weight_update += maths_fixed_mul32(weight_update_constant_component,
+                                                   temp, STDP_FIXED_POINT);
     }
 
     int32_t decayed_eligibility_trace =
