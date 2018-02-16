@@ -402,8 +402,8 @@ class PyNNPopulationCommon(object):
             cell_label = model_label
         elif model_label is not None and pop_level_label is not None:
             cell_label = pop_level_label
-            logger.warn("Don't know which label to use. Will use pop "
-                        "label and carry on")
+            logger.warning("Don't know which label to use. Will use pop "
+                           "label and carry on")
         return cell_label
 
     def _get_variable_unit(self, parameter_name):

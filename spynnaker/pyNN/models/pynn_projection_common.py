@@ -89,8 +89,8 @@ class PyNNProjectionCommon(object):
                     max_delay))
 
         if max_delay > (user_max_delay / (machine_time_step / 1000.0)):
-            logger.warn("The end user entered a max delay"
-                        " for which the projection breaks")
+            logger.warning("The end user entered a max delay"
+                           " for which the projection breaks")
 
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None

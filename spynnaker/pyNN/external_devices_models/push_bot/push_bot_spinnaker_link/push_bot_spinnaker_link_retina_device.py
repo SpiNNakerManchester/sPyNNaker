@@ -24,7 +24,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             label=default_parameters['label']):
 
         if n_neurons is not None and n_neurons != resolution.value.n_neurons:
-            logger.warn(
+            logger.warning(
                 "The specified number of neurons for the push bot retina"
                 " device has been ignored {} will be used instead"
                 .format(resolution.value.n_neurons))
