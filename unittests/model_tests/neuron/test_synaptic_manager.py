@@ -240,6 +240,7 @@ class TestSynapticManager(unittest.TestCase):
         config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
         machine_time_step = 1000.0
+        max_feasible_atoms_per_core = 255
 
         pre_app_vertex = SimpleApplicationVertex(10)
         pre_vertex = SimpleMachineVertex(resources=None)
@@ -314,7 +315,7 @@ class TestSynapticManager(unittest.TestCase):
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_region, synapse_region, routing_info, graph_mapper,
-            graph, machine_time_step)
+            graph, machine_time_step, max_feasible_atoms_per_core)
         spec.end_specification()
         spec_writer.close()
 
