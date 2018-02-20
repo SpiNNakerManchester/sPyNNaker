@@ -29,3 +29,5 @@ class AbstractPopulationInitializable(object):
 
         :return: list of propery names
         """
+        # Note: this will have been none_pynn_default_parameters in the
+        # subclass in previous versions.
