@@ -2,7 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod, \
     abstractproperty
-from spinn_utilities.ranged.ranged_list import RangedList
+from spinn_utilities.ranged.abstract_list import AbstractList
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
     SpynakkerRangedList
 
@@ -30,7 +30,7 @@ class AbstractPopulationSettable(AbstractSettable):
         :param value: the new value of the parameter to assign
         """
         old_values = self.get_value(key)
-        if isinstance(old_values, RangedList):
+        if isinstance(old_values, AbstractList):
             ranged_list = old_values
         else:
             # Keep all the getting stuff in one place by creating a RangedList
@@ -49,7 +49,7 @@ class AbstractPopulationSettable(AbstractSettable):
         :param value: the new value of the parameter to assign
         """
         old_values = self.get_value(key)
-        if isinstance(old_values, RangedList):
+        if isinstance(old_values, AbstractList):
             ranged_list = old_values
         else:
             # Keep all the setting stuff in one place by creating a RangedList
