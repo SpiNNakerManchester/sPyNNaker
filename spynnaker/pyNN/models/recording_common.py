@@ -130,14 +130,14 @@ class RecordingCommon(object):
                 .format(variable))
 
         elif not sim.has_ran:
-            logger.warn(
+            logger.warning(
                 "The simulation has not yet run, therefore {} cannot"
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
 
         elif sim.use_virtual_board:
-            logger.warn(
+            logger.warning(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
@@ -168,13 +168,13 @@ class RecordingCommon(object):
 
         sim = get_simulator()
         if not sim.has_ran:
-            logger.warn(
+            logger.warning(
                 "The simulation has not yet run, therefore spikes cannot"
                 " be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
         if sim.use_virtual_board:
-            logger.warn(
+            logger.warning(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
