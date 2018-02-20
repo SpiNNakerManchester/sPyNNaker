@@ -24,7 +24,7 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
         'tau_syn_I': 5.0, 'tau_refrac': 0.1, 'i_offset': 0,
         'isyn_exc': 0.0, 'isyn_inh': 0.0, 'isyn_exc2': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=AbstractPopulationVertex.

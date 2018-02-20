@@ -11,7 +11,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     """ Control module for a pushbot connected to a SpiNNaker Link
     """
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, protocol, devices,
@@ -39,7 +39,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
                 ExternalDeviceLifControl.default_parameters['tau_refrac']
             ),
             i_offset=ExternalDeviceLifControl.default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
 
         self._command_protocol = MunichIoSpiNNakerLinkProtocol(
             protocol.mode, uart_id=protocol.uart_id)

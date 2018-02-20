@@ -11,7 +11,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
         current input
     """
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, protocol, devices, pushbot_ip_address,
@@ -37,7 +37,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             tau_refrac=ExternalDeviceLifControl.default_parameters[
                 'tau_refrac'],
             i_offset=ExternalDeviceLifControl.default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
 
         translator = PushBotTranslator(
             protocol,

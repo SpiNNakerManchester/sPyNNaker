@@ -24,7 +24,7 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
         'tau_ca2': 50.0, "i_ca2": 0.0, "i_alpha": 0.1, 'isyn_exc': 0.0,
         'isyn_inh': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=AbstractPopulationVertex.
@@ -48,7 +48,7 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
             tau_ca2=default_parameters["tau_ca2"],
             i_ca2=default_parameters["i_ca2"],
             i_alpha=default_parameters["i_alpha"],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
 

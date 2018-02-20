@@ -1,6 +1,7 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod, \
+    abstractproperty
 
 
 @add_metaclass(AbstractBase)
@@ -16,4 +17,15 @@ class AbstractPopulationInitializable(object):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
+        """
+
+    @abstractproperty
+    def initialize_parameters(self):
+        """
+        List the parameters that are initializable.
+
+        If "foo" is initializable there should be a setter initialize_foo
+        and a getter proporty foo_init
+
+        :return: list of propery names
         """
