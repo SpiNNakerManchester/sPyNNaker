@@ -651,6 +651,16 @@ class AbstractPopulationVertex(
     def initial_values(self):
         """A dict containing the initial values of the state variables."""
         results = dict()
+        for variable_init in self.none_pynn_default_parameters:
+            if variable_init.endswith("_init"):
+                variable = variable_init[:-5]
+            else:
+                variable = variable_init
+            results[variable] = getattr(self._neuron_model, variable_init)
+        return results
+
+        """
+        results = dict()
         all_methods = dir(self._neuron_model)
         for method in all_methods:
             if method.startswith("initialize_"):
@@ -668,6 +678,7 @@ class AbstractPopulationVertex(
                     value = value.get_values()
                 results[variable] = value
         return results
+        """
 
     @property
     def input_type(self):
