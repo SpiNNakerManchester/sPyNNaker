@@ -170,4 +170,5 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
         # otherwise no idea what command is, so raise warning and ignore
         else:
-            logger.warn("Unknown Pushbot command: {}".format(multicast_packet))
+            logger.warning(
+                "Unknown Pushbot command: {}".format(multicast_packet))

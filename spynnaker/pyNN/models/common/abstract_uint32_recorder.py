@@ -100,7 +100,7 @@ class AbstractUInt32Recorder(object):
                 data.append(missing_values)
 
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing {} data in region {}"
                 " from the following cores: {}".format(
                     label, variable, region, missing_str))

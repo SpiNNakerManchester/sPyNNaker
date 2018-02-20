@@ -188,7 +188,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self._time_scale_factor = max(
                 1, math.ceil(1000.0 / float(self._machine_time_step)))
             if self._time_scale_factor > 1:
-                logger.warn(
+                logger.warning(
                     "A timestep was entered that has forced sPyNNaker "
                     "to automatically slow the simulation down from "
                     "real time by a factor of {}. To remove this "
@@ -201,17 +201,17 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if self._machine_time_step * self._time_scale_factor < 1000:
             if config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
-                logger.warn(
+                logger.warning(
                     "****************************************************")
-                logger.warn(
+                logger.warning(
                     "*** The combination of simulation time step and  ***")
-                logger.warn(
+                logger.warning(
                     "*** the machine time scale factor results in a   ***")
-                logger.warn(
+                logger.warning(
                     "*** wall clock timer tick that is currently not  ***")
-                logger.warn(
+                logger.warning(
                     "*** reliably supported by the spinnaker machine. ***")
-                logger.warn(
+                logger.warning(
                     "****************************************************")
             else:
                 raise ConfigurationException(
