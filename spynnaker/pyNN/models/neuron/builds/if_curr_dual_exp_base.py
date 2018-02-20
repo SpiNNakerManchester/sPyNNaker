@@ -28,15 +28,15 @@ class IFCurrDualExpBase(AbstractPopulationVertex):
 
     def __init__(
             self, n_neurons, spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
+                non_pynn_default_parameters['spikes_per_second'],
             ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
+                non_pynn_default_parameters['ring_buffer_sigma'],
             incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
+                non_pynn_default_parameters['incoming_spike_buffer_size'],
             constraints=AbstractPopulationVertex.
-            none_pynn_default_parameters['constraints'],
+                non_pynn_default_parameters['constraints'],
             label=AbstractPopulationVertex.
-            none_pynn_default_parameters['label'],
+                non_pynn_default_parameters['label'],
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],

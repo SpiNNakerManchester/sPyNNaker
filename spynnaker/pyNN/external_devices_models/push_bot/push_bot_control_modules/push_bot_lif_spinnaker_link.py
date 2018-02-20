@@ -18,15 +18,15 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
 
             # default params from abstract pop vertex
             spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
+                non_pynn_default_parameters['spikes_per_second'],
+            label=AbstractPopulationVertex.non_pynn_default_parameters[
                 'label'],
             ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
+                non_pynn_default_parameters['ring_buffer_sigma'],
             incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
+                non_pynn_default_parameters['incoming_spike_buffer_size'],
             constraints=AbstractPopulationVertex.
-            none_pynn_default_parameters['constraints'],
+                non_pynn_default_parameters['constraints'],
 
             # default params for the neuron model type
             tau_m=ExternalDeviceLifControl.default_parameters['tau_m'],

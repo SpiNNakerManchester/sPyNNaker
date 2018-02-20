@@ -22,14 +22,14 @@ class IzkCurrExpBase(AbstractPopulationVertex):
     def __init__(
             self, n_neurons,
             spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
+                non_pynn_default_parameters['spikes_per_second'],
             ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
+                non_pynn_default_parameters['ring_buffer_sigma'],
             incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
+                non_pynn_default_parameters['incoming_spike_buffer_size'],
+            constraints=AbstractPopulationVertex.non_pynn_default_parameters[
                 'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
+            label=AbstractPopulationVertex.non_pynn_default_parameters[
                 'label'],
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
