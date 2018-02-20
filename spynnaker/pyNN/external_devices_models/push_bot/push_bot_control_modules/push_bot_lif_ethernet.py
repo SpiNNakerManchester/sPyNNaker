@@ -11,21 +11,21 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
         current input
     """
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, protocol, devices, pushbot_ip_address,
             pushbot_port=56000,
-            spikes_per_second=AbstractPopulationVertex
-            .none_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex
-            .none_pynn_default_parameters['ring_buffer_sigma'],
-            label=AbstractPopulationVertex
-            .none_pynn_default_parameters['label'],
-            incoming_spike_buffer_size=AbstractPopulationVertex
-            .none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex
-            .none_pynn_default_parameters['constraints'],
+            spikes_per_second=AbstractPopulationVertex.
+            non_pynn_default_parameters['spikes_per_second'],
+            ring_buffer_sigma=AbstractPopulationVertex.
+            non_pynn_default_parameters['ring_buffer_sigma'],
+            label=AbstractPopulationVertex.
+            non_pynn_default_parameters['label'],
+            incoming_spike_buffer_size=AbstractPopulationVertex.
+            non_pynn_default_parameters['incoming_spike_buffer_size'],
+            constraints=AbstractPopulationVertex.
+            non_pynn_default_parameters['constraints'],
 
             # default params for the neuron model type
             tau_m=ExternalDeviceLifControl.default_parameters['tau_m'],
@@ -37,7 +37,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             tau_refrac=ExternalDeviceLifControl.default_parameters[
                 'tau_refrac'],
             i_offset=ExternalDeviceLifControl.default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
 
         translator = PushBotTranslator(
             protocol,

@@ -11,22 +11,22 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     """ Control module for a pushbot connected to a SpiNNaker Link
     """
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, protocol, devices,
 
             # default params from abstract pop vertex
             spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
+            non_pynn_default_parameters['spikes_per_second'],
+            label=AbstractPopulationVertex.non_pynn_default_parameters[
                 'label'],
             ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
+            non_pynn_default_parameters['ring_buffer_sigma'],
             incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
+            non_pynn_default_parameters['incoming_spike_buffer_size'],
             constraints=AbstractPopulationVertex.
-            none_pynn_default_parameters['constraints'],
+            non_pynn_default_parameters['constraints'],
 
             # default params for the neuron model type
             tau_m=ExternalDeviceLifControl.default_parameters['tau_m'],
@@ -39,7 +39,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
                 ExternalDeviceLifControl.default_parameters['tau_refrac']
             ),
             i_offset=ExternalDeviceLifControl.default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
 
         self._command_protocol = MunichIoSpiNNakerLinkProtocol(
             protocol.mode, uart_id=protocol.uart_id)

@@ -22,3 +22,15 @@ class AbstractPopulationInitializable(object):
     @abstractproperty
     def initial_values(self):
         """A dict containing the initial values of the state variables."""
+
+    @abstractproperty
+    def initialize_parameters(self):
+        """
+        List the parameters that are initializable.
+
+        If "foo" is initializable there should be a setter initialize_foo
+        and a getter proporty foo_init
+
+        :return: list of propery names
+        """
+        # Note: this will have been none_pynn_default_parameters
