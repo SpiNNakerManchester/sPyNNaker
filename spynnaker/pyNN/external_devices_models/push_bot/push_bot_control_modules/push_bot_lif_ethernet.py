@@ -16,16 +16,16 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     def __init__(
             self, n_neurons, protocol, devices, pushbot_ip_address,
             pushbot_port=56000,
-            spikes_per_second=AbstractPopulationVertex
-            .non_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex
-            .non_pynn_default_parameters['ring_buffer_sigma'],
-            label=AbstractPopulationVertex
-            .non_pynn_default_parameters['label'],
-            incoming_spike_buffer_size=AbstractPopulationVertex
-            .non_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex
-            .non_pynn_default_parameters['constraints'],
+            spikes_per_second=AbstractPopulationVertex.
+            non_pynn_default_parameters['spikes_per_second'],
+            ring_buffer_sigma=AbstractPopulationVertex.
+            non_pynn_default_parameters['ring_buffer_sigma'],
+            label=AbstractPopulationVertex.
+            non_pynn_default_parameters['label'],
+            incoming_spike_buffer_size=AbstractPopulationVertex.
+            non_pynn_default_parameters['incoming_spike_buffer_size'],
+            constraints=AbstractPopulationVertex.
+            non_pynn_default_parameters['constraints'],
 
             # default params for the neuron model type
             tau_m=ExternalDeviceLifControl.default_parameters['tau_m'],
