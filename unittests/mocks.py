@@ -1,5 +1,6 @@
-from spinn_front_end_common.utilities import globals_variables
+import configparser
 import numpy
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities.spynnaker_failed_state \
     import SpynnakerFailedState
 
@@ -29,6 +30,22 @@ class MockRNG(object):
 
 
 class MockSimulator(object):
+
+    def __init__(self):
+        self.config = configparser.ConfigParser()
+        self.config["Simulation"] = \
+            {"spikes_per_second":"30",
+            "incoming_spike_buffer_size":"256",
+            "ring_buffer_sigma": "5",
+            "one_to_one_connection_dtcm_max_bytes": "0"}
+        self.config["Buffers"] = {"time_between_requests": "10",
+                                  "minimum_buffer_sdram": "10",
+                                  "use_auto_pause_and_resume":"True",
+                                  "receive_buffer_host": "None",
+                                  "receive_buffer_port": "None",
+                                  "enable_buffered_recording":"False"}
+        self.config["MasterPopTable"] = {"generator": "BinarySearch"}
+        self.config["Reports"] = {"n_profile_samples": 0}
 
     def is_a_pynn_random(self, values):
         return isinstance(values, MockRNG)
