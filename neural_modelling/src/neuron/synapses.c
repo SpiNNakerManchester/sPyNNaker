@@ -341,7 +341,7 @@ void synapses_do_timestep_update(timer_t time) {
                     ring_buffers[ring_buffer_index],
                     ring_buffer_to_input_left_shifts[synapse_type_index]));
 
-            log_info("adding to synapse input buffer; %k", scaled_synapse_input);
+            log_debug("adding to synapse input buffer; %k", scaled_synapse_input);
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;

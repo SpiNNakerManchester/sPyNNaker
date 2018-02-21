@@ -17,7 +17,7 @@ static inline input_t input_type_convert_excitatory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-    UFRACT scalar = 0.00028; // 0.000035 * 2
+    UFRACT scalar = 0.00028 * 8; // 0.000035 * 2^3 (to account for ring buffer shift)
     return scalar * exc_input;
 }
 
@@ -26,7 +26,8 @@ static inline input_t input_type_convert_inhibitory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-    return inh_input;
+    UFRACT scalar = 0.00028 * 8; // 0.000035 * 2^3 (to account for ring buffer shift)
+    return scalar * inh_input;
 }
 
 #endif // _INPUT_TYPE_CURRENT_H_
