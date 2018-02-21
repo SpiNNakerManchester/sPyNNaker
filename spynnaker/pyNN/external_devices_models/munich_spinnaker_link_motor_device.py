@@ -72,8 +72,9 @@ class MunichMotorDevice(
         """
 
         if n_neurons != 6:
-            logger.warn("The specified number of neurons for the munich motor"
-                        " device has been ignored; 6 will be used instead")
+            logger.warning(
+                "The specified number of neurons for the munich motor"
+                " device has been ignored; 6 will be used instead")
 
         ApplicationVertex.__init__(self, label)
         AbstractProvidesOutgoingPartitionConstraints.__init__(self)

@@ -89,7 +89,7 @@ class EIEIOSpikeRecorder(object):
                 results.append(numpy.dstack((neuron_ids, timestamps))[0])
 
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
         if len(results) != 0:

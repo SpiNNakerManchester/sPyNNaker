@@ -91,7 +91,7 @@ class MultiSpikeRecorder(object):
                 spike_times.append(times)
 
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
 
