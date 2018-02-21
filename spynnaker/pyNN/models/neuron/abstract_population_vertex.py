@@ -32,6 +32,8 @@ from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
 
+from spinn_utilities.ranged.abstract_list import AbstractList
+
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
@@ -646,6 +648,62 @@ class AbstractPopulationVertex(
         initialize_attr(value)
         self._change_requires_neuron_parameters_reload = True
 
+    def _get_init_key_and_parameter(self, variable):
+        if variable.endswith("_init"):
+            # method called with "V_int"
+            key = variable[:-5]
+            if hasattr(self._neuron_model, variable):
+                # variable is v and parameter is v_init
+                return (key, variable)
+            elif hasattr(self._neuron_model, key):
+                # Oops neuron defines v and not v init
+                return (key, key)
+        else:
+            # methon called with "v"
+            if hasattr(self._neuron_model, variable + "_init"):
+                # variable is v and parameter is v_init
+                return (variable, variable + "_init")
+            if hasattr(self._neuron_model, variable):
+                # Oops neuron defines v and not v init
+                return (variable, variable)
+        # parameter not found for this variable
+
+        raise KeyError("Variable {} not initialized".format(variable))
+
+    @overrides(AbstractPopulationInitializable.get_initial_value)
+    def get_initial_value(self, variable, selector=None ):
+        (key, parameter) = self.get_init_key_and_parameter(variable)
+
+        full = getattr(self._neuron_model, variable)
+        if selector is None:
+            return full
+        if not isinstance(full, AbstractList):
+            ranged_list = full
+        else:
+            # Keep all the getting stuff in one place by creating a RangedList
+            ranged_list = SpynakkerRangedList(
+                size=self.n_atoms, value=full)
+            # Now that we have created a RangedList why not use it.
+            self.initialize(key, ranged_list)
+
+        return ranged_list.get_values(selector)
+
+    @overrides(AbstractPopulationInitializable.set_initial_value)
+    def set_initial_value(self, variable, value, selector=None ):
+        (key, parameter) = self.get_init_key_and_parameter(variable)
+
+        full = getattr(self._neuron_model, variable)
+        if not isinstance(full, AbstractList):
+            ranged_list = full
+        else:
+            # Keep all the setting stuff in one place by creating a RangedList
+            ranged_list = SpynakkerRangedList(
+                size=self.n_atoms, value=full)
+            # Now that we have created a RangedList why not use it.
+            self.initialize(key, ranged_list)
+
+        ranged_list.set_values(selector, value)
+
     @property
     @overrides(AbstractPopulationInitializable.initial_values)
     def initial_values(self):
@@ -656,7 +714,7 @@ class AbstractPopulationVertex(
                 variable = variable_init[:-5]
             else:
                 variable = variable_init
-            results[variable] = getattr(self._neuron_model, variable_init)
+            results[variable] = self.get_initial_value(variable_init)
         return results
 
         """
