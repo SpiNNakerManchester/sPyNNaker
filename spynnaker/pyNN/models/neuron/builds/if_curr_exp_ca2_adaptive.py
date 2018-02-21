@@ -7,6 +7,9 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AdditionalInputCa2Adaptive
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
     """ Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency\
@@ -15,7 +18,7 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
         doi:10.1023/A:1008916026143
     """
 
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
@@ -74,7 +77,9 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
             model_name="IF_curr_exp_ca2_adaptive", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, additional_input=additional_input,
-            constraints=constraints)
+            constraints=constraints,
+            max_feasible_atoms_per_core=DEFAULT_MAX_ATOMS_PER_CORE
+            )
 
     @staticmethod
     def get_max_atoms_per_core():
