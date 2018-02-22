@@ -553,10 +553,11 @@ class SynapticManager(object):
         spec.write_array(ring_buffer_shifts)
 
         weight_scales = numpy.array([
-            self._get_precision_based_weight_scale() * weight_scale
+            #self._get_precision_based_weight_scale() *
+            weight_scale
             for r in ring_buffer_shifts])
 
-        print weight_scales
+#         print weight_scales
 
         return weight_scales
 
