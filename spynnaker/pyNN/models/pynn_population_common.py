@@ -144,9 +144,11 @@ class PyNNPopulationCommon(object):
             population.
 
         :param parameter_name: Name of parameter
-        :param selector: See RangedList.set_value_by_selector as this is just \
-            a pass through method
-        """
+        :param selector: a description of the subrange to accept. \
+            Or None for all \
+            See: _selector_to_ids in \
+            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+       """
         if self._vertex_population_settable:
             return self._vertex.get_value_by_selector(selector, parameter_name)
         raise KeyError("Population does not support setting")
