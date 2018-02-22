@@ -182,6 +182,8 @@ static inline void _process_fixed_synapses(
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
             delay + time, combined_synapse_neuron_index);
 
+        log_info("adding weight: %u", weight);
+
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
@@ -326,14 +328,20 @@ void synapses_do_timestep_update(timer_t time) {
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                 time, synapse_type_index, neuron_index);
 
+            input_t scaled_synapse_input = synapses_convert_weight_to_input(
+                    ring_buffers[ring_buffer_index],
+                    ring_buffer_to_input_left_shifts[synapse_type_index]);
+
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
             synapse_types_add_neuron_input(
                 synapse_type_index,
                 &(neuron_synapse_shaping_params[neuron_index]),
-                synapses_convert_weight_to_input(
+                 synapses_convert_weight_to_input(
                     ring_buffers[ring_buffer_index],
                     ring_buffer_to_input_left_shifts[synapse_type_index]));
+
+            log_debug("adding to synapse input buffer; %k", scaled_synapse_input);
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;

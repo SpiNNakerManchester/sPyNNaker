@@ -396,8 +396,8 @@ void neuron_do_timestep_update(timer_t time) {
                 additional_input, voltage);
 
         // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = exc_input_value;
-        inputs_inhibitory->inputs[neuron_index].input = inh_input_value;
+        inputs_excitatory->inputs[neuron_index].input = exc_input;
+        inputs_inhibitory->inputs[neuron_index].input = inh_input;
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
