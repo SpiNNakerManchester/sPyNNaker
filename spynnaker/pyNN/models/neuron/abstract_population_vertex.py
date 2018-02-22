@@ -643,8 +643,8 @@ class AbstractPopulationVertex(
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialisation of"
-                            " parameter {}".format(variable))
+            raise KeyError("Vertex does not support initialisation of"
+                           " parameter {}".format(variable))
         initialize_attr(value)
         self._change_requires_neuron_parameters_reload = True
 
@@ -668,16 +668,16 @@ class AbstractPopulationVertex(
                 return (variable, variable)
         # parameter not found for this variable
 
-        raise KeyError("Variable {} not initialized".format(variable))
+        raise KeyError("Variable {} has not getter".format(variable))
 
     @overrides(AbstractPopulationInitializable.get_initial_value)
     def get_initial_value(self, variable, selector=None ):
-        (key, parameter) = self.get_init_key_and_parameter(variable)
+        (key, parameter) = self._get_init_key_and_parameter(variable)
 
-        full = getattr(self._neuron_model, variable)
+        full = getattr(self._neuron_model, parameter)
         if selector is None:
             return full
-        if not isinstance(full, AbstractList):
+        if isinstance(full, AbstractList):
             ranged_list = full
         else:
             # Keep all the getting stuff in one place by creating a RangedList
@@ -690,10 +690,10 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.set_initial_value)
     def set_initial_value(self, variable, value, selector=None ):
-        (key, parameter) = self.get_init_key_and_parameter(variable)
+        (key, parameter) = self._get_init_key_and_parameter(variable)
 
-        full = getattr(self._neuron_model, variable)
-        if not isinstance(full, AbstractList):
+        full = getattr(self._neuron_model, parameter)
+        if isinstance(full, AbstractList):
             ranged_list = full
         else:
             # Keep all the setting stuff in one place by creating a RangedList
@@ -702,41 +702,7 @@ class AbstractPopulationVertex(
             # Now that we have created a RangedList why not use it.
             self.initialize(key, ranged_list)
 
-        ranged_list.set_values(selector, value)
-
-    @property
-    @overrides(AbstractPopulationInitializable.initial_values)
-    def initial_values(self):
-        """A dict containing the initial values of the state variables."""
-        results = dict()
-        for variable_init in self.none_pynn_default_parameters:
-            if variable_init.endswith("_init"):
-                variable = variable_init[:-5]
-            else:
-                variable = variable_init
-            results[variable] = self.get_initial_value(variable_init)
-        return results
-
-        """
-        results = dict()
-        all_methods = dir(self._neuron_model)
-        for method in all_methods:
-            if method.startswith("initialize_"):
-                variable = method[11:]
-                key = "%s_init" % variable
-                if hasattr(self._neuron_model, key):
-                    getter = key
-                elif hasattr(self._neuron_model, variable):
-                    getter = variable
-                else:
-                    raise Exception("Vertex does not support getting of"
-                                    " parameter {}".format(variable))
-                value = self.get_value(getter)
-                if isinstance(value, SpynakkerRangedList):
-                    value = value.get_values()
-                results[variable] = value
-        return results
-        """
+        ranged_list.set_value_by_selector(selector, value)
 
     @property
     def input_type(self):
