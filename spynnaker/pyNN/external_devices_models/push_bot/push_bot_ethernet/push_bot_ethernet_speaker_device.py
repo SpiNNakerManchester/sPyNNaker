@@ -14,12 +14,6 @@ class PushBotEthernetSpeakerDevice(
         ProvidesKeyToAtomMappingImpl):
     """ The Speaker of a PushBot
     """
-    __slots__ = [
-        "_command_protocol",
-        "_start_active_time",
-        "_start_frequency",
-        "_start_melody",
-        "_start_total_period"]
 
     def __init__(
             self, speaker, protocol, start_active_time=0,

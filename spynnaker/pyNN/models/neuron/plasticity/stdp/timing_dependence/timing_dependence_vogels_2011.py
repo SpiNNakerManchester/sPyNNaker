@@ -35,11 +35,13 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return self._tau
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, other):
-        # pylint: disable=protected-access, arguments-differ
-        if other is None or not isinstance(other, TimingDependenceVogels2011):
+    def is_same_as(self, timing_dependence):
+        # pylint: disable=protected-access
+        if timing_dependence is None or not isinstance(
+                timing_dependence, TimingDependenceVogels2011):
             return False
-        return self._tau == other._tau and self._alpha == other._alpha
+        return (self._tau == timing_dependence._tau and
+                self._alpha == timing_dependence._alpha)
 
     @property
     def vertex_executable_suffix(self):

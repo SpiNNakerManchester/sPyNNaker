@@ -668,7 +668,7 @@ class SynapticManager(object):
                     app_edge.n_delay_stages, machine_time_step))
                 conn_holder.finish()
 
-        if row_data:
+        if row_data.size:
             block_addr, single_addr = self.__write_row_data(
                 spec, synapse_info, row_length, row_data, rinfo,
                 single_synapses, master_pop_table_region,
@@ -688,7 +688,7 @@ class SynapticManager(object):
                      pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
-        if delayed_row_data:
+        if delayed_row_data.size:
             block_addr, single_addr = self.__write_row_data(
                 spec, synapse_info, delayed_row_length, delayed_row_data,
                 delay_rinfo, single_synapses, master_pop_table_region,

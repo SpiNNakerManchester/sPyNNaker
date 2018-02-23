@@ -41,16 +41,16 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._synapse_structure = SynapseStructureWeightAccumulator()
 
     @overrides(AbstractTimingDependence.is_same_as)
-    def is_same_as(self, other):
-        # pylint: disable=arguments-differ
-        if other is None or not isinstance(other, TimingDependenceRecurrent):
+    def is_same_as(self, timing_dependence):
+        if timing_dependence is None or not isinstance(
+                timing_dependence, TimingDependenceRecurrent):
             return False
         return ((self.accumulator_depression_plus_one ==
-                 other.accumulator_depression_plus_one) and
+                 timing_dependence.accumulator_depression_plus_one) and
                 (self.accumulator_potentiation_minus_one ==
-                 other.accumulator_potentiation_minus_one) and
-                (self.mean_pre_window == other.mean_pre_window) and
-                (self.mean_post_window == other.mean_post_window))
+                 timing_dependence.accumulator_potentiation_minus_one) and
+                (self.mean_pre_window == timing_dependence.mean_pre_window) and
+                (self.mean_post_window == timing_dependence.mean_post_window))
 
     @property
     def vertex_executable_suffix(self):

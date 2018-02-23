@@ -36,7 +36,7 @@ class SynapseTypeDelta(AbstractSynapseType):
     def get_synapse_targets(self):
         return "excitatory", "inhibitory"
 
-    @overrides(AbstractSynapseType.get_n_synapse_types)
+    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
     def get_n_synapse_type_parameters(self):
         return 2
 

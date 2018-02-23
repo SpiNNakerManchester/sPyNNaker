@@ -17,7 +17,7 @@ class AbstractSynapseIO(object):
 
     @abstractmethod
     def get_sdram_usage_in_bytes(
-            self, edge, n_pre_slices, pre_slice_index,
+            self, synapse_info, n_pre_slices, pre_slice_index,
             n_post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table):
         """ Get the SDRAM usage of a list of synapse information objects for\
@@ -29,8 +29,8 @@ class AbstractSynapseIO(object):
 
     @abstractmethod
     def get_synapses(
-            self, edge, n_pre_slices, pre_slice_index,
-            n_post_slices, post_slice_index, pre_vertex_slice,
+            self, synapse_info, pre_slices, pre_slice_index,
+            post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step):
         """ Get the synapses as an array of words for non-delayed synapses and\
@@ -39,9 +39,10 @@ class AbstractSynapseIO(object):
 
     @abstractmethod
     def read_synapses(
-            self, edge, synapse_info, pre_vertex_slice, post_vertex_slice,
+            self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, machine_time_step):
+            weight_scales, data, delayed_data, n_delay_stages,
+            machine_time_step):
         """ Read the synapses for a given projection synapse information\
             object out of the given data
         """

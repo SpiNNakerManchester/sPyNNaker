@@ -268,7 +268,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     @overrides(
         AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
-            self, incoming_key_combo, master_pop_base_mem_address, txrx,
+            self, incoming_key, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
@@ -294,7 +294,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             full_data, 'uint8', n_address_bytes, n_entry_bytes).view(
                 dtype=self.ADDRESS_LIST_DTYPE)
 
-        entry = self._locate_entry(entry_list, incoming_key_combo)
+        entry = self._locate_entry(entry_list, incoming_key)
         if entry is None:
             return []
         addresses = list()

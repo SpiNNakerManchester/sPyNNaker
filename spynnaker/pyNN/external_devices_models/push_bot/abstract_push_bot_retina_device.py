@@ -8,10 +8,6 @@ from spinn_utilities.overrides import overrides
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl):
-    __slots__ = [
-        "_protocol",
-        "_resolution"]
-
     def __init__(self, protocol, resolution):
         self._protocol = protocol
         self._resolution = resolution

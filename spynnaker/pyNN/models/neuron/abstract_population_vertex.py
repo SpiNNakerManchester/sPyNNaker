@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import SpikeRecorder, NeuronRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron import PopulationMachineVertex
+from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
