@@ -88,6 +88,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def __init__(self):
         self._entries = None
         self._n_addresses = 0
+        self._n_single_entries = None
 
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):

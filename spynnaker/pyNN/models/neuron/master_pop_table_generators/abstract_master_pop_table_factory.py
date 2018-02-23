@@ -34,17 +34,18 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def update_master_population_table(
-            self, spec, block_start_addr, row_length, keys_and_masks,
+            self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
         """ updates a spec with a master pop entry in some form
 
         :param spec: the spec to write the master pop entry to
         :param block_start_addr: the start address of the row in the region
         :param row_length: the row length of this entry
-        :param keys_and_masks: list of key_and_mask objects containing the\
-            keys and masks for a given edge that will require being received\
-            to be stored in the master pop table
-        :type keys_and_masks: list of\
+        :param key_and_mask: a key_and_mask object used as part of describing\
+            an edge that will require being received to be stored in the\
+            master pop table; the whole edge will become multiple calls to\
+            this function
+        :type key_and_mask: \
             :py:class:`pacman.model.routing_info.KeyAndMask`
         :param master_pop_table_region: \
             The region to which the master pop table is being stored

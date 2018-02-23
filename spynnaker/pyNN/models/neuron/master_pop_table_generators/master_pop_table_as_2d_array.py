@@ -139,20 +139,18 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """
-        Writes an entry in the Master Population Table for the newly\
-        created synaptic block.
+        """ Writes an entry in the Master Population Table for the newly\
+            created synaptic block.
 
         An entry in the table is a 16-bit value, with the following structure:
-        * Bits [2:0]  Row length information. This value (from 0->7)\
-            indicates the maximum number of synapses in this\
-            block. It is translated in the row length translation\
-            table by the executing code each time the table is\
-            accessed, to calculate offsets.
-        * Bits [15:3] Address within the synaptic matrix region of the\
-            start of the block. This is 1K bytes aligned, so\
-            the true value is found by shifting left by 7 bits\
-            then adding the start address of the memory region.
+        * Bits [2:0]  Row length information. This value (from 0->7) indicates\
+            the maximum number of synapses in this block. It is translated in\
+            the row length translation table by the executing code each time\
+            the table is accessed, to calculate offsets.
+        * Bits [15:3] Address within the synaptic matrix region of the start\
+            of the block. This is 1K bytes aligned, so the true value is found\
+            by shifting left by 7 bits then adding the start address of the\
+            memory region.
 
         :param spec:
         :param block_start_addr:
