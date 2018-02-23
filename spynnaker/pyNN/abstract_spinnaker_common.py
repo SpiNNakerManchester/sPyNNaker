@@ -349,15 +349,15 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
-        """ common data extractor for projection data. Allows fully \
-            exploitation of the
+        """ Common data extractor for projection data. Allows fully \
+            exploitation of the ????
 
         :param projection_to_attribute_map: \
             the projection to attributes mapping
         :type projection_to_attribute_map: \
             dict of projection with set of attributes
         :return: a extracted data object with get method for getting the data
-        :rtype ExtractedData object
+        :rtype: ExtractedData object
         """
         # pylint: disable=protected-access
 

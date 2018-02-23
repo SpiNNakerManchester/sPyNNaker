@@ -12,16 +12,16 @@ class AbstractWeightDependence(object):
         """ Get any provenance data
 
         :param pre_population_label: label of pre.
-        :param post_population_label:label of post.
+        :param post_population_label: label of post.
         :return: the provenance data of the weight dependency
         """
         return list()
 
     @abstractmethod
     def get_parameter_names(self):
-        """ returns iterable of parameter names as basestrings
+        """ Returns the parameter names
 
-        :return: iterable of basestring
+        :rtype: iterable(str)
         """
 
     @abstractmethod
