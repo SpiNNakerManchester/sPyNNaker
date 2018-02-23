@@ -1,5 +1,6 @@
 # utils imports
 from spinn_utilities.abstract_base import AbstractBase
+from spinn_utilities.log import FormatAdapter
 
 # common front end imports
 from spinn_front_end_common.interface.abstract_spinnaker_base \
@@ -26,7 +27,7 @@ import os
 # global objects
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 @add_metaclass(AbstractBase)
@@ -187,11 +188,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self._time_scale_factor = max(
                 1.0, math.ceil(1000.0 / self._machine_time_step))
             if self._time_scale_factor > 1:
-                logger.warn(
+                logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
                     "automatically slow the simulation down from real time "
-                    "by a factor of %f. To remove this automatic behaviour, "
-                    "please enter a timescaleFactor value in your .%s",
+                    "by a factor of {}. To remove this automatic behaviour, "
+                    "please enter a timescaleFactor value in your .{}",
                     self._time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
@@ -206,12 +207,18 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                     "behaviour (at your own risk), please add "
                     "violate_1ms_wall_clock_restriction = True to the [Mode] "
                     "section of your .{} file".format(self.CONFIG_FILE_NAME))
-            logger.warn("****************************************************")
-            logger.warn("*** The combination of simulation time step and  ***")
-            logger.warn("*** the machine time scale factor results in a   ***")
-            logger.warn("*** wall clock timer tick that is currently not  ***")
-            logger.warn("*** reliably supported by the spinnaker machine. ***")
-            logger.warn("****************************************************")
+            logger.warning(
+                "****************************************************")
+            logger.warning(
+                "*** The combination of simulation time step and  ***")
+            logger.warning(
+                "*** the machine time scale factor results in a   ***")
+            logger.warning(
+                "*** wall clock timer tick that is currently not  ***")
+            logger.warning(
+                "*** reliably supported by the spinnaker machine. ***")
+            logger.warning(
+                "****************************************************")
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterates though the graph and looks changes

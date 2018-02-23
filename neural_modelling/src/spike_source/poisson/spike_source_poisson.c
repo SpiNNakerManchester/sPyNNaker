@@ -618,7 +618,6 @@ void sdp_packet_callback(uint mailbox, uint port) {
     uint32_t *data = (uint32_t *) &(msg->cmd_rc);
 
     uint32_t n_items = data[0];
-    REAL rate;
     data = &(data[1]);
     for (uint32_t item = 0; item < n_items; item++) {
         uint32_t id = data[(item * 2)];

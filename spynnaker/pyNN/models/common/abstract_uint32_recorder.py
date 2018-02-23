@@ -2,10 +2,11 @@ import numpy
 import logging
 
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.common import recording_utils
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class AbstractUInt32Recorder(object):
@@ -59,9 +60,9 @@ class AbstractUInt32Recorder(object):
 
         if missing:
             missing_str = recording_utils.make_missing_string(missing)
-            logger.warn(
-                "Population %s is missing %s data in region %s from the "
-                "following cores: %s", label, variable, region, missing_str)
+            logger.warning(
+                "Population {} is missing {} data in region {} from the "
+                "following cores: {}", label, variable, region, missing_str)
         data = numpy.vstack(data)
         order = numpy.lexsort((data[:, 1], data[:, 0]))
         result = data[order]

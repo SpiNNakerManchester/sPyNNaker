@@ -1,4 +1,5 @@
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -6,7 +7,7 @@ import math
 import numpy
 import logging
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class SpikeRecorder(object):
@@ -59,9 +60,9 @@ class SpikeRecorder(object):
                 graph_mapper.get_slice(vertex), spike_ids, spike_times))
 
         if missing:
-            logger.warn(
-                "Population %s is missing spike data in region %s from the"
-                " following cores: %s", label, region,
+            logger.warning(
+                "Population {} is missing spike data in region {} from the "
+                "following cores: {}", label, region,
                 recording_utils.make_missing_string(missing))
 
         if not spike_ids:

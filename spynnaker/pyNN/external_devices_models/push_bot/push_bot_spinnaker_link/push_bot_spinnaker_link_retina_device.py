@@ -26,7 +26,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
             label=default_parameters['label']):
         # pylint: disable=too-many-arguments
         if n_neurons is not None and n_neurons != resolution.value.n_neurons:
-            logger.warn(
+            logger.warning(
                 "The specified number of neurons for the push bot retina"
                 " device has been ignored %d will be used instead",
                 resolution.value.n_neurons)
