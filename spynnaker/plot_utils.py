@@ -4,14 +4,14 @@ import sys
 # pylint: disable=consider-using-enumerate, import-error
 
 try:
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt  # @UnresolvedImport
     matplotlib_missing = False
-except Exception as e:
+except Exception:  #pylint: disable=broad-except
     matplotlib_missing = True
 
 
 def _precheck(data, title):
-    if not data:
+    if not len(data):
         if title is None:
             print "NO Data"
         else:
@@ -38,8 +38,7 @@ def line_plot(data_sets, title=None):
     for index in range(len(data_sets)):
         data = data_sets[index]
         plt.subplot(numrows, numcols, index+1)
-        neurons = np.unique(data[:, 0])
-        for neuron in neurons:
+        for neuron in np.unique(data[:, 0]):
             time = [i[1] for i in data if i[0] == neuron]
             membrane_voltage = [i[2] for i in data if i[0] == neuron]
             plt.plot(time, membrane_voltage)
@@ -148,9 +147,9 @@ def plot_spikes(spikes, title="spikes"):
 
 # This is code for manual testing.
 if __name__ == "__main__":
-    spikes = np.loadtxt("spikes.csv", delimiter=',')
-    plot_spikes(spikes)
-    double = np.loadtxt("spikes.csv", delimiter=',')
-    for i in range(len(double)):
-        double[i][0] = double[i][0] + 5
-    plot_spikes([spikes, double])
+    spike_data = np.loadtxt("spikes.csv", delimiter=',')
+    plot_spikes(spike_data)
+    doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
+    for _i in range(len(doubled_spike_data)):
+        doubled_spike_data[_i][0] = doubled_spike_data[_i][0] + 5
+    plot_spikes([spike_data, doubled_spike_data])

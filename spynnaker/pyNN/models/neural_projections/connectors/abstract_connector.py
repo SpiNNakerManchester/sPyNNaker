@@ -103,8 +103,8 @@ class AbstractConnector(object):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
             raise NotImplementedError(
-                "Lists are not supported the implementation of"
-                " {} on this platform".format(self.__class__))
+                "Lists of {} are not supported by the implementation of {} on "
+                "this platform".format(name, self.__class__))
 
     def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\

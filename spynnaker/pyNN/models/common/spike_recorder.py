@@ -47,7 +47,7 @@ class SpikeRecorder(object):
         # pylint: disable=too-many-arguments, too-many-locals
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = float(machine_time_step / 1000.0)
+        ms_per_tick = float(machine_time_step) / 1000.0
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing = []
