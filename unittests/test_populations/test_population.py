@@ -7,28 +7,24 @@ def test_simple():
     pop = PyNNPopulationCommon(spinnaker_control=simulator, size=5, vertex=None,
                                structure=None, initial_values=None)
 
-def test_init_by_in():
+
+def test_selector():
     simulator = MockSimulator.setup()
     vertex = IFCurrExpBase(5)
-    pop = PyNNPopulationCommon(spinnaker_control=simulator, size=5, vertex=None,
-                               structure=None, initial_values=None)
-    assert 1 == pop.get_initial_value("foo")
-    pop.set_initial_value(variable="foo", value=11, selector=1)
-    assert [1, 11, 1, 1, 1] == pop.get_initial_value("foo")
-    pop.set_initial_value(variable="foo", value=12, selector=2)
-    assert [1, 11, 12, 1, 1] == pop.get_initial_value("foo")
-    assert [11] == pop.get_initial_value("bar", selector=1)
-    assert [12] == pop.get_initial_value("foo", selector=2)
-
-
-def test_initial_values():
-    simulator = MockSimulator.setup()
-    vertex = IFCurrExpBase(5)
-    pop = PyNNPopulationCommon(spinnaker_control=simulator, size=5,
-                               vertex=vertex, structure=None,
-                               initial_values=None)
-    initial_values = pop.initial_values
-    assert "foo" in initial_values
-    assert "bar" in initial_values
-    initial_values = pop.get_initial_values(selector=3)
-    assert {"foo": [1], "bar": [11]} == initial_values
+    pop_1 = PyNNPopulationCommon(spinnaker_control=simulator, size=5,
+                                 vertex=vertex,
+                                 structure=None, initial_values=None)
+    pop_1.set("tau_m", 2)
+    values = pop_1.get("tau_m")
+    assert [2, 2, 2, 2, 2] == values
+    values = pop_1.get_by_selector(slice(1, 3), "tau_m")
+    assert [2, 2] == values
+    pop_1.set_by_selector(slice(1, 3), "tau_m", 3)
+    values = pop_1.get("tau_m")
+    assert [2, 3, 3, 2, 2] == values
+    values = pop_1.get(["cm", "v_thresh"])
+    assert [1.0, 1.0, 1.0, 1.0, 1.0] == values['cm']
+    assert [-50.0, -50.0, -50.0, -50.0, -50.0] == values["v_thresh"]
+    values = pop_1.get_by_selector([1, 3, 4], ["cm", "v_thresh"])
+    assert [1.0, 1.0, 1.0] == values['cm']
+    assert [-50.0, -50.0, -50.0] == values["v_thresh"]

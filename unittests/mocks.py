@@ -59,6 +59,15 @@ class MockSimulator(object):
     def add_application_vertex(self, vertex):
         pass
 
+    def verify_not_running(self):
+        pass
+
+    def has_ran(self):
+        return False
+
+    def has_reset_last(self):
+        return False
+
     @property
     def id_counter(self):
         return 1

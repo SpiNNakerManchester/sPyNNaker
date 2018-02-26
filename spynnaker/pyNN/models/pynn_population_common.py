@@ -124,34 +124,54 @@ class PyNNPopulationCommon(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, parameter_name, gather=False):
-        """
-
-        """
+    def get(self, parameter_names, gather=False):
         """ Get the values of a parameter for every local cell in the\
             population.
 
-            :param parameter_name: Name of parameter
-            :return: 
+            :param parameter_names: Name of parameter. This is either a
+            single string or a list of strings
+            :return: A single list of values (or possibly a single value)
+                if paramter_names is a string or a dict of these if
+                parameter names is a list.
         """
-        if self._vertex_population_settable:
-            return self._vertex.get_value(parameter_name)
-        raise KeyError("Population does not support setting")
+        if not self._vertex_population_settable:
+            raise KeyError("Population does not support setting")
+        if isinstance(parameter_names, str):
+            return self._vertex.get_value(parameter_names)
+        else:
+            results = dict()
+            for parameter_name in parameter_names:
+                results[parameter_name] = self._vertex.get_value(
+                    parameter_name)
+            return results
 
     # NONE PYNN API CALL
-    def get_by_selector(self, selector, parameter_name):
-        """ Get the values of a parameter for the selected cell in the\
+    def get_by_selector(self, selector, parameter_names):
+        """
+        Get the values of a parameter for the selected cell in the\
             population.
 
-        :param parameter_name: Name of parameter
+        :param parameter_names: Name of parameter. This is either a
+            single string or a list of strings
         :param selector: a description of the subrange to accept. \
             Or None for all \
             See: _selector_to_ids in \
             SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :return: A single list of values (or possibly a single value)
+                if paramter_names is a string or a dict of these if
+                parameter names is a list.
        """
-        if self._vertex_population_settable:
-            return self._vertex.get_value_by_selector(selector, parameter_name)
-        raise KeyError("Population does not support setting")
+        if not self._vertex_population_settable:
+            raise KeyError("Population does not support setting")
+        if isinstance(parameter_names, str):
+            return self._vertex.get_value_by_selector(
+                selector, parameter_names)
+        else:
+            results = dict()
+            for parameter_name in parameter_names:
+                results[parameter_name] = self._vertex.get_value_by_selector(
+                    selector, parameter_name)
+            return results
 
     def id_to_index(self, id):  # @ReservedAssignment
         """
