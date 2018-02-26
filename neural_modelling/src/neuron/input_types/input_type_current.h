@@ -9,7 +9,7 @@ typedef struct input_type_t {
 static inline input_t input_type_get_input_value(
         input_t value, input_type_pointer_t input_type) {
     use(input_type);
-    return value;
+    return value ;
 }
 
 static inline input_t input_type_convert_excitatory_input_to_current(

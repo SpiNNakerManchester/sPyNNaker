@@ -137,6 +137,8 @@ class TestSynapticManager(unittest.TestCase):
             os.path.dirname(abstract_spinnaker_common.__file__),
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
 
+        # load both configs
+
         config = conf_loader.load_config(
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
 

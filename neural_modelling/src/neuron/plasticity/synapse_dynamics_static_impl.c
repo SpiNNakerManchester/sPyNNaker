@@ -1,6 +1,11 @@
 #include "synapse_dynamics.h"
 #include <debug.h>
 
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+static additional_input_pointer_t additional_input_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
+
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
@@ -46,4 +51,16 @@ void synapse_dynamics_print_plastic_synapses(
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
+}
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
+	neuron_array_plasticity = neuron_array;
+}
+
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_plasticity = threshold_type_array;
+}
+
+void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_plasticity = additional_input_array;
 }

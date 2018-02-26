@@ -281,6 +281,32 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     _print_neuron_parameters();
 
+//    //! SddddD: Reserve memory for neuron potentials and potential at last spike:
+//    last_voltage_sz = sizeof(accum) * n_neurons;
+//    last_voltage = (accum *) spin1_malloc(last_voltage_sz);
+//    voltage_before_last_spike_sz = sizeof(accum) * n_neurons;
+//    voltage_before_last_spike = (accum *) spin1_malloc(voltage_before_last_spike_sz);
+//    for(index_t neuron_index=0; neuron_index<n_neurons; neuron_index++) {
+//       last_voltage[neuron_index] = 0.0;
+//       voltage_before_last_spike[neuron_index] = 0.0;
+//    }
+//    log_info(" value: %u", threshold_type_array[0]);
+
+//    log_info(
+//        "\t neurons = %u, last_v addr = 0x%08x, v_before_last_spike_addr = 0x%08x",
+//         n_neurons, last_voltage, voltage_before_last_spike);
+         
+         
+    // Initialise pointers to Neuron parameters in STDP code
+    synapse_dynamics_set_neuron_array(neuron_array);
+    //log_info("set pointer to neuron array in stdp code");
+
+    synapse_dynamics_set_additional_input_array(additional_input_array);
+    //log_info("set pointer to additional input array in stdp code");
+
+    synapse_dynamics_set_threshold_array(threshold_type_array);
+    //log_info("set pointer to threshold type array in stdp code");
+
     return true;
 }
 

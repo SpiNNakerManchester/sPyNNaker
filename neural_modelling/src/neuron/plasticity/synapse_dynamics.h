@@ -4,6 +4,12 @@
 #include "../../common/neuron-typedefs.h"
 #include "../synapse_row.h"
 
+#include "../models/neuron_model.h"
+#include "../additional_inputs/additional_input.h"
+#include "../threshold_types/threshold_type.h"
+
+
+
 bool synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
     uint32_t *ring_buffer_to_input_buffer_left_shifts);
@@ -26,5 +32,12 @@ void synapse_dynamics_print_plastic_synapses(
 //!        returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array);
+
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array);
+
+void synapse_dynamics_set_additional_input_array(
+			additional_input_pointer_t additional_input_array);
 
 #endif // _SYNAPSE_DYNAMICS_H_

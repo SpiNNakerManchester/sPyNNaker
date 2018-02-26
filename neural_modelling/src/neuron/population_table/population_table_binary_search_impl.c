@@ -131,7 +131,7 @@ bool population_table_initialise(
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
-    _print_master_population_table();
+    //_print_master_population_table();
     return true;
 }
 

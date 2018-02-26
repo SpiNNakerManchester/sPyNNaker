@@ -91,7 +91,8 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
+	        -include $(SYNAPSE_TYPE_H) -o $$@ $$< #\
+	        # -include $(NEURON_MODEL_H) -o $$@ $$<
 endef
 
 define stdp_rule
@@ -101,6 +102,9 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) \
 	      -include $$(SYNAPSE_TYPE_H) \
+	      -include $$(NEURON_MODEL_H) \
+	      -include $$(THRESHOLD_TYPE_H) \
+	      -include $$(ADDITIONAL_INPUT_H) \
 	      -include $$(WEIGHT_DEPENDENCE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
 endef
@@ -118,7 +122,10 @@ $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
-	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+	        -include $(WEIGHT_DEPENDENCE_H) \
+	        -include $(NEURON_MODEL_H) \
+	        -include $(THRESHOLD_TYPE_H) \
+	        -include $(ADDITIONAL_INPUT_H) -o $@ $<
 
 $(NEURON_MODEL_O): $(NEURON_MODEL)
 	-mkdir -p $(dir $@)
