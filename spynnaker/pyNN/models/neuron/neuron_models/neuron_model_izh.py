@@ -116,7 +116,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(key=I_OFFSET, value=i_offset)
+        self._data.set_value(I_OFFSET. i_offset)
 
     @property
     def v_init(self):
@@ -203,8 +203,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[4]
-        self._data[U_INIT][vertex_slice.as_slice] = neural_parameters[5]
+        self._v_init[vertex_slice.as_slice] = neural_parameters[4]
+        self._u_init[vertex_slice.as_slice] = neural_parameters[5]
 
     def get_n_cpu_cycles_per_neuron(self):
 

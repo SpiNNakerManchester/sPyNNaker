@@ -38,7 +38,6 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls
   - python ./setup.py install
 
 before_script:
@@ -56,7 +55,7 @@ before_script:
 
 script:
   # Python
-  - py.test unittests --cov spynnaker
+  - py.test unittests
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
   # XML
@@ -68,7 +67,3 @@ script:
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
   - support/travis-sphinx.sh singlehtml -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
-
-after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - coveralls

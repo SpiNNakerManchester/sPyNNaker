@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/SpiNNakerManchester/sPyNNaker.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/sPyNNaker)
-[![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/sPyNNaker/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/sPyNNaker?branch=master)
 
 sPyNNaker - PyNN Simulations on SpiNNaker Hardware 
 ==================================================

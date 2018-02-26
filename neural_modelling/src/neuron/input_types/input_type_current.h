@@ -9,10 +9,7 @@ typedef struct input_type_t {
 static inline input_t input_type_get_input_value(
         input_t value, input_type_pointer_t input_type) {
     use(input_type);
-
-    UFRACT scalar = 0.000035; // scalar corresponding to that set in the Python input_type_current.py
-    return (scalar * value) << 3;// DO NOT CHANGE 3!!!
-
+    return value;
 }
 
 static inline input_t input_type_convert_excitatory_input_to_current(
@@ -20,7 +17,6 @@ static inline input_t input_type_convert_excitatory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-
     return exc_input;
 }
 
@@ -29,7 +25,6 @@ static inline input_t input_type_convert_inhibitory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-
     return inh_input;
 }
 
