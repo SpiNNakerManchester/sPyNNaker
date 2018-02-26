@@ -1,16 +1,18 @@
 """
 utility class containing simple helper methods
 """
-from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
 import numpy
 import os
 import logging
 import struct
 
+from spinn_utilities.safe_eval import SafeEval
+
 from scipy.stats import binom
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+
+MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
 logger = logging.getLogger(__name__)
 
@@ -58,15 +60,37 @@ def convert_param_to_numpy(param, no_atoms):
     return numpy.array(param, dtype="float")
 
 
-def write_parameters_per_neuron(spec, vertex_slice, parameters):
+def write_parameters_per_neuron(spec, vertex_slice, parameters,
+                                slice_paramaters=False):
+    """
+    Writes the parameters neurons by neuron
+
+    :param spec: The data specification to write to
+    :param vertex_slice: The vertex currently being writen
+    :param parameters: The parameters currently being written
+    :param slice_paramaters: Flag to indicate if the parameters are only for\
+        this slice.
+
+        The default False say that the parameters are for full\
+        lists accross all slices. So that parameter[x] will be for the neuron\
+        x where x is the id which may or may nor be in the slice.
+
+        If True the parememter list will only contain values for this slice.\
+        So that parameter[x] is the xth neuron in the slice.\
+        ie the neuron with the id x + vertex_slice.lo_atom
+    """
     if len(parameters) == 0:
         return
 
     # Get an iterator per parameter
     iterators = []
     for param in parameters:
-        iterators.append(param.iterator_by_slice(
-            vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
+        if slice_paramaters:
+            iterators.append(param.iterator_by_slice(
+                0, vertex_slice.n_atoms, spec))
+        else:
+            iterators.append(param.iterator_by_slice(
+                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
 
     # Iterate through the iterators until a StopIteration is generated
     while True:
@@ -328,3 +352,20 @@ def validate_mars_kiss_64_seed(seed):
 
     # avoid z=c=0 and make < 698769069
     seed[3] = seed[3] % 698769068 + 1
+
+
+def check_sampling_interval(sampling_interval):
+    step = globals_variables.get_simulator().machine_time_step / 1000
+    if sampling_interval is None:
+        return step
+    rate = int(sampling_interval / step)
+    if sampling_interval != rate * step:
+        msg = "sampling_interval {} is not an an integer " \
+              "multiple of the simulation timestep {}" \
+              "".format(sampling_interval, step)
+        raise ConfigurationException(msg)
+    if rate > MAX_RATE:
+        msg = "sampling_interval {} higher than max allowed which is {}" \
+              "".format(sampling_interval, step * MAX_RATE)
+        raise ConfigurationException(msg)
+    return sampling_interval

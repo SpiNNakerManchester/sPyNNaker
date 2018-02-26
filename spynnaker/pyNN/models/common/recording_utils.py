@@ -1,10 +1,11 @@
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
-from spynnaker.pyNN.exceptions import MemReadException
-
+from __future__ import division
 import struct
 import logging
 import numpy
+
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
+from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")

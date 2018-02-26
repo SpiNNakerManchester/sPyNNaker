@@ -47,13 +47,27 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram_usage,
-            buffered_sdram_per_timestep, label, constraints=None):
+            buffered_sdram_per_timestep, label, constraints=None,
+            overflow_sdram=0):
+        """
+
+        :param resources_required:
+        :param is_recording:
+        :param minimum_buffer_sdram_usage:
+        :param buffered_sdram_per_timestep:
+        :param label:
+        :param constraints:
+        :param overflow_sdram: Extra sdram that may be required if
+            buffered_sdram_per_timestep is an average
+        :type sampling: bool
+        """
         MachineVertex.__init__(self, label, constraints)
         AbstractRecordable.__init__(self)
         self._is_recording = is_recording
         self._resources = resources_required
         self._minimum_buffer_sdram_usage = minimum_buffer_sdram_usage
         self._buffered_sdram_per_timestep = buffered_sdram_per_timestep
+        self._overflow_sdram = overflow_sdram
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -130,8 +144,9 @@ class PopulationMachineVertex(
 
     @overrides(AbstractReceiveBuffersToHost.get_n_timesteps_in_buffer_space)
     def get_n_timesteps_in_buffer_space(self, buffer_space, machine_time_step):
+        safe_space = buffer_space - self._overflow_sdram
         return recording_utilities.get_n_timesteps_in_buffer_space(
-            buffer_space, self._buffered_sdram_per_timestep)
+            safe_space, self._buffered_sdram_per_timestep)
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
