@@ -6,7 +6,7 @@ import sys
 try:
     import matplotlib.pyplot as plt  # @UnresolvedImport
     matplotlib_missing = False
-except Exception:  #pylint: disable=broad-except
+except Exception:  # pylint: disable=broad-except
     matplotlib_missing = True
 
 
