@@ -1,5 +1,6 @@
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.exceptions import SpynnakerException
 
 import numpy.random
 
@@ -14,6 +15,10 @@ class MultapseConnector(AbstractConnector):
 
     :param num_synapses:
         Integer. This is the total number of synapses in the connection.
+    :param allow_self_connections:
+        Bool. Allow a neuron to connect to itself or not.
+    :param with_replacement:
+        Bool. When selecting, allow a neuron to be re-selected or not.
 
     """
     def __init__(
@@ -191,15 +196,55 @@ class MultapseConnector(AbstractConnector):
             pre_slice_index, post_slice_index)
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = numpy.random.choice(
-            numpy.arange(
-                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
-            size=n_connections, replace=True)
-        block["source"].sort()
-        block["target"] = numpy.random.choice(
-            numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
-            size=n_connections, replace=True)
+
+        source_neuron_ids = []
+        target_neuron_ids = []
+
+        try:
+            source_neuron_ids = numpy.random.choice(
+                numpy.arange(
+                    pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
+                size=n_connections, replace=self._with_replacement)
+        except Exception:
+            raise SpynnakerException(
+                "MultapseConnector: The number of connections is too large "
+                "for sampling without replacement in the pre-population: "
+                "reduce the value specified in the connector")
+
+        try:
+            target_neuron_ids = numpy.random.choice(
+                numpy.arange(
+                    post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
+                size=n_connections, replace=self._with_replacement)
+        except Exception:
+            raise SpynnakerException(
+                "MultapseConnector: The number of connections is too large "
+                "for sampling without replacement in the post-population: ",
+                "reduce the value specified in the connector")
+
+        # Sort the source neuron ids
+        source_neuron_ids.sort()
+
+        # Now check for self_connections if necessary
+        if (self._pre_population is self._post_population and
+                not self._allow_self_connections):
+            # loop over and change any links from a neuron to itself
+            for i in range(0,n_connections):
+                if (source_neuron_ids[i]==target_neuron_ids[i]):
+                    # Make a list of target ids that haven't been used yet
+                    missing_target_ids = []
+                    for j in range(post_vertex_slice.lo_atom,
+                                   post_vertex_slice.hi_atom +1):
+                        if ((not numpy.isin(j,target_neuron_ids[i])) and
+                                (j!=target_neuron_ids[i])):
+                            missing_target_ids.append(j)
+
+                    # This could be a problem if missing_target_ids is empty?
+                    target_neuron_ids[i]=numpy.random.choice(
+                        missing_target_ids, 1)
+
+        block["source"] = source_neuron_ids
+        block["target"] = target_neuron_ids
         block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
