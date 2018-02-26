@@ -38,8 +38,8 @@ class GraphEdgeFilter(object):
                 vertex, graph_mapper, new_machine_graph, new_graph_mapper)
 
         # start checking edges to decide which ones need pruning....
-        for partition in machine_graph.outgoing_edge_partitions:
-            for edge in progress.over(partition.edges, False):
+        for partition in progress.over(machine_graph.outgoing_edge_partitions):
+            for edge in partition.edges:
                 if self._is_filterable(edge, graph_mapper):
                     logger.debug("this edge was pruned %s", edge)
                     continue
@@ -48,7 +48,6 @@ class GraphEdgeFilter(object):
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
-        progress.end()
         # returned the pruned graph and graph_mapper
         return new_machine_graph, new_graph_mapper
 

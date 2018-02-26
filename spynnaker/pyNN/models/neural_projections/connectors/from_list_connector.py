@@ -34,7 +34,7 @@ class FromListConnector(AbstractConnector):
         Creates a new FromListConnector.
         """
         super(FromListConnector, self).__init__(safe, verbose)
-        if conn_list is None or not conn_list:
+        if conn_list is None or not len(conn_list):
             raise InvalidParameterType(
                 "The connection list for the FromListConnector must contain"
                 " at least a list of tuples, each of which should contain:"

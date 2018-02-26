@@ -229,7 +229,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_delayed_row_length = 0
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
-        if delayed_connections:
+        if delayed_connections.size:
 
             # Get the delay stages and which row each delayed connection will
             # go into
@@ -267,10 +267,10 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Translate the data into rows
         row_data = None
         delayed_row_data = None
-        if data is not None and data:
+        if data is not None and len(data):
             row_data = numpy.frombuffer(data, dtype="<u4").reshape(
                 -1, (max_row_length + _N_HEADER_WORDS))
-        if delayed_data is not None and delayed_data:
+        if delayed_data is not None and len(delayed_data):
             delayed_row_data = numpy.frombuffer(
                 delayed_data, dtype="<u4").reshape(
                     -1, (delayed_max_row_length + _N_HEADER_WORDS))
