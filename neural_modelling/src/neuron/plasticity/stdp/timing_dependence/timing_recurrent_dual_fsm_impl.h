@@ -20,7 +20,6 @@ typedef uint16_t pre_trace_t;
 #include "../../common/stdp_typedefs.h"
 #include "random.h"
 
-
 typedef struct {
     int32_t accum_decay_per_ts;
     int32_t accum_dep_plus_one[4];
@@ -31,6 +30,8 @@ typedef struct {
 
 static inline weight_state_t weight_one_term_apply_potentiation_sd(weight_state_t state,
                                                 uint32_t syn_type, int32_t potentiation);
+static inline weight_state_t weight_two_term_apply_potentiation_sd(weight_state_t state,
+                                  accum v_diff, uint32_t syn_type, int32_t potentiation);
 static inline weight_state_t weight_one_term_apply_depression_sd(weight_state_t state,
                                                   uint32_t syn_type, int32_t depression);
 static inline weight_t weight_update_add( weight_state_t state);
@@ -59,7 +60,14 @@ extern uint32_t recurrentSeed[4];
 //extern accum *voltage_before_last_spike;
 extern threshold_type_pointer_t threshold_type_array;
 
-int32_t old_w;
+// How muany right shifts to apply to the voltage difference. This is set to 4. Why?
+// We assume a 16mV swing from resting potential to Vthresh. So a value of v_diff of 16mV
+// is translated into a multiplier of 1. Any lesser value for v_diff will scale the 
+// multiplier in the potentiation rule by a value less than 1. (In fact the difference
+// between rest and threshold is 20mV (in this model) so this will not be exact, but
+// a multiple of 2 is convenient to calculate).
+
+#define full_v_scale_shift 4
 
 #define ACCUM_SCALING	10
 // With cycle time 35ms, timestep 0.2ms and goal of forgetting an accum update in 6 cycles,
@@ -160,8 +168,10 @@ static inline update_state_t timing_apply_pre_spike(
     // Debug:
     // Check windows for syn_type 3 (inhibitory 2) which has special properties:
     if (syn_type == 3) {
-       old_w = previous_state.weight_state.weight;
-       previous_state.weight_state.weight = weight_update_sub(previous_state.weight_state);
+      if ((uint32_t)(mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1)) < 100) {
+         // Increment weight 1% of the time (slow tracking of activity):
+         previous_state.weight_state.weight = weight_update_sub(previous_state.weight_state);
+      }
        //log_info("D-");
        // If we are inside a post-pre window, perform additive potentiation:
        if (time < previous_state.longest_post_pre_window_closing_time) {
@@ -225,10 +235,20 @@ static inline update_state_t timing_apply_post_spike(
    use(&syn_type);
    use(&post_synaptic_neuron);
    use(&post_synaptic_additional_input);
-   use(&post_synaptic_threshold);
-   use(&post_synaptic_mem_V);
+   //use(&post_synaptic_threshold);
+   //use(&post_synaptic_mem_V);
 
-//   log_info("Post_synaptic_potential from within apply post spike: %k", post_synaptic_mem_V);
+   // How far was the neuron from threshold just before the teaching signal arrived?
+   accum voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
+
+   // Voltage difference will be rectified (so no negative values allowed):
+   if (voltage_difference < (accum)0.0) {
+      voltage_difference = (accum)0.0;
+   }
+
+   //log_info("Thr: %k, postV: %k", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
+
+   // log_info("Post_synaptic_potential from within apply post spike: %k", post_synaptic_mem_V);
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
@@ -258,8 +278,11 @@ static inline update_state_t timing_apply_post_spike(
    // For inhib-2-type (ID of 3) synapses, if we're inside the pre-post window
    // perform potentiation:
    if ((syn_type == 3) && (time_since_last_pre < last_pre_trace)) {
-      old_w = previous_state.weight_state.weight;
-      previous_state.weight_state.weight = weight_update_add(previous_state.weight_state);
+      // Increment weight 1% of the time (slow tracking of activity):
+      random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
+      if (random < 100) {
+         previous_state.weight_state.weight = weight_update_add(previous_state.weight_state);
+      }
       //log_info("P+");
       return previous_state;
    }
@@ -282,9 +305,11 @@ static inline update_state_t timing_apply_post_spike(
              //log_debug("Current V = %12.6k, V_hist = %12.6k",
                    //post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
              //log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
-
-             previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
-                                                                        syn_type, STDP_FIXED_POINT_ONE);
+             //log_info("Prev_V: %k", post_synaptic_mem_V);
+             previous_state.weight_state = weight_two_term_apply_potentiation_sd(previous_state.weight_state,
+                                                      voltage_difference, syn_type, STDP_FIXED_POINT_ONE);
+             //previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
+             //                                                           syn_type, STDP_FIXED_POINT_ONE);
          }
       }
    }
@@ -310,10 +335,8 @@ static inline weight_t weight_update_sub( weight_state_t state) {
 static inline weight_state_t weight_one_term_apply_potentiation_sd(
    weight_state_t state, uint32_t syn_type, int32_t potentiation) {
    use(&syn_type);
-   old_w = state.weight;
    int32_t scale = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
-                   //state.weight_region->a2_plus, 15);
                    state.weight_region->a2_plus, state.weight_multiply_right_shift);
 
    // Multiply scale by potentiation and add
@@ -322,12 +345,45 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
    return state;
 }
 
+static inline weight_state_t weight_two_term_apply_potentiation_sd(
+   weight_state_t state, accum v_diff, uint32_t syn_type, int32_t potentiation) {
+   use(&syn_type);
+   union accum_int {
+       accum acc_interpretation;
+       int32_t int_interpretation;
+   };
+       
+   union accum_int scaled_v_diff;
+   //accum scaled_v_diff;
+   int32_t old_w = state.weight;
+   //scaled_v_diff.acc_interpretation = v_diff >> full_v_scale_shift; // 16mV diff translates to scaled_v_diff = 1
+   scaled_v_diff.acc_interpretation = v_diff * (accum)(1.0/20.0); // 20mV diff translates to scaled_v_diff = 1
+   int32_t scale1 = maths_fixed_mul16(
+                   state.weight_region->max_weight - state.weight,
+                   state.weight_region->a2_plus, state.weight_multiply_right_shift);
+
+   // Now scale the scale value further using the voltage difference between threshold and the
+   // voltage at the soma just before the teaching signal:
+   int32_t scale = scale1 * (int) scaled_v_diff.int_interpretation;
+   scale = scale >> 15;
+
+   // Multiply scale by potentiation and add
+   // **NOTE** using standard STDP fixed-point format handles format conversion
+   state.weight += scale;
+   //if (1==1) {
+       //log_info("Int: diff: %d, scaled_v_diff: %d    scale1: %d, scale: %d", v_diff, scaled_v_diff.int_interpretation, scale1, scale);
+       //log_info("Max: %k, a2_plus: %k, shift: %d", state.weight_region->max_weight, state.weight_region->a2_plus, state.weight_multiply_right_shift);
+       //log_info("shift: %d", state.weight_multiply_right_shift);
+       //log_info("Diff: %k, scale1: %k, scale: %k oldW: %k, W: %k", v_diff, scale1, scale, old_w, state.weight);
+   //} 
+   return state;
+}
+
 static inline weight_state_t weight_one_term_apply_depression_sd(
    weight_state_t state, uint32_t syn_type, int32_t depression) {
    use(&syn_type);
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
-                   //state.weight_region->a2_minus, 15);
                    state.weight_region->a2_minus, state.weight_multiply_right_shift);
 
     // Multiply scale by depression and subtract
