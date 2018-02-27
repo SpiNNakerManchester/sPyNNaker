@@ -15,8 +15,9 @@ class IzkCurrExpBase(AbstractPopulationVertex):
 
     default_parameters = {
         'a': 0.02, 'c': -65.0, 'b': 0.2, 'd': 2.0, 'i_offset': 0,
-        'u_init': -14.0, 'v_init': -70.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
-        'isyn_exc': 0, 'isyn_inh': 0}
+        'tau_syn_E': 5.0, 'tau_syn_I': 5.0, 'isyn_exc': 0, 'isyn_inh': 0}
+
+    initialize_parameters = {'u_init': -14.0, 'v_init': -70.0}
 
     # noinspection PyPep8Naming
     def __init__(
@@ -34,8 +35,8 @@ class IzkCurrExpBase(AbstractPopulationVertex):
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
             i_offset=default_parameters['i_offset'],
-            u_init=default_parameters['u_init'],
-            v_init=default_parameters['v_init'],
+            u_init=initialize_parameters['u_init'],
+            v_init=initialize_parameters['v_init'],
             tau_syn_E=default_parameters['tau_syn_E'],
             tau_syn_I=default_parameters['tau_syn_I'],
             isyn_exc=default_parameters['isyn_exc'],
