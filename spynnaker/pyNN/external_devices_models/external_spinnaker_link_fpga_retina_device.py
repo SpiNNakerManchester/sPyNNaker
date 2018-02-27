@@ -96,9 +96,9 @@ class ExternalFPGARetinaDevice(
         self._fixed_mask = self._get_mask(mode)
 
         if fixed_n_neurons != n_neurons and n_neurons is not None:
-            logger.warn("The specified number of neurons for the FPGA retina"
-                        " device has been ignored {} will be used instead"
-                        .format(fixed_n_neurons))
+            logger.warning("The specified number of neurons for the FPGA "
+                           "retina device has been ignored {} will be used "
+                           "instead".format(fixed_n_neurons))
         ApplicationSpiNNakerLinkVertex.__init__(
             self, n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, max_atoms_per_core=fixed_n_neurons,
