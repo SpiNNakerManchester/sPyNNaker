@@ -132,11 +132,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             timestep, min_delay, max_delay, self.config, time_scale_factor)
         self.set_up_machine_specifics(hostname)
 
-        logger.info("Setting time scale factor to %f.",
+        logger.info("Setting time scale factor to {}.",
                     self._time_scale_factor)
 
         # get the machine time step
-        logger.info("Setting machine time step to %f micro-seconds.",
+        logger.info("Setting machine time step to {} micro-seconds.",
                     self._machine_time_step)
 
     def _set_up_timings(
@@ -339,7 +339,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             if previous < max_permitted:
                 logger.warning(
                     "Attempt to increase number_of_neurons_per_core "
-                    "from %d to %d ignored", previous, max_permitted)
+                    "from {} to {} ignored", previous, max_permitted)
                 return
         neuron_type.set_model_max_atoms_per_core(max_permitted)
         self._neurons_per_core_set.add(neuron_type)
