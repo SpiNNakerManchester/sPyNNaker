@@ -62,8 +62,7 @@ class IFCurrDelta(AbstractPopulationVertex):
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_curr_delta", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints,
-            max_feasible_atoms_per_core=DEFAULT_MAX_ATOMS_PER_CORE)
+            threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
     def get_max_atoms_per_core():
