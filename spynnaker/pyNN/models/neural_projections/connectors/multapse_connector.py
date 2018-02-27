@@ -234,7 +234,7 @@ class MultapseConnector(AbstractConnector):
                     # Make a list of target ids that haven't been used yet
                     missing_target_ids = []
                     for j in range(post_vertex_slice.lo_atom,
-                                   post_vertex_slice.hi_atom +1):
+                                   post_vertex_slice.hi_atom + 1):
                         if ((not numpy.isin(j, target_neuron_ids[i])) and
                                 (j != target_neuron_ids[i])):
                             missing_target_ids.append(j)
