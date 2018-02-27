@@ -229,18 +229,18 @@ class MultapseConnector(AbstractConnector):
         if (self._pre_population is self._post_population and
                 not self._allow_self_connections):
             # loop over and change any links from a neuron to itself
-            for i in range(0,n_connections):
-                if (source_neuron_ids[i]==target_neuron_ids[i]):
+            for i in range(0, n_connections):
+                if (source_neuron_ids[i] == target_neuron_ids[i]):
                     # Make a list of target ids that haven't been used yet
                     missing_target_ids = []
                     for j in range(post_vertex_slice.lo_atom,
                                    post_vertex_slice.hi_atom +1):
-                        if ((not numpy.isin(j,target_neuron_ids[i])) and
-                                (j!=target_neuron_ids[i])):
+                        if ((not numpy.isin(j, target_neuron_ids[i])) and
+                                (j != target_neuron_ids[i])):
                             missing_target_ids.append(j)
 
                     # This could be a problem if missing_target_ids is empty?
-                    target_neuron_ids[i]=numpy.random.choice(
+                    target_neuron_ids[i] = numpy.random.choice(
                         missing_target_ids, 1)
 
         block["source"] = source_neuron_ids
