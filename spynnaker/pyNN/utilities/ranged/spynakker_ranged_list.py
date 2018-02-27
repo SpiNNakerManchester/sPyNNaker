@@ -18,9 +18,9 @@ class SpynakkerRangedList(RangedList):
 
     @staticmethod
     @overrides(RangedList.as_list)
-    def as_list(value, size):
+    def as_list(value, size, ids=None):
 
         if globals_variables.get_simulator().is_a_pynn_random(value):
             return value.next(n=size)
 
-        return RangedList.as_list(value, size)
+        return RangedList.as_list(value, size, ids)
