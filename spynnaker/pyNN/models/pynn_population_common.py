@@ -210,6 +210,8 @@ class PyNNPopulationCommon(object):
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
+
+        Note: This is supported by sPyNNaker8
         """
 
         # TODO: Needs a more precise recording mechanism (coming soon)
@@ -223,7 +225,10 @@ class PyNNPopulationCommon(object):
         raise NotImplementedError
 
     def __iter__(self):
-        """ Iterate over local cells
+        """
+        Iterate over local cells
+
+        Note: This is supported by sPyNNaker8
         """
 
         # TODO:
