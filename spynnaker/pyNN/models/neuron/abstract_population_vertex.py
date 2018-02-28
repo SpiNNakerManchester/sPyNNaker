@@ -294,9 +294,6 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
-                       self._spike_recorder.record
-
         is_recording = len(self._neuron_recorder.recording_variables) > 0
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
@@ -672,7 +669,7 @@ class AbstractPopulationVertex(
     def get_data(self, variable, n_machine_time_steps, placements,
                  graph_mapper, buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
-        return self._neuron_recorder.get_data(
+        return self._neuron_recorder.get_matrix_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
             placements, graph_mapper, self, variable, n_machine_time_steps)
 

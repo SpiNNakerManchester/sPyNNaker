@@ -145,7 +145,7 @@ class RecordingCommon(object):
         data = None
         sim = get_simulator()
 
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
 
         # check that we're in a state to get voltages
         if not isinstance(
