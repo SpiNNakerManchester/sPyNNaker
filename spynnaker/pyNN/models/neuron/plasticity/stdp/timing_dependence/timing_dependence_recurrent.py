@@ -63,7 +63,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return ((self.accum_dep_plus_one_excit == other.accum_dep_plus_one_excit) and
                 (self.accum_pot_minus_one_excit == other.accum_pot_minus_one_excit) and
                 (self.pre_window_tc_excit == other.pre_window_tc_excit) and
-                (self.pre_window_tc_excit == other.post_window_tc_excit))
+                (self.post_window_tc_excit == other.post_window_tc_excit))
         #return ((self.accumulator_depression_plus_one ==
         #         other.accumulator_depression_plus_one) and
         #        (self.accumulator_potentiation_minus_one ==
