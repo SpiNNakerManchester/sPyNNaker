@@ -795,7 +795,7 @@ class AbstractPopulationVertex(
             placements=None, data_receiver=None,
             sender_extra_monitor_core_placement=None,
             extra_monitor_cores_for_router_timeout=None,
-            handle_time_out_configuration=True):
+            handle_time_out_configuration=True, fixed_routes=None):
         # pylint: disable=too-many-arguments
         return self._synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper,
@@ -803,7 +803,7 @@ class AbstractPopulationVertex(
             using_extra_monitor_cores, placements, data_receiver,
             sender_extra_monitor_core_placement,
             extra_monitor_cores_for_router_timeout,
-            handle_time_out_configuration)
+            handle_time_out_configuration, fixed_routes)
 
     def clear_connection_cache(self):
         self._synapse_manager.clear_connection_cache()
