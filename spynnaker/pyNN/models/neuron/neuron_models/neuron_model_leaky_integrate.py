@@ -1,5 +1,5 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
@@ -27,10 +27,12 @@ class _IF_TYPES(Enum):
     EXP_TC = (4, DataType.S1615)
     I_OFFSET = (5, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -39,11 +41,13 @@ class _IF_TYPES(Enum):
 
 
 class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, v_init, v_rest, tau_m, cm, i_offset):
-        AbstractNeuronModel.__init__(self)
-        AbstractContainsUnits.__init__(self)
-
+        # pylint: disable=too-many-arguments
         self._units = {
             V_INIT: 'mV',
             V_REST: 'mV',
@@ -122,6 +126,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         return [
 
             # membrane voltage [mV]
