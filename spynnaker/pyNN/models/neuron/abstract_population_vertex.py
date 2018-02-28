@@ -126,7 +126,7 @@ class AbstractPopulationVertex(
 
     _n_vertices = 0
 
-    none_pynn_default_parameters = {
+    non_pynn_default_parameters = {
         'spikes_per_second': None, 'ring_buffer_sigma': None,
         'incoming_spike_buffer_size': None, 'constraints': None,
         'label': None}
