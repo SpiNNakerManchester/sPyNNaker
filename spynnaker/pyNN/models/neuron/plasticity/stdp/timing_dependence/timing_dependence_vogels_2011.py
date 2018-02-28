@@ -17,12 +17,14 @@ LOOKUP_TAU_SHIFT = 0
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
+    __slots__ = [
+        "_alpha",
+        "_synapse_structure",
+        "_tau"]
 
     default_parameters = {'tau': 20.0}
 
     def __init__(self, alpha, tau=default_parameters['tau']):
-        AbstractTimingDependence.__init__(self)
-
         self._alpha = alpha
         self._tau = tau
 
@@ -32,11 +34,14 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def tau(self):
         return self._tau
 
-    def is_same_as(self, other):
-        if (other is None) or (not isinstance(
-                other, TimingDependenceVogels2011)):
+    @overrides(AbstractTimingDependence.is_same_as)
+    def is_same_as(self, timing_dependence):
+        # pylint: disable=protected-access
+        if timing_dependence is None or not isinstance(
+                timing_dependence, TimingDependenceVogels2011):
             return False
-        return ((self._tau == other._tau) and (self._alpha == other._alpha))
+        return (self._tau == timing_dependence._tau and
+                self._alpha == timing_dependence._alpha)
 
     @property
     def vertex_executable_suffix(self):
@@ -48,6 +53,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         # Trace entries consist of a single 16-bit number
         return 2
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return 4 + (2 * LOOKUP_TAU_SIZE)
 
@@ -55,6 +61,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Check timestep is valid

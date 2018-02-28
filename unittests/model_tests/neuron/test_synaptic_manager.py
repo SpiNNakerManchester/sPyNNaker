@@ -78,7 +78,7 @@ class MockTransceiverRawData(object):
 class SimpleApplicationVertex(ApplicationVertex):
 
     def __init__(self, n_atoms):
-        ApplicationVertex.__init__(self)
+        super(SimpleApplicationVertex, self).__init__()
         self._n_atoms = n_atoms
 
     def n_atoms(self):

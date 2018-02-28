@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
 class IFCurrExpBase(AbstractPopulationVertex):
@@ -25,16 +26,11 @@ class IFCurrExpBase(AbstractPopulationVertex):
 
     def __init__(
             self, n_neurons,
-            spikes_per_second=AbstractPopulationVertex.
-            non_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            non_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex.
-            non_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.non_pynn_default_parameters[
-                'constraints'],
-            label=AbstractPopulationVertex.non_pynn_default_parameters[
-                'label'],
+            spikes_per_second=_apv_defs['spikes_per_second'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
+            label=_apv_defs['label'],
             tau_m=default_parameters['tau_m'],
             cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -47,7 +43,7 @@ class IFCurrExpBase(AbstractPopulationVertex):
             v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
@@ -56,8 +52,8 @@ class IFCurrExpBase(AbstractPopulationVertex):
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
+        super(IFCurrExpBase, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_exp.aplx", label=label,
             max_atoms_per_core=IFCurrExpBase._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

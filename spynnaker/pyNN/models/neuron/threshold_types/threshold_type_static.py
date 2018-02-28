@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -16,10 +16,12 @@ V_THRESH = "v_thresh"
 class _STATIC_TYPES(Enum):
     V_THRESH = (1, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -28,14 +30,14 @@ class _STATIC_TYPES(Enum):
 
 
 class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
-
     """ A threshold that is a static value
     """
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, v_thresh):
-        AbstractThresholdType.__init__(self)
-        AbstractContainsUnits.__init__(self)
-
         self._units = {V_THRESH: "mV"}
 
         self._n_neurons = n_neurons
@@ -65,6 +67,7 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
     def get_threshold_parameter_types(self):
         return [item.data_type for item in _STATIC_TYPES]
 
+    @overrides(AbstractThresholdType.get_n_cpu_cycles_per_neuron)
     def get_n_cpu_cycles_per_neuron(self):
 
         # Just a comparison, but 2 just in case!

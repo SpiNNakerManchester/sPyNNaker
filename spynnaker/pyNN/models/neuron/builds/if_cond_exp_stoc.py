@@ -47,7 +47,7 @@ class IFCondExpStoc(AbstractPopulationVertex):
             v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
@@ -58,9 +58,8 @@ class IFCondExpStoc(AbstractPopulationVertex):
         threshold_type = ThresholdTypeMaassStochastic(
             n_neurons, du_th, tau_th, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_cond_exp_stoc.aplx",
-            label=label,
+        super(IFCondExpStoc, self).__init__(
+            n_neurons=n_neurons, binary="IF_cond_exp_stoc.aplx", label=label,
             max_atoms_per_core=IFCondExpStoc._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

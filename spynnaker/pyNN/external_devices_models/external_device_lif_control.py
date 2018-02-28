@@ -1,10 +1,11 @@
+from spinn_utilities.overrides import overrides
+
 from .threshold_type_multicast_device_control \
     import ThresholdTypeMulticastDeviceControl
 from .abstract_ethernet_controller import AbstractEthernetController
 
 from pacman.model.constraints.key_allocator_constraints import \
     FixedKeyAndMaskConstraint
-from pacman.model.decorators import overrides
 from pacman.model.routing_info import BaseKeyAndMask
 
 from spinn_front_end_common.abstract_models import \
@@ -23,6 +24,7 @@ import logging
 from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
 class ExternalDeviceLifControl(
@@ -34,6 +36,12 @@ class ExternalDeviceLifControl(
         but without spikes, and using the voltage as the output to the various\
         devices
     """
+    __slots__ = [
+        "_dependent_vertices",
+        "_devices",
+        "_message_translator",
+        "_partition_id_to_atom",
+        "_partition_id_to_key"]
 
     _model_based_max_atoms_per_core = 15
 
@@ -51,16 +59,11 @@ class ExternalDeviceLifControl(
             self, n_neurons, devices, create_edges, translator=None,
 
             # standard neuron stuff
-            spikes_per_second=AbstractPopulationVertex.
-            non_pynn_default_parameters['spikes_per_second'],
-            label=AbstractPopulationVertex.non_pynn_default_parameters[
-                'label'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            non_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex.
-            non_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.
-            non_pynn_default_parameters['constraints'],
+            spikes_per_second=_apv_defs['spikes_per_second'],
+            label=_apv_defs['label'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
 
             # default params for the neuron model type
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
@@ -72,10 +75,8 @@ class ExternalDeviceLifControl(
             i_offset=default_parameters['i_offset'],
             v_init=initialize_parameters['v_init'],
             isyn_inh=default_parameters['isyn_inh'],
-            isyn_exc=default_parameters['isyn_exc']
-    ):
+            isyn_exc=default_parameters['isyn_exc']):
         """
-
         :param n_neurons: The number of neurons in the population
         :param devices:\
             The AbstractMulticastControllableDevice instances to be controlled\
@@ -87,14 +88,15 @@ class ExternalDeviceLifControl(
             Translator to be used when used for Ethernet communication.  Must\
             be provided if the dev is to be controlled over Ethernet.
         """
+        # pylint: disable=too-many-arguments, too-many-locals
+
+        if not devices:
+            raise ConfigurationException("No devices specified")
 
         # Verify that there are the correct number of neurons
         if n_neurons != len(devices):
             raise ConfigurationException(
                 "The number of neurons must match the number of devices")
-
-        if len(devices) == 0:
-            raise ConfigurationException("No devices specified")
 
         # Create a partition to key map
         self._partition_id_to_key = OrderedDict(
@@ -125,9 +127,8 @@ class ExternalDeviceLifControl(
         if create_edges:
             self._dependent_vertices = devices
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons,
-            binary="external_device_lif_control.aplx",
+        super(ExternalDeviceLifControl, self).__init__(
+            n_neurons=n_neurons, binary="external_device_lif_control.aplx",
             label=label,
             max_atoms_per_core=(
                 ExternalDeviceLifControl._model_based_max_atoms_per_core),
@@ -144,6 +145,7 @@ class ExternalDeviceLifControl(
         return ExternalDeviceLifControl._model_based_max_atoms_per_core
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
+        # pylint: disable=arguments-differ
         key = self._partition_id_to_key[partition.identifier]
         atom = self._partition_id_to_atom[partition.identifier]
         return [(atom, key)]
@@ -151,12 +153,9 @@ class ExternalDeviceLifControl(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        constraints = list()
-        constraints.append(FixedKeyAndMaskConstraint(
-            [BaseKeyAndMask(
-                self._partition_id_to_key[partition.identifier],
-                self._DEFAULT_COMMAND_MASK)]))
-        return constraints
+        return [FixedKeyAndMaskConstraint([BaseKeyAndMask(
+            self._partition_id_to_key[partition.identifier],
+            self._DEFAULT_COMMAND_MASK)])]
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):
