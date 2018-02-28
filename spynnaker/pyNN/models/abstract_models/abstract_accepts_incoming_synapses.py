@@ -46,7 +46,7 @@ class AbstractAcceptsIncomingSynapses(object):
             using_extra_monitor_cores, placements=None, data_receiver=None,
             sender_extra_monitor_core_placement=None,
             extra_monitor_cores_for_router_timeout=None,
-            handle_time_out_configuration=True):
+            handle_time_out_configuration=True, fixed_routes=None):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run
         """
