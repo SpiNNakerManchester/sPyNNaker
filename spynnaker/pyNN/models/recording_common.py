@@ -99,8 +99,6 @@ class RecordingCommon(object):
         """
         self._population._vertex.set_recording("v")
 
-    def _set_spikes_recording(self):
-        """ Sets the parameters etc that are used by the spike recording
     def _set_spikes_recording(self, sampling_interval, indexes=None):
         """ sets the parameters etc that are used by the spikes recording
 
