@@ -35,7 +35,7 @@ class SpikeSourceArray(
     }
 
     # parameters expected by spinnaker
-    none_pynn_default_parameters = {
+    non_pynn_default_parameters = {
         'port': None, 'tag': None, 'ip_address': None, 'board_address': None,
         'max_on_chip_memory_usage_for_spikes_in_bytes': (
             constants.SPIKE_BUFFER_SIZE_BUFFERING_IN),
@@ -48,24 +48,24 @@ class SpikeSourceArray(
     SPIKE_RECORDING_REGION_ID = 0
 
     # Needed to get long names past pep8
-    DEFAULT1 = none_pynn_default_parameters[
+    DEFAULT1 = non_pynn_default_parameters[
         'max_on_chip_memory_usage_for_spikes_in_bytes']
 
     def __init__(
             self, n_neurons,
             spike_times=default_parameters['spike_times'],
-            port=none_pynn_default_parameters['port'],
-            tag=none_pynn_default_parameters['tag'],
-            ip_address=none_pynn_default_parameters['ip_address'],
-            board_address=none_pynn_default_parameters['board_address'],
+            port=non_pynn_default_parameters['port'],
+            tag=non_pynn_default_parameters['tag'],
+            ip_address=non_pynn_default_parameters['ip_address'],
+            board_address=non_pynn_default_parameters['board_address'],
             max_on_chip_memory_usage_for_spikes_in_bytes=DEFAULT1,
-            space_before_notification=none_pynn_default_parameters[
+            space_before_notification=non_pynn_default_parameters[
                 'space_before_notification'],
-            constraints=none_pynn_default_parameters['constraints'],
-            label=none_pynn_default_parameters['label'],
-            spike_recorder_buffer_size=none_pynn_default_parameters[
+            constraints=non_pynn_default_parameters['constraints'],
+            label=non_pynn_default_parameters['label'],
+            spike_recorder_buffer_size=non_pynn_default_parameters[
                 'spike_recorder_buffer_size'],
-            buffer_size_before_receive=none_pynn_default_parameters[
+            buffer_size_before_receive=non_pynn_default_parameters[
                 'buffer_size_before_receive']):
         # pylint: disable=too-many-arguments
         self._model_name = "SpikeSourceArray"

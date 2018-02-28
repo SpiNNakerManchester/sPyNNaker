@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AdditionalInputCa2Adaptive
 
-_apv_defs = AbstractPopulationVertex.none_pynn_default_parameters
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
 class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
@@ -26,10 +26,11 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
         'tau_ca2': 50.0, "i_ca2": 0.0, "i_alpha": 0.1, 'isyn_exc': 0.0,
         'isyn_inh': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
-            self, n_neurons, spikes_per_second=_apv_defs['spikes_per_second'],
+            self, n_neurons,
+            spikes_per_second=_apv_defs['spikes_per_second'],
             ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
             incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
             constraints=_apv_defs['constraints'],
@@ -45,7 +46,7 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
             tau_ca2=default_parameters["tau_ca2"],
             i_ca2=default_parameters["i_ca2"],
             i_alpha=default_parameters["i_alpha"],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
         # pylint: disable=too-many-arguments, too-many-locals

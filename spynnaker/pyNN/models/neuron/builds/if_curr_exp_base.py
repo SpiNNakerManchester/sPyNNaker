@@ -7,7 +7,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
-_apv_defs = AbstractPopulationVertex.none_pynn_default_parameters
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
 class IFCurrExpBase(AbstractPopulationVertex):
@@ -22,15 +22,15 @@ class IFCurrExpBase(AbstractPopulationVertex):
         'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
         'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
-            self, n_neurons, spikes_per_second=_apv_defs['spikes_per_second'],
+            self, n_neurons,
+            spikes_per_second=_apv_defs['spikes_per_second'],
             ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
             incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
             constraints=_apv_defs['constraints'],
             label=_apv_defs['label'],
-
             tau_m=default_parameters['tau_m'],
             cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -40,7 +40,7 @@ class IFCurrExpBase(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
         # pylint: disable=too-many-arguments, too-many-locals

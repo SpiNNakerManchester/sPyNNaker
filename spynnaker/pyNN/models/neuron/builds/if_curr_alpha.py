@@ -30,13 +30,13 @@ class IFCurrAlpha(AbstractPopulationVertex):
         'i_offset': 0}
 
     non_pynn_default_parameters = {
-        # Common parameters
-        'v_init': None,
         # Internal parameters
         'exc_response': 0,
         'exc_exp_response': 0,
         'inh_response': 0,
         'inh_exp_response': 0}
+
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
@@ -53,7 +53,7 @@ class IFCurrAlpha(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
-            v_init=non_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,

@@ -5,7 +5,7 @@ from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
     import get_pushbot_wifi_connection
 
-_abstract_defaults = AbstractPopulationVertex.none_pynn_default_parameters
+_abstract_defaults = AbstractPopulationVertex.non_pynn_default_parameters
 _extern_defaults = ExternalDeviceLifControl.default_parameters
 
 
@@ -15,7 +15,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     """
     __slots__ = []
 
-    non_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, protocol, devices, pushbot_ip_address,
@@ -36,7 +36,7 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
             tau_syn_I=_extern_defaults['tau_syn_I'],
             tau_refrac=_extern_defaults['tau_refrac'],
             i_offset=_extern_defaults['i_offset'],
-            v_init=non_pynn_default_parameters['v_init']):
+            v_init=initialize_parameters['v_init']):
         # pylint: disable=too-many-arguments, too-many-locals
 
         translator = PushBotTranslator(
