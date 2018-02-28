@@ -1,6 +1,5 @@
 import logging
 
-from pacman.model.decorators import overrides
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
@@ -111,7 +110,7 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return get_simulator().machine_time_step
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(

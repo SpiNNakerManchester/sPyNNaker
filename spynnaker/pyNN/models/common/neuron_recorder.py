@@ -68,7 +68,6 @@ class NeuronRecorder(object):
             application_vertex, variable, n_machine_time_steps):
         """ method for reading a uint32 mapped to time and neuron ids from\
             the SpiNNaker machine
-
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
         :param region: the dsg region id used for this data
@@ -86,7 +85,7 @@ class NeuronRecorder(object):
             raise fec_excceptions.ConfigurationException(msg)
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
-                vertices, "Getting {} for {}".format(variable, label))
+            vertices, "Getting {} for {}".format(variable, label))
         sampling_interval = self._sampling_rates[variable]
         expected_rows = int(math.ceil(
             n_machine_time_steps / sampling_interval))
@@ -105,8 +104,10 @@ class NeuronRecorder(object):
                     placement, region)
             record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
+
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
-                n_neurons * self.N_BYTES_PER_VALUE
+            n_neurons * self.N_BYTES_PER_VALUE
+
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
             # Converts bytes to ints and make a matrix
@@ -124,10 +125,10 @@ class NeuronRecorder(object):
                 for i in xrange(0, expected_rows):
                     time = i * sampling_interval
                     # Check if there is data for this timestep
-                    indexes = numpy.where(record[:, 0] == time)
-                    if len(indexes[0]) > 0:
+                    local_indexes = numpy.where(record[:, 0] == time)
+                    if len(local_indexes[0]) > 0:
                         # Set row to data for that timestep
-                        fragment[i] = record[indexes[0][0], 1:]
+                        fragment[i] = record[local_indexes[0][0], 1:]
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)

@@ -109,16 +109,3 @@ class MultiSpikeRecorder(object):
             indices = indices + vertex_slice.lo_atom
             spike_ids.append(indices)
             spike_times.append(times)
-
-        if len(missing_str) > 0:
-            logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
-
-        if len(spike_ids) > 0:
-            spike_ids = numpy.hstack(spike_ids)
-            spike_times = numpy.hstack(spike_times)
-            result = numpy.dstack((spike_ids, spike_times))[0]
-            return result[numpy.lexsort((spike_times, spike_ids))]
-
-        return numpy.zeros((0, 2))
