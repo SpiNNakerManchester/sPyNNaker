@@ -1,13 +1,12 @@
-from pacman.model.decorators import overrides
-
+from spinn_utilities.overrides import overrides
+from spinn_utilities.log import FormatAdapter
+from time import sleep
+import logging
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
 from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
 from spynnaker.pyNN.protocols import munich_io_spinnaker_link_protocol
 
-
-from time import sleep
-import logging
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 def _signed_int(uint_value):
@@ -20,10 +19,12 @@ class PushBotTranslator(AbstractEthernetTranslator):
     """ Translates packets between PushBot Multicast packets and PushBot\
         WiFi Commands
     """
+    __slots__ = [
+        "_protocol",
+        "_pushbot_wifi_connection"]
 
     def __init__(self, protocol, pushbot_wifi_connection):
         """
-
         :param protocol: The instance of the PushBot protocol to get keys from
         :param pushbot_wifi_connection: A WiFi connection to the PushBot
         """
@@ -32,7 +33,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
     @overrides(AbstractEthernetTranslator.translate_control_packet)
     def translate_control_packet(self, multicast_packet):
-
+        # pylint: disable=too-many-statements, too-many-branches
         key = multicast_packet.key
 
         # disable retina
@@ -55,98 +56,98 @@ class PushBotTranslator(AbstractEthernetTranslator):
         # motor 0 leaky velocity command
         elif key == self._protocol.push_bot_motor_0_leaking_towards_zero_key:
             speed = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Motor 0 Leaky Velocity = {}".format(speed))
+            logger.debug("Sending Motor 0 Leaky Velocity = {}", speed)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.motor_0_leaky_velocity(speed))
 
         # motor 0 permanent velocity command
         elif key == self._protocol.push_bot_motor_0_permanent_key:
             speed = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Motor 0 Velocity = {}".format(speed))
+            logger.debug("Sending Motor 0 Velocity = {}", speed)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.motor_0_permanent_velocity(speed))
 
         # motor 1 leaky velocity command
         elif key == self._protocol.push_bot_motor_1_leaking_towards_zero_key:
             speed = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Motor 1 Leaky Velocity = {}".format(speed))
+            logger.debug("Sending Motor 1 Leaky Velocity = {}", speed)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.motor_1_leaky_velocity(speed))
 
         # motor 1 permanent velocity command
         elif key == self._protocol.push_bot_motor_1_permanent_key:
             speed = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Motor 1 Velocity = {}".format(speed))
+            logger.debug("Sending Motor 1 Velocity = {}", speed)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.motor_1_permanent_velocity(speed))
 
         # laser total period command
         elif key == self._protocol.push_bot_laser_config_total_period_key:
             period = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Laser Period = {}".format(period))
+            logger.debug("Sending Laser Period = {}", period)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.laser_total_period(period))
 
         # laser active time
         elif key == self._protocol.push_bot_laser_config_active_time_key:
             time = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Laser Active Time = {}".format(time))
+            logger.debug("Sending Laser Active Time = {}", time)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.laser_active_time(time))
 
         # laser frequency
         elif key == self._protocol.push_bot_laser_set_frequency_key:
             frequency = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Laser Frequency = {}".format(frequency))
+            logger.debug("Sending Laser Frequency = {}", frequency)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.laser_frequency(frequency))
 
         # led total period command
         elif key == self._protocol.push_bot_led_total_period_key:
             period = _signed_int(multicast_packet.payload)
-            logger.debug("Sending LED Period = {}".format(period))
+            logger.debug("Sending LED Period = {}", period)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.led_total_period(period))
 
         # front led active time
         elif key == self._protocol.push_bot_led_front_active_time_key:
             time = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Front LED Active Time = {}".format(time))
+            logger.debug("Sending Front LED Active Time = {}", time)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.led_front_active_time(time))
 
         # back led active time
         elif key == self._protocol.push_bot_led_back_active_time_key:
             time = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Back LED Active Time = {}".format(time))
+            logger.debug("Sending Back LED Active Time = {}", time)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.led_back_active_time(time))
 
         # led frequency
         elif key == self._protocol.push_bot_led_set_frequency_key:
             frequency = _signed_int(multicast_packet.payload)
-            logger.debug("Sending LED Frequency = {}".format(frequency))
+            logger.debug("Sending LED Frequency = {}", frequency)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.led_frequency(frequency))
 
         # speaker total period
         elif key == self._protocol.push_bot_speaker_config_total_period_key:
             period = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Speaker Period = {}".format(period))
+            logger.debug("Sending Speaker Period = {}", period)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.speaker_total_period(period))
 
         # speaker active time
         elif key == self._protocol.push_bot_speaker_config_active_time_key:
             time = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Speaker Active Time = {}".format(time))
+            logger.debug("Sending Speaker Active Time = {}", time)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.speaker_active_time(time))
 
         # speaker frequency
         elif key == self._protocol.push_bot_speaker_set_tone_key:
             frequency = _signed_int(multicast_packet.payload)
-            logger.debug("Sending Speaker Frequency = {}".format(frequency))
+            logger.debug("Sending Speaker Frequency = {}", frequency)
             self._pushbot_wifi_connection.send(
                 MunichIoEthernetProtocol.speaker_frequency(frequency))
 
@@ -170,5 +171,4 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
         # otherwise no idea what command is, so raise warning and ignore
         else:
-            logger.warning(
-                "Unknown Pushbot command: {}".format(multicast_packet))
+            logger.warning("Unknown Pushbot command: {}", multicast_packet)

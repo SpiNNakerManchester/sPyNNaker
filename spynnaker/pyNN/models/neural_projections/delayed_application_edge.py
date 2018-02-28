@@ -1,14 +1,16 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from .delayed_machine_edge import DelayedMachineEdge
 from pacman.model.graphs.application import ApplicationEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
+    __super__ = [
+        "_synapse_information"]
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
-        ApplicationEdge.__init__(
-            self, pre_vertex, post_vertex, label=label)
+        super(DelayedApplicationEdge, self).__init__(
+            pre_vertex, post_vertex, label=label)
         self._synapse_information = [synapse_information]
 
     def add_synapse_information(self, synapse_information):

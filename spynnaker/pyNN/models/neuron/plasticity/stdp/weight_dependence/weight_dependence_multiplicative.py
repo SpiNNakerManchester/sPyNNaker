@@ -5,11 +5,13 @@ from .abstract_weight_dependence import AbstractWeightDependence
 
 
 class WeightDependenceMultiplicative(
-        AbstractWeightDependence, AbstractHasAPlusAMinus):
+        AbstractHasAPlusAMinus, AbstractWeightDependence):
+    __slots__ = [
+        "_w_max",
+        "_w_min"]
 
     def __init__(self, w_min=0.0, w_max=1.0):
-        AbstractWeightDependence.__init__(self)
-        AbstractHasAPlusAMinus.__init__(self)
+        super(WeightDependenceMultiplicative, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
 
@@ -21,7 +23,9 @@ class WeightDependenceMultiplicative(
     def w_max(self):
         return self._w_max
 
+    @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
+        # pylint: disable=protected-access
         if not isinstance(weight_dependence, WeightDependenceMultiplicative):
             return False
         return (
@@ -34,6 +38,7 @@ class WeightDependenceMultiplicative(
     def vertex_executable_suffix(self):
         return "multiplicative"
 
+    @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 1:
@@ -42,6 +47,7 @@ class WeightDependenceMultiplicative(
 
         return (4 * 4) * n_synapse_types
 
+    @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
         if n_weight_terms != 1:

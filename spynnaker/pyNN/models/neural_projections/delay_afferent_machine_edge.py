@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
@@ -8,14 +8,11 @@ logger = logging.getLogger(__name__)
 
 
 class DelayAfferentMachineEdge(
-        MachineEdge, AbstractFilterableEdge,
-        AbstractWeightUpdatable):
+        MachineEdge, AbstractFilterableEdge, AbstractWeightUpdatable):
 
     def __init__(self, pre_vertex, post_vertex, label, weight=1):
-        MachineEdge.__init__(
-            self, pre_vertex, post_vertex, label=label, traffic_weight=weight)
-        AbstractFilterableEdge.__init__(self)
-        AbstractWeightUpdatable.__init__(self)
+        super(DelayAfferentMachineEdge, self).__init__(
+            pre_vertex, post_vertex, label=label, traffic_weight=weight)
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):

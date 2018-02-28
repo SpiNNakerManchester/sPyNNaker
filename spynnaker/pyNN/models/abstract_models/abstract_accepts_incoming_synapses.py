@@ -1,14 +1,14 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractproperty
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import abstractproperty, abstractmethod
 
 
 @add_metaclass(AbstractBase)
 class AbstractAcceptsIncomingSynapses(object):
     """ Indicates an object that can be a post-vertex in a PyNN projection
     """
+    __slots__ = ()
 
     @abstractproperty
     def synapse_type(self):
@@ -47,6 +47,7 @@ class AbstractAcceptsIncomingSynapses(object):
             sender_extra_monitor_core_placement=None,
             extra_monitor_cores_for_router_timeout=None,
             handle_time_out_configuration=True):
+        # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run
         """
         pass

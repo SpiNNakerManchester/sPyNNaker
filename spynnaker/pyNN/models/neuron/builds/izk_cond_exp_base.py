@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 _IZK_THRESHOLD = 30.0
+_apv_defs = AbstractPopulationVertex.none_pynn_default_parameters
 
 
 class IzkCondExpBase(AbstractPopulationVertex):
@@ -21,16 +22,11 @@ class IzkCondExpBase(AbstractPopulationVertex):
     # noinspection PyPep8Naming
     def __init__(
             self, n_neurons,
-            spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex
-            .none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
-                'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
-                'label'],
+            spikes_per_second=_apv_defs['spikes_per_second'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
+            label=_apv_defs['label'],
             a=default_parameters['a'], b=default_parameters['b'],
             c=default_parameters['c'], d=default_parameters['d'],
             i_offset=default_parameters['i_offset'],
@@ -42,7 +38,7 @@ class IzkCondExpBase(AbstractPopulationVertex):
             e_rev_I=default_parameters['e_rev_I'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelIzh(
             n_neurons, a, b, c, d, v_init, u_init, i_offset)
         synapse_type = SynapseTypeExponential(
@@ -50,8 +46,8 @@ class IzkCondExpBase(AbstractPopulationVertex):
         input_type = InputTypeConductance(n_neurons, e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(n_neurons, _IZK_THRESHOLD)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IZK_cond_exp.aplx", label=label,
+        super(IzkCondExpBase, self).__init__(
+            n_neurons=n_neurons, binary="IZK_cond_exp.aplx", label=label,
             max_atoms_per_core=IzkCondExpBase._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
