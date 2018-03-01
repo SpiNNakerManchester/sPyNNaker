@@ -224,9 +224,9 @@ class MultapseConnector(AbstractConnector):
                             post_vertex_slice.as_slice].T.reshape((-1, 2))
 
         # Deal with case where self-connections aren't allowed
-        if not self._allow_self_connections and (
-            self._pre_population is self._post_population):
-            pairs = pairs[pairs[:,0] != pairs[:,1]]
+        if not self._allow_self_connections and (self._pre_population is
+                                                 self._post_population):
+            pairs = pairs[pairs[:, 0] != pairs[:, 1]]
 
         # Now do the actual random choice from the available connections
         try:
@@ -240,8 +240,8 @@ class MultapseConnector(AbstractConnector):
                 "reduce the value specified in the connector")
 
         # Set up synaptic block
-        block["source"] = pairs[chosen,0]
-        block["target"] = pairs[chosen,1]
+        block["source"] = pairs[chosen, 0]
+        block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
