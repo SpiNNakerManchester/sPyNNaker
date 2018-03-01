@@ -166,7 +166,7 @@ def set_slice_values(arrays, values, vertex_slice):
 
 
 def read_in_data_from_file(
-        file_path, min_atom, max_atom, min_time, max_time):
+        file_path, min_atom, max_atom, min_time, max_time, extra=False):
     """ Read in a file of data values where the values are in a format of:
         <time>\t<atom id>\t<data value>
 
@@ -185,7 +185,10 @@ def read_in_data_from_file(
         for line in f.readlines():
             if line.startswith('#'):
                 continue
-            time, neuron_id, data_value = line.split("\t")
+            if extra:
+                time, neuron_id, data_value, extra = line.split("\t")
+            else:
+                time, neuron_id, data_value = line.split("\t")
             time = float(evaluator.eval(time))
             neuron_id = int(evaluator.eval(neuron_id))
             data_value = float(evaluator.eval(data_value))
