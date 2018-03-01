@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 
 # pacman imports
 from pacman.model.constraints.key_allocator_constraints \
@@ -14,14 +15,6 @@ from spinn_front_end_common.utilities import helpful_functions
 
 # dsg imports
 from data_specification.enums import DataType
-
-
-# general imports
-import logging
-import math
-
-
-logger = logging.getLogger(__name__)
 
 # Fixed row sizes allowed in this table
 ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]
@@ -60,10 +53,6 @@ def get_mpt_sb_mem_addrs_from_coords(x, y, p):
 
 
 class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
-
-    def __init__(self):
-        AbstractMasterPopTableFactory.__init__(self)
-
     def initialise_table(self, spec, master_population_table_region):
         # Zero all entries in the Master Population Table so that all unused
         # entries are assumed empty:
@@ -78,17 +67,17 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         for entry in ROW_LEN_TABLE_ENTRIES:
             spec.write_value(data=entry)
 
+    @overrides(
+        AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
+        # pylint: disable=too-many-arguments
+
         # locate address of the synaptic block
-        pre_x = get_x_from_key(incoming_key)
-        pre_y = get_y_from_key(incoming_key)
-        pre_p = get_p_from_key(incoming_key)
-        table_slot_addr = self._get_table_address_from_coords(
-            pre_x, pre_y, pre_p)
-        master_table_pop_entry_address = (table_slot_addr +
-                                          master_pop_base_mem_address)
+        table_slot_addr = self._get_table_address_from_key(incoming_key)
+        master_table_pop_entry_address = (
+            table_slot_addr + master_pop_base_mem_address)
 
         # read in entry
         master_pop_entry = helpful_functions.read_data(
@@ -104,6 +93,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         max_row_length = ROW_LEN_TABLE_ENTRIES[max_row_length_index]
         return [(max_row_length, synaptic_block_base_address_offset)]
 
+    @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         # 2 bytes per entry + row length table
         return (2 * MASTER_POPULATION_ENTRIES) + ROW_LEN_TABLE_SIZE
@@ -113,52 +103,54 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         if row_length > ROW_LEN_TABLE_ENTRIES[-1]:
             raise SynapseRowTooBigException(
                 ROW_LEN_TABLE_ENTRIES[-1],
-                "Max row length too long -"
-                " wanted length %d, but max length permitted is %d."
-                % (row_length, ROW_LEN_TABLE_ENTRIES[-1])
-            )
+                "Max row length too long; wanted length {}, but max length "
+                "permitted is {}.".format(
+                    row_length, ROW_LEN_TABLE_ENTRIES[-1]))
 
         # Search up the list until we find one entry big enough:
-        for i in range(len(ROW_LEN_TABLE_ENTRIES)):
-            if row_length <= ROW_LEN_TABLE_ENTRIES[i]:
-
+        for length in ROW_LEN_TABLE_ENTRIES:
+            if row_length <= length:
                 # This row length is big enough. Choose it and exit:
-                return ROW_LEN_TABLE_ENTRIES[i]
+                return length
         raise Exception("Should not get here!")
 
     def _get_row_length_table_index(self, row_length):
-        for i in range(len(ROW_LEN_TABLE_ENTRIES)):
-            if row_length <= ROW_LEN_TABLE_ENTRIES[i]:
+        for i, length in enumerate(ROW_LEN_TABLE_ENTRIES):
+            if row_length <= length:
                 return i
         raise Exception("Should not get here!")
 
     def get_next_allowed_address(self, next_address):
         # Addresses should be 1K offset
         if (next_address & 0x3FF) != 0:
-
             return (next_address & 0xFFFFFC00) + 0x400
         return next_address
+
+    def _get_table_address_from_key(self, key):
+        x = get_x_from_key(key)
+        y = get_y_from_key(key)
+        p = get_p_from_key(key)
+        return self._get_table_address_from_coords(x, y, p)
 
     def _get_table_address_from_coords(self, x, y, p):
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """
-        Writes an entry in the Master Population Table for the newly
-        created synaptic block.
+        """ Writes an entry in the Master Population Table for the newly\
+            created synaptic block.
 
         An entry in the table is a 16-bit value, with the following structure:
-        * Bits [2:0]  Row length information. This value (from 0->7)\
-            indicates the maximum number of synapses in this\
-            block. It is translated in the row length translation\
-            table by the executing code each time the table is\
-            accessed, to calculate offsets.
-        * Bits [15:3] Address within the synaptic matrix region of the\
-            start of the block. This is 1K bytes aligned, so\
-            the true value is found by shifting left by 7 bits\
-            then adding the start address of the memory region.
+        * Bits [2:0]  Row length information. This value (from 0->7) indicates\
+            the maximum number of synapses in this block. It is translated in\
+            the row length translation table by the executing code each time\
+            the table is accessed, to calculate offsets.
+        * Bits [15:3] Address within the synaptic matrix region of the start\
+            of the block. This is 1K bytes aligned, so the true value is found\
+            by shifting left by 7 bits then adding the start address of the\
+            memory region.
 
         :param spec:
         :param block_start_addr:
@@ -166,19 +158,21 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         :param key_and_mask:
         :param master_pop_table_region:
         :param is_single: True if this is a single synapse, False otherwise
-         """
-        # Which core has this projection arrived from?
+        """
+        # pylint: disable=too-many-arguments, arguments-differ
+
+        # Where has this projection arrived from?
         key = key_and_mask.key
-        x = get_x_from_key(key)
-        y = get_y_from_key(key)
-        p = get_p_from_key(key)
 
         # Calculate the index into the master pynn_population.py table for
         # a projection from the given core:
-        table_slot_addr = self._get_table_address_from_coords(x, y, p)
+        table_slot_addr = self._get_table_address_from_key(key)
         row_index = self._get_row_length_table_index(row_length)
 
         # What is the write address in the table for this index?
+        x = get_x_from_key(key)
+        y = get_y_from_key(key)
+        p = get_p_from_key(key)
         spec.comment("\nUpdate entry in master pynn_population.py table for "
                      "incoming connection from {}, {}, {}:\n".format(x, y, p))
 
@@ -187,7 +181,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         if (block_start_addr & 0x3FF) != 0:
             raise SynapticBlockGenerationException(
                 "Synaptic Block start address is not aligned to a 1K boundary")
-        assert(block_start_addr < math.pow(2, 32))
+        assert(block_start_addr < 2 ** 32)
 
         # moves by 7 to tack on at the end the row_length information
         # which resides in the last 3 bits
@@ -201,19 +195,21 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         spec.set_write_pointer(address=table_slot_addr)
         spec.write_value(data=new_entry, data_type=DataType.INT16)
 
+    @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
         pass
 
+    @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
         # This allocator requires each edge to have keys of the form
         # |8 bits >= 0 and <= 7|8 bits >= 0 and <= 7|5 bits >= 0 and <= 17|
         # |11 remaining bits|
         # This is because this table was designed for a 48-chip board
-        constraints = list()
-        fields = list()
-        fields.append(Field(0, 7, 0xFF000000))
-        fields.append(Field(0, 7, 0x00FF0000))
-        fields.append(Field(0, 17, 0x0000F800))
-        constraints.append(FixedMaskConstraint(0xFFFFF800))
-        constraints.append(FixedKeyFieldConstraint(fields))
+        fields = [
+            Field(0, 7, 0xFF000000),
+            Field(0, 7, 0x00FF0000),
+            Field(0, 17, 0x0000F800)]
+        constraints = [
+            FixedMaskConstraint(0xFFFFF800),
+            FixedKeyFieldConstraint(fields)]
         return constraints

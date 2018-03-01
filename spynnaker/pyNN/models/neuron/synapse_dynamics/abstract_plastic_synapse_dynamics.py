@@ -7,9 +7,9 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
+    """ Synapses which change over time
     """
-    AbstractPlasticSynapseDynamics : synapses which change over time
-    """
+    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 
@@ -25,13 +25,15 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         """ Get the fixed-plastic data, and plastic-plastic data for each row,\
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
-            Data is returned as an array made up of an array of 32-bit words\
-            for each row, for each of the fixed-plastic and plastic-plastic\
-            data regions.  The row into which connection should go is given by\
-            connection_row_indices, and the total number of rows is given by\
-            n_rows.
-            Lengths are returned as an array made up of an integer for each\
-            row, for each of the fixed-plastic and plastic-plastic regions.
+
+        Data is returned as an array made up of an array of 32-bit words for\
+        each row, for each of the fixed-plastic and plastic-plastic data\
+        regions.  The row into which connection should go is given by\
+        connection_row_indices, and the total number of rows is given by\
+        n_rows.
+
+        Lengths are returned as an array made up of an integer for each row,\
+        for each of the fixed-plastic and plastic-plastic regions.
         """
 
     @abstractmethod
@@ -46,7 +48,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
 
     @abstractmethod
     def get_n_synapses_in_rows(self, pp_size, fp_size):
-        """ Get the number of synapses in each of the rows with plastic sizes
+        """ Get the number of synapses in each of the rows with plastic sizes\
             pp_size and fp_size
         """
 

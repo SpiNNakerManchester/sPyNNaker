@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance \
@@ -13,14 +13,16 @@ from pacman.model.graphs.machine import MachineEdge
 class ProjectionMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
+    __slots__ = [
+        "_synapse_information"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
             label=None, traffic_weight=1):
-        MachineEdge.__init__(self, pre_vertex, post_vertex, label=label,
-                             traffic_weight=traffic_weight)
-        AbstractFilterableEdge.__init__(self)
-        AbstractWeightUpdatable.__init__(self)
+        # pylint: disable=too-many-arguments
+        super(ProjectionMachineEdge, self).__init__(
+            pre_vertex, post_vertex, label=label,
+            traffic_weight=traffic_weight)
 
         self._synapse_information = synapse_information
 
