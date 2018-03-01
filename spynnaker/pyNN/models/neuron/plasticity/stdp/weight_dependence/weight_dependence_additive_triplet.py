@@ -1,13 +1,16 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
-    import AbstractHasAPlusAMinus
-from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
-    import AbstractWeightDependence
+from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
+from .abstract_weight_dependence import AbstractWeightDependence
 
 
 class WeightDependenceAdditiveTriplet(
-        AbstractWeightDependence, AbstractHasAPlusAMinus):
+        AbstractHasAPlusAMinus, AbstractWeightDependence):
+    __slots__ = [
+        "_a3_minus",
+        "_a3_plus",
+        "_w_max",
+        "_w_min"]
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
                           'A3_minus': 0.01}
@@ -18,9 +21,7 @@ class WeightDependenceAdditiveTriplet(
             w_max=default_parameters['w_max'],
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
-
-        AbstractWeightDependence.__init__(self)
-        AbstractHasAPlusAMinus.__init__(self)
+        super(WeightDependenceAdditiveTriplet, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
         self._a3_plus = A3_plus
@@ -42,6 +43,7 @@ class WeightDependenceAdditiveTriplet(
     def A3_minus(self):
         return self._a3_minus
 
+    @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceAdditiveTriplet):
             return False
@@ -57,14 +59,15 @@ class WeightDependenceAdditiveTriplet(
     def vertex_executable_suffix(self):
         return "additive"
 
+    @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
-        if n_weight_terms == 2:
-            return (6 * 4) * n_synapse_types
-        else:
+        if n_weight_terms != 2:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
+        return (6 * 4) * n_synapse_types
 
+    @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
 

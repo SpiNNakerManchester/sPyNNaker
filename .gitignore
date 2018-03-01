@@ -1,7 +1,7 @@
 /.project
 /.pydevproject
 /.idea
-/.settings
+.settings/
 /doc/build
 *.pyc
 *reports/
@@ -11,7 +11,5 @@
 *egg-info/
 MANIFEST
 /.cache/
-
-spynnaker/pyNN/models/.DS_Store
-spynnaker/pyNN/models/neural_projections/.DS_Store
-neural_modelling/.settings/language.settings.xml
+.DS_Store
+.coverage

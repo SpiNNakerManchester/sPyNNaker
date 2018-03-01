@@ -1,6 +1,6 @@
+from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_front_end_common.utilities import globals_variables
-from pacman.model.decorators.overrides import overrides
 
 
 class SpynakkerRangedList(RangedList):

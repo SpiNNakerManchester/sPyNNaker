@@ -18,11 +18,36 @@ logger = logging.getLogger(__file__)
 
 
 class PyNNPopulationCommon(object):
+    __slots__ = [
+        "_all_ids",
+        "_change_requires_mapping",
+        "_delay_vertex",
+        "_first_id",
+        "_has_read_neuron_parameters_this_run",
+        "_last_id",
+        "_positions",
+        "_record_gsyn_file",
+        "_record_spike_file",
+        "_record_v_file",
+        "_size",
+        "_spinnaker_control",
+        "_structure",
+        "_vertex",
+        "_vertex_changeable_after_run",
+        "_vertex_contains_units",
+        "_vertex_has_set_max_atoms_per_core",
+        "_vertex_population_initializable",
+        "_vertex_population_settable",
+        "_vertex_read_parameters_before_set"]
+
     def __init__(
             self, spinnaker_control, size, vertex, structure, initial_values):
+        # pylint: disable=too-many-arguments
         if size is not None and size <= 0:
             raise ConfigurationException(
                 "A population cannot have a negative or zero size.")
+
+        self._vertex = vertex
 
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
@@ -30,7 +55,6 @@ class PyNNPopulationCommon(object):
             for name, value in initial_values.iteritems():
                 self._vertex.set_value(name, value)
 
-        self._vertex = vertex
         # Introspect properties of the vertex
         self._vertex_population_settable = \
             isinstance(self._vertex, AbstractPopulationSettable)
@@ -134,10 +158,10 @@ class PyNNPopulationCommon(object):
             parameter_name))
 
     def id_to_index(self, id):  # @ReservedAssignment
+        """ Given the ID(s) of cell(s) in the Population, return its (their)\
+            index (order in the Population).
         """
-        Given the ID(s) of cell(s) in the Population, return its (their) index
-        (order in the Population).
-        """
+        # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
             if not self._first_id <= id <= self._last_id:
                 raise ValueError(
@@ -215,15 +239,16 @@ class PyNNPopulationCommon(object):
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a
-        string giving the parameter name, in which case value is the parameter
-        value. value can be a numeric value, or list of such
+        param can be a dict, in which case value should not be supplied, or a\
+        string giving the parameter name, in which case value is the parameter\
+        value. value can be a numeric value, or list of such\
         (e.g. for setting spike times)::
 
           p.set("tau_m", 20.0).
           p.set({'tau_m':20, 'v_rest':-65})
 
         :param parameter: the parameter to set
+        :type parameter: str or dict
         :param value: the value of the parameter to set.
         """
         if not self._vertex_population_settable:
@@ -236,22 +261,22 @@ class PyNNPopulationCommon(object):
                 "This population does not support changes to settings after"
                 " run has been called")
 
-        if type(parameter) is str:
+        if isinstance(parameter, str):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
 
-        if type(parameter) is not dict:
+        if not isinstance(parameter, dict):
             raise Exception(
                 "Parameter must either be the name of a single parameter to"
                 " set, or a dict of parameter: value items to set")
 
         # set new parameters
         self._read_parameters_before_set()
-        for (key, value) in parameter.iteritems():
-            self._vertex.set_value(key, value)
+        for _key, _value in parameter.iteritems():
+            self._vertex.set_value(_key, _value)
 
     def _read_parameters_before_set(self):
         """ Reads parameters from the machine before "set" completes
@@ -338,7 +363,7 @@ class PyNNPopulationCommon(object):
         """ Add a placement constraint - for backwards compatibility
 
         :param constraint_dict: A dictionary containing "x", "y" and\
-                    optionally "p" as keys, and ints as values
+            optionally "p" as keys, and ints as values
         :type constraint_dict: dict of str->int
         """
         globals_variables.get_simulator().verify_not_running()
@@ -402,8 +427,8 @@ class PyNNPopulationCommon(object):
             cell_label = model_label
         elif model_label is not None and pop_level_label is not None:
             cell_label = pop_level_label
-            logger.warn("Don't know which label to use. Will use pop "
-                        "label and carry on")
+            logger.warning("Don't know which label to use. Will use pop "
+                           "label and carry on")
         return cell_label
 
     def _get_variable_unit(self, parameter_name):
@@ -428,12 +453,10 @@ class PyNNPopulationCommon(object):
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the popluation with label {} "
-                           "rounded from {} to {} "
-                           "Please use int values for size"
-                           "".format(label, size, temp))
+            logger.warning("Size of the population with label %s rounded "
+                           "from %s to %d. Please use int values for size",
+                           label, size, temp)
             return temp
-        else:
-            raise ConfigurationException(
-                "Size of a population with label {} must be an int,"
-                " received {}".format(label, size))
+        raise ConfigurationException(
+            "Size of a population with label {} must be an int,"
+            " received {}".format(label, size))
