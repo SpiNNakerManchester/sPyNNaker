@@ -314,7 +314,8 @@ class PyNNProjectionCommon(object):
                 ctl.routing_infos, self._synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
                 ctl.placements, receiver, sender_monitor_place,
-                extra_monitors, handle_time_out_configuration)
+                extra_monitors, handle_time_out_configuration,
+                ctl.fixed_routes)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()
