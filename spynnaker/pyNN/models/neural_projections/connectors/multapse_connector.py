@@ -2,6 +2,7 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spinn_utilities.abstract_base import abstractmethod
 
 import numpy.random
 
@@ -36,6 +37,11 @@ class MultapseConnector(AbstractConnector):
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
+
+    @abstractmethod
+    def get_rng_next(self, num_synapses, prob_connect):
+        """ Get the required rngs
+        """
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
