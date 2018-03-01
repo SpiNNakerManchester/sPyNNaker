@@ -204,53 +204,44 @@ class MultapseConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
+        # update the synapses as required, and get the number of connections
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
         if n_connections == 0:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+
+        # get connection slice
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
+
+        # set up array for synaptic block
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        source_neuron_ids = []
-        target_neuron_ids = []
+        # Create pairs between the pre- and post-vertex slices
+        pairs = numpy.mgrid[pre_vertex_slice.as_slice,
+                            post_vertex_slice.as_slice].T.reshape((-1, 2))
 
+        # Deal with case where self-connections aren't allowed
+        if not self._allow_self_connections and (
+            self._pre_population is self._post_population):
+            pairs = pairs[pairs[:,0] != pairs[:,1]]
+
+        # Now do the actual random choice from the available connections
         try:
-            source_neuron_ids = numpy.random.choice(
-                numpy.arange(
-                    pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
-                size=n_connections, replace=self._with_replacement)
+            chosen = numpy.random.choice(
+                pairs.shape[0], size=n_connections,
+                replace=self._with_replacement)
         except Exception:
             raise SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
-                "for sampling without replacement in the pre-population: "
+                "for sampling without replacement; "
                 "reduce the value specified in the connector")
 
-        # Sort the source neuron ids
-        source_neuron_ids.sort()
-
-        if self._allow_self_connections:
-            try:
-                target_neuron_ids = numpy.random.choice(
-                    numpy.arange(post_vertex_slice.lo_atom,
-                                 post_vertex_slice.hi_atom + 1),
-                    size=n_connections, replace=self._with_replacement)
-            except Exception:
-                raise SpynnakerException(
-                    "MultapseConnector: The number of connections is too "
-                    "large for sampling without replacement in the post- ",
-                    "population: reduce the value specified in the connector")
-        else:
-            for source in source_neuron_ids:
-                target_neuron_ids.append(numpy.random.choice(numpy.concatenate(
-                    [numpy.arange(0, source),
-                     numpy.arange(source + 1, post_vertex_slice.hi_atom + 1)]),
-                    size=1, replace=self._with_replacement))
-
-        block["source"] = source_neuron_ids
-        block["target"] = target_neuron_ids
+        # Set up synaptic block
+        block["source"] = pairs[chosen,0]
+        block["target"] = pairs[chosen,1]
         block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
