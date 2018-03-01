@@ -229,7 +229,7 @@ class MultapseConnector(AbstractConnector):
             for source in source_neuron_ids:
                 target_neuron_ids.append(numpy.random.choice(numpy.concatenate(
                     [numpy.arange(0, source),
-                     numpy.arange(source + 1, post_vertex_slice.hi_atom +1)]),
+                     numpy.arange(source + 1, post_vertex_slice.hi_atom + 1)]),
                     size=1, replace=self._with_replacement))
 
         block["source"] = source_neuron_ids
