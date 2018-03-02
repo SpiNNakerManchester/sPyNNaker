@@ -461,13 +461,17 @@ void neuron_store_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     log_info("writing parameters");
+
+    // Do not write rates and indexex back.
+    // If you do you need to change python to read them too in:
+    // AbstractReadParametersBeforeSet.read_parameters_from_machine
     //log_info("writing gobal recordi parameters");
-    memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
-    next += sizeof(global_record_params_t) / 4;
+    //memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
+    //next += sizeof(global_record_params_t) / 4;
 
     //log_info("writing index local parameters");
-    memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
-    next += (n_neurons * sizeof(indexes_t)) / 4;
+    //memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
+    //next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //log_info("writing neuron global parameters");
     memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
