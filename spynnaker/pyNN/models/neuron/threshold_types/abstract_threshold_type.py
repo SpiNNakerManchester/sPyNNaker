@@ -24,7 +24,7 @@ class AbstractThresholdType(object):
 
         :return: An array of parameters
         :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+            :py:class:`spynnaker.pyNN.models.neural_properties.NeuronParameter`
         """
 
     @abstractmethod
@@ -61,7 +61,7 @@ class AbstractThresholdType(object):
         return self.get_n_threshold_parameters() * 4
 
     def set_threshold_parameters(self, parameters, vertex_slice):
-        """ Sets the threshold type parameters.  Override if there are any\
+        """ Sets the threshold type parameters. Override if there are any\
             variables that change.
 
         :param parameters:\

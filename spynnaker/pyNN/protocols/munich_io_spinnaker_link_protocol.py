@@ -803,8 +803,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         """ set the retina transmission key
 
         :param retina_key: the new key for the retina
-        :param retina_payload: the new payload for the set retina key\
-            command packet
+        :param retina_payload: \
+            the new payload for the set retina key command packet
         :type retina_payload: enum or None
         :param time: when to transmit this packet
         :return: the command to send
