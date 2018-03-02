@@ -160,8 +160,7 @@ void _reset_record_counter(){
         spike_increment = 0;
         // Index is not rate so does not record. Nor one so we never reset
         spike_index = 2;
-    }
-    else {
+    } else {
         // Increase one each call so z_index gets to v_rate
         spike_increment = 1;
         // Using rate base here first zero time is record
@@ -175,8 +174,7 @@ void _reset_record_counter(){
         // Index is not rate so does not record
         v_index = 1;
 
-    }
-    else {
+    } else {
         // Increase one each call so z_index gets to v_rate
         v_increment = 1;
         // Using rate base here first zero time is record
@@ -186,16 +184,14 @@ void _reset_record_counter(){
     if (global_record_params->exc_rate == 0){
         exc_increment = 0;
         exc_index = 1;
-    }
-    else {
+    } else {
         exc_increment = 1;
         exc_index = global_record_params->exc_rate;
     }
     if (global_record_params->inh_rate == 0){
         inh_increment = 0;
         inh_index = 1;
-    }
-    else {
+    } else {
         inh_increment = 1;
         inh_index = global_record_params->inh_rate;
     }
@@ -296,8 +292,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     // output if this model is expecting to transmit
     if (!use_key){
         log_info("\tThis model is not expecting to transmit as it has no key");
-    }
-    else{
+    } else{
         log_info("\tThis model is expected to transmit with key = %08x", key);
     }
 
@@ -401,8 +396,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     size_t spike_size;
     if (global_record_params->spike_recording == n_neurons){
         spike_size = n_neurons;
-    }
-    else {
+    } else {
         spike_size = global_record_params->spike_recording + 1;
     }
     if (!out_spikes_initialize(spike_size)) {
@@ -413,8 +407,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     if (global_record_params->v_recording == n_neurons){
         voltages_size = sizeof(uint32_t) + sizeof(state_t) * n_neurons;
         voltages = (timed_state_t *) spin1_malloc(voltages_size);
-    }
-    else {
+    } else {
         voltages_size = sizeof(uint32_t) +
             sizeof(state_t) * global_record_params->v_recording;
         // one extra for overflow
@@ -426,8 +419,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
         inputs_excitatory = (timed_input_t *) spin1_malloc(exc_size);
-    }
-    else {
+    } else {
         exc_size = sizeof(uint32_t) +
             sizeof(input_struct_t) * global_record_params->exc_recording;
         // one extra for overflow
@@ -439,8 +431,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     if (global_record_params->inh_recording == n_neurons){
         inh_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
         inputs_inhibitory = (timed_input_t *) spin1_malloc(exc_size);
-    }
-    else {
+    } else {
         inh_size = sizeof(uint32_t) +
             sizeof(input_struct_t) * global_record_params->inh_recording;
         // one extra for overflow
