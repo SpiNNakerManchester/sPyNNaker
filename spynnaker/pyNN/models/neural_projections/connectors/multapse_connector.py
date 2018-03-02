@@ -1,6 +1,8 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.exceptions import SpynnakerException
+from spinn_utilities.abstract_base import abstractmethod
 
 import numpy.random
 
@@ -13,19 +15,33 @@ class MultapseConnector(AbstractConnector):
     is created by selecting at random from the source and target populations\
     with replacement. Uniform selection probability is assumed.
     """
-    def __init__(self, num_synapses, safe=True, verbose=False):
+    def __init__(self, num_synapses, allow_self_connections=True,
+                 with_replacement=True, safe=True, verbose=False):
         """
         Creates a new connector.
 
         :param num_synapses:
             This is the total number of synapses in the connection.
         :type num_synapses: int
+        :param allow_self_connections:
+            Allow a neuron to connect to itself or not.
+        :type allow_self_connections: bool
+        :param with_replacement:
+            When selecting, allow a neuron to be re-selected or not.
+        :type with_replacement: bool
         """
         super(MultapseConnector, self).__init__(safe, verbose)
         self._num_synapses = num_synapses
+        self._allow_self_connections = allow_self_connections
+        self._with_replacement = with_replacement
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
+
+    @abstractmethod
+    def get_rng_next(self, num_synapses, prob_connect):
+        """ Get the required rngs
+        """
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
@@ -69,9 +85,8 @@ class MultapseConnector(AbstractConnector):
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
                 for pre in pre_slices for post in post_slices]
-            self._synapses_per_edge = self._rng.next(
-                1, distribution="multinomial", parameters=[
-                    self._num_synapses, prob_connect])
+            self._synapses_per_edge = self.get_rng_next(
+                self._num_synapses, prob_connect)
             self._pre_slices = pre_slices
             self._post_slices = post_slices
 
@@ -195,23 +210,44 @@ class MultapseConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
+        # update the synapses as required, and get the number of connections
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
         if n_connections == 0:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+
+        # get connection slice
         connection_slice = self._get_connection_slice(
             pre_slice_index, post_slice_index)
-        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = numpy.random.choice(
-            numpy.arange(
-                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1),
-            size=n_connections, replace=True)
-        block["source"].sort()
-        block["target"] = numpy.random.choice(
-            numpy.arange(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
-            size=n_connections, replace=True)
+
+        # set up array for synaptic block
+        block = numpy.zeros(
+            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+
+        # Create pairs between the pre- and post-vertex slices
+        pairs = numpy.mgrid[pre_vertex_slice.as_slice,
+                            post_vertex_slice.as_slice].T.reshape((-1, 2))
+
+        # Deal with case where self-connections aren't allowed
+        if not self._allow_self_connections and (self._pre_population is
+                                                 self._post_population):
+            pairs = pairs[pairs[:, 0] != pairs[:, 1]]
+
+        # Now do the actual random choice from the available connections
+        try:
+            chosen = numpy.random.choice(
+                pairs.shape[0], size=n_connections,
+                replace=self._with_replacement)
+        except Exception:
+            raise SpynnakerException(
+                "MultapseConnector: The number of connections is too large "
+                "for sampling without replacement; "
+                "reduce the value specified in the connector")
+
+        # Set up synaptic block
+        block["source"] = pairs[chosen, 0]
+        block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
             self._weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
