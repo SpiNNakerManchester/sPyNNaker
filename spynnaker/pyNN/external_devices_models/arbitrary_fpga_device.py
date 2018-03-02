@@ -11,6 +11,7 @@ from spinn_front_end_common.abstract_models.impl\
 @add_metaclass(AbstractBase)
 class ArbitraryFPGADevice(
         ApplicationFPGAVertex, ProvidesKeyToAtomMappingImpl):
+    __slots__ = []
 
     default_parameters = {
         'board_address': None, 'label': "ArbitraryFPGADevice"}
@@ -19,6 +20,6 @@ class ArbitraryFPGADevice(
             self, n_neurons, fpga_link_id, fpga_id,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
-        ApplicationFPGAVertex.__init__(
-            self, n_neurons, fpga_id, fpga_link_id, board_address, label)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
+        # pylint: disable=too-many-arguments
+        super(ArbitraryFPGADevice, self).__init__(
+            n_neurons, fpga_id, fpga_link_id, board_address, label)

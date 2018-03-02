@@ -17,10 +17,12 @@ class _CONDUCTANTCE_TYPES(Enum):
     E_REV_E = (1, DataType.S1615)
     E_REV_I = (2, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -31,10 +33,12 @@ class _CONDUCTANTCE_TYPES(Enum):
 class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     """ The conductance input type
     """
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, e_rev_E, e_rev_I):
-        AbstractInputType.__init__(self)
-        AbstractContainsUnits.__init__(self)
         self._units = {
             E_REV_E: "mV",
             E_REV_I: "mV"}

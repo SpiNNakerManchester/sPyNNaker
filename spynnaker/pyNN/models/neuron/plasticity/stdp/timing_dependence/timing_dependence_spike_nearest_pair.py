@@ -1,12 +1,10 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
     import SynapseStructureWeightOnly
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
-    import TimingDependenceSpikePair
+from .abstract_timing_dependence import AbstractTimingDependence
+from .timing_dependence_spike_pair import TimingDependenceSpikePair
 
 import logging
 
@@ -19,13 +17,17 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
+    __slots__ = [
+        "_synapse_structure",
+        "_tau_minus",
+        "_tau_minus_last_entry",
+        "_tau_plus",
+        "_tau_plus_last_entry"]
 
     default_parameters = {'tau_plus': 20.0, 'tau_minus': 20.0}
 
     def __init__(self, tau_plus=default_parameters['tau_plus'],
                  tau_minus=default_parameters['tau_minus']):
-
-        AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 
@@ -43,11 +45,13 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def tau_minus(self):
         return self._tau_minus
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
+        # pylint: disable=protected-access
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
-        return ((self._tau_plus == timing_dependence._tau_plus) and
-                (self._tau_minus == timing_dependence._tau_minus))
+        return (self._tau_plus == timing_dependence._tau_plus and
+                self._tau_minus == timing_dependence._tau_minus)
 
     @property
     def vertex_executable_suffix(self):
@@ -60,6 +64,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         # Neighbours are considered and, a single 16-bit R1 trace
         return 0
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
 
@@ -67,6 +72,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Check timestep is valid
@@ -86,6 +92,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     def synaptic_structure(self):
         return self._synapse_structure
 
+    @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(

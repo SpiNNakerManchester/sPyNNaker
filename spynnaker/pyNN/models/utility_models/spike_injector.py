@@ -1,11 +1,11 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 
 from spinn_front_end_common.abstract_models \
     import AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 from spynnaker.pyNN.models.common \
     import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
@@ -18,6 +18,14 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
+    __slots__ = [
+        "_buffer_size_before_receive",
+        "_receive_port",
+        "_requires_mapping",
+        "_spike_buffer_max_size",
+        "_spike_recorder",
+        "_time_between_requests",
+        "_virtual_key"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -31,8 +39,8 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             spike_buffer_max_size=None, buffer_size_before_receive=None,
             time_between_requests=None, buffer_notification_ip_address=None,
             buffer_notification_port=None):
-
-        config = globals_variables.get_simulator().config
+        # pylint: disable=too-many-arguments
+        config = get_simulator().config
         if buffer_notification_ip_address is None:
             buffer_notification_ip_address = config.get(
                 "Buffers", "receive_buffer_host")
@@ -40,13 +48,11 @@ class SpikeInjector(ReverseIpTagMultiCastSource,
             buffer_notification_port = config.get_int(
                 "Buffers", "receive_buffer_port")
 
-        ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, label=label, receive_port=port,
+        super(SpikeInjector, self).__init__(
+            n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key, reserve_reverse_ip_tag=True,
             buffer_notification_ip_address=buffer_notification_ip_address,
             buffer_notification_port=buffer_notification_port)
-
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
 
         # Set up for recording
         self._spike_recorder = EIEIOSpikeRecorder()

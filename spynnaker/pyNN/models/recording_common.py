@@ -1,8 +1,8 @@
 from spinn_utilities import logger_utils
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
@@ -11,11 +11,18 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from collections import defaultdict
 import numpy
 import logging
+# pylint: disable=protected-access
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RecordingCommon(object):
+    # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
+    # __slots__ = [
+    #     "_indices_to_record",
+    #     "_population",
+    #     "_write_to_files_indicators"]
+
     def __init__(self, population):
         """ object to hold recording behaviour
 
@@ -36,16 +43,16 @@ class RecordingCommon(object):
             lambda: numpy.repeat(False, population.size))
 
     def _record(self, variable, new_ids, sampling_interval, to_file):
-        """ tells the vertex to record data
+        """ Tells the vertex to record data
 
-        :param variable: the variable to record, valued variables to record
-        are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param variable: the variable to record. Supported recordable\
+            variables are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param new_ids:  ids to record
         :param sampling_interval: the interval to record them
-        :return:  None
+        :return: None
         """
 
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
             self._set_spikes_recording()
@@ -72,27 +79,27 @@ class RecordingCommon(object):
         if variable == "gsyn_exc":
             if not isinstance(self._population._vertex.input_type,
                               InputTypeConductance):
-                msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input. " \
-                      "You will receive current measurements instead."
-                logger_utils.warn_once(logger, msg)
+                logger_utils.warn_once(
+                    logger, "You are trying to record the excitatory "
+                    "conductance from a model which does not use conductance "
+                    "input. You will receive current measurements instead.")
         elif variable == "gsyn_inh":
             if not isinstance(self._population._vertex.input_type,
                               InputTypeConductance):
-                msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input. " \
-                      "You will receive current measurements instead."
-                logger_utils.warn_once(logger, msg)
+                logger_utils.warn_once(
+                    logger, "You are trying to record the inhibtatory "
+                    "conductance from a model which does not use conductance "
+                    "input. You will receive current measurements instead.")
 
     def _set_v_recording(self):
-        """ sets the parameters etc that are used by the v recording
+        """ Sets the parameters etc that are used by the voltage recording
 
         :return: None
         """
         self._population._vertex.set_recording("v")
 
     def _set_spikes_recording(self):
-        """ sets the parameters etc that are used by the spikes recording
+        """ Sets the parameters etc that are used by the spike recording
 
         :return: None
         """
@@ -102,19 +109,17 @@ class RecordingCommon(object):
         self._population._vertex.set_recording_spikes()
 
     def _get_recorded_variable(self, variable):
-        """ method that contains all the safety checks and gets the recorded
-        data from the vertex
+        """ Gets the recorded data from the vertex while doing safety checks
 
-        :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param variable: the variable name to read. Supported variable names\
+            are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :return: the data
         """
         timer = Timer()
         timer.start_timing()
-        data = None
         sim = get_simulator()
 
-        globals_variables.get_simulator().verify_not_running()
+        sim.verify_not_running()
         if variable == "spikes":
             data = self._get_spikes()
 
@@ -126,34 +131,32 @@ class RecordingCommon(object):
                 .format(variable))
         elif not self._population._vertex.is_recording(variable):
             raise ConfigurationException(
-                "This population has not been set to record {}"
-                .format(variable))
+                "This population has not been set to record {}".format(
+                    variable))
 
         elif not sim.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore {} cannot"
-                " be retrieved, hence the list will be empty".format(
-                    variable))
+            logger.warning(
+                "The simulation has not yet run, therefore {} cannot "
+                "be retrieved, hence the list will be empty", variable)
             data = numpy.zeros((0, 3))
 
         elif sim.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
         else:
-            # assuming we got here, everything is ok, so we should go get the
+            # assuming we got here, everything is OK, so we should go get the
             # voltages
             data = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
 
-        get_simulator().add_extraction_timing(
-            timer.take_sample())
+        sim.add_extraction_timing(timer.take_sample())
         return data
 
     def _get_spikes(self):
-        """ method for getting spikes from a vertex
+        """ How to get spikes from a vertex
 
         :return: the spikes from a vertex
         """
@@ -168,26 +171,26 @@ class RecordingCommon(object):
 
         sim = get_simulator()
         if not sim.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved, hence the list will be empty")
+            logger.warning(
+                "The simulation has not yet run, therefore spikes cannot "
+                "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
         if sim.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        # assuming we got here, everything is ok, so we should go get the
+        # assuming we got here, everything is OK, so we should go get the
         # spikes
         return self._population._vertex.get_spikes(
             sim.placements, sim.graph_mapper, sim.buffer_manager,
             sim.machine_time_step)
 
     def _turn_off_all_recording(self):
-        """
-        turns off recording, is used by a pop saying .record()
+        """ Turns off recording, is used by a pop saying .record()
+
         :rtype: None
         """
 

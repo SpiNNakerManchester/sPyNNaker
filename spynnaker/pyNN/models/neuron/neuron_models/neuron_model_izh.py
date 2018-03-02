@@ -1,5 +1,5 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
@@ -28,10 +28,12 @@ class _IZH_TYPES(Enum):
     I_OFFSET = (7, DataType.S1615)
     THIS_H = (8, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -42,10 +44,12 @@ class _IZH_TYPES(Enum):
 class _IZH_GLOBAL_TYPES(Enum):
     TIMESTEP = (1, DataType.S1615)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -54,11 +58,13 @@ class _IZH_GLOBAL_TYPES(Enum):
 
 
 class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
+    __slots__ = [
+        "_data",
+        "_n_neurons",
+        "_units"]
 
     def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
-        AbstractNeuronModel.__init__(self)
-        AbstractContainsUnits.__init__(self)
-
+        # pylint: disable=too-many-arguments
         self._units = {
             A: "ms",
             B: "ms",
@@ -116,7 +122,7 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(I_OFFSET. i_offset)
+        self._data.set_value(key=I_OFFSET, value=i_offset)
 
     @property
     def v_init(self):
@@ -148,8 +154,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
+        # pylint: disable=arguments-differ
         return [
-
             # REAL A
             NeuronParameter(self._data[A], _IZH_TYPES.A.data_type),
 
@@ -191,11 +197,10 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_global_parameters,
                additional_arguments={'machine_time_step'})
     def get_global_parameters(self, machine_time_step):
-        return [
-            NeuronParameter(
-                machine_time_step / 1000.0,
-                _IZH_GLOBAL_TYPES.TIMESTEP.data_type)
-        ]
+        # pylint: disable=arguments-differ
+        return [NeuronParameter(
+            machine_time_step / 1000.0,
+            _IZH_GLOBAL_TYPES.TIMESTEP.data_type)]
 
     @overrides(AbstractNeuronModel.get_global_parameter_types)
     def get_global_parameter_types(self):
@@ -203,8 +208,8 @@ class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
 
     @overrides(AbstractNeuronModel.set_neural_parameters)
     def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._v_init[vertex_slice.as_slice] = neural_parameters[4]
-        self._u_init[vertex_slice.as_slice] = neural_parameters[5]
+        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[4]
+        self._data[U_INIT][vertex_slice.as_slice] = neural_parameters[5]
 
     def get_n_cpu_cycles_per_neuron(self):
 

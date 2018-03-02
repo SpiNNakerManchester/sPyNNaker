@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineEdge
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector\
     import OneToOneConnector
@@ -6,13 +6,15 @@ from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 
 class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
+    __slots__ = [
+        "_synapse_information"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
             label=None, weight=1):
-        MachineEdge.__init__(
-            self, pre_vertex, post_vertex, label=label, traffic_weight=weight)
-        AbstractFilterableEdge.__init__(self)
+        # pylint: disable=too-many-arguments
+        super(DelayedMachineEdge, self).__init__(
+            pre_vertex, post_vertex, label=label, traffic_weight=weight)
         self._synapse_information = synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)
