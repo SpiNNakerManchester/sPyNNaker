@@ -151,10 +151,6 @@ static inline void _print_neuron_parameters() {
 
 
 void _reset_record_counter(){
-    if (recording_flags != 0xFFFFFFFF){
-        //Not the first run so do not reset counters
-        return;
-    }
     if (global_record_params->spike_rate == 0){
         // Setting increment to zero means v_index will never equal v_rate
         spike_increment = 0;
@@ -209,8 +205,6 @@ bool _neuron_load_neuron_parameters(address_t address){
     //log_info("loading global record parameters");
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
-
-    _reset_record_counter();
 
     //log_info("loading indexes parameters");
     memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
@@ -382,14 +376,12 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         }
     }
 
-    //! Setting this to MAX so it can be used to detect first run
-    recording_flags = 0xFFFFFFFF;
-
     // load the data into the allocated DTCM spaces.
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
 
+    _reset_record_counter();
     recording_flags = recording_flags_param;
 
     // Set up the out spikes array
