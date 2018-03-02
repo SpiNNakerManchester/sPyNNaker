@@ -543,7 +543,6 @@ void neuron_do_timestep_update(timer_t time) {
 
         // record this neuron parameter. Just as cheap to set then to gate
         voltages->states[indexes->v] = voltage;
-        //voltages->states[v_indexes[neuron_index]] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
@@ -567,9 +566,9 @@ void neuron_do_timestep_update(timer_t time) {
         	total_inh += inh_syn_input[i];
         }
 
-         // If we should be recording input, record the values
-        inputs_excitatory->inputs[neuron_index].input = total_exc;
-        inputs_inhibitory->inputs[neuron_index].input = total_inh;
+        // record these neuron parameter. Just as cheap to set then to gate
+        inputs_excitatory->inputs[indexes->exc].input = total_exc;
+        inputs_inhibitory->inputs[indexes->inh].input = total_inh;
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
@@ -583,10 +582,6 @@ void neuron_do_timestep_update(timer_t time) {
             synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
-
-        // record these neuron parameter. Just as cheap to set then to gate
-        inputs_excitatory->inputs[indexes->exc].input = exc_input_value;
-        inputs_inhibitory->inputs[indexes->inh].input = inh_input_value;
 
         // Update neuron parameters
         state_t result = neuron_model_state_update(
