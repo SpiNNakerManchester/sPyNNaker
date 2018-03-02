@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 import numpy
 import logging
@@ -10,6 +11,9 @@ class AllToAllConnector(AbstractConnector):
         the postsynaptic population
     """
 
+    __slots__ = [
+        "_allow_self_connections"]
+
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
 
@@ -19,11 +23,12 @@ class AllToAllConnector(AbstractConnector):
             allowed to connect to itself, or only to other neurons in the
             Population.
     """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
         self._weights = None
         self._delays = None
 
+    @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
         """ sets the weights and delays as needed
 
@@ -57,22 +62,26 @@ class AllToAllConnector(AbstractConnector):
                 (pre_vertex_slice.hi_atom + 1) * n_post_neurons,
                 n_post_neurons)]
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, self._n_pre_neurons * self._n_post_neurons)
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         connection_slices = self._connection_slices(
             pre_vertex_slice, post_vertex_slice)
         return self._get_delay_variance(self._delays, connection_slices)
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         total_n_connections_per_pre_neuron = self._n_post_neurons
         n_connections_per_pre_neuron = post_vertex_slice.n_atoms
         if (not self._allow_self_connections and
@@ -90,17 +99,21 @@ class AllToAllConnector(AbstractConnector):
             self._connection_slices(pre_vertex_slice, post_vertex_slice),
             min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
             return pre_vertex_slice.n_atoms - 1
         return pre_vertex_slice.n_atoms
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
@@ -109,9 +122,11 @@ class AllToAllConnector(AbstractConnector):
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_mean(self._weights, connection_slices)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
@@ -121,22 +136,27 @@ class AllToAllConnector(AbstractConnector):
         return self._get_weight_maximum(
             self._weights, n_connections, connection_slices)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         connection_slices = self._connection_slices(
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_variance(self._weights, connection_slices)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return (
             not self._generate_lists_on_host(self._weights) and
             not self._generate_lists_on_host(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         if (not self._allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):

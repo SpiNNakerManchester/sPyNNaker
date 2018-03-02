@@ -3,10 +3,11 @@ from .delay_afferent_machine_edge import DelayAfferentMachineEdge
 
 
 class DelayAfferentApplicationEdge(ApplicationEdge):
+    __slots__ = ()
 
     def __init__(self, prevertex, delayvertex, label=None):
-        ApplicationEdge.__init__(
-            self, prevertex, delayvertex, label=label)
+        super(DelayAfferentApplicationEdge, self).__init__(
+            prevertex, delayvertex, label=label)
 
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayAfferentMachineEdge(pre_vertex, post_vertex, label)

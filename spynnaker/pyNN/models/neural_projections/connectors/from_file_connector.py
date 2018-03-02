@@ -7,6 +7,8 @@ from six import add_metaclass
 
 @add_metaclass(AbstractBase)
 class FromFileConnector(FromListConnector):
+    # pylint: disable=redefined-builtin
+    __slots__ = ["_file"]
 
     def __init__(
             self, file,  # @ReservedAssignment
@@ -20,16 +22,15 @@ class FromFileConnector(FromListConnector):
                 real_file.close()
         else:
             conn_list = self._read_conn_list(file, distributed)
-        FromListConnector.__init__(self, conn_list, safe, verbose)
+        super(FromFileConnector, self).__init__(conn_list, safe, verbose)
 
     def _read_conn_list(self, the_file, distributed):
         if not distributed:
             return the_file.read()
-        directory = os.path.dirname(the_file.file)
         filename = "{}.".format(os.path.basename(the_file.file))
 
         conns = list()
-        for found_file in os.listdir(directory):
+        for found_file in os.listdir(os.path.dirname(the_file.file)):
             if found_file.startswith(filename):
                 file_reader = self.get_reader(found_file)
                 try:
@@ -43,11 +44,12 @@ class FromFileConnector(FromListConnector):
 
     @abstractmethod
     def get_reader(self, file):  # @ReservedAssignment
-        """
-        get a filereader object probably using the pynn methods
+        """ Get a filereader object, probably using the pynn methods.
 
-        For example calling
+        For example calling:
+
         from pyNN.recording import files
         return files.StandardTextFile(file, mode="r")
+
         :return: A pynn StandardTextFile or similar
         """
