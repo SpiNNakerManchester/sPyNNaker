@@ -49,16 +49,17 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         # note probably only need to do this once... ?
         if self._probs is None:
             # numpy arrays of indices
-            pre_list = numpy.array([i for i in range(
-                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)])
-            post_list = numpy.array([j for j in range(
-                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
+#            pre_list = numpy.array([i for i in range(
+#                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)])
+#            post_list = numpy.array([j for j in range(
+#                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
 
             # numpy array of probabilities using the index_expression
             self._probs = numpy.array([[_index_expr_context.eval(
-                self._index_expression, i=pre_list[i], j=post_list[j])
-                for i in range(pre_vertex_slice.n_atoms)]
-                for j in range(post_vertex_slice.n_atoms)])
+                self._index_expression, i=i, j=j)
+#                self._index_expression, i=pre_list[i], j=post_list[j])
+                for i in range(self._n_pre_neurons)] # pre_vertex_slice.n_atoms)]
+                for j in range(self._n_post_neurons)]) # post_vertex_slice.n_atoms)])
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -135,13 +136,11 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         probs = self._probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].flatten()
 
-        print 'probs in synaptic block: ', probs
-
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
         # If self connections are not allowed, remove the possibility of self
-        # connections by setting them to a value of infinity
+        # connections by setting the probability to a value of infinity
         if not self._allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
