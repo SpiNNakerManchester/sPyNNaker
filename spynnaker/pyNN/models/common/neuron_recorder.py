@@ -34,22 +34,23 @@ class NeuronRecorder(object):
             self._sampling_rates[variable] = 0
             self._indexes[variable] = None
 
-    def _count_recording_per_slice(self, variable, slice):
+    def _count_recording_per_slice(self, variable, vertex_slice):
         if self._sampling_rates[variable] == 0:
             return 0
         if self._indexes[variable] is None:
-            return slice.n_atoms
-        return sum((index >= slice.lo_atom and index <= slice.hi_atom)
+            return vertex_slice.n_atoms
+        return sum((index >= vertex_slice.lo_atom and
+                    index <= vertex_slice.hi_atom)
                    for index in self._indexes[variable])
 
-    def _neurons_recording(self, variable, slice):
+    def _neurons_recording(self, variable, vertex_slice):
         if self._sampling_rates[variable] == 0:
             return []
         if self._indexes[variable] is None:
-            return range(slice.lo_atom, slice.hi_atom+1)
+            return range(vertex_slice.lo_atom, vertex_slice.hi_atom+1)
         recording = []
         indexes = self._indexes[variable]
-        for index in xrange(slice.lo_atom, slice.hi_atom+1):
+        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
             if index in indexes:
                 recording.append(index)
         return recording
@@ -75,7 +76,7 @@ class NeuronRecorder(object):
         :param graph_mapper: the mapping between application and machine\
             vertices
         :param application_vertex:
-        :param variable: PyNN name for the variable (V, gsy_ihn ect
+        :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
         :param n_machine_time_steps:
         :return:
@@ -108,7 +109,7 @@ class NeuronRecorder(object):
             record_length = len(record_raw)
 
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
-            n_neurons * self.N_BYTES_PER_VALUE
+                n_neurons * self.N_BYTES_PER_VALUE
 
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
@@ -300,7 +301,7 @@ class NeuronRecorder(object):
             # But if they do make sure it is the same as before
             if rate != self._sampling_rates[variable]:
                 msg = "Illegal sampling_interval parameter while turning " \
-                      "off recorinding"
+                      "off recording"
                 raise fec_excceptions.ConfigurationException(msg)
 
         if self._indexes[variable] is None:
@@ -323,8 +324,8 @@ class NeuronRecorder(object):
         if self._sampling_rates[variable] == 0:
             self._sampling_rates[variable] = rate
         elif rate != self._sampling_rates[variable]:
-            msg = "Current implementaion does not support multiple " \
-                  "sampling_intervals for {} on one polulation. " \
+            msg = "Current implementation does not support multiple " \
+                  "sampling_intervals for {} on one population. " \
                 .format(variable)
             raise fec_excceptions.ConfigurationException(msg)
         # else rate not changed so no action
@@ -370,7 +371,7 @@ class NeuronRecorder(object):
             return 0
         if variable == SPIKES:
             if n_neurons < vertex_slice.n_atoms:
-                # Indexing is used rather than gating to dettermine recording
+                # Indexing is used rather than gating to determine recording
                 # Non recoding neurons write to an extra slot
                 n_neurons += 1
             out_spike_words = int(math.ceil(n_neurons / 32.0))
