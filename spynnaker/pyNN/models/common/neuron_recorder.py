@@ -97,6 +97,8 @@ class NeuronRecorder(object):
             vertex_slice = graph_mapper.get_slice(vertex)
             neurons = self._neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
+            if n_neurons == 0:
+                continue
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
             neuron_param_region_data_pointer, missing_data = \
@@ -162,6 +164,8 @@ class NeuronRecorder(object):
                     (index >= vertex_slice.lo_atom and
                      index <= vertex_slice.hi_atom)
                     for index in self._indexes[SPIKES])
+                if neurons_recording == 0:
+                    continue
                 if neurons_recording < vertex_slice.n_atoms:
                     # For spikes the overflow position is also returned
                     neurons_recording += 1
