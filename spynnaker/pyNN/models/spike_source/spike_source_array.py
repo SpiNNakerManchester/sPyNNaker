@@ -161,10 +161,10 @@ class SpikeSourceArray(
     def set_recording_spikes(
             self, new_state=True, sampling_interval=None, indexes=None):
         if sampling_interval is not None:
-            logger.warning("Sampling interval currently not sopported for "
+            logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
         if indexes is not None:
-            logger.warning("Indexes currently not sopported for "
+            logger.warning("Indexes currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.enable_recording(
             self._spike_recorder_buffer_size,
