@@ -38,7 +38,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             allowed to connect to itself, or only to other neurons in the
             Population.
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(IndexBasedProbabiliyConnector, self).__init__(safe, verbose)
         self._index_expression = index_expression
         self._allow_self_connections = allow_self_connections
 
