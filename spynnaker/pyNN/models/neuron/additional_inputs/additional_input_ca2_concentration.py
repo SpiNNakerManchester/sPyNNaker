@@ -89,7 +89,8 @@ class AdditionalInputCa2Concentration(AbstractAdditionalInput):
     def set_parameters(self, parameters, vertex_slice):
 
         # Can ignore anything that isn't a state variable
-        self._i_ca_2[vertex_slice.slice] = parameters[1]
+        #self._i_ca_2[vertex_slice.slice] = parameters[1]
+        pass
 
     def get_n_cpu_cycles_per_neuron(self):
         return 3
