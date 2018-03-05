@@ -141,11 +141,6 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
-        # debug
-        print 'connection ids: ', ids
-        print 'source: ', (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom
-        print 'target: ', (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom
-
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
