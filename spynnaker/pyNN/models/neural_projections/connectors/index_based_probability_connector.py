@@ -24,6 +24,11 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         dependent upon the indices of the pre- and post-populations.
     """
 
+    __slots = [
+        "_allow_self_connections",
+        "_index_expression",
+        "_probs"]
+
     def __init__(
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
