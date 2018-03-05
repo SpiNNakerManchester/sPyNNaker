@@ -46,20 +46,13 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     def _update_probs_from_index_expression(self, pre_vertex_slice,
                                             post_vertex_slice):
-        # note probably only need to do this once... ?
+        # note: this only needs to be done once
         if self._probs is None:
-            # numpy arrays of indices
-#            pre_list = numpy.array([i for i in range(
-#                pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1)])
-#            post_list = numpy.array([j for j in range(
-#                post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
-
             # numpy array of probabilities using the index_expression
             self._probs = numpy.array([[_index_expr_context.eval(
                 self._index_expression, i=i, j=j)
-#                self._index_expression, i=pre_list[i], j=post_list[j])
-                for i in range(self._n_pre_neurons)] # pre_vertex_slice.n_atoms)]
-                for j in range(self._n_post_neurons)]) # post_vertex_slice.n_atoms)])
+                for j in range(self._n_post_neurons)]
+                for i in range(self._n_pre_neurons)])
 
     def get_delay_maximum(self):
         return self._get_delay_maximum(
@@ -147,6 +140,11 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         present = items < probs
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
+
+        # debug
+        print 'connection ids: ', ids
+        print 'source: ', (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom
+        print 'target: ', (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
