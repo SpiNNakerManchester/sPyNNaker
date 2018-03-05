@@ -131,7 +131,8 @@ class NeuronRecorder(object):
                     local_indexes = numpy.where(record[:, 0] == time)
                     if len(local_indexes[0]) > 0:
                         # Set row to data for that timestep
-                        fragment[i] = record[local_indexes[0][0], 1:]
+                        fragment[i] = (record[local_indexes[0], 1:] /
+                                       float(DataType.S1615.scale))
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -140,6 +141,10 @@ class NeuronRecorder(object):
             else:
                 # Add the slice fragment on axis 1 which is ids/ channel_index
                 data = numpy.append(data, fragment, axis=1)
+        if len(missing_str) > 0:
+            logger.warn(
+                "Population {} is missing recorded data in region {} from the"
+                " following cores: {}".format(label, region, missing_str))
         return (data, indexes, sampling_interval)
 
     def get_spikes(
