@@ -6,7 +6,7 @@ import logging
 import numpy
 import math
 
-# support for arbitrary expression for the distance dependence
+# support for arbitrary expression for the indices
 from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
 from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
 from numpy import log, log10, modf, power, sin, sinh, sqrt
