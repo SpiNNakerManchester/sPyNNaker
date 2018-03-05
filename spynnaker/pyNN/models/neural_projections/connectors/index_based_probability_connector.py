@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spinn_utilities.safe_eval import SafeEval
@@ -54,6 +55,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
                 for j in range(self._n_post_neurons)]
                 for i in range(self._n_pre_neurons)])
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
@@ -61,6 +63,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -75,6 +78,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self._n_pre_neurons * self._n_post_neurons, out_of,
             max_prob)
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -89,17 +93,20 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self._delays, self._n_pre_neurons * self._n_post_neurons,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         return self._get_n_connections(
             pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
@@ -109,14 +116,17 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return False
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
