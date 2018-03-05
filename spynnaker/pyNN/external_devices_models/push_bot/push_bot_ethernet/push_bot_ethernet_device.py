@@ -1,12 +1,10 @@
-from pacman.model.decorators import overrides
-
 from spynnaker.pyNN.external_devices_models \
     import AbstractMulticastControllableDevice
 
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.overrides import overrides
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)

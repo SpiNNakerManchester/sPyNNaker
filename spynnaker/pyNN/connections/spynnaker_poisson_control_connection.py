@@ -1,31 +1,34 @@
-from spinn_front_end_common.utilities.connections.live_event_connection\
-    import LiveEventConnection
+from spinn_utilities.overrides import overrides
 
-from spinnman.messages.eieio.eieio_type import EIEIOType
-from data_specification.enums.data_type import DataType
+from spinnman.messages.eieio import EIEIOType
+from spinnman.messages.eieio.data_messages import EIEIODataMessage
+
+from data_specification.enums import DataType
+
+from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from pacman.model.decorators.overrides import overrides
-from spinnman.messages.eieio.data_messages.eieio_data_message \
-    import EIEIODataMessage
+from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 
 _MAX_RATES_PER_PACKET = 32
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
+    __slots__ = [
+        "_control_label_extension"]
 
     def __init__(
-            self, poisson_labels=None, local_host=None, local_port=19999,
+            self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,
             control_label_extension="_control"):
         """
 
         :param poisson_labels: Labels of Poisson populations to be controlled
         :type poisson_labels: iterable of str
         :param local_host: Optional specification of the local hostname or\
-                    ip address of the interface to listen on
+            IP address of the interface to listen on
         :type local_host: str
         :param local_port: Optional specification of the local port to listen\
-                    on.  Must match the port that the toolchain will send the\
-                    notification on (19999 by default)
+            on.  Must match the port that the toolchain will send the\
+            notification on (19999 by default)
         :type local_port: int
         :param control_label_extension:\
             The extra name added to the label of each Poisson source
@@ -37,8 +40,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             for label in poisson_labels
         ]
 
-        LiveEventConnection.__init__(
-            self, live_packet_gather_label=None, send_labels=control_labels,
+        super(SpynnakerPoissonControlConnection, self).__init__(
+            live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
         self._control_label_extension = control_label_extension
@@ -48,15 +51,13 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
 
     @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label, start_callback):
-        control_label = self._control_label(label)
-        LiveEventConnection.add_start_callback(
-            self, control_label, start_callback)
+        super(SpynnakerPoissonControlConnection, self).add_start_callback(
+            self._control_label(label), start_callback)
 
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
-        control_label = self._control_label(label)
-        LiveEventConnection.add_init_callback(
-            self, control_label, init_callback)
+        super(SpynnakerPoissonControlConnection, self).add_init_callback(
+            self._control_label(label), init_callback)
 
     @overrides(LiveEventConnection.add_receive_callback)
     def add_receive_callback(self, label, live_event_callback):
@@ -84,21 +85,23 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         control_label = label
         if not control_label.endswith(self._control_label_extension):
             control_label = self._control_label(label)
-        max_keys = _MAX_RATES_PER_PACKET
-
         pos = 0
         while pos < len(neuron_id_rates):
-
-            message = EIEIODataMessage.create(EIEIOType.KEY_PAYLOAD_32_BIT)
-
-            events_in_packet = 0
-            while pos < len(neuron_id_rates) and events_in_packet < max_keys:
-                (neuron_id, rate) = neuron_id_rates[pos]
-                key = self._atom_id_to_key[control_label][neuron_id]
-                rate_accum = int(round(rate * DataType.S1615.scale))
-                message.add_key_and_payload(key, rate_accum)
-                pos += 1
-                events_in_packet += 1
+            message, pos = self._assemble_message(
+                self._atom_id_to_key[control_label], neuron_id_rates, pos)
             ip_address, port = self._send_address_details[control_label]
             self._sender_connection.send_eieio_message_to(
                 message, ip_address, port)
+
+    @staticmethod
+    def _assemble_message(id_to_key_map, neuron_id_rates, pos):
+        scale = DataType.S1615.scale  # @UndefinedVariable
+        message = EIEIODataMessage.create(EIEIOType.KEY_PAYLOAD_32_BIT)
+        for _ in range(_MAX_RATES_PER_PACKET):
+            neuron_id, rate = neuron_id_rates[pos]
+            key = id_to_key_map[neuron_id]
+            message.add_key_and_payload(key, int(round(rate * scale)))
+            pos += 1
+            if pos >= len(neuron_id_rates):
+                break
+        return message, pos

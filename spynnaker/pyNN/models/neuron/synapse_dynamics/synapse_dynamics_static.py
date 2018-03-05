@@ -5,12 +5,15 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import InvalidParameterType
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun):
+    __slots__ = [
+        "_change_requires_mapping"]
 
     def __init__(self):
         AbstractStaticSynapseDynamics.__init__(self)
@@ -18,27 +21,36 @@ class SynapseDynamicsStatic(
         AbstractChangableAfterRun.__init__(self)
         self._change_requires_mapping = True
 
+    @overrides(AbstractSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
 
+    @overrides(AbstractSynapseDynamics.are_weights_signed)
     def are_weights_signed(self):
         return False
 
+    @overrides(AbstractSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return ""
 
+    @overrides(AbstractSynapseDynamics.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         return 0
 
+    @overrides(AbstractSynapseDynamics.write_parameters)
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         pass
 
+    @overrides(
+        AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
         return n_connections
 
+    @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
+        # pylint: disable=too-many-arguments
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (
@@ -96,7 +108,7 @@ class SynapseDynamicsStatic(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractSettable.get_value)
+    @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -105,7 +117,7 @@ class SynapseDynamicsStatic(
         raise exceptions.InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractSettable.set_value)
+    @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 

@@ -192,9 +192,9 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
 }
 
 
-static inline print_event_history(post_event_history_t *events){
+static inline void print_event_history(post_event_history_t *events){
 	log_info("		##  printing entire post event history  ##");
-	for (int i = 0; i <= events->count_minus_one; i++){
+	for (uint i = 0; i <= events->count_minus_one; i++){
 		log_info("post event: %u, time: %u, trace: %u",
 				i,
 				events->times[i],
@@ -203,7 +203,7 @@ static inline print_event_history(post_event_history_t *events){
 	}
 }
 
-static inline print_delayed_window_events(post_event_history_t *post_event_history,
+static inline void print_delayed_window_events(post_event_history_t *post_event_history,
 		uint32_t begin_time, uint32_t end_time, uint32_t delay_dendritic){
 	log_info("		##  printing post window  ##");
     post_event_window_t post_window = post_events_get_window_delayed(

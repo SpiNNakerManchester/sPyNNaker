@@ -5,7 +5,7 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from spynnaker.pyNN import exceptions
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
@@ -17,6 +17,11 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun):
+    __slots__ = [
+        "_change_requires_mapping",
+        "_dendritic_delay_fraction",
+        "_timing_dependence",
+        "_weight_dependence"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
@@ -29,8 +34,7 @@ class SynapseDynamicsSTDP(
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
         self._change_requires_mapping = True
 
-        if (self._dendritic_delay_fraction < 0.5 or
-                self._dendritic_delay_fraction > 1.0):
+        if not (0.5 <= self._dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
@@ -66,7 +70,7 @@ class SynapseDynamicsSTDP(
         for obj in [self._timing_dependence, self._weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
-        raise exceptions.InvalidParameterType(
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractSettable.set_value)
@@ -80,7 +84,8 @@ class SynapseDynamicsSTDP(
             if hasattr(obj, key):
                 setattr(obj, key, value)
                 self._change_requires_mapping = True
-        raise exceptions.InvalidParameterType(
+                return
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @property
@@ -100,6 +105,7 @@ class SynapseDynamicsSTDP(
         self._dendritic_delay_fraction = new_value
 
     def is_same_as(self, synapse_dynamics):
+        # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
@@ -145,7 +151,6 @@ class SynapseDynamicsSTDP(
 
     @property
     def _n_header_bytes(self):
-
         # The header contains a single timestamp and pre-trace
         n_bytes = (
             TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
@@ -169,6 +174,7 @@ class SynapseDynamicsSTDP(
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
+        # pylint: disable=too-many-arguments
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         dendritic_delays = (
             connections["delay"] * self._dendritic_delay_fraction)
@@ -206,25 +212,32 @@ class SynapseDynamicsSTDP(
 
         return (fp_data, pp_data, fp_size, pp_size)
 
+    @overrides(
+        AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row)
     def get_n_plastic_plastic_words_per_row(self, pp_size):
 
         # pp_size is in words, so return
         return pp_size
 
+    @overrides(
+        AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row)
     def get_n_fixed_plastic_words_per_row(self, fp_size):
 
         # fp_size is in half-words
         return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
 
+    @overrides(AbstractPlasticSynapseDynamics.get_n_synapses_in_rows)
     def get_n_synapses_in_rows(self, pp_size, fp_size):
 
         # Each fixed-plastic synapse is a half-word and fp_size is in half
         # words so just return it
         return fp_size
 
+    @overrides(AbstractPlasticSynapseDynamics.read_plastic_synaptic_data)
     def read_plastic_synaptic_data(
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
             fp_size, fp_data):
+        # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         data_fixed = numpy.concatenate([
@@ -248,6 +261,7 @@ class SynapseDynamicsSTDP(
     def get_weight_mean(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
@@ -256,6 +270,7 @@ class SynapseDynamicsSTDP(
     def get_weight_variance(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
@@ -264,6 +279,7 @@ class SynapseDynamicsSTDP(
     def get_weight_maximum(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
 
         # The maximum weight is the largest that it could be set to from
         # the weight dependence

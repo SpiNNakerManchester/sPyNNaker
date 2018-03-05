@@ -7,9 +7,6 @@ class AbstractContainsUnits(object):
 
     __slots__ = ()
 
-    def __init__(self):
-        pass
-
     @abstractmethod
     def get_units(self, variable):
         """ get units for a given variable

@@ -1,5 +1,4 @@
-# pacman imports
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 
 # front end common imports
@@ -13,6 +12,8 @@ from enum import Enum
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+    __slots__ = [
+        "_resources"]
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -30,8 +31,8 @@ class DelayExtensionMachineVertex(
                ("N_DELAYS", 5)])
 
     def __init__(self, resources_required, label, constraints=None):
-        MachineVertex.__init__(
-            self, label, constraints=constraints)
+        super(DelayExtensionMachineVertex, self).__init__(
+            label, constraints=constraints)
         self._resources = resources_required
 
     @property
@@ -53,6 +54,7 @@ class DelayExtensionMachineVertex(
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)
     def get_provenance_data_from_machine(self, transceiver, placement):
+        # pylint: disable=too-many-locals
         provenance_data = self._read_provenance_data(transceiver, placement)
         provenance_items = self._read_basic_provenance_items(
             provenance_data, placement)
