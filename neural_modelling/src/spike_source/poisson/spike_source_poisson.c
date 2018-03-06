@@ -5,7 +5,6 @@
  *
  */
 
-#include "../../common/out_spikes.h"
 #include "../../common/maths-util.h"
 
 #include <data_specification.h>
@@ -511,9 +510,6 @@ void timer_callback(uint timer_count, uint unused) {
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
-
-    // Reset the out spikes before the loop
-    out_spikes_reset();
 
     // Loop through spike sources
     for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {

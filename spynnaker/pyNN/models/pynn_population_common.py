@@ -210,6 +210,20 @@ class PyNNPopulationCommon(object):
             return int(id - self._first_id)  # this assumes ids are consecutive
         return id - self._first_id
 
+    def index_to_id(self, index):
+        """
+        Given the index (order in the Population) of cell(s) in the
+        Population, return their ID(s)
+        """
+        if not numpy.iterable(index):
+            if index > self._last_id - self._first_id:
+                raise ValueError(
+                    "indexes should be in the range [{},{}], actually {}"
+                    "".format(0, self._last_id - self._first_id, index))
+            return int(index + self._first_id)
+        # this assumes ids are consecutive
+        return index + self._first_id
+
     def id_to_local_index(self, cell_id):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
