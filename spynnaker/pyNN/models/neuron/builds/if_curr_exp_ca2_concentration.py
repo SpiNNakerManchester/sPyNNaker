@@ -26,18 +26,18 @@ class IFCurrExpCa2Concentration(AbstractPopulationVertex):
         'tau_ca2': 50.0, "i_ca2": 0.0, "i_alpha": 0.1, 'isyn_exc': 0.0,
         'isyn_inh': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    non_pynn_default_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
+            non_pynn_default_parameters['spikes_per_second'],
             ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
+            non_pynn_default_parameters['ring_buffer_sigma'],
             incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
+            non_pynn_default_parameters['incoming_spike_buffer_size'],
+            constraints=AbstractPopulationVertex.non_pynn_default_parameters[
                 'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
+            label=AbstractPopulationVertex.non_pynn_default_parameters[
                 'label'],
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -50,7 +50,7 @@ class IFCurrExpCa2Concentration(AbstractPopulationVertex):
             tau_ca2=default_parameters["tau_ca2"],
             i_ca2=default_parameters["i_ca2"],
             i_alpha=default_parameters["i_alpha"],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=non_pynn_default_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
 
