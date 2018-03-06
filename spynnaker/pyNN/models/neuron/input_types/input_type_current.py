@@ -14,7 +14,7 @@ class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
 
     def get_global_weight_scale(self):
 
-        precision = 0.000001 # scalar corresponding to that set in C input_type_current.h
+        precision = 0.00035 # scalar corresponding to that set in C input_type_current.h
         return int(1/precision)
 #         return 1.0
 
