@@ -35,8 +35,7 @@ static inline void input_type_convert_excitatory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-
-    return exc_input;
+    use(exc_input);
 }
 
 static inline void input_type_convert_inhibitory_input_to_current(
@@ -44,8 +43,7 @@ static inline void input_type_convert_inhibitory_input_to_current(
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
-
-    return inh_input;
+    use(inh_input);
 }
 
 #endif // _INPUT_TYPE_CURRENT_H_
