@@ -37,7 +37,7 @@ from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.common import SpikeRecorder, NeuronRecorder
+from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.utilities import constants
 from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
@@ -166,8 +166,8 @@ class AbstractPopulationVertex(
         self._additional_input = additional_input
 
         # Set up for recording
-        self._spike_recorder = SpikeRecorder()
-        self._neuron_recorder = NeuronRecorder(["v", "gsyn_exc", "gsyn_inh"])
+        self._neuron_recorder = NeuronRecorder(
+            ["spikes", "v", "gsyn_exc", "gsyn_inh"], n_neurons)
 
         self._time_between_requests = config.getint(
             "Buffers", "time_between_requests")
@@ -243,9 +243,8 @@ class AbstractPopulationVertex(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
         recording_sizes = recording_utilities.get_recording_region_sizes(
-            self._get_buffered_sdram_per_timestep(vertex_slice),
-            n_machine_time_steps, self._minimum_buffer_sdram,
-            self._maximum_sdram_for_buffering,
+            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
+            self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
         container.extend(recording_utilities.get_recording_resources(
             recording_sizes, self._receive_buffer_host,
@@ -265,14 +264,26 @@ class AbstractPopulationVertex(
 
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
         return [
-            self._spike_recorder.get_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "v", vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "gsyn_exc", vertex_slice.n_atoms, 1),
-            self._neuron_recorder.get_sdram_usage_in_bytes(
-                "gsyn_inh", vertex_slice.n_atoms, 1)
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "spikes", vertex_slice),
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "v", vertex_slice),
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "gsyn_exc", vertex_slice),
+            self._neuron_recorder.get_buffered_sdram_per_timestep(
+                "gsyn_inh", vertex_slice)
+        ]
+
+    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+        return [
+            self._neuron_recorder.get_buffered_sdram(
+                "spikes", vertex_slice, n_machine_time_steps),
+            self._neuron_recorder.get_buffered_sdram(
+                "v", vertex_slice, n_machine_time_steps),
+            self._neuron_recorder.get_buffered_sdram(
+                "gsyn_exc", vertex_slice, n_machine_time_steps),
+            self._neuron_recorder.get_buffered_sdram(
+                "gsyn_inh", vertex_slice, n_machine_time_steps)
         ]
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
@@ -283,16 +294,18 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        is_recording = len(self._neuron_recorder.recording_variables) > 0 or \
-                       self._spike_recorder.record
+        is_recording = len(self._neuron_recorder.recording_variables) > 0
         buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
             vertex_slice)
+        buffered_sdram = self._get_buffered_sdram(
+            vertex_slice, n_machine_time_steps)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
-            buffered_sdram_per_timestep, n_machine_time_steps,
-            self._minimum_buffer_sdram)
+            buffered_sdram, self._minimum_buffer_sdram)
+        overflow_sdram = self._neuron_recorder.get_sampling_overflow_sdram(
+            vertex_slice)
         vertex = PopulationMachineVertex(
             resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, label, constraints)
+            buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
         AbstractPopulationVertex._n_vertices += 1
 
@@ -312,7 +325,6 @@ class AbstractPopulationVertex(
         return (_NEURON_BASE_N_CPU_CYCLES +
                 _C_MAIN_BASE_N_CPU_CYCLES +
                 (per_neuron_cycles * vertex_slice.n_atoms) +
-                self._spike_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
                 self._synapse_manager.get_n_cpu_cycles())
 
@@ -326,14 +338,14 @@ class AbstractPopulationVertex(
                 self._additional_input.get_dtcm_usage_per_neuron_in_bytes()
         return (_NEURON_BASE_DTCM_USAGE_IN_BYTES +
                 (per_neuron_usage * vertex_slice.n_atoms) +
-                self._spike_recorder.get_dtcm_usage_in_bytes() +
-                self._neuron_recorder.get_dtcm_usage_in_bytes() +
+                self._neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
                 self._synapse_manager.get_dtcm_usage_in_bytes())
 
     def _get_sdram_usage_for_neuron_params_per_neuron(self):
         per_neuron_usage = (
             self._input_type.get_sdram_usage_per_neuron_in_bytes() +
             self._threshold_type.get_sdram_usage_per_neuron_in_bytes() +
+            self._neuron_recorder.get_sdram_usage_per_neuron_in_bytes() +
             self._neuron_model.get_sdram_usage_per_neuron_in_bytes())
         if self._additional_input is not None:
             per_neuron_usage += \
@@ -350,6 +362,8 @@ class AbstractPopulationVertex(
             self._get_sdram_usage_for_neuron_params_per_neuron()
         return (self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
                 self._neuron_model
+                    .get_sdram_usage_for_global_parameters_in_bytes() +
+                self._neuron_recorder
                     .get_sdram_usage_for_global_parameters_in_bytes() +
                 (per_neuron_usage * vertex_slice.n_atoms))
 
@@ -374,8 +388,6 @@ class AbstractPopulationVertex(
 
     def _get_number_of_mallocs_used_by_dsg(self):
         extra_mallocs = len(self._neuron_recorder.recording_variables)
-        if self._spike_recorder.record:
-            extra_mallocs += 1
         return (
             self.BASIC_MALLOC_USAGE +
             self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
@@ -452,6 +464,18 @@ class AbstractPopulationVertex(
 
         # Write the size of the incoming spike buffer
         spec.write_value(data=self._incoming_spike_buffer_size)
+
+        # Write the recording rates and sizes
+        record_globals = self._neuron_recorder.get_global_parameters(
+            vertex_slice)
+        for param in record_globals:
+            spec.write_value(data=param.get_value(),
+                             data_type=param.get_dataspec_datatype())
+
+        # Write the index parameters
+        indexes = self._neuron_recorder.get_index_parameters(vertex_slice)
+        utility_calls.write_parameters_per_neuron(
+            spec, vertex_slice, indexes, slice_paramaters=True)
 
         # Write the global parameters
         global_params = self._neuron_model.get_global_parameters()
@@ -572,8 +596,7 @@ class AbstractPopulationVertex(
             constants.POPULATION_BASED_REGIONS.RECORDING.value)
         ip_tags = tags.get_ip_tags_for_vertex(vertex)
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            n_machine_time_steps,
-            self._get_buffered_sdram_per_timestep(vertex_slice),
+            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
@@ -613,17 +636,17 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
-        return self._spike_recorder.record
+        return self._neuron_recorder.is_recording("spikes")
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True):
-        self._change_requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
+        self.set_recording("spikes", new_state, sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
-        return self._spike_recorder.get_spikes(
+        return self._neuron_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
             placements, graph_mapper, self, machine_time_step)
 
@@ -636,18 +659,27 @@ class AbstractPopulationVertex(
         return self._neuron_recorder.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
-    def set_recording(self, variable, new_state=True):
+    def set_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
         self._change_requires_mapping = not self.is_recording(variable)
-        self._neuron_recorder.set_recording(variable, new_state)
+        self._neuron_recorder.set_recording(
+            variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
                  graph_mapper, buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
-        return self._neuron_recorder.get_data(
+        return self._neuron_recorder.get_matrix_data(
             self.label, buffer_manager, self.RECORDING_REGION[variable],
-            placements, graph_mapper, self, machine_time_step,
-            self.VARIABLE_LONG[variable], n_machine_time_steps)
+            placements, graph_mapper, self, variable, n_machine_time_steps)
+
+    @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
+    def get_neuron_sampling_interval(self, variable):
+        return self._neuron_recorder.get_neuron_sampling_interval(variable)
+
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return self._neuron_recorder.get_neuron_sampling_interval("spikes")
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
