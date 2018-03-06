@@ -6,10 +6,10 @@ from .abstract_input_type import AbstractInputType
 class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
     """ The current input type
     """
+    __slots__ = [
+        "_units"]
 
     def __init__(self):
-        AbstractInputType.__init__(self)
-        AbstractContainsUnits.__init__(self)
         self._units = {}
 
     def get_global_weight_scale(self):

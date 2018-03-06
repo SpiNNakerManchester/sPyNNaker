@@ -1,14 +1,10 @@
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
-from spynnaker.pyNN.models.neuron.neuron_models\
-    .neuron_model_leaky_integrate_and_fire \
+from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha\
-    import SynapseTypeAlpha
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
-    import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeAlpha
+from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
@@ -33,12 +29,14 @@ class IFCurrAlpha(AbstractPopulationVertex):
         'tau_refrac': 0.1,
         'i_offset': 0}
 
-    non_pynn_default_parameters = {'v_init': None,
-                                   'exc_response': 0,  # Internal Parameter
-                                   'exc_exp_response': 0,  # Internal Parameter
-                                   'inh_response': 0,  # Internal Parameter
-                                   'inh_exp_response': 0,  # Internal Parameter
-                                   }
+    non_pynn_default_parameters = {
+        # Internal parameters
+        'exc_response': 0,
+        'exc_exp_response': 0,
+        'inh_response': 0,
+        'inh_exp_response': 0}
+
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
@@ -55,8 +53,8 @@ class IFCurrAlpha(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
-            v_init=non_pynn_default_parameters['v_init']):
-
+            v_init=initialize_parameters['v_init']):
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
@@ -68,15 +66,13 @@ class IFCurrAlpha(AbstractPopulationVertex):
                 tau_syn_E,
                 inh_response,
                 inh_exp_response,
-                tau_syn_I
-                )
+                tau_syn_I)
 
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_alpha.aplx",
-            label=label,
+        super(IFCurrAlpha, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_alpha.aplx", label=label,
             max_atoms_per_core=IFCurrAlpha._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,

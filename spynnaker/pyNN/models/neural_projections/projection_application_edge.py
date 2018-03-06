@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 
 from .projection_machine_edge import ProjectionMachineEdge
@@ -11,11 +11,15 @@ logger = logging.getLogger(__name__)
 class ProjectionApplicationEdge(ApplicationEdge):
     """ An edge which terminates on an AbstractPopulationVertex
     """
+    __slots__ = [
+        "_delay_edge",
+        "_stored_synaptic_data_from_machine",
+        "_synapse_information"]
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
-        ApplicationEdge.__init__(
-            self, pre_vertex, post_vertex, label=label)
+        super(ProjectionApplicationEdge, self).__init__(
+            pre_vertex, post_vertex, label=label)
 
         # A list of all synapse information for all the projections that are
         # represented by this edge
