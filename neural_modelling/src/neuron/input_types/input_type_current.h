@@ -21,8 +21,11 @@ typedef struct input_type_t {
 static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
+
+    UFRACT scalar = 0.000001; // scalar corresponding to that set in the Python input_type_current.py
+
     for (int i=0; i< num_receptors; i++){
-    	value[i] = value[i];
+    	value[i] = (value[i] * scalar) << 3; // DO NOT CHANGE 3!!!
     }
     return &value[0];
 }
