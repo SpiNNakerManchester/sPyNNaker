@@ -16,8 +16,8 @@ def check_gsyn(gsyn1, gsyn2):
 
 
 def check_path_gysn(path, n_neurons, runtime, gsyn):
-    gsyn2 = utility_calls.read_in_data_from_file(path, 0, n_neurons,
-                                                 0, runtime)
+    gsyn2 = utility_calls.read_in_data_from_file(
+        path, 0, n_neurons, 0, runtime, True)
     check_gsyn(gsyn, gsyn2)
 
 
