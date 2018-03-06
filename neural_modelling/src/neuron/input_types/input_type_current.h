@@ -10,7 +10,7 @@ static inline input_t input_type_get_input_value(
         input_t value, input_type_pointer_t input_type) {
     use(input_type);
 
-    UFRACT scalar = 0.000035; // scalar corresponding to that set in the Python input_type_current.py
+    UFRACT scalar = 0.000001; // scalar corresponding to that set in the Python input_type_current.py
     return (scalar * value) << 3;// DO NOT CHANGE 3!!!
 
 }
