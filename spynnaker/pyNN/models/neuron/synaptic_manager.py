@@ -490,7 +490,8 @@ class SynapticManager(object):
             stats = running_totals[synapse_type]
             rates = rate_stats[synapse_type]
             if delay_running_totals[synapse_type].variance == 0.0:
-                max_weights[synapse_type] = total_weights[synapse_type]
+                max_weights[synapse_type] = max(total_weights[synapse_type],
+                                                biggest_weight[synapse_type])
             else:
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
