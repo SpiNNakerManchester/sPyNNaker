@@ -38,10 +38,10 @@ class SynapseDynamicsStatic(
 
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_feasible_atoms_per_core):
+            post_vertex_slice, n_synapse_types):
 
         n_neuron_id_bits = int(
-            math.ceil(math.log(max_feasible_atoms_per_core, 2)))
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
 
         fixed_fixed = (
@@ -71,12 +71,11 @@ class SynapseDynamicsStatic(
         return ff_size
 
     def read_static_synaptic_data(
-            self, post_vertex_slice, n_synapse_types, ff_size, ff_data,
-            max_feasible_atoms_per_core):
+            self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
 
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
         n_neuron_id_bits = int(
-            math.ceil(math.log(max_feasible_atoms_per_core, 2)))
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
 
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)

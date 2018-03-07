@@ -77,9 +77,7 @@ class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
             model_name="IF_curr_exp_ca2_adaptive", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, additional_input=additional_input,
-            constraints=constraints,
-            max_feasible_atoms_per_core=DEFAULT_MAX_ATOMS_PER_CORE
-            )
+            constraints=constraints)
 
     @staticmethod
     def get_max_atoms_per_core():
