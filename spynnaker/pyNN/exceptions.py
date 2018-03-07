@@ -62,7 +62,7 @@ class SynapseRowTooBigException(SpynnakerException):
     """ Raised when a synapse row is bigger than is allowed
     """
     def __init__(self, max_size, message):
-        SpynnakerException.__init__(self, message)
+        super(SynapseRowTooBigException, self).__init__(message)
         self._max_size = max_size
 
     @property

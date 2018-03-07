@@ -5,12 +5,9 @@ from spinn_utilities.abstract_base import AbstractBase
 
 @add_metaclass(AbstractBase)
 class AbstractHasAPlusAMinus(object):
-
     __slots__ = [
-
         # things
         '_a_plus',
-
         # more things
         '_a_minus'
     ]

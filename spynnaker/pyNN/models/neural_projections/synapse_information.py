@@ -3,6 +3,11 @@ class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
         and synapse dynamics
     """
+    __slots__ = [
+        "_connector",
+        "_index",
+        "_synapse_dynamics",
+        "_synapse_type"]
 
     def __init__(self, connector, synapse_dynamics, synapse_type):
         self._connector = connector
