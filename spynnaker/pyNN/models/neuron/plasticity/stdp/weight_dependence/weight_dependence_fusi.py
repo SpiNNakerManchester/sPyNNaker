@@ -69,7 +69,7 @@ class WeightDependenceFusi(
                 data=int(round(self._th_w * w)), data_type=DataType.INT32)
             spec.write_value(
 #                data=self._w_drift*w , data_type=DataType.S1615) # changed type
-                data=self._w_drift*w , data_type=DataType.INT32) # changed type
+                data=int(round(self._w_drift*w)), data_type=DataType.INT32) # changed type
 
             spec.write_value(
                 data=int(round(self._a_plus * w)),
