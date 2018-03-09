@@ -25,8 +25,15 @@ class EIEIOSpikeRecorder(object):
         return self._record
 
     @record.setter
-    def record(self, record):
-        self._record = record
+    def record(self, new_state):
+        """ Old method assumed to be spikes """
+        self._record = new_state
+
+    def set_recording(self, new_state, sampling_interval=None):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval currently not supported for "
+                           "SpikeSourceArray so being ignored")
+        self._record = new_state
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:
