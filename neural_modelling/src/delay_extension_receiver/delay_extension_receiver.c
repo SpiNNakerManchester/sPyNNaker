@@ -12,8 +12,6 @@
 
 //#define DEBUG_MESSAGES
 
-static uint32_t tick_count;
-
 // Constants
 #define MAX_DELAY  16
 #define SDRAM_TAG 160
@@ -27,7 +25,6 @@ enum parameter_positions {
 };
 
 // Globals
-static uint32_t done_receiving = false;
 
 static uint32_t num_neurons = 0;
 static uint32_t num_delay_stages = 0;
@@ -48,7 +45,7 @@ static void send_ack_response(sdp_msg_t *msg) {
              msg->srce_port &((1 << PORT_SHIFT) - 1), msg->srce_port >> PORT_SHIFT);
 //#endif
 
-    uint8_t *data = &msg->cmd_rc;
+    uint8_t *data = (uint8_t *) &msg->cmd_rc;
     data[0] = RC_OK;
     msg->length = sizeof(sdp_hdr_t) + 1;
     uint8_t  old_dest_port = msg->dest_port;
@@ -81,7 +78,6 @@ void handle_sdp_message(uint mailbox, uint port) {
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
     uint16_t *data = &(msg->cmd_rc);
     uint16_t n_delays = data[0];
-    uint16_t pre_slice_start = data[1];
 
 //    log_info("n delays %u\tpre slice start %u", n_delays, pre_slice_start);
     if (n_delays == 0) {
@@ -142,7 +138,7 @@ void handle_sdp_message(uint mailbox, uint port) {
 
 void app_start(uint a0, uint a1){
     use(a0);
-    use(a0);
+    use(a1);
     sark_cpu_state(CPU_STATE_RUN);
 
     uint32_t *clear_memory_ptr = (uint32_t *)sark_tag_ptr(SDRAM_TAG + spin1_get_core_id(),

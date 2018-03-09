@@ -1,6 +1,6 @@
 #include "delay_block.h"
 
-bool init_delay_block(uint32_t num_delay_stages, uint32_t neuron_bit_field_words, 
+bool init_delay_block(uint32_t num_delay_stages, uint32_t neuron_bit_field_words,
                       bit_field_t* *delay_block){
     log_info("\tAllocating delay block memory");
     bit_field_t *dly_blk = NULL;
@@ -17,12 +17,12 @@ bool init_delay_block(uint32_t num_delay_stages, uint32_t neuron_bit_field_words
         // Allocate bit-field
         dly_blk[d] = (bit_field_t) spin1_malloc(
                                    neuron_bit_field_words * sizeof(uint32_t));
-        
+
         if( dly_blk[d] == NULL ){
             log_error("\tUnable to allocate memory for a delay stage %d", d);
             return false;
         }
-        
+
         log_debug("\tClearing delay stage %d bit field",d);
         clear_bit_field(dly_blk[d], neuron_bit_field_words);
         use(dly_blk[d]);
@@ -35,7 +35,7 @@ bool init_delay_block(uint32_t num_delay_stages, uint32_t neuron_bit_field_words
 
 bool init_spike_counters(uint32_t num_delay_slots_pot, uint32_t num_neurons,
                          uint8_t** *spike_counters){
-    
+
     log_info("\tAllocate array of counters for each delay slot");
     uint8_t **spk_cnt = NULL;
     spk_cnt = (uint8_t**) spin1_malloc(
@@ -61,6 +61,8 @@ bool init_spike_counters(uint32_t num_delay_slots_pot, uint32_t num_neurons,
 
     *spike_counters = spk_cnt;
     log_info("\tspike counters address 0x%08x", *spike_counters);
+
+    return true;
 }
 
 bool add_delay(uint32_t source_id, uint32_t stage, bit_field_t* *delay_block){
