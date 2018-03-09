@@ -56,7 +56,7 @@ bool out_spikes_initialize(size_t max_spike_sources);
 //! \param[in] time The time at which the recording is being made
 //! \param[in] callback Callback to call when the recording is done
 //                      (can be NULL)
-void out_spikes_record(
+bool out_spikes_record(
     uint8_t channel, uint32_t time, recording_complete_callback_t callback);
 
 //! \brief Check if any spikes have been recorded

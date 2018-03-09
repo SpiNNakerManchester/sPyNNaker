@@ -2,7 +2,7 @@ from six import add_metaclass
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
@@ -29,33 +29,23 @@ class AbstractConnector(object):
                             ("synapse_type", "uint8")]
 
     __slots__ = [
-        "_safe",
-
-        "_space",
-
-        "_verbose",
-
-        "_pre_population",
-
-        "_post_population",
-
-        "_n_pre_neurons",
-
-        "_n_post_neurons",
-
-        "_rng",
-
-        "_n_clipped_delays",
-
-        "_min_delay",
-
-        "_weights",
-
         "_delays",
-        
-        "_gen_on_spinn"
-
-        ]
+        "_min_delay",
+        "_pre_population",
+        "_post_population",
+        "_n_clipped_delays",
+        "_n_post_neurons",
+        "_n_pre_neurons",
+        "_rng",
+        "_safe",
+        "_space",
+        "_verbose",
+        "_weights",
+        "_n_clipped_delays",
+        "_min_delay",
+        "_weights",
+        "_delays",
+        "_gen_on_spinn"]
 
     def __init__(self, safe=True, verbose=False,
                  generate_on_machine=False):
@@ -74,7 +64,7 @@ class AbstractConnector(object):
         self._weights = None
         self._delays = None
         self._gen_on_spinn = generate_on_machine
-        
+
     def set_space(self, space):
         """ allows setting of the space object after instantiation
 
@@ -87,12 +77,12 @@ class AbstractConnector(object):
         """ sets the weights and delays as needed
 
         :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list\
-            1D array with at least as many items as connections to be\
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+            May either be a float, a !RandomDistribution object, a list 1D\
+            array with at least as many items as connections to be created,\
+            or a distance dependence as per a d_expression. Units nA.
+        :param `float` delays:  -- as `weights`. If `None`, all synaptic\
             delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
+        :raises Exception: when not a standard interface of list, scaler,\
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
@@ -108,21 +98,20 @@ class AbstractConnector(object):
         self._n_post_neurons = post_population.size
         self._rng = rng
         if self._rng is None:
-            self._rng = globals_variables.get_simulator().get_pynn_NumpyRNG()
+            self._rng = get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported
         """
         if (not numpy.isscalar(values) and
-                not (globals_variables.get_simulator().
-                     is_a_pynn_random(values)) and
+                not (get_simulator().is_a_pynn_random(values)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
             raise NotImplementedError(
-                "Lists of {} are not supported the implementation of"
-                " {} on this platform".format(name, self.__class__))
+                "Lists of {} are not supported by the implementation of {} on "
+                "this platform".format(name, self.__class__))
 
     def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\
@@ -136,7 +125,7 @@ class AbstractConnector(object):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays
         """
-        if globals_variables.get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
             high = utility_calls.high(delays)
@@ -162,7 +151,7 @@ class AbstractConnector(object):
     def _get_delay_variance(delays, connection_slices):
         """ Get the variance of the delays
         """
-        if globals_variables.get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(delays):
             return utility_calls.get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
@@ -178,6 +167,8 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the delays for this connection
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -187,7 +178,8 @@ class AbstractConnector(object):
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
-        if globals_variables.get_simulator().is_a_pynn_random(delays):
+        # pylint: disable=too-many-arguments
+        if get_simulator().is_a_pynn_random(delays):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
@@ -222,6 +214,8 @@ class AbstractConnector(object):
             and max_delay (inclusive) if both specified\
             (otherwise all connections)
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(
@@ -231,12 +225,14 @@ class AbstractConnector(object):
             neurons in the post_vertex_slice from neurons in the\
             pre_vertex_slice
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_mean(weights, connection_slices):
         """ Get the mean of the weights
         """
-        if globals_variables.get_simulator().is_a_pynn_random(weights):
+        if get_simulator().is_a_pynn_random(weights):
             return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -252,12 +248,14 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_maximum(weights, n_connections, connection_slices):
         """ Get the maximum of the weights
         """
-        if globals_variables.get_simulator().is_a_pynn_random(weights):
+        if get_simulator().is_a_pynn_random(weights):
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -288,12 +286,14 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     @staticmethod
     def _get_weight_variance(weights, connection_slices):
         """ Get the variance of the weights
         """
-        if globals_variables.get_simulator().is_a_pynn_random(weights):
+        if get_simulator().is_a_pynn_random(weights):
             return utility_calls.get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
@@ -309,6 +309,8 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the weights for this connection
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     def _expand_distances(self, d_expression):
         """ Check if a distance expression contains at least one term d[x]. \
@@ -318,12 +320,10 @@ class AbstractConnector(object):
             such as d[0] + d[2].
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
-        if regexpr.match(d_expression):
-            return True
-        return False
+        return regexpr.match(d_expression)
 
     def _generate_values(self, values, n_connections, connection_slices):
-        if globals_variables.get_simulator().is_a_pynn_random(values):
+        if get_simulator().is_a_pynn_random(values):
             if n_connections == 1:
                 return numpy.array([values.next(n_connections)],
                                    dtype="float64")
@@ -352,6 +352,7 @@ class AbstractConnector(object):
             if isinstance(values, basestring):
                 return _expr_context.eval(values)
             return values(d)
+        raise Exception("what on earth are you giving me?")
 
     def _generate_weights(self, values, n_connections, connection_slices):
         """ Generate weight values
@@ -359,7 +360,7 @@ class AbstractConnector(object):
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
-            if len(weights) == 0:
+            if not weights.size:
                 logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
@@ -382,7 +383,7 @@ class AbstractConnector(object):
             if delays < self._min_delay:
                 delays = self._min_delay
         else:
-            if delays.size > 0:
+            if delays.size:
                 delays[delays < self._min_delay] = self._min_delay
         return delays
 
@@ -407,7 +408,7 @@ class AbstractConnector(object):
 
         # Only certain types of random distributions are supported for\
         # generation on the machine
-        if globals_variables.get_simulator().is_a_pynn_random(values):
+        if get_simulator().is_a_pynn_random(values):
             return values.name in (
                 "uniform", "uniform_int", "poisson", "normal", "exponential")
 
@@ -418,6 +419,7 @@ class AbstractConnector(object):
         """ Determines if the connector generation is supported on the machine\
             or if the connector must be generated on the host
         """
+        pass
 
     @abstractmethod
     def create_synaptic_block(
@@ -426,13 +428,14 @@ class AbstractConnector(object):
             synapse_type):
         """ Create a synaptic block from the data
         """
+        # pylint: disable=too-many-arguments
+        pass
 
     def get_provenance_data(self):
-        data_items = list()
         name = "{}_{}_{}".format(
             self._pre_population.label, self._post_population.label,
             self.__class__.__name__)
-        data_items.append(ProvenanceDataItem(
+        return [ProvenanceDataItem(
             [name, "Times_synaptic_delays_got_clipped"],
             self._n_clipped_delays,
             report=self._n_clipped_delays > 0,
@@ -443,8 +446,7 @@ class AbstractConnector(object):
                 "timestep".format(
                     self.__class__.__name__, self._pre_population.label,
                     self._post_population.label, self._min_delay,
-                    self._n_clipped_delays))))
-        return data_items
+                    self._n_clipped_delays)))]
 
     @property
     def safe(self):
@@ -490,8 +492,8 @@ class AbstractConnector(object):
         # Only certain types of random distributions are supported for\
         # generation on the machine
         if isinstance(values, RandomDistribution):
-            return values.name in ("uniform", 
-                                   # "uniform_int", "poisson", 
+            return values.name in ("uniform",
+                                   # "uniform_int", "poisson",
                                    "normal", "exponential")
 
         if isinstance(values, ConvolutionKernel):
@@ -507,8 +509,8 @@ class AbstractConnector(object):
 
 
     def _param_hash(self, values):
-        """Generate a hash code for the parameter type, two special cases will 
-           be constant and kernel-based. Everything else is RandomDistribution 
+        """Generate a hash code for the parameter type, two special cases will
+           be constant and kernel-based. Everything else is RandomDistribution
            names. We should check if the parameters are supported before.
         """
 
@@ -525,5 +527,5 @@ class AbstractConnector(object):
 
     @abstractmethod
     def gen_on_machine_info(self):
-        """Does this connector require more info than general ones? if so, return a 
+        """Does this connector require more info than general ones? if so, return a
         list of this data, each element should be a 32-bit int"""

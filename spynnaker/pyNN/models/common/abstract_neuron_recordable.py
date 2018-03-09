@@ -5,7 +5,8 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractNeuronRecordable(object):
-    """ Indicates that membrane voltage can be recorded from this object
+    """ Indicates that a variable (e.g., membrane voltage) can be recorded\
+        from this object
     """
 
     __slots__ = ()
@@ -25,7 +26,8 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def set_recording(self, variable, new_state=True):
+    def set_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
         """ Sets v to being recorded
         """
 
@@ -52,4 +54,14 @@ class AbstractNeuronRecordable(object):
         :param buffer_manager:
         :param machine_time_step:
         :return:
+        """
+        # pylint: disable=too-many-arguments
+        pass
+
+    @abstractmethod
+    def get_neuron_sampling_interval(self, variable):
+        """
+        Returns the current sampling interval for this variable
+        :param variable: PyNN name of the variable
+        :return: Sampling interval in micro seconds
         """
