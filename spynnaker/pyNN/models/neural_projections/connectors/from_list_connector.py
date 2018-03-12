@@ -4,6 +4,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 import logging
 import numpy
+from six.moves import range
 
 logger = logging.getLogger(__name__)
 
