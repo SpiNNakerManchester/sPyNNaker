@@ -11,7 +11,7 @@ from unittests.mocks import MockSimulator
 
 import os
 import struct
-from six.moves import range, xrange
+from six.moves import xrange
 
 
 def _iterate_parameter_values(iterator, data_type):
@@ -73,7 +73,7 @@ def test_real_list():
     spec_writer = FileDataWriter("test.dat")
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
-        value = range(10)
+        value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
         param = NeuronParameter(value, DataType.S1615)
         iterator = param.iterator_by_slice(0, 5, spec)
         values = _iterate_parameter_values(iterator, DataType.S1615)
