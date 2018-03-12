@@ -4,6 +4,7 @@ import os
 import tempfile
 
 import spinn_utilities.conf_loader as conf_loader
+from spinn_utilities.overrides import overrides
 
 from pacman.model.placements.placement import Placement
 from pacman.model.resources.resource_container import ResourceContainer
@@ -79,6 +80,8 @@ class SimpleApplicationVertex(ApplicationVertex):
         super(SimpleApplicationVertex, self).__init__()
         self._n_atoms = n_atoms
 
+    @property
+    @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
         return self._n_atoms
 
@@ -86,11 +89,13 @@ class SimpleApplicationVertex(ApplicationVertex):
     def size(self):
         return self._n_atoms
 
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         return SimpleMachineVertex(resources_required, label, constraints)
 
+    @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
 
