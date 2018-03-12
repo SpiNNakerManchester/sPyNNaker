@@ -127,7 +127,7 @@ class SynapseDynamicsStatic(
         if hasattr(self, key):
             setattr(self, key, value)
             self._change_requires_mapping = True
-        raise exceptions.InvalidParameterType(
+        raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @overrides(AbstractStaticSynapseDynamics.get_parameter_names)

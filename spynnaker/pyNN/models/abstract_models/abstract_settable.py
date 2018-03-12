@@ -1,10 +1,6 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod, \
-    abstractproperty
-from spinn_utilities.ranged.ranged_list import RangedList
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
-    SpynakkerRangedList
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)

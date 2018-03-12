@@ -8,7 +8,7 @@ from .abstract_read_parameters_before_set \
 from .abstract_settable import AbstractSettable
 from .abstract_weight_updatable import AbstractWeightUpdatable
 
-__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractFilterableEdge",
-           "AbstractPopulationInitializable", "AbstractPopulationSettable",
-           "AbstractReadParametersBeforeSet", "AbstractWeightUpdatable",
-           "AbstractContainsUnits"]
+__all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
+           "AbstractFilterableEdge", "AbstractPopulationInitializable",
+           "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
+           "AbstractSettable", "AbstractWeightUpdatable"]

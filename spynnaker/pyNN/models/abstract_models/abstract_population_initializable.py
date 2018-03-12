@@ -43,28 +43,6 @@ class AbstractPopulationInitializable(object):
             results[variable] = self.get_initial_value(variable_init, selector)
         return results
 
-        """
-        results = dict()
-        
-        all_methods = dir(self._neuron_model)
-        for method in all_methods:
-            if method.startswith("initialize_"):
-                variable = method[11:]
-                key = "%s_init" % variable
-                if hasattr(self._neuron_model, key):
-                    getter = key
-                elif hasattr(self._neuron_model, variable):
-                    getter = variable
-                else:
-                    raise Exception("Vertex does not support getting of"
-                                    " parameter {}".format(variable))
-                value = self.get_value(getter)
-                if isinstance(value, SpynakkerRangedList):
-                    value = value.get_values()
-                results[variable] = value
-        return results
-        """
-
     @abstractmethod
     def get_initial_value(self, variable, selector=None):
         """ gets the value for any variable whose in initialize_parameters.keys

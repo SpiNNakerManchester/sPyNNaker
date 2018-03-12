@@ -45,7 +45,6 @@ from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
     SpynakkerRangedList
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
-from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
@@ -720,7 +719,7 @@ class AbstractPopulationVertex(
         raise KeyError("Variable {} has not getter".format(variable))
 
     @overrides(AbstractPopulationInitializable.get_initial_value)
-    def get_initial_value(self, variable, selector=None ):
+    def get_initial_value(self, variable, selector=None):
         (key, parameter) = self._get_init_key_and_parameter(variable)
 
         full = getattr(self._neuron_model, parameter)
@@ -738,7 +737,7 @@ class AbstractPopulationVertex(
         return ranged_list.get_values(selector)
 
     @overrides(AbstractPopulationInitializable.set_initial_value)
-    def set_initial_value(self, variable, value, selector=None ):
+    def set_initial_value(self, variable, value, selector=None):
         (key, parameter) = self._get_init_key_and_parameter(variable)
 
         full = getattr(self._neuron_model, parameter)

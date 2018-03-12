@@ -2,11 +2,6 @@ from unittests.mocks import MockSimulator
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 
-def test_simple():
-    simulator = MockSimulator.setup()
-    pop = PyNNPopulationCommon(spinnaker_control=simulator, size=5, vertex=None,
-                               structure=None, initial_values=None)
-
 
 def test_selector():
     simulator = MockSimulator.setup()

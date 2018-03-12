@@ -76,8 +76,6 @@ class MockSimulator(object):
     def id_counter(self, value):
         pass
 
-
-
     @classmethod
     def setup(cls):
         simulator = MockSimulator()

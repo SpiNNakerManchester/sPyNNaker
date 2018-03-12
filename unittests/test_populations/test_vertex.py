@@ -29,6 +29,7 @@ class MockModel(AbstractNeuronModel):
     def get_neural_parameters(self):
         raise NotImplementedError
 
+
 class FooBar(MockModel):
 
     def __init__(self):
@@ -48,6 +49,7 @@ class FooBar(MockModel):
     @property
     def bar(self):
         return self._bar
+
 
 class MockNeuron(AbstractPopulationVertex):
 
@@ -99,7 +101,6 @@ def test_init_by_in():
     assert [12] == neuron.get_initial_value("foo", selector=2)
 
 
-
 def test_init_bad():
     MockSimulator.setup()
     neuron = MockNeuron(5, FooBar())
@@ -108,6 +109,7 @@ def test_init_bad():
     with pytest.raises(KeyError):
         assert 1 == neuron.initialize("anotherbad", "junk")
 
+
 def test_initial_values():
     MockSimulator.setup()
     neuron = MockNeuron(5, FooBar())
@@ -115,4 +117,4 @@ def test_initial_values():
     assert "foo" in initial_values
     assert "bar" in initial_values
     initial_values = neuron.get_initial_values(selector=3)
-    assert {"foo":[1], "bar":[11]} == initial_values
+    assert {"foo": [1], "bar": [11]} == initial_values
