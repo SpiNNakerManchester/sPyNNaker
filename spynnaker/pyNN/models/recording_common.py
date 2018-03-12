@@ -11,6 +11,7 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from collections import defaultdict
 import numpy
 import logging
+from six.moves import xrange
 # pylint: disable=protected-access
 
 logger = FormatAdapter(logging.getLogger(__name__))
