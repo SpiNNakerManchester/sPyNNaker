@@ -280,8 +280,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
             # currently, controls = 1 if the subvertex (on the current core)
             # is part of this population
-            controls = int(
-                current_key in np.asarray(subpopulation_list)[:, 0])
+            controls = 1 if current_key in np.asarray(subpopulation_list)[:,
+                                           0] else 0
             spec.write_value(data=controls, data_type=DataType.UINT16)
 
             spec.write_value(
@@ -331,7 +331,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
                                     dtype=np.int32) * -1
         for row in self._connections[post_slice.lo_atom]:
-            if row[0].size > 0:
+            if row[0].size > 0 and row[1].post_vertex is app_vertex:
                 for source, target, _weight, _delay, _syn_type in row[0]:
                     # Select pre vertex
                     pre_vertex_slice = graph_mapper._slice_by_machine_vertex[
