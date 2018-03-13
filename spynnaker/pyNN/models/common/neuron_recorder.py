@@ -63,7 +63,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        step = globals_variables.get_simulator().machine_time_step // 1000
+        step = globals_variables.get_simulator().machine_time_step / 1000
         return self._sampling_rates[variable] * step
 
     def get_matrix_data(

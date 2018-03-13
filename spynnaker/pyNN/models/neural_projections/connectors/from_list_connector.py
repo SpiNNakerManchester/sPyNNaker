@@ -69,7 +69,7 @@ class FromListConnector(AbstractConnector):
             weight_index = column_names.index("weight")
         if "delay" in column_names:
             delay_index = column_names.index("delay")
-        element_index = range(2, len(column_names))
+        element_index = list(range(2, len(column_names)))
 
         # figure out where other stuff is
         conn_list = numpy.array(conn_list)
