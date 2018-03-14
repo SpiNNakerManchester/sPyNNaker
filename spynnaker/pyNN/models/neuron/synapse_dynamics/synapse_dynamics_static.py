@@ -13,7 +13,8 @@ class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
     __slots__ = [
-        "_change_requires_mapping"]
+        "_change_requires_mapping",
+        "_pad_to_length"]
 
     def __init__(self, pad_to_length=None):
         AbstractStaticSynapseDynamics.__init__(self)
@@ -75,7 +76,6 @@ class SynapseDynamicsStatic(
 
         return (ff_data, ff_size)
 
-    @overrides(AbstractStaticSynapseDynamics.get_n_static_words_per_row)
     # TODO remove this redundant piece of code
     def _pad_row(self, rows, no_bytes_per_connection):
         padded_rows = []

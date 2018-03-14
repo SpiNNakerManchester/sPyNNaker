@@ -546,7 +546,8 @@ class SpikeSourcePoissonVariable(
         return self._spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(self, new_state=True):
+    def set_recording_spikes(self, new_state=True,
+                             sampling_interval=None, indexes=None):
         self._change_requires_mapping = (
             self._spike_recorder.record != new_state)
         self._spike_recorder.record = new_state

@@ -635,7 +635,7 @@ class SynapticManager(object):
                         machine_time_step,
                         routing_info.get_routing_info_for_edge(machine_edge),
                         all_syn_block_sz, block_addr, single_addr,
-                        machine_edge = machine_edge)
+                        machine_edge=machine_edge)
 
         self._poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -665,7 +665,8 @@ class SynapticManager(object):
              synapse_info, pre_slices, pre_slice_idx, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
              app_edge.n_delay_stages, self._poptable_type, n_synapse_types,
-             weight_scales, machine_time_step, machine_edge=machine_edge)
+             weight_scales, machine_time_step,
+             app_edge=app_edge, machine_edge=machine_edge)
 
         if app_edge.delay_edge is not None:
             app_edge.delay_edge.pre_vertex.add_delays(

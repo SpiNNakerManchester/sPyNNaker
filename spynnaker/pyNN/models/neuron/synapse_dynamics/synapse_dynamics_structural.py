@@ -14,6 +14,24 @@ from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
+    __slots__ = [
+        "_f_rew",
+        "_p_rew",
+        "_weight",
+        "_delay",
+        "_s_max",
+        "_lateral_inhibition",
+        "_sigma_form_forward",
+        "_sigma_form_lateral",
+        "_p_form_forward",
+        "_p_form_lateral",
+        "_p_elim_dep",
+        "_p_elim_pot",
+        "_grid",
+        "_random_partner",
+        "_connections",
+        "_actual_row_max_length"]
+
     def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1,
                  s_max=32,
                  sigma_form_forward=2.5, sigma_form_lateral=1,
