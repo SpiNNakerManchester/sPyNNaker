@@ -54,8 +54,9 @@ class Convertor(object):
             return  # newer so no need to copy
         with open(src_path) as src_f:
             with open(destination, 'w') as dest_f:
-                dest_f.write("# DO NOT EDIT! THIS FILE WAS GENERATED FROM {}\n"
-                             .format(src_path))
+                dest_f.write(
+                    "# DO NOT EDIT! THIS FILE WAS GENERATED FROM {}\n\n"
+                    .format(src_path))
                 for line in src_f:
                     line_dest = line.replace(
                         self._src_basename, self._dest_basename)
@@ -103,7 +104,7 @@ if __name__ == '__main__':
     modified = os.path.abspath(sys.argv[2])
     print ("modified: {}".format(modified))
     if len(sys.argv) > 3:
-        rule = os.path.abspath(sys.argv[3])
+        rule = sys.argv[3]
         if rule == "all":
             convert(src, modified, True)
             sys.exit(0)
