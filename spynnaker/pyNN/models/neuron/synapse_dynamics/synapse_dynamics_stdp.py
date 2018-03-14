@@ -21,7 +21,8 @@ class SynapseDynamicsSTDP(
         "_change_requires_mapping",
         "_dendritic_delay_fraction",
         "_timing_dependence",
-        "_weight_dependence"]
+        "_weight_dependence",
+        "_pad_to_length"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
