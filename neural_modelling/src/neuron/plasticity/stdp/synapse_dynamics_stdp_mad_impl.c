@@ -93,8 +93,7 @@ static inline final_state_t _plasticity_update_synapse(
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
-//                                           + delay_dendritic;
-                                           + 0;
+                                           + delay_dendritic;
         log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
