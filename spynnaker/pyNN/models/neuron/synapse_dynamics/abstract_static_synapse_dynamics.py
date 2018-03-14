@@ -7,9 +7,9 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
+    """ Dynamics which don't change over time.
     """
-    AbstractStaticSynapseDynamics: dynamics which don't change over time.
-    """
+    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 
@@ -24,12 +24,14 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
             post_vertex_slice, n_synapse_types):
         """ Get the fixed-fixed data for each row, and lengths for the\
             fixed-fixed parts of each row.
-            Data is returned as an array made up of an array of 32-bit words\
-            for each row for the fixed-fixed region.  The row into which\
-            connection should go is given by connection_row_indices, and the\
-            total number of rows is given by n_rows.
-            Lengths are returned as an array made up of an integer for each\
-            row, for the fixed-fixed region.
+
+        Data is returned as an array made up of an array of 32-bit words for\
+        each row for the fixed-fixed region. The row into which connection\
+        should go is given by connection_row_indices, and the total number of\
+        rows is given by n_rows.
+
+        Lengths are returned as an array made up of an integer for each row,\
+        for the fixed-fixed region.
         """
 
     @abstractmethod

@@ -15,6 +15,7 @@ class HHCondExp(AbstractPopulationVertex):
             i_offset=0.0, g_leak=0.01, e_rev_E=0.0, gbar_Na=20.0,
             e_rev_leak=-65.0, e_rev_I=-80, e_rev_K=-90.0, v_offset=-63,
             v_init=None):
+        # pylint: disable=too-many-arguments, too-many-locals, unused-argument
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
 

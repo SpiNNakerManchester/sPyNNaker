@@ -49,7 +49,7 @@ class AbstractSynapseType(object):
 
         :return: The parameters
         :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+            :py:class:`spynnaker.pyNN.models.neural_properties.NeuronParameter`
         """
 
     @abstractmethod

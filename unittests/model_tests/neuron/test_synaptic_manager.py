@@ -21,8 +21,6 @@ from data_specification \
 
 from spinn_storage_handlers import FileDataWriter, FileDataReader
 
-from spinn_front_end_common.utilities import globals_variables
-
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
@@ -36,8 +34,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neuron.synapse_types \
     import AbstractSynapseType
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+
+from unittests.mocks import MockSimulator
 
 
 class MockSynapseIO(object):
@@ -68,7 +66,7 @@ class MockTransceiverRawData(object):
 class SimpleApplicationVertex(ApplicationVertex):
 
     def __init__(self, n_atoms):
-        ApplicationVertex.__init__(self)
+        super(SimpleApplicationVertex, self).__init__()
         self._n_atoms = n_atoms
 
     def n_atoms(self):
@@ -109,15 +107,6 @@ class MockSynapseType(AbstractSynapseType):
 
     def get_n_cpu_cycles_per_neuron(self):
         return 0
-
-
-class MockSimulator(object):
-
-    def is_a_pynn_random(self, values):
-        return False
-
-    def get_pynn_NumpyRNG(self):
-        return None
 
 
 class TestSynapticManager(unittest.TestCase):
@@ -216,10 +205,7 @@ class TestSynapticManager(unittest.TestCase):
         assert data_2 == direct_matrix_2_expanded
 
     def test_write_synaptic_matrix_and_master_population_table(self):
-
-        simulator = MockSimulator()
-        globals_variables.set_failed_state(SpynnakerFailedState())
-        globals_variables.set_simulator(simulator)
+        MockSimulator.setup()
 
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
@@ -406,8 +392,6 @@ class TestSynapticManager(unittest.TestCase):
             post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
-
-        globals_variables.unset_simulator()
 
 
 if __name__ == "__main__":

@@ -5,14 +5,26 @@
 #ifndef _ALPHA_SYNAPSE_H_
 #define _ALPHA_SYNAPSE_H_
 
-#include "../decay.h"
-#include <debug.h>
 
 //---------------------------------------
 // Macros
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 1
 #define SYNAPSE_TYPE_COUNT 2
+
+#define NUM_EXCITATORY_RECEPTORS 1
+#define NUM_INHIBITORY_RECEPTORS 1
+
+#include "../decay.h"
+#include <debug.h>
+#include "synapse_types.h"
+
+
+//---------------------------------------
+// Synapse parameters
+//---------------------------------------
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct alpha_params{
 	// buffer for linear term
@@ -28,15 +40,10 @@ typedef struct alpha_params{
 	decay_t decay;
 }alpha_params;
 
-//---------------------------------------
-// Synapse parameters
-//---------------------------------------
 typedef struct synapse_param_t {
 	alpha_params exc;
 	alpha_params inh;
 } synapse_param_t;
-
-#include "synapse_types.h"
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
@@ -44,6 +51,10 @@ typedef enum input_buffer_regions {
 	EXCITATORY, INHIBITORY,
 } input_buffer_regions;
 
+
+//---------------------------------------
+// Synapse shaping inline implementation
+//---------------------------------------
 static inline void _alpha_shaping(alpha_params* a_params){
 	a_params->lin_buff = a_params->lin_buff + a_params->dt_divided_by_tau_sqr;
 
@@ -88,14 +99,16 @@ static inline void synapse_types_add_neuron_input(
 	}
 }
 
-static inline input_t synapse_types_get_excitatory_input(
+static inline input_t* synapse_types_get_excitatory_input(
 		synapse_param_pointer_t parameter) {
-	return parameter->exc.lin_buff * parameter->exc.exp_buff;
+	excitatory_response[0] = parameter->exc.lin_buff * parameter->exc.exp_buff;
+	return &excitatory_response[0];
 }
 
-static inline input_t synapse_types_get_inhibitory_input(
+static inline input_t* synapse_types_get_inhibitory_input(
 		synapse_param_pointer_t parameter) {
-	return parameter->inh.lin_buff * parameter->inh.exp_buff;
+	inhibitory_response[0] = parameter->inh.lin_buff * parameter->inh.exp_buff;
+	return &inhibitory_response[0];
 }
 
 static inline const char *synapse_types_get_type_char(
