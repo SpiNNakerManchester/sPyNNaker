@@ -500,8 +500,7 @@ class SpikeSourcePoissonVariable(
 
             # Compute the spikes per tick for each atom
             spikes_per_tick = (
-                    rates * (
-                    float(machine_time_step) / MICROSECONDS_PER_SECOND))
+                rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
             # Determine which sources are fast and which are slow
             is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
@@ -541,9 +540,8 @@ class SpikeSourcePoissonVariable(
 
     @staticmethod
     def _convert_n_timesteps_to_ms(value, machine_time_step):
-        return (
-                value / (
-                MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
+        return value / (MICROSECONDS_PER_MILLISECOND /
+                        float(machine_time_step))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
