@@ -63,6 +63,25 @@ class Convertor(object):
                     dest_f.write(line_dest)
 
     def convert_c(self, src_path):
+        destination = self._check_destination(src_path)
+        if destination is None:
+            return  # newer so no need to copy
+        with open(src_path) as src_f:
+            with open(destination, 'w') as dest_f:
+                dest_f.write(
+                    "// DO NOT EDIT! THIS FILE WAS GENERATED FROM {}\n\n"
+                    .format(src_path))
+                too_many_lines = 2
+                for line in src_f:
+                    if too_many_lines:
+                        # Try to recover the lines added by do not edit
+                        check = line.strip()
+                        if len(check) == 0 or check == "*":
+                            too_many_lines -= 1
+                            continue
+                    line_dest = line
+                    dest_f.write(line_dest)
+
         self.copy_if_newer(src_path)
 
     def copy_if_newer(self, src_path):
