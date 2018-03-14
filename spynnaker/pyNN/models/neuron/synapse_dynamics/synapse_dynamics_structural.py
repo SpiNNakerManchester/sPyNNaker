@@ -33,8 +33,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         "_actual_row_max_length"]
 
     def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1,
-                 s_max=32,
-                 sigma_form_forward=2.5, sigma_form_lateral=1,
+                 s_max=32, sigma_form_forward=2.5, sigma_form_lateral=1,
                  p_form_forward=0.16, p_form_lateral=1,
                  p_elim_dep=0.0245, p_elim_pot=1.36 * 10 ** -4,
                  grid=np.array([16, 16]), lateral_inhibition=0,
@@ -91,20 +90,22 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
     @overrides(AbstractSynapseDynamicsStructural.get_parameter_names)
     def get_parameter_names(self):
-        # TODO
-        return []
+        names = ['weight', 'delay', 'f_rew', 's_max', 'lateral_inhibition',
+                 'sigma_form_forward', 'sigma_form_lateral', 'p_form_forward',
+                 'p_form_lateral', 'p_elim_dep', 'p_elim_pot', 'grid',
+                 'random_partner']
+        names.extend(self.super.get_parameter_names())
+        return names
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]),
                  type='euclidian'):  # @ReservedAssignment
         x0 = np.asarray(x0)
         x1 = np.asarray(x1)
         delta = np.abs(x0 - x1)
-        #     delta = np.where(delta > grid * .5, delta - grid, delta)
-        #     print delta, grid
-        if delta[0] > grid[0] * .5 and grid[0] > 0:
+        if (delta[0] > grid[0] * .5) and grid[0] > 0:
             delta[0] -= grid[0]
 
-        if delta[1] > grid[1] * .5 and grid[1] > 0:
+        if (delta[1] > grid[1] * .5) and grid[1] > 0:
             delta[1] -= grid[1]
 
         if type == 'manhattan':
@@ -242,8 +243,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                         break
 
         no_pre_populations = len(structural_application_edges)
-        # For each structurally plastic APPLICATION edge find the c
-        # orresponding machine edges
+        # For each structurally plastic APPLICATION edge find the
+        # corresponding machine edges
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
             if isinstance(machine_edge, ProjectionMachineEdge):
