@@ -24,7 +24,7 @@ class Convertor(object):
         self._dest_basename = "/" + dest_basename + "/"
         self._mkdir(self._dest)
 
-    def run(self):
+    def run(self, copy_all):
         for dirName, subdirList, fileList in os.walk(self._src):
             self._mkdir(dirName)
             for fileName in fileList:
@@ -38,12 +38,15 @@ class Convertor(object):
                 elif extension in [".mk"]:
                     self.convert_make(path)
                 elif extension in [".c", ".cpp", ".h"]:
-                    self.convert_c(path)
+                    if copy_all:
+                        self.convert_c(path)
                 elif extension in [".elf", ".o", ".nm", ".txt"]:
-                    self.copy_if_newer(path)
+                    if copy_all:
+                        self.copy_if_newer(path)
                 else:
                     print ("Unexpected file {}".format(path))
-                    self.copy_if_newer(path)
+                    if copy_all:
+                        self.copy_if_newer(path)
 
     def convert_make(self, src_path):
         destination = self._check_destination(src_path)
@@ -51,6 +54,8 @@ class Convertor(object):
             return  # newer so no need to copy
         with open(src_path) as src_f:
             with open(destination, 'w') as dest_f:
+                dest_f.write("# DO NOT EDIT! THIS FILE WAS GENERATED FROM {}\n"
+                             .format(src_path))
                 for line in src_f:
                     line_dest = line.replace(
                         self._src_basename, self._dest_basename)
@@ -85,21 +90,10 @@ class Convertor(object):
         if not os.path.exists(destination):
             raise Exception("mkdir failed {}".format(destination))
 
-"""
-  with open('Test.txt') as f1:
-    with open(Output.txt, 'w') as f2:
-      for line in f1:
-        if line == searchquery:
-          f2.write(line)
-          f2.write(f1.next())
-          f2.write(f1.next())
-"""
 
-
-
-def convert(src, modified):
+def convert(src, modified, copy_all):
     convertor = Convertor(src, modified)
-    convertor.run()
+    convertor.run(copy_all)
 
 
 if __name__ == '__main__':
@@ -108,7 +102,14 @@ if __name__ == '__main__':
     print ("src: {}".format(src))
     modified = os.path.abspath(sys.argv[2])
     print ("modified: {}".format(modified))
-    convert(src, modified)
+    if len(sys.argv) > 3:
+        rule = os.path.abspath(sys.argv[3])
+        if rule == "all":
+            convert(src, modified, True)
+            sys.exit(0)
+
+    convert(src, modified, False)
+
 
         #print (subdirList)
     #print (fileList)
