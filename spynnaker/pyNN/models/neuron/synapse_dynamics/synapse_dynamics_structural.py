@@ -1,3 +1,4 @@
+from six import itervalues
 import numpy as np
 import collections
 
@@ -269,7 +270,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                      vertex, constants.SPIKE_PARTITION_ID).first_mask))
 
         for subpopulation_list in \
-                population_to_subpopulation_information.itervalues():
+                itervalues(population_to_subpopulation_information):
             max_subpartitions = np.maximum(max_subpartitions,
                                            len(subpopulation_list))
 
@@ -287,7 +288,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         total_words_written = 0
         for subpopulation_list in \
-                population_to_subpopulation_information.itervalues():
+                itervalues(population_to_subpopulation_information):
             # Population header(s)
             # Number of subpopulations
             spec.write_value(data=len(subpopulation_list),
