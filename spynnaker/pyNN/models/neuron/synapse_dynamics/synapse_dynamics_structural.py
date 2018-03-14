@@ -179,10 +179,10 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 data=int((self._p_rew * 10 ** 6) / float(machine_time_step)),
                 data_type=DataType.INT32)
 
-        # TODO when implementing inhibitory connections add another
-        # spec.write_value here multiplied by weight_scale[1]
+        # scale the excitatory weight appropriately
         spec.write_value(data=int(round(self._weight * weight_scales[0])),
                          data_type=DataType.INT32)
+        # scale the inhibitory weight appropriately
         spec.write_value(data=int(round(self._weight * weight_scales[1])),
                          data_type=DataType.INT32)
         spec.write_value(data=self._delay, data_type=DataType.INT32)
