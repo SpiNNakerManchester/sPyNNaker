@@ -61,13 +61,13 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self._actual_row_max_length = self._s_max
 
         if stdp_model is not None:
-            self.super = SynapseDynamicsSTDP(
+            self._super = SynapseDynamicsSTDP(
                 timing_dependence=stdp_model.timing_dependence,
                 weight_dependence=stdp_model.weight_dependence,
                 dendritic_delay_fraction=stdp_model._dendritic_delay_fraction,
                 pad_to_length=self._s_max)
         else:
-            self.super = SynapseDynamicsStatic(pad_to_length=self._s_max)
+            self._super = SynapseDynamicsStatic(pad_to_length=self._s_max)
 
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
@@ -94,7 +94,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                  'sigma_form_forward', 'sigma_form_lateral', 'p_form_forward',
                  'p_form_lateral', 'p_elim_dep', 'p_elim_pot', 'grid',
                  'random_partner']
-        names.extend(self.super.get_parameter_names())
+        names.extend(self._super.get_parameter_names())
         return names
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]),
@@ -160,8 +160,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                          application_graph, machine_graph,
                          app_vertex, post_slice, machine_vertex, graph_mapper,
                          routing_info):
-        self.super.write_parameters(spec, region, machine_time_step,
-                                    weight_scales)
+        self._super.write_parameters(spec, region, machine_time_step,
+                                     weight_scales)
         spec.comment("Writing structural plasticity parameters")
         if spec.current_region != constants.POPULATION_BASED_REGIONS. \
                 SYNAPSE_DYNAMICS.value:
@@ -410,7 +410,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         structure_size += post_to_pre_table_size
 
         self.structure_size = structure_size
-        initial_size = self.super.get_parameters_sdram_usage_in_bytes(
+        initial_size = self._super.get_parameters_sdram_usage_in_bytes(
             n_neurons, n_synapse_types)
         total_size = structure_size + initial_size
         # Aproximation of the sizes of both probability vs distance tables
@@ -443,11 +443,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
-        if isinstance(self.super, AbstractPlasticSynapseDynamics):
-            return self.super.get_plastic_synaptic_data(
+        if isinstance(self._super, AbstractPlasticSynapseDynamics):
+            return self._super.get_plastic_synaptic_data(
                 connections, connection_row_indices, n_rows,
                 post_vertex_slice, n_synapse_types)
-        return self.super.get_static_synaptic_data(
+        return self._super.get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
             n_synapse_types)
 
@@ -458,56 +458,56 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
-        return self.super.get_static_synaptic_data(
+        return self._super.get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
             n_synapse_types)
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
             self._actual_row_max_length = \
-                self.super.get_n_words_for_plastic_connections(n_connections)
+                self._super.get_n_words_for_plastic_connections(n_connections)
         except Exception:
             self._actual_row_max_length = \
-                self.super.get_n_words_for_static_connections(n_connections)
+                self._super.get_n_words_for_static_connections(n_connections)
         return self._actual_row_max_length
 
     def get_n_words_for_static_connections(self, n_connections):
         self._actual_row_max_length = \
-            self.super.get_n_words_for_static_connections(n_connections)
+            self._super.get_n_words_for_static_connections(n_connections)
         return self._actual_row_max_length
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         if fp_size is not None:
-            return self.super.get_n_synapses_in_rows(pp_size, fp_size)
-        return self.super.get_n_synapses_in_rows(pp_size)
+            return self._super.get_n_synapses_in_rows(pp_size, fp_size)
+        return self._super.get_n_synapses_in_rows(pp_size)
 
     def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                    pp_size, pp_data, fp_size, fp_data):
-        return self.super.read_plastic_synaptic_data(
+        return self._super.read_plastic_synaptic_data(
             post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size,
             fp_data)
 
     def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                   ff_size, ff_data):
-        return self.super.read_static_synaptic_data(
+        return self._super.read_static_synaptic_data(
             post_vertex_slice, n_synapse_types, ff_size, ff_data)
 
     def get_n_fixed_plastic_words_per_row(self, fp_size):
-        return self.super.get_n_fixed_plastic_words_per_row(fp_size)
+        return self._super.get_n_fixed_plastic_words_per_row(fp_size)
 
     def get_n_plastic_plastic_words_per_row(self, pp_size):
-        return self.super.get_n_plastic_plastic_words_per_row(pp_size)
+        return self._super.get_n_plastic_plastic_words_per_row(pp_size)
 
     def are_weights_signed(self):
-        return self.super.are_weights_signed()
+        return self._super.are_weights_signed()
 
     def get_vertex_executable_suffix(self):
-        name = self.super.get_vertex_executable_suffix()
+        name = self._super.get_vertex_executable_suffix()
         name += "_structural"
         return name
 
     def get_n_static_words_per_row(self, ff_size):
-        return self.super.get_n_static_words_per_row(ff_size)
+        return self._super.get_n_static_words_per_row(ff_size)
 
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
@@ -528,4 +528,4 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         )
 
     def get_max_synapses(self, n_words):
-        return self.super.get_max_synapses(n_words)
+        return self._super.get_max_synapses(n_words)

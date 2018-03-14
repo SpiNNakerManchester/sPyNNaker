@@ -92,7 +92,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         delayed_size = 0
         if isinstance(dynamics, AbstractStaticSynapseDynamics) or (
                     isinstance(dynamics, AbstractSynapseDynamicsStructural) and
-                    isinstance(dynamics.super, AbstractStaticSynapseDynamics)):
+                    isinstance(dynamics._super,
+                               AbstractStaticSynapseDynamics)):
             undelayed_size = dynamics.get_n_words_for_static_connections(
                 max_undelayed_row_length)
             delayed_size = dynamics.get_n_words_for_static_connections(
@@ -134,7 +135,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
         if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics) or \
                 (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-                 isinstance(synapse_dynamics.super,
+                 isinstance(synapse_dynamics._super,
                             AbstractStaticSynapseDynamics)):
 
             # Get the static data
@@ -155,7 +156,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         elif isinstance(synapse_dynamics, SynapseDynamicsSTDP) or \
                 (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-                 isinstance(synapse_dynamics.super, SynapseDynamicsSTDP)):
+                 isinstance(synapse_dynamics._super, SynapseDynamicsSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
@@ -309,7 +310,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = list()
         if isinstance(dynamics, AbstractStaticSynapseDynamics) \
                 or (isinstance(dynamics, AbstractSynapseDynamicsStructural)
-                    and isinstance(dynamics.super,
+                    and isinstance(dynamics._super,
                                    AbstractStaticSynapseDynamics)):
             # Read static data
             connections = self._read_static_data(
