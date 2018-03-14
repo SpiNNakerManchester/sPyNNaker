@@ -528,11 +528,8 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag) {
 
     if (current_state.element_exists && search_hit) {
         synaptogenesis_dynamics_elimination_rule();
-    } else if (current_state.element_exists && (!search_hit)) {
-        log_error("FAIL Search");
-        rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
-        // rt_error(RTE_SWERR);
-    } else {
+    }
+    else {
         synaptogenesis_dynamics_formation_rule();
     }
     // This calls _setup_synaptic_dma_read() again!

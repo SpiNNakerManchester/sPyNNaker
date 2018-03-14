@@ -88,11 +88,11 @@ void out_spikes_print() {
 }
 
 void out_spike_info_print(){
-    log_info("-----------\n");
+    log_debug("-----------\n");
     index_t i; //!< For indexing through the bit field
 
     for (i = 0; i < out_spikes_size; i++) {
-    	log_info("%08x\n", out_spikes[i]);
+    	log_debug("%08x\n", out_spikes[i]);
     }
-    log_info("-----------\n");
+    log_debug("-----------\n");
 }

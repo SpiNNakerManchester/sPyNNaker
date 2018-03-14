@@ -280,8 +280,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
             # currently, controls = 1 if the subvertex (on the current core)
             # is part of this population
-            controls = 1 if current_key in np.asarray(subpopulation_list)[:,
-                                           0] else 0
+            controls = 1 if current_key in \
+                            np.asarray(subpopulation_list)[:0] else 0
             spec.write_value(data=controls, data_type=DataType.UINT16)
 
             spec.write_value(

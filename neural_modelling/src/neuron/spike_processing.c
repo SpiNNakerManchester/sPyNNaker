@@ -258,7 +258,7 @@ bool spike_processing_initialise(
             log_error("Could not initialise DMA buffers");
             return false;
         }
-        log_info(
+        log_debug(
             "DMA buffer %u allocated at 0x%08x", i, dma_buffers[i].row);
     }
     dma_busy = false;
