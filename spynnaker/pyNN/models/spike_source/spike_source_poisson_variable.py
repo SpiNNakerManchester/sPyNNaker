@@ -48,7 +48,8 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set \
+from spynnaker.pyNN.models.abstract_models. \
+    abstract_read_parameters_before_set \
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
@@ -72,8 +73,9 @@ RANDOM_SEED_WORDS = 4
 # has key, key, random_back off, time_between_spikes,
 # seed1, seed2, seed3 , seed4,
 # n_sources, seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
-START_OF_POISSON_GENERATOR_PARAMETERS = (
-                                                PARAMS_BASE_WORDS + PARAMS_VARIABLE + RANDOM_SEED_WORDS) * 4
+START_OF_POISSON_GENERATOR_PARAMETERS = (PARAMS_BASE_WORDS +
+                                         PARAMS_VARIABLE +
+                                         RANDOM_SEED_WORDS) * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
@@ -109,12 +111,12 @@ class _PoissonStruct(Enum):
 
 
 class SpikeSourcePoissonVariable(
-    ApplicationVertex, AbstractGeneratesDataSpecification,
-    AbstractHasAssociatedBinary, AbstractSpikeRecordable,
-    AbstractProvidesOutgoingPartitionConstraints,
-    AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-    AbstractRewritesDataSpecification, SimplePopulationSettable,
-    ProvidesKeyToAtomMappingImpl):
+        ApplicationVertex, AbstractGeneratesDataSpecification,
+        AbstractHasAssociatedBinary, AbstractSpikeRecordable,
+        AbstractProvidesOutgoingPartitionConstraints,
+        AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
+        AbstractRewritesDataSpecification, SimplePopulationSettable,
+        ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
 
@@ -499,7 +501,7 @@ class SpikeSourcePoissonVariable(
             # Compute the spikes per tick for each atom
             spikes_per_tick = (
                     rates * (
-                        float(machine_time_step) / MICROSECONDS_PER_SECOND))
+                    float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
             # Determine which sources are fast and which are slow
             is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
@@ -541,7 +543,7 @@ class SpikeSourcePoissonVariable(
     def _convert_n_timesteps_to_ms(value, machine_time_step):
         return (
                 value / (
-                    MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
+                MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -573,7 +575,7 @@ class SpikeSourcePoissonVariable(
              SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
              poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg() * \
-                      front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+            front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
         return total_size
 
     def _get_number_of_mallocs_used_by_dsg(self):
@@ -723,7 +725,7 @@ class SpikeSourcePoissonVariable(
         # write setup data
         spec.switch_write_focus(
             SpikeSourcePoissonMachineVertex.
-                POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+            POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
@@ -732,7 +734,7 @@ class SpikeSourcePoissonVariable(
         ip_tags = tags.get_ip_tags_for_vertex(vertex)
         spec.switch_write_focus(
             SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
-                .SPIKE_HISTORY_REGION.value)
+            .SPIKE_HISTORY_REGION.value)
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(

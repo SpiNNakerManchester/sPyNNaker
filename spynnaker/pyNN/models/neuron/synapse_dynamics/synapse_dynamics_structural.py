@@ -121,11 +121,9 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 else:
                     pre = (0, row % self._grid[1])
                     post = (0, column % self._grid[1])
-                euclidian_distances[row, column] = self.distance(
-                    pre,
-                    post,
-                    grid=self._grid,
-                    type='euclidian')
+
+                euclidian_distances[row, column] = \
+                    self.distance(pre, post, grid=self._grid, type='euclidian')
         largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
@@ -298,8 +296,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
             # currently, controls = 1 if the subvertex (on the current core)
             # is part of this population
-            controls = 1 if current_key in \
-                            np.asarray(subpopulation_list)[:0] else 0
+            controls = 1 if current_key in np.asarray(
+                subpopulation_list)[:0] else 0
             spec.write_value(data=controls, data_type=DataType.UINT16)
 
             spec.write_value(
