@@ -5,7 +5,7 @@ import random
 import numpy
 from enum import Enum
 from pacman.model.constraints.key_allocator_constraints import \
-   ContiguousKeyRangeContraint
+    ContiguousKeyRangeContraint
 
 from data_specification.enums.data_type import DataType
 
@@ -22,7 +22,7 @@ from spinn_front_end_common.abstract_models. \
     abstract_provides_outgoing_partition_constraints import \
     AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.abstract_models\
+from spinn_front_end_common.abstract_models \
     .abstract_generates_data_specification \
     import AbstractGeneratesDataSpecification
 from spinn_front_end_common.utilities import helpful_functions
@@ -32,10 +32,10 @@ from spinn_front_end_common.abstract_models.abstract_has_associated_binary \
     import AbstractHasAssociatedBinary
 from spinn_front_end_common.utilities import constants as \
     front_end_common_constants
-from spinn_front_end_common.abstract_models\
+from spinn_front_end_common.abstract_models \
     .abstract_rewrites_data_specification \
     import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models.impl\
+from spinn_front_end_common.abstract_models.impl \
     .provides_key_to_atom_mapping_impl import ProvidesKeyToAtomMappingImpl
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
@@ -48,7 +48,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
     import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set\
+from spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set \
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
@@ -73,7 +73,7 @@ RANDOM_SEED_WORDS = 4
 # seed1, seed2, seed3 , seed4,
 # n_sources, seconds_per_timestep, timesteps_per_second, slow_rate_tick_cutoff
 START_OF_POISSON_GENERATOR_PARAMETERS = (
-    PARAMS_BASE_WORDS + PARAMS_VARIABLE + RANDOM_SEED_WORDS) * 4
+                                                PARAMS_BASE_WORDS + PARAMS_VARIABLE + RANDOM_SEED_WORDS) * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
@@ -90,8 +90,8 @@ class _PoissonStruct(Enum):
     ISI_VAL = (4, DataType.S1615)
     TIME_TO_SPIKE = (5, DataType.S1615)
 
-#     NUM_RATES = (6, DataType.UINT32)
-#     RATE_INTERVAL_DURATION = (7, DataType.UINT32)
+    #     NUM_RATES = (6, DataType.UINT32)
+    #     RATE_INTERVAL_DURATION = (7, DataType.UINT32)
 
     def __new__(cls, value, data_type, doc=""):
         obj = object.__new__(cls)
@@ -109,12 +109,12 @@ class _PoissonStruct(Enum):
 
 
 class SpikeSourcePoissonVariable(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
-        AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-        AbstractRewritesDataSpecification, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl):
+    ApplicationVertex, AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary, AbstractSpikeRecordable,
+    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
+    AbstractRewritesDataSpecification, SimplePopulationSettable,
+    ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
 
@@ -254,9 +254,9 @@ class SpikeSourcePoissonVariable(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
                 self._N_POPULATION_RECORDING_REGIONS)],
-            n_machine_time_steps, self._minimum_buffer_sdram,
-            self._maximum_sdram_for_buffering,
-            self._using_auto_pause_and_resume)
+            minimum_sdram_for_buffering=self._minimum_buffer_sdram,
+            maximum_sdram_for_buffering=self._maximum_sdram_for_buffering,
+            use_auto_pause_and_resume=self._using_auto_pause_and_resume)
         container.extend(recording_utilities.get_recording_resources(
             recording_sizes, self._receive_buffer_host,
             self._receive_buffer_port))
@@ -278,12 +278,12 @@ class SpikeSourcePoissonVariable(
             self, vertex_slice, resources_required, n_machine_time_steps,
             machine_time_step, label=None, constraints=None):
         SpikeSourcePoissonVariable._n_poisson_machine_vertices += 1
-        buffered_sdram_per_timestep =\
+        buffered_sdram_per_timestep = \
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step), 1)
         minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
-            [buffered_sdram_per_timestep], n_machine_time_steps,
+            [buffered_sdram_per_timestep * n_machine_time_steps],
             self._minimum_buffer_sdram)
         return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
@@ -435,10 +435,10 @@ class SpikeSourcePoissonVariable(
             max_spikes = numpy.sum(scipy.stats.poisson.ppf(
                 1.0 - (1.0 / total_mean_rate), total_mean_rate))
             spikes_per_timestep = (
-                max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
+                    max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
             time_between_spikes = (
-                (machine_time_step * time_scale_factor) /
-                (spikes_per_timestep * 2.0))
+                    (machine_time_step * time_scale_factor) /
+                    (spikes_per_timestep * 2.0))
             spec.write_value(data=int(time_between_spikes))
         else:
 
@@ -498,7 +498,8 @@ class SpikeSourcePoissonVariable(
 
             # Compute the spikes per tick for each atom
             spikes_per_tick = (
-                rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
+                    rates * (
+                        float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
             # Determine which sources are fast and which are slow
             is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
@@ -513,7 +514,7 @@ class SpikeSourcePoissonVariable(
             # average number of timesteps between spikes
             isi_val = numpy.zeros(len(spikes_per_tick), dtype="float")
             elements = numpy.logical_not(is_fast_source) & (
-                spikes_per_tick > 0)
+                    spikes_per_tick > 0)
             isi_val[elements] = 1.0 / spikes_per_tick[elements]
 
             # Get the time to spike value
@@ -539,7 +540,8 @@ class SpikeSourcePoissonVariable(
     @staticmethod
     def _convert_n_timesteps_to_ms(value, machine_time_step):
         return (
-            value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
+                value / (
+                    MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -548,8 +550,15 @@ class SpikeSourcePoissonVariable(
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(self, new_state=True,
                              sampling_interval=None, indexes=None):
+        if sampling_interval is not None:
+            logger.warning("Sampling interval currently not supported for "
+                           "SpikeSourcePoisson so being ignored")
+
+        if indexes is not None:
+            logger.warning("indexes not supported for "
+                           "SpikeSourcePoisson so being ignored")
         self._change_requires_mapping = (
-            self._spike_recorder.record != new_state)
+                self._spike_recorder.record != new_state)
         self._spike_recorder.record = new_state
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
@@ -564,7 +573,7 @@ class SpikeSourcePoissonVariable(
              SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
              poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg() * \
-            front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
+                      front_end_common_constants.SARK_PER_MALLOC_SDRAM_USAGE
         return total_size
 
     def _get_number_of_mallocs_used_by_dsg(self):
@@ -676,8 +685,8 @@ class SpikeSourcePoissonVariable(
 
         # Convert spikes per tick to rates
         self._rate[vertex_slice.as_slice] = (
-            spikes_per_tick *
-            (MICROSECONDS_PER_SECOND / float(self._machine_time_step)))
+                spikes_per_tick *
+                (MICROSECONDS_PER_SECOND / float(self._machine_time_step)))
 
         # Store the updated time until next spike so that it can be
         # rewritten when the parameters are loaded
@@ -714,7 +723,7 @@ class SpikeSourcePoissonVariable(
         # write setup data
         spec.switch_write_focus(
             SpikeSourcePoissonMachineVertex.
-            POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
+                POISSON_SPIKE_SOURCE_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
@@ -723,13 +732,12 @@ class SpikeSourcePoissonVariable(
         ip_tags = tags.get_ip_tags_for_vertex(vertex)
         spec.switch_write_focus(
             SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
-            .SPIKE_HISTORY_REGION.value)
+                .SPIKE_HISTORY_REGION.value)
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            n_machine_time_steps,
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                1)],
+                n_machine_time_steps)],
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
@@ -759,6 +767,10 @@ class SpikeSourcePoissonVariable(
             self.label, buffer_manager,
             SpikeSourcePoissonVariable.SPIKE_RECORDING_REGION_ID,
             placements, graph_mapper, self, machine_time_step)
+
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return globals_variables.get_simulator().machine_time_step
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
