@@ -1,11 +1,8 @@
 BUILDS = spike_source/poisson delay_extension neuron robot_motor_control
-DIRS = $(BUILDS:%=modified_src/%)
 
-$(DIRS):
-	python convertor.py $(abspath src) $(abspath modified_src) all
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
-
-all: $(DIRS)
+all: 
+	python convertor.py $(abspath src) $(abspath modified_src) messages.txt || exit $$?; done
+	for d in $(BUILDS:%=modified_src/%); do $(MAKE) -C $$d || exit $$?; done
 
 %.aplx: %
 	"$(MAKE)" -C $*
@@ -14,6 +11,5 @@ all: $(DIRS)
 	"$(MAKE)" -C neuron/builds/$*
 
 clean: 
-	python convertor.py $(abspath src) $(abspath modified_src)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+	for d in $(BUILDS:%=src/%); do $(MAKE) -C $$d clean || exit $$?; done
 	rm -r $(abspath modified_src) || true
