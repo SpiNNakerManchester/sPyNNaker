@@ -219,6 +219,15 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         for _ in range(4):
             spec.write_value(data=np.random.randint(0x7FFFFFFF))
 
+        # Write presynaptic (sub)population information
+
+        self.__write_presynaptic_information(
+            spec, application_graph, machine_graph,
+            app_vertex, post_slice, machine_vertex, graph_mapper,
+            routing_info)
+
+    def __compute_aux(self, application_graph, machine_graph,
+                      app_vertex, machine_vertex, graph_mapper, routing_info):
         # Compute the max number of presynaptic subpopulations
         population_to_subpopulation_information = collections.OrderedDict()
 
@@ -282,6 +291,22 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             current_key = current_key.first_key
         else:
             current_key = -1
+        return (population_to_subpopulation_information, current_key,
+                no_pre_populations)
+
+    def __write_presynaptic_information(self, spec, application_graph,
+                                        machine_graph,
+                                        app_vertex, post_slice, machine_vertex,
+                                        graph_mapper,
+                                        routing_info):
+        # Compute all the auxilliary stuff
+        results = self.__compute_aux(application_graph, machine_graph,
+                                     app_vertex, machine_vertex, graph_mapper,
+                                     routing_info)
+
+        population_to_subpopulation_information = results[0]
+        current_key = results[1]
+        no_pre_populations = results[2]
 
         # Table header
         spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
@@ -345,6 +370,16 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._lat_distance_probabilities.view(dtype=np.uint32))
         total_words_written += self._lat_distance_probabilities.size // 2
 
+        # Write post to pre table (inverse of synaptic matrix)
+        self.__write_post_to_pre_table(spec, app_vertex, post_slice,
+                                       machine_vertex, graph_mapper,
+                                       population_to_subpopulation_information,
+                                       total_words_written)
+
+    def __write_post_to_pre_table(self, spec,  app_vertex, post_slice,
+                                  machine_vertex, graph_mapper,
+                                  population_to_subpopulation_information,
+                                  total_words_written):
         # Setting up Post to Pre table
         post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
                                     dtype=np.int32) * -1
@@ -396,7 +431,6 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             machine_vertex] = 4 * 27 + 4 * total_words_written
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
-        #
         relevant_edges = []
         for edge in machine_in_edges:
             for synapse_info in edge._synapse_information:
