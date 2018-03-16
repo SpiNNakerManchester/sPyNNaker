@@ -1,5 +1,5 @@
 APP = synapse_expander
 BUILD_DIR = build/
-SOURCES = synapse_expander.c
+SOURCES = matrix_generator.c synapse_expander.c
 
 include ../common.mk

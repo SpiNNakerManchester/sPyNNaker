@@ -1,9 +1,13 @@
 #include "synapse_expander.h"
+#include "matrix_generator.h"
+#include "connection_generator.h"
+#include "param_generator.h"
+#include "rng.h"
+
 #include <stdbool.h>
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
-#include <random.h>
 
 //#define DEBUG_MESSAGES
 #define SARK_HEAP 1
@@ -51,21 +55,17 @@ static sdp_msg_t delay_message;
 
 uint16_t *pre_delay_pairs = NULL;
 
-// Factories to create matrix, connector and parameter generators by ID
-GeneratorFactory<MatrixGenerator::Base, 2> g_MatrixGeneratorFactory;
-GeneratorFactory<ConnectorGenerator::Base, 5> g_ConnectorGeneratorFactory;
-GeneratorFactory<ParamGenerator::Base, 10> g_ParamGeneratorFactory;
-
-// Memory buffers to placement new generators into
-void *g_MatrixGeneratorBuffer = NULL;
-void *g_ConnectorGeneratorBuffer = NULL;
-void *g_DelayParamGeneratorBuffer = NULL;
-void *g_WeightParamGeneratorBuffer = NULL;
+matrix_generator_t matrix_generator;
+connection_generator_t connection_generator;
+param_generator_t weight_generator;
+param_generator_t delay_generator;
 
 uint32_t *sdram_address = NULL;
 
 static void handle_sdp_message(uint mailbox, uint sdp_port) {
-    log_info("\t\tACK rec");
+    use(mailbox);
+    use(sdp_port);
+    log_info("\t\tACK received");
     delay_response_received = true;
 }
 
@@ -73,7 +73,7 @@ static void wait_for_delay_response(uint32_t rand_num) {
 //  spin1_delay_us(SLEEP_TIME);
   int retry_count = 0;
   // Wait until the response to the last message has been received
-  LOG_PRINT(LOG_LEVEL_INFO, "\t - Waiting for ACK");
+  log_info("\t - Waiting for ACK");
   while (!delay_response_received) {
     if (retry_count >= MAX_RETRIES){
 //      rt_error(RTE_ABORT);
@@ -83,7 +83,7 @@ static void wait_for_delay_response(uint32_t rand_num) {
     }
 
   //   Wait for a time for a response
-  //   LOG_PRINT(LOG_LEVEL_INFO, "Waiting for response from last delay message");
+  //   log_info("Waiting for response from last delay message");
     uint32_t shift = (spin1_get_core_id()*spin1_get_chip_id() + retry_count)%28;
     spin1_delay_us(SLEEP_TIME + 2*((rand_num >> shift) & 3) +
                   ((rand_num >> (shift+2)) & 3));
@@ -95,7 +95,7 @@ static void wait_for_delay_response(uint32_t rand_num) {
     }
   }
 
-  LOG_PRINT(LOG_LEVEL_INFO, "\t\t - Waited %u times", retry_count);
+  log_info("\t\t - Waited %u times", retry_count);
 }
 
 static void send_n_delays(uint32_t placement, uint16_t *delays, uint32_t n_delays,
@@ -103,16 +103,9 @@ static void send_n_delays(uint32_t placement, uint16_t *delays, uint32_t n_delay
 
   uint16_t delay_chip = (uint16_t)_place_xy_16(placement);
   uint8_t delay_core  = (uint8_t)_place_p(placement);
-//#ifdef DEBUG_MESSAGES
-  LOG_PRINT(LOG_LEVEL_INFO,
-            "send_n_delays to 0x%04x.%02u, N = %u",
-            delay_chip, delay_core, n_delays);
-//  for(uint32_t i = 0; i < n_delays; i++){
-//    LOG_PRINT(LOG_LEVEL_INFO,
-//              "\tpre = %u, delay = %u", _preid_delay_i(delays[i]),
-//              _preid_delay_d(delays[i]));
-//  }
-//#endif
+  log_info("send_n_delays to 0x%04x.%02u, N = %u",
+      delay_chip, delay_core, n_delays);
+
   // initialise SDP header
   uint8_t src_port = 1;
   delay_message.tag = BUILD_IN_MACHINE_TAG;
@@ -139,7 +132,7 @@ static void send_n_delays(uint32_t placement, uint16_t *delays, uint32_t n_delay
   }
 
 
-  spin1_delay_us(1+(rand_num >>  spin1_get_core_id()) & 3);
+  spin1_delay_us(1 + ((rand_num >> spin1_get_core_id()) & 3));
   delay_response_received = false;
   spin1_send_sdp_msg(&delay_message, 1);
   wait_for_delay_response(rand_num);
@@ -151,7 +144,9 @@ static bool send_delays(
         const uint32_t num_placements, const uint32_t *placements,
         const uint32_t *delay_starts, const uint32_t *delay_counts,
         uint16_t n_delays, uint16_t *delays, uint32_t pre_slice_start,
-        const uint32_t rand_num) {
+        rng_t rng) {
+
+    uint32_t rand_num = rng_generator(rng);
 
     if (n_delays == 0) {
         return true;
@@ -194,9 +189,8 @@ static bool send_delays(
     //loop through all delay extension placements to send the appropriate pairs
     for (uint32_t place_i = 0; place_i < num_placements; place_i++) {
 
-#ifdef DEBUG_MESSAGES
-        log_info("place 0x%04x", placements[place_idx]);
-#endif
+        log_debug("place 0x%04x", placements[place_idx]);
+
         prev_pre = 333;
         prev_dly = 333;
         uint32_t prev_plc_idx = place_idx - 1;
@@ -223,7 +217,7 @@ static bool send_delays(
 
             if ((index >= delay_starts[place_idx]) && (index < delay_end)) {
 
-                log_debug("idx %u, dly %u, d-start %u, d-end %u",
+                log_debug("index %u, delay %u, d-start %u, d-end %u",
                     index, delay, delay_starts[place_idx], delay_end);
 
                 pairs_per_core[count] = delays[index_seen];
@@ -259,7 +253,7 @@ static bool send_delays(
         count = 0;
 
         if(seen[place_idx]){
-        LOG_PRINT(LOG_LEVEL_INFO, "\t --- 0x%04x finished",
+        log_info("\t --- 0x%04x finished",
                   placements[place_idx]);
 
         send_n_delays(placements[place_idx], NULL, 0, rand_num, 0);
@@ -271,7 +265,7 @@ static bool send_delays(
     }
 
 //    for(uint32_t i = index_seen; i < num_placements; i++){
-//      LOG_PRINT(LOG_LEVEL_INFO, "Seen placementes %u", seen[i]);
+//      log_info("Seen placements %u", seen[i]);
 //    }
 
     return true;
@@ -294,7 +288,7 @@ uint32_t max_matrix_size(
 }
 
 bool read_connection_builder_region(
-        uint32_t **in_region, uint32_t *synaptic_matrix_region,
+        address_t *in_region, address_t synaptic_matrix_region,
         uint32_t post_slice_start, uint32_t post_slice_count,
         int32_t *weight_scales, uint32_t num_synapse_bits,
         uint32_t num_static, uint32_t num_plastic){
@@ -303,9 +297,7 @@ bool read_connection_builder_region(
     uint32_t *region = *in_region;
 
     // Read RNG seed for this matrix
-    mars_kiss64_seed_t seed;
-    spin1_memcpy(seed, region, sizeof(mars_kiss64_seed_t));
-    validate_mars_kiss64_seed(seed);
+    rng_t rng = rng_init(region);
 
     const uint32_t connector_type_hash = *region++;
     const uint32_t pre_key             = *region++;
@@ -336,7 +328,6 @@ bool read_connection_builder_region(
     const uint32_t weight_type_hash    = *region++;
     const uint32_t delay_type_hash     = *region++;
 
-#ifdef DEBUG_MESSAGES
     log_info(
         "\t connector type hash:%u, delay type hash:%u, weight type hash:%u",
         connector_type_hash, delay_type_hash, weight_type_hash);
@@ -362,37 +353,27 @@ bool read_connection_builder_region(
     log_info("\t direct? %u, delayed? %u", is_direct_row, is_delayed);
 
     log_info(
-        "\t synapse (plastic/static) hash %u,"
-        "synapse type (exc, inh, etc.) %u, ",
+        "\t synapse (plastic/static) hash %u, synapse type  %u, ",
         matrix_type_hash, synapse_type);
-#endif
 
     // Generate matrix, connector, delays and weights
-    const auto matrixGenerator = g_MatrixGeneratorFactory.Create(
-        matrix_type_hash, region, g_MatrixGeneratorBuffer);
-
-    const auto connectorGenerator = g_ConnectorGeneratorFactory.Create(
-        connector_type_hash, region, g_ConnectorGeneratorBuffer);
-
-    log_info("\t\tWeight");
-    const auto weightGenerator = g_ParamGeneratorFactory.Create(
-        weight_type_hash, region, g_WeightParamGeneratorBuffer);
-
-    log_info("\t\tDelay");
-    const auto delayGenerator = g_ParamGeneratorFactory.Create(
-        delay_type_hash, region, g_DelayParamGeneratorBuffer);
+    matrix_generator = matrix_generator_init(matrix_type_hash, &region);
+    connection_generator = connection_generator_init(
+        connector_type_hash, &region);
+    weight_generator = param_generator_init(weight_type_hash, &region);
+    delay_generator = param_generator_init(delay_type_hash, &region);
 
     *in_region = region;
 
     // If any components couldn't be created return false
-    if (matrixGenerator == NULL || connectorGenerator == NULL
-            || delayGenerator == NULL || weightGenerator == NULL) {
+    if (matrix_generator == NULL || connection_generator == NULL
+            || delay_generator == NULL || weight_generator == NULL) {
         return false;
     }
 
     log_debug("max num static: %u, max num plastic: %u, row_len: %u",
         num_static, num_plastic, row_len);
-    if (matrixGenerator->is_static){
+    if (matrix_generator_is_static(matrix_generator)) {
         // num_static = max_post_neurons;
         num_static = row_len;
     } else if (row_len > 0) {
@@ -414,7 +395,8 @@ bool read_connection_builder_region(
     }
 
     uint32_t per_pre_size = max_matrix_size(
-        num_static, num_plastic, matrixGenerator->m_PreStateWords);
+        num_static, num_plastic,
+        matrix_generator_n_pre_state_words(matrix_generator));
     log_debug(
         "max num static: %u, max num plastic: %u, max matrix size: %u",
          num_static, num_plastic, per_pre_size);
@@ -443,13 +425,14 @@ bool read_connection_builder_region(
 
         uint16_t pair_count = 0;
         spin1_delay_us(spin1_get_core_id());
-        if (!matrixGenerator->Generate(
+        if (!matrix_generator_generate(
+                matrix_generator,
                 synaptic_matrix_region, address_delta, num_static, num_plastic,
                 per_pre_size, synapse_type, post_slice_start, post_slice_count,
-                pre_key, pre_mask, pre_slice_start, pre_slice_count,
-                pre_start_new, pre_count_new, num_pre_neurons, words_per_weight,
-                weight_scales, num_synapse_bits, connectorGenerator,
-                delayGenerator, weightGenerator, rng, pre_delay_pairs,
+                pre_slice_start, pre_slice_count,
+                pre_start_new, pre_count_new, words_per_weight,
+                weight_scales, num_synapse_bits, connection_generator,
+                delay_generator, weight_generator, rng, pre_delay_pairs,
                 pair_count)){
             log_error("\tMatrix generation failed");
             return false;
@@ -466,7 +449,7 @@ bool read_connection_builder_region(
         if (pair_count > 0) {
             if (!send_delays(num_delayed_places, delay_places_xyp,
                     delay_starts, delay_counts, pair_count, pre_delay_pairs,
-                    pre_slice_start, seed[spin1_get_core_id()%4])) {
+                    pre_slice_start, rng)) {
                 return false;
             }
         }
@@ -485,7 +468,7 @@ void clear_memory(uint32_t *syn_mtx_addr){
 }
 
 
-bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
+bool read_sdram_data(address_t params_address, address_t syn_mtx_addr){
     uint32_t mem_tag = ID_DELAY_SDRAM_TAG + spin1_get_core_id();
 
     log_info("Allocating up memory for tag %u", mem_tag);
@@ -496,9 +479,7 @@ bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
             sark_heap_max(sv->sdram_heap, ALLOC_LOCK));
     #endif
 
-    //#endif
-
-    log_info("idx/delay buffer size = %u bytes",
+    log_info("index/delay buffer size = %u bytes",
         (MAX_PRE_DELAY_ENTRIES*256)*sizeof(uint16_t));
 
     #if SARK_HEAP == 1
@@ -568,7 +549,7 @@ bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
     params_address += num_synapse_types;
     log_debug("num_synapse_types = %u", num_synapse_types);
 
-    uint32_t min_weight_scale = 100000;
+    int32_t min_weight_scale = 100000;
     // weight_scales[0] -= 1;
     for (uint32_t i = 0; i < num_synapse_types; i++) {
         log_info("Weight scale %u = %u", i, weight_scales[i]);
@@ -591,7 +572,6 @@ bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
     }
 #endif
 
-    uint32_t *conn_bldr_params = params_address;
     for (uint32_t w = 0; w < num_flag_words; w++) {
         for (uint32_t edge = 0; edge < 32; edge++) {
             uint32_t edge_mask = 1 << edge;
@@ -609,7 +589,7 @@ bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
                 }
 
                 #ifdef DEBUG_MESSAGES
-                log_info("AFTER: params and syn addr 0x%08x\t0x%08x",
+                log_info("AFTER: params and synapse address 0x%08x\t0x%08x",
                     params_address, syn_mtx_addr);
                 log_info("synaptic matrix size = %u", syn_mtx_addr[0] >> 2);
                 for (uint32_t i = 0; i < (syn_mtx_addr[0] >> 2)+2; i++) {
@@ -630,7 +610,7 @@ bool read_sdram_data(uint32_t *params_address, uint32_t *syn_mtx_addr){
         }
     }
 
-    log_info("indirect syn mtx size %d", (syn_mtx_addr[0] >> 2));
+    log_info("indirect synaptic matrix size %d", (syn_mtx_addr[0] >> 2));
 
     log_info("syn_mtx_addr[%u] = %d", (syn_mtx_addr[0] >> 2) + 1,
         syn_mtx_addr[(syn_mtx_addr[0] >> 2)+1]);
@@ -665,39 +645,40 @@ void app_start(uint a0, uint a1) {
     // Register matrix generators with factories
     // **NOTE** plastic matrix generator is capable of generating
     // both standard and extended plastic matrices
-    log_info("Matrix generators");
-    REGISTER_FACTORY_CLASS("StaticSynapticMatrix", MatrixGenerator, Static);
-    REGISTER_FACTORY_CLASS("PlasticSynapticMatrix", MatrixGenerator, Plastic);
-    //  REGISTER_FACTORY_CLASS("ExtendedPlasticSynapticMatrix", MatrixGenerator, Plastic);
+    // log_info("Matrix generators");
+    // REGISTER_FACTORY_CLASS("StaticSynapticMatrix", MatrixGenerator, Static);
+    // REGISTER_FACTORY_CLASS("PlasticSynapticMatrix", MatrixGenerator, Plastic);
+    // REGISTER_FACTORY_CLASS("ExtendedPlasticSynapticMatrix", MatrixGenerator, Plastic);
+    register_matrix_generators();
 
     // Register connector generators with factories
-    log_info("Connector generators");
-    REGISTER_FACTORY_CLASS("AllToAllConnector", ConnectorGenerator, AllToAll);
-    REGISTER_FACTORY_CLASS("OneToOneConnector", ConnectorGenerator, OneToOne);
-    REGISTER_FACTORY_CLASS("FixedProbabilityConnector", ConnectorGenerator,
-                                                      FixedProbability);
-    REGISTER_FACTORY_CLASS("KernelConnector", ConnectorGenerator, Kernel);
-    REGISTER_FACTORY_CLASS("MappingConnector", ConnectorGenerator, Mapping);
-
+    // log_info("Connector generators");
+    // REGISTER_FACTORY_CLASS("AllToAllConnector", ConnectorGenerator, AllToAll);
+    // REGISTER_FACTORY_CLASS("OneToOneConnector", ConnectorGenerator, OneToOne);
+    // REGISTER_FACTORY_CLASS("FixedProbabilityConnector", ConnectorGenerator, FixedProbability);
+    // REGISTER_FACTORY_CLASS("KernelConnector", ConnectorGenerator, Kernel);
+    // REGISTER_FACTORY_CLASS("MappingConnector", ConnectorGenerator, Mapping);
     // REGISTER_FACTORY_CLASS("FixedTotalNumberConnector", ConnectorGenerator, FixedTotalNumber);
+    register_connection_generators();
 
     // Register parameter generators with factories
-    log_info("Parameter generators");
-    REGISTER_FACTORY_CLASS("constant", ParamGenerator, Constant);
-    REGISTER_FACTORY_CLASS("kernel",   ParamGenerator, ConvKernel);
-    REGISTER_FACTORY_CLASS("uniform",  ParamGenerator, Uniform);
-    REGISTER_FACTORY_CLASS("normal",   ParamGenerator, Normal);
+    // log_info("Parameter generators");
+    // REGISTER_FACTORY_CLASS("constant", ParamGenerator, Constant);
+    // REGISTER_FACTORY_CLASS("kernel",   ParamGenerator, ConvKernel);
+    // REGISTER_FACTORY_CLASS("uniform",  ParamGenerator, Uniform);
+    // REGISTER_FACTORY_CLASS("normal",   ParamGenerator, Normal);
     //  REGISTER_FACTORY_CLASS("normal_clipped", ParamGenerator, NormalClipped);
     //  REGISTER_FACTORY_CLASS("normal_clipped_to_boundary", ParamGenerator, NormalClippedToBoundary);
-    REGISTER_FACTORY_CLASS("exponential", ParamGenerator, Exponential);
+    // REGISTER_FACTORY_CLASS("exponential", ParamGenerator, Exponential);
+    register_param_generators();
 
     // Allocate buffers for placement new from factories
     // **NOTE** we need to be able to simultaneously allocate a delay and
     // a weight generator so we need two buffers for parameter allocation
-    g_MatrixGeneratorBuffer = g_MatrixGeneratorFactory.Allocate();
-    g_ConnectorGeneratorBuffer = g_ConnectorGeneratorFactory.Allocate();
-    g_DelayParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
-    g_WeightParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
+    // g_MatrixGeneratorBuffer = g_MatrixGeneratorFactory.Allocate();
+    // g_ConnectorGeneratorBuffer = g_ConnectorGeneratorFactory.Allocate();
+    // g_DelayParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
+    // g_WeightParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
 
     // Get this core's base address using alloc tag
     // uint32_t *params_address = Config::GetBaseAddressAllocTag();
@@ -706,10 +687,10 @@ void app_start(uint a0, uint a1) {
     log_info("Starting To Build Connectors");
     // If reading SDRAM data fails
 
-    uint32_t *core_address = data_specification_get_data_address();
-    uint32_t *sdram_address = data_specification_get_region(
+    address_t core_address = data_specification_get_data_address();
+    address_t sdram_address = data_specification_get_region(
         CONNECTOR_BUILDER_REGION, core_address);
-    uint32_t *syn_mtx_addr = data_specification_get_region(
+    address_t syn_mtx_addr = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, core_address);
 
     log_info("\tReading SDRAM at 0x%08x", sdram_address);

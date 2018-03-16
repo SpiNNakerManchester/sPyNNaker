@@ -29,11 +29,11 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _n_words(self, n_bytes):
         return math.ceil(float(n_bytes) / 4.0)
 
-    def _get_max_row_bytes(
+    def _get_max_row_length(
             self, size, dynamics, population_table, in_edge, row_length):
         # pylint: disable=too-many-arguments
         try:
-            return population_table.get_allowed_row_length(size) * 4
+            return population_table.get_allowed_row_length(size)
         except SynapseRowTooBigException as e:
             max_synapses = dynamics.get_max_synapses(e.max_size)
             raise SynapseRowTooBigException(
@@ -98,26 +98,27 @@ class SynapseIORowBased(AbstractSynapseIO):
                 max_delayed_row_length)
 
         # Adjust for the allowed row lengths from the population table
-        undelayed_max_bytes = self._get_max_row_bytes(
+        undelayed_max_length = self._get_max_row_length(
             undelayed_size, dynamics, population_table, in_edge,
             max_undelayed_row_length)
-        delayed_max_bytes = self._get_max_row_bytes(
+        delayed_max_length = self._get_max_row_length(
             delayed_size, dynamics, population_table, in_edge,
             max_delayed_row_length)
 
         # Add on the header words and multiply by the number of rows in the
         # block
         n_bytes_undelayed = 0
-        if undelayed_max_bytes > 0:
+        if undelayed_max_length > 0:
             n_bytes_undelayed = (
-                ((_N_HEADER_WORDS * 4) + undelayed_max_bytes) *
+                ((_N_HEADER_WORDS + undelayed_max_length) * 4) *
                 pre_vertex_slice.n_atoms)
         n_bytes_delayed = 0
-        if delayed_max_bytes > 0:
+        if delayed_max_length > 0:
             n_bytes_delayed = (
-                ((_N_HEADER_WORDS * 4) + delayed_max_bytes) *
+                ((_N_HEADER_WORDS + delayed_max_length) * 4) *
                 pre_vertex_slice.n_atoms * n_delay_stages)
-        return n_bytes_undelayed, n_bytes_delayed
+        return (n_bytes_undelayed, n_bytes_delayed,
+                undelayed_max_length, delayed_max_length)
 
     @staticmethod
     def _get_max_row_length_and_row_data(
