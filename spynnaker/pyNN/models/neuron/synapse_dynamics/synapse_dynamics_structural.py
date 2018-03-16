@@ -61,7 +61,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         self.fudge_factor = 1.5
         self._actual_row_max_length = self._s_max
 
-        if stdp_model is not None:
+        if stdp_model is not None and \
+                isinstance(stdp_model, SynapseDynamicsSTDP):
             self._super = SynapseDynamicsSTDP(
                 timing_dependence=stdp_model.timing_dependence,
                 weight_dependence=stdp_model.weight_dependence,
