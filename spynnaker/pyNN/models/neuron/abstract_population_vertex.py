@@ -748,8 +748,12 @@ class AbstractPopulationVertex(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 
+        # Skip the recorder globals as these are not change on machione
+        # Just written out in case data is changed and written back
+        offset = self._neuron_recorder.get_size_of_global_parameters(
+            vertex_slice)
+
         # update python neuron parameters with the data
-        offset = 0
 
         # handle global params (only once, so given a slice of 0 to 0)
         global_params, offset = utility_calls.translate_parameters(
