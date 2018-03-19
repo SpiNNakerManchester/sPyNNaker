@@ -106,9 +106,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Acc decay per timeStep is scaled up by 1024 to preserve 10-bit precision:
-        acc_decay_per_ts = (int)((float(self.accum_decay) * float(machine_time_step)*1.024))
+        #acc_decay_per_ts = (int)((float(self.accum_decay) * float(machine_time_step)*1.024))
+        acc_decay_per_32ts = (int)(float(self.accum_decay) * 32 * 1.024 * float(machine_time_step)/1000.0)
         # Write parameters (four per synapse type):
-        spec.write_value(data=acc_decay_per_ts,                data_type=DataType.INT32)
+        spec.write_value(data=acc_decay_per_32ts,              data_type=DataType.INT32)
         spec.write_value(data=self.accum_dep_plus_one_excit,   data_type=DataType.INT32)
         spec.write_value(data=self.accum_pot_minus_one_excit,  data_type=DataType.INT32)
         spec.write_value(data=self.pre_window_tc_excit,        data_type=DataType.INT32)
