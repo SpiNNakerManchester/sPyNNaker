@@ -31,13 +31,13 @@ uint32_t *weight_initialise(uint32_t *address,
         weight_multiply_right_shift[s] =
                 16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
 
-        /*log_info(
+        log_info(
             "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u",
             s, plasticity_weight_region_data[s].min_weight,
             plasticity_weight_region_data[s].max_weight,
             plasticity_weight_region_data[s].a2_plus,
             plasticity_weight_region_data[s].a2_minus,
-            weight_multiply_right_shift[s]); */
+            weight_multiply_right_shift[s]);
     }
 
     //log_info("weight_initialise: completed successfully");

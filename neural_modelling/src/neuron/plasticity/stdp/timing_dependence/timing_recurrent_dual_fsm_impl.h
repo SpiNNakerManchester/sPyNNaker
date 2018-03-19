@@ -73,6 +73,7 @@ extern threshold_type_pointer_t threshold_type_array;
 // With cycle time 35ms, timestep 0.2ms and goal of forgetting an accum update in 6 cycles,
 // this means accum must drain in 210 ms, or 1050 timesteps, so set one step for accum to 1024
 // to approximate this value.
+#define ACC_DECAY_SCALING  5
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -111,8 +112,8 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
    else if (syn_type == 2)
       window_length = pre_exp_dist_lookup_inhib[random];
    else
-      //window_length = 50;   // 10ms at 0.2 ms timestep
-      window_length = pre_exp_dist_lookup_inhib2[random];
+      window_length = 50;   // 10ms at 0.2 ms timestep
+      //window_length = pre_exp_dist_lookup_inhib2[random];
     // Return window length
     return window_length;
 }
@@ -144,7 +145,7 @@ static inline update_state_t timing_apply_pre_spike(
     use(&post_synaptic_additional_input);
     use(&post_synaptic_threshold);
 
-	// Decay accum value so that long periods without spikes cause it to forget:
+    // Decay accum value so that long periods without spikes cause it to forget:
     uint32_t time_since_last_event = time - last_event_time;
 
     //// For inhib2-type synapses, always decay the weight a little:
@@ -152,7 +153,9 @@ static inline update_state_t timing_apply_pre_spike(
     //   previous_state.weight_state.weight -= (accum) 0.01;
     //}
 
-    int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event)>>ACCUM_SCALING;
+    // Param accum_decay_per_ts is actually per 32 time steps now, to avoid rounding to zero errors:
+    int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event>>5);
+    //log_info("Acc step: %d,  time: %d, +/-: %d", recurrent_plasticity_params.accum_decay_per_ts, time_since_last_event, acc_change);
     if (previous_state.accumulator > 0) {
         previous_state.accumulator -= acc_change;
         if (previous_state.accumulator < 0) {
@@ -168,10 +171,7 @@ static inline update_state_t timing_apply_pre_spike(
     // Debug:
     // Check windows for syn_type 3 (inhibitory 2) which has special properties:
     if (syn_type == 3) {
-      if ((uint32_t)(mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1)) < 100) {
-         // Increment weight 1% of the time (slow tracking of activity):
-         previous_state.weight_state.weight = weight_update_sub(previous_state.weight_state);
-      }
+       previous_state.weight_state.weight = weight_update_sub(previous_state.weight_state);
        //log_info("D-");
        // If we are inside a post-pre window, perform additive potentiation:
        if (time < previous_state.longest_post_pre_window_closing_time) {
@@ -195,8 +195,8 @@ static inline update_state_t timing_apply_pre_spike(
           } else {
              // Otherwise, reset accumulator and apply depression
              previous_state.accumulator = 0;
-             previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
-                                                                                syn_type, STDP_FIXED_POINT_ONE);
+             //## previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
+             //##                                                                    syn_type, STDP_FIXED_POINT_ONE);
             }
        }
        // Set the post window to be just before this pre-spike. This is the only way I've found to
@@ -278,11 +278,7 @@ static inline update_state_t timing_apply_post_spike(
    // For inhib-2-type (ID of 3) synapses, if we're inside the pre-post window
    // perform potentiation:
    if ((syn_type == 3) && (time_since_last_pre < last_pre_trace)) {
-      // Increment weight 1% of the time (slow tracking of activity):
-      random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
-      if (random < 100) {
          previous_state.weight_state.weight = weight_update_add(previous_state.weight_state);
-      }
       //log_info("P+");
       return previous_state;
    }
@@ -299,6 +295,9 @@ static inline update_state_t timing_apply_post_spike(
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
          } else {
+             //previous_state.accumulator = 0;
+             // Set accum to a sub-threshold value, so that two potentiations in quick 
+             // succession are less likely:
              previous_state.accumulator = 0;
              // SD Only update weight if we are not yet getting enough potential
              // to fire neuron without teaching input:
@@ -306,10 +305,21 @@ static inline update_state_t timing_apply_post_spike(
                    //post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
              //log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
              //log_info("Prev_V: %k", post_synaptic_mem_V);
-             previous_state.weight_state = weight_two_term_apply_potentiation_sd(previous_state.weight_state,
-                                                      voltage_difference, syn_type, STDP_FIXED_POINT_ONE);
-             //previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
-             //                                                           syn_type, STDP_FIXED_POINT_ONE);
+             if (previous_state.weight_state.weight == (accum)0.0) {
+                if (voltage_difference > (accum) 0.5) {
+                   // Make a full weight increment:
+                   previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
+                                                            syn_type, STDP_FIXED_POINT_ONE);
+                }
+                else {
+                   // Weight is to be used, but we don't want or need a full weight increment.
+                   // make a tiny weight change so that this weight does not get used again until it decays:
+                   previous_state.weight_state.weight = 1000; // Smallest posiive weight.
+                }
+             }
+
+             //previous_state.weight_state = weight_two_term_apply_potentiation_sd(previous_state.weight_state,
+             //                                         voltage_difference, syn_type, STDP_FIXED_POINT_ONE);
          }
       }
    }
@@ -342,6 +352,8 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
    // Multiply scale by potentiation and add
    // **NOTE** using standard STDP fixed-point format handles format conversion
    state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+   if (state.weight > state.weight_region->max_weight)
+      state.weight = state.weight_region->max_weight;
    return state;
 }
 
@@ -357,7 +369,7 @@ static inline weight_state_t weight_two_term_apply_potentiation_sd(
    //accum scaled_v_diff;
    int32_t old_w = state.weight;
    //scaled_v_diff.acc_interpretation = v_diff >> full_v_scale_shift; // 16mV diff translates to scaled_v_diff = 1
-   scaled_v_diff.acc_interpretation = v_diff * (accum)(1.0/20.0); // 20mV diff translates to scaled_v_diff = 1
+   scaled_v_diff.acc_interpretation = v_diff * (accum)(1.0/18.0); // 18mV diff translates to scaled_v_diff = 1
    int32_t scale1 = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
                    state.weight_region->a2_plus, state.weight_multiply_right_shift);
