@@ -177,7 +177,7 @@ void synapse_dynamics_print_plastic_synapses(
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                   synapse_row_sparse_delay(control_word),
                   synapse_types_get_type_char(
-                    synapse_row_sparse_type(control_word)),
+                      synapse_row_sparse_type(control_word)),
                   synapse_row_sparse_index(control_word), SYNAPSE_DELAY_MASK,
                   SYNAPSE_TYPE_INDEX_BITS);
     }
@@ -299,7 +299,7 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
-        index_t neuron_index) {
+                                            index_t neuron_index) {
     use(time);
     use(neuron_index);
     return 0.0k;
@@ -320,7 +320,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
  * returns: true iff neuron with id is in synaptic row
  */
 bool find_plastic_neuron_with_id(uint32_t id, address_t row,
-        structural_plasticity_data_t *sp_data){
+                                 structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words =
@@ -329,12 +329,15 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
     plastic_synapse_t weight;
     uint32_t delay;
+
     // Loop through plastic synapses
     bool found = false;
     for (; plastic_synapse > 0; plastic_synapse--) {
+
         // Get next control word (auto incrementing)
         weight = *plastic_words++;
         uint32_t control_word = *control_words++;
+
         // Check if index is the one I'm looking for
         delay = synapse_row_sparse_delay(control_word);
         if (synapse_row_sparse_index(control_word)==id) {
@@ -344,7 +347,6 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
     }
 
     if (found){
-        // TODO make methods to extract components from plastic_synapse_t
         sp_data -> weight = weight;
         sp_data -> offset = synapse_row_num_plastic_controls(fixed_region) -
             plastic_synapse;
@@ -372,9 +374,11 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
         _plastic_synapses(synapse_row_plastic_region(row));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+
     // Delete weight at offset
     plastic_words[offset] =  plastic_words[plastic_synapse-1];
     plastic_words[plastic_synapse-1] = 0;
+
    // Delete control word at offset
     control_words[offset] = control_words[plastic_synapse-1];
     control_words[plastic_synapse-1] = 0;
@@ -414,8 +418,10 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row,
         _plastic_synapses(synapse_row_plastic_region(row));
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
+
     // Add weight at offset
     plastic_words[plastic_synapse] = new_weight;
+
     // Add control word at offset
     control_words[plastic_synapse] = new_control;
 

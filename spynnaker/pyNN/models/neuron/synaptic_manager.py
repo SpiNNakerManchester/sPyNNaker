@@ -659,7 +659,7 @@ class SynapticManager(object):
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             master_pop_table_region, weight_scales, machine_time_step,
             rinfo, all_syn_block_sz, block_addr, single_addr,
-            machine_edge=None):
+            machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self._synapse_io.get_synapses(
              synapse_info, pre_slices, pre_slice_idx, post_slices,

@@ -30,7 +30,8 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
 }
 
 //---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
+                                            index_t neuron_index) {
     use(time);
     use(neuron_index);
     return REAL_CONST(0.0);
@@ -48,7 +49,8 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
-bool find_plastic_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+bool find_plastic_neuron_with_id(uint32_t id, address_t row,
+                                 structural_plasticity_data_t *sp_data){
     use(id);
     use(row);
     use(sp_data);

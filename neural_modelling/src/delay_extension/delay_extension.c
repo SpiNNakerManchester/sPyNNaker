@@ -107,11 +107,11 @@ static bool read_parameters(address_t address) {
     num_delay_slots_mask = (num_delay_slots_pot - 1);
 
     log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
-             " num delay stages = %u, num delay slots = %u (pot = %u),"
-             " num delay slots mask = %08x",
-             num_neurons, neuron_bit_field_words,
-             num_delay_stages, num_delay_slots, num_delay_slots_pot,
-             num_delay_slots_mask);
+              " num delay stages = %u, num delay slots = %u (pot = %u),"
+              " num delay slots mask = %08x",
+              num_neurons, neuron_bit_field_words,
+              num_delay_stages, num_delay_slots, num_delay_slots_pot,
+              num_delay_slots_mask);
 
     log_debug(
         "\t random back off = %u, time_between_spikes = %u",

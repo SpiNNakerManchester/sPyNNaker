@@ -30,7 +30,7 @@ void out_spikes_reset() {
 bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
     log_debug("Out spike size is %u words, allowing %u spike sources",
-             out_spikes_size, max_spike_sources);
+              out_spikes_size, max_spike_sources);
     spikes = (timed_out_spikes *) spin1_malloc(
         sizeof(timed_out_spikes) + (out_spikes_size * sizeof(uint32_t)));
     if (spikes == NULL) {

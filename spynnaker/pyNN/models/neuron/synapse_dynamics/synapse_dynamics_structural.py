@@ -16,22 +16,34 @@ from spynnaker.pyNN.utilities import constants
 
 class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
     __slots__ = [
+        # Frequency of rewiring (Hz)
         "_f_rew",
+        # Period of rewiring (ms)
         "_p_rew",
+        # Initial weight assigned to a newly formed connection
         "_weight",
+        # Delay assigned to a newly formed connection
         "_delay",
+        # Maximum fan-in per target layer neuron
         "_s_max",
+        # Flag whether to mark synapses formed within a layer as inhibitory or excitatory
         "_lateral_inhibition",
+        # Spread of feed-forward formation receptive field
         "_sigma_form_forward",
+        # Spread of lateral formation receptive field
         "_sigma_form_lateral",
+        # Peak probability for feed-forward formation
         "_p_form_forward",
+        # Peak probability for lateral formation
         "_p_form_lateral",
+        # Probabily of elimination of a depressed synapse
         "_p_elim_dep",
+        # Probabily of elimination of a potentiated synapse
         "_p_elim_pot",
+        # Grid shape
         "_grid",
-        "_random_partner",
-        "_connections",
-        "_actual_row_max_length"]
+        # Flag whether to randomly select pre-synaptic partner for formation
+        "_random_partner"]
 
     def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1,
                  s_max=32, sigma_form_forward=2.5, sigma_form_lateral=1,

@@ -307,7 +307,6 @@ class SynapseIORowBased(AbstractSynapseIO):
                 -1, (delayed_max_row_length + _N_HEADER_WORDS))
 
         dynamics = synapse_info.synapse_dynamics
-        connections = list()
         if isinstance(dynamics, AbstractStaticSynapseDynamics) \
                 or (isinstance(dynamics, AbstractSynapseDynamicsStructural)
                     and isinstance(dynamics._super,
