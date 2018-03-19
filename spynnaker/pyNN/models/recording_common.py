@@ -220,18 +220,20 @@ class RecordingCommon(object):
             sim.placements, sim.graph_mapper, sim.buffer_manager,
             sim.machine_time_step)
 
-    def _turn_off_all_recording(self):
+    def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying .record()
 
         :rtype: None
         """
 
-        # check for standard record
+        # check for standard record which includes spikes
         if isinstance(self._population._vertex, AbstractNeuronRecordable):
             variables = self._population._vertex.get_recordable_variables()
             for variable in variables:
-                self._population._vertex.set_recording(variable, False)
+                self._population._vertex.set_recording(
+                    variable, new_state=False, indexes=indexes)
 
         # check for spikes
         elif isinstance(self._population._vertex, AbstractSpikeRecordable):
-            self._population._vertex.set_recording_spikes(False)
+            self._population._vertex.set_recording_spikes(
+                new_state=False, indexes=indexes)

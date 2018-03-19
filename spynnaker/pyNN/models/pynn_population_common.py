@@ -145,6 +145,7 @@ class PyNNPopulationCommon(object):
         return isinstance(self._vertex.input_type, InputTypeConductance)
 
     def __getitem__(self, index_or_slice):
+        # Note: This is supported by sPyNNaker8
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 

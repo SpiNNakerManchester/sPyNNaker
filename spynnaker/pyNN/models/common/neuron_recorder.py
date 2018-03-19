@@ -324,16 +324,31 @@ class NeuronRecorder(object):
             self._sampling_rates[variable] = 0
             self._indexes[variable] = None
 
+    def _check_complete_overwrite(self, variable, indexes):
+        if indexes is None:
+            # overwriting all OK!
+            return
+        if self._indexes[variable] is None:
+            if set(set(range(self._n_neurons))).issubset(set(indexes)):
+                # overwriting all previous so OK!
+                return
+        else:
+            if set(self._indexes[variable]).issubset(set(indexes)):
+                # overwriting all previous so OK!
+                return
+        msg = "Current implementation does not support multiple " \
+              "sampling_intervals for {} on one population. " \
+            .format(variable)
+        raise fec_excceptions.ConfigurationException(msg)
+
     def _turn_on_recording(self, variable, sampling_interval, indexes):
 
         rate = self._compute_rate(sampling_interval)
         if self._sampling_rates[variable] == 0:
+            # Previously not recording so ok
             self._sampling_rates[variable] = rate
         elif rate != self._sampling_rates[variable]:
-            msg = "Current implementation does not support multiple " \
-                  "sampling_intervals for {} on one population. " \
-                .format(variable)
-            raise fec_excceptions.ConfigurationException(msg)
+            self._check_complete_overwrite(variable, indexes)
         # else rate not changed so no action
 
         if indexes is None:
