@@ -37,7 +37,7 @@ int (*number_of_connections_in_row)(address_t);
 
 
 //------------------------------------------------------------------------------
-// Structures and global data                                                  |
+// Structures and global data                                                  |3
 //------------------------------------------------------------------------------
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 5

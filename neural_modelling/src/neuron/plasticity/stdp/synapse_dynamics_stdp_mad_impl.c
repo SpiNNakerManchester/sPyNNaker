@@ -312,13 +312,14 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
 
 #if SYNGEN_ENABLED == 1
 
-/*
- * Function that searches the synaptic row for the existence
- * of the neuron with the required id. If such a synapse
- * exists, then its information (offset, delay, weight)
- * are recorded in sp_data.
- * returns: true iff neuron with id is in synaptic row
- */
+//! \brief  Searches the synaptic row for the the connection with the
+//!         specified post-synaptic id
+//! \param[in] id: the (core-local) id of the neuron to search for in the
+//! synaptic row
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] sp_data: the address of a struct through which to return
+//! weight, delay information
+//! \return bool: was the search successful?
 bool find_plastic_neuron_with_id(uint32_t id, address_t row,
                                  structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
@@ -361,13 +362,10 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
         }
 }
 
-/*
- * Function that removes a synapse from the synaptic row, specified
- * as an offset from the beginning of the respective region of the row.
- * Additionally, this method compresses the row so that the memory
- * region representing the row is continuous.
- * return: true iff the deletion and compression have succeeded
- */
+//! \brief  Remove the entry at the specified offset in the synaptic row
+//! \param[in] offset: the offset in the row at which to remove the entry
+//! \param[in] row: the core-local address of the synaptic row
+//! \return bool: was the removal successful?
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words =
@@ -402,12 +400,13 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay,
     return new_control;
 }
 
-/*
- * Function that adds a new synapse at the end of the respective region
- * in the synaptic row. This process involves the expansion of the row
- * in order to make space for the extra information.
- * return: true iff the addition and expansion have succeeded
- */
+//! \brief  Add a plastic entry in the synaptic row
+//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] weight: the initial weight associated with the connection
+//! \param[in] delay: the delay associated with the connection
+//! \param[in] type: the type of the connection (e.g. inhibitory)
+//! \return bool: was the addition successful?
 bool add_plastic_neuron_with_id(uint32_t id, address_t row,
         uint32_t weight, uint32_t delay, uint32_t type){
     plastic_synapse_t new_weight = _weight_conversion(weight);
