@@ -49,6 +49,15 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
+
+//! \brief  Don't search the synaptic row for the the connection with the
+//!         specified post-synaptic id -- no rewiring here
+//! \param[in] id: the (core-local) id of the neuron to search for in the
+//! synaptic row
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] sp_data: the address of a struct through which to return
+//! weight, delay information
+//! \return bool: was the search successful?
 bool find_plastic_neuron_with_id(uint32_t id, address_t row,
                                  structural_plasticity_data_t *sp_data){
     use(id);
@@ -57,12 +66,24 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
     return false;
 }
 
+//! \brief  Don't remove the entry at the specified offset in the synaptic row
+//! -- no rewiring here
+//! \param[in] offset: the offset in the row at which to remove the entry
+//! \param[in] row: the core-local address of the synaptic row
+//! \return bool: was the removal successful?
 bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     use(offset);
     use(row);
     return false;
 }
 
+//! \brief  Don't add a plastic entry in the synaptic row -- no rewiring here
+//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] weight: the initial weight associated with the connection
+//! \param[in] delay: the delay associated with the connection
+//! \param[in] type: the type of the connection (e.g. inhibitory)
+//! \return bool: was the addition successful?
 bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
                                 uint32_t delay, uint32_t type){
     use(id);
