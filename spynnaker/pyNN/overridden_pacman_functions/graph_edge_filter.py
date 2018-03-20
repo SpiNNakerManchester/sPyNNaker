@@ -8,11 +8,12 @@ from pacman.model.graphs.common import GraphMapper
 # spynnaker imports
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
-
-import logging
-
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics import \
     AbstractSynapseDynamicsStructural
+
+# import logging
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +70,10 @@ class GraphEdgeFilter(object):
         new_graph.add_edge(edge, partition.identifier)
         new_mapper.add_edge_mapping(
             edge, old_mapper.get_application_edge(edge))
+
         # add partition constraints from the original graph to the new graph
         # add constraints from the application partition
-        new_partition = new_graph.\
+        new_partition = new_graph. \
             get_outgoing_edge_partition_starting_at_vertex(
                 edge.pre_vertex, partition.identifier)
         new_partition.add_constraints(partition.constraints)
@@ -79,7 +81,9 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _is_filterable(edge, graph_mapper):
         app_edge = graph_mapper.get_application_edge(edge)
-        if hasattr(app_edge, "synapse_information"):
+
+        # Don't filter edges which have structural synapse dynamics
+        if isinstance(app_edge, ProjectionApplicationEdge):
             for syn_info in app_edge.synapse_information:
                 if isinstance(syn_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
