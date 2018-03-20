@@ -517,7 +517,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
 
-    while (0 == spin1_dma_transfer(
+    while (!spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address,
             rewiring_dma_buffer.row, DMA_READ,
             n_bytes)) {
