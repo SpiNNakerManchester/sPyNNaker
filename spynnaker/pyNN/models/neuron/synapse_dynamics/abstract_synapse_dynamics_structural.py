@@ -5,4 +5,6 @@ from spinn_utilities.abstract_base import AbstractBase
 
 @add_metaclass(AbstractBase)
 class AbstractSynapseDynamicsStructural(AbstractSynapseDynamics):
-    pass
+
+    __slots__ = ()
+

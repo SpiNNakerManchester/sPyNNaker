@@ -263,17 +263,20 @@ bool synapses_initialise(
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }
-    *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
+    *ring_buffer_to_input_buffer_left_shifts =
+        ring_buffer_to_input_left_shifts;
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
     log_debug("Indirect matrix is %u words in size", direct_matrix_offset - 1);
-    uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
+    uint32_t direct_matrix_size =
+        synaptic_matrix_address[direct_matrix_offset];
     log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
-        *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
+        *direct_synapses_address = (address_t)
+            spin1_malloc(direct_matrix_size);
 
         if (*direct_synapses_address == NULL) {
             log_error("Not enough memory to allocate direct matrix");

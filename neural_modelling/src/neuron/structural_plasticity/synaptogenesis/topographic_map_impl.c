@@ -27,18 +27,18 @@
 #include <circular_buffer.h>
 
 
-//------------------------------------------------------------------------------
-// External functions                                                          |
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// External functions                                                         |
+//-----------------------------------------------------------------------------
 bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
 bool (*remove_neuron)(uint32_t, address_t);
 bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t, uint32_t);
 int (*number_of_connections_in_row)(address_t);
 
 
-//------------------------------------------------------------------------------
-// Structures and global data                                                  |3
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Structures and global data                                                 |
+//-----------------------------------------------------------------------------
 // DMA tags
 #define DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING 5
 #define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 7
@@ -145,9 +145,9 @@ static inline int pack(
     return (int) value;
 }
 
-//------------------------------------------------------------------------------
-// Initialisation                                                              |
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// Initialisation                                                             |
+//-----------------------------------------------------------------------------
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //! parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
@@ -415,7 +415,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
                     pre_sub_pop = subpop_index;
                     choice = _spike &
                 	    ~rewiring_data.pre_pop_info_table.subpop_info[i].
-                	        key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3];
+                        key_atom_info[KEY_INFO_CONSTANTS * subpop_index + 3];
                 }
             }
         }

@@ -156,7 +156,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         elif isinstance(synapse_dynamics, SynapseDynamicsSTDP) or \
                 (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
-                 isinstance(synapse_dynamics._weight_dynamics, SynapseDynamicsSTDP)):
+                 isinstance(synapse_dynamics.weight_dynamics,
+                            SynapseDynamicsSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
