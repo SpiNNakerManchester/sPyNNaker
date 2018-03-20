@@ -7,4 +7,3 @@ from spinn_utilities.abstract_base import AbstractBase
 class AbstractSynapseDynamicsStructural(AbstractSynapseDynamics):
 
     __slots__ = ()
-
