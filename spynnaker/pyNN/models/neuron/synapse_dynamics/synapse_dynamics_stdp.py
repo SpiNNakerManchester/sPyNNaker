@@ -18,10 +18,15 @@ class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
     __slots__ = [
+        # ??????????????
         "_change_requires_mapping",
+        # ??????????????
         "_dendritic_delay_fraction",
+        # timing dependence to use for the STDP rule
         "_timing_dependence",
+        # weight dependence to use for the STDP rule
         "_weight_dependence",
+        # padding to add to a synaptic row for synaptic rewiring
         "_pad_to_length"]
 
     def __init__(
@@ -225,7 +230,7 @@ class SynapseDynamicsSTDP(
         pp_size = self.get_n_items(plastic_plastic_rows, 4)
         pp_data = self.get_words(plastic_plastic_rows)
 
-        return (fp_data, pp_data, fp_size, pp_size)
+        return fp_data, pp_data, fp_size, pp_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
         padded_rows = []

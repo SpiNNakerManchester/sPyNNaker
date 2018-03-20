@@ -13,7 +13,9 @@ class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
     __slots__ = [
+        # ??????????
         "_change_requires_mapping",
+        # padding to add to a synaptic row for synaptic rewiring
         "_pad_to_length"]
 
     def __init__(self, pad_to_length=None):
@@ -46,8 +48,8 @@ class SynapseDynamicsStatic(
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
-        if self._pad_to_length is not None and \
-                        n_connections < self._pad_to_length:
+        if (self._pad_to_length is not None and
+                n_connections < self._pad_to_length):
             n_connections = self._pad_to_length
         return n_connections
 
@@ -74,9 +76,8 @@ class SynapseDynamicsStatic(
             fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
 
-        return (ff_data, ff_size)
+        return ff_data, ff_size
 
-    # TODO remove this redundant piece of code
     def _pad_row(self, rows, no_bytes_per_connection):
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes

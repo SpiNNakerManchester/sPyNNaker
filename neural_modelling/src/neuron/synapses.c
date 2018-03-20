@@ -405,7 +405,17 @@ uint32_t synapses_get_pre_synaptic_events() {
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
-bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticity_data_t *sp_data){
+
+//! \brief  Searches the synaptic row for the the connection with the
+//!         specified post-synaptic id
+//! \param[in] id: the (core-local) id of the neuron to search for in the
+//! synaptic row
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] sp_data: the address of a struct through which to return
+//! weight, delay information
+//! \return bool: was the search successful?
+bool find_static_neuron_with_id(uint32_t id, address_t row,
+                                structural_plasticity_data_t *sp_data){
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
@@ -413,8 +423,10 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
 
     uint32_t weight, delay;
     bool found = false;
+
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
+
         // Get next control word (auto incrementing)
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
@@ -431,7 +443,8 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
 
     if (found){
         sp_data -> weight = weight;
-        sp_data -> offset = synapse_row_num_fixed_synapses(fixed_region) - fixed_synapse;
+        sp_data -> offset = synapse_row_num_fixed_synapses(fixed_region) -
+            fixed_synapse;
         sp_data -> delay  = delay;
         return true;
         }
@@ -443,6 +456,10 @@ bool find_static_neuron_with_id(uint32_t id, address_t row, structural_plasticit
         }
 }
 
+//! \brief  Remove the entry at the specified offset in the synaptic row
+//! \param[in] offset: the offset in the row at which to remove the entry
+//! \param[in] row: the core-local address of the synaptic row
+//! \return bool: was the removal successful?
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
@@ -457,29 +474,37 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
     return true;
 }
 
+//! packing all of the information into the required static control word
 static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
                                             uint32_t delay, uint32_t type){
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
-    new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
-    new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) << SYNAPSE_INDEX_BITS);
+    new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) <<
+        SYNAPSE_TYPE_INDEX_BITS);
+    new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) <<
+        SYNAPSE_INDEX_BITS);
     new_synapse |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
     return new_synapse;
 }
 
-
+//! \brief  Add a static entry in the synaptic row
+//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] weight: the initial weight associated with the connection
+//! \param[in] delay: the delay associated with the connection
+//! \param[in] type: the type of the connection (e.g. inhibitory)
+//! \return bool: was the addition successful?
 bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
                                uint32_t delay, uint32_t type){
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region);
-
     uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay, type);
+
     // Add control word at offset
     synaptic_words[fixed_synapse] = new_synapse;
 
    // Increment FF
     fixed_region[0] = fixed_region[0] + 1;
-
     return true;
 }

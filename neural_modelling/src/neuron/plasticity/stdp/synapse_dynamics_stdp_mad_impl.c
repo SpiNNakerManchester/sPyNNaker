@@ -387,10 +387,12 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
     return true;
 }
 
+//! ensuring the weight is of the correct type and size
 static inline plastic_synapse_t _weight_conversion(uint32_t weight){
     return (plastic_synapse_t)(0xFFFF & weight);
 }
 
+//! packing all of the information into the required plastic control word
 static inline control_t _control_conversion(uint32_t id, uint32_t delay,
                                             uint32_t type){
     control_t new_control =

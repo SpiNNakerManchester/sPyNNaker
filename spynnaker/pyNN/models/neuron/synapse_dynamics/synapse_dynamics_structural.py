@@ -15,18 +15,69 @@ from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
+    """ Class enables synaptic rewiring. It acts as a wrapper around \
+        SynapseDynamicsStatic or SynapseDynamicsSTDP. This means rewiring \
+        can operate in parallel with these types of synapses.
+
+        Example usage to allow rewiring in parallel with STDP::
+
+            stdp_model = sim.STDPMechanism(...)
+
+            structure_model_with_stdp = sim.StructuralMechanism(
+                stdp_model=stdp_model,
+                weight=0,
+                s_max=32,
+                grid=[np.sqrt(pop_size), np.sqrt(pop_size)],
+                random_partner=True,
+                f_rew=10 ** 4,  # Hz
+                sigma_form_forward=1.,
+                delay=10
+            )
+
+
+    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will be
+        done per second.
+    :type f_rew: int
+    :param weight: Initial weight assigned to a newly formed connection
+    :type weight: float
+    :param delay: Delay assigned to a newly formed connection
+    :type delay: int
+    :param s_max: Maximum fan-in per target layer neuron
+    :type s_max: int
+    :param sigma_form_forward: Spread of feed-forward formation receptive field
+    :type sigma_form_forward: float
+    :param sigma_form_lateral: Spread of lateral formation receptive field
+    :type sigma_form_lateral: float
+    :param p_form_forward: Peak probability for feed-forward formation
+    :type p_form_forward: float
+    :param p_form_lateral: Peak probability for lateral formation
+    :type p_form_lateral: float
+    :param p_elim_pot: Probability of elimination of a potentiated synapse
+    :type p_elim_pot: float
+    :param p_elim_dep: Probability of elimination of a depressed synapse
+    :type p_elim_dep: float
+    :param grid: Grid shape
+    :type grid: 2d int array
+    :param lateral_inhibition: Flag whether to mark synapses formed within a
+        layer as inhibitory or excitatory
+    :type lateral_inhibition: bool
+    :param random_partner: Flag whether to randomly select pre-synaptic
+        partner for formation
+    :type random_partner: bool
+    :param seed: seed the random number generators
+    :type seed: int
+    """
     __slots__ = [
         # Frequency of rewiring (Hz)
         "_f_rew",
-        # Period of rewiring (ms)
-        "_p_rew",
         # Initial weight assigned to a newly formed connection
         "_weight",
         # Delay assigned to a newly formed connection
         "_delay",
         # Maximum fan-in per target layer neuron
         "_s_max",
-        # Flag whether to mark synapses formed within a layer as inhibitory or excitatory
+        # Flag whether to mark synapses formed within a layer as
+        # inhibitory or excitatory
         "_lateral_inhibition",
         # Spread of feed-forward formation receptive field
         "_sigma_form_forward",
@@ -36,29 +87,46 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         "_p_form_forward",
         # Peak probability for lateral formation
         "_p_form_lateral",
-        # Probabily of elimination of a depressed synapse
+        # Probability of elimination of a depressed synapse
         "_p_elim_dep",
-        # Probabily of elimination of a potentiated synapse
+        # Probability of elimination of a potentiated synapse
         "_p_elim_pot",
         # Grid shape
         "_grid",
         # Flag whether to randomly select pre-synaptic partner for formation
         "_random_partner"]
 
-    def __init__(self, stdp_model=None, f_rew=10 ** 4, weight=0, delay=1,
-                 s_max=32, sigma_form_forward=2.5, sigma_form_lateral=1,
-                 p_form_forward=0.16, p_form_lateral=1,
-                 p_elim_dep=0.0245, p_elim_pot=1.36 * 10 ** -4,
-                 grid=np.array([16, 16]), lateral_inhibition=0,
-                 random_partner=False,
+    default_parameters = {
+        'stdp_model': None, 'f_rew': 10 ** 4, 'weight': 0, 'delay': 1,
+        's_max': 32, 'sigma_form_forward': 2.5, 'sigma_form_lateral': 1,
+        'p_form_forward': 0.16, 'p_form_lateral': 1.,
+        'p_elim_pot': 1.36 * 10 ** -4, 'p_elim_dep': 0.0245,
+        'grid': np.array([16, 16]), 'lateral_inhibition': 0,
+        'random_partner': False}
+
+    def __init__(self,
+                 stdp_model=default_parameters['stdp_model'],
+                 f_rew=default_parameters['f_rew'],
+                 weight=default_parameters['weight'],
+                 delay=default_parameters['delay'],
+                 s_max=default_parameters['s_max'],
+                 sigma_form_forward=default_parameters['sigma_form_forward'],
+                 sigma_form_lateral=default_parameters['sigma_form_lateral'],
+                 p_form_forward=default_parameters['p_form_forward'],
+                 p_form_lateral=default_parameters['p_form_lateral'],
+                 p_elim_dep=default_parameters['p_elim_dep'],
+                 p_elim_pot=default_parameters['p_elim_pot'],
+                 grid=default_parameters['grid'],
+                 lateral_inhibition=default_parameters['lateral_inhibition'],
+                 random_partner=default_parameters['random_partner'],
                  seed=None):
 
         AbstractSynapseDynamicsStructural.__init__(self)
-        self._f_rew = f_rew  # Hz
-        self._p_rew = 1. / self._f_rew  # ms
+        self._f_rew = f_rew
+        self._p_rew = 1. / self._f_rew
         self._weight = weight
         self._delay = delay
-        self._s_max = s_max  # maximum number of presynaptic neurons
+        self._s_max = s_max
         self._lateral_inhibition = lateral_inhibition
         self._sigma_form_forward = sigma_form_forward
         self._sigma_form_lateral = sigma_form_lateral
@@ -75,13 +143,14 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
 
         if stdp_model is not None and \
                 isinstance(stdp_model, SynapseDynamicsSTDP):
-            self._super = SynapseDynamicsSTDP(
+            self._weight_dynamics = SynapseDynamicsSTDP(
                 timing_dependence=stdp_model.timing_dependence,
                 weight_dependence=stdp_model.weight_dependence,
-                dendritic_delay_fraction=stdp_model._dendritic_delay_fraction,
+                dendritic_delay_fraction=stdp_model.dendritic_delay_fraction,
                 pad_to_length=self._s_max)
         else:
-            self._super = SynapseDynamicsStatic(pad_to_length=self._s_max)
+            self._weight_dynamics = \
+                SynapseDynamicsStatic(pad_to_length=self._s_max)
 
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
@@ -102,13 +171,17 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 self._p_form_lateral,
                 self._sigma_form_lateral)
 
+    @property
+    def weight_dynamics(self):
+        return self._weight_dynamics
+
     @overrides(AbstractSynapseDynamicsStructural.get_parameter_names)
     def get_parameter_names(self):
         names = ['weight', 'delay', 'f_rew', 's_max', 'lateral_inhibition',
                  'sigma_form_forward', 'sigma_form_lateral', 'p_form_forward',
                  'p_form_lateral', 'p_elim_dep', 'p_elim_pot', 'grid',
                  'random_partner']
-        names.extend(self._super.get_parameter_names())
+        names.extend(self._weight_dynamics.get_parameter_names())
         return names
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]),
@@ -174,8 +247,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                          application_graph, machine_graph,
                          app_vertex, post_slice, machine_vertex, graph_mapper,
                          routing_info):
-        self._super.write_parameters(spec, region, machine_time_step,
-                                     weight_scales)
+        self._weight_dynamics.write_parameters(spec, region, machine_time_step,
+                                               weight_scales)
         spec.comment("Writing structural plasticity parameters")
         if spec.current_region != constants.POPULATION_BASED_REGIONS. \
                 SYNAPSE_DYNAMICS.value:
@@ -389,7 +462,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                                        population_to_subpopulation_information,
                                        total_words_written)
 
-    def __write_post_to_pre_table(self, spec,  app_vertex, post_slice,
+    def __write_post_to_pre_table(self, spec, app_vertex, post_slice,
                                   machine_vertex, graph_mapper,
                                   population_to_subpopulation_information,
                                   total_words_written):
@@ -405,7 +478,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     pre_vertex_id = source - pre_vertex_slice.lo_atom
                     masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
                     # Select population index
-                    pop_index = population_to_subpopulation_information.\
+                    pop_index = population_to_subpopulation_information. \
                         keys().index(row[1].pre_vertex)
                     masked_pop_index = pop_index & (2 ** 9 - 1)
                     # Select subpopulation index
@@ -426,7 +499,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                     # identifier combines the vertex, pop and subpop
                     # into 1 x 32 bit word
                     identifier = (masked_pop_index << (32 - 8)) | (
-                        masked_sub_pop_index << 16) | masked_pre_vertex_id
+                            masked_sub_pop_index << 16) | masked_pre_vertex_id
                     try:
                         synaptic_entry = np.argmax(
                             post_to_pre_table[target - post_slice.lo_atom] ==
@@ -458,7 +531,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         structure_size += post_to_pre_table_size
 
         self.structure_size = structure_size
-        initial_size = self._super.get_parameters_sdram_usage_in_bytes(
+        initial_size = self._weight_dynamics.get_parameters_sdram_usage_in_bytes(
             n_neurons, n_synapse_types)
         total_size = structure_size + initial_size
         # Aproximation of the sizes of both probability vs distance tables
@@ -480,7 +553,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             no_pre_vertices_estimate *= 4
             pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
         elif (in_edges is not None and
-                isinstance(in_edges[0], ProjectionMachineEdge)):
+              isinstance(in_edges[0], ProjectionMachineEdge)):
             pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
         return int(self.fudge_factor * (total_size + pop_size))  # bytes
 
@@ -491,11 +564,11 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
-        if isinstance(self._super, AbstractPlasticSynapseDynamics):
-            return self._super.get_plastic_synaptic_data(
+        if isinstance(self._weight_dynamics, AbstractPlasticSynapseDynamics):
+            return self._weight_dynamics.get_plastic_synaptic_data(
                 connections, connection_row_indices, n_rows,
                 post_vertex_slice, n_synapse_types)
-        return self._super.get_static_synaptic_data(
+        return self._weight_dynamics.get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
             n_synapse_types)
 
@@ -506,74 +579,74 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
-        return self._super.get_static_synaptic_data(
+        return self._weight_dynamics.get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
             n_synapse_types)
 
     def get_n_words_for_plastic_connections(self, n_connections):
         try:
             self._actual_row_max_length = \
-                self._super.get_n_words_for_plastic_connections(n_connections)
+                self._weight_dynamics.get_n_words_for_plastic_connections(n_connections)
         except Exception:
             self._actual_row_max_length = \
-                self._super.get_n_words_for_static_connections(n_connections)
+                self._weight_dynamics.get_n_words_for_static_connections(n_connections)
         return self._actual_row_max_length
 
     def get_n_words_for_static_connections(self, n_connections):
         self._actual_row_max_length = \
-            self._super.get_n_words_for_static_connections(n_connections)
+            self._weight_dynamics.get_n_words_for_static_connections(n_connections)
         return self._actual_row_max_length
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         if fp_size is not None:
-            return self._super.get_n_synapses_in_rows(pp_size, fp_size)
-        return self._super.get_n_synapses_in_rows(pp_size)
+            return self._weight_dynamics.get_n_synapses_in_rows(pp_size, fp_size)
+        return self._weight_dynamics.get_n_synapses_in_rows(pp_size)
 
     def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                    pp_size, pp_data, fp_size, fp_data):
-        return self._super.read_plastic_synaptic_data(
+        return self._weight_dynamics.read_plastic_synaptic_data(
             post_vertex_slice, n_synapse_types, pp_size, pp_data, fp_size,
             fp_data)
 
     def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types,
                                   ff_size, ff_data):
-        return self._super.read_static_synaptic_data(
+        return self._weight_dynamics.read_static_synaptic_data(
             post_vertex_slice, n_synapse_types, ff_size, ff_data)
 
     def get_n_fixed_plastic_words_per_row(self, fp_size):
-        return self._super.get_n_fixed_plastic_words_per_row(fp_size)
+        return self._weight_dynamics.get_n_fixed_plastic_words_per_row(fp_size)
 
     def get_n_plastic_plastic_words_per_row(self, pp_size):
-        return self._super.get_n_plastic_plastic_words_per_row(pp_size)
+        return self._weight_dynamics.get_n_plastic_plastic_words_per_row(pp_size)
 
     def are_weights_signed(self):
-        return self._super.are_weights_signed()
+        return self._weight_dynamics.are_weights_signed()
 
     def get_vertex_executable_suffix(self):
-        name = self._super.get_vertex_executable_suffix()
+        name = self._weight_dynamics.get_vertex_executable_suffix()
         name += "_structural"
         return name
 
     def get_n_static_words_per_row(self, ff_size):
-        return self._super.get_n_static_words_per_row(ff_size)
+        return self._weight_dynamics.get_n_static_words_per_row(ff_size)
 
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
-            self._f_rew == synapse_dynamics._f_rew and
-            self._s_max == synapse_dynamics._s_max and
-            np.isclose(self._sigma_form_forward,
-                       synapse_dynamics._sigma_form_forward) and
-            np.isclose(self._sigma_form_lateral,
-                       synapse_dynamics._sigma_form_lateral) and
-            np.isclose(self._p_form_forward,
-                       synapse_dynamics._p_form_forward) and
-            np.isclose(self._p_form_lateral,
-                       synapse_dynamics._p_form_lateral) and
-            np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
-            np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
+                self._f_rew == synapse_dynamics._f_rew and
+                self._s_max == synapse_dynamics._s_max and
+                np.isclose(self._sigma_form_forward,
+                           synapse_dynamics._sigma_form_forward) and
+                np.isclose(self._sigma_form_lateral,
+                           synapse_dynamics._sigma_form_lateral) and
+                np.isclose(self._p_form_forward,
+                           synapse_dynamics._p_form_forward) and
+                np.isclose(self._p_form_lateral,
+                           synapse_dynamics._p_form_lateral) and
+                np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
+                np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
         )
 
     def get_max_synapses(self, n_words):
-        return self._super.get_max_synapses(n_words)
+        return self._weight_dynamics.get_max_synapses(n_words)

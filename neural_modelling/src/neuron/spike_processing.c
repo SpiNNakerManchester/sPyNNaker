@@ -34,11 +34,6 @@ static spike_t spike=-1;
 
 static uint32_t single_fixed_synapse[4];
 
-// Last spike
-//spike_t last_spike;
-//uint32_t buffer_real_size;
-//spike_t last_spike=-1;
-
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
@@ -79,9 +74,6 @@ void _setup_synaptic_dma_read() {
     bool finished = false;
     uint cpsr = 0;
     while (!setup_done && !finished) {
-
-        // If rewiring needs doing on synaptic_row_address, rewiring_dma_buffer.row, DMA_READ,
-        //    n_bytes)) {
         if (number_of_rewires) {
             number_of_rewires--;
             synaptogenesis_dynamics_rewire(time);
@@ -155,12 +147,6 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
         DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
         synapse_row_plastic_region(buffer->row),
         DMA_WRITE, n_plastic_region_bytes);
-
-    // Start transfer of the entire row, not just PP
-//    spin1_dma_transfer(
-//        DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address,
-//        buffer->row,
-//        DMA_WRITE, buffer->n_bytes_transferred);
 }
 
 
@@ -169,9 +155,9 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 // Called when a multicast packet is received
 void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
-//    last_spike = key;
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
 
@@ -238,7 +224,6 @@ void _dma_complete_callback(uint unused, uint tag) {
         }
     } while (subsequent_spikes);
 
-
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
 }
@@ -270,8 +255,6 @@ bool spike_processing_initialise(
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
         return false;
     }
-//
-//    buffer_real_size = in_spikes_real_size();
 
     // Set up for single fixed synapses (data that is consistent per direct row)
     single_fixed_synapse[0] = 0;
@@ -300,34 +283,35 @@ uint32_t spike_processing_get_buffer_overflows() {
     return in_spikes_get_n_buffer_overflows();
 }
 
-//spike_t get_last_spike() {
-//    spike_t temp_spike = last_spike;
-//    last_spike = -1;
-//    return temp_spike;
-//    return last_spike;
-//}
-
-//uint32_t get_buffer_real_size() {
-//    return buffer_real_size;
-//}
-
+//! \brief get the address of the circular buffer used for buffering received
+//! spikes before processing them
+//! \return address of circular buffer
 circular_buffer get_circular_buffer(){
     return buffer;
 }
 
+//! \brief set the dma status
+//! param[in] busy: bool
+//! \return None
 void set_dma_busy(bool busy) {
     dma_busy = busy;
 }
 
+//! \brief retrieve the dma status
+//! \return bool
 bool get_dma_busy() {
     return dma_busy;
 }
 
+//! \brief set the number of times spike_processing has to attempt rewiring
+//! \return bool: currently, always true
 bool do_rewiring(int number_of_rew) {
     number_of_rewires+=number_of_rew;
     return true;
 }
 
+//! \brief has this core received any spikes since the last batch of rewires?
+//! \return bool
 bool received_any_spike() {
     return any_spike;
 }
