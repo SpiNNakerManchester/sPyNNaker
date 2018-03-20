@@ -29,5 +29,4 @@ static inline int32_t get_dopamine_trace(int32_t trace);
 
 static inline int32_t trace_build(int32_t post_trace, int32_t dopamine_trace);
 
-
 #endif // _TIMING_H_

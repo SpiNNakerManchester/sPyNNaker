@@ -83,14 +83,11 @@ static inline post_trace_t timing_add_post_spike(
     uint32_t delta_time = time - last_time;
 
     // Decay previous post trace
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(get_post_trace(last_trace),
+    int32_t decayed_post_trace = STDP_FIXED_MUL_16X16(get_post_trace(last_trace),
             DECAY_LOOKUP_TAU_MINUS(delta_time));
 
     // Add energy caused by new spike to trace
-    // **NOTE** o2 trace is pre-multiplied by a3_plus
-    int32_t new_o1_trace = decayed_o1_trace + STDP_FIXED_POINT_ONE;
-
-    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
+    int32_t new_post_trace = decayed_post_trace + STDP_FIXED_POINT_ONE;
 
     // Decay previous dopamine trace
     int32_t new_dopamine_trace = STDP_FIXED_MUL_16X16(get_dopamine_trace(last_trace),
@@ -98,7 +95,7 @@ static inline post_trace_t timing_add_post_spike(
 
     // Return new pre- synaptic event with decayed trace values with energy
     // for new spike added
-    return (post_trace_t) trace_build(new_o1_trace, new_dopamine_trace);
+    return (post_trace_t) trace_build(new_post_trace, new_dopamine_trace);
 }
 
 //---------------------------------------
@@ -108,18 +105,16 @@ static inline pre_trace_t timing_add_pre_spike(
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
-    // Decay previous r1 and r2 traces
-    int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(
+    // Decay previous pre-synaptic trace
+    int32_t decayed_pre_trace = STDP_FIXED_MUL_16X16(
         last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
 
     // Add energy caused by new spike to trace
-    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
-
-    log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
+    int32_t new_pre_trace = decayed_pre_trace + STDP_FIXED_POINT_ONE;
 
     // Return new pre-synaptic event with decayed trace values with energy
     // for new spike added
-    return (pre_trace_t) new_r1_trace;
+    return (pre_trace_t) new_pre_trace;
 }
 
 #endif // _TIMING_IZHIKEVICH_NEUROMODULATION_H_

@@ -64,7 +64,6 @@ post_event_history_t *post_event_history;
 uint32_t weight_update_constant_component;
 weight_state_t weight_state;
 
-
 //---------------------------------------
 // On each dopamine spike arrival, we add a new history trace in the post
 // synaptic history trace buffer
@@ -130,10 +129,7 @@ static inline void correlation_apply_post_spike(
                                                    temp, STDP_FIXED_POINT);
     }
 
-    int32_t decayed_eligibility_trace =
-       synapse_structure_get_eligibility_trace(*previous_state);
-
-    decayed_eligibility_trace = __smulbb(
+    int32_t decayed_eligibility_trace = __smulbb(
         *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
 
     // Apply STDP to the eligibility trace if this spike is non-dopamine spike
@@ -141,11 +137,11 @@ static inline void correlation_apply_post_spike(
         // Apply STDP
         uint32_t time_since_last_pre = time - last_pre_time;
         if (time_since_last_pre > 0) {
-            int32_t decayed_r1 = __smulbb(
+            int32_t decayed_pre_trace = __smulbb(
                 last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre)) >> STDP_FIXED_POINT;
-            decayed_r1 = __smulbb(decayed_r1,
+            decayed_pre_trace = __smulbb(decayed_pre_trace,
                 weight_state.weight_region -> a2_plus) >> weight_state.weight_multiply_right_shift;
-            decayed_eligibility_trace += decayed_r1;
+            decayed_eligibility_trace += decayed_pre_trace;
         }
     }
 
@@ -182,21 +178,18 @@ static inline void correlation_apply_pre_spike(
                                                    temp, STDP_FIXED_POINT);
     }
 
-    int32_t decayed_eligibility_trace =
-       synapse_structure_get_eligibility_trace(*previous_state);
-
-    decayed_eligibility_trace = __smulbb(
+    int32_t decayed_eligibility_trace = __smulbb(
         *previous_state, decay_eligibility_trace) >> STDP_FIXED_POINT;
 
     // Apply STDP to the eligibility trace if this spike is non-dopamine spike
     uint32_t time_since_last_post = time - last_post_time;
     if (time_since_last_post > 0) {
-        int32_t decayed_r1 = __smultb(
+        int32_t decayed_post_trace = __smultb(
             last_post_trace,
             DECAY_LOOKUP_TAU_MINUS(time_since_last_post)) >> STDP_FIXED_POINT;
-        decayed_r1 = __smulbb(decayed_r1,
+        decayed_post_trace = __smulbb(decayed_post_trace,
             weight_state.weight_region -> a2_minus) >> weight_state.weight_multiply_right_shift;
-        decayed_eligibility_trace -= decayed_r1;
+        decayed_eligibility_trace -= decayed_post_trace;
         if (decayed_eligibility_trace < 0) {
             decayed_eligibility_trace = 0;
         }
@@ -439,43 +432,8 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
-
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
     return 0.0k;
 }
-
-//---------------------------------------
-#ifdef DEBUG
-void print_plastic_synapses(address_t plastic, address_t fixed)
-{
-  // Extract seperate arrays of weights (from plastic region),
-  // Control words (from fixed region) and number of plastic synapses
-  /*const weight_t *weights = plastic_weights(plastic);
-  const control_t *control_words = plastic_controls(fixed);
-  size_t plastic_synapse  = num_plastic_controls(fixed);
-  const pre_synaptic_event_history_t *event_history = plastic_event_history(plastic);
-
-  printf ("Plastic region %u synapses pre-synaptic event buffer count:%u:\n",
-          plastic_synapse, event_history->count);
-
-  // Loop through plastic synapses
-  for (uint32_t i = 0; i < plastic_synapse; i++)
-  {
-    // Get next weight and control word (autoincrementing control word)
-    uint32_t weight = *weights++;
-    uint32_t control_word = *control_words++;
-
-    printf ("%08x [%3d: (w: %5u (=", control_word, i, weight);
-    print_weight (weight);
-    printf ("pA) d: %2u, %c, n = %3u)] - {%08x %08x}\n",
-      sparse_delay(control_word),
-      (sparse_type(control_word)==0)? 'X': 'I',
-      sparse_index(control_word),
-      SYNAPSE_DELAY_MASK,
-      SYNAPSE_TYPE_INDEX_BITS
-    );
-  }*/
-}
-#endif  // DEBUG
