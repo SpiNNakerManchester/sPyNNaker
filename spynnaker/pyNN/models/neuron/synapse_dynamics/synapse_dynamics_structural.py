@@ -19,6 +19,8 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         SynapseDynamicsStatic or SynapseDynamicsSTDP. This means rewiring \
         can operate in parallel with these types of synapses.
 
+        Written by Petrut Bogdan.
+
         Example usage to allow rewiring in parallel with STDP::
 
             stdp_model = sim.STDPMechanism(...)
@@ -32,6 +34,12 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
                 f_rew=10 ** 4,  # Hz
                 sigma_form_forward=1.,
                 delay=10
+            )
+            plastic_projection = sim.Projection(
+                ...,
+                synapse_dynamics=sim.SynapseDynamics(
+                    slow=structure_model_with_stdp
+                )
             )
 
 

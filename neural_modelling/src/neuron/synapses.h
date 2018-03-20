@@ -87,7 +87,7 @@ uint32_t synapses_get_pre_synaptic_events();
 //! \param[in] id: the (core-local) id of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
-//! \param[in] sp_data: the address of a struct through which to return
+//! \param[out] sp_data: the address of a struct through which to return
 //! weight, delay information
 //! \return bool: was the search successful?
 bool find_static_neuron_with_id(uint32_t id, address_t row,

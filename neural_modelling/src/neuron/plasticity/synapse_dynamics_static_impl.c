@@ -1,3 +1,13 @@
+/*! \file
+ *
+ * SUMMARY
+ *  \brief This file contains the main interface for structural plasticity
+ * but no actual code. For that, look at topographic_map_impl.c
+ *
+ *
+ * Author: Petrut Bogdan
+ *
+ */
 #include "synapse_dynamics.h"
 #include <debug.h>
 

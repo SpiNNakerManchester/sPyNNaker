@@ -4,6 +4,8 @@
  *  \brief This file contains the main functions for probabilistic
  *  synaptogenesis.
  *
+ * Author: Petrut Bogdan
+ *
  */
 #include "../synaptogenesis_dynamics.h"
 #include "../../population_table/population_table.h"
@@ -148,6 +150,7 @@ static inline int pack(
 //-----------------------------------------------------------------------------
 // Initialisation                                                             |
 //-----------------------------------------------------------------------------
+
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //! parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
@@ -555,17 +558,17 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag) {
     _setup_synaptic_dma_read();
 }
 
+
+//! \brief Formation and elimination are structurally agnostic, i.e. they don't
+//! care how synaptic rows are organised in physical memory.
 //!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
+//!  As such, they need to call functions that have a knowledge of how the
+//!  memory is physically organised to be able to modify Plastic-Plastic
+//!  synaptic regions.
 //!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The elimination rule calls the remove neuron function in the appropriate
-//!   module (STDP or static).
-//!
+//!  The elimination rule calls the remove neuron function in the appropriate
+//!  module (STDP or static).
+//!  \return true if elimination was successful
 bool synaptogenesis_dynamics_elimination_rule(void) {
 
     // Is synaptic weight <.5 g_max? (i.e. synapse is depressed)
@@ -599,17 +602,17 @@ bool synaptogenesis_dynamics_elimination_rule(void) {
 }
 
 
+
+//! \brief Formation and elimination are structurally agnostic, i.e. they don't
+//! care how synaptic rows are organised in physical memory.
 //!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
+//!  As such, they need to call functions that have a knowledge of how the
+//!  memory is physically organised to be able to modify Plastic-Plastic
+//!  synaptic regions.
 //!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The formation rule calls the add neuron function in the appropriate
-//!   module (STDP or static).
-//!
+//!  The formation rule calls the add neuron function in the appropriate
+//!  module (STDP or static).
+//!  \return true if formation was successful
 bool synaptogenesis_dynamics_formation_rule(void) {
 
     // Distance based probability extracted from the appropriate LUT

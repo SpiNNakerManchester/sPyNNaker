@@ -1,3 +1,12 @@
+/*! \file
+ *
+ * SUMMARY
+ *  \brief This file contains the main interface for structural plasticity
+ *
+ *
+ * Author: Petrut Bogdan
+ *
+ */
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
 
@@ -18,30 +27,30 @@ address_t synaptogenesis_dynamics_initialise(
 //! \return None
 void synaptogenesis_dynamics_rewire(uint32_t time);
 
+
+//! \brief Formation and elimination are structurally agnostic, i.e. they don't
+//! care how synaptic rows are organised in physical memory.
 //!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
+//!  As such, they need to call functions that have a knowledge of how the
+//!  memory is physically organised to be able to modify Plastic-Plastic
+//!  synaptic regions.
 //!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The formation rule calls the add neuron function in the appropriate
-//!   module (STDP or static).
-//!
+//!  The formation rule calls the add neuron function in the appropriate
+//!  module (STDP or static).
+//!  \return true if formation was successful
 bool synaptogenesis_dynamics_formation_rule();
 
+
+//! \brief Formation and elimination are structurally agnostic, i.e. they don't
+//! care how synaptic rows are organised in physical memory.
 //!
-//!   Formation and elimination are structurally agnostic, i.e. they don't
-//!   care how synaptic rows are organised in physical memory.
+//!  As such, they need to call functions that have a knowledge of how the
+//!  memory is physically organised to be able to modify Plastic-Plastic
+//!  synaptic regions.
 //!
-//!   As such, they need to call functions that have a knowledge of how the
-//!   memory is physically organised to be able to modify Plastic-Plastic
-//!   synaptic regions.
-//!
-//!   The elimination rule calls the remove neuron function in the appropriate
-//!   module (STDP or static).
-//!
+//!  The elimination rule calls the remove neuron function in the appropriate
+//!  module (STDP or static).
+//!  \return true if elimination was successful
 bool synaptogenesis_dynamics_elimination_rule();
 
 //! \brief This function is a rewiring DMA callback
