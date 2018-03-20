@@ -30,9 +30,9 @@ void synapse_dynamics_print_plastic_synapses(
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Synaptic rewiring functions
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 //! \brief  Searches the synaptic row for the the connection with the
 //!         specified post-synaptic id
