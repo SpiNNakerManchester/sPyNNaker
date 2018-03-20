@@ -348,7 +348,6 @@ static inline spike_t select_last_spike () {
 	    (current_state.my_cb_output + offset) & current_state.cb_total_size);
 }
 
-
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
@@ -530,7 +529,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
     rewiring_dma_buffer.sdram_writeback_address = synaptic_row_address;
 }
 
-
 //! \brief This function is a rewiring DMA callback
 //! \param[in] dma_id: the id of the dma
 //! \param[in] dma_tag: the dma tag, i.e. the tag used for reading row for rew.
@@ -557,7 +555,6 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag) {
     // service the next event (either rewiring or synaptic)
     _setup_synaptic_dma_read();
 }
-
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.
@@ -600,8 +597,6 @@ bool synaptogenesis_dynamics_elimination_rule(void) {
     rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
     return true;
 }
-
-
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.
