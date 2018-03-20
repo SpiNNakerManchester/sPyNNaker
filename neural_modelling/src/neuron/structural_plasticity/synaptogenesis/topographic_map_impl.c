@@ -457,7 +457,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
     size_t n_bytes;
 
     if (!population_table_get_first_address(_spike, &synaptic_row_address,
-	    &n_bytes)) {
+	        &n_bytes)) {
         log_error("FAIL@key %d", _spike);
         rt_error(RTE_SWERR);
     }
