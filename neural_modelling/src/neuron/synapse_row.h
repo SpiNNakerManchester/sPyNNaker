@@ -139,7 +139,7 @@ static inline size_t synapse_row_num_plastic_controls(address_t fixed) {
 }
 
 static inline control_t* synapse_row_plastic_controls(address_t fixed) {
-    return ((control_t*) (&(fixed[2 + synapse_row_num_fixed_synapses(fixed)])));
+    return (control_t*) (&fixed[2 + synapse_row_num_fixed_synapses(fixed)]);
 }
 
 static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
