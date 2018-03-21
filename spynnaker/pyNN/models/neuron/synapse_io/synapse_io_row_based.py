@@ -5,10 +5,8 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neural_projections.connectors \
     import AbstractConnector
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_static import \
-    SynapseDynamicsStructuralStatic
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp import \
-    SynapseDynamicsStructuralSTDP
+from spynnaker.pyNN.models.neuron.synapse_dynamics import \
+    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP
 from .abstract_synapse_io import AbstractSynapseIO
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural
@@ -72,10 +70,10 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # delay point where delay extensions start
         min_delay_for_delay_extension = (
-            max_delay_supported + numpy.finfo(numpy.double).tiny)
+                max_delay_supported + numpy.finfo(numpy.double).tiny)
 
         # row length for the non-delayed synaptic matrix
-        max_undelayed_row_length = synapse_info.connector\
+        max_undelayed_row_length = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
                 n_pre_slices, pre_slice_index, n_post_slices,
                 post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -84,7 +82,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # determine the max row length in the delay extension
         max_delayed_row_length = 0
         if n_delay_stages > 0:
-            max_delayed_row_length = synapse_info.connector\
+            max_delayed_row_length = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
                     n_pre_slices, pre_slice_index, n_post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -92,10 +90,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the row sizes
         dynamics = synapse_info.synapse_dynamics
-        undelayed_size = 0
-        delayed_size = 0
         if (isinstance(dynamics, AbstractStaticSynapseDynamics) or
-                    isinstance(dynamics, SynapseDynamicsStructuralStatic)):
+                isinstance(dynamics, SynapseDynamicsStructuralStatic)):
             undelayed_size = dynamics.get_n_words_for_static_connections(
                 max_undelayed_row_length)
             delayed_size = dynamics.get_n_words_for_static_connections(
@@ -154,8 +150,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-        elif (isinstance(synapse_dynamics, SynapseDynamicsSTDP) or \
-                isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
+        elif (isinstance(synapse_dynamics, SynapseDynamicsSTDP) or
+              isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
@@ -220,8 +216,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             connections["delay"] * (1000.0 / machine_time_step))
 
         # Scale weights
-        connections["weight"] = (
-            connections["weight"] * weight_scales[synapse_info.synapse_type])
+        connections["weight"] = (connections["weight"] * weight_scales[
+            synapse_info.synapse_type])
 
         # Split the connections up based on the delays
         if max_delay is not None:
@@ -244,7 +240,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                            AbstractSynapseDynamicsStructural):
             # Get which row each connection will go into
             undelayed_row_indices = (
-                undelayed_connections["source"] - pre_vertex_slice.lo_atom)
+                    undelayed_connections["source"] - pre_vertex_slice.lo_atom)
             max_row_length, row_data = self._get_max_row_length_and_row_data(
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
@@ -260,18 +256,18 @@ class SynapseIORowBased(AbstractSynapseIO):
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
         if delayed_connections.size:
-
             # Get the delay stages and which row each delayed connection will
             # go into
             stages = numpy.floor((numpy.round(
                 delayed_connections["delay"] - 1.0)) / max_delay).astype(
-                    "uint32")
+                "uint32")
             delayed_row_indices = (
-                (delayed_connections["source"] - pre_vertex_slice.lo_atom) +
-                ((stages - 1) * pre_vertex_slice.n_atoms))
+                    (delayed_connections[
+                         "source"] - pre_vertex_slice.lo_atom) +
+                    ((stages - 1) * pre_vertex_slice.n_atoms))
             delayed_connections["delay"] -= max_delay * stages
             delayed_source_ids = (
-                delayed_connections["source"] - pre_vertex_slice.lo_atom)
+                    delayed_connections["source"] - pre_vertex_slice.lo_atom)
 
             # Get the data
             max_delayed_row_length, delayed_row_data = \
@@ -327,11 +323,11 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Return the delays values to milliseconds
         connections["delay"] = (
-            connections["delay"] / (1000.0 / machine_time_step))
+                connections["delay"] / (1000.0 / machine_time_step))
 
         # Undo the weight scaling
-        connections["weight"] = (
-            connections["weight"] / weight_scales[synapse_info.synapse_type])
+        connections["weight"] = (connections["weight"] / weight_scales[
+            synapse_info.synapse_type])
 
         # Return the connections
         return connections

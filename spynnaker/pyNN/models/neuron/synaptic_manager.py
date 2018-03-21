@@ -28,8 +28,7 @@ from spynnaker.pyNN.models.neural_projections.connectors \
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic, SynapseDynamicsStructuralCommon, \
-    AbstractSynapseDynamicsStructural
+    import SynapseDynamicsStatic, AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex

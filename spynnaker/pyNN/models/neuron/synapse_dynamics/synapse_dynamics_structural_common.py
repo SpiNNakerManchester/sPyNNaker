@@ -2,17 +2,12 @@ from six import itervalues
 import numpy as np
 import collections
 
-from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
-from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_synapse_dynamics_structural import \
     AbstractSynapseDynamicsStructural
-from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from .synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities import constants
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
@@ -720,7 +715,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                         if (synapse_info.synapse_dynamics is
                                 self._weight_dynamics):
                             no_pre_vertices_estimate += (1 + np.ceil(
-                                    edge.pre_vertex.n_atoms / 32.))
+                                edge.pre_vertex.n_atoms / 32.))
                     no_pre_vertices_estimate *= 2
                 elif isinstance(edge, ProjectionMachineEdge):
                     pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
@@ -729,7 +724,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
 
         return int(self.fudge_factor * (total_size + pop_size))  # bytes
-
 
     def synaptic_data_update(self, connections,
                              post_vertex_slice,
@@ -749,7 +743,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         """
         self._actual_row_max_length = value
-
 
     def n_words_for_static_connections(self, value):
         """
@@ -774,15 +767,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
-            self._f_rew == synapse_dynamics._f_rew and
-            self._s_max == synapse_dynamics._s_max and
-            np.isclose(self._sigma_form_forward,
-                       synapse_dynamics._sigma_form_forward) and
-            np.isclose(self._sigma_form_lateral,
-                       synapse_dynamics._sigma_form_lateral) and
-            np.isclose(self._p_form_forward,
-                       synapse_dynamics._p_form_forward) and
-            np.isclose(self._p_form_lateral,
-                       synapse_dynamics._p_form_lateral) and
-            np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
-            np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot))
+                self._f_rew == synapse_dynamics._f_rew and
+                self._s_max == synapse_dynamics._s_max and
+                np.isclose(self._sigma_form_forward,
+                           synapse_dynamics._sigma_form_forward) and
+                np.isclose(self._sigma_form_lateral,
+                           synapse_dynamics._sigma_form_lateral) and
+                np.isclose(self._p_form_forward,
+                           synapse_dynamics._p_form_forward) and
+                np.isclose(self._p_form_lateral,
+                           synapse_dynamics._p_form_lateral) and
+                np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
+                np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot))
