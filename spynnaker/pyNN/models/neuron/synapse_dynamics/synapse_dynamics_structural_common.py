@@ -456,7 +456,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
-                    if synapse_info.synapse_dynamics is self:
+                    if synapse_info.synapse_dynamics is self._weight_dynamics:
                         structural_application_edges.append(app_edge)
                         population_to_subpopulation_information[
                             app_edge.pre_vertex] = []
@@ -469,7 +469,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 machine_vertex):
             if isinstance(machine_edge, ProjectionMachineEdge):
                 for synapse_info in machine_edge._synapse_information:
-                    if synapse_info.synapse_dynamics is self:
+                    if synapse_info.synapse_dynamics is self._weight_dynamics:
                         structural_machine_edges.append(machine_edge)
                         # For each structurally plastic MACHINE edge find the
                         # corresponding presynaptic subvertices
@@ -709,7 +709,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         relevant_edges = []
         for edge in machine_in_edges:
             for synapse_info in edge._synapse_information:
-                if synapse_info.synapse_dynamics is self:
+                if synapse_info.synapse_dynamics is self._weight_dynamics:
                     relevant_edges.append(edge)
         return int(self.fudge_factor * (4 * (12 * len(relevant_edges))))
 
@@ -734,49 +734,39 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         initial_size = 0
         total_size = structure_size + initial_size
 
-        # Aproximation of the sizes of both probability vs distance tables
-        total_size += (80 * 4)
+        # Approximation of the sizes of both probability vs distance tables
+        ff_lut = np.count_nonzero(self._ff_distance_probabilities) * 4
+        lat_lut = np.count_nonzero(self._lat_distance_probabilities) * 4
+        total_size += ff_lut
+        total_size += lat_lut
+        # total_size += (80 * 4)
         pop_size = 0
 
         # approximate the size of the pop -> subpop table
+        no_pre_vertices_estimate = 0
         if in_edges is not None:
 
             # Approximation gets computed here based on number of
             # afferent edges
             # How many afferent application vertices?
             # How large are they?
-            no_pre_vertices_estimate = 0
+
             for edge in in_edges:
                 if isinstance(edge, ProjectionApplicationEdge):
                     for synapse_info in edge.synapse_information:
-                        if synapse_info.synapse_dynamics is self:
-                            no_pre_vertices_estimate += 1 * np.ceil(
-                                    edge.pre_vertex.n_atoms / 32.)
-                    no_pre_vertices_estimate *= 4
-                    pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
+                        if (synapse_info.synapse_dynamics is
+                                self._weight_dynamics):
+                            no_pre_vertices_estimate += (1 + np.ceil(
+                                    edge.pre_vertex.n_atoms / 32.))
+                    no_pre_vertices_estimate *= 2
                 elif isinstance(edge, ProjectionMachineEdge):
                     pop_size += self.get_extra_sdram_usage_in_bytes(in_edges)
+                    break
+
+        pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
 
         return int(self.fudge_factor * (total_size + pop_size))  # bytes
 
-    def get_plastic_synaptic_data(self, connections, connection_row_indices,
-                                  n_rows, post_vertex_slice,
-                                  n_synapse_types, app_edge, machine_edge):
-        """
-        Get plastic synaptic data
-
-        """
-        if post_vertex_slice.lo_atom not in self._connections.keys():
-            self._connections[post_vertex_slice.lo_atom] = []
-        self._connections[post_vertex_slice.lo_atom].append(
-            (connections, app_edge, machine_edge))
-        if isinstance(self._weight_dynamics, AbstractPlasticSynapseDynamics):
-            return self._weight_dynamics.get_plastic_synaptic_data(
-                connections, connection_row_indices, n_rows,
-                post_vertex_slice, n_synapse_types)
-        return self._weight_dynamics.get_static_synaptic_data(
-            connections, connection_row_indices, n_rows, post_vertex_slice,
-            n_synapse_types)
 
     def synaptic_data_update(self, connections,
                              post_vertex_slice,
@@ -790,20 +780,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self._connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
 
-    def get_n_words_for_plastic_connections(self, n_connections):
+    def n_words_for_plastic_connections(self, value):
         """
         Get size of plastic connections in words
 
         """
-        try:
-            self._actual_row_max_length = \
-                self._weight_dynamics. \
-                    get_n_words_for_plastic_connections(n_connections)
-        except Exception:
-            self._actual_row_max_length = \
-                self._weight_dynamics. \
-                    get_n_words_for_static_connections(n_connections)
-        return self._actual_row_max_length
+        self._actual_row_max_length = value
+
 
     def n_words_for_static_connections(self, value):
         """

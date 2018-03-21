@@ -200,10 +200,10 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address){
     // Need to malloc space for subpop_info, i.e. an array
     // containing information for each pre-synaptic
     // application vertex
-    if (rewiring_data.pre_pop_info_table.no_pre_pops == 0) {
+
+    if (!rewiring_data.pre_pop_info_table.no_pre_pops) {
         return NULL;
     }
-
     rewiring_data.pre_pop_info_table.subpop_info =
         (subpopulation_info_t*) sark_alloc(
 	    rewiring_data.pre_pop_info_table.no_pre_pops,
@@ -311,7 +311,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address){
     number_of_connections_in_row = &synapse_row_num_fixed_synapses;
 #endif
 
-    log_debug("SR init complete.");
+    log_info("SR init complete.");
     return (address_t)sp_word;
 }
 
