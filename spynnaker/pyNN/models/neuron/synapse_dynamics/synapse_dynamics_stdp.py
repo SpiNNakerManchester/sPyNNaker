@@ -134,12 +134,9 @@ class SynapseDynamicsSTDP(
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        size = 0
-
-        size += self._timing_dependence.get_parameters_sdram_usage_in_bytes()
+        size = self._timing_dependence.get_parameters_sdram_usage_in_bytes()
         size += self._weight_dependence.get_parameters_sdram_usage_in_bytes(
             n_synapse_types, self._timing_dependence.n_weight_terms)
-
         return size
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
@@ -172,8 +169,8 @@ class SynapseDynamicsSTDP(
         if self._pad_to_length is not None:
             n_connections = max(n_connections, self._pad_to_length)
         fp_size_words = (
-            n_connections / 2 if n_connections % 2 == 0
-            else (n_connections + 1) / 2)
+            n_connections // 2 if n_connections % 2 == 0
+            else (n_connections + 1) // 2)
         pp_size_bytes = (
             self._n_header_bytes +
             (synapse_structure.get_n_bytes_per_connection() * n_connections))
@@ -233,39 +230,31 @@ class SynapseDynamicsSTDP(
         return fp_data, pp_data, fp_size, pp_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
-        padded_rows = []
-        for row in rows:  # Row elements are (individual) bytes
-            padded_rows.append(
-                numpy.concatenate(
-                    (row,
-                     numpy.zeros(
-                         numpy.clip(
-                             no_bytes_per_connection * self._pad_to_length -
-                             row.size,
-                             0,
-                             None)).astype(dtype="uint8"))
+        # Row elements are (individual) bytes
+        return [
+            numpy.concatenate((
+                row, numpy.zeros(
+                    numpy.clip(
+                        (no_bytes_per_connection * self._pad_to_length -
+                         row.size),
+                        0, None)).astype(dtype="uint8"))
                 ).view(dtype="uint8")
-            )
-
-        return padded_rows
+            for row in rows]
 
     @overrides(
         AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row)
     def get_n_plastic_plastic_words_per_row(self, pp_size):
-
         # pp_size is in words, so return
         return pp_size
 
     @overrides(
         AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row)
     def get_n_fixed_plastic_words_per_row(self, fp_size):
-
         # fp_size is in half-words
         return numpy.ceil(fp_size / 2.0).astype(dtype="uint32")
 
     @overrides(AbstractPlasticSynapseDynamics.get_n_synapses_in_rows)
     def get_n_synapses_in_rows(self, pp_size, fp_size):
-
         # Each fixed-plastic synapse is a half-word and fp_size is in half
         # words so just return it
         return fp_size

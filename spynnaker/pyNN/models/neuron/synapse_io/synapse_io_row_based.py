@@ -239,7 +239,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
-        if len(undelayed_connections) > 0 or \
+        if undelayed_connections.size or \
                 isinstance(synapse_info.synapse_dynamics,
                            AbstractSynapseDynamicsStructural):
             # Get which row each connection will go into
@@ -300,7 +300,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         if data is not None and len(data):
             row_data = numpy.frombuffer(data, dtype="<u4").reshape(
                 -1, (max_row_length + _N_HEADER_WORDS))
-        if delayed_data is not None and len(delayed_data) > 0:
+        if delayed_data is not None and len(delayed_data):
             delayed_row_data = numpy.frombuffer(
                 delayed_data, dtype="<u4").reshape(
                 -1, (delayed_max_row_length + _N_HEADER_WORDS))

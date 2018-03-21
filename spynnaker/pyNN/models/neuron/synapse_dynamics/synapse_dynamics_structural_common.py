@@ -12,6 +12,7 @@ from .abstract_synapse_dynamics_structural import \
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from spynnaker.pyNN.utilities import constants
+from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
@@ -45,11 +46,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     :type p_elim_dep: float
     :param grid: Grid shape
     :type grid: 2d int array
-    :param lateral_inhibition: Flag whether to mark synapses formed within a
+    :param lateral_inhibition: Flag whether to mark synapses formed within a\
         layer as inhibitory or excitatory
     :type lateral_inhibition: bool
-    :param random_partner: Flag whether to randomly select pre-synaptic
-        partner for formation
+    :param random_partner: \
+        Flag whether to randomly select pre-synaptic partner for formation
     :type random_partner: bool
     :param seed: seed the random number generators
     :type seed: int
@@ -127,8 +128,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  lateral_inhibition=default_parameters['lateral_inhibition'],
                  random_partner=default_parameters['random_partner'],
                  seed=None):
-
-        AbstractSynapseDynamicsStructural.__init__(self)
         self._f_rew = f_rew
         self._p_rew = 1. / self._f_rew
         self._initial_weight = weight
@@ -162,18 +161,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         self._ff_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_forward,
-                self._sigma_form_forward)
+                self._p_form_forward, self._sigma_form_forward)
         self._lat_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_lateral,
-                self._sigma_form_lateral)
+                self._p_form_lateral, self._sigma_form_lateral)
 
     @property
     def weight_dynamics(self):
         return self._weight_dynamics
 
-    # @overrides(AbstractSynapseDynamicsStructural.get_parameter_names)
     def get_parameter_names(self):
         names = ['initial_weight', 'initial_delay', 'f_rew', 's_max',
                  'lateral_inhibition',
@@ -184,9 +180,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]),
                  type='euclidian'):  # @ReservedAssignment
-        """
-        Compute the distance between points x0 and x1 place on the grid using
-        periodic boundary conditions
+        """ Compute the distance between points x0 and x1 place on the grid\
+            using periodic boundary conditions.
+
         :param x0: first point in space
         :type x0: np.ndarray of ints
         :param x1: second point in space
@@ -212,8 +208,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         return np.sqrt((delta ** 2).sum(axis=-1))
 
     def generate_distance_probability_array(self, probability, sigma):
-        """
-        Generate the exponentially decaying probability LUTs
+        """ Generate the exponentially decaying probability LUTs.
+
         :param probability: peak probability
         :type probability: float
         :param sigma: spread
@@ -247,15 +243,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if filtered_probabilities.size % 2 != 0:
             filtered_probabilities = np.concatenate(
                 (filtered_probabilities,
-                 np.zeros(
-                     filtered_probabilities.size % 2, dtype="uint16")))
+                 np.zeros(filtered_probabilities.size % 2, dtype="uint16")))
 
         return filtered_probabilities
 
     @property
     def p_rew(self):
-        """
-        The period of rewiring
+        """ The period of rewiring.
 
         :return: The period of rewiring
         :rtype: int
@@ -264,8 +258,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     @property
     def actual_sdram_usage(self):
-        """
-        Actual SDRAM usage (based on what is written to spec)
+        """ Actual SDRAM usage (based on what is written to spec).
 
         :return: actual SDRAM usage
         :rtype: int
@@ -274,25 +267,18 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     @property
     def approximate_sdram_usage(self):
-        """
-        Approximate the SDRAM usage before final partitioning
+        """ Approximate the SDRAM usage before final partitioning.
 
         :return: SDRAM usage approximation
         :rtype: int
         """
         return self._approximate_sdram_usage
 
-    # @overrides(
-    #     AbstractSynapseDynamicsStructural.write_parameters,
-    #     additional_arguments={
-    #         "application_graph", "machine_graph", "app_vertex",
-    #         "post_slice", "machine_vertex", "graph_mapper", "routing_info"})
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
             machine_vertex, graph_mapper, routing_info):
-        """
-        Write the synapse parameters to the spec
+        """ Write the synapse parameters to the spec.
 
         :param spec: the data spec
         :type spec: spec
@@ -302,22 +288,22 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type machine_time_step: int
         :param weight_scales: scaling the weights
         :type weight_scales: float
-        :param application_graph: the entire, highest level, graph of the
-            network to be simulated
+        :param application_graph: \
+            the entire, highest level, graph of the network to be simulated
         :type application_graph: ApplicationGraph
-        :param machine_graph: the entire, lowest level, graph of the
-            network to be simulated
+        :param machine_graph: \
+            the entire, lowest level, graph of the network to be simulated
         :type machine_graph: MachineGraph
-        :param app_vertex: the highest level object of the post-synaptic
-            population
+        :param app_vertex: \
+            the highest level object of the post-synaptic population
         :type app_vertex: ApplicationVertex
-        :param post_slice: the slice of the App Vertex corresponding to this
-            Machine Vertex
+        :param post_slice: \
+            the slice of the app vertex corresponding to this machine vertex
         :type post_slice: Slice
-        :param machine_vertex: the lowest level object of the post-synaptic
-            population
+        :param machine_vertex: \
+            the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
@@ -391,26 +377,25 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     def __compute_aux(self, application_graph, machine_graph,
                       app_vertex, machine_vertex, graph_mapper, routing_info):
-        """
-        Compute all of the relavant pre-synaptic population information, as
-        well as the key of the current vertex
+        """ Compute all of the relevant pre-synaptic population information,\
+            as well as the key of the current vertex.
 
-        :param application_graph: the entire, highest level, graph of the
-            network to be simulated
+        :param application_graph: \
+            the entire, highest level, graph of the network to be simulated
         :type application_graph: ApplicationGraph
-        :param machine_graph: the entire, lowest level, graph of the
-            network to be simulated
+        :param machine_graph: \
+            the entire, lowest level, graph of the network to be simulated
         :type machine_graph: MachineGraph
-        :param app_vertex: the highest level object of the post-synaptic
-            population
+        :param app_vertex: \
+            the highest level object of the post-synaptic population
         :type app_vertex: ApplicationVertex
-        :param post_slice: the slice of the App Vertex corresponding to this
-            Machine Vertex
+        :param post_slice: \
+            the slice of the app vertex corresponding to this machine vertex
         :type post_slice: Slice
-        :param machine_vertex: the lowest level object of the post-synaptic
-            population
+        :param machine_vertex: \
+            the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
@@ -488,37 +473,37 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                                         app_vertex, post_slice, machine_vertex,
                                         graph_mapper,
                                         routing_info):
-        """
-        All cores which do synaptic rewiring have information about all
-        the relevant pre-synaptic populations.
+        """ All cores which do synaptic rewiring have information about all\
+            the relevant pre-synaptic populations.
+
         :param spec: the data spec
         :type spec: spec
-        :param application_graph: the entire, highest level, graph of the
-            network to be simulated
+        :param application_graph: \
+            the entire, highest level, graph of the network to be simulated
         :type application_graph: ApplicationGraph
-        :param machine_graph: the entire, lowest level, graph of the
-            network to be simulated
+        :param machine_graph: \
+            the entire, lowest level, graph of the network to be simulated
         :type machine_graph: MachineGraph
-        :param app_vertex: the highest level object of the post-synaptic
-            population
+        :param app_vertex: \
+            the highest level object of the post-synaptic population
         :type app_vertex: ApplicationVertex
-        :param post_slice: the slice of the App Vertex corresponding to this
-            Machine Vertex
+        :param post_slice: \
+            the slice of the app vertex corresponding to this machine vertex
         :type post_slice: Slice
-        :param machine_vertex: the lowest level object of the post-synaptic
-            population
+        :param machine_vertex: \
+            the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
         :return: None
         :rtype: None
         """
-        # Compute all the auxilliary stuff
-        results = self.__compute_aux(application_graph, machine_graph,
-                                     app_vertex, machine_vertex, graph_mapper,
-                                     routing_info)
+        # Compute all the auxiliary stuff
+        results = self.__compute_aux(
+            application_graph, machine_graph, app_vertex, machine_vertex,
+            graph_mapper, routing_info)
 
         population_to_subpopulation_information = results[0]
         current_key = results[1]
@@ -537,11 +522,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                              data_type=DataType.UINT16)
 
             # Custom header for commands / controls
-            # currently, controls = 1 if the subvertex (on the current core)
+            # currently, controls = True if the subvertex (on the current core)
             # is part of this population
-            controls = 1 if current_key in np.asarray(
-                subpopulation_list)[:0] else 0
-            spec.write_value(data=controls, data_type=DataType.UINT16)
+            controls = current_key in np.asarray(subpopulation_list)[:0]
+            spec.write_value(data=int(controls), data_type=DataType.UINT16)
 
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
@@ -597,31 +581,31 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                                   machine_vertex, graph_mapper,
                                   population_to_subpopulation_information,
                                   total_words_written):
-        """
-        Post to pre table is basically the transverse of the synaptic matrix
+        """ Post to pre table is basically the transpose of the synaptic\
+            matrix
+
         :param spec: the data spec
         :type spec: spec
-        :param app_vertex: the highest level object of the post-synaptic
-            population
+        :param app_vertex: \
+            the highest level object of the post-synaptic population
         :type app_vertex: ApplicationVertex
-        :param post_slice: the slice of the App Vertex corresponding to this
-            Machine Vertex
+        :param post_slice: \
+            the slice of the app vertex corresponding to this machine vertex
         :type post_slice: Slice
-        :param machine_vertex: the lowest level object of the post-synaptic
-            population
+        :param machine_vertex: \
+            the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
-        :param population_to_subpopulation_information: generated relevant
-            information
+        :param population_to_subpopulation_information: \
+            generated relevant information
         :type population_to_subpopulation_information: dict
-        :param total_words_written: keeping track of how many words have been
-            written
+        :param total_words_written: \
+            keeping track of how many words have been written
         :type total_words_written: int
         :return: None
         :rtype: None
         """
-
         # Setting up Post to Pre table
         post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
                                     dtype=np.int32) * -1
@@ -678,11 +662,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             machine_vertex] = 4 * 27 + 4 * total_words_written
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
-        """
-        Better aprox of sdram usage based on incoming machine edges
+        """ Better approximation of SDRAM usage based on incoming machine edges
+
         :param machine_in_edges: incoming machine edges
         :type machine_in_edges: machine edges
-        :return: sdram usage
+        :return: SDRAM usage
         :rtype: int
         """
         relevant_edges = []
@@ -690,20 +674,20 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             for synapse_info in edge._synapse_information:
                 if synapse_info.synapse_dynamics is self._weight_dynamics:
                     relevant_edges.append(edge)
-        return int(self.fudge_factor * (4 * (12 * len(relevant_edges))))
+        return int(self.fudge_factor * 4 * 12 * len(relevant_edges))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges):
-        """
-        approximate sdram usage
+        """ Approximate SDRAM usage
+
         :param n_neurons: number of neurons
         :type n_neurons: int
-        :param n_synapse_types: number of synapse types (i.e. excitatory and
-            inhibitory)
+        :param n_synapse_types: \
+            number of synapse types (i.e. excitatory and inhibitory)
         :type n_synapse_types: int
         :param in_edges: incoming edges
         :type in_edges: edges
-        :return: sdram usage
+        :return: SDRAM usage
         :rtype: int
         """
         structure_size = 27 * 4 + 4 * 4  # parameters + rng seed
@@ -775,9 +759,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self._actual_row_max_length = value
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
-        """
-        Get number of synapses in a row
-
+        """ Get number of synapses in a row.
         """
         if fp_size is not None:
             return self._weight_dynamics. \
@@ -788,21 +770,19 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         name = "_structural"
         return name
 
-    # @overrides(AbstractSynapseDynamicsStructural.is_same_as)
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
-                self._f_rew == synapse_dynamics._f_rew and
-                self._s_max == synapse_dynamics._s_max and
-                np.isclose(self._sigma_form_forward,
-                           synapse_dynamics._sigma_form_forward) and
-                np.isclose(self._sigma_form_lateral,
-                           synapse_dynamics._sigma_form_lateral) and
-                np.isclose(self._p_form_forward,
-                           synapse_dynamics._p_form_forward) and
-                np.isclose(self._p_form_lateral,
-                           synapse_dynamics._p_form_lateral) and
-                np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
-                np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot)
-        )
+            self._f_rew == synapse_dynamics._f_rew and
+            self._s_max == synapse_dynamics._s_max and
+            np.isclose(self._sigma_form_forward,
+                       synapse_dynamics._sigma_form_forward) and
+            np.isclose(self._sigma_form_lateral,
+                       synapse_dynamics._sigma_form_lateral) and
+            np.isclose(self._p_form_forward,
+                       synapse_dynamics._p_form_forward) and
+            np.isclose(self._p_form_lateral,
+                       synapse_dynamics._p_form_lateral) and
+            np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
+            np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot))
