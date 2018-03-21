@@ -8,6 +8,67 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics. \
 
 class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                                     SynapseDynamicsSTDP):
+    """ Class that enables synaptic rewiring. It acts as a wrapper
+        around SynapseDynamicsSTDP.
+        This means rewiring can operate in parallel with these
+        types of synapses.
+
+        Written by Petrut Bogdan.
+
+        Example usage to allow rewiring in parallel with STDP::
+
+            stdp_model = sim.STDPMechanism(...)
+
+            structure_model_with_stdp = sim.StructuralMechanismSTDP(
+                stdp_model=stdp_model,
+                weight=0,
+                s_max=32,
+                grid=[np.sqrt(pop_size), np.sqrt(pop_size)],
+                random_partner=True,
+                f_rew=10 ** 4,  # Hz
+                sigma_form_forward=1.,
+                delay=10
+            )
+            plastic_projection = sim.Projection(
+                ...,
+                synapse_dynamics=sim.SynapseDynamics(
+                    slow=structure_model_with_stdp
+                )
+            )
+
+
+    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will
+        be done per second.
+    :type f_rew: int
+    :param weight: Initial weight assigned to a newly formed connection
+    :type weight: float
+    :param delay: Delay assigned to a newly formed connection
+    :type delay: int
+    :param s_max: Maximum fan-in per target layer neuron
+    :type s_max: int
+    :param sigma_form_forward: Spread of feed-forward formation receptive field
+    :type sigma_form_forward: float
+    :param sigma_form_lateral: Spread of lateral formation receptive field
+    :type sigma_form_lateral: float
+    :param p_form_forward: Peak probability for feed-forward formation
+    :type p_form_forward: float
+    :param p_form_lateral: Peak probability for lateral formation
+    :type p_form_lateral: float
+    :param p_elim_pot: Probability of elimination of a potentiated synapse
+    :type p_elim_pot: float
+    :param p_elim_dep: Probability of elimination of a depressed synapse
+    :type p_elim_dep: float
+    :param grid: Grid shape
+    :type grid: 2d int array
+    :param lateral_inhibition: Flag whether to mark synapses formed within a
+        layer as inhibitory or excitatory
+    :type lateral_inhibition: bool
+    :param random_partner: Flag whether to randomly select pre-synaptic
+        partner for formation
+    :type random_partner: bool
+    :param seed: seed the random number generators
+    :type seed: int
+    """
     __slots__ = ["_common_sp"]
 
     def __init__(self, stdp_model=CommonSP.default_parameters['stdp_model'],
@@ -93,7 +154,7 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                                             n_synapse_types, in_edges):
         initial_size = \
             super(SynapseDynamicsStructuralSTDP, self). \
-                get_parameters_sdram_usage_in_bytes(
+            get_parameters_sdram_usage_in_bytes(
                 n_neurons, n_synapse_types)
         initial_size += \
             self._common_sp.get_parameters_sdram_usage_in_bytes(

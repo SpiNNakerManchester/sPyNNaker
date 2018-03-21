@@ -15,33 +15,12 @@ from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
-    """ Class enables synaptic rewiring. It acts as a wrapper around \
-        SynapseDynamicsStatic or SynapseDynamicsSTDP. This means rewiring \
-        can operate in parallel with these types of synapses.
+    """ Common class that enables synaptic rewiring. It acts as a wrapper
+        around SynapseDynamicsStatic or SynapseDynamicsSTDP.
+        This means rewiring can operate in parallel with these
+        types of synapses.
 
         Written by Petrut Bogdan.
-
-        Example usage to allow rewiring in parallel with STDP::
-
-            stdp_model = sim.STDPMechanism(...)
-
-            structure_model_with_stdp = sim.StructuralMechanism(
-                stdp_model=stdp_model,
-                weight=0,
-                s_max=32,
-                grid=[np.sqrt(pop_size), np.sqrt(pop_size)],
-                random_partner=True,
-                f_rew=10 ** 4,  # Hz
-                sigma_form_forward=1.,
-                delay=10
-            )
-            plastic_projection = sim.Projection(
-                ...,
-                synapse_dynamics=sim.SynapseDynamics(
-                    slow=structure_model_with_stdp
-                )
-            )
-
 
     :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will
         be done per second.
