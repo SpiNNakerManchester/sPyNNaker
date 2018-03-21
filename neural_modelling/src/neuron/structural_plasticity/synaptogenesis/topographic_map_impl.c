@@ -539,12 +539,13 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
 static inline void dma_writeback(
 	const char *msg)
 {
+    use(msg);
     while (!spin1_dma_transfer(
             DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,
             rewiring_dma_buffer.sdram_writeback_address,
             rewiring_dma_buffer.row, DMA_WRITE,
             rewiring_dma_buffer.n_bytes_transferred)) {
-        log_error(msg);
+        log_error("%s", msg);
     }
 }
 
