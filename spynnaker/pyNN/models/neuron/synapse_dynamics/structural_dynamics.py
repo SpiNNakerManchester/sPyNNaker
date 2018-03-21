@@ -1,4 +1,4 @@
-from pynn_synapse_dynamics import PyNNSynapseDynamics
+from .pynn_synapse_dynamics import PyNNSynapseDynamics
 
 
 class StructuralDynamics(PyNNSynapseDynamics):

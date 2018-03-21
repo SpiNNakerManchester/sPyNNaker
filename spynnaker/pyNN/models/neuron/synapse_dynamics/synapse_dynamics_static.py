@@ -19,9 +19,6 @@ class SynapseDynamicsStatic(
         "_pad_to_length"]
 
     def __init__(self, pad_to_length=None):
-        AbstractStaticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
         self._change_requires_mapping = True
         self._pad_to_length = pad_to_length
 
@@ -82,17 +79,11 @@ class SynapseDynamicsStatic(
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
-                numpy.concatenate(
-                    (row,
-                     numpy.zeros(
-                         numpy.clip(
-                             no_bytes_per_connection * self._pad_to_length -
-                             row.size,
-                             0,
-                             None)).astype(
-                         dtype="uint8"))
-                ).view(dtype="uint8")
-            )
+                numpy.concatenate((
+                    row, numpy.zeros(numpy.clip(
+                        no_bytes_per_connection * self._pad_to_length -
+                        row.size, 0, None)).astype(
+                            dtype="uint8"))).view(dtype="uint8"))
 
         return padded_rows
 
@@ -115,8 +106,7 @@ class SynapseDynamicsStatic(
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
-            [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))]
-        )
+            [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF
