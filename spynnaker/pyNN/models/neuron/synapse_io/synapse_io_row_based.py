@@ -9,7 +9,7 @@ from .abstract_synapse_io import AbstractSynapseIO
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsSTDP, SynapseDynamicsStructural
+    import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import AbstractSynapseDynamics
 
@@ -134,12 +134,12 @@ class SynapseIORowBased(AbstractSynapseIO):
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
         if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics) or \
-                (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+                (isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural) and
                  isinstance(synapse_dynamics._weight_dynamics,
                             AbstractStaticSynapseDynamics)):
 
             # Get the static data
-            if isinstance(synapse_dynamics, SynapseDynamicsStructural):
+            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
                 ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
                     connections, row_indices, n_rows, post_vertex_slice,
                     n_synapse_types, app_edge=app_edge,
@@ -155,7 +155,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
         elif isinstance(synapse_dynamics, SynapseDynamicsSTDP) or \
-                (isinstance(synapse_dynamics, SynapseDynamicsStructural) and
+                (isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural) and
                  isinstance(synapse_dynamics.weight_dynamics,
                             SynapseDynamicsSTDP)):
 
@@ -164,7 +164,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             ff_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]
 
             # Get the plastic data
-            if isinstance(synapse_dynamics, SynapseDynamicsStructural):
+            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
                 fp_data, pp_data, fp_size, pp_size = \
                     synapse_dynamics.get_plastic_synaptic_data(
                         connections, row_indices, n_rows, post_vertex_slice,

@@ -28,7 +28,8 @@ from spynnaker.pyNN.models.neural_projections.connectors \
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic, SynapseDynamicsStructural
+    import SynapseDynamicsStatic, SynapseDynamicsStructuralCommon, \
+    AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
@@ -292,13 +293,12 @@ class SynapticManager(object):
         """
         # Does the size of the parameters area depend on presynaptic
         # connections in any way?
-        try:
-            # Yes!
+        if isinstance(self.synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
             return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types(),
                 in_edges=in_edges)
-        except TypeError:
-            # No!
+        else:
             return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._synapse_type.get_n_synapse_types())
 
@@ -786,7 +786,8 @@ class SynapticManager(object):
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        if isinstance(self._synapse_dynamics, SynapseDynamicsStructural):
+        if isinstance(self._synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
             self._synapse_dynamics.write_parameters(
                 spec,
                 POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,

@@ -7,10 +7,10 @@ from .pynn_synapse_dynamics import PyNNSynapseDynamics
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .structural_dynamics import StructuralDynamics
-from .synapse_dynamics_structural import SynapseDynamicsStructural
+from .synapse_dynamics_structural_common import SynapseDynamicsStructuralCommon
 
 __all__ = ["AbstractSynapseDynamics", "AbstractStaticSynapseDynamics",
            "AbstractPlasticSynapseDynamics", "PyNNSynapseDynamics",
            "SynapseDynamicsStatic", "SynapseDynamicsSTDP",
            "AbstractSynapseDynamicsStructural", "StructuralDynamics",
-           "SynapseDynamicsStructural"]
+           "SynapseDynamicsStructuralCommon"]
