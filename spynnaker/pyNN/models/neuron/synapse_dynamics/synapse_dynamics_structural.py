@@ -338,7 +338,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
@@ -430,7 +430,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
@@ -528,7 +528,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param routing_info: All of the routing information on the network
         :type routing_info: RoutingInfo
@@ -630,7 +630,7 @@ class SynapseDynamicsStructural(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: ?????
+        :param graph_mapper: for looking up application vertices
         :type graph_mapper: GraphMapper
         :param population_to_subpopulation_information: \
             generated relevant information
