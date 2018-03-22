@@ -147,9 +147,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
         _rng = np.random.RandomState(seed)
-        self._seeds = []
-        for _ in range(4):
-            self._seeds.append(_rng.randint(0x7FFFFFFF))
+        self._seeds = [_rng.randint(0x7FFFFFFF) for _ in range(4)]
 
         # Addition information -- used for SDRAM usage
         self._actual_sdram_usage = {}
@@ -282,7 +280,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param machine_time_step: the duration of a machine time step (ms)
         :type machine_time_step: int
         :param weight_scales: scaling the weights
-        :type weight_scales: float
+        :type weight_scales: list(float)
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
         :type application_graph: ApplicationGraph
@@ -310,49 +308,72 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 SYNAPSE_DYNAMICS.value:
             spec.switch_write_focus(region)
 
+        # Write the common part of the rewiring data
+        self.__write_common_rewiring_data(
+            spec, app_vertex, post_slice, weight_scales, machine_time_step)
+
+        # Write presynaptic (sub)population information
+        self.__write_presynaptic_information(
+            spec, application_graph, machine_graph,
+            app_vertex, post_slice, machine_vertex, graph_mapper,
+            routing_info)
+
+    def __write_common_rewiring_data(self, spec, app_vertex, post_slice,
+                                     weight_scales, machine_time_step):
+        """ Write the non-subpopulation synapse parameters to the spec.
+
+        :param spec: the data spec
+        :type spec: spec
+        :param app_vertex: \
+            the highest level object of the post-synaptic population
+        :type app_vertex: ApplicationVertex
+        :param post_slice: \
+            the slice of the app vertex corresponding to this machine vertex
+        :type post_slice: Slice
+        :param weight_scales: scaling the weights
+        :type weight_scales: list(float)
+        :param machine_time_step: the duration of a machine time step (ms)
+        :type machine_time_step: int
+        :return: None
+        :rtype: None
+        """
         if self._p_rew * 1000. < machine_time_step / 1000.:
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(
-                data=int(machine_time_step / (self._p_rew * 10 ** 6)),
-                data_type=DataType.INT32)
+                data=int(machine_time_step / (self._p_rew * 10 ** 6)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(
-                data=int((self._p_rew * 10 ** 6) / float(machine_time_step)),
-                data_type=DataType.INT32)
+                data=int((self._p_rew * 10 ** 6) / float(machine_time_step)))
 
         # scale the excitatory weight appropriately
         spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[0])),
-            data_type=DataType.INT32)
+            data=int(round(self._initial_weight * weight_scales[0])))
         # scale the inhibitory weight appropriately
         spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[1])),
-            data_type=DataType.INT32)
-        spec.write_value(data=self._initial_delay, data_type=DataType.INT32)
-        spec.write_value(data=int(self._s_max), data_type=DataType.INT32)
+            data=int(round(self._initial_weight * weight_scales[1])))
+        spec.write_value(data=self._initial_delay)
+        spec.write_value(data=int(self._s_max))
         spec.write_value(data=int(self._lateral_inhibition),
                          data_type=DataType.INT32)
         spec.write_value(data=int(self._random_partner),
                          data_type=DataType.INT32)
         # write total number of atoms in the application vertex
-        spec.write_value(data=app_vertex.n_atoms, data_type=DataType.INT32)
+        spec.write_value(data=app_vertex.n_atoms)
         # write local low, high and number of atoms
-        spec.write_value(data=post_slice[0], data_type=DataType.INT32)
-        spec.write_value(data=post_slice[1], data_type=DataType.INT32)
-        spec.write_value(data=post_slice[2], data_type=DataType.INT32)
+        spec.write_value(data=post_slice[0])
+        spec.write_value(data=post_slice[1])
+        spec.write_value(data=post_slice[2])
 
         # write the grid size for periodic boundary distance computation
-        spec.write_value(data=self._grid[0], data_type=DataType.INT32)
-        spec.write_value(data=self._grid[1], data_type=DataType.INT32)
+        spec.write_value(data=self._grid[0])
+        spec.write_value(data=self._grid[1])
 
         # write probabilities for elimination
-        spec.write_value(data=int(self._p_elim_dep * (2 ** 32 - 1)),
-                         data_type=DataType.UINT32)
-        spec.write_value(data=int(self._p_elim_pot * (2 ** 32 - 1)),
-                         data_type=DataType.UINT32)
+        spec.write_value(data=self._p_elim_dep, data_type=DataType.U032)
+        spec.write_value(data=self._p_elim_pot, data_type=DataType.U032)
 
         # write the random seed (4 words), generated randomly,
         # but the same for all postsynaptic vertices!
@@ -362,13 +383,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # write local seed (4 words), generated randomly!
         for _ in range(4):
             spec.write_value(data=np.random.randint(0x7FFFFFFF))
-
-        # Write presynaptic (sub)population information
-
-        self.__write_presynaptic_information(
-            spec, application_graph, machine_graph,
-            app_vertex, post_slice, machine_vertex, graph_mapper,
-            routing_info)
 
     def __compute_aux(self, application_graph, machine_graph,
                       app_vertex, machine_vertex, graph_mapper, routing_info):
@@ -447,8 +461,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  routing_info.get_routing_info_from_pre_vertex(
                      vertex, constants.SPIKE_PARTITION_ID).first_mask))
 
-        for subpopulation_list in \
-                itervalues(population_to_subpopulation_information):
+        for subpopulation_list in itervalues(
+                population_to_subpopulation_information):
             max_subpartitions = np.maximum(max_subpartitions,
                                            len(subpopulation_list))
 
@@ -496,21 +510,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: None
         """
         # Compute all the auxiliary stuff
-        results = self.__compute_aux(
+        pop_to_subpop_info, current_key, no_prepops = self.__compute_aux(
             application_graph, machine_graph, app_vertex, machine_vertex,
             graph_mapper, routing_info)
 
-        population_to_subpopulation_information = results[0]
-        current_key = results[1]
-        no_pre_populations = results[2]
-
         # Table header
-        spec.write_value(data=no_pre_populations, data_type=DataType.INT32)
+        spec.write_value(data=no_prepops)
 
         total_words_written = 0
-        for subpopulation_list in \
-                itervalues(population_to_subpopulation_information):
-
+        for subpopulation_list in itervalues(pop_to_subpop_info):
             # Population header(s)
             # Number of subpopulations
             spec.write_value(data=len(subpopulation_list),
@@ -524,53 +532,48 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
-                    subpopulation_list) > 0 else 0,
-                data_type=DataType.INT32)
+                    subpopulation_list) > 0 else 0)
             words_written = 2
 
             # Ensure the following values are written in ascending
             # order of low_atom (implicit)
             dt = np.dtype(
-                [('key', 'int'), ('n_atoms', 'int'), ('lo_atom', 'int'),
+                [('key', 'uint'), ('n_atoms', 'uint'), ('lo_atom', 'uint'),
                  ('mask', 'uint')])
             structured_array = np.array(subpopulation_list, dtype=dt)
             sorted_info_list = np.sort(structured_array, order='lo_atom')
             for subpopulation_info in sorted_info_list:
                 # Subpopulation information (i.e. key and number of atoms)
                 # Key
-                spec.write_value(data=subpopulation_info[0],
-                                 data_type=DataType.INT32)
+                spec.write_value(data=subpopulation_info[0])
                 # n_atoms
-                spec.write_value(data=subpopulation_info[1],
-                                 data_type=DataType.INT32)
+                spec.write_value(data=subpopulation_info[1])
                 # lo_atom
-                spec.write_value(data=subpopulation_info[2],
-                                 data_type=DataType.INT32)
+                spec.write_value(data=subpopulation_info[2])
                 # mask
-                spec.write_value(data=subpopulation_info[3],
-                                 data_type=DataType.UINT32)
-
+                spec.write_value(data=subpopulation_info[3])
                 words_written += 4
 
-            total_words_written += words_written * 4
+            total_words_written += words_written
 
         # Now we write the probability tables for formation
         # (feedforward and lateral)
-        spec.write_value(data=self._ff_distance_probabilities.size,
-                         data_type=DataType.INT32)
-        spec.write_array(self._ff_distance_probabilities.view(dtype=np.uint32))
-        total_words_written += self._ff_distance_probabilities.size // 2
+        spec.write_value(data=self._ff_distance_probabilities.size)
+        spec.write_array(
+            self._ff_distance_probabilities.view(dtype=np.uint16),
+            data_type=DataType.UINT16)
+        total_words_written += self._ff_distance_probabilities.size // 2 + 1
         spec.write_value(data=self._lat_distance_probabilities.size,
                          data_type=DataType.INT32)
         spec.write_array(
-            self._lat_distance_probabilities.view(dtype=np.uint32))
-        total_words_written += self._lat_distance_probabilities.size // 2
+            self._lat_distance_probabilities.view(dtype=np.uint16),
+            data_type=DataType.UINT16)
+        total_words_written += self._lat_distance_probabilities.size // 2 + 1
 
         # Write post to pre table (inverse of synaptic matrix)
         self.__write_post_to_pre_table(spec, app_vertex, post_slice,
                                        machine_vertex, graph_mapper,
-                                       population_to_subpopulation_information,
-                                       total_words_written)
+                                       pop_to_subpop_info, total_words_written)
 
     def __write_post_to_pre_table(self, spec, app_vertex, post_slice,
                                   machine_vertex, graph_mapper,
@@ -650,9 +653,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                         target - post_slice.lo_atom, synaptic_entry] = \
                         identifier
 
-        spec.write_array(post_to_pre_table.ravel())
+        spec.write_array(post_to_pre_table.ravel(), data_type=DataType.INT32)
+        total_words_written += post_to_pre_table.size
 
-        total_words_written += (post_to_pre_table.size)
         self.actual_sdram_usage[
             machine_vertex] = 4 * 27 + 4 * total_words_written
 
@@ -728,9 +731,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     def synaptic_data_update(self, connections,
                              post_vertex_slice,
                              app_edge, machine_edge):
-        """
-        Get static synaptic data
-
+        """ Get static synaptic data
         """
         if post_vertex_slice.lo_atom not in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
@@ -738,16 +739,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             (connections, app_edge, machine_edge))
 
     def n_words_for_plastic_connections(self, value):
-        """
-        Get size of plastic connections in words
-
+        """ Get size of plastic connections in words
         """
         self._actual_row_max_length = value
 
     def n_words_for_static_connections(self, value):
-        """
-        Get size of static connections in words
-
+        """ Get size of static connections in words
         """
         self._actual_row_max_length = value
 
