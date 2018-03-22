@@ -29,12 +29,30 @@
 #include <circular_buffer.h>
 
 //-----------------------------------------------------------------------------
-// External functions                                                         |
+// Static functions                                                           |
 //-----------------------------------------------------------------------------
-bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
-bool (*remove_neuron)(uint32_t, address_t);
-bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t, uint32_t);
-size_t (*number_of_connections_in_row)(address_t);
+typedef bool (*search_for_neuron_t)(uint32_t, address_t,
+structural_plasticity_data_t *);
+typedef bool (*remove_neuron_t)(uint32_t, address_t);
+typedef bool (*add_neuron_t)(uint32_t, address_t, uint32_t, uint32_t, uint32_t)
+;
+typedef size_t (*number_of_connections_in_row_t)(address_t);
+
+#if STDP_ENABLED == 1
+static const search_for_neuron_t search_for_neuron =
+&find_plastic_neuron_with_id;
+static const remove_neuron_t remove_neuron = &remove_plastic_neuron_at_offset;
+static const add_neuron_t add_neuron = &add_plastic_neuron_with_id;
+static const number_of_connections_in_row_t number_of_connections_in_row =
+    &synapse_row_num_plastic_controls;
+#else
+static const search_for_neuron_t search_for_neuron =
+    &find_static_neuron_with_id;
+static const remove_neuron_t remove_neuron = &remove_static_neuron_at_offset;
+static const add_neuron_t add_neuron = &add_static_neuron_with_id;
+static const number_of_connections_in_row_t number_of_connections_in_row =
+    &synapse_row_num_fixed_synapses;
+#endif
 
 //-----------------------------------------------------------------------------
 // Structures and global data                                                 |
@@ -289,18 +307,6 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         log_error("Fail init DMA buffers");
         rt_error(RTE_SWERR);
     }
-
-#if STDP_ENABLED == 1
-    search_for_neuron = &find_plastic_neuron_with_id;
-    remove_neuron = &remove_plastic_neuron_at_offset;
-    add_neuron = &add_plastic_neuron_with_id;
-    number_of_connections_in_row = &synapse_row_num_plastic_controls;
-#else
-    search_for_neuron = &find_static_neuron_with_id;
-    remove_neuron = &remove_static_neuron_at_offset;
-    add_neuron = &add_static_neuron_with_id;
-    number_of_connections_in_row = &synapse_row_num_fixed_synapses;
-#endif
 
     log_debug("SR init complete.");
     return (address_t) sp_word;
