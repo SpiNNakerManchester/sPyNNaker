@@ -31,11 +31,11 @@
 //-----------------------------------------------------------------------------
 // Static functions                                                           |
 //-----------------------------------------------------------------------------
-typedef bool (*search_for_neuron_t)(uint32_t, address_t,
-structural_plasticity_data_t *);
+typedef bool (*search_for_neuron_t)
+    (uint32_t, address_t, structural_plasticity_data_t *);
 typedef bool (*remove_neuron_t)(uint32_t, address_t);
-typedef bool (*add_neuron_t)(uint32_t, address_t, uint32_t, uint32_t, uint32_t)
-;
+typedef bool (*add_neuron_t)
+    (uint32_t, address_t, uint32_t, uint32_t, uint32_t);
 typedef size_t (*number_of_connections_in_row_t)(address_t);
 
 #if STDP_ENABLED == 1
