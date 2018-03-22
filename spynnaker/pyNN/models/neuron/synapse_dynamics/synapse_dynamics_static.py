@@ -13,10 +13,14 @@ class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractPopulationSettable,
         AbstractChangableAfterRun):
     __slots__ = [
-        "_change_requires_mapping"]
+        # ??????????
+        "_change_requires_mapping",
+        # padding to add to a synaptic row for synaptic rewiring
+        "_pad_to_length"]
 
-    def __init__(self):
+    def __init__(self, pad_to_length=None):
         self._change_requires_mapping = True
+        self._pad_to_length = pad_to_length
 
     @overrides(AbstractSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
@@ -41,6 +45,9 @@ class SynapseDynamicsStatic(
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
+        if (self._pad_to_length is not None and
+                n_connections < self._pad_to_length):
+            n_connections = self._pad_to_length
         return n_connections
 
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
@@ -64,9 +71,24 @@ class SynapseDynamicsStatic(
             connection_row_indices, n_rows,
             fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
         ff_size = self.get_n_items(fixed_fixed_rows, 4)
+        if self._pad_to_length is not None:
+            # Pad the data
+            fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
 
-        return (ff_data, ff_size)
+        return ff_data, ff_size
+
+    def _pad_row(self, rows, no_bytes_per_connection):
+        padded_rows = []
+        for row in rows:  # Row elements are (individual) bytes
+            padded_rows.append(
+                numpy.concatenate((
+                    row, numpy.zeros(numpy.clip(
+                        no_bytes_per_connection * self._pad_to_length -
+                        row.size, 0, None)).astype(
+                            dtype="uint8"))).view(dtype="uint8"))
+
+        return padded_rows
 
     @overrides(AbstractStaticSynapseDynamics.get_n_static_words_per_row)
     def get_n_static_words_per_row(self, ff_size):
@@ -90,8 +112,8 @@ class SynapseDynamicsStatic(
 
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
-        connections["source"] = numpy.concatenate([numpy.repeat(
-            i, ff_size[i]) for i in range(len(ff_size))])
+        connections["source"] = numpy.concatenate(
+            [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (n_neuron_id_bits +

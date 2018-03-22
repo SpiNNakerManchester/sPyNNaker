@@ -24,6 +24,7 @@ class NeuronRecorder(object):
     N_BYTES_PER_SIZE = 4
     N_CPU_CYCLES_PER_NEURON = 8
     N_BYTES_PER_WORD = 4
+    N_BYTES_PER_POINTER = 4
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(self, allowed_variables, n_neurons):
@@ -455,7 +456,7 @@ class NeuronRecorder(object):
 
     def get_sdram_usage_for_global_parameters_in_bytes(self):
         return len(self._sampling_rates) * \
-               self.N_BYTES_PER_RATE + self.N_BYTES_PER_INDEX
+               (self.N_BYTES_PER_RATE + self.N_BYTES_PER_INDEX)
 
     def get_sdram_usage_per_neuron_in_bytes(self):
         """
@@ -469,9 +470,9 @@ class NeuronRecorder(object):
         # global_record_params_t
         usage = self.get_sdram_usage_for_global_parameters_in_bytes()
         # indexes_t
-        usage += self.get_sdram_usage_per_neuron_in_bytes() + total_neurons
+        usage += self.get_sdram_usage_per_neuron_in_bytes() * total_neurons
         # *_index + *_increment
-        usage += len(self._sampling_rates) * self.N_BYTES_PER_RATE * 2
+        usage += len(self._sampling_rates) * self.N_BYTES_PER_POINTER * 2
         # out_spikes voltages inputs_excitatory inputs_inhibitory
         for variable in self._sampling_rates:
             n_neurons = self._count_recording_per_slice(variable, vertex_slice)
@@ -529,3 +530,11 @@ class NeuronRecorder(object):
                 local_indexes = 0
             params.append(NeuronParameter(local_indexes, DataType.UINT8))
         return params
+
+    def get_size_of_global_parameters(self, vertex_slice):
+        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        # global_record_params_t
+        usage = self.get_sdram_usage_for_global_parameters_in_bytes()
+        # indexes_t
+        usage += self.get_sdram_usage_per_neuron_in_bytes() * total_neurons
+        return usage

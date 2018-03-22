@@ -13,6 +13,7 @@
 #include <string.h>
 #include <debug.h>
 #include <utils.h>
+#include "../synapse_dynamics.h"
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
