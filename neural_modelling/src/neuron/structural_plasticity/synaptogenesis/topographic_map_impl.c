@@ -40,7 +40,7 @@ typedef size_t (*number_of_connections_in_row_t)(address_t);
 
 #if STDP_ENABLED == 1
 static const search_for_neuron_t search_for_neuron =
-&find_plastic_neuron_with_id;
+    &find_plastic_neuron_with_id;
 static const remove_neuron_t remove_neuron = &remove_plastic_neuron_at_offset;
 static const add_neuron_t add_neuron = &add_plastic_neuron_with_id;
 static const number_of_connections_in_row_t number_of_connections_in_row =

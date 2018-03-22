@@ -107,6 +107,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         'grid': np.array([16, 16]), 'lateral_inhibition': 0,
         'random_partner': False}
 
+    BIT_MASK_8_BIT = 2**9-1
+    BIT_MASK_16_BIT = 2**17-1
+    OFFSET_MASKED_POP = 32 - 8
+    OFFSET_MASKED_SUB_POP = 16
+
     def __init__(self,
                  stdp_model=default_parameters['stdp_model'],
                  f_rew=default_parameters['f_rew'],
@@ -615,12 +620,16 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     pre_vertex_slice = graph_mapper._slice_by_machine_vertex[
                         row[2].pre_vertex]
                     pre_vertex_id = source - pre_vertex_slice.lo_atom
-                    masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
+                    masked_pre_vertex_id = \
+                        pre_vertex_id & \
+                        SynapseDynamicsStructuralCommon.BIT_MASK_16_BIT
 
                     # Select population index
                     pop_index = population_to_subpopulation_information. \
                         keys().index(row[1].pre_vertex)
-                    masked_pop_index = pop_index & (2 ** 9 - 1)
+                    masked_pop_index = \
+                        pop_index & \
+                        SynapseDynamicsStructuralCommon.BIT_MASK_8_BIT
 
                     # Select subpopulation index
                     dt = np.dtype(
@@ -637,12 +646,19 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     subpop_index = np.argwhere(
                         sorted_info_list['lo_atom'] ==
                         pre_vertex_slice.lo_atom).ravel()[0]
-                    masked_sub_pop_index = subpop_index & (2 ** 9 - 1)
+                    masked_sub_pop_index = \
+                        subpop_index & \
+                        SynapseDynamicsStructuralCommon.BIT_MASK_8_BIT
 
                     # identifier combines the vertex, pop and subpop
                     # into 1 x 32 bit word
-                    identifier = (masked_pop_index << (32 - 8)) | (
-                            masked_sub_pop_index << 16) | masked_pre_vertex_id
+                    identifier = \
+                        masked_pop_index << \
+                        SynapseDynamicsStructuralCommon.OFFSET_MASKED_POP
+                    identifier |= \
+                        masked_sub_pop_index << \
+                        SynapseDynamicsStructuralCommon.OFFSET_MASKED_SUB_POP
+                    identifier |= masked_pre_vertex_id
                     try:
                         synaptic_entry = np.argmax(
                             post_to_pre_table[target - post_slice.lo_atom] ==
