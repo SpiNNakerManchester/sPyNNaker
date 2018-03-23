@@ -460,8 +460,8 @@ bool find_static_neuron_with_id(uint32_t id, address_t row,
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
         weight = synapse_row_sparse_weight(synaptic_word);
-        delay = synapse_row_sparse_delay(synaptic_word);
-        if (synapse_row_sparse_index(synaptic_word)==id){
+        delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+        if (synapse_row_sparse_index(synaptic_word, synapse_index_mask)==id){
             found = true;
             break;
         }
@@ -508,10 +508,10 @@ static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
                                             uint32_t delay, uint32_t type){
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
     new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) <<
-        SYNAPSE_TYPE_INDEX_BITS);
+    		synapse_type_index_bits);
     new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) <<
-        SYNAPSE_INDEX_BITS);
-    new_synapse |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+    		synapse_index_bits);
+    new_synapse |= (id & ((1<<synapse_type_index_bits) - 1));
     return new_synapse;
 }
 
