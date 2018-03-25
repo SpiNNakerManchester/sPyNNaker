@@ -107,8 +107,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         'grid': np.array([16, 16]), 'lateral_inhibition': 0,
         'random_partner': False}
 
-    BIT_MASK_8_BIT = 2**9-1
-    BIT_MASK_16_BIT = 2**17-1
+    BIT_MASK_8_BIT = 2**8-1
+    BIT_MASK_16_BIT = 2**16-1
     OFFSET_MASKED_POP = 32 - 8
     OFFSET_MASKED_SUB_POP = 16
 
