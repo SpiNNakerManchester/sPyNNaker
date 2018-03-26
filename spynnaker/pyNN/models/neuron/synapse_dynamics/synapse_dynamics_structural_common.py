@@ -780,15 +780,17 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
-                self._f_rew == synapse_dynamics._f_rew and
-                self._s_max == synapse_dynamics._s_max and
+                self._f_rew == synapse_dynamics._common_sp._f_rew and
+                self._s_max == synapse_dynamics._common_sp._s_max and
                 np.isclose(self._sigma_form_forward,
-                           synapse_dynamics._sigma_form_forward) and
+                           synapse_dynamics._common_sp._sigma_form_forward) and
                 np.isclose(self._sigma_form_lateral,
-                           synapse_dynamics._sigma_form_lateral) and
+                           synapse_dynamics._common_sp._sigma_form_lateral) and
                 np.isclose(self._p_form_forward,
-                           synapse_dynamics._p_form_forward) and
+                           synapse_dynamics._common_sp._p_form_forward) and
                 np.isclose(self._p_form_lateral,
-                           synapse_dynamics._p_form_lateral) and
-                np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
-                np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot))
+                           synapse_dynamics._common_sp._p_form_lateral) and
+                np.isclose(self._p_elim_dep,
+                           synapse_dynamics._common_sp._p_elim_dep) and
+                np.isclose(self._p_elim_pot,
+                           synapse_dynamics._common_sp._p_elim_pot))
