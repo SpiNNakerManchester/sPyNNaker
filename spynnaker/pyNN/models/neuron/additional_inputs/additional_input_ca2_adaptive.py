@@ -13,6 +13,7 @@ I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"
 TAU_CA2 = "tau_ca2"
 
+
 class _CA2_TYPES(Enum):
     EXP_TAU_CA2 = (1, DataType.S1615)
     I_CA2 = (2, DataType.S1615)
