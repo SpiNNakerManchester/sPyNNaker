@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class ArrayConnector(AbstractConnector):
     """ Make connections using an array of integers based on the IDs
-        of the neurons in the  pre- and post-populations.
+        of the neurons in the pre- and post-populations.
     """
 
     __slots = [
@@ -20,32 +20,18 @@ class ArrayConnector(AbstractConnector):
         """
 
         :param `integer` array:
-            An array of integers that specifies the connections between
-            the pre- and post-popultations
+            A (numpy) array of integers that specifies the connections
+            between the pre- and post-populations
         """
         super(ArrayConnector, self).__init__(safe, verbose)
         self._array = array
 
-#  this isn't needed as the array already exists?
-#    def _update_probs_from_index_expression(self, pre_vertex_slice,
-#                                            post_vertex_slice):
-        # note: this only needs to be done once
-#        if self._probs is None:
-#            # numpy array of probabilities using the index_expression
-#            self._probs = numpy.array([[_index_expr_context.eval(
-#                self._index_expression, i=i, j=j)
-#                for j in range(self._n_post_neurons)]
-#                for i in range(self._n_pre_neurons)])
-
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
-        n_connections = self._get_n_connections()
+        n_connections_max = self._n_pre_neurons * self._n_post_neurons
+        # we can probably look at the array and do better than this?
         return self._get_delay_maximum(
-            self._delays, n_connections, None)
-#            utility_calls.get_probable_maximum_selected(
-#                self._n_pre_neurons * self._n_post_neurons,
-#                self._n_pre_neurons * self._n_post_neurons,
-#                numpy.amax(self._probs)))
+            self._delays, n_connections_max)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
@@ -55,7 +41,6 @@ class ArrayConnector(AbstractConnector):
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         n_connections = pre_vertex_slice.n_atoms
-        print "check n_connections:", n_connections
         return n_connections
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -110,15 +95,19 @@ class ArrayConnector(AbstractConnector):
         n_connections = self._get_n_connections(pre_vertex_slice,
                                                 post_vertex_slice)
 
-        # the array already exists: just feed it into the block structure
+        # The array already exists: just feed it into the block structure
+        source = self._array[
+            0,pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom+1]
+
+        # This might look strange, but it's correct: the 2D array needs
+        # the same set of indices on each row for this to work
+        target = self._array[
+            1,pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom+1]
+
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (
-            self._array[0]
-            [pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom+1])
-        block["target"] = (
-            self._array[0]
-            [post_vertex_slice.lo_atom:post_vertex_slice.hi_atom+1])
+        block["source"] = source
+        block["target"] = target
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
