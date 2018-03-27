@@ -213,7 +213,7 @@ void _reset_record_counter(){
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
-    log_info("loading parameters");
+    //log_info("loading parameters");
     //log_info("loading global record parameters");
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
@@ -310,12 +310,12 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
     // log message for debug purposes
-    log_info(
+    /*log_info(
         "\t neurons = %u, spike buffer size = %u, params size = %u,"
         "input type size = %u, threshold size = %u", n_neurons,
         *incoming_spike_buffer_size, sizeof(neuron_t),
         sizeof(input_type_t), sizeof(threshold_type_t));
-
+    */
     // allocate DTCM for the global record details
     if (sizeof(global_record_params_t) > 0) {
         global_record_params = (global_record_params_t *)
