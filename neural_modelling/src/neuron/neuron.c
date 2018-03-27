@@ -214,13 +214,8 @@ void _reset_record_counter(){
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
-<<<<<<< HEAD
-    //log_info("loading parameters");
-    //log_info("loading global record parameters");
-=======
     log_debug("loading parameters");
     //log_debug("loading global record parameters");
->>>>>>> branch 'Fusi_plasticity' of https://github.com/SpiNNakerManchester/sPyNNaker.git
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
@@ -316,11 +311,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
     // log message for debug purposes
-<<<<<<< HEAD
-    /*log_info(
-=======
-    log_debug(
->>>>>>> branch 'Fusi_plasticity' of https://github.com/SpiNNakerManchester/sPyNNaker.git
+    /*log_debug(
         "\t neurons = %u, spike buffer size = %u, params size = %u,"
         "input type size = %u, threshold size = %u", n_neurons,
         *incoming_spike_buffer_size, sizeof(neuron_t),
@@ -428,7 +419,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         voltages = (timed_state_t *) spin1_malloc(
             voltages_size + sizeof(state_t));
     }
-    //log_info("voltage_size = %u", voltages_size);
+    //log_debug("voltage_size = %u", voltages_size);
 
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
