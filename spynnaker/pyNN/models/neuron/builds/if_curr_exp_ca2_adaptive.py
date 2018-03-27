@@ -10,7 +10,6 @@ from spynnaker.pyNN.models.neuron.additional_inputs \
 _apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
-
 class IFCurrExpCa2Adaptive(AbstractPopulationVertex):
     """ Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency\
         adaptation of a generalized leaky integrate-and-fire model neuron. \
