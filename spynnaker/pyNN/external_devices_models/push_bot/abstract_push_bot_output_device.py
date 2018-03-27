@@ -6,6 +6,7 @@ class AbstractPushBotOutputDevice(Enum):
     def __new__(
             cls, value, protocol_property, min_value, max_value,
             time_between_send):
+        # pylint: disable=too-many-arguments, protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._protocol_property = protocol_property

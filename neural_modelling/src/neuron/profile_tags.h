@@ -1,6 +1,9 @@
 // Profiler tags
 #define PROFILER_TIMER                    0
-#define PROFILER_DMA_READ                 1
+#define PROFILER_SETUP_DMA                1
 #define PROFILER_INCOMING_SPIKE           2
 #define PROFILER_PROCESS_FIXED_SYNAPSES   3
 #define PROFILER_PROCESS_PLASTIC_SYNAPSES 4
+#define PROFILER_TIMER_NEURON_UPDATE      5
+#define PROFILER_TIMER_SYNAPSES_UPDATE    6
+#define PROFILER_DMA_SETUP_TO_CALLBACK    7

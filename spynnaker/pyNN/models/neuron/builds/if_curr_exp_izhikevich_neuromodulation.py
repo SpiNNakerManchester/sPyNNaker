@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
 class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
@@ -22,19 +23,15 @@ class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
         'v_thresh': -50.0, 'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
         'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
-            self, n_neurons, spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
-                'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
-                'label'],
+            self, n_neurons,
+            spikes_per_second=_apv_defs['spikes_per_second'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
+            label=_apv_defs['label'],
             tau_m=default_parameters['tau_m'],
             cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -44,7 +41,7 @@ class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh']):
 
@@ -56,8 +53,8 @@ class IFCurrExpIzhikevichNeuromodulation(AbstractPopulationVertex):
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons,
+        super(IFCurrExpIzhikevichNeuromodulation, self).__init__(
+            n_neurons=n_neurons,
             binary="IF_curr_exp_stdp_izhikevich_neuromodulation.aplx",
             label=label,
             max_atoms_per_core=IFCurrExpIzhikevichNeuromodulation.
