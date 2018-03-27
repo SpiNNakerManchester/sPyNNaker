@@ -1,7 +1,5 @@
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from spinn_utilities.safe_eval import SafeEval
 import logging
 import numpy
 
@@ -56,9 +54,6 @@ class ArrayConnector(AbstractConnector):
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
-#        self._update_probs_from_index_expression(pre_vertex_slice,
-#                                                 post_vertex_slice)
-
         n_connections = pre_vertex_slice.n_atoms
         print "check n_connections:", n_connections
         return n_connections
@@ -70,9 +65,6 @@ class ArrayConnector(AbstractConnector):
             min_delay=None, max_delay=None):
         n_connections = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
-
-        if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             self._delays, self._n_pre_neurons * self._n_post_neurons,
@@ -115,6 +107,8 @@ class ArrayConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        n_connections = self._get_n_connections(pre_vertex_slice,
+                                                post_vertex_slice)
 
         # the array already exists: just feed it into the block structure
         block = numpy.zeros(
