@@ -14,8 +14,10 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "../common/out_spikes.h"
 #include "recording.h"
+#include "./profile_tags.h"
 #include <debug.h>
 #include <string.h>
+#include <profiler.h>
 
 // declare spin1_wfi
 void spin1_wfi();
@@ -504,6 +506,8 @@ void recording_done_callback() {
 //! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update(timer_t time) {
 
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER_NEURON_UPDATE);
+
     // Wait a random number of clock cycles
     uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
     while (tc[T1_COUNT] > random_backoff_time) {
@@ -688,4 +692,6 @@ void neuron_do_timestep_update(timer_t time) {
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER_NEURON_UPDATE);
 }
