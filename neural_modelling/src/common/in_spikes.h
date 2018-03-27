@@ -46,4 +46,23 @@ static inline void in_spikes_print_buffer() {
     circular_buffer_print_buffer(buffer);
 }
 
+//---------------------------------------
+// Synaptic rewiring functions
+//---------------------------------------
+static inline uint32_t in_spikes_input_index() {
+    return circular_buffer_input(buffer);
+}
+
+static inline uint32_t in_spikes_output_index() {
+    return circular_buffer_output(buffer);
+}
+
+static inline uint32_t in_spikes_real_size() {
+    return circular_buffer_real_size(buffer);
+}
+
+static inline uint32_t in_spikes_value_at_index(uint32_t index){
+    return circular_buffer_value_at_index(buffer, index);
+}
+
 #endif // _IN_SPIKES_H_

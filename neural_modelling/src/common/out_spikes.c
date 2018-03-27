@@ -29,8 +29,8 @@ void out_spikes_reset() {
 //! \return True if the initialisation was successful, false otherwise
 bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
-    log_info("Out spike size is %u words, allowing %u spike sources",
-             out_spikes_size, max_spike_sources);
+    log_debug("Out spike size is %u words, allowing %u spike sources",
+              out_spikes_size, max_spike_sources);
     spikes = (timed_out_spikes *) spin1_malloc(
         sizeof(timed_out_spikes) + (out_spikes_size * sizeof(uint32_t)));
     if (spikes == NULL) {
@@ -88,11 +88,11 @@ void out_spikes_print() {
 }
 
 void out_spike_info_print(){
-    log_info("-----------\n");
+    log_debug("-----------\n");
     index_t i; //!< For indexing through the bit field
 
     for (i = 0; i < out_spikes_size; i++) {
-    	log_info("%08x\n", out_spikes[i]);
+    	log_debug("%08x\n", out_spikes[i]);
     }
-    log_info("-----------\n");
+    log_debug("-----------\n");
 }

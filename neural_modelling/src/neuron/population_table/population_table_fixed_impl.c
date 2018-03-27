@@ -44,7 +44,7 @@ static inline uint32_t _get_table_index(key_t x, key_t y, key_t p) {
 bool population_table_initialise(address_t table_address,
                                  address_t synapse_rows_address,
                                  uint32_t *row_max_n_words) {
-    log_info("population_table_initialise: starting");
+    log_debug("population_table_initialise: starting");
     // Copy the master population table
     log_debug("reading master pop table from address 0x%.8x", table_address);
     memcpy(master_population_table, table_address,
@@ -68,7 +68,7 @@ bool population_table_initialise(address_t table_address,
     *row_max_n_words = row_size_table[ROW_SIZE_TABLE_MAX - 1]
                        + N_SYNAPSE_ROW_HEADER_WORDS;
 
-    log_info("population_table_initialise: completed successfully");
+    log_debug("population_table_initialise: completed successfully");
     _print_master_population_table();
     _print_row_size_table();
 
