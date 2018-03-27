@@ -318,7 +318,7 @@ static bool initialize(uint32_t *timer_period) {
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
-    
+
     if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
@@ -367,8 +367,10 @@ void resume_callback() {
                 slow_spike_source_get_time_to_spike(
                     poisson_parameters[s].mean_isi_ticks);
         }
-
     }
+
+    log_info("Successfully resumed Poisson spike source at time: %u", time);
+
     // print spike sources for debug purposes
     // print_spike_sources();
 }
