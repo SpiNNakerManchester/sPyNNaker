@@ -19,8 +19,11 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
          IF_curr_exp_stdp_mad_pfister_triplet_additive \
          IF_cond_exp_stdp_mad_nearest_pair_additive \
-		 IF_curr_alpha
-		 
+	     IF_curr_alpha \
+         IF_cond_exp_structural \
+         IF_cond_exp_stdp_mad_pair_additive_structural \
+         IF_curr_exp_stdp_mad_pair_additive_structural \
+         IF_curr_exp_structural
 BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
 all: $(BUILD_DIRS)
