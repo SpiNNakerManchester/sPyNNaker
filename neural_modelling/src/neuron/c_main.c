@@ -6,7 +6,8 @@
  *
  *
  * This is the main entrance class for most of the neural models. The following
- * Figure shows how all of the c code interacts with each other and what classes
+ * Figure shows how all of the c code
+ * interacts with each other and what classes
  * are used to represent over arching logic
  * (such as plasticity, spike processing, utilities, synapse types, models)
  *
@@ -20,6 +21,7 @@
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 
 #include <data_specification.h>
@@ -65,7 +67,7 @@ typedef enum callback_priorities{
 
 // Globals
 
-//! the current timer tick value TODO this might be able to be removed with
+//! the current timer tick value
 //! the timer tick callback returning the same value.
 uint32_t time;
 
@@ -78,13 +80,26 @@ static uint32_t infinite_run;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
+//! Timer callbacks since last rewiring
+int32_t last_rewiring_time = 0;
+
+//! Rewiring period represented as an integer
+int32_t rewiring_period = 0;
+
+//! Flag representing whether rewiring is enabled
+bool rewiring = false;
+
+// FOR DEBUGGING!
+uint32_t count_rewires = 0;
+
+
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in sdram where to store
 //! recordings
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(address_t recording_address){
     bool success = recording_initialize(recording_address, &recording_flags);
-    log_info("Recording flags = 0x%08x", recording_flags);
+    log_debug("Recording flags = 0x%08x", recording_flags);
     return success;
 }
 
@@ -108,7 +123,7 @@ void c_main_store_provenance_data(address_t provenance_region){
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(uint32_t *timer_period) {
-    log_info("Initialise: started");
+    log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
@@ -169,13 +184,25 @@ static bool initialise(uint32_t *timer_period) {
             &row_max_n_words)) {
         return false;
     }
-
     // Set up the synapse dynamics
-    if (!synapse_dynamics_initialise(
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address),
-            n_neurons, ring_buffer_to_input_buffer_left_shifts)) {
+    address_t synapse_dynamics_region_address =
+        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+    address_t syn_dyn_end_address = synapse_dynamics_initialise(
+            synapse_dynamics_region_address,
+            n_neurons, ring_buffer_to_input_buffer_left_shifts);
+
+    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
         return false;
     }
+
+    // Set up structural plasticity dynamics
+    if (synapse_dynamics_region_address &&
+        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+        return false;
+    }
+
+    rewiring_period = get_p_rew();
+    rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER,
@@ -187,7 +214,7 @@ static bool initialise(uint32_t *timer_period) {
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
 
-    log_info("Initialise: finished");
+    log_debug("Initialise: finished");
     return true;
 }
 
@@ -218,14 +245,19 @@ void timer_callback(uint timer_count, uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
+    last_rewiring_time++;
 
+    // This is the part where I save the input and output indices
+    //   from the circular buffer
+    // If time == 0 as well as output == input == 0  then no rewire is
+    //   supposed to happen. No spikes yet
     log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
-        log_info("Completed a run");
+        log_debug("Completed a run");
 
         // rewrite neuron params to sdram for reading out if needed
         address_t address = data_specification_get_data_address();
@@ -240,7 +272,7 @@ void timer_callback(uint timer_count, uint unused) {
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
-            log_info("updating recording regions");
+            log_debug("updating recording regions");
             recording_finalise();
         }
         profiler_finalise();
@@ -248,9 +280,41 @@ void timer_callback(uint timer_count, uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time -= 1;
+
+        log_debug("Rewire tries = %d", count_rewires);
+
         return;
     }
 
+    uint cpsr = 0;
+    // Do rewiring
+    if (rewiring &&
+	    ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+        update_goal_posts(time);
+        last_rewiring_time = 0;
+        // put flag in spike processing to do synaptic rewiring
+//        synaptogenesis_dynamics_rewire(time);
+        if (is_fast()) {
+            do_rewiring(rewiring_period);
+        } else {
+            do_rewiring(1);
+        }
+        // disable interrupts
+        cpsr = spin1_int_disable();
+//       // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+        if (!get_dma_busy()) {
+            log_debug("Sending user event for new spike");
+            if (spin1_trigger_user_event(0, 0)) {
+                set_dma_busy(true);
+            } else {
+                log_debug("Could not trigger user event\n");
+            }
+        }
+        // enable interrupts
+        spin1_mode_restore(cpsr);
+        count_rewires++;
+    }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time);
@@ -278,7 +342,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    log_info("setting timer tick callback for %d microseconds",
+    log_debug("setting timer tick callback for %d microseconds",
               timer_period);
     spin1_set_timer_tick(timer_period);
 

@@ -227,7 +227,7 @@ static inline index_t _sparse_axonal_delay(uint32_t x) {
     return ((x >> SYNAPSE_DELAY_TYPE_INDEX_BITS) & SYNAPSE_AXONAL_DELAY_MASK);
 }
 
-bool synapse_dynamics_initialise(
+address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
@@ -249,7 +249,7 @@ bool synapse_dynamics_initialise(
         return false;
     }
 
-    return true;
+    return weight_result;
 }
 
 bool synapse_dynamics_process_plastic_synapses(

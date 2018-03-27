@@ -409,8 +409,8 @@ class SpikeSourcePoisson(
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
         if total_mean_rate > 0:
-            max_spikes = scipy.stats.poisson.ppf(
-                1.0 - (1.0 / total_mean_rate), total_mean_rate)
+            max_spikes = numpy.sum(scipy.stats.poisson.ppf(
+                1.0 - (1.0 / self._rate), self._rate))
             spikes_per_timestep = (
                 max_spikes / (MICROSECONDS_PER_SECOND / machine_time_step))
             # avoid a possible division by zero / small number (which may
