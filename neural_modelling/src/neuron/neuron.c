@@ -428,7 +428,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         voltages = (timed_state_t *) spin1_malloc(
             voltages_size + sizeof(state_t));
     }
-    //log_debug("voltage_size = %u", voltages_size);
+    //log_info("voltage_size = %u", voltages_size);
 
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
