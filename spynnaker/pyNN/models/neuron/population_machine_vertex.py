@@ -45,12 +45,13 @@ class PopulationMachineVertex(
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
-        1: "DMA_READ",
+        1: "SETUP_DMA",
         2: "INCOMING_SPIKE",
         3: "PROCESS_FIXED_SYNAPSES",
         4: "PROCESS_PLASTIC_SYNAPSES",
         5: "TIMER_NEURON_UPDATE",
-        6: "TIMER_SYNAPSES_UPDATE"}
+        6: "TIMER_SYNAPSES_UPDATE",
+        7: "DMA_SETUP_TO_CALLBACK"}
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 

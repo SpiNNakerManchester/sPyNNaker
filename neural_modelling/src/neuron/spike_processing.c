@@ -3,9 +3,11 @@
 #include "synapse_row.h"
 #include "synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
+#include "./profile_tags.h"
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
+#include <profiler.h>
 
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
@@ -42,6 +44,8 @@ bool any_spike = false;
 static inline void _do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
 
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_SETUP_DMA);
+
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
@@ -56,6 +60,12 @@ static inline void _do_dma_read(
         DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
         n_bytes_to_transfer);
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_SETUP_DMA);
+
+    // The following measures actual DMA hardware module delay.
+    // Profiler tag exit is placed in the dma callback
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DMA_SETUP_TO_CALLBACK);
 }
 
 
@@ -131,6 +141,8 @@ void _setup_synaptic_dma_read() {
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_SETUP_DMA);
+
     // Get pointer to current buffer
     dma_buffer *buffer = &dma_buffers[dma_buffer_index];
 
@@ -147,6 +159,8 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
         DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
         synapse_row_plastic_region(buffer->row),
         DMA_WRITE, n_plastic_region_bytes);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_SETUP_DMA);
 }
 
 
@@ -187,6 +201,8 @@ void _user_event_callback(uint unused0, uint unused1) {
 // Called when a DMA completes
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DMA_SETUP_TO_CALLBACK);
 
     log_debug("DMA transfer complete with tag %u", tag);
 
