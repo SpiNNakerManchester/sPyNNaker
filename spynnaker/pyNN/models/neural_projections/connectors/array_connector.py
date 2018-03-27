@@ -97,11 +97,11 @@ class ArrayConnector(AbstractConnector):
 
         # The array already exists: just feed it into the block structure
         source = self._array[
-            0,pre_vertex_slice.lo_atom:(pre_vertex_slice.hi_atom+1)]
+            0, pre_vertex_slice.lo_atom:(pre_vertex_slice.hi_atom+1)]
         # This might look strange, but it's correct: the 2D array needs
         # the same set of indices on each row for this to work
         target = self._array[
-            1,pre_vertex_slice.lo_atom:(pre_vertex_slice.hi_atom+1)]
+            1, pre_vertex_slice.lo_atom:(pre_vertex_slice.hi_atom+1)]
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
