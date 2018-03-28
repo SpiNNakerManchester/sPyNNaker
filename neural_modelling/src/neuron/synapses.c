@@ -223,7 +223,7 @@ bool synapses_initialise(
         address_t *indirect_synapses_address,
         address_t *direct_synapses_address) {
 
-    log_info("synapses_initialise: starting");
+    log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
 
     // Get the synapse shaping data
@@ -259,27 +259,30 @@ bool synapses_initialise(
         ring_buffer_to_input_left_shifts[synapse_index] =
             synapse_params_address[
                 ring_buffer_input_left_shifts_base + synapse_index];
-        log_info("synapse type %s, ring buffer to input left shift %u",
+        log_debug("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }
-    *ring_buffer_to_input_buffer_left_shifts = ring_buffer_to_input_left_shifts;
+    *ring_buffer_to_input_buffer_left_shifts =
+        ring_buffer_to_input_left_shifts;
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
     uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
-    log_info("Indirect matrix is %u words in size", direct_matrix_offset - 1);
-    uint32_t direct_matrix_size = synaptic_matrix_address[direct_matrix_offset];
-    log_info("Direct matrix malloc size is %d", direct_matrix_size);
+    log_debug("Indirect matrix is %u words in size", direct_matrix_offset - 1);
+    uint32_t direct_matrix_size =
+        synaptic_matrix_address[direct_matrix_offset];
+    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
-        *direct_synapses_address = (address_t) spin1_malloc(direct_matrix_size);
+        *direct_synapses_address = (address_t)
+            spin1_malloc(direct_matrix_size);
 
         if (*direct_synapses_address == NULL) {
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
-        log_info(
+        log_debug(
             "Copying %u bytes of direct synapses to 0x%08x",
             direct_matrix_size, *direct_synapses_address);
         spin1_memcpy(
@@ -289,7 +292,7 @@ bool synapses_initialise(
     }
     *indirect_synapses_address = &(synaptic_matrix_address[1]);
 
-    log_info("synapses_initialise: completed successfully");
+    log_debug("synapses_initialise: completed successfully");
     _print_synapse_parameters();
 
     *neuron_synapse_shaping_params_value = neuron_synapse_shaping_params;
@@ -403,4 +406,108 @@ uint32_t synapses_get_saturation_count() {
 uint32_t synapses_get_pre_synaptic_events() {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
+}
+
+
+//! \brief  Searches the synaptic row for the the connection with the
+//!         specified post-synaptic id
+//! \param[in] id: the (core-local) id of the neuron to search for in the
+//! synaptic row
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[out] sp_data: the address of a struct through which to return
+//! weight, delay information
+//! \return bool: was the search successful?
+bool find_static_neuron_with_id(uint32_t id, address_t row,
+                                structural_plasticity_data_t *sp_data){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+    uint32_t weight, delay;
+    bool found = false;
+
+    // Loop through plastic synapses
+    for (; fixed_synapse > 0; fixed_synapse--) {
+
+        // Get next control word (auto incrementing)
+        // Check if index is the one I'm looking for
+        uint32_t synaptic_word = *synaptic_words++;
+        weight = synapse_row_sparse_weight(synaptic_word);
+        delay = synapse_row_sparse_delay(synaptic_word);
+        if (synapse_row_sparse_index(synaptic_word)==id){
+            found = true;
+            break;
+        }
+    }
+
+    // Making assumptions explicit
+    assert( synapse_row_num_plastic_controls(fixed_region) == 0 );
+
+    if (found){
+        sp_data -> weight = weight;
+        sp_data -> offset = synapse_row_num_fixed_synapses(fixed_region) -
+            fixed_synapse;
+        sp_data -> delay  = delay;
+        return true;
+        }
+    else{
+        sp_data -> weight = -1;
+        sp_data -> offset = -1;
+        sp_data -> delay  = -1;
+        return false;
+        }
+}
+
+//! \brief  Remove the entry at the specified offset in the synaptic row
+//! \param[in] offset: the offset in the row at which to remove the entry
+//! \param[in] row: the core-local address of the synaptic row
+//! \return bool: was the removal successful?
+bool remove_static_neuron_at_offset(uint32_t offset, address_t row){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+
+   // Delete control word at offset (contains weight)
+    synaptic_words[offset] = synaptic_words[fixed_synapse-1];
+
+    // Decrement FF
+    fixed_region[0] = fixed_region[0] - 1;
+    return true;
+}
+
+//! packing all of the information into the required static control word
+static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
+                                            uint32_t delay, uint32_t type){
+    uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
+    new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) <<
+        SYNAPSE_TYPE_INDEX_BITS);
+    new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) <<
+        SYNAPSE_INDEX_BITS);
+    new_synapse |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+    return new_synapse;
+}
+
+//! \brief  Add a static entry in the synaptic row
+//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] row: the core-local address of the synaptic row
+//! \param[in] weight: the initial weight associated with the connection
+//! \param[in] delay: the delay associated with the connection
+//! \param[in] type: the type of the connection (e.g. inhibitory)
+//! \return bool: was the addition successful?
+bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
+                               uint32_t delay, uint32_t type){
+    address_t fixed_region = synapse_row_fixed_region(row);
+    int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
+        fixed_region);
+    uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay, type);
+
+    // Add control word at offset
+    synaptic_words[fixed_synapse] = new_synapse;
+
+   // Increment FF
+    fixed_region[0] = fixed_region[0] + 1;
+    return true;
 }
