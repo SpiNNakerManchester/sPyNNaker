@@ -29,7 +29,6 @@ class ArrayConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         n_connections_max = self._n_pre_neurons * self._n_post_neurons
-        # we can probably look at the array and do better than this?
         return self._get_delay_maximum(
             self._delays, n_connections_max)
 
@@ -49,10 +48,10 @@ class ArrayConnector(AbstractConnector):
                 (pre_neurons[i] <= pre_vertex_slice.hi_atom) and
                 (post_neurons[i] >= post_vertex_slice.lo_atom) and
                 (post_neurons[i] <= post_vertex_slice.hi_atom)):
-                self._pre_neurons_slice = numpy.append(
-                    self._pre_neurons_slice, pre_neurons[i])
-                self._post_neurons_slice = numpy.append(
-                    self._post_neurons_slice, post_neurons[i])
+                    self._pre_neurons_slice = numpy.append(
+                        self._pre_neurons_slice, pre_neurons[i])
+                    self._post_neurons_slice = numpy.append(
+                        self._post_neurons_slice, post_neurons[i])
 
         n_connections = self._pre_neurons_slice.size
         return n_connections
@@ -109,10 +108,8 @@ class ArrayConnector(AbstractConnector):
         n_connections = self._get_n_connections(pre_vertex_slice,
                                                 post_vertex_slice)
 
-        # The array already exists: just feed it into the block structure
+        # Feed the arrays calculated above into the block structure
         source = self._pre_neurons_slice
-        # This might look strange, but it's correct: the 2D array needs
-        # the same set of indices on each row for this to work
         target = self._post_neurons_slice
 
         block = numpy.zeros(
