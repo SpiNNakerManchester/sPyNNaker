@@ -45,13 +45,13 @@ class ArrayConnector(AbstractConnector):
         self._post_neurons_slice = numpy.empty(0, numpy.uint32)
         for i in range(pre_neurons.size):
             if ((pre_neurons[i] >= pre_vertex_slice.lo_atom) and
-                (pre_neurons[i] <= pre_vertex_slice.hi_atom) and
-                (post_neurons[i] >= post_vertex_slice.lo_atom) and
-                (post_neurons[i] <= post_vertex_slice.hi_atom)):
-                    self._pre_neurons_slice = numpy.append(
-                        self._pre_neurons_slice, pre_neurons[i])
-                    self._post_neurons_slice = numpy.append(
-                        self._post_neurons_slice, post_neurons[i])
+                    (pre_neurons[i] <= pre_vertex_slice.hi_atom) and
+                    (post_neurons[i] >= post_vertex_slice.lo_atom) and
+                    (post_neurons[i] <= post_vertex_slice.hi_atom)):
+                self._pre_neurons_slice = numpy.append(
+                    self._pre_neurons_slice, pre_neurons[i])
+                self._post_neurons_slice = numpy.append(
+                    self._post_neurons_slice, post_neurons[i])
 
         n_connections = self._pre_neurons_slice.size
         return n_connections
