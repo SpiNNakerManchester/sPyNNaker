@@ -19,37 +19,18 @@ class SpynnakerDataSpecificationWriter(
             app_data_runtime_folder, machine, graph_mapper=None):
         # pylint: disable=too-many-arguments
 
-        # Keep the results
-        dsg_targets = dict()
-
-        # Keep delay extensions until the end
-        delay_extension_placements = list()
-
-        plist = list(placements.placements)
-
-        # create a progress bar for end users
-        progress = ProgressBar(
-            plist, "Generating sPyNNaker data specifications")
-
-        for placement in plist:
+        delay_extensions = list()
+        placement_order = list()
+        for placement in placements.placements:
             associated_vertex = graph_mapper.get_application_vertex(
                 placement.vertex)
 
             if isinstance(associated_vertex, DelayExtensionVertex):
-                delay_extension_placements.append(
-                    (placement, associated_vertex))
+                delay_extensions.append(placement)
             else:
-                self._generate_data_spec_for_vertices(
-                    placement, associated_vertex, dsg_targets, hostname,
-                    report_default_directory, write_text_specs,
-                    app_data_runtime_folder, machine)
-                progress.update()
+                placement_order.append(placement)
+        placement_order.extend(delay_extensions)
 
-        for placement, associated_vertex in progress.over(
-                delay_extension_placements):
-            self._generate_data_spec_for_vertices(
-                placement, associated_vertex, dsg_targets, hostname,
-                report_default_directory, write_text_specs,
-                app_data_runtime_folder, machine)
-
-        return dsg_targets
+        return super(SpynnakerDataSpecificationWriter, self).__call__(
+            placements, hostname, report_default_directory, write_text_specs,
+            app_data_runtime_folder, machine, graph_mapper, placement_order)
