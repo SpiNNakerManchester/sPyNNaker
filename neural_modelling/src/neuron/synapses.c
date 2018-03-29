@@ -327,7 +327,7 @@ bool synapses_initialise(
 
 void synapses_do_timestep_update(timer_t time) {
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER_SYNAPSES_UPDATE);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER_SYNAPSES_UPDATE);
 
     _print_ring_buffers(time);
 
@@ -371,7 +371,7 @@ void synapses_do_timestep_update(timer_t time) {
     // Re-enable the interrupts
     spin1_mode_restore(state);
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER_SYNAPSES_UPDATE);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER_SYNAPSES_UPDATE);
 }
 
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,

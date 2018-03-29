@@ -62,12 +62,6 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_SETUP_DMA);
-
-    // The following measures actual DMA hardware module delay.
-    // Profiler tag exit is placed in the dma callback
-    // NOTE: This tag is likely to give incorrect results when DMA is setup
-    // while another one is still executing - tag exits on a wrong callback.
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DMA_SETUP_TO_CALLBACK);
 }
 
 
@@ -208,9 +202,6 @@ void _user_event_callback(uint unused0, uint unused1) {
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DMA_SETUP_TO_CALLBACK);
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DMA_CALLBACK);
-
     log_debug("DMA transfer complete with tag %u", tag);
 
     // Get pointer to current buffer
@@ -249,8 +240,6 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
-
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DMA_CALLBACK);
 }
 
 
