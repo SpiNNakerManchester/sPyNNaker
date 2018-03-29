@@ -52,7 +52,9 @@ class PopulationMachineVertex(
         5: "TIMER_NEURON_UPDATE",
         6: "TIMER_SYNAPSES_UPDATE",
         7: "DMA_SETUP_TO_CALLBACK",
-        8: "DMA_CALLBACK"}
+        8: "DMA_CALLBACK",
+        9: "POP_TABLE_GET_FIRST",
+       10: "POP_TABLE_GET_NEXT"}
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
