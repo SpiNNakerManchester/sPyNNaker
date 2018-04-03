@@ -51,7 +51,8 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
                 [device.device_control_key for device in self._devices],
                 _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROL_KEY.data_type),
             NeuronParameter(
-                [1 if device.device_control_uses_payload else 0
+                [device.device_control_scaling_factor
+                 if device.device_control_uses_payload else 0
                  for device in self._devices],
                 _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROLS_USES_PAYLOAD
                 .data_type),
