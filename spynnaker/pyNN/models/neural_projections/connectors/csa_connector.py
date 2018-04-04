@@ -1,5 +1,6 @@
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+
 import logging
 import numpy
 import csa
@@ -26,7 +27,8 @@ class CSAConnector(AbstractConnector):
         super(CSAConnector, self).__init__(safe, verbose)
         self._cset = cset
         # think this is probably needed here
-        self._arrays_set = False
+        self._pair_list = None
+        self._full_connection_set = None
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
@@ -50,23 +52,20 @@ class CSAConnector(AbstractConnector):
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
 
+        cset = self._cset
+
         # use CSA to cross the range of this vertex's neurons with the cset
-        pair_list = csa.cross(range(pre_lo, pre_hi),
-                              range(post_lo, post_hi)) * self._cset
+        self._pair_list = csa.cross(range(pre_lo, pre_hi+1),
+                                    range(post_lo, post_hi+1)) * cset
 
-        print 'pair_list: ', pair_list
-        print 'tabulate: ', csa.tabulate(pair_list)
-
-        self._pre_neurons = [x[0] for x in pair_list]
-        self._post_neurons = [x[1] for x in pair_list]
+        # Get the lists of pre and post neurons that result from this
+        self._pre_neurons = [x[0] for x in self._pair_list]
+        self._post_neurons = [x[1] for x in self._pair_list]
 
         print 'pre_neurons: ', self._pre_neurons
         print 'post_neurons: ', self._post_neurons
 
-            #self._arrays_set = True
-
         n_connections = len(self._pre_neurons) # size of the array created
-        print 'n_connections: ', n_connections
         return n_connections
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -124,6 +123,12 @@ class CSAConnector(AbstractConnector):
         # Use whatever has been set up in _get_n_connections here
         # to send into the block structure
 
+        # Use the CSA implementation to show the connection structure?
+        if self._full_connection_set is None:
+            self._full_connection_set = self._pair_list
+        else:
+            self._full_connection_set += self._pair_list
+
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self._pre_neurons
@@ -134,6 +139,11 @@ class CSAConnector(AbstractConnector):
             self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
+
+    def show_connection_set(self):
+        print 'full_connection_set: ', self._full_connection_set
+        csa.show(self._full_connection_set,
+                 self._n_pre_neurons, self._n_post_neurons)
 
     def __repr__(self):
         return "CSAConnector({})".format(
