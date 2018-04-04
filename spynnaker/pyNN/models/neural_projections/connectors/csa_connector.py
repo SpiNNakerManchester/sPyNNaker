@@ -45,7 +45,6 @@ class CSAConnector(AbstractConnector):
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         # do the work from self._cset in here
-#        if not self._arrays_set:
         # get the values for this slice
         pre_lo = pre_vertex_slice.lo_atom
         pre_hi = pre_vertex_slice.hi_atom
@@ -65,7 +64,7 @@ class CSAConnector(AbstractConnector):
         print 'pre_neurons: ', self._pre_neurons
         print 'post_neurons: ', self._post_neurons
 
-        n_connections = len(self._pre_neurons) # size of the array created
+        n_connections = len(self._pre_neurons)  # size of the array created
         return n_connections
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -125,9 +124,9 @@ class CSAConnector(AbstractConnector):
 
         # Use the CSA implementation to show the connection structure?
         if self._full_connection_set is None:
-            self._full_connection_set = self._pair_list
+            self._full_connection_set = [x for x in self._pair_list]
         else:
-            self._full_connection_set += self._pair_list
+            self._full_connection_set += [x for x in self._pair_list]
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
