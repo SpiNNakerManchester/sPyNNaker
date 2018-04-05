@@ -26,9 +26,12 @@ class CSAConnector(AbstractConnector):
         """
         super(CSAConnector, self).__init__(safe, verbose)
         self._cset = cset
+        self._verbose = verbose
+        print 'cset: ', cset
         # think this is probably needed here
         self._pair_list = None
         self._full_connection_set = None
+        self._full_cset = None
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
@@ -51,18 +54,26 @@ class CSAConnector(AbstractConnector):
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
 
-        cset = self._cset
+        # this is where the magic needs to happen somehow
+        if self._full_cset is None:
+            self._full_cset = [x for x in csa.cross(
+                range(self._n_pre_neurons),
+                range(self._n_post_neurons)) * self._cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
-        self._pair_list = csa.cross(range(pre_lo, pre_hi+1),
-                                    range(post_lo, post_hi+1)) * cset
+        self._pair_list = csa.cross(
+            range(pre_lo, pre_hi+1),
+            range(post_lo, post_hi+1)) * self._full_cset
 
         # Get the lists of pre and post neurons that result from this
         self._pre_neurons = [x[0] for x in self._pair_list]
         self._post_neurons = [x[1] for x in self._pair_list]
 
-        print 'pre_neurons: ', self._pre_neurons
-        print 'post_neurons: ', self._post_neurons
+        if self._verbose:
+            print 'full cset: ', self._full_cset
+            print 'this vertex pair_list: ', self._pair_list
+            print 'this vertex pre_neurons: ', self._pre_neurons
+            print 'this vertex post_neurons: ', self._post_neurons
 
         n_connections = len(self._pre_neurons)  # size of the array created
         return n_connections
