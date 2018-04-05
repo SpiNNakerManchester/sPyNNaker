@@ -27,7 +27,7 @@ class CSAConnector(AbstractConnector):
         super(CSAConnector, self).__init__(safe, verbose)
         self._cset = cset
         self._verbose = verbose
-        print 'cset: ', cset
+
         # think this is probably needed here
         self._pair_list = None
         self._full_connection_set = None
