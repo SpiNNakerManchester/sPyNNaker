@@ -5,7 +5,7 @@
  *
  */
 
-#include "../../common/maths-util.h"
+#include <maths-util.h>
 
 #include <data_specification.h>
 #include <recording.h>
