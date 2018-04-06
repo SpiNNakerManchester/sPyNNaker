@@ -12,7 +12,7 @@
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
-#include "../common/out_spikes.h"
+#include <out_spikes.h>
 #include "recording.h"
 #include <debug.h>
 #include <string.h>

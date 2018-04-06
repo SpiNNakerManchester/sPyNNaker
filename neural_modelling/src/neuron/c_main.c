@@ -15,7 +15,7 @@
  *
  */
 
-#include "../common/in_spikes.h"
+#include <in_spikes.h>
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
