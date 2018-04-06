@@ -2,14 +2,14 @@
 #define _TIMING_RECURRENT_COMMON_H_
 
 #include "timing.h"
-#include "../weight_dependence/weight_one_term.h"
+#include <weight_one_term.h>
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "../../common/maths.h"
-#include "../../common/stdp_typedefs.h"
+#include <maths.h>
+#include <stdp_typedefs.h>
 
 #include "random_util.h"
 

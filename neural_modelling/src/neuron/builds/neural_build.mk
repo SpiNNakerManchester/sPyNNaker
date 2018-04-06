@@ -120,6 +120,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) -I $(NEURAL_MODELLING_DIRS)/src/neuron \
+	      -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity \
 	      -DSTDP_ENABLED=$(STDP_ENABLED) \
 	      -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) \
 	      -include $$(SYNAPSE_TYPE_H) \
@@ -133,12 +134,17 @@ $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity \
+	        -I $(NEURAL_MODELLING_DIRS)/src/neuron \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
+	echo TIMING_DEPENDENCE_O
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -I $(NEURAL_MODELLING_DIRS)/src/neuron/ \
+	        -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity \
 	        -include $(SYNAPSE_TYPE_H)\
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
