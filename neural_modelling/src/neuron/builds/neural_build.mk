@@ -102,6 +102,7 @@ endif
 
 include $(SPINN_DIRS)/make/FrontEndCommon.mk
 CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src/common
+#$(NEURAL_MODELLING_DIRS)/src/neuron $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity/common
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
