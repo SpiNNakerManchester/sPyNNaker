@@ -2,7 +2,7 @@
 #define _SYNAPSE_DYNAMICS_H_
 
 #include <neuron-typedefs.h>
-#include "../synapse_row.h"
+#include <synapse_row.h>
 #include <sp_structs.h>
 
 address_t synapse_dynamics_initialise(
