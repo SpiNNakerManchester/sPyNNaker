@@ -2,17 +2,17 @@
 #include "static-assert.h"
 
 // sPyNNaker neural modelling includes
-#include "../../synapses.h"
+#include <synapses.h>
 
-// Plasticity common includes
-#include "../common/maths.h"
-#include "../common/post_events.h"
+// Plasticity includes
+#include <maths.h>
+#include <post_events.h>
 
-#include "weight_dependence/weight.h"
+#include <weight.h>
 #include "timing_dependence/timing.h"
 #include <string.h>
 #include <debug.h>
-#include "../synapse_dynamics.h"
+#include <synapse_dynamics.h>
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 

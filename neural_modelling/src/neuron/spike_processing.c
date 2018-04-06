@@ -1,8 +1,8 @@
 #include "spike_processing.h"
-#include "population_table/population_table.h"
+#include "population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
+#include "synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>

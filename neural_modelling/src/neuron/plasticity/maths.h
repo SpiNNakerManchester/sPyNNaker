@@ -2,7 +2,7 @@
 #define MATHS_H
 
 // Standard includes
-#include "../../../common/neuron-typedefs.h"
+#include <neuron-typedefs.h>
 
 //---------------------------------------
 // Macros
