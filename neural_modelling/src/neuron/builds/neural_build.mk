@@ -65,7 +65,7 @@ endif
 SYNGEN_ENABLED = 1
 
 ifndef SYNAPTOGENESIS_DYNAMICS_H
-    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
+    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/synaptogenesis_dynamics.h
     SYNGEN_ENABLED = 0
 endif
 
@@ -110,6 +110,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) -I $(NEURAL_MODELLING_DIRS)/src/neuron \
+	        -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity \
 	        -DSTDP_ENABLED=$(STDP_ENABLED) \
 	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
 endef
