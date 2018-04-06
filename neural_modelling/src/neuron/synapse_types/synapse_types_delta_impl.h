@@ -22,7 +22,7 @@
 #define NUM_INHIBITORY_RECEPTORS 1
 
 #include <debug.h>
-#include "../../common/neuron-typedefs.h"
+#include <neuron-typedefs.h>
 #include "synapse_types.h"
 
 
