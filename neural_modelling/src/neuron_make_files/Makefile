@@ -22,10 +22,11 @@ MODELS = IF_curr_exp \
          IF_cond_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_structural
-BUILD_DIRS := $(addprefix builds/, $(MODELS))
+MODELS = IF_curr_exp
+#BUILD_DIRS := $(addprefix builds/, $(MODELS))
 
-all: $(BUILD_DIRS)
-	for d in $(BUILD_DIRS); do $(MAKE) -C $$d || exit $$?; done
+all: $(MODELS)
+	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
 
-clean: $(BUILD_DIRS)
-	for d in $(BUILD_DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+clean: $(MODELS)
+	for d in $(MODELS); do $(MAKE) -C $$d clean || exit $$?; done

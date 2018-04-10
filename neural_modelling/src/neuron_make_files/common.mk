@@ -3,6 +3,11 @@ ifndef SPINN_DIRS
     $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
 endif
 
+# If NEURAL_MODELLING_DIRS is not defined, this is an error!
+ifndef NEURAL_MODELLING_DIRS
+    $(error NEURAL_MODELLING_DIRS is not set.  Please define NEURAL_MODELLING_DIRS (possibly by running "source setup" in the sPyNNaker folder))
+endif
+
 ifeq ($(SPYNNAKER_DEBUG), DEBUG)
     NEURON_DEBUG = LOG_DEBUG
     SYNAPSE_DEBUG = LOG_DEBUG
@@ -74,6 +79,23 @@ ifndef SYNAPTOGENESIS_DYNAMICS
     SYNGEN_ENABLED = 0
 endif
 
+MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+CURRENT_DIR := $(dir $(MAKEFILE_PATH))
+SOURCE_DIR := $(abspath $(CURRENT_DIR))
+SOURCE_DIRS += $(SOURCE_DIR)
+ifndef APP_OUTPUT_DIR
+    APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
+endif
+
+
+all: $(APP_OUTPUT_DIR)$(APP).aplx $(COPIED_DIRS)
+
+include $(NEURAL_MODELLING_DIRS)/commoncopy.mk
+COPIED_DIRS += $(COMMON_MODIFIED_DIR)
+
+include $(NEURAL_MODELLING_DIRS)/neuroncopy.mk
+COPIED_DIRS += $(NEURON_MODIFIED_DIR)
+
 NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 
 SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
@@ -100,8 +122,56 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
     STDP_ENABLED = 1
 endif
 
-include $(SPINN_DIRS)/make/FrontEndCommon.mk
-CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src/common
+ifndef SOURCE_DIRS
+    $(error SOURCE_DIRS is not set.  Please define SOURCE_DIRS)
+endif
+
+ifndef APP_OUTPUT_DIR
+    $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR)
+endif
+
+ifndef BUILD_DIR
+    $(error BUILD_DIR is not set.  Please define BUILD_DIR)
+endif
+
+
+define define-build-code
+$$(BUILD_DIR)%.o: $1/%.c
+	-mkdir -p $$(dir $$@)
+	$$(CC) $$(CFLAGS) -D__FILENAME__=\"$$(notdir $$*.c)\" -o $$@ $$<
+endef
+
+define source_dir
+$(firstword $(abspath $(strip $(foreach dir, $(sort $(SOURCE_DIRS)), $(findstring $(dir), $(1))))))
+endef
+
+define build_dir
+$(patsubst $(call source_dir, $(1))/%.c,$(BUILD_DIR)%.o,$(1))
+endef
+
+# Convert the objs into the correct format to work here
+OBJS := $(abspath $(SOURCES))
+$(foreach dir, $(sort $(SOURCE_DIRS)), $(eval OBJS := $(OBJS:$(abspath $(dir))/%.c=$(BUILD_DIR)%.o)))
+$(foreach dir, $(sort $(SOURCE_DIRS)), $(eval $(call define-build-code,$(dir))))
+OBJECTS += $(OBJS)
+
+LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
+FEC_DEBUG := PRODUCTION_CODE
+PROFILER := PROFILER_DISABLED
+
+# Run md5sum on application name and extract first 8 bytes
+SHELL = bash
+APPLICATION_NAME_HASH = $(shell echo -n "$(APP)" | (md5sum 2>/dev/null || md5) | cut -c 1-8)
+
+CFLAGS += -Wall -Wextra -D$(FEC_DEBUG) -D$(PROFILER) $(OTIME) -DAPPLICATION_NAME_HASH=0x$(APPLICATION_NAME_HASH)
+
+include $(SPINN_DIRS)/make/Makefile.common
+
+# Tidy and cleaning dependencies
+clean:
+	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx
+
+CFLAGS += -I $(COMMON_MODIFIED_DIR)
 
 INCLUDE_NEURON_HEADERS = -I $(NEURAL_MODELLING_DIRS)/src/neuron
 INCLUDE_PLASTICITY_HEADERS = $(INCLUDE_NEURON_HEADERS) -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity

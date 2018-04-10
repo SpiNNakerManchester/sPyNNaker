@@ -1,4 +1,0 @@
-# THIS FILE IS A STUB FOR A RENAMED VERSION
-# IT IS KEPT FOR BACKWARD COMPATIBILITY ONLY
-$(warning inclusion of Makefile.paths instead of paths.mk)
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))paths.mk
