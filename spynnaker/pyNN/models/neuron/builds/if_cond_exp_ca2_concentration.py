@@ -28,7 +28,7 @@ class IFCondExpCa2Concentration(AbstractPopulationVertex):
         'isyn_inh': 0.0,
         'e_rev_E': 0.0, 'e_rev_I': -70.0}
 
-    non_pynn_default_parameters = {'v_init': None}
+    initialize_parameters  = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=AbstractPopulationVertex.
@@ -52,7 +52,7 @@ class IFCondExpCa2Concentration(AbstractPopulationVertex):
             tau_ca2=default_parameters["tau_ca2"],
             i_ca2=default_parameters["i_ca2"],
             i_alpha=default_parameters["i_alpha"],
-            v_init=non_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh'],
             e_rev_E=default_parameters['e_rev_E'],
@@ -69,8 +69,8 @@ class IFCondExpCa2Concentration(AbstractPopulationVertex):
         additional_input = AdditionalInputCa2Concentration(
             n_neurons, tau_ca2, i_ca2, i_alpha)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_cond_exp_ca2_concentration.aplx",
+        super(IFCondExpCa2Concentration, self).__init__(
+            n_neurons=n_neurons, binary="IF_cond_exp_ca2_concentration.aplx",
             label=label,
             max_atoms_per_core=(
                 IFCondExpCa2Concentration._model_based_max_atoms_per_core),
