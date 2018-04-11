@@ -2,9 +2,9 @@
 #define _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 
 // Include generic plasticity maths functions
-#include "../../common/maths.h"
-#include "../../common/stdp_typedefs.h"
-#include "../../../synapse_row.h"
+#include <maths.h>
+#include <stdp_typedefs.h>
+#include <synapse_row.h>
 
 #include <debug.h>
 

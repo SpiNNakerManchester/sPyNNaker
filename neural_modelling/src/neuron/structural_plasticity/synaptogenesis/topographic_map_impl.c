@@ -7,8 +7,8 @@
  * Author: Petrut Bogdan
  *
  */
-#include "../synaptogenesis_dynamics.h"
-#include "../../population_table/population_table.h"
+#include <synaptogenesis_dynamics.h>
+#include <population_table.h>
 
 
 #include <random.h>
@@ -16,14 +16,14 @@
 #include <debug.h>
 #include <stdfix-full-iso.h>
 
-#include "../../synapse_row.h"
+#include <synapse_row.h>
 
-#include "../../synapses.h"
-#include "../../plasticity/synapse_dynamics.h"
+#include <synapses.h>
+#include <synapse_dynamics.h>
 
-#include "../../../common/maths-util.h"
-#include "../../../common/sp_structs.h"
-#include "simulation.h"
+#include <maths-util.h>
+#include <sp_structs.h>
+#include <simulation.h>
 
 // For last spike selection
 #include <circular_buffer.h>

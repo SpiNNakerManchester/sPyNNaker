@@ -25,7 +25,7 @@
 #ifndef _SYNAPSE_ROW_H_
 #define _SYNAPSE_ROW_H_
 
-#include "../common/neuron-typedefs.h"
+#include <neuron-typedefs.h>
 
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
