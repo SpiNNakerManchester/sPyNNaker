@@ -306,7 +306,7 @@ bool synapses_initialise(
     if (!is_power_of_2(n_neurons)) {
         n_neurons_power_2 = next_power_of_2(n_neurons);
     }
-    uint32_t log_n_neurons = log_2(n_neurons_power_2);
+    uint32_t log_n_neurons = ilog_2(n_neurons_power_2);
     uint32_t n_ring_buffer_bits =
         log_n_neurons + SYNAPSE_TYPE_BITS + SYNAPSE_DELAY_BITS;
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
@@ -508,9 +508,9 @@ static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
                                             uint32_t delay, uint32_t type){
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
     new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) <<
-    		synapse_type_index_bits);
+            synapse_type_index_bits);
     new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) <<
-    		synapse_index_bits);
+            synapse_index_bits);
     new_synapse |= (id & ((1<<synapse_type_index_bits) - 1));
     return new_synapse;
 }
