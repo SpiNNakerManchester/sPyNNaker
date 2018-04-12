@@ -11,3 +11,4 @@ scipy
 lxml
 six
 csa
+matplotlib
