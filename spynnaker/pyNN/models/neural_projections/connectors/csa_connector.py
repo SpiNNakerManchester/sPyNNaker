@@ -21,8 +21,8 @@ class CSAConnector(AbstractConnector):
             safe=True, callback=None, verbose=False):
         """
 
-        :param `string` cset:
-            A string describing the connection set between populations
+        :param '?' cset:
+            A description of the connection set between populations
         """
         super(CSAConnector, self).__init__(safe, verbose)
         self._cset = cset
@@ -157,4 +157,4 @@ class CSAConnector(AbstractConnector):
 
     def __repr__(self):
         return "CSAConnector({})".format(
-            self._cset)
+            self._full_cset)

@@ -1,4 +1,5 @@
 from six import add_metaclass
+from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -353,7 +354,9 @@ class AbstractConnector(object):
             values, n_connections, connection_slices)
         if self._safe:
             if not weights.size:
-                logger.warning("No connection in " + str(self))
+                logger_utils.warn_once(logger,
+                                       "No connection in " + str(self))
+#                logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
