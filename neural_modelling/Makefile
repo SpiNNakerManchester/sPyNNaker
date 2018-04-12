@@ -1,6 +1,5 @@
 # BUILDS = spike_source/poisson delay_extension neuron_make_files robot_motor_control
-BUILDS = spike_source/poisson
-DIRS = $(BUILDS:%=src/%)
+DIRS = spike_source/poisson delay_extension robot_motor_control
 
 all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
