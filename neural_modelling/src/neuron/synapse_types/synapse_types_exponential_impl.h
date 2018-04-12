@@ -21,7 +21,7 @@
 #define NUM_EXCITATORY_RECEPTORS 1
 #define NUM_INHIBITORY_RECEPTORS 1
 
-#include "../decay.h"
+#include <decay.h>
 #include <debug.h>
 #include "synapse_types.h"
 

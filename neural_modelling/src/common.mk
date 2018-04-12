@@ -14,4 +14,4 @@ ifneq ($(CHECK_PATH), $(MAKEFILE_PATH))
 endif
 
 include $(NEURAL_MODELLING_DIRS)/src/paths.mk
-include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+include $(SPINN_DIRS)/make/FrontEndCommon.mk
