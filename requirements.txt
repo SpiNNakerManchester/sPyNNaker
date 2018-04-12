@@ -10,5 +10,5 @@ numpy
 scipy
 lxml
 six
-csa
 matplotlib
+csa
