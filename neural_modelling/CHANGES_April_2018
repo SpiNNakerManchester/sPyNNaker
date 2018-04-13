@@ -1,0 +1,20 @@
+The c code has been changed in the following ways
+
+1. Many c and h files have been moved.
+    in most cases to a src folder next to their originakl location.
+
+2. neuron/src/... files and directories are jsut neuron/...
+
+3. All the indirect relative includes .. patterns have been replaced with <xyz> includes
+3a. Some h files have been moved up to either neuron or neuron/plasticy
+3b. Make files have been updated to add extra -I flags to find these includes
+3c. The only "xyz" includes should be for direct sibling files
+
+4. neuron/structural_plasticity/synaptogenesis/topographic_map_impl.c has been changed.
+The DMA_WRITEBACK method has been removed. (code hardlined in where needed)
+This because the log_error(  convertor can only handle direct Strings not parameters)
+
+5. neural_modelling/src/neuron/builds/ are now neural_modelling/neuron_make_files/
+
+6. makefiles have been simplified
+

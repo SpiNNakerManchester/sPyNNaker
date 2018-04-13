@@ -29,14 +29,32 @@ endif
 #POPULATION_TABLE_IMPL := fixed
 POPULATION_TABLE_IMPL := binary_search
 
+# Variables used the converted version of the common files
+COMMON_RAW_DIR := $(NEURAL_MODELLING_DIRS)/common/
+COMMON_MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/common_modified/
+COMMON_DICT_FILE := $(NEURAL_MODELLING_DIRS)/common_modified/common.dict
+COMMON_BUILD_DIR = $(NEURAL_MODELLING_DIRS)/common_build/
+# Add to list or prerequirements for rule to build o files
+C_FILES_MODIFIED += $(COMMON_DICT_FILE)
+NEURON_RAW_DIR := $(NEURAL_MODELLING_DIRS)/neuron/
+NEURON_MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/neuron_modified/
+NEURON_DICT_FILE := $(NEURAL_MODELLING_DIRS)/neuron_modified/neuron.dict
+NEURON_BUILD_DIR = $(NEURAL_MODELLING_DIRS)/neuron_build/
+# Add to list or prerequirements for rule to build o files
+C_FILES_MODIFIED += $(NEURON_DICT_FILE)
+#locaTION FOR ELF AND OTHER FILES
+BUILD_DIR = $(NEURAL_MODELLING_DIRS)/build/
+
+
 ifndef ADDITIONAL_INPUT_H
-    ADDITIONAL_INPUT_H = $(SOURCE_DIR)/neuron/additional_inputs/additional_input_none_impl.h
+    ADDITIONAL_INPUT_H = $(NEURON_MODIFIED_DIR)additional_inputs/additional_input_none_impl.h
 endif
 
 ifndef NEURON_MODEL
     $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
 else
-    NEURON_MODEL_O = $(call build_dir, $(NEURON_MODEL))
+    NEURON_MODEL := $(NEURON_MODIFIED_DIR)$(NEURON_MODEL)
+    NEURON_MODEL_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(NEURON_MODEL))
 endif
 
 ifndef NEURON_MODEL_H
@@ -45,115 +63,119 @@ endif
 
 ifndef INPUT_TYPE_H
     $(error INPUT_TYPE_H is not set.  Please select an input type header file)
+else
+    INPUT_TYPE_H := $(NEURON_MODIFIED_DIR)$(INPUT_TYPE_H)
 endif
 
 ifndef THRESHOLD_TYPE_H
     $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
+else
+    THRESHOLD_TYPE_H := $(NEURON_MODIFIED_DIR)$(THRESHOLD_TYPE_H)
 endif
 
 ifndef SYNAPSE_TYPE_H
     $(error SYNAPSE_TYPE_H is not set.  Please select a synapse type header file)
+else
+    SYNAPSE_TYPE_H := $(NEURON_MODIFIED_DIR)$(SYNAPSE_TYPE_H)
 endif
 
 ifndef SYNAPSE_DYNAMICS
     $(error SYNAPSE_DYNAMICS is not set.  Please select a synapse dynamics implementation)
+else
+    SYNAPSE_DYNAMICS := $(NEURON_MODIFIED_DIR)$(SYNAPSE_DYNAMICS)
 endif
 
+#TODO FIX
 ifdef WEIGHT_DEPENDENCE
-    WEIGHT_DEPENDENCE_O = $(call build_dir, $(WEIGHT_DEPENDENCE))
+    WEIGHT_DEPENDENCE := $(NEURON_MODIFIED_DIR)($(WEIGHT_DEPENDENCE)
+    WEIGHT_DEPENDENCE_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)$%.o,$(WEIGHT_DEPENDENCE))
 endif
 
 ifdef TIMING_DEPENDENCE
-    TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
+    TIMING_DEPENDENCE_O := $(NEURON_MODIFIED_DIR)$(TIMING_DEPENDENCE)
+    TIMING_DEPENDENCE_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)$%.o,$(TIMING_DEPENDENCE))
 endif
 
 SYNGEN_ENABLED = 1
 
 ifndef SYNAPTOGENESIS_DYNAMICS_H
-    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/synaptogenesis_dynamics.h
+    SYNAPTOGENESIS_DYNAMICS_H = $(NEURON_MODIFIED_DIR)synaptogenesis_dynamics.h
     SYNGEN_ENABLED = 0
 endif
 
 ifndef SYNAPTOGENESIS_DYNAMICS
-    SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS = $(NEURON_MODIFIED_DIR)structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNGEN_ENABLED = 0
 endif
 
-MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_DIR := $(dir $(MAKEFILE_PATH))
-SOURCE_DIR := $(abspath $(CURRENT_DIR))
-SOURCE_DIRS += $(SOURCE_DIR)
+_MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+_CURRENT_DIR := $(dir $(MAKEFILE_PATH))
+#SOURCE_DIR := $(abspath $(CURRENT_DIR))
+#SOURCE_DIRS += $(SOURCE_DIR)
 ifndef APP_OUTPUT_DIR
-    APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
+    APP_OUTPUT_DIR := $(abspath $(_CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
 endif
 
+NEURON_O = $(NEURON_MODIFIED_DIR)neuron.c
 
-all: $(APP_OUTPUT_DIR)$(APP).aplx $(COPIED_DIRS)
+SOURCES = $(COMMON_MODIFIED_DIR)out_spikes.c \
+          $(NEURON_MODIFIED_DIR)c_main.c \
+          $(NEURON_MODIFIED_DIR)synapses.c \
+          $(NEURON_MODIFIED_DIR)neuron.c \
+          $(NEURON_MODIFIED_DIR)spike_processing.c \
+          $(NEURON_MODIFIED_DIR)population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS)
 
-include $(NEURAL_MODELLING_DIRS)/commoncopy.mk
-COPIED_DIRS += $(COMMON_MODIFIED_DIR)
-
-include $(NEURAL_MODELLING_DIRS)/neuroncopy.mk
-COPIED_DIRS += $(NEURON_MODIFIED_DIR)
-
-NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
-
-SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
-          $(SOURCE_DIR)/neuron/c_main.c \
-          $(SOURCE_DIR)/neuron/synapses.c  $(SOURCE_DIR)/neuron/neuron.c \
-	      $(SOURCE_DIR)/neuron/spike_processing.c \
-	      $(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES) $(SYNAPTOGENESIS_DYNAMICS)
-
-SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
-                        $(SOURCE_DIR)/neuron/synapses.c \
-                        $(SOURCE_DIR)/neuron/spike_processing.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
-                        $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c \
+SYNAPSE_TYPE_SOURCES += $(NEURON_MODIFIED_DIR)c_main.c \
+                        $(NEURON_MODIFIED_DIR)synapses.c \
+                        $(NEURON_MODIFIED_DIR)spike_processing.c \
+                        $(NEURON_MODIFIED_DIR)population_table/population_table_fixed_impl.c \
+                        $(NEURON_MODIFIED_DIR)population_table/population_table_binary_search_impl.c \
+                        $(NEURON_MODIFIED_DIR)plasticity/synapse_dynamics_static_impl.c \
                         $(SYNAPTOGENESIS_DYNAMICS)
 
 STDP_ENABLED = 0
-ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)
+ifneq ($(SYNAPSE_DYNAMICS), $(NEURON_MODIFIED_DIR)/plasticity/synapse_dynamics_static_impl.c)
     STDP += $(SYNAPSE_DYNAMICS) \
-            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c \
+            $(NEURON_MODIFIED_DIR)/plasticity/common/post_events.c \
             $(SYNAPTOGENESIS_DYNAMICS)
     STDP_ENABLED = 1
 endif
 
-ifndef SOURCE_DIRS
-    $(error SOURCE_DIRS is not set.  Please define SOURCE_DIRS)
-endif
-
-ifndef APP_OUTPUT_DIR
-    $(error APP_OUTPUT_DIR is not set.  Please define APP_OUTPUT_DIR)
-endif
-
-ifndef BUILD_DIR
-    $(error BUILD_DIR is not set.  Please define BUILD_DIR)
-endif
-
-
-define define-build-code
-$$(BUILD_DIR)%.o: $1/%.c
-	-mkdir -p $$(dir $$@)
-	$$(CC) $$(CFLAGS) -D__FILENAME__=\"$$(notdir $$*.c)\" -o $$@ $$<
-endef
-
-define source_dir
-$(firstword $(abspath $(strip $(foreach dir, $(sort $(SOURCE_DIRS)), $(findstring $(dir), $(1))))))
-endef
-
-define build_dir
-$(patsubst $(call source_dir, $(1))/%.c,$(BUILD_DIR)%.o,$(1))
-endef
-
 # Convert the objs into the correct format to work here
-OBJS := $(abspath $(SOURCES))
-$(foreach dir, $(sort $(SOURCE_DIRS)), $(eval OBJS := $(OBJS:$(abspath $(dir))/%.c=$(BUILD_DIR)%.o)))
-$(foreach dir, $(sort $(SOURCE_DIRS)), $(eval $(call define-build-code,$(dir))))
-OBJECTS += $(OBJS)
+OBJECTS := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(SOURCES))
+OBJECTS := $(patsubst $(COMMON_MODIFIED_DIR)%.c,$(COMMON_BUILD_DIR)%.o,$(OBJECTS))
+
+#Build rules
+all: $(APP_OUTPUT_DIR)$(APP).aplx
+
+test: 
+	echo $(OBJECTS)
+
+# Copy the common files
+$(COMMON_DICT_FILE): $(COMMON_RAW_DIR)                                                                          # Extra tag as this is a library
+	python -m spinn_utilities.make_tools.convertor $(COMMON_RAW_DIR) $(COMMON_MODIFIED_DIR) $(COMMON_DICT_FILE) neural_modelling_common
+
+	# While the called python copied the whole directory the individual rule is required for the makerule chain
+$(COMMON_MODIFIED_DIR)%.c:  $(COMMON_RAW_DIR)%.c                                                                  # Extra tag as this is a library%.c
+	python -m spinn_utilities.make_tools.convertor $(COMMON_RAW_DIR) $(COMMON_MODIFIED_DIR) $(COMMON_DICT_FILE) neural_modelling_common
+
+# Copy the neuron files
+$(NEURON_DICT_FILE): $(NEURON_RAW_DIR)
+	python -m spinn_utilities.make_tools.convertor $(NEURON_RAW_DIR) $(NEURON_MODIFIED_DIR) $(NEURON_DICT_FILE) 
+
+	# While the called python copied the whole directory the individual rule is required for the makerule chain
+$(NEURON_MODIFIED_DIR)%.c: $(NEURON_RAW_DIR)%.c
+	python -m spinn_utilities.make_tools.convertor $(NEURON_RAW_DIR) $(NEURON_MODIFIED_DIR) $(NEURON_DICT_FILE) 
+
+$(COMMON_BUILD_DIR)%.o: $(COMMON_MODIFIED_DIR)%.c
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(NEURON_BUILD_DIR)%.o: $(NEURON_MODIFIED_DIR)%.c
+	# neuron build
+	-mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $<
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
@@ -170,11 +192,13 @@ include $(SPINN_DIRS)/make/Makefile.common
 # Tidy and cleaning dependencies
 clean:
 	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx
+	rm -rf $(COMMON_MODIFIED_DIR)
+	rm -rf $(NEURON_MODIFIED_DIR)
 
 CFLAGS += -I $(COMMON_MODIFIED_DIR)
 
-INCLUDE_NEURON_HEADERS = -I $(NEURAL_MODELLING_DIRS)/src/neuron
-INCLUDE_PLASTICITY_HEADERS = $(INCLUDE_NEURON_HEADERS) -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity
+INCLUDE_NEURON_HEADERS = -I $(NEURON_MODIFIED_DIR)
+INCLUDE_PLASTICITY_HEADERS = $(INCLUDE_NEURON_HEADERS) -I $(NEURON_MODIFIED_DIR)plasticity
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
@@ -184,6 +208,12 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	        -DSTDP_ENABLED=$(STDP_ENABLED) \
 	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
 endef
+
+SYNAPSE_TYPE_COMPILE := $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
+$(NEURON_BUILD_DIR)c_main.o: $(NEURON_MODIFIED_DIR)c_main.c $(C_FILES_MODIFIED)
+	#c_main.c
+	-mkdir -p $(COMMON_BUILD_DIR)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 define stdp_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
@@ -198,8 +228,10 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
 endef
 
-$(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
-$(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
+
+#TODO FIX HERE
+#$(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
+#$(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
@@ -220,7 +252,7 @@ $(NEURON_MODEL_O): $(NEURON_MODEL)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(NEURON_DEBUG) \
 	        $(CFLAGS) -o $@ $<
 
-$(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
+$(NEURON_O): $(NEURON_MODEL)/neuron__modified/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
