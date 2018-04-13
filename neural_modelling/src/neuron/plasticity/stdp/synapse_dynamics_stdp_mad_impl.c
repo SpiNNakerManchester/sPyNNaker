@@ -12,7 +12,14 @@
 #include "timing_dependence/timing.h"
 #include <string.h>
 #include <debug.h>
+#include <utils.h>
 #include <synapse_dynamics.h>
+
+static uint32_t synapse_type_index_bits;
+static uint32_t synapse_index_bits;
+static uint32_t synapse_index_mask;
+static uint32_t synapse_type_index_mask;
+static uint32_t synapse_delay_index_type_bits;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 
@@ -43,13 +50,6 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 #endif
 
 #define SYNAPSE_AXONAL_DELAY_MASK ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
-
-#define SYNAPSE_DELAY_TYPE_INDEX_BITS \
-    (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_INDEX_BITS)
-
-#if (SYNAPSE_DELAY_TYPE_INDEX_BITS + SYNAPSE_AXONAL_DELAY_BITS) > 16
-#error "Not enough bits for axonal synaptic delay bits"
-#endif
 
 //---------------------------------------
 // Structures
@@ -175,18 +175,19 @@ void synapse_dynamics_print_plastic_synapses(
         synapses_print_weight(
             weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                  synapse_row_sparse_delay(control_word),
-                  synapse_types_get_type_char(
-                      synapse_row_sparse_type(control_word)),
-                  synapse_row_sparse_index(control_word), SYNAPSE_DELAY_MASK,
-                  SYNAPSE_TYPE_INDEX_BITS);
+                  synapse_row_sparse_delay(
+                      control_word, synapse_type_index_bits),
+                  synapse_types_get_type_char(synapse_row_sparse_type(
+                      control_word, synapse_index_bits)),
+                  synapse_row_sparse_index(control_word, synapse_index_mask),
+                  SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //---------------------------------------
 static inline index_t _sparse_axonal_delay(uint32_t x) {
-    return ((x >> SYNAPSE_DELAY_TYPE_INDEX_BITS) & SYNAPSE_AXONAL_DELAY_MASK);
+    return ((x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK);
 }
 
 address_t synapse_dynamics_initialise(
@@ -210,6 +211,19 @@ address_t synapse_dynamics_initialise(
     if (post_event_history == NULL) {
         return NULL;
     }
+
+    uint32_t n_neurons_power_2 = n_neurons;
+    if (!is_power_of_2(n_neurons)) {
+        n_neurons_power_2 = next_power_of_2(n_neurons);
+    }
+    uint32_t log_n_neurons = ilog_2(n_neurons_power_2);
+
+    synapse_type_index_bits = log_n_neurons + SYNAPSE_TYPE_BITS;
+    synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
+    synapse_index_bits = log_n_neurons;
+    synapse_index_mask = (1 << synapse_index_bits) - 1;
+    synapse_delay_index_type_bits =
+        SYNAPSE_DELAY_BITS + synapse_type_index_bits;
 
     return weight_result;
 }
@@ -253,10 +267,14 @@ bool synapse_dynamics_process_plastic_synapses(
         // **NOTE** cunningly, control word is just the same as lower
         // 16-bits of 32-bit fixed synapse so same functions can be used
         uint32_t delay_axonal = 0;    //_sparse_axonal_delay(control_word);
-        uint32_t delay_dendritic = synapse_row_sparse_delay(control_word);
-        uint32_t type = synapse_row_sparse_type(control_word);
-        uint32_t index = synapse_row_sparse_index(control_word);
-        uint32_t type_index = synapse_row_sparse_type_index(control_word);
+        uint32_t delay_dendritic = synapse_row_sparse_delay(
+            control_word, synapse_type_index_bits);
+        uint32_t type = synapse_row_sparse_type(
+            control_word, synapse_index_bits);
+        uint32_t index = synapse_row_sparse_index(
+            control_word, synapse_index_mask);
+        uint32_t type_index = synapse_row_sparse_type_index(
+            control_word, synapse_type_index_mask);
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
@@ -270,7 +288,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index);
+                delay_axonal + delay_dendritic + time, type_index,
+                synapse_type_index_bits);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
@@ -340,8 +359,8 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
         uint32_t control_word = *control_words++;
 
         // Check if index is the one I'm looking for
-        delay = synapse_row_sparse_delay(control_word);
-        if (synapse_row_sparse_index(control_word)==id) {
+        delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
+        if (synapse_row_sparse_index(control_word, synapse_index_mask)==id) {
             found = true;
             break;
         }
@@ -396,9 +415,9 @@ static inline plastic_synapse_t _weight_conversion(uint32_t weight){
 static inline control_t _control_conversion(uint32_t id, uint32_t delay,
                                             uint32_t type){
     control_t new_control =
-        ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << SYNAPSE_TYPE_INDEX_BITS);
-    new_control |= (type & ((1<<SYNAPSE_TYPE_BITS) - 1)) << SYNAPSE_INDEX_BITS;
-    new_control |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+        ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << synapse_type_index_bits);
+    new_control |= (type & ((1<<synapse_type_index_bits) - 1)) << synapse_index_bits;
+    new_control |= (id & ((1<<synapse_index_bits) - 1));
     return new_control;
 }
 

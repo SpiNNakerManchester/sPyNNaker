@@ -9,10 +9,11 @@
 // neuron index
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
-        uint32_t neuron_index){
+        uint32_t neuron_index, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits){
     return (((simuation_timestep & SYNAPSE_DELAY_MASK)
-             << SYNAPSE_TYPE_INDEX_BITS)
-            | (synapse_type_index << SYNAPSE_INDEX_BITS)
+             << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
             | neuron_index);
 }
 
@@ -20,9 +21,10 @@ static inline index_t synapses_get_ring_buffer_index(
 // synapse type and neuron index (as stored in a synapse row)
 static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
-        uint32_t combined_synapse_neuron_index) {
+        uint32_t combined_synapse_neuron_index,
+        uint32_t synapse_type_index_bits) {
     return (((simulation_timestep & SYNAPSE_DELAY_MASK)
-             << SYNAPSE_TYPE_INDEX_BITS)
+             << synapse_type_index_bits)
             | combined_synapse_neuron_index);
 }
 

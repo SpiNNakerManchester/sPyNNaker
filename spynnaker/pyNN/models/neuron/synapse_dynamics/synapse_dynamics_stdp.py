@@ -183,6 +183,9 @@ class SynapseDynamicsSTDP(
             post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = int(
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+
         dendritic_delays = (
             connections["delay"] * self._dendritic_delay_fraction)
         axonal_delays = (
@@ -191,10 +194,11 @@ class SynapseDynamicsSTDP(
         # Get the fixed data
         fixed_plastic = (
             ((dendritic_delays.astype("uint16") & 0xF) <<
-             (8 + n_synapse_type_bits)) |
+             (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (12 + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype("uint16") << 8) |
+            (connections["synapse_type"].astype("uint16")
+             << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
               post_vertex_slice.lo_atom) & 0xFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
@@ -265,7 +269,11 @@ class SynapseDynamicsSTDP(
             fp_size, fp_data):
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
+
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = int(
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+
         data_fixed = numpy.concatenate([
             fp_data[i].view(dtype="uint16")[0:fp_size[i]]
             for i in range(n_rows)])
@@ -280,7 +288,8 @@ class SynapseDynamicsSTDP(
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = synapse_structure.read_synaptic_data(
             fp_size, pp_without_headers)
-        connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"] = (data_fixed >> (n_neuron_id_bits
+                                               + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 

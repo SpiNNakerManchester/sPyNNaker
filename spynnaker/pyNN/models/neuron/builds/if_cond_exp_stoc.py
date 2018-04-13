@@ -6,10 +6,13 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.threshold_types \
     import ThresholdTypeMaassStochastic
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCondExpStoc(AbstractPopulationVertex):
 
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'e_rev_E': 0.0, 'e_rev_I': -70.0,
