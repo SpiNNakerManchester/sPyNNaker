@@ -20,8 +20,10 @@ class PushBotRetinaViewer(Thread):
             decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
         # pylint: disable=too-many-arguments
         try:
-            import matplotlib  # NOQA
-            self.__matplotlib = matplotlib
+            from matplotlib import pyplot  # NOQA
+            from matplotlib import animation  # NOQA
+            self.__pyplot = pyplot
+            self.__animation = animation
         except ImportError:
             raise Exception("matplotlib must be installed to use this viewer")
 
@@ -94,13 +96,13 @@ class PushBotRetinaViewer(Thread):
 
     def run(self):
         # Create image plot of retina output
-        fig = self.__matplotlib.pyplot.figure()
-        self._image = self.__matplotlib.pyplot.imshow(
+        fig = self.__pyplot.figure()
+        self._image = self.__pyplot.imshow(
             self._image_data_view, cmap="jet", vmin=0.0,
             vmax=self._display_max)
 
         # Play animation
-        self._ani = self.__matplotlib.animation.FuncAnimation(
+        self._ani = self.__animation.FuncAnimation(
             fig, self._updatefig, interval=self._frame_time_ms,
             blit=True)
-        self.__matplotlib.pyplot.show()
+        self.__pyplot.show()
