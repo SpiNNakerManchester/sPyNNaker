@@ -13,3 +13,4 @@ MANIFEST
 /.cache/
 .DS_Store
 .coverage
+/.pytest_cache

@@ -343,7 +343,7 @@ class SynapseDynamicsSTDP(
     def get_max_synapses(self, n_words):
 
         # Subtract the header size that will always exist
-        n_header_words = self._n_header_bytes / 4
+        n_header_words = self._n_header_bytes // 4
         n_words_space = n_words - n_header_words
 
         # Get plastic plastic size per connection
@@ -354,7 +354,7 @@ class SynapseDynamicsSTDP(
         bytes_per_fp = 2
 
         # Maximum possible connections, ignoring word alignment
-        n_connections = (n_words_space * 4) / (bytes_per_pp + bytes_per_fp)
+        n_connections = (n_words_space * 4) // (bytes_per_pp + bytes_per_fp)
 
         # Reduce until correct
         while (self.get_n_words_for_plastic_connections(n_connections) >

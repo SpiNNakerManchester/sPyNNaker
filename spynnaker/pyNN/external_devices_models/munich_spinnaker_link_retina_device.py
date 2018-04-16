@@ -96,7 +96,7 @@ class MunichRetinaDevice(
                 "The external Retina does not recognise this _position")
 
         if n_neurons != fixed_n_neurons and n_neurons is not None:
-            print ("Warning, the retina will have {} neurons".format(
+            print("Warning, the retina will have {} neurons".format(
                 fixed_n_neurons))
 
     def get_outgoing_partition_constraints(self, partition):
