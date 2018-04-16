@@ -1,8 +1,8 @@
 #ifndef _SPIKE_PROCESSING_H_
 #define _SPIKE_PROCESSING_H_
 
-#include "../common/neuron-typedefs.h"
-#include "../common/in_spikes.h"
+#include <neuron-typedefs.h>
+#include <in_spikes.h>
 
 bool spike_processing_initialise(
     size_t row_max_n_bytes, uint mc_packet_callback_priority,

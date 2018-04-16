@@ -1,9 +1,9 @@
 #ifndef _SYNAPSE_DYNAMICS_H_
 #define _SYNAPSE_DYNAMICS_H_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_row.h"
-#include "../../common/sp_structs.h"
+#include <neuron-typedefs.h>
+#include <synapse_row.h>
+#include <sp_structs.h>
 
 address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,

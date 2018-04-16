@@ -25,8 +25,8 @@
 #ifndef _DECAY_H_
 #define _DECAY_H_
 
-#include "../common/maths-util.h"
-#include "../common/neuron-typedefs.h"
+#include <maths-util.h>
+#include <neuron-typedefs.h>
 
 //! this is a redefine of the ufract into a decay for easier conversions in
 //! the future if the type is redefined
