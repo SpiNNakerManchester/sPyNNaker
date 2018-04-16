@@ -73,7 +73,7 @@ def test_real_list():
     spec_writer = FileDataWriter("test.dat")
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
-        value = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        value = range(10)
         param = NeuronParameter(value, DataType.S1615)
         iterator = param.iterator_by_slice(0, 5, spec)
         values = _iterate_parameter_values(iterator, DataType.S1615)
