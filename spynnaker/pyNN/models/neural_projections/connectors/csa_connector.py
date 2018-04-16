@@ -151,7 +151,6 @@ class CSAConnector(AbstractConnector):
         return block
 
     def show_connection_set(self):
-        print 'full_connection_set: ', self._full_connection_set
         csa.show(self._full_connection_set,
                  self._n_pre_neurons, self._n_post_neurons)
 
