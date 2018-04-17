@@ -85,7 +85,6 @@ else
     SYNAPSE_DYNAMICS := $(NEURON_MODIFIED_DIR)$(SYNAPSE_DYNAMICS)
 endif
 
-#TODO FIX
 ifdef WEIGHT_DEPENDENCE
     WEIGHT_DEPENDENCE := $(NEURON_MODIFIED_DIR)($(WEIGHT_DEPENDENCE)
     WEIGHT_DEPENDENCE_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)$%.o,$(WEIGHT_DEPENDENCE))
@@ -116,7 +115,7 @@ ifndef APP_OUTPUT_DIR
     APP_OUTPUT_DIR := $(abspath $(_CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
 endif
 
-NEURON_O = $(NEURON_MODIFIED_DIR)neuron.c
+NEURON_O = $(NEURON_BUILD_DIR)neuron.o
 
 SOURCES = $(COMMON_MODIFIED_DIR)out_spikes.c \
           $(NEURON_MODIFIED_DIR)c_main.c \
@@ -126,31 +125,12 @@ SOURCES = $(COMMON_MODIFIED_DIR)out_spikes.c \
           $(NEURON_MODIFIED_DIR)population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS)
 
-SYNAPSE_TYPE_SOURCES += $(NEURON_MODIFIED_DIR)c_main.c \
-                        $(NEURON_MODIFIED_DIR)synapses.c \
-                        $(NEURON_MODIFIED_DIR)spike_processing.c \
-                        $(NEURON_MODIFIED_DIR)population_table/population_table_fixed_impl.c \
-                        $(NEURON_MODIFIED_DIR)population_table/population_table_binary_search_impl.c \
-                        $(NEURON_MODIFIED_DIR)plasticity/synapse_dynamics_static_impl.c \
-                        $(SYNAPTOGENESIS_DYNAMICS)
-
-STDP_ENABLED = 0
-ifneq ($(SYNAPSE_DYNAMICS), $(NEURON_MODIFIED_DIR)/plasticity/synapse_dynamics_static_impl.c)
-    STDP += $(SYNAPSE_DYNAMICS) \
-            $(NEURON_MODIFIED_DIR)/plasticity/common/post_events.c \
-            $(SYNAPTOGENESIS_DYNAMICS)
-    STDP_ENABLED = 1
-endif
-
 # Convert the objs into the correct format to work here
 OBJECTS := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(SOURCES))
 OBJECTS := $(patsubst $(COMMON_MODIFIED_DIR)%.c,$(COMMON_BUILD_DIR)%.o,$(OBJECTS))
 
 #Build rules
 all: $(APP_OUTPUT_DIR)$(APP).aplx
-
-test: 
-	echo $(OBJECTS)
 
 # Copy the common files
 $(COMMON_DICT_FILE): $(COMMON_RAW_DIR)                                                                          # Extra tag as this is a library
@@ -168,14 +148,6 @@ $(NEURON_DICT_FILE): $(NEURON_RAW_DIR)
 $(NEURON_MODIFIED_DIR)%.c: $(NEURON_RAW_DIR)%.c
 	python -m spinn_utilities.make_tools.convertor $(NEURON_RAW_DIR) $(NEURON_MODIFIED_DIR) $(NEURON_DICT_FILE) 
 
-$(COMMON_BUILD_DIR)%.o: $(COMMON_MODIFIED_DIR)%.c
-	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $<
-
-$(NEURON_BUILD_DIR)%.o: $(NEURON_MODIFIED_DIR)%.c
-	# neuron build
-	-mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -o $@ $<
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
@@ -186,52 +158,83 @@ SHELL = bash
 APPLICATION_NAME_HASH = $(shell echo -n "$(APP)" | (md5sum 2>/dev/null || md5) | cut -c 1-8)
 
 CFLAGS += -Wall -Wextra -D$(FEC_DEBUG) -D$(PROFILER) $(OTIME) -DAPPLICATION_NAME_HASH=0x$(APPLICATION_NAME_HASH)
-
-include $(SPINN_DIRS)/make/Makefile.common
-
-# Tidy and cleaning dependencies
-clean:
-	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx
-	rm -rf $(COMMON_MODIFIED_DIR)
-	rm -rf $(NEURON_MODIFIED_DIR)
-
+CFLAGS += -I $(SPINN_DIRS)/include
 CFLAGS += -I $(COMMON_MODIFIED_DIR)
-
 INCLUDE_NEURON_HEADERS = -I $(NEURON_MODIFIED_DIR)
 INCLUDE_PLASTICITY_HEADERS = $(INCLUDE_NEURON_HEADERS) -I $(NEURON_MODIFIED_DIR)plasticity
 
-define synapse_type_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
-	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
-	        $$(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) \
-	        -DSTDP_ENABLED=$(STDP_ENABLED) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
-endef
-
-SYNAPSE_TYPE_COMPILE := $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
-$(NEURON_BUILD_DIR)c_main.o: $(NEURON_MODIFIED_DIR)c_main.c $(C_FILES_MODIFIED)
-	#c_main.c
+# Make sure build dir exists before building
+$(COMMON_BUILD_DIR):
 	-mkdir -p $(COMMON_BUILD_DIR)
+C_FILES_MODIFIED+= $(COMMON_BUILD_DIR)
+
+$(NEURON_BUILD_DIR):
+	-mkdir -p $(NEURON_BUILD_DIR)
+C_FILES_MODIFIED+= $(NEURON_BUILD_DIR)
+
+# Simple build rules
+$(COMMON_BUILD_DIR)%.o: $(COMMON_MODIFIED_DIR)%.c $(C_FILES_MODIFIED)
+	# Simple
+	$(CC) $(CFLAGS) -o $@ $<
+
+$(NEURON_BUILD_DIR)%.o: $(NEURON_MODIFIED_DIR)%.c $(C_FILES_MODIFIED)
+	# Simple
+	$(CC) $(CFLAGS) -o $@ $<
+
+# Synapese build rules
+SYNAPSE_TYPE_COMPILE := $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
+
+$(NEURON_BUILD_DIR)c_main.o: $(NEURON_MODIFIED_DIR)c_main.c $(C_FILES_MODIFIED) 
+	#c_main.c
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-define stdp_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
-                               $$(WEIGHT_DEPENDENCE_H) $$(TIMING_DEPENDENCE_H)
-	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
-	      $$(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) \
-	      -DSTDP_ENABLED=$(STDP_ENABLED) \
-	      -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) \
-	      -include $$(SYNAPSE_TYPE_H) \
-	      -include $$(WEIGHT_DEPENDENCE_H) \
-	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
-endef
+$(NEURON_BUILD_DIR)synapses.o: $(NEURON_MODIFIED_DIR)synapses.c $(C_FILES_MODIFIED) 
+	#synapses.c
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
+$(NEURON_BUILD_DIR)spike_processing.o: $(NEURON_MODIFIED_DIR)spike_processing.c $(C_FILES_MODIFIED) 
+	#spike_processing.c
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-#TODO FIX HERE
-#$(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
-#$(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
+$(NEURON_BUILD_DIR)population_table/population_table_fixed_impl.o: $(NEURON_MODIFIED_DIR)population_table/population_table_fixed_impl.c $(C_FILES_MODIFIED) 
+	#population_table/population_table_fixed_impln.c
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+$(NEURON_BUILD_DIR)population_table/population_table_binary_search_impl.o: $(NEURON_MODIFIED_DIR)population_table/population_table_binary_search_impl.c $(C_FILES_MODIFIED) 
+	#population_table/population_table_binary_search_impl
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+#STDP Build rules If and only if STDP used
+ifneq ($(SYNAPSE_DYNAMICS), $(NEURON_MODIFIED_DIR)/plasticity/synapse_dynamics_static_impl.c)
+	STDP_ENABLED = 1
+
+	STDP_INCLUDES:= $(INCLUDE_PLASTICITY_HEADERS) -include $(SYNAPSE_TYPE_H) -include $(WEIGHT_DEPENDENCE_H) -include $$(TIMING_DEPENDENCE_H)
+	STDP_COMPILE:= $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
+
+	SYNAPSE_DYNAMICS_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(SYNAPSE_DYNAMICS))
+
+	$(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS) $(C_FILES_MODIFIED) 
+		# $(SYNAPTOGENESIS_DYNAMICS)
+		$(STDP_COMPILE) -o $@ $<
+
+	SYNAPTOGENESIS_DYNAMICS_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(SYNAPTOGENESIS_DYNAMICS))
+
+	$(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS) $(C_FILES_MODIFIED) 
+		# $(SYNAPTOGENESIS_DYNAMICS) stdp
+		$(STDP_COMPILE) -o $@ $<
+
+	$(NEURON_BUILD_DIR)/plasticity/common/post_events.o: $(NEURON_MODIFIED_DIR)/plasticity/common/post_events.c
+		# plasticity/common/post_events.c
+else
+	STDP_ENABLED = 0
+
+	SYNAPTOGENESIS_DYNAMICS_O := $(patsubst $(NEURON_MODIFIED_DIR)%.c,$(NEURON_BUILD_DIR)%.o,$(SYNAPTOGENESIS_DYNAMICS))
+
+	$(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS) $(C_FILES_MODIFIED) 
+		# $(SYNAPTOGENESIS_DYNAMICS) SYNAPSE
+		$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+endif
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
@@ -263,3 +266,18 @@ $(NEURON_O): $(NEURON_MODEL)/neuron__modified/neuron.c $(NEURON_MODEL_H) \
 	      -include $(THRESHOLD_TYPE_H) \
 	      -include $(ADDITIONAL_INPUT_H) \
 	      -include $(SYNAPTOGENESIS_DYNAMICS_H) -o $@ $<
+
+include $(SPINN_DIRS)/make/Makefile.common
+
+# Tidy and cleaning dependencies
+clean:
+	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx
+	rm -rf $(COMMON_BUILD_DIR)
+	rm -rf $(NEURON_BUILD_DIR)
+	rm -rf $(COMMON_MODIFIED_DIR)
+	rm -rf $(NEURON_MODIFIED_DIR)
+
+test: 
+	echo $(CFLAGS)
+
+
