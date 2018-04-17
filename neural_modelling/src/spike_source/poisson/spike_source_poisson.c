@@ -5,7 +5,7 @@
  *
  */
 
-#include <maths-util.h>
+#include <common/maths-util.h>
 
 #include <data_specification.h>
 #include <recording.h>
@@ -318,7 +318,7 @@ static bool initialize(uint32_t *timer_period) {
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;
     }
-    
+
     if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))) {
         return false;

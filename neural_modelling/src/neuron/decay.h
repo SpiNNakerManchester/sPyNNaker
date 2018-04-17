@@ -25,8 +25,8 @@
 #ifndef _DECAY_H_
 #define _DECAY_H_
 
-#include <maths-util.h>
-#include <neuron-typedefs.h>
+#include <common/maths-util.h>
+#include <common/neuron-typedefs.h>
 
 //! this is a redefine of the ufract into a decay for easier conversions in
 //! the future if the type is redefined
@@ -96,15 +96,15 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
 #define decay(x, d) ({ \
     __typeof__(x) tmp = (x); \
     if (__builtin_types_compatible_p(__typeof__(x), s1615)) {\
-	tmp = decay_s1615(x, d); \
+    tmp = decay_s1615(x, d); \
     } else if (__builtin_types_compatible_p(__typeof__(x), u1616)) {\
-	tmp = decay_u1616(x, d); \
+    tmp = decay_u1616(x, d); \
     } else if (__builtin_types_compatible_p(__typeof__(x), s015)) {\
-	tmp = decay_s015(x, d); \
+    tmp = decay_s015(x, d); \
     } else if (__builtin_types_compatible_p(__typeof__(x), u016)) {\
-	tmp = decay_u016(x, d); \
+    tmp = decay_u016(x, d); \
     } else {\
-	abort(1); \
+    abort(1); \
     }\
     tmp; \
 })

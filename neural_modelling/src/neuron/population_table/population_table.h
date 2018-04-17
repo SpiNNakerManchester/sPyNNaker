@@ -1,7 +1,7 @@
 #ifndef _POPULATION_TABLE_H_
 #define _POPULATION_TABLE_H_
 
-#include <neuron-typedefs.h>
+#include <common/neuron-typedefs.h>
 
 //! \brief Sets up the table
 //! \param[in] table_address The address of the start of the table data

@@ -4,4 +4,4 @@ SOURCES = spike_source_poisson.c
 
 include ../../common.mk
 
-CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src/common
+CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src

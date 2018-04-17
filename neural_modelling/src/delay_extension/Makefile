@@ -4,4 +4,4 @@ SOURCES = delay_extension.c
 
 include ../common.mk
 
-CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src/common
+CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src

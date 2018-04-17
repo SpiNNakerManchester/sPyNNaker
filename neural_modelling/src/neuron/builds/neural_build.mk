@@ -64,11 +64,6 @@ endif
 
 SYNGEN_ENABLED = 1
 
-ifndef SYNAPTOGENESIS_DYNAMICS_H
-    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/synaptogenesis_dynamics.h
-    SYNGEN_ENABLED = 0
-endif
-
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNGEN_ENABLED = 0
@@ -101,17 +96,14 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
 endif
 
 include $(SPINN_DIRS)/make/FrontEndCommon.mk
-CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src/common
 FEC_OPT = $(OSPACE)
-
-INCLUDE_NEURON_HEADERS = -I $(NEURAL_MODELLING_DIRS)/src/neuron
-INCLUDE_PLASTICITY_HEADERS = $(INCLUDE_NEURON_HEADERS) -I $(NEURAL_MODELLING_DIRS)/src/neuron/plasticity
+CFLAGS += -I$(NEURAL_MODELLING_DIRS)/src
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
-	        $$(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) \
+	        $$(CFLAGS) \
 	        -DSTDP_ENABLED=$(STDP_ENABLED) \
 	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
 endef
@@ -121,7 +113,7 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
                                $$(WEIGHT_DEPENDENCE_H) $$(TIMING_DEPENDENCE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
-	      $$(CFLAGS) $(INCLUDE_PLASTICITY_HEADERS) \
+	      $$(CFLAGS) \
 	      -DSTDP_ENABLED=$(STDP_ENABLED) \
 	      -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) \
 	      -include $$(SYNAPSE_TYPE_H) \
@@ -135,14 +127,12 @@ $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        $(INCLUDE_PLASTICITY_HEADERS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"$(notdir $*.c)\" -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
-	        $(INCLUDE_PLASTICITY_HEADERS) \
 	        -include $(SYNAPSE_TYPE_H)\
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
@@ -155,10 +145,8 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	-mkdir -p $(dir $@)
 	$(CC) -D__FILE__=\"neuron.c\" -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
-	      $(INCLUDE_NEURON_HEADERS) \
 	      -include $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) \
-	      -include $(SYNAPTOGENESIS_DYNAMICS_H) -o $@ $<
+	      -include $(ADDITIONAL_INPUT_H) -o $@ $<

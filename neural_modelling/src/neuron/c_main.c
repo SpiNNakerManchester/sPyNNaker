@@ -15,13 +15,13 @@
  *
  */
 
-#include <in_spikes.h>
+#include <common/in_spikes.h>
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
-#include <synaptogenesis_dynamics.h>
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
 
 #include <data_specification.h>
@@ -289,7 +289,7 @@ void timer_callback(uint timer_count, uint unused) {
     uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
-	    ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
         update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
