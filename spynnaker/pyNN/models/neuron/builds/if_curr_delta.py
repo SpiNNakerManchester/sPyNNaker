@@ -5,12 +5,15 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 
+# global objects
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+
 
 class IFCurrDelta(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an instantaneous \
         current input
     """
-    _model_based_max_atoms_per_core = 255
+    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,

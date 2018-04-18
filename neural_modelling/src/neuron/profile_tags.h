@@ -1,4 +1,7 @@
 // Profiler tags
+#ifndef _PROFILE_TAGS_H_
+#define _PROFILE_TAGS_H_
+
 #define PROFILER_TIMER                    0
 #define PROFILER_SETUP_DMA                1
 #define PROFILER_INCOMING_SPIKE           2
@@ -10,3 +13,5 @@
 #define PROFILER_DMA_CALLBACK             8
 #define PROFILER_POP_TABLE_GET_FIRST      9
 #define PROFILER_POP_TABLE_GET_NEXT      10
+
+#endif // _PROFILE_TAGS_H_

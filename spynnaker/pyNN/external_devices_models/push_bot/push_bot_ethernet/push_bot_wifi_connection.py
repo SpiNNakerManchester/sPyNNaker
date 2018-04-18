@@ -8,6 +8,7 @@ import subprocess
 import socket
 import select
 import logging
+from six import raise_from
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +53,9 @@ class PushBotWIFIConnection(Connection, Listenable):
         try:
             # Create a TCP Socket
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except Exception as exception:
-            raise SpinnmanIOException(
-                "Error setting up socket: {}".format(exception))
+        except Exception as e:
+            raise_from(SpinnmanIOException(
+                "Error setting up socket: {}".format(e)), e)
 
         # Get the port to connect to
         self._remote_port = int(remote_port)
@@ -68,10 +69,10 @@ class PushBotWIFIConnection(Connection, Listenable):
             self._socket.connect((self._remote_ip_address, self._remote_port))
             logger.info("Succeeded in connecting to push bot via WIFI")
 
-        except Exception as exception:
-            raise SpinnmanIOException(
+        except Exception as e:
+            raise_from(SpinnmanIOException(
                 "Error binding socket to {}:{}: {}".format(
-                    self._remote_ip_address, self._remote_port, exception))
+                    self._remote_ip_address, self._remote_port, e)), e)
 
         # Get the details of where the socket is connected
         try:
@@ -82,9 +83,9 @@ class PushBotWIFIConnection(Connection, Listenable):
             # hostname
             if self._local_ip_address is None or self._local_ip_address == "":
                 self._local_ip_address = "0.0.0.0"
-        except Exception as exception:
-            raise SpinnmanIOException("Error querying socket: {}".format(
-                exception))
+        except Exception as e:
+            raise_from(SpinnmanIOException(
+                "Error querying socket: {}".format(e)), e)
 
         # Set a general timeout on the socket
         self._socket.settimeout(0)
@@ -168,7 +169,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         except socket.timeout:
             raise SpinnmanTimeoutException("receive", timeout)
         except Exception as e:
-            raise SpinnmanIOException(str(e))
+            raise_from(SpinnmanIOException(str(e)), e)
 
     def send(self, data):
         """ Send data down this connection
@@ -180,7 +181,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         try:
             self._socket.send(data)
         except Exception as e:
-            raise SpinnmanIOException(str(e))
+            raise_from(SpinnmanIOException(str(e)), e)
 
     def close(self):
         """ See\

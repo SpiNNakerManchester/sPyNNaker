@@ -27,7 +27,7 @@ class SpikeSourceArray(
     """ Model for play back of spikes
     """
 
-    _model_based_max_atoms_per_core = sys.maxint
+    _model_based_max_atoms_per_core = sys.maxsize
 
     # parameters expected by pynn
     default_parameters = {
@@ -199,7 +199,7 @@ class SpikeSourceArray(
                 SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value=sys.maxint):
+    def set_model_max_atoms_per_core(new_value=sys.maxsize):
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     @staticmethod
