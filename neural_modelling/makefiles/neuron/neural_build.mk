@@ -39,24 +39,12 @@ POPULATION_TABLE_IMPL := binary_search
 
 # Define the directories
 SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
+	# Ok to share modified files between builds
 MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
+	# Need to build each neuron seperately or complier gets confused
 BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
 APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../../spynnaker/pyNN/model_binaries/)
-LOG_DICT_FILE = $(APP_OUTPUT_DIR)/$(APP).dict
-
-## Variables used the converted version of the common files
-#COMMON_RAW_DIR := $(NEURAL_MODELLING_DIRS)/common/
-#COMMON_MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/common_modified/
-#COMMON_DICT_FILE := $(NEURAL_MODELLING_DIRS)/common_modified/common.dict
-# Add to list or prerequirements for rule to build o files
-#C_FILES_MODIFIED += $(COMMON_DICT_FILE)
-#NEURON_RAW_DIR := $(NEURAL_MODELLING_DIRS)/neuron/
-#NEURON_MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/neuron_modified/
-#NEURON_DICT_FILE := $(NEURAL_MODELLING_DIRS)/neuron_modified/neuron.dict
-# Add to list or prerequirements for rule to build o files
-#C_FILES_MODIFIED += $(NEURON_DICT_FILE)
-#locaTION FOR ELF AND OTHER FILES
-
+LOG_DICT_FILE := $(MODIFIED_DIR)log_dict.dict
 
 # Check required inputs and point them to modified sources
 ifndef ADDITIONAL_INPUT_H
@@ -113,8 +101,10 @@ endif
 SYNGEN_ENABLED = 1
 
 ifndef SYNAPTOGENESIS_DYNAMICS
-    SYNAPTOGENESIS_DYNAMICS = $(MODIFIED_DIR)neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS := $(MODIFIED_DIR)neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNGEN_ENABLED = 0
+else
+    SYNAPTOGENESIS_DYNAMICS := $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
 endif
 
 # List all the sources
@@ -161,7 +151,7 @@ $(BUILD_DIR)%.o: $(MODIFIED_DIR)%.c $(LOG_DICT_FILE)
 	$(CC) $(CFLAGS) -o $@ $<
 
 # Synapese build rules
-SYNAPSE_TYPE_COMPILE:= $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
+SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
 
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c $(LOG_DICT_FILE)
 	#c_main.c
@@ -277,6 +267,6 @@ clean:
 	rm -rf $(MODIFIED_DIR)
 
 test: 
-	# $(dir $(MAKEFILE_PATH))
-	# $(abspath $(dir $(MAKEFILE_PATH)))
+	# $(STDP_ENABLED)
+	# $(STDP_COMPILE)
 
