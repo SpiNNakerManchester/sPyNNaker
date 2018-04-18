@@ -6,12 +6,24 @@ endif
 ifndef NEURAL_MODELLING_DIRS
     $(error NEURAL_MODELLING_DIRS is not set.  Please define NEURAL_MODELLING_DIRS (possibly by running "source setup" in the sPyNNaker folder))
 endif
-
+#Check NEURAL_MODELLING_DIRS
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CHECK_PATH := $(NEURAL_MODELLING_DIRS)/src/common.mk
-ifneq ($(CHECK_PATH), $(MAKEFILE_PATH))
+ifneq ($(NEURAL_MODELLING_DIRS)/makefiles/common.mk, $(MAKEFILE_PATH))
     $(error Please check NEURAL_MODELLING_DIRS as based on that this file is at $(CHECK_PATH) when it is actually at $(MAKEFILE_PATH))
 endif
 
-include $(NEURAL_MODELLING_DIRS)/src/paths.mk
-include $(SPINN_DIRS)/make/FrontEndCommon.mk
+# APP name for a and dict files
+ifndef APP
+    $(error APP is not set.  Please define APP)
+endif
+
+# Define the directories
+SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
+MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
+BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
+APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../spynnaker/pyNN/model_binaries/)
+
+CFLAGS += -I $(MODIFIED_DIR)
+
+include $(SPINN_DIRS)/make/local.mk
+
