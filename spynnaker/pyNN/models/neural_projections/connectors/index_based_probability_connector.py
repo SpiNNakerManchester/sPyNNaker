@@ -50,8 +50,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
         self._probs = None
 
-    def _update_probs_from_index_expression(self, pre_vertex_slice,
-                                            post_vertex_slice):
+    def _update_probs_from_index_expression(self):
         # note: this only needs to be done once
         if self._probs is None:
             # numpy array of probabilities using the index_expression
@@ -62,6 +61,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
+        self._update_probs_from_index_expression()
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
@@ -75,8 +75,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
-        self._update_probs_from_index_expression(pre_vertex_slice,
-                                                 post_vertex_slice)
+        self._update_probs_from_index_expression()
         max_prob = numpy.amax(
             self._probs[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
         return utility_calls.get_probable_maximum_selected(
@@ -138,8 +137,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             synapse_type):
 
         # setup probs here
-        self._update_probs_from_index_expression(pre_vertex_slice,
-                                                 post_vertex_slice)
+        self._update_probs_from_index_expression()
 
         probs = self._probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].flatten()
