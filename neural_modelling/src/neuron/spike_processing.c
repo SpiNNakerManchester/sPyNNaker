@@ -1,8 +1,8 @@
 #include "spike_processing.h"
-#include "population_table.h"
+#include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
-#include "synaptogenesis_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -206,7 +206,7 @@ void _dma_complete_callback(uint unused, uint tag) {
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
         if (!synapses_process_synaptic_row(time, current_buffer->row,
-        	!subsequent_spikes, current_buffer_index)) {
+            !subsequent_spikes, current_buffer_index)) {
             log_error(
                 "Error processing spike 0x%.8x for address 0x%.8x"
                 "(local=0x%.8x)",

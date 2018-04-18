@@ -2,9 +2,9 @@
 #define _WEIGHT_MULTIPLICATIVE_IMPL_H_
 
 // Include generic plasticity maths functions
-#include <maths.h>
-#include <stdp_typedefs.h>
-#include <synapse_row.h>
+#include <neuron/plasticity/stdp/maths.h>
+#include <neuron/plasticity/stdp/stdp_typedefs.h>
+#include <neuron/synapse_row.h>
 
 #include <debug.h>
 
