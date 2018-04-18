@@ -1,12 +1,17 @@
 The c code has been changed in the following ways
 
 1. Many c and h files have been moved.
-    in most cases to a src folder next to their originakl location.
+    in most cases to a src folder next to their original location.
 
-2. neuron/src/... files and directories are jsut neuron/...
+2. src subfolder level under neuron has been removed
+    neuron/src/... files and directories are just neuron/...
+    for example sPyNNaker/neural_modelling/src/spike_source/poisson/Makefile
+        is now sPyNNaker/neural_modelling/spike_source/poisson/Makefile
 
 3. All the indirect relative includes .. patterns have been replaced with <xyz> includes
-3a. Some h files have been moved up to either neuron or neuron/plasticy
+3a. Some h files have been moved up to either
+    neural_modelling/neuron or
+    neural_modelling/neuron/plasticy
 3b. Make files have been updated to add extra -I flags to find these includes
 3c. The only "xyz" includes should be for direct sibling files
 
@@ -16,5 +21,21 @@ This because the log_error(  convertor can only handle direct Strings not parame
 
 5. neural_modelling/src/neuron/builds/ are now neural_modelling/neuron_make_files/
 
-6. makefiles have been simplified
+6. The paths in the neuron make files should now be relative to
+        sPyNNaker/neural_modelling/neuron
+    -these included NEURON_MODE, NEURON_MODEL_H, INPUT_TYPE_H,
+        THRESHOLD_TYPE_H, SYNAPSE_TYPE_H, SYNAPSE_DYNAMICS, TIMING_DEPENDENCE,
+        TIMING_DEPENDENCE_H, WEIGHT_DEPENDENCE and WEIGHT_DEPENDENCE_H
+    -for example NEURON_MODEL = $(SOURCE_DIR)/neuron/models/neuron_model_lif_impl.c
+        is now just NEURON_MODEL = models/neuron_model_lif_impl.c
+    -They will automatically be converted
+        placed in sPyNNaker/neural_modelling/neuron_modifed and built from there
 
+7. shared makefiles have been simplified
+    (More verbose but hopefully easier to understand)
+    -multipe files have been combined
+    -define rules have been replaced by explicit ones
+    -Variable defintion is done as late as possible
+    -FrontEndCommonx.mk is no longer used
+        -replaced by local.mk for non neuron builds
+        -merged into neural_build.mk for neuron builds

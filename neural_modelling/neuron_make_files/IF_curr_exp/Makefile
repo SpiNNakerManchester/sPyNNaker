@@ -7,4 +7,4 @@ THRESHOLD_TYPE_H = threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = synapse_types/synapse_types_exponential_impl.h
 SYNAPSE_DYNAMICS = plasticity/synapse_dynamics_static_impl.c
 
-include ../common.mk
+include ../neural_build.mk

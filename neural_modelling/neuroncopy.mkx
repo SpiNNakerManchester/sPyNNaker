@@ -1,0 +1,36 @@
+_NEURON_SRC_DIR =  $(NEURAL_MODELLING_DIRS)/src/neuron/
+NEURON_MODIFIED_DIR =  $(NEURAL_MODELLING_DIRS)/src/neuron_modified/
+
+_NEURON_RAW_FILES = $(shell find $(NEURAL_MODELLING_DIRS)/src/neuron -name '*.c')
+_NEURON_RAW_FILES += $(shell find $(NEURAL_MODELLING_DIRS)/src/neuron -name '*.h')
+
+_NEURON_MODIFIED_FILES = $(_NEURON_RAW_FILES)
+$(eval _NEURON_MODIFIED_FILES := $(_NEURON_MODIFIED_FILES:$(_NEURON_SRC_DIR)%=$(NEURON_MODIFIED_DIR)%))
+
+_NEURON_DICT_FILES = $(sort $(RAW_FILES))
+$(eval _NEURON_DICT_FILES := $(_NEURON_DICT_FILES:$(_NEURON_SRC_DIR)%.c=$(NEURON_MODIFIED_DIR)%.cdict))
+$(eval _NEURON_DICT_FILES := $(_NEURON_DICT_FILES:$(_NEURON_SRC_DIR)%.h=$(NEURON_MODIFIED_DIR)%.hdict))
+
+_NEURON_DICT_FILE =  $(NEURON_MODIFIED_DIR)neuron.dict
+
+$(NEURON_MODIFIED_DIR): $(_NEURON_FILES) $(_NEURON_DICT_FILE)
+
+
+_NEURON_RANGE_FILE = $(abspath $(NEURON_MODIFIED_DIR))/log_ranges.txt
+# sPyNNaker/neural_modelling/src/common is 3000 range
+_NEURON_RANGE_START = 4000
+
+# Rule to create all the modified c files
+$(NEURON_MODIFIED_DIR)%.c $(NEURON_MODIFIED_DIR)%.cdict: $(_NEURON_SRC_DIR)%.c
+	python -m spinn_utilities.make_tools.file_convertor $< $(NEURON_MODIFIED_DIR)$*.c $(_NEURON_RANGE_FILE) $(_NEURON_RANGE_START)
+
+# Rule to create all the modified h files
+$(NEURON_MODIFIED_DIR)%.h $(NEURON_MODIFIED_DIR)%.hdict: $(_NEURON_SRC_DIR)%.h
+	python -m spinn_utilities.make_tools.file_convertor $< $(NEURON_MODIFIED_DIR)$*.h $(_NEURON_RANGE_FILE) $(_NEURON_R
+
+# At the end we want all the dict files merged
+$(_NEURON_DICT_FILE): $(_NEURON_DICT_FILES)
+	head -n 2 $(firstword $(_NEURON_DICT_FILES)) > $(_NEURON_DICT_FILE)
+	$(foreach dict, $(_NEURON_DICT_FILES), tail -n+3 $(dict) >> $(_NEURON_DICT_FILE);)
+
+NEURON_PRECIOUS := $(_MODIFIED_FILES) $(_NEURON_DICT_FILES) $(_NEURON_DICT_FILE)
