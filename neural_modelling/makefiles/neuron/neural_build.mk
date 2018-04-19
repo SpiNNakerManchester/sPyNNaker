@@ -143,6 +143,7 @@ APPLICATION_NAME_HASH = $(shell echo -n "$(APP)" | (md5sum 2>/dev/null || md5) |
 CFLAGS += -Wall -Wextra -D$(FEC_DEBUG) -D$(PROFILER) $(OTIME) -DAPPLICATION_NAME_HASH=0x$(APPLICATION_NAME_HASH)
 CFLAGS += -I $(SPINN_DIRS)/include
 CFLAGS += -I $(MODIFIED_DIR)
+FEC_OPT = $(OSPACE)
 
 # Simple build rules
 $(BUILD_DIR)%.o: $(MODIFIED_DIR)%.c $(LOG_DICT_FILE)
