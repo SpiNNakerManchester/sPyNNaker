@@ -54,10 +54,10 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         # note: this only needs to be done once
         if self._probs is None:
             # numpy array of probabilities using the index_expression
-            self._probs = numpy.array([[_index_expr_context.eval(
-                self._index_expression, i=i, j=j)
-                for j in range(self._n_post_neurons)]
-                for i in range(self._n_pre_neurons)])
+            self._probs = numpy.fromfunction(
+                lambda i, j: _index_expr_context.eval(
+                    self._index_expression, i=i, j=j),
+                (self._n_pre_neurons, self._n_post_neurons))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
@@ -140,7 +140,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         self._update_probs_from_index_expression()
 
         probs = self._probs[
-            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].flatten()
+            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
 
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
