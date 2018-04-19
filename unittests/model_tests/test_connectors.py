@@ -1,3 +1,4 @@
+from __future__ import print_function
 from pacman.model.graphs.common.slice import Slice
 import numpy
 import pytest
@@ -143,11 +144,11 @@ def test_connectors(
             assert matrix_max_weight <= max_weight
             assert matrix_max_delay <= max_delay
         except Exception:
-            print connector.__class__.__name__
-            print max_row_length, max(source_histogram), source_histogram
-            print max_col_length, max(target_histogram), target_histogram
-            print max_weight, matrix_max_weight, synaptic_block["weight"]
-            print max_delay, matrix_max_delay, synaptic_block["delay"]
+            print(connector.__class__.__name__)
+            print(max_row_length, max(source_histogram), source_histogram)
+            print(max_col_length, max(target_histogram), target_histogram)
+            print(max_weight, matrix_max_weight, synaptic_block["weight"])
+            print(max_delay, matrix_max_delay, synaptic_block["delay"])
             raise
-    print (connector.__class__.__name__, n_pre, n_post, max_row_length,
-           max_source, max_col_length, max_target)
+    print(connector.__class__.__name__, n_pre, n_post, max_row_length,
+          max_source, max_col_length, max_target)

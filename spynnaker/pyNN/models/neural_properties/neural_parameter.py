@@ -1,9 +1,10 @@
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
+from six import Iterator
 
 
-class _Range_Iterator(object):
+class _Range_Iterator(Iterator):
     __slots__ = [
         "_cmd_pair",
         "_datatype",
@@ -13,8 +14,7 @@ class _Range_Iterator(object):
         "_stop_range"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """
-        Iterator over a RangedList which is range based
+        """ Iterator over a RangedList which is range based
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -34,20 +34,20 @@ class _Range_Iterator(object):
         self._spec = spec
         self._cmd_pair = (None, None)
 
-    def next(self):
+    def __next__(self):
         # We pre-update the index here as the first value in the range
         # was done at the last iteration, or else this is the first iteration
         # and we need to force the iterator to be called
         self._index += 1
         if self._index < self._stop_range:
             return self._cmd_pair
-        (self._index, self._stop_range, current) = self._iterator.next()
+        (self._index, self._stop_range, current) = next(self._iterator)
         self._cmd_pair = self._spec.create_cmd(
             data=current, data_type=self._datatype)
         return self._cmd_pair
 
 
-class _Get_Iterator(object):
+class _Get_Iterator(Iterator):
     __slots__ = [
         "_datatype",
         "_index",
@@ -56,8 +56,7 @@ class _Get_Iterator(object):
         "_value"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """
-        Iterator over a standard collection that supports __getitem__
+        """ Iterator over a standard collection that supports __getitem__
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -73,7 +72,7 @@ class _Get_Iterator(object):
         self._slice_stop = slice_stop
         self._spec = spec
 
-    def next(self):
+    def __next__(self):
         if self._index >= self._slice_stop:
             raise StopIteration
         cmd_pair = self._spec.create_cmd(
@@ -82,18 +81,18 @@ class _Get_Iterator(object):
         return cmd_pair
 
 
-class _SingleValue_Iterator(object):
+class _SingleValue_Iterator(Iterator):
     __slots__ = [
         "_cmd_pair",
         "_index",
         "_stop"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """
-        Iterator that repeats the single values the required number of times
+        """ Iterator that repeats the single values the required number of\
+            times.
 
         Allows a single Value parameter to be treated the same as parameters\
-        with len
+        with len. \
         Caches cmd_word_list and cmd_string so they are only created once.
 
         :param value: The list or Abstract list holding the data
@@ -108,7 +107,7 @@ class _SingleValue_Iterator(object):
         self._index = slice_start
         self._stop = slice_stop
 
-    def next(self):
+    def __next__(self):
         if self._index >= self._stop:
             raise StopIteration
         self._index += 1

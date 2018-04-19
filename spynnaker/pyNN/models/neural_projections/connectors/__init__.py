@@ -1,5 +1,6 @@
 from .abstract_connector import AbstractConnector
 from .all_to_all_connector import AllToAllConnector
+from .array_connector import ArrayConnector
 from .distance_dependent_probability_connector \
     import DistanceDependentProbabilityConnector
 from .fixed_number_post_connector import FixedNumberPostConnector
@@ -12,7 +13,7 @@ from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 
-__all__ = ["AbstractConnector", "AllToAllConnector",
+__all__ = ["AbstractConnector", "AllToAllConnector", "ArrayConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector", "FromListConnector",
