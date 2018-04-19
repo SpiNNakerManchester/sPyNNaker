@@ -5,7 +5,7 @@ import pytest
 import functools
 from spynnaker.pyNN.models.neural_projections.connectors \
     import FixedNumberPreConnector, FixedNumberPostConnector, \
-    FixedProbabilityConnector
+    FixedProbabilityConnector, IndexBasedProbabilityConnector
 from unittests.mocks import MockSimulator, MockPopulation
 
 
@@ -36,7 +36,9 @@ def n_in_slice(request):
         functools.partial(FixedNumberPreConnector, 20, with_replacement=True),
         functools.partial(FixedNumberPostConnector, 20, with_replacement=True),
         functools.partial(FixedProbabilityConnector, 0.1),
-        functools.partial(FixedProbabilityConnector, 0.5)],
+        functools.partial(FixedProbabilityConnector, 0.5),
+        functools.partial(IndexBasedProbabilityConnector,
+                          "1 / sqrt(((i + 1) ** 2) + ((j + 1) ** 2))")],
     ids=[
         "FixedNumberPreConnector1-",
         "FixedNumberPostConnector1-",
@@ -47,7 +49,8 @@ def n_in_slice(request):
         "FixedNumberPreConnector20Replace-",
         "FixedNumberPreConnector20Replace-",
         "FixedProbabilityConnector0.1-",
-        "FixedProbabilityConnector0.5-"]
+        "FixedProbabilityConnector0.5-",
+        "IndexBasedProbabilityConnector"]
     )
 def create_connector(request):
     return request.param
@@ -147,5 +150,5 @@ def test_connectors(
             print(max_weight, matrix_max_weight, synaptic_block["weight"])
             print(max_delay, matrix_max_delay, synaptic_block["delay"])
             raise
-    print(connector.__class__.__name__, max_row_length, max_source,
-          max_col_length, max_target)
+    print(connector.__class__.__name__, n_pre, n_post, max_row_length,
+          max_source, max_col_length, max_target)
