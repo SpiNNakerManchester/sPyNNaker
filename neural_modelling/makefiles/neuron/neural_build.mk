@@ -163,16 +163,15 @@ all: $(APP_OUTPUT_DIR)$(APP).aplx
 
 include $(SPINN_DIRS)/make/Makefile.common
 
-# TODO may need a fourth pthyon parameter
 # Rules to convert the source files
-$(MODIFIED_DIR)%.c: $(SRC_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(C_FILES_MODIFIED) 
+$(MODIFIED_DIR)%.c: $(SRC_DIR)%.c                                                                  # Intentionally a STRING not a variable
+	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
 $(MODIFIED_DIR)%.h: $(SRC_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(C_FILES_MODIFIED) 
+	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
 $(LOG_DICT_FILE): $(SRC_DIR)
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(C_FILES_MODIFIED) 
+	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
