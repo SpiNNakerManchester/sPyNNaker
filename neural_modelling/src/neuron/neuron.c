@@ -10,7 +10,7 @@
 #include <string.h>
 
 // declare spin1_wfi
-void spin1_wfi();
+//void spin1_wfi();
 
 //! The key to be used for this core (will be ORed with neuron id)
 static key_t key;
@@ -18,6 +18,12 @@ static key_t key;
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.
 static bool use_key;
+
+//! The number of neurons on the core
+static uint32_t n_neurons;
+
+//! The recording flags
+static uint32_t recording_flags;
 
 //! The number of clock ticks to back off before starting the timer, in an
 //! attempt to avoid overloading the network
@@ -76,7 +82,7 @@ bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // call the neuron implementation functions to do the work
-    neuron_impl_load_neuron_parameters(address, next);
+    neuron_impl_load_neuron_parameters(address, next, n_neurons);
     neuron_impl_set_global_neuron_parameters();
 
     return true;
@@ -152,9 +158,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     recording_flags = recording_flags_param;
 
     // Set up the out spikes array
-    size_t spike_size = neuron_impl_spike_size();
+   // size_t spike_size = neuron_impl_spike_size(n_neurons);
 
-    if (!out_spikes_initialize(spike_size)) {
+    if (!out_spikes_initialize(neuron_impl_spike_size(n_neurons))) {
         return false;
     }
 
@@ -172,7 +178,7 @@ void neuron_store_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // call neuron implementation function to do the work
-    neuron_impl_store_neuron_parameters(address, next);
+    neuron_impl_store_neuron_parameters(address, next, n_neurons);
 }
 
 //! \setter for the internal input buffers
@@ -198,7 +204,7 @@ void neuron_do_timestep_update(timer_t time) {
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
 
-    // Reset the out spikes before starting if a beginning of recording
+    // Reset the out spikes before starting if at beginning of recording
     neuron_impl_wait_for_recordings_and_reset_out_spikes();
 
     // update each neuron individually

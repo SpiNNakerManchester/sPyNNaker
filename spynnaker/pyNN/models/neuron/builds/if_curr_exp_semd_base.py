@@ -13,6 +13,7 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 _apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
+
 class IFCurrExpSEMDBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input, where the excitatory input depends upon the inhibitory
@@ -59,9 +60,8 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
                                           inh_input_previous)
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_exp_sEMD.aplx",
-            label=label,
+        super(IFCurrExpSEMDBase, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_exp_sEMD.aplx", label=label,
             max_atoms_per_core=IFCurrExpSEMDBase.
             _model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,

@@ -17,7 +17,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons);
 static void neuron_impl_initialise_recording(uint32_t n_neurons);
 
 //! \brief return value for spike size
-static size_t neuron_impl_spike_size();
+static size_t neuron_impl_spike_size(uint32_t n_neurons);
 
 //! \brief Add inputs as required to the implementation
 //! \param[in] synapse_type_index the synapse type (exc. or inh.)
@@ -30,7 +30,8 @@ static void neuron_impl_add_inputs(
 
 //! \brief Load in the neuron parameters
 //! \return None
-static void neuron_impl_load_neuron_parameters(address_t address, uint32_t next);
+static void neuron_impl_load_neuron_parameters(
+		address_t address, uint32_t next, uint32_t n_neurons);
 
 //! \brief Wrapper to set global neuron parameters
 //! \return None
@@ -64,7 +65,8 @@ static void neuron_impl_do_recording(timer_t time); //, uint32_t recording_flags
 static void neuron_impl_record_spikes(timer_t time);
 
 //! \brief Store the neuron parameters
-static void neuron_impl_store_neuron_parametrs(address_t address, uint32_t next);
+static void neuron_impl_store_neuron_parametrs(
+		address_t address, uint32_t next, uint32_t n_neurons);
 
 //! \brief Get the membrange voltage
 //! \return The membrane voltage value

@@ -57,12 +57,6 @@ static threshold_type_pointer_t threshold_type_array;
 //! Global parameters for the neurons
 static global_neuron_params_pointer_t global_parameters;
 
-//! The number of neurons on the core
-static uint32_t n_neurons;
-
-//! The recording flags
-static uint32_t recording_flags;
-
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
@@ -293,7 +287,7 @@ static void neuron_impl_initialise_recording(uint32_t n_neurons)
 }
 
 //! \brief return value for spike size
-static size_t neuron_impl_spike_size()
+static size_t neuron_impl_spike_size(uint32_t n_neurons)
 {
 	size_t spike_size;
 
@@ -321,7 +315,8 @@ static void neuron_impl_add_inputs(
 
 //! \bried Load in the neuron parameters
 //! \return None
-static void neuron_impl_load_neuron_parameters(address_t address, uint32_t next)
+static void neuron_impl_load_neuron_parameters(
+		address_t address, uint32_t next, uint32_t n_neurons)
 {
     log_debug("writing parameters, next is %u ", next);
 
@@ -498,8 +493,9 @@ static void neuron_impl_print_parameters(index_t neuron_index)
 
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store
-static void neuron_impl_store_neuron_parameters(address_t address, uint32_t next){
-
+static void neuron_impl_store_neuron_parameters(
+		address_t address, uint32_t next, uint32_t n_neurons)
+{
     log_debug("writing parameters");
 
     log_debug("writing global recording parameters");

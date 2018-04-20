@@ -73,9 +73,9 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return [
             NeuronParameter(
-                self._data[E_REV_E], _CONDUCTANTCE_TYPES.E_REV_E.data_type),
+                self._data[E_REV_E], _CONDUCTANCE_TYPES.E_REV_E.data_type),
             NeuronParameter(
-                self._data[E_REV_I], _CONDUCTANTCE_TYPES.E_REV_I.data_type)
+                self._data[E_REV_I], _CONDUCTANCE_TYPES.E_REV_I.data_type)
         ]
 
     def get_input_type_parameter_types(self):
