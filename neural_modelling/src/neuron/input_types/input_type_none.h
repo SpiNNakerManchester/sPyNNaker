@@ -7,7 +7,7 @@ typedef struct input_type_t {
 } input_type_t;
 
 static input_t input_type_get_input_value(
-    input_t value, input_type_pointer_t input_type)
+    input_t* value, input_type_pointer_t input_type)
 {
 	use(value);
 	use(input_type);
@@ -15,7 +15,7 @@ static input_t input_type_get_input_value(
 }
 
 static void input_type_set_inhibitory_multiplicator_value(
-		input_t value, input_type_pointer_t input_type, input_t inh_input)
+		input_t* value, input_type_pointer_t input_type, input_t* inh_input)
 {
 	use(value);
 	use(input_type);
@@ -23,7 +23,7 @@ static void input_type_set_inhibitory_multiplicator_value(
 }
 
 static input_t input_type_convert_excitatory_input_to_current(
-    input_t exc_input, input_type_pointer_t input_type,
+    input_t* exc_input, input_type_pointer_t input_type,
     state_t membrane_voltage)
 {
 	use(exc_input);
@@ -33,7 +33,7 @@ static input_t input_type_convert_excitatory_input_to_current(
 }
 
 static input_t input_type_convert_inhibitory_input_to_current(
-    input_t inh_input, input_type_pointer_t input_type,
+    input_t* inh_input, input_type_pointer_t input_type,
     state_t membrane_voltage)
 {
 	use(inh_input);

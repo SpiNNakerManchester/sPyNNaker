@@ -1,26 +1,27 @@
 # Imports
 import numpy as np
 import sys
+# pylint: disable=consider-using-enumerate
 
 try:
     import matplotlib.pyplot as plt
     matplotlib_missing = False
-except Exception as e:
+except ImportError:
     matplotlib_missing = True
 
 
 def _precheck(data, title):
-    if data is None or len(data) == 0:
+    if not len(data):
         if title is None:
-            print "NO Data"
+            print("NO Data")
         else:
-            print "NO data for " + title
+            print("NO data for " + title)
         return False
     if matplotlib_missing:
         if title is None:
-            print "matplotlib not installed skipping plotting"
+            print("matplotlib not installed skipping plotting")
         else:
-            print "matplotlib not installed skipping plotting for " + title
+            print("matplotlib not installed skipping plotting for " + title)
         return False
     return True
 
@@ -28,17 +29,16 @@ def _precheck(data, title):
 def line_plot(data_sets, title=None):
     if not _precheck(data_sets, title):
         return
-    print ("Setting up line graph")
+    print("Setting up line graph")
     if isinstance(data_sets, np.ndarray):
         data_sets = [data_sets]
 
-    print "Setting up {} sets of line plots".format(len(data_sets))
+    print("Setting up {} sets of line plots".format(len(data_sets)))
     (numrows, numcols) = grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
         plt.subplot(numrows, numcols, index+1)
-        neurons = np.unique(data[:, 0])
-        for neuron in neurons:
+        for neuron in np.unique(data[:, 0]):
             time = [i[1] for i in data if i[0] == neuron]
             membrane_voltage = [i[2] for i in data if i[0] == neuron]
             plt.plot(time, membrane_voltage)
@@ -59,7 +59,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
     if isinstance(data_sets, np.ndarray):
         data_sets = [data_sets]
 
-    print "Setting up {} sets of heat graph".format(len(data_sets))
+    print("Setting up {} sets of heat graph".format(len(data_sets)))
     (numrows, numcols) = grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
@@ -99,7 +99,7 @@ def grid(length):
         return (1, 3)
     if length == 4:
         return (2, 2)
-    return (length / 3 + 1, length % 3 + 1)
+    return (length // 3 + 1, length % 3 + 1)
 
 
 def plot_spikes(spikes, title="spikes"):
@@ -115,12 +115,12 @@ def plot_spikes(spikes, title="spikes"):
 
     colours = get_colour()
 
-    minTime = sys.maxint
+    minTime = sys.maxsize
     maxTime = 0
-    minSpike = sys.maxint
+    minSpike = sys.maxsize
     maxSpike = 0
 
-    print "Plotting {} set of spikes".format(len(spikes))
+    print("Plotting {} set of spikes".format(len(spikes)))
     (numrows, numcols) = grid(len(spikes))
     for index in range(len(spikes)):
         plt.subplot(numrows, numcols, index+1)
@@ -131,7 +131,7 @@ def plot_spikes(spikes, title="spikes"):
         maxTime = max(maxTime, max(spike_time))
         minSpike = min(minSpike, min(spike_id))
         maxSpike = max(maxSpike, max(spike_id))
-        plt.plot(spike_time, spike_id, colours.next(), )
+        plt.plot(spike_time, spike_id, next(colours), )
     plt.xlabel("Time (ms)")
     plt.ylabel("Neuron ID")
     plt.title(title)
@@ -147,9 +147,9 @@ def plot_spikes(spikes, title="spikes"):
 
 # This is code for manual testing.
 if __name__ == "__main__":
-    spikes = np.loadtxt("spikes.csv", delimiter=',')
-    plot_spikes(spikes)
-    double = np.loadtxt("spikes.csv", delimiter=',')
-    for i in range(len(double)):
-        double[i][0] = double[i][0] + 5
-    plot_spikes([spikes, double])
+    spike_data = np.loadtxt("spikes.csv", delimiter=',')
+    plot_spikes(spike_data)
+    doubled_spike_data = np.loadtxt("spikes.csv", delimiter=',')
+    for _i in range(len(doubled_spike_data)):
+        doubled_spike_data[_i][0] = doubled_spike_data[_i][0] + 5
+    plot_spikes([spike_data, doubled_spike_data])

@@ -24,8 +24,8 @@ class FakeHBPPortalMachineProvider(object):
                 'machine_name': "BOB"}
 
     def destroy(self):
-        print "PORTAL DESTROYED!!!!"
+        print("PORTAL DESTROYED!")
 
     def wait_till_not_ready(self):
-        while(True):
+        while True:
             pass

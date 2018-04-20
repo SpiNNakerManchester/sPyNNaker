@@ -42,7 +42,7 @@ typedef enum parameters_in_neuron_parameter_data_region {
 static inline void _print_neuron_state_variables() {
 
 //! only if the models are compiled in debug mode will this method contain
-//! said lines.
+//! said lines
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -88,7 +88,7 @@ bool _neuron_load_neuron_parameters(address_t address){
 //! \return bool which is true if the reload of the neuron parameters was
 //! successful or not
 bool neuron_reload_neuron_parameters(address_t address){
-    log_info("neuron_reloading_neuron_parameters: starting");
+    log_debug("neuron_reloading_neuron_parameters: starting");
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
@@ -107,11 +107,11 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size) {
-    log_info("neuron_initialise: starting");
+    log_debug("neuron_initialise: starting");
 
     random_backoff = address[RANDOM_BACKOFF];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
-    log_info(
+    log_debug(
         "\t back off = %u, time between spikes %u",
         random_backoff, time_between_spikes);
 
@@ -123,12 +123,10 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     // output if this model is expecting to transmit
     if (!use_key){
-        log_info("\tThis model is not expecting to transmit as it has no key");
+        log_debug("\tThis model is not expecting to transmit as it has no key");
+    } else{
+        log_debug("\tThis model is expected to transmit with key = %08x", key);
     }
-    else{
-        log_info("\tThis model is expected to transmit with key = %08x", key);
-    }
-
 
     // Read the neuron details
     n_neurons = address[N_NEURONS_TO_SIMULATE];  // is this still going to be here?
@@ -137,23 +135,30 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
-    log_info("\t n_neurons = %u, spike buffer size = %u", n_neurons,
+    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
             *incoming_spike_buffer_size);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
-    bool test = neuron_impl_initialise(n_neurons);
+    if (!neuron_impl_initialise(n_neurons)) {
+    	return false;
+    }
 
     // load the data into the allocated DTCM spaces.
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
 
+    neuron_impl_reset_record_counter();
+    recording_flags = recording_flags_param;
+
     // Set up the out spikes array
-    if (!out_spikes_initialize(n_neurons)) {
+    size_t spike_size = neuron_impl_spike_size();
+
+    if (!out_spikes_initialize(spike_size)) {
         return false;
     }
 
-    recording_flags = recording_flags_param;
+    neuron_impl_initialise_recording(n_neurons);
 
     _print_neuron_parameters();
 
@@ -167,7 +172,7 @@ void neuron_store_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     // call neuron implementation function to do the work
-    neuron_impl_load_neuron_parameters(address, next);
+    neuron_impl_store_neuron_parameters(address, next);
 }
 
 //! \setter for the internal input buffers
@@ -193,14 +198,8 @@ void neuron_do_timestep_update(timer_t time) {
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
 
-    // Wait until recordings have completed, to ensure the recording space
-    // can be re-written
-    while (n_recordings_outstanding > 0) {
-        spin1_wfi();
-    }
-
-    // Reset the out spikes before starting
-    out_spikes_reset();
+    // Reset the out spikes before starting if a beginning of recording
+    neuron_impl_wait_for_recordings_and_reset_out_spikes();
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -232,7 +231,7 @@ void neuron_do_timestep_update(timer_t time) {
         } else {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
-        }
+         }
     }
 
     // Disable interrupts to avoid possible concurrent access
@@ -240,11 +239,14 @@ void neuron_do_timestep_update(timer_t time) {
     cpsr = spin1_int_disable();
 
     // now call the neuron implementation function to do required recording
-    neuron_impl_do_recording(time, recording_flags);
+    neuron_impl_do_recording(time); //, recording_flags);
 
     // do logging stuff if required
     out_spikes_print();
     _print_neuron_state_variables();
+
+    // order seems to be important for some reason
+    neuron_impl_record_spikes(time);
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);

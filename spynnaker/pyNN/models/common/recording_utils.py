@@ -1,10 +1,11 @@
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
-from spynnaker.pyNN.exceptions import MemReadException
-
+from __future__ import division
 import struct
 import logging
 import numpy
+
+from spinn_front_end_common.utilities.helpful_functions \
+    import locate_memory_region_for_placement
+from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
@@ -27,10 +28,10 @@ def get_data(transceiver, placement, region, region_size):
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written_buf = buffer(transceiver.read_memory(
-        placement.x, placement.y, region_base_address, 4))
     number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        number_of_bytes_written_buf)[0]
+        transceiver.read_memory(
+            placement.x, placement.y, region_base_address,
+            _RECORDING_COUNT.size))[0]
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - _RECORDING_COUNT.size
@@ -56,20 +57,18 @@ def pull_off_cached_lists(no_loads, cache_file):
     cache_file.seek(0)
     if no_loads == 1:
         values = numpy.load(cache_file)
-
         # Seek to the end of the file (for windows compatibility)
         cache_file.seek(0, 2)
         return values
     elif no_loads == 0:
         return []
-    else:
-        lists = list()
-        for _ in range(0, no_loads):
-            lists.append(numpy.load(cache_file))
 
-        # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, 2)
-        return numpy.concatenate(lists)
+    lists = list()
+    for _ in range(0, no_loads):
+        lists.append(numpy.load(cache_file))
+    # Seek to the end of the file (for windows compatibility)
+    cache_file.seek(0, 2)
+    return numpy.concatenate(lists)
 
 
 def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
@@ -90,3 +89,13 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
     if buffer_max < space_needed:
         return buffer_max
     return space_needed
+
+
+def make_missing_string(missing):
+    missing_str = ""
+    separator = ""
+    for placement in missing:
+        missing_str += "{}({}, {}, {})".format(
+            separator, placement.x, placement.y, placement.p)
+        separator = "; "
+    return missing_str

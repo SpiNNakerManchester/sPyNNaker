@@ -3,8 +3,7 @@ import math
 from data_specification.enums import DataType
 
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence \
-    import AbstractTimingDependence
+from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
     import SynapseStructureWeightAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
@@ -12,6 +11,13 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    __slots__ = [
+        "accumulator_depression_plus_one",
+        "accumulator_potentiation_minus_one",
+        "dual_fsm",
+        "mean_post_window",
+        "mean_pre_window",
+        "_synapse_structure"]
 
     default_parameters = {
         'accumulator_depression': -6, 'accumulator_potentiation': 6,
@@ -25,9 +31,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             mean_pre_window=default_parameters['mean_pre_window'],
             mean_post_window=default_parameters['mean_post_window'],
             dual_fsm=default_parameters['dual_fsm']):
-
-        AbstractTimingDependence.__init__(self)
-
+        # pylint: disable=too-many-arguments
         self.accumulator_depression_plus_one = accumulator_depression + 1
         self.accumulator_potentiation_minus_one = accumulator_potentiation - 1
         self.mean_pre_window = mean_pre_window
@@ -36,16 +40,17 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
         self._synapse_structure = SynapseStructureWeightAccumulator()
 
-    def is_same_as(self, other):
-        if (other is None) or (not isinstance(
-                other, TimingDependenceRecurrent)):
+    @overrides(AbstractTimingDependence.is_same_as)
+    def is_same_as(self, timing_dependence):
+        if timing_dependence is None or not isinstance(
+                timing_dependence, TimingDependenceRecurrent):
             return False
         return ((self.accumulator_depression_plus_one ==
-                 other.accumulator_depression_plus_one) and
+                 timing_dependence.accumulator_depression_plus_one) and
                 (self.accumulator_potentiation_minus_one ==
-                 other.accumulator_potentiation_minus_one) and
-                (self.mean_pre_window == other.mean_pre_window) and
-                (self.mean_post_window == other.mean_post_window))
+                 timing_dependence.accumulator_potentiation_minus_one) and
+                (self.mean_pre_window == timing_dependence.mean_pre_window) and
+                (self.mean_post_window == timing_dependence.mean_post_window))
 
     @property
     def vertex_executable_suffix(self):
@@ -60,6 +65,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         # otherwise it's in the synapse
         return 2 if self.dual_fsm else 0
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
 
         # 2 * 32-bit parameters
@@ -70,6 +76,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Write parameters

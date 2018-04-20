@@ -6,10 +6,18 @@
 //! Forward declaration of the neuron impl pointer
 typedef struct neuron_impl_t* neuron_impl_pointer_t;
 
+//! TODO: Add comment about this here
+static void neuron_impl_reset_record_counter();
+
 //! \brief Initialise the particular implementation of the data
-//! \param[in] data_address The address of the data to be initialised
-//! \return None
+//! \param[in] n_neurons The number of neurons
+//! \return bool
 static bool neuron_impl_initialise(uint32_t n_neurons);
+
+static void neuron_impl_initialise_recording(uint32_t n_neurons);
+
+//! \brief return value for spike size
+static size_t neuron_impl_spike_size();
 
 //! \brief Add inputs as required to the implementation
 //! \param[in] synapse_type_index the synapse type (exc. or inh.)
@@ -20,13 +28,16 @@ static void neuron_impl_add_inputs(
 		index_t synapse_type_index, synapse_param_pointer_t parameter,
 		input_t weights_this_timestep);
 
-//! \brief Load in the neuron parameters... ?
+//! \brief Load in the neuron parameters
 //! \return None
-static void neuron_impl_load_neuron_parameters(address_t data_address, uint32_t next);
+static void neuron_impl_load_neuron_parameters(address_t address, uint32_t next);
 
-//! \brief Wrapper to set global neuron parameters ?
+//! \brief Wrapper to set global neuron parameters
 //! \return None
 static void neuron_impl_set_global_neuron_parameters();
+
+//! \brief forgot about this one
+static void neuron_impl_wait_for_recordings_and_reset_out_spikes();
 
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron index
@@ -47,8 +58,15 @@ static void neuron_impl_print_parameters(index_t neuron_index);
 //! \brief Do any required recording
 //! \param[in] recording_flags
 //! \return None
-static void neuron_impl_do_recording(timer_t time, uint32_t recording_flags);
+static void neuron_impl_do_recording(timer_t time); //, uint32_t recording_flags);
 
+//! \brief not sure this is needed but something weird is happening
+static void neuron_impl_record_spikes(timer_t time);
+
+//! \brief Store the neuron parameters
+static void neuron_impl_store_neuron_parametrs(address_t address, uint32_t next);
+
+//! \brief Get the membrange voltage
 //! \return The membrane voltage value
 static input_t neuron_impl_get_membrane_voltage(index_t neuron_index);
 

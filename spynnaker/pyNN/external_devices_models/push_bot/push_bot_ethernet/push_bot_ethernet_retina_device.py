@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.external_devices_models import AbstractEthernetSensor
 from .push_bot_translator import PushBotTranslator
@@ -10,13 +10,12 @@ from spynnaker.pyNN.external_devices_models.push_bot \
 
 class PushBotEthernetRetinaDevice(
         AbstractPushBotRetinaDevice, AbstractEthernetSensor):
-
     def __init__(
             self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,
             injector_port=None, local_host=None, local_port=None,
             retina_injector_label="PushBotRetinaInjector"):
-
-        AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
+        # pylint: disable=too-many-arguments
+        super(PushBotEthernetRetinaDevice, self).__init__(protocol, resolution)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
             pushbot_ip_address, pushbot_port)
         self._translator = PushBotTranslator(protocol, pushbot_wifi_connection)

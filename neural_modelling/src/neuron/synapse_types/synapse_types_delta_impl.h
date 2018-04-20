@@ -11,28 +11,36 @@
 #ifndef _SYNAPSE_TYPES_DELTA_IMPL_H_
 #define _SYNAPSE_TYPES_DELTA_IMPL_H_
 
+
 //---------------------------------------
 // Macros
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 1
 #define SYNAPSE_TYPE_COUNT 2
 
+#define NUM_EXCITATORY_RECEPTORS 1
+#define NUM_INHIBITORY_RECEPTORS 1
+
 #include <debug.h>
-#include "../../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
+#include "synapse_types.h"
+
 
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
+
 typedef struct synapse_param_t {
     input_t input_buffer_excitatory_value;
     input_t input_buffer_inhibitory_value;
 } synapse_param_t;
 
-#include "synapse_types.h"
-
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
 } input_buffer_regions;
+
 
 //---------------------------------------
 // Synapse shaping inline implementation
@@ -74,18 +82,20 @@ static inline void synapse_types_add_neuron_input(
 //! for a given parameter set
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron id.
-static inline input_t synapse_types_get_excitatory_input(
+static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
-    return parameter->input_buffer_excitatory_value;
+    excitatory_response[0] = parameter->input_buffer_excitatory_value;
+    return &excitatory_response[0];
 }
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given parameter set
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron id.
-static inline input_t synapse_types_get_inhibitory_input(
+static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
-    return parameter->input_buffer_inhibitory_value;
+    inhibitory_response[0] = parameter->input_buffer_inhibitory_value;
+    return &inhibitory_response[0];
 }
 
 //! \brief returns a human readable character for the type of synapse.

@@ -10,6 +10,8 @@ from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
 from spynnaker.pyNN.models.neuron.abstract_population_vertex \
     import AbstractPopulationVertex
 
+DEFAULT_MAX_ATOMS_PER_CORE = 255
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 class IFCurrExpSEMDBase(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
@@ -17,7 +19,6 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
         input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
     """
 
-    DEFAULT_MAX_ATOMS_PER_CORE = 255
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
@@ -26,19 +27,14 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
         'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0,
         'multiplicator': 0, 'inh_input_previous': 0}
 
-    none_pynn_default_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': None}
 
     def __init__(
-            self, n_neurons, spikes_per_second=AbstractPopulationVertex.
-            none_pynn_default_parameters['spikes_per_second'],
-            ring_buffer_sigma=AbstractPopulationVertex.
-            none_pynn_default_parameters['ring_buffer_sigma'],
-            incoming_spike_buffer_size=AbstractPopulationVertex.
-            none_pynn_default_parameters['incoming_spike_buffer_size'],
-            constraints=AbstractPopulationVertex.none_pynn_default_parameters[
-                'constraints'],
-            label=AbstractPopulationVertex.none_pynn_default_parameters[
-                'label'],
+            self, n_neurons, spikes_per_second=_apv_defs['spikes_per_second'],
+            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
+            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
+            constraints=_apv_defs['constraints'],
+            label=_apv_defs['label'],
             tau_m=default_parameters['tau_m'],
             cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
@@ -48,7 +44,7 @@ class IFCurrExpSEMDBase(AbstractPopulationVertex):
             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
-            v_init=none_pynn_default_parameters['v_init'],
+            v_init=initialize_parameters['v_init'],
             isyn_exc=default_parameters['isyn_exc'],
             isyn_inh=default_parameters['isyn_inh'],
             multiplicator=default_parameters['multiplicator'],

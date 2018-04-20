@@ -1,5 +1,6 @@
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 import logging
 import numpy
@@ -22,28 +23,33 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     """ Make connections using a distribution which varies with distance.
     """
 
+    __slots__ = [
+        "_allow_self_connections",
+        "_d_expression",
+        "_probs"]
+
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
         """
-
-        :param `string` d_expression:
-            the right-hand side of a valid python expression for
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
-            that can be parsed by eval(), that computes the distance
+        :param `string` d_expression:\
+            the right-hand side of a valid python expression for\
+            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
+            that can be parsed by eval(), that computes the distance\
             dependent distribution
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
-            Population.
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-
-            dependent weights or delays
-        :param `int` n_connections:
+        :param `bool` allow_self_connections:\
+            if the connector is used to connect a Population to itself, this\
+            flag determines whether a neuron is allowed to connect to itself,\
+            or only to other neurons in the Population.
+        :param `pyNN.Space` space:\
+            a Space object, needed if you wish to specify distance-dependent\
+            weights or delays
+        :param `int` n_connections:\
             The number of efferent synaptic connections per neuron.
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        # pylint: disable=too-many-arguments
+        super(DistanceDependentProbabilityConnector, self).__init__(
+            safe, verbose)
         self._d_expression = d_expression
         self._allow_self_connections = allow_self_connections
 
@@ -62,6 +68,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             pre_positions, post_positions, expand_distances)
         self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
@@ -69,9 +76,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
@@ -81,10 +90,12 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self._n_pre_neurons * self._n_post_neurons, out_of,
             max_prob)
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             post_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
@@ -95,39 +106,49 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self._delays, self._n_pre_neurons * self._n_post_neurons,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_n_connections(
             pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return False
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
+        # pylint: disable=too-many-arguments
         probs = self._probs[
             pre_slice_index.to_slice, post_slice_index.to_slice]
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -143,9 +164,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         n_connections = numpy.sum(present)
 
         block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+            n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
-            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(

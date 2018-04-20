@@ -12,10 +12,12 @@ class _THRESHOLD_TYPE_MULTICAST(Enum):
     DEVICE_CONTROL_TIMESTEPS_BETWEEN_SENDING = (5, DataType.UINT32)
     DEVICE_STATE = (6, DataType.UINT32)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -27,9 +29,9 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     """ A threshold type that can send multicast keys with the value of\
         membrane voltage as the payload
     """
+    __slots__ = ["_devices"]
 
     def __init__(self, devices):
-        AbstractThresholdType.__init__(self)
         self._devices = devices
 
     def get_n_threshold_parameters(self):
@@ -42,7 +44,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         timings = [device.device_control_timesteps_between_sending
                    for device in self._devices]
         max_time = max(timings)
-        time_between_send = int(max_time) / len(self._devices)
+        time_between_send = int(max_time) // len(self._devices)
 
         return [
             NeuronParameter(
