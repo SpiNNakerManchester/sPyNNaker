@@ -161,7 +161,7 @@ OBJECTS := $(call convert_to_object, $(SOURCES))
 #Build rules
 all: $(APP_OUTPUT_DIR)$(APP).aplx
 
-include $(SPINN_DIRS)/make/Makefile.common
+include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 # Rules to convert the source files
 $(MODIFIED_DIR)%.c: $(SRC_DIR)%.c                                                                  # Intentionally a STRING not a variable
