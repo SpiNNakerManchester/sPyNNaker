@@ -38,17 +38,24 @@ endif
 POPULATION_TABLE_IMPL := binary_search
 
 # Define the directories
-SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
-	# Ok to share modified files between builds
 # Path flag to replace with the modified dir  (abspath drops the final /)
-NEURON_DIR := $(abspath $(SRC_DIR))
+NEURON_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/src)
 # For historical reasons we support the variable SOURCE_DIR but its use is not encouraged
 SOURCE_DIR := $(NEURON_DIR)
-MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
+MODIFIED_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/modified_src)
 	# Need to build each neuron seperately or complier gets confused
-BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
-APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../../spynnaker/pyNN/model_binaries/)
-LOG_DICT_FILE := $(MODIFIED_DIR)log_dict.dict
+# BUILD_DIR and APP_OUTPUT_DIR end with a / for historictical/ shared reasons
+    # abspath strips of the final / so save to add one on after
+ifndef BUILD_DIR
+    BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
+endif
+BUILD_DIR := $(abspath $(BUILD_DIR))/
+ifndef APP_OUTPUT_DIR
+    APP_OUTPUT_DIR :=  $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries
+endif
+APP_OUTPUT_DIR :=  $(APP_OUTPUT_DIR)/
+
+LOG_DICT_FILE := $(MODIFIED_DIR)/log_dict.dict
 LOG_DICT_FILES += $(LOG_DICT_FILE)
 # If the LOG_DICT_FILES are up to date we know the c code has been modifed 
 C_FILES_MODIFIED = $(LOG_DICT_FILES)
@@ -60,32 +67,34 @@ C_FILES_MODIFIED = $(LOG_DICT_FILES)
 # abspath is used to remove double /, any ../ and any trailing / 
 ifdef extra_convert_to_modified
 define convert_to_modified
-$(abspath $(patsubst $(NEURON_DIR)%,$(MODIFIED_DIR)%,$(call extra_convert_to_modified, $(1))))
+$(abspath $(patsubst $(NEURON_DIR)/%,$(MODIFIED_DIR)/%,$(call extra_convert_to_modified, $(1))))
 endef
 else
 define convert_to_modified
-$(abspath $(patsubst $(NEURON_DIR)%,$(MODIFIED_DIR)%,$(1)))
+$(abspath $(patsubst $(NEURON_DIR)/%,$(MODIFIED_DIR)/%,$(1)))
 endef
 endif
 
 # function to convert c file to a object file in the build dir
 # $1 is the first parameter passed in
 # extra_convert_to_object can be used to convert other modified directories
-# patsubst is pattern substitution so does nothing if path does not start with $(MODIFIED_DIR)
-# abspath is used to remove double /, any ../ and any trailing / 
+# patsubst is pattern substitution so does nothing if path does not start with $(MODIFIED_DIR)/
+# abspath is used to remove double /, any ../ and any trailing /
+# BUILD_DIR ends with a / for historictical/ shared reasons
+
 ifdef extra_convert_to_object
 define convert_to_object
-$(abspath $(patsubst $(MODIFIED_DIR)%.c, $(BUILD_DIR)%.o, $(call extra_convert_to_object, $(1))))
+$(abspath $(patsubst $(MODIFIED_DIR)/%.c, $(BUILD_DIR)%.o, $(call extra_convert_to_object, $(1))))
 endef
 else
 define convert_to_object
-$(abspath $(patsubst $(MODIFIED_DIR)%.c, $(BUILD_DIR)%.o, $(1)))
+$(abspath $(patsubst $(MODIFIED_DIR)/%.c, $(BUILD_DIR)%.o, $(1)))
 endef
 endif
 
 # Check required inputs and point them to modified sources
 ifndef ADDITIONAL_INPUT_H
-    ADDITIONAL_INPUT_H = $(MODIFIED_DIR)neuron/additional_inputs/additional_input_none_impl.h
+    ADDITIONAL_INPUT_H = $(MODIFIED_DIR)/neuron/additional_inputs/additional_input_none_impl.h
 else
     ADDITIONAL_INPUT_H := $(call convert_to_modified, $(ADDITIONAL_INPUT_H))
 endif
@@ -140,19 +149,19 @@ endif
 SYNGEN_ENABLED = 1
 
 ifndef SYNAPTOGENESIS_DYNAMICS
-    SYNAPTOGENESIS_DYNAMICS := $(MODIFIED_DIR)neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS := $(MODIFIED_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNGEN_ENABLED = 0
 else
     SYNAPTOGENESIS_DYNAMICS := $(call convert_to_modified, $(SYNAPTOGENESIS_DYNAMICS))
 endif
 
 # List all the sources
-SOURCES = $(MODIFIED_DIR)common/out_spikes.c \
-          $(MODIFIED_DIR)neuron/c_main.c \
-          $(MODIFIED_DIR)neuron/synapses.c \
-          $(MODIFIED_DIR)neuron/neuron.c \
-          $(MODIFIED_DIR)neuron/spike_processing.c \
-          $(MODIFIED_DIR)neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+SOURCES = $(MODIFIED_DIR)/common/out_spikes.c \
+          $(MODIFIED_DIR)/neuron/c_main.c \
+          $(MODIFIED_DIR)/neuron/synapses.c \
+          $(MODIFIED_DIR)/neuron/neuron.c \
+          $(MODIFIED_DIR)/neuron/spike_processing.c \
+          $(MODIFIED_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS)
 
 # Convert the sources into Objects
@@ -164,14 +173,14 @@ all: $(APP_OUTPUT_DIR)$(APP).aplx
 include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 # Rules to convert the source files
-$(MODIFIED_DIR)%.c: $(SRC_DIR)%.c                                                                  # Intentionally a STRING not a variable
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+$(MODIFIED_DIR)%.c: $(NEURON_DIR)%.c                                                                  # Intentionally a STRING not a variable
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
-$(MODIFIED_DIR)%.h: $(SRC_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+$(MODIFIED_DIR)%.h: $(NEURON_DIR)%.c
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
-$(LOG_DICT_FILE): $(SRC_DIR)
-	python -m spinn_utilities.make_tools.convertor $(SRC_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+$(LOG_DICT_FILE): $(NEURON_DIR)
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
@@ -187,7 +196,7 @@ CFLAGS += -I $(MODIFIED_DIR)
 FEC_OPT = $(OSPACE)
 
 # Simple build rules
-$(BUILD_DIR)%.o: $(MODIFIED_DIR)%.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)%.o: $(MODIFIED_DIR)/%.c $(C_FILES_MODIFIED)
 	# Simple
 	-mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -o $@ $<
@@ -195,27 +204,27 @@ $(BUILD_DIR)%.o: $(MODIFIED_DIR)%.c $(C_FILES_MODIFIED)
 # Synapese build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
 
-$(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)/neuron/c_main.c $(C_FILES_MODIFIED)
 	#c_main.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)/neuron/synapses.c $(C_FILES_MODIFIED)
 	#synapses.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)/neuron/spike_processing.c $(C_FILES_MODIFIED)
 	#spike_processing.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_fixed_impl.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)neuron/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)/neuron/population_table/population_table_fixed_impl.c $(C_FILES_MODIFIED)
 	#population_table/population_table_fixed_impln.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c $(C_FILES_MODIFIED)
+$(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)/neuron/population_table/population_table_binary_search_impl.c $(C_FILES_MODIFIED)
 	#population_table/population_table_binary_search_impl
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
@@ -223,9 +232,9 @@ $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MOD
 #STDP Build rules If and only if STDP used
 STDP_ENABLED = 0
 SYNAPSE_DYNAMICS_O := $(call convert_to_object, $(SYNAPSE_DYNAMICS))
-SYNAPTOGENESIS_DYNAMICS_O := $(patsubst $(MODIFIED_DIR)%.c,$(BUILD_DIR)%.o,$(SYNAPTOGENESIS_DYNAMICS))
+SYNAPTOGENESIS_DYNAMICS_O := $(patsubst $(MODIFIED_DIR)/%.c,$(BUILD_DIR)%.o,$(SYNAPTOGENESIS_DYNAMICS))
 
-ifneq ($(SYNAPSE_DYNAMICS), $(MODIFIED_DIR)neuron/plasticity/synapse_dynamics_static_impl.c)
+ifneq ($(SYNAPSE_DYNAMICS), $(MODIFIED_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)
     ifdef TIMING_DEPENDENCE_H
 	TIMING_DEPENDENCE_H := $(call convert_to_modified, $(TIMING_DEPENDENCE_H))
     else
@@ -252,7 +261,7 @@ ifneq ($(SYNAPSE_DYNAMICS), $(MODIFIED_DIR)neuron/plasticity/synapse_dynamics_st
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
-    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
+    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)/neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
@@ -290,7 +299,7 @@ $(NEURON_MODEL_O): $(NEURON_MODEL)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) \
 	        $(CFLAGS) -o $@ $<
 
-$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
+$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H) $(C_FILES_MODIFIED)
 	# neuron.o
 	-mkdir -p $(dir $@)
