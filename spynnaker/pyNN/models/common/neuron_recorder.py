@@ -90,9 +90,9 @@ class NeuronRecorder(object):
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
-        sampling_interval = self._sampling_rates[variable]
+        sampling_rate = self._sampling_rates[variable]
         expected_rows = int(math.ceil(
-            n_machine_time_steps / sampling_interval))
+            n_machine_time_steps / sampling_rate))
         missing_str = ""
         data = None
         indexes = []
@@ -129,7 +129,7 @@ class NeuronRecorder(object):
                 # Start the fragment for this slice empty
                 fragment = numpy.empty((expected_rows, n_neurons))
                 for i in xrange(0, expected_rows):
-                    time = i * sampling_interval
+                    time = i * sampling_rate
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
                     if len(local_indexes[0]) > 0:
@@ -148,6 +148,7 @@ class NeuronRecorder(object):
             logger.warn(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
+        sampling_interval = self.get_neuron_sampling_interval(variable)
         return (data, indexes, sampling_interval)
 
     def get_spikes(
