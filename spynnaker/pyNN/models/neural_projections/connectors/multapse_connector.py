@@ -5,6 +5,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.abstract_base import abstractmethod
 
 import numpy.random
+from six import raise_from
 
 
 class MultapseConnector(AbstractConnector):
@@ -239,11 +240,11 @@ class MultapseConnector(AbstractConnector):
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self._with_replacement)
-        except Exception:
-            raise SpynnakerException(
+        except Exception as e:
+            raise_from(SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
-                "reduce the value specified in the connector")
+                "reduce the value specified in the connector"), e)
 
         # Set up synaptic block
         block["source"] = pairs[chosen, 0]

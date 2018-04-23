@@ -21,7 +21,7 @@
 #define NUM_EXCITATORY_RECEPTORS 2
 #define NUM_INHIBITORY_RECEPTORS 1
 
-#include "../decay.h"
+#include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
 
@@ -108,8 +108,8 @@ static inline void synapse_types_add_neuron_input(
 //! \return the excitatory input buffers for a given neuron id.
 static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
-	excitatory_response[0] = parameter->input_buffer_excitatory_value;
-	excitatory_response[1] = parameter->input_buffer_excitatory2_value;
+    excitatory_response[0] = parameter->input_buffer_excitatory_value;
+    excitatory_response[1] = parameter->input_buffer_excitatory2_value;
     return &excitatory_response[0];
 }
 
@@ -119,7 +119,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 //! \return the inhibitory input buffers for a given neuron id.
 static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
-	inhibitory_response[0] = parameter->input_buffer_inhibitory_value;
+    inhibitory_response[0] = parameter->input_buffer_inhibitory_value;
     return &inhibitory_response[0];
 }
 

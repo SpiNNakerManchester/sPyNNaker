@@ -6,15 +6,12 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <string.h>
+#include <utils.h>
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
     #include "profile_tags.h"
 #endif
-
-// Compute the size of the input buffers and ring buffers
-#define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_TYPE_BITS\
-                                + SYNAPSE_INDEX_BITS))
 
 // Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
@@ -23,7 +20,7 @@ uint32_t  num_fixed_pre_synaptic_events = 0;
 static uint32_t n_neurons;
 
 // Ring buffers to handle delays between synapses and neurons
-static weight_t ring_buffers[RING_BUFFER_SIZE];
+static weight_t *ring_buffers;
 
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t ring_buffer_to_input_left_shifts[SYNAPSE_TYPE_COUNT];
@@ -33,6 +30,11 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
+
+static uint32_t synapse_type_index_bits;
+static uint32_t synapse_index_bits;
+static uint32_t synapse_index_mask;
+static uint32_t synapse_type_index_mask;
 
 
 /* PRIVATE FUNCTIONS */
@@ -66,10 +68,11 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
                               ring_buffer_to_input_left_shifts[synapse_type]);
         log_debug(
             "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-            synapse_row_sparse_delay(synapse),
-            synapse_types_get_type_char(synapse_row_sparse_type(synapse)),
-            synapse_row_sparse_index(synapse),
-            SYNAPSE_DELAY_MASK, SYNAPSE_TYPE_INDEX_BITS);
+            synapse_row_sparse_delay(synapse, synapse_type_index_bits),
+            synapse_types_get_type_char(
+                synapse_row_sparse_type(synapse, synapse_index_bits)),
+            synapse_row_sparse_index(synapse, synapse_index_mask),
+            SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
 
     // If there's a plastic region
@@ -173,14 +176,16 @@ static inline void _process_fixed_synapses(
         uint32_t synaptic_word = *synaptic_words++;
 
         // Extract components from this word
-        uint32_t delay = synapse_row_sparse_delay(synaptic_word);
+        uint32_t delay = synapse_row_sparse_delay(synaptic_word,
+            synapse_type_index_bits);
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
-                synaptic_word);
+                synaptic_word, synapse_type_index_mask);
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-            delay + time, combined_synapse_neuron_index);
+            delay + time, combined_synapse_neuron_index,
+            synapse_type_index_bits);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
@@ -297,9 +302,29 @@ bool synapses_initialise(
 
     *neuron_synapse_shaping_params_value = neuron_synapse_shaping_params;
 
-    for (uint32_t i = 0; i < RING_BUFFER_SIZE; i++) {
+    uint32_t n_neurons_power_2 = n_neurons;
+    if (!is_power_of_2(n_neurons)) {
+        n_neurons_power_2 = next_power_of_2(n_neurons);
+    }
+    uint32_t log_n_neurons = ilog_2(n_neurons_power_2);
+    uint32_t n_ring_buffer_bits =
+        log_n_neurons + SYNAPSE_TYPE_BITS + SYNAPSE_DELAY_BITS;
+    uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
+
+    ring_buffers = (weight_t *) spin1_malloc(
+        ring_buffer_size * sizeof(weight_t));
+    if (ring_buffers == NULL) {
+        log_error(
+            "Could not allocate %u entries for ring buffers", ring_buffer_size);
+    }
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
+
+    synapse_type_index_bits = log_n_neurons + SYNAPSE_TYPE_BITS;
+    synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
+    synapse_index_bits = log_n_neurons;
+    synapse_index_mask = (1 << synapse_index_bits) - 1;
 
     return true;
 }
@@ -327,7 +352,8 @@ void synapses_do_timestep_update(timer_t time) {
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
             uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                time, synapse_type_index, neuron_index);
+                time, synapse_type_index, neuron_index, synapse_type_index_bits,
+                synapse_index_bits);
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
@@ -434,8 +460,8 @@ bool find_static_neuron_with_id(uint32_t id, address_t row,
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
         weight = synapse_row_sparse_weight(synaptic_word);
-        delay = synapse_row_sparse_delay(synaptic_word);
-        if (synapse_row_sparse_index(synaptic_word)==id){
+        delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+        if (synapse_row_sparse_index(synaptic_word, synapse_index_mask)==id){
             found = true;
             break;
         }
@@ -482,10 +508,10 @@ static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
                                             uint32_t delay, uint32_t type){
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
     new_synapse |= ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) <<
-        SYNAPSE_TYPE_INDEX_BITS);
+            synapse_type_index_bits);
     new_synapse |= ((type & ((1<<SYNAPSE_TYPE_BITS) - 1)) <<
-        SYNAPSE_INDEX_BITS);
-    new_synapse |= (id & ((1<<SYNAPSE_INDEX_BITS) - 1));
+            synapse_index_bits);
+    new_synapse |= (id & ((1<<synapse_type_index_bits) - 1));
     return new_synapse;
 }
 

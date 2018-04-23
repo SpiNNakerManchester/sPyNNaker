@@ -19,7 +19,6 @@ class EthernetControlConnection(EIEIOConnection):
     def __init__(
             self, translator, local_host=None, local_port=None):
         """
-
         :param translator: The translator of multicast to control commands
         :param local_host: The optional host to listen on
         :param local_port: The optional port to listen on
@@ -39,7 +38,7 @@ class EthernetControlConnection(EIEIOConnection):
                 self._step()
         except Exception:
             if self._running:
-                logger.error("failure processing EIEIO message", exc_info=True)
+                logger.exception("failure processing EIEIO message")
 
     def _step(self):
         message = self.receive_eieio_message()

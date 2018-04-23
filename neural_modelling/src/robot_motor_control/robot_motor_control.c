@@ -1,5 +1,5 @@
-#include "../common/neuron-typedefs.h"
-#include "../common/in_spikes.h"
+#include <common/neuron-typedefs.h>
+#include <common/in_spikes.h>
 
 #include <data_specification.h>
 #include <debug.h>
