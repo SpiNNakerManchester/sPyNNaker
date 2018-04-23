@@ -1,7 +1,6 @@
 from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
     SpynakkerRangeDictionary
