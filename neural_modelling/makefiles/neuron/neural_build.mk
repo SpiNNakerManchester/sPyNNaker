@@ -53,12 +53,14 @@ BUILD_DIR := $(abspath $(BUILD_DIR))/
 ifndef APP_OUTPUT_DIR
     APP_OUTPUT_DIR :=  $(NEURAL_MODELLING_DIRS)/../spynnaker/pyNN/model_binaries
 endif
-APP_OUTPUT_DIR :=  $(APP_OUTPUT_DIR)/
+APP_OUTPUT_DIR :=  $(abspath $(APP_OUTPUT_DIR))/
 
-LOG_DICT_FILE := $(MODIFIED_DIR)/log_dict.dict
-LOG_DICT_FILES += $(LOG_DICT_FILE)
+MODIFIED_DICT_FILE := $(MODIFIED_DIR)/log_dict.dict
+LOG_DICT_FILES += $(wildcard $(SPINN_DIRS)/lib/*.dict)
+LOG_DICT_FILES += $(MODIFIED_DICT_FILE)
 # If the LOG_DICT_FILES are up to date we know the c code has been modifed 
 C_FILES_MODIFIED = $(LOG_DICT_FILES)
+APP_DICT_FILE = $(APP_OUTPUT_DIR)$(APP).dict
 
 # function to convert a path with NEURON_DIR to use MODIFIED_DIR instead
 # $1 is the first parameter passed in
@@ -168,19 +170,19 @@ SOURCES = $(MODIFIED_DIR)/common/out_spikes.c \
 OBJECTS := $(call convert_to_object, $(SOURCES))
 
 #Build rules
-all: $(APP_OUTPUT_DIR)$(APP).aplx
+all: $(APP_OUTPUT_DIR)$(APP).aplx $(APP_DICT_FILE)
 
 include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 # Rules to convert the source files
 $(MODIFIED_DIR)%.c: $(NEURON_DIR)%.c                                                                  # Intentionally a STRING not a variable
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
 
 $(MODIFIED_DIR)%.h: $(NEURON_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
 
-$(LOG_DICT_FILE): $(NEURON_DIR)
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(LOG_DICT_FILE) NEURAL_MODELLING_DIRS
+$(MODIFIED_DICT_FILE): $(NEURON_DIR)
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
@@ -311,9 +313,16 @@ $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(ADDITIONAL_INPUT_H) \
 	      -o $@ $<
 
+$(APP_DICT_FILE): $(LOG_DICT_FILES)
+	head -2 $(firstword $(LOG_DICT_FILES)) > $(APP_DICT_FILE)
+	$(foreach ldf, $(LOG_DICT_FILES), tail -n +3 $(ldf) >> $(APP_DICT_FILE) ;)
+
 # Tidy and cleaning dependencies
 clean:
-	$(RM) $(OBJECTS) $(APP_OUTPUT_DIR)$(APP).aplx
+	$(RM) $(OBJECTS) $(APP_OUTPUT_DIR)$(APP).aplx $(APP_DICT_FILE)
 	rm -rf $(BUILD_DIR)
 	rm -rf $(MODIFIED_DIR)
+    # EXTRA_CLEAN_DIRS can be added to but is ignored if empty
+	$(foreach ecd, $(EXTRA_CLEAN_DIRS), rm -rf $(ecd);)
 
+.PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(MODIFIED_DICT_FILE) $(EXTRA_PRECIOUS)

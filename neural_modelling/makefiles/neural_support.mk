@@ -8,7 +8,7 @@ ifndef NEURAL_MODELLING_DIRS
 endif
 #Check NEURAL_MODELLING_DIRS
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-ifneq ($(NEURAL_MODELLING_DIRS)/makefiles/common.mk, $(MAKEFILE_PATH))
+ifneq ($(NEURAL_MODELLING_DIRS)/makefiles/neural_support.mk, $(MAKEFILE_PATH))
     $(error Please check NEURAL_MODELLING_DIRS as based on that this file is at $(CHECK_PATH) when it is actually at $(MAKEFILE_PATH))
 endif
 
@@ -21,7 +21,7 @@ endif
 SRC_DIR := $(NEURAL_MODELLING_DIRS)/src/
 MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
 BUILD_DIR := $(NEURAL_MODELLING_DIRS)/builds/$(APP)/
-APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../spynnaker/pyNN/model_binaries/)
+APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../spynnaker/pyNN/model_binaries)/
 
 CFLAGS += -I $(MODIFIED_DIR)
 
