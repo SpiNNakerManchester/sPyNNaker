@@ -25,8 +25,5 @@ APP_OUTPUT_DIR :=  $(abspath $(dir $(MAKEFILE_PATH))../../spynnaker/pyNN/model_b
 
 CFLAGS += -I $(MODIFIED_DIR)
 
-# Intentionally a string and not a variable
-LOG_RANGE_NAME = NEURAL_MODELLING_DIRS
-
 include $(SPINN_DIRS)/make/local.mk
 

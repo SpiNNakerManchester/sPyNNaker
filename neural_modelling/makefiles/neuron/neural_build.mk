@@ -175,14 +175,14 @@ all: $(APP_OUTPUT_DIR)$(APP).aplx $(APP_DICT_FILE)
 include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 # Rules to convert the source files
-$(MODIFIED_DIR)%.c: $(NEURON_DIR)%.c                                                                  # Intentionally a STRING not a variable
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
+$(MODIFIED_DIR)%.c: $(NEURON_DIR)%.c
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 $(MODIFIED_DIR)%.h: $(NEURON_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 $(MODIFIED_DICT_FILE): $(NEURON_DIR)
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE) NEURAL_MODELLING_DIRS
+	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
