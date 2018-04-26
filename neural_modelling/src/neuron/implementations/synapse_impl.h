@@ -1,8 +1,8 @@
 #ifndef _SYNAPSE_IMPL_H_
 #define _SYNAPSE_IMPL_H_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_types/synapse_types.h"
+#include <common/neuron-typedefs.h>
+#include <neuron/synapse_types/synapse_types.h>
 
 //! \brief Add inputs as required to the implementation
 //! \param[in] synapse_type_index the synapse type (exc. or inh.)

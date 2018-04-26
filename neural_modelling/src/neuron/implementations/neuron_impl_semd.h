@@ -4,16 +4,16 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include "../models/neuron_model.h"
-#include "../input_types/input_type.h"
-#include "../additional_inputs/additional_input.h"
-#include "../threshold_types/threshold_type.h"
-#include "../synapse_types/synapse_types.h"
+#include <neuron/models/neuron_model.h>
+#include <neuron/input_types/input_type.h>
+#include <neuron/additional_inputs/additional_input.h>
+#include <neuron/threshold_types/threshold_type.h>
+#include <neuron/synapse_types/synapse_types.h>
 
 // Further includes
-#include "../plasticity/synapse_dynamics.h"
-#include "../structural_plasticity/synaptogenesis_dynamics.h"
-#include "../../common/out_spikes.h"
+#include <neuron/plasticity/synapse_dynamics.h>
+#include <neuron/structural_plasticity/synaptogenesis_dynamics.h>
+#include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
 #include <string.h>

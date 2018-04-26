@@ -1,7 +1,7 @@
 #ifndef _NEURON_IMPL_H_
 #define _NEURON_IMPL_H_
 
-#include "../../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
 
 //! Forward declaration of the neuron impl pointer
 typedef struct neuron_impl_t* neuron_impl_pointer_t;
