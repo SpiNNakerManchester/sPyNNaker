@@ -156,12 +156,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        delays = self._conn_list["delay"][mask]
+        delays = self._conn_list["delay"][self._mask]
         if delays.size == 0:
             return 0
         return numpy.var(delays)
@@ -177,15 +172,7 @@ class FromListConnector(AbstractConnector):
                         post_slice_index, post_vertex_slice)
         if min_delay is None or max_delay is None:
             mask = self._mask
-#             mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                     (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                     (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                     (self._conn_list["target"] <= post_vertex_slice.hi_atom))
         else:
-#             mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                     (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                     (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                     (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
             mask = (self._mask &
                     (self._conn_list["delay"] >= min_delay) &
                     (self._conn_list["delay"] <= max_delay))
@@ -201,12 +188,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        targets = self._conn_list["target"][mask]
+        targets = self._conn_list["target"][self._mask]
         if targets.size == 0:
             return 0
         return numpy.max(numpy.bincount(targets.view('int32')))
@@ -218,12 +200,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._conn_list["weight"][self._mask]
         if weights.size == 0:
             return 0
         return numpy.mean(weights)
@@ -235,12 +212,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._conn_list["weight"][self._mask]
         if weights.size == 0:
             return 0
         return numpy.max(weights)
@@ -252,12 +224,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
+        weights = self._conn_list["weight"][self._mask]
         if weights.size == 0:
             return 0
         return numpy.var(weights)
@@ -274,12 +241,7 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         self._list_mask(pre_slice_index, pre_vertex_slice,
                         post_slice_index, post_vertex_slice)
-        mask = self._mask
-#         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-#                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-#                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-#                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        items = self._conn_list[mask]
+        items = self._conn_list[self._mask]
         block = numpy.zeros(items.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = items["source"]
         block["target"] = items["target"]
