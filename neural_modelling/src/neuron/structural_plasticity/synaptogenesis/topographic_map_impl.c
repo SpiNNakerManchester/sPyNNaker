@@ -536,6 +536,18 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
     _setup_synaptic_dma_read();
 }
 
+// Trivial helper; has to be macro because uses log_error()
+#define DMA_WRITEBACK(msg) \
+    do {\
+        while (!spin1_dma_transfer(\
+            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,\
+            rewiring_dma_buffer.sdram_writeback_address,\
+            rewiring_dma_buffer.row, DMA_WRITE,\
+            rewiring_dma_buffer.n_bytes_transferred)) {\
+        log_error("%s", msg);\
+        }\
+    } while (0)
+
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.
 //!
@@ -567,14 +579,7 @@ bool synaptogenesis_dynamics_elimination_rule(void)
             rewiring_dma_buffer.row)) {
         return false;
     }
-    while (!spin1_dma_transfer(\
-            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,\
-            rewiring_dma_buffer.sdram_writeback_address,\
-            rewiring_dma_buffer.row, DMA_WRITE,\
-            rewiring_dma_buffer.n_bytes_transferred)) {\
-        log_error("DMA queue full-removal");\
-    }\
-
+    DMA_WRITEBACK("DMA queue full-removal");
     rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
     return true;
 }
@@ -626,13 +631,7 @@ bool synaptogenesis_dynamics_formation_rule(void)
             current_state.current_controls : 0)) {
         return false;
     }
-    while (!spin1_dma_transfer(\
-            DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,\
-            rewiring_dma_buffer.sdram_writeback_address,\
-            rewiring_dma_buffer.row, DMA_WRITE,\
-            rewiring_dma_buffer.n_bytes_transferred)) {\
-        log_error("DMA queue full-formation");\
-    }\
+    DMA_WRITEBACK("DMA queue full-formation");
 
     int the_pack = pack(current_state.pop_index,
         current_state.subpop_index,
