@@ -78,6 +78,10 @@ class MockNeuron(AbstractPopulationVertex):
             synapse_type=None,
             threshold_type=None)
 
+    @staticmethod
+    def get_max_atoms_per_core():
+        return 1
+
 
 def test_initializable():
     MockSimulator.setup()

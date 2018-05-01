@@ -12,8 +12,8 @@
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
-#include "../common/out_spikes.h"
-#include "recording.h"
+#include <common/out_spikes.h>
+#include <recording.h>
 #include <debug.h>
 #include <string.h>
 
@@ -545,23 +545,23 @@ void neuron_do_timestep_update(timer_t time) {
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
         input_t* exc_syn_input = input_type_get_input_value(
-        		synapse_types_get_excitatory_input(
-        				&(neuron_synapse_shaping_params[neuron_index])),
-						input_type, NUM_EXCITATORY_RECEPTORS);
+                synapse_types_get_excitatory_input(
+                        &(neuron_synapse_shaping_params[neuron_index])),
+                        input_type, NUM_EXCITATORY_RECEPTORS);
         input_t* inh_syn_input = input_type_get_input_value(
-        		synapse_types_get_inhibitory_input(
-        				&(neuron_synapse_shaping_params[neuron_index])),
-						input_type, NUM_INHIBITORY_RECEPTORS);
+                synapse_types_get_inhibitory_input(
+                        &(neuron_synapse_shaping_params[neuron_index])),
+                        input_type, NUM_INHIBITORY_RECEPTORS);
 
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
         REAL total_inh = 0;
 
         for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        	total_exc += exc_syn_input[i];
+            total_exc += exc_syn_input[i];
         }
         for (int i=0; i< NUM_INHIBITORY_RECEPTORS; i++){
-        	total_inh += inh_syn_input[i];
+            total_inh += inh_syn_input[i];
         }
 
         // record these neuron parameter. Just as cheap to set then to gate
@@ -571,9 +571,9 @@ void neuron_do_timestep_update(timer_t time) {
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
         input_type_convert_excitatory_input_to_current(
-        		exc_syn_input, input_type, voltage);
+                exc_syn_input, input_type, voltage);
         input_type_convert_inhibitory_input_to_current(
-        		inh_syn_input, input_type, voltage);
+                inh_syn_input, input_type, voltage);
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
@@ -584,8 +584,8 @@ void neuron_do_timestep_update(timer_t time) {
         // Update neuron parameters
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
-			NUM_INHIBITORY_RECEPTORS, inh_syn_input,
-			external_bias, neuron);
+            NUM_INHIBITORY_RECEPTORS, inh_syn_input,
+            external_bias, neuron);
 
         // Determine if a spike should occur
         bool spike = threshold_type_is_above_threshold(result, threshold_type);

@@ -57,5 +57,5 @@ class SpYNNakerSynapticMatrixReport(object):
                 for info in edge.synapse_information:
                     f.write("{}".format(connection_holder[edge, info]))
         except IOError:
-            logger.error("Generate_placement_reports: Can't open file"
-                         " %s for writing.", file_name, exc_info=True)
+            logger.exception("Generate_placement_reports: Can't open file"
+                             " %s for writing.", file_name)

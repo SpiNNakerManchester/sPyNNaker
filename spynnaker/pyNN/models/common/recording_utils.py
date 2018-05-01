@@ -28,10 +28,10 @@ def get_data(transceiver, placement, region, region_size):
 
     region_base_address = locate_memory_region_for_placement(
         placement, region, transceiver)
-    number_of_bytes_written_buf = buffer(transceiver.read_memory(
-        placement.x, placement.y, region_base_address, 4))
     number_of_bytes_written = _RECORDING_COUNT.unpack_from(
-        number_of_bytes_written_buf)[0]
+        transceiver.read_memory(
+            placement.x, placement.y, region_base_address,
+            _RECORDING_COUNT.size))[0]
 
     # Subtract 4 for the word representing the size itself
     expected_size = region_size - _RECORDING_COUNT.size

@@ -44,7 +44,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         timings = [device.device_control_timesteps_between_sending
                    for device in self._devices]
         max_time = max(timings)
-        time_between_send = int(max_time) / len(self._devices)
+        time_between_send = int(max_time) // len(self._devices)
 
         return [
             NeuronParameter(
