@@ -338,13 +338,6 @@ class PyNNPopulationCommon(object):
         self._set_check(parameter, value)
 
         # set new parameters
-        if isinstance(parameter, str):
-        if globals_variables.get_not_running_simulator().has_ran \
-                and not self._vertex_changeable_after_run:
-            raise Exception(
-                "This population does not support changes to settings after"
-                " run has been called")
-
         if isinstance(parameter, string_types):
             if value is None:
                 raise Exception("A value (not None) must be specified")
