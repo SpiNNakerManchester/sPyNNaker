@@ -339,7 +339,7 @@ class NeuronRecorder(object):
         msg = "Current implementation does not support multiple " \
               "sampling_intervals for {} on one population. " \
             .format(variable)
-        raise fec_excceptions.ConfigurationException(msg)
+        raise ConfigurationException(msg)
 
     def _turn_on_recording(self, variable, sampling_interval, indexes):
 
