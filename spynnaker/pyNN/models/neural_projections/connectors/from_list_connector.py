@@ -4,6 +4,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 import logging
 import numpy
+from six.moves import range
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +69,7 @@ class FromListConnector(AbstractConnector):
             weight_index = column_names.index("weight")
         if "delay" in column_names:
             delay_index = column_names.index("delay")
-        element_index = range(2, len(column_names))
+        element_index = list(range(2, len(column_names)))
 
         # figure out where other stuff is
         conn_list = numpy.array(conn_list)

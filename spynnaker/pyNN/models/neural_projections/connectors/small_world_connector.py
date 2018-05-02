@@ -115,7 +115,7 @@ class SmallWorldConnector(AbstractConnector):
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
-            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(

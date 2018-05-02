@@ -62,6 +62,13 @@ ifdef TIMING_DEPENDENCE
     TIMING_DEPENDENCE_O = $(call build_dir, $(TIMING_DEPENDENCE))
 endif
 
+SYNGEN_ENABLED = 1
+
+ifndef SYNAPTOGENESIS_DYNAMICS
+    SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNGEN_ENABLED = 0
+endif
+
 NEURON_O = $(call build_dir, $(SOURCE_DIR)/neuron/neuron.c)
 
 SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
@@ -70,27 +77,34 @@ SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
 	      $(SOURCE_DIR)/neuron/spike_processing.c \
 	      $(SOURCE_DIR)/neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
 	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES)
+	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES) $(SYNAPTOGENESIS_DYNAMICS)
 
 SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
                         $(SOURCE_DIR)/neuron/synapses.c \
                         $(SOURCE_DIR)/neuron/spike_processing.c \
                         $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
                         $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
-                        $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+                        $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c \
+                        $(SYNAPTOGENESIS_DYNAMICS)
 
-ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)             
+STDP_ENABLED = 0
+ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)
     STDP += $(SYNAPSE_DYNAMICS) \
-            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c
+            $(SOURCE_DIR)/neuron/plasticity/common/post_events.c \
+            $(SYNAPTOGENESIS_DYNAMICS)
+    STDP_ENABLED = 1
 endif
 
-include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+include $(SPINN_DIRS)/make/FrontEndCommon.mk
+FEC_OPT = $(OSPACE)
+CFLAGS += -I$(NEURAL_MODELLING_DIRS)/src
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
 	        $$(CFLAGS) \
+	        -DSTDP_ENABLED=$(STDP_ENABLED) \
 	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
 endef
 
@@ -100,6 +114,8 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	-mkdir -p $$(dir $$@)
 	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$$(PLASTIC_DEBUG) \
 	      $$(CFLAGS) \
+	      -DSTDP_ENABLED=$(STDP_ENABLED) \
+	      -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) \
 	      -include $$(SYNAPSE_TYPE_H) \
 	      -include $$(WEIGHT_DEPENDENCE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<

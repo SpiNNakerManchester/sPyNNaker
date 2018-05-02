@@ -50,7 +50,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
-        print path
+        print(path)
         AbstractSpinnakerBase(base.CONFIG_FILE, ExecutableFinder())
 
     def test_stop_init(self):

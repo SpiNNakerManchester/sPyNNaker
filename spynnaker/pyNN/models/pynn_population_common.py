@@ -14,6 +14,7 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
 import numpy
 import logging
+from six import iteritems, string_types
 logger = logging.getLogger(__file__)
 
 
@@ -52,7 +53,7 @@ class PyNNPopulationCommon(object):
         # copy the parameters so that the end users are not exposed to the
         # additions placed by spinnaker.
         if initial_values is not None:
-            for name, value in initial_values.iteritems():
+            for name, value in iteritems(initial_values):
                 self._vertex.set_value(name, value)
 
         # Introspect properties of the vertex
@@ -275,7 +276,7 @@ class PyNNPopulationCommon(object):
                 "This population does not support changes to settings after"
                 " run has been called")
 
-        if isinstance(parameter, str):
+        if isinstance(parameter, string_types):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self._read_parameters_before_set()
@@ -289,7 +290,7 @@ class PyNNPopulationCommon(object):
 
         # set new parameters
         self._read_parameters_before_set()
-        for _key, _value in parameter.iteritems():
+        for _key, _value in iteritems(parameter):
             self._vertex.set_value(_key, _value)
 
     def _read_parameters_before_set(self):

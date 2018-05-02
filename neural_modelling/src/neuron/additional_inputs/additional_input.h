@@ -1,7 +1,7 @@
 #ifndef _ADDITIONAL_INPUT_TYPE_H_
 #define _ADDITIONAL_INPUT_TYPE_H_
 
-#include "../../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
 
 //! Forward declaration of the additional input pointer
 typedef struct additional_input_t* additional_input_pointer_t;

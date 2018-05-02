@@ -110,7 +110,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxint
+                max_atoms = sys.maxsize
                 edge_pre_vertex = in_edge.pre_vertex
                 if (isinstance(edge_pre_vertex, ApplicationVertex) and
                         isinstance(
@@ -205,7 +205,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # if single, don' t add to start address as its going in its own block
         if not is_single:
-            start_addr = block_start_addr / 4
+            start_addr = block_start_addr // 4
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
@@ -275,9 +275,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # get entries in master pop
-        count_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address, 8)
-        n_entries, n_addresses = _TWO_WORDS.unpack(buffer(count_data))
+        n_entries, n_addresses = _TWO_WORDS.unpack(txrx.read_memory(
+            chip_x, chip_y, master_pop_base_mem_address, _TWO_WORDS.size))
         n_entry_bytes = (
             n_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
         n_address_bytes = (
@@ -285,7 +284,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # read in master pop structure
         full_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address + 8,
+            chip_x, chip_y, master_pop_base_mem_address + _TWO_WORDS.size,
             n_entry_bytes + n_address_bytes)
 
         # convert into a numpy arrays
@@ -319,8 +318,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             addresses.append((row_length, address, is_single))
         return addresses
 
-    def _locate_entry(self, entries, key):
-        """ searches the binary tree structure for the correct entry.
+    @staticmethod
+    def _locate_entry(entries, key):
+        """ Searches the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
         :return: the entry for this given key
@@ -330,7 +330,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         imax = len(entries)
 
         while imin < imax:
-            imid = (imax + imin) / 2
+            imid = (imax + imin) // 2
             entry = entries[imid]
             if key & entry["mask"] == entry["key"]:
                 return entry
