@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AbstractAdditionalInput
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 import numpy
 from enum import Enum
@@ -38,7 +38,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     def __init__(self, n_neurons, tau_ca2, i_ca2, i_alpha):
         self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[TAU_CA2] = tau_ca2
         self._data[I_CA2] = i_ca2
         self._data[I_ALPHA] = i_alpha

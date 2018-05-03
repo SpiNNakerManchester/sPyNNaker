@@ -1,8 +1,8 @@
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
-from .spynnaker_ranged_list import SpynakkerRangedList
+from .spynnaker_ranged_list import SpynnakerRangedList
 
 
-class SpynakkerRangeDictionary(RangeDictionary):
+class SpynnakerRangeDictionary(RangeDictionary):
 
     def list_factory(self, size, value, key):
         """
@@ -16,4 +16,4 @@ class SpynakkerRangeDictionary(RangeDictionary):
         :param key: The dict key this list covers.
         :return: AbstractList in this case a RangedList
         """
-        return SpynakkerRangedList(size, value, key)
+        return SpynnakerRangedList(size, value, key)

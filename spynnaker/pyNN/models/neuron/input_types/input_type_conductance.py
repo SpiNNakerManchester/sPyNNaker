@@ -2,7 +2,7 @@ from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 from .abstract_input_type import AbstractInputType
 
@@ -43,7 +43,7 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
             E_REV_I: "mV"}
 
         self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[E_REV_E] = e_rev_E
         self._data[E_REV_I] = e_rev_I
 
