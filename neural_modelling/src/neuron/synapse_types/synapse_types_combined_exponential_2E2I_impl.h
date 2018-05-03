@@ -14,11 +14,30 @@
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 2
 #define SYNAPSE_TYPE_COUNT 4
-#define SYNAPSE_INDEX_BITS 5   // Was 6
+//#define SYNAPSE_INDEX_BITS 5   // Was 6
+
+#define NUM_EXCITATORY_RECEPTORS 2
+#define NUM_INHIBITORY_RECEPTORS 2
 
  //---------------------------------------
  // Synapse parameters
  //---------------------------------------
+
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
+
+typedef struct bi_exp_params{
+ 	input_t exc_a_response;
+ 	input_t exc_a_A;
+ 	decay_t exc_a_decay;
+ 	decay_t exc_a_init;
+ 	input_t exc_b_response;
+ 	input_t exc_b_B;
+ 	decay_t exc_b_decay;
+ 	decay_t exc_b_init;
+}bi_exp_params;
+
+
  typedef struct synapse_param_t {
 	// excitatory
  	input_t exc_a_response;
@@ -179,16 +198,23 @@
  	}
  }
 
- static inline input_t synapse_types_get_excitatory_input(
+ static inline input_t* synapse_types_get_excitatory_input(
  		synapse_param_pointer_t parameter) {
-	 return (parameter->exc_a_A * parameter->exc_a_response) + (parameter->exc_b_B * parameter->exc_b_response) +
- 				(parameter->exc2_a_A * parameter->exc2_a_response) + (parameter->exc2_b_B * parameter->exc2_b_response);
+	 excitatory_response[0] = (parameter->exc_a_A * parameter->exc_a_response) +
+			 (parameter->exc_b_B * parameter->exc_b_response);
+	 excitatory_response[1] = (parameter->exc2_a_A * parameter->exc2_a_response) +
+			 (parameter->exc2_b_B * parameter->exc2_b_response);
+
+	 return &excitatory_response[0];
  }
 
- static inline input_t synapse_types_get_inhibitory_input(
+ static inline input_t* synapse_types_get_inhibitory_input(
  		synapse_param_pointer_t parameter) {
- 	return (parameter->inh_a_A * parameter->inh_a_response) + (parameter->inh_b_B * parameter->inh_b_response) +
- 		        (parameter->inh2_a_A * parameter->inh2_a_response) + (parameter->inh2_b_B * parameter->inh2_b_response);
+	 inhibitory_response[0] = (parameter->inh_a_A * parameter->inh_a_response) +
+			 	 (parameter->inh_b_B * parameter->inh_b_response);
+	 inhibitory_response[1] = (parameter->inh2_a_A * parameter->inh2_a_response) +
+	 	 	 	 (parameter->inh2_b_B * parameter->inh2_b_response);
+ 	 return &inhibitory_response[0];
  }
 
  static inline const char *synapse_types_get_type_char(

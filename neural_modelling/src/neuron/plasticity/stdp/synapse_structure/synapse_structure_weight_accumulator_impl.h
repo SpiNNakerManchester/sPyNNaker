@@ -77,8 +77,4 @@ static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
     return final_state;
 }
 
-<<<<<<< HEAD
 #endif //_SYNAPSE_STRUCUTRE_WEIGHT_ACCUMULATOR_IMPL_H_
-=======
-#endif // _SYNAPSE_STRUCUTRE_WEIGHT_STATE_ACCUMULATOR_IMPL_H_
->>>>>>> refs/remotes/origin/master

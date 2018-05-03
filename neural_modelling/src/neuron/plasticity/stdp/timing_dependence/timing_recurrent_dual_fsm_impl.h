@@ -18,7 +18,7 @@ typedef uint16_t pre_trace_t;
 // Include generic plasticity maths functions
 #include <neuron/plasticity/stdp/maths.h>
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
-#include "random_util.h"
+#include "random.h"
 
 typedef struct {
     int32_t accum_decay_per_ts;
@@ -62,7 +62,7 @@ extern threshold_type_pointer_t threshold_type_array;
 
 // How muany right shifts to apply to the voltage difference. This is set to 4. Why?
 // We assume a 16mV swing from resting potential to Vthresh. So a value of v_diff of 16mV
-// is translated into a multiplier of 1. Any lesser value for v_diff will scale the 
+// is translated into a multiplier of 1. Any lesser value for v_diff will scale the
 // multiplier in the potentiation rule by a value less than 1. (In fact the difference
 // between rest and threshold is 20mV (in this model) so this will not be exact, but
 // a multiple of 2 is convenient to calculate).
@@ -104,7 +104,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
     last_event_time = last_time;
 
     // Pick random number and use to draw from exponential distribution
-    uint32_t random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
+    uint32_t random = mars_kiss64_seed( recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
    if (syn_type == 0)
       window_length = pre_exp_dist_lookup_excit[random];
    else if (syn_type == 1)
@@ -296,7 +296,7 @@ static inline update_state_t timing_apply_post_spike(
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
          } else {
              //previous_state.accumulator = 0;
-             // Set accum to a sub-threshold value, so that two potentiations in quick 
+             // Set accum to a sub-threshold value, so that two potentiations in quick
              // succession are less likely:
              previous_state.accumulator = 0;
              // SD Only update weight if we are not yet getting enough potential
@@ -364,7 +364,7 @@ static inline weight_state_t weight_two_term_apply_potentiation_sd(
        accum acc_interpretation;
        int32_t int_interpretation;
    };
-       
+
    union accum_int scaled_v_diff;
    //accum scaled_v_diff;
    int32_t old_w = state.weight;
@@ -387,7 +387,7 @@ static inline weight_state_t weight_two_term_apply_potentiation_sd(
        //log_info("Max: %k, a2_plus: %k, shift: %d", state.weight_region->max_weight, state.weight_region->a2_plus, state.weight_multiply_right_shift);
        //log_info("shift: %d", state.weight_multiply_right_shift);
        //log_info("Diff: %k, scale1: %k, scale: %k oldW: %k, W: %k", v_diff, scale1, scale, old_w, state.weight);
-   //} 
+   //}
    return state;
 }
 

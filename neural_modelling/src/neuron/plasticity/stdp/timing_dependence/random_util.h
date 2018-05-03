@@ -1,5 +1,5 @@
 // Utility function
-static inline int32_t mars_kiss_fixed_point() {
+static inline uint32_t mars_kiss_fixed_point() {
 
     // **YUCK** copy and pasted rng to allow inlining and also to avoid
     // horrific executable bloat
@@ -24,5 +24,5 @@ static inline int32_t mars_kiss_fixed_point() {
     uint32_t random = x + y + w;
 
     // **YUCK** mask out and return STDP_FIXED_POINT_ONE lowest bits
-    return (int32_t)(random & (STDP_FIXED_POINT_ONE - 1));
+    return (uint32_t)(random & (STDP_FIXED_POINT_ONE - 1));
 }
