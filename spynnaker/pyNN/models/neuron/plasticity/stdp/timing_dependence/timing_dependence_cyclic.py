@@ -5,36 +5,91 @@ from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
-    import SynapseStructureWeightAccumulator
+    import SynapseStructureWeightRecurrentAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 
 
-class TimingDependenceRecurrent(AbstractTimingDependence):
+class TimingDependenceCyclic(AbstractTimingDependence):
     __slots__ = [
-        "accumulator_depression_plus_one",
-        "accumulator_potentiation_minus_one",
-        "dual_fsm",
-        "mean_post_window",
-        "mean_pre_window",
-        "_synapse_structure"]
+#         "accumulator_depression_plus_one",
+#         "accumulator_potentiation_minus_one",
+#         "dual_fsm",
+#         "mean_post_window",
+#         "mean_pre_window",
+#         "_synapse_structure",
+        #
+        'accum_decay',
+        'accum_dep_thresh_excit',
+        'accum_pot_thresh_excit',
+        'pre_window_tc_excit',
+        'post_window_tc_excit',
+        'accum_dep_thresh_excit2',
+        'accum_pot_thresh_excit2',
+        'pre_window_tc_excit2',
+        'post_window_tc_excit2',
+        'accum_dep_thresh_inhib',
+        'accum_pot_thresh_inhib',
+        'pre_window_tc_inhib',
+        'post_window_tc_inhib',
+        'accum_dep_thresh_inhib2',
+        'accum_pot_thresh_inhib2',
+        'pre_window_tc_inhib2',
+        'post_window_tc_inhib2',
+        'seed',
+        'accum_dep_plus_one_excit',
+        'accum_pot_minus_one_excit',
+        'accum_dep_plus_one_excit2',
+        'accum_pot_minus_one_excit2',
+        'accum_dep_plus_one_inhib',
+        'accum_pot_minus_one_inhib',
+        'accum_dep_plus_one_inhib2',
+        'accum_pot_minus_one_inhib2',
+        'rng',
+        '_synapse_structure'
+        ]
 
     default_parameters = {
-        'accumulator_depression': -6, 'accumulator_potentiation': 6,
-        'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
-
+#         'accumulator_depression': -6, 'accumulator_potentiation': 6,
+#         'mean_pre_window': 35.0, 'mean_post_window': 35.0
+        'accum_decay':10.00,
+        'accum_dep_thresh_excit':-6,
+        'accum_pot_thresh_excit':7,
+        'pre_window_tc_excit':20.0,
+        'post_window_tc_excit':25.0,
+        'accum_dep_thresh_excit2':-6,
+        'accum_pot_thresh_excit2':7,
+        'pre_window_tc_excit2':20.0,
+        'post_window_tc_excit2':25.0,
+        'accum_dep_thresh_inhib':-4,
+        'accum_pot_thresh_inhib':5,
+        'pre_window_tc_inhib':35.0,
+        'post_window_tc_inhib':45.0,
+        'accum_dep_thresh_inhib2':-4,
+        'accum_pot_thresh_inhib2':5,
+        'pre_window_tc_inhib2':35.0,
+        'post_window_tc_inhib2':45.0,
+        'seed':None}
 
     def __init__(
-            self, accum_decay = 10.00,
-            accum_dep_thresh_excit=-6, accum_pot_thresh_excit=7,
-            pre_window_tc_excit=20.0, post_window_tc_excit=25.0,
-            accum_dep_thresh_excit2=-6, accum_pot_thresh_excit2=7,
-            pre_window_tc_excit2=20.0, post_window_tc_excit2=25.0,
-            accum_dep_thresh_inhib=-4, accum_pot_thresh_inhib=5,
-            pre_window_tc_inhib=35.0, post_window_tc_inhib=45.0,
-            accum_dep_thresh_inhib2=-4, accum_pot_thresh_inhib2=5,
-            pre_window_tc_inhib2=35.0, post_window_tc_inhib2=45.0,
-            dual_fsm=True, seed=None):
+            self, accum_decay = default_parameters['accum_decay'],
+            accum_dep_thresh_excit=default_parameters['accum_dep_thresh_excit'],
+            accum_pot_thresh_excit=default_parameters['accum_pot_thresh_excit'],
+            pre_window_tc_excit=default_parameters['pre_window_tc_excit'],
+            post_window_tc_excit=default_parameters['post_window_tc_excit'],
+            accum_dep_thresh_excit2=default_parameters['accum_dep_thresh_excit2'],
+            accum_pot_thresh_excit2=default_parameters['accum_pot_thresh_excit2'],
+            pre_window_tc_excit2=default_parameters['pre_window_tc_excit2'],
+            post_window_tc_excit2=default_parameters['post_window_tc_excit2'],
+            accum_dep_thresh_inhib=default_parameters['accum_dep_thresh_inhib'],
+            accum_pot_thresh_inhib=default_parameters['accum_pot_thresh_inhib'],
+            pre_window_tc_inhib=default_parameters['pre_window_tc_inhib'],
+            post_window_tc_inhib=default_parameters['post_window_tc_inhib'],
+            accum_dep_thresh_inhib2=default_parameters['accum_dep_thresh_inhib2'],
+            accum_pot_thresh_inhib2=default_parameters['accum_pot_thresh_inhib2'],
+            pre_window_tc_inhib2=default_parameters['pre_window_tc_inhib2'],
+            post_window_tc_inhib2=default_parameters['post_window_tc_inhib2'],
+            seed=default_parameters['seed']):
         AbstractTimingDependence.__init__(self)
 
         self.accum_decay = accum_decay
@@ -62,7 +117,6 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         #self.accumulator_potentiation_minus_one = accumulator_potentiation - 1
         #self.mean_pre_window = mean_pre_window
         #self.mean_post_window = mean_post_window
-        self.dual_fsm = dual_fsm
         self.rng = numpy.random.RandomState(seed)
 
         self._synapse_structure = SynapseStructureWeightRecurrentAccumulator()
@@ -70,7 +124,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         if timing_dependence is None or not isinstance(
-                timing_dependence, TimingDependenceRecurrent):
+                timing_dependence, TimingDependenceCyclic):
             return False
         return ((self.accum_dep_plus_one_excit == other.accum_dep_plus_one_excit) and
                 (self.accum_pot_minus_one_excit == other.accum_pot_minus_one_excit) and
@@ -85,16 +139,13 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
-        if self.dual_fsm:
-            return "recurrent_dual_fsm"
-        return "recurrent_pre_stochastic"
+        return "cyclic"
 
     @property
     def pre_trace_n_bytes(self):
 
-        # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
-        return 2 if self.dual_fsm else 0
+        return 2
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):

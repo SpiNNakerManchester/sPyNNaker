@@ -264,7 +264,7 @@ bool synapses_initialise(
         ring_buffer_to_input_left_shifts[synapse_index] =
             synapse_params_address[
                 ring_buffer_input_left_shifts_base + synapse_index];
-        log_debug("synapse type %s, ring buffer to input left shift %u",
+        log_info("synapse type %s, ring buffer to input left shift %u",
                  synapse_types_get_type_char(synapse_index),
                  ring_buffer_to_input_left_shifts[synapse_index]);
     }

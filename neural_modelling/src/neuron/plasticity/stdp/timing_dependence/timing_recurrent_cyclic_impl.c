@@ -1,6 +1,6 @@
-#include "timing_recurrent_dual_fsm_impl.h"
 #include "random.h"
 #include <string.h>
+#include "timing_recurrent_cyclic_impl.h"
 
 //---------------------------------------
 // Globals
@@ -92,7 +92,7 @@ uint32_t *timing_initialise(address_t address) {
     lut_address += 4;
     validate_mars_kiss64_seed(recurrentSeed);
 
-    log_info("timing_initialise: completed successfully");
+    log_info("timing_cyclicinitialise: completed successfully");
 
     /*log_info("Pre exp table, I2:");
     for(int u = 0; u< 2048; u+=5) {

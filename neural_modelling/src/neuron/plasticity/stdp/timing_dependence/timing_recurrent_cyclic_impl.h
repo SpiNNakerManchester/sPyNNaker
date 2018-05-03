@@ -1,5 +1,5 @@
-#ifndef _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
-#define _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
+#ifndef _TIMING_RECURRENT_CYCLIC_IMPL_H_
+#define _TIMING_RECURRENT_CYCLIC_IMPL_H_
 
 //---------------------------------------
 // Typedefines
@@ -404,4 +404,4 @@ static inline weight_state_t weight_one_term_apply_depression_sd(
     return state;
 }
 
-#endif  // _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
+#endif  // _TIMING_RECURRENT_CYCLIC_IMPL_H_
