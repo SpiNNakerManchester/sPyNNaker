@@ -75,6 +75,8 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
             v_reset=default_parameters['v_reset'],
             v_thresh=default_parameters['v_thresh'],
             v_hist=default_parameters['v_hist'],
+            tau_refrac=default_parameters['tau_refrac'],
+            i_offset=default_parameters['i_offset'],
 
             # excitatory
             exc_a_response=default_parameters['exc_a_response'],
@@ -106,10 +108,7 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
             inh2_a_tau=default_parameters['inh2_a_tau'],
             inh2_b_response=default_parameters['inh2_b_response'],
             inh2_b_B=default_parameters['inh2_b_B'],
-            inh2_b_tau=default_parameters['inh2_b_tau'],
-
-            tau_refrac=default_parameters['tau_refrac'],
-            i_offset=default_parameters['i_offset'], v_init=None):
+            inh2_b_tau=default_parameters['inh2_b_tau']):
 
 
         # Construct neuron/synapse objects

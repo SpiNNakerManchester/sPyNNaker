@@ -21,7 +21,7 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
     @abstractmethod
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, max_atoms_per_core):
+            post_vertex_slice, n_synapse_types):
         """ Get the fixed-fixed data for each row, and lengths for the\
             fixed-fixed parts of each row.
 
