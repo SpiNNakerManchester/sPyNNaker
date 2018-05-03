@@ -340,6 +340,8 @@ class NeuronRecorder(object):
             # previous recording indexes does not matter as now all (None)
             self._indexes[variable] = None
         else:
+            # make sure indexes is not a generator like range
+            indexes = list(indexes)
             self.check_indexes(indexes)
             if self._indexes[variable] is None:
                 # just use the new indexes
