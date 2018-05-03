@@ -81,7 +81,6 @@ class EIEIOSpikeRecorder(object):
     @staticmethod
     def _process_spike_data(
             vertex_slice, spike_data, ms_per_tick, base_key, results):
-        spike_data = str(spike_data)
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:
