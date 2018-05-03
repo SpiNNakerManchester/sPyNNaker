@@ -1,5 +1,5 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.decorators import overrides
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from .neuron_model_leaky_integrate import NeuronModelLeakyIntegrate
 
@@ -11,6 +11,7 @@ from enum import Enum
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNTDOWN_TO_REFRACTORY_PERIOD = "countdown_to_refactory_period"
+_CPU_RESET_CYCLES = 20  # pure guesswork
 
 
 class _LIF_TYPES(Enum):
@@ -18,10 +19,12 @@ class _LIF_TYPES(Enum):
     V_RESET = (2, DataType.S1615)
     TAU_REFRACT = (3, DataType.INT32)
 
-    def __new__(cls, value, data_type):
+    def __new__(cls, value, data_type, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj._data_type = data_type
+        obj.__doc__ = doc
         return obj
 
     @property
@@ -30,12 +33,15 @@ class _LIF_TYPES(Enum):
 
 
 class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
+    __slots__ = [
+        "_my_units"]
 
     def __init__(
             self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
             tau_refrac):
-        NeuronModelLeakyIntegrate.__init__(
-            self, n_neurons, v_init, v_rest, tau_m, cm, i_offset)
+        # pylint: disable=too-many-arguments
+        super(NeuronModelLeakyIntegrateAndFire, self).__init__(
+            n_neurons, v_init, v_rest, tau_m, cm, i_offset)
         self._data[V_RESET] = v_reset
         self._data[TAU_REFRAC] = tau_refrac
         self._data[COUNTDOWN_TO_REFRACTORY_PERIOD] = 0
@@ -59,7 +65,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     @overrides(NeuronModelLeakyIntegrate.get_n_neural_parameters)
     def get_n_neural_parameters(self):
-        return NeuronModelLeakyIntegrate.get_n_neural_parameters(self) + 3
+        return super(NeuronModelLeakyIntegrateAndFire,
+                     self).get_n_neural_parameters() + 3
 
     def _tau_refrac_timesteps(self, machine_time_step):
         return self._data[TAU_REFRAC].apply_operation(
@@ -67,7 +74,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_neural_parameters(self, machine_time_step):
-        params = NeuronModelLeakyIntegrate.get_neural_parameters(self)
+        params = super(NeuronModelLeakyIntegrateAndFire,
+                       self).get_neural_parameters()
         params.extend([
 
             # count down to end of next refractory period [timesteps]
@@ -91,18 +99,19 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     @overrides(NeuronModelLeakyIntegrate.get_neural_parameter_types)
     def get_neural_parameter_types(self):
-        if_types = NeuronModelLeakyIntegrate.get_neural_parameter_types(self)
+        if_types = super(NeuronModelLeakyIntegrateAndFire,
+                         self).get_neural_parameter_types()
         if_types.extend([item.data_type for item in _LIF_TYPES])
         return if_types
 
     def get_n_cpu_cycles_per_neuron(self):
-
         # A guess - 20 for the reset procedure
-        return NeuronModelLeakyIntegrate.get_n_cpu_cycles_per_neuron(self) + 20
+        return super(NeuronModelLeakyIntegrateAndFire,
+                     self).get_n_cpu_cycles_per_neuron() + _CPU_RESET_CYCLES
 
     @overrides(NeuronModelLeakyIntegrate.get_units)
     def get_units(self, variable):
         if variable in self._my_units:
             return self._my_units[variable]
-        else:
-            return NeuronModelLeakyIntegrate.get_units(variable)
+        return super(NeuronModelLeakyIntegrateAndFire,
+                     self).get_units(variable)

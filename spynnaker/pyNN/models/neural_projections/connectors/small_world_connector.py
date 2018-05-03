@@ -1,13 +1,20 @@
 from .abstract_connector import AbstractConnector
+from spinn_utilities.overrides import overrides
 import numpy
 
 
 class SmallWorldConnector(AbstractConnector):
+    __slots__ = [
+        "_degree",
+        "_mask",
+        "_n_connections",
+        "_rewiring"]
 
     def __init__(
             self, degree, rewiring, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
-        AbstractConnector.__init__(self, safe, verbose)
+        # pylint: disable=too-many-arguments
+        super(SmallWorldConnector, self).__init__(safe, verbose)
         self._rewiring = rewiring
 
         if n_connections is not None:
@@ -25,23 +32,27 @@ class SmallWorldConnector(AbstractConnector):
         self._mask = (distances < degree).as_type(float)
         self._n_connections = numpy.sum(self._mask)
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._delays, self._n_connections)
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         return numpy.sum(
             self._mask[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-
+        # pylint: disable=too-many-arguments
         n_connections = numpy.amax([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
             for i in range(
@@ -54,50 +65,57 @@ class SmallWorldConnector(AbstractConnector):
             self._delays, self._n_connections,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = numpy.amax([
+        # pylint: disable=too-many-arguments
+        return numpy.amax([
             numpy.sum(self._mask[pre_vertex_slice.as_slice, i])
             for i in range(
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)])
 
-        return n_connections
-
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return False
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
+        # pylint: disable=too-many-arguments
         ids = numpy.where(self._mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
         n_connections = numpy.sum(ids)
 
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
-            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(

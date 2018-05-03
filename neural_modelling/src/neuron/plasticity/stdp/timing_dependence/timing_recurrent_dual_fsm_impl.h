@@ -7,18 +7,18 @@
 typedef uint16_t post_trace_t;
 typedef uint16_t pre_trace_t;
 
-#include "../synapse_structure/synapse_structure_weight_accumulator_impl.h"
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h>
 
 #include "timing.h"
-#include "../weight_dependence/weight_one_term.h"
+#include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 
 // Include debug header for log_info etc
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "../../common/maths.h"
-#include "../../common/stdp_typedefs.h"
-#include "random.h"
+#include <neuron/plasticity/stdp/maths.h>
+#include <neuron/plasticity/stdp/stdp_typedefs.h>
+#include "random_util.h"
 
 typedef struct {
     int32_t accum_decay_per_ts;

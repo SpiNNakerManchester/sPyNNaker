@@ -1,46 +1,12 @@
-from spinn_front_end_common.utilities import globals_variables
+from __future__ import print_function
 from pacman.model.graphs.common.slice import Slice
 import numpy
 import pytest
 import functools
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
 from spynnaker.pyNN.models.neural_projections.connectors \
     import FixedNumberPreConnector, FixedNumberPostConnector, \
-    FixedProbabilityConnector
-
-
-class MockPopulation(object):
-
-    def __init__(self, size, label):
-        self._size = size
-        self._label = label
-
-    @property
-    def size(self):
-        return self._size
-
-    @property
-    def label(self):
-        return self.label
-
-    def __repr__(self):
-        return "Population {}".format(self._label)
-
-
-class MockRNG(object):
-
-    def next(self, n):
-        return numpy.random.uniform(size=n)
-
-
-class MockSimulator(object):
-
-    def is_a_pynn_random(self, values):
-        return isinstance(values, MockRNG)
-
-    def get_pynn_NumpyRNG(self):
-        return MockRNG()
+    FixedProbabilityConnector, IndexBasedProbabilityConnector
+from unittests.mocks import MockSimulator, MockPopulation
 
 
 @pytest.fixture(scope="module", params=[10, 100])
@@ -70,7 +36,9 @@ def n_in_slice(request):
         functools.partial(FixedNumberPreConnector, 20, with_replacement=True),
         functools.partial(FixedNumberPostConnector, 20, with_replacement=True),
         functools.partial(FixedProbabilityConnector, 0.1),
-        functools.partial(FixedProbabilityConnector, 0.5)],
+        functools.partial(FixedProbabilityConnector, 0.5),
+        functools.partial(IndexBasedProbabilityConnector,
+                          "1 / sqrt(((i + 1) ** 2) + ((j + 1) ** 2))")],
     ids=[
         "FixedNumberPreConnector1-",
         "FixedNumberPostConnector1-",
@@ -81,7 +49,8 @@ def n_in_slice(request):
         "FixedNumberPreConnector20Replace-",
         "FixedNumberPreConnector20Replace-",
         "FixedProbabilityConnector0.1-",
-        "FixedProbabilityConnector0.5-"]
+        "FixedProbabilityConnector0.5-",
+        "IndexBasedProbabilityConnector"]
     )
 def create_connector(request):
     return request.param
@@ -100,9 +69,7 @@ def delay(request):
 def test_connectors(
         n_pre, n_post, n_in_slice, create_connector, weight, delay):
 
-    simulator = MockSimulator()
-    globals_variables.set_failed_state(SpynnakerFailedState())
-    globals_variables.set_simulator(simulator)
+    MockSimulator.setup()
 
     max_target = 0
     max_source = 0
@@ -177,11 +144,11 @@ def test_connectors(
             assert matrix_max_weight <= max_weight
             assert matrix_max_delay <= max_delay
         except Exception:
-            print connector.__class__.__name__
-            print max_row_length, max(source_histogram), source_histogram
-            print max_col_length, max(target_histogram), target_histogram
-            print max_weight, matrix_max_weight, synaptic_block["weight"]
-            print max_delay, matrix_max_delay, synaptic_block["delay"]
+            print(connector.__class__.__name__)
+            print(max_row_length, max(source_histogram), source_histogram)
+            print(max_col_length, max(target_histogram), target_histogram)
+            print(max_weight, matrix_max_weight, synaptic_block["weight"])
+            print(max_delay, matrix_max_delay, synaptic_block["delay"])
             raise
-    print (connector.__class__.__name__, max_row_length, max_source,
-           max_col_length, max_target)
+    print(connector.__class__.__name__, n_pre, n_post, max_row_length,
+          max_source, max_col_length, max_target)

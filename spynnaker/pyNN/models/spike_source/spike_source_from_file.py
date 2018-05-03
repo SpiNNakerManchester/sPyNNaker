@@ -1,7 +1,5 @@
-
 # spynnaker imports
-from spynnaker.pyNN.models.spike_source.spike_source_array import \
-    SpikeSourceArray
+from .spike_source_array import SpikeSourceArray
 from spynnaker.pyNN.utilities import utility_calls
 
 # general imports
@@ -18,15 +16,15 @@ class SpikeSourceFromFile(SpikeSourceArray):
             board_address=None, min_atom=None, max_atom=None, min_time=None,
             max_time=None, max_on_chip_memory_usage_for_spikes_in_bytes=None,
             constraints=None, split_value="\t", label="SpikeSourceArray"):
-
+        # pylint: disable=too-many-arguments, too-many-locals
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)
 
-        SpikeSourceArray.__init__(
-            self, n_neurons, spike_times, machine_time_step,
-            timescale_factor, port=port,
-            tag=tag, ip_address=ip_address, board_address=board_address,
+        super(SpikeSourceFromFile, self).__init__(
+            n_neurons, spike_times, machine_time_step, timescale_factor,
+            port=port, tag=tag, ip_address=ip_address,
+            board_address=board_address,
             max_on_chip_memory_usage_for_spikes_in_bytes=(
                 max_on_chip_memory_usage_for_spikes_in_bytes),
             constraints=constraints, label=label)
@@ -36,7 +34,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
         sub_sampled_array = {}
         for neuron in spike_array:
             times = [t for t in spike_array[neuron] if start <= t < stop]
-            interval = step / 2
+            interval = step // 2
             t_start = times[0]
             t_last = len(times)
             t_index = 0
@@ -65,6 +63,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
     @staticmethod
     def _convert_spike_list_to_timed_spikes(
             spike_list, min_idx, max_idx, tmin, tmax, tstep):
+        # pylint: disable=too-many-arguments
         times = numpy.array(range(tmin, tmax, tstep))
         spike_ids = sorted(spike_list)
         possible_neurons = range(min_idx, max_idx)

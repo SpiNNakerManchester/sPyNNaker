@@ -11,7 +11,6 @@
 *egg-info/
 MANIFEST
 /.cache/
-language.settings.xml
-spynnaker/pyNN/models/.DS_Store
-spynnaker/pyNN/models/neural_projections/.DS_Store
-neural_modelling/.settings/language.settings.xml
+.DS_Store
+.coverage
+/.pytest_cache

@@ -1,18 +1,29 @@
 import math
 import numpy
-from spinn_utilities.overrides import overrides
-from data_specification.enums.data_type import DataType
+from data_specification.enums import DataType
 
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.\
-    abstract_timing_dependence import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp\
-    .synapse_structure.synapse_structure_weight_recurrent_accumulator \
-    import SynapseStructureWeightRecurrentAccumulator
+from spinn_utilities.overrides import overrides
+from .abstract_timing_dependence import AbstractTimingDependence
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
+    import SynapseStructureWeightAccumulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    __slots__ = [
+        "accumulator_depression_plus_one",
+        "accumulator_potentiation_minus_one",
+        "dual_fsm",
+        "mean_post_window",
+        "mean_pre_window",
+        "_synapse_structure"]
+        
+    default_parameters = {
+        'accumulator_depression': -6, 'accumulator_potentiation': 6,
+        'mean_pre_window': 35.0, 'mean_post_window': 35.0, 'dual_fsm': True}
+    
+    
     def __init__(
             self, accum_decay = 10.00,
             accum_dep_thresh_excit=-6, accum_pot_thresh_excit=7,
@@ -26,7 +37,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             dual_fsm=True, seed=None):
         AbstractTimingDependence.__init__(self)
 
-        self.accum_decay               = accum_decay
+        self.accum_decay = accum_decay
 
         self.accum_dep_plus_one_excit  = accum_dep_thresh_excit + 1
         self.accum_pot_minus_one_excit = accum_pot_thresh_excit - 1
@@ -56,9 +67,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
         self._synapse_structure = SynapseStructureWeightRecurrentAccumulator()
 
-    def is_same_as(self, other):
-        if (other is None) or (not isinstance(
-                other, TimingDependenceRecurrent)):
+    @overrides(AbstractTimingDependence.is_same_as)
+    def is_same_as(self, timing_dependence):
+        if timing_dependence is None or not isinstance(
+                timing_dependence, TimingDependenceRecurrent):
             return False
         return ((self.accum_dep_plus_one_excit == other.accum_dep_plus_one_excit) and
                 (self.accum_pot_minus_one_excit == other.accum_pot_minus_one_excit) and
@@ -84,6 +96,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         # otherwise it's in the synapse
         return 2 if self.dual_fsm else 0
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
 
         # 2 * 32-bit parameters
@@ -103,6 +116,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def n_weight_terms(self):
         return 1
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Acc decay per timeStep is scaled up by 1024 to preserve 10-bit precision:

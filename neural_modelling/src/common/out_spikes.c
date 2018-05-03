@@ -29,8 +29,8 @@ void out_spikes_reset() {
 //! \return True if the initialisation was successful, false otherwise
 bool out_spikes_initialize(size_t max_spike_sources) {
     out_spikes_size = get_bit_field_size(max_spike_sources);
-    log_info("Out spike size is %u words, allowing %u spike sources",
-             out_spikes_size, max_spike_sources);
+    log_debug("Out spike size is %u words, allowing %u spike sources",
+              out_spikes_size, max_spike_sources);
     spikes = (timed_out_spikes *) spin1_malloc(
         sizeof(timed_out_spikes) + (out_spikes_size * sizeof(uint32_t)));
     if (spikes == NULL) {
@@ -46,13 +46,18 @@ bool out_spikes_initialize(size_t max_spike_sources) {
 //!        recording
 //! \param[in] channel The channel to record to
 //! \param[in] time The time at which the recording is being made
-void out_spikes_record(
+bool out_spikes_record(
         uint8_t channel, uint32_t time,
         recording_complete_callback_t callback) {
-    spikes->time = time;
-    recording_record_and_notify(
-        channel, spikes, (out_spikes_size + 1) * sizeof(uint32_t),
-        callback);
+    if (out_spikes_is_empty()) {
+        return false;
+    } else {
+        spikes->time = time;
+        recording_record_and_notify(
+            channel, spikes, (out_spikes_size + 1) * sizeof(uint32_t),
+            callback);
+        return true;
+    }
 }
 
 //! \brief Check if any spikes have been recorded
@@ -80,4 +85,14 @@ void out_spikes_print() {
         log_debug("-----------\n");
     }
 #endif // LOG_LEVEL >= LOG_DEBUG
+}
+
+void out_spike_info_print(){
+    log_debug("-----------\n");
+    index_t i; //!< For indexing through the bit field
+
+    for (i = 0; i < out_spikes_size; i++) {
+    	log_debug("%08x\n", out_spikes[i]);
+    }
+    log_debug("-----------\n");
 }

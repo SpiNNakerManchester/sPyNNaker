@@ -1,7 +1,7 @@
 #ifndef _TIMING_H_
 #define _TIMING_H_
 
-#include "../synapse_structure/synapse_structure.h"
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure.h>
 #include "../../../models/neuron_model.h"
 #include "../../../additional_inputs/additional_input.h"
 #include "../../../threshold_types/threshold_type.h"

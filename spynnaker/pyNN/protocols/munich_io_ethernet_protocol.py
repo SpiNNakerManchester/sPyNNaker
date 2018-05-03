@@ -77,12 +77,12 @@ class MunichIoEthernetProtocol(object):
     def led_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
         return "!PC={}\n!PC0={}\n!PC1={}\n".format(
-            active_time, active_time / 2, active_time / 2)
+            active_time, active_time // 2, active_time // 2)
 
     @staticmethod
     def speaker_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PB={}\n!PB0={}\n".format(active_time, active_time / 2)
+        return "!PB={}\n!PB0={}\n".format(active_time, active_time // 2)
 
     @staticmethod
     def speaker_total_period(total_period):
@@ -95,7 +95,7 @@ class MunichIoEthernetProtocol(object):
     @staticmethod
     def laser_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PA={}\n!PA0={}\n".format(active_time, active_time / 2)
+        return "!PA={}\n!PA0={}\n".format(active_time, active_time // 2)
 
     @staticmethod
     def laser_total_period(total_period):

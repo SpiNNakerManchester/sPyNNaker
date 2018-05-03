@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -6,25 +7,30 @@ import numpy
 
 
 class FixedProbabilityConnector(AbstractConnector):
+    __slots__ = [
+        "_allow_self_connections",
+        "_p_connect"]
+
     """
     For each pair of pre-post cells, the connection probability is constant.
 
-    :param `float` p_connect:
-        a float between zero and one. Each potential connection
-        is created with this probability.
-    :param `bool` allow_self_connections:
-        if the connector is used to connect a
-        Population to itself, this flag determines whether a neuron is
-        allowed to connect to itself, or only to other neurons in the
-        Population.
+    :param p_connect:
+        a float between zero and one. Each potential connection is created\
+        with this probability.
+    :type p_connect: float
+    :param allow_self_connections:
+        if the connector is used to connect a Population to itself, this flag\
+        determines whether a neuron is allowed to connect to itself, or only\
+        to other neurons in the Population.
+    :type allow_self_connections: bool
     :param `pyNN.Space` space:
-        a Space object, needed if you wish to specify distance-
-        dependent weights or delays - not implemented
+        a Space object, needed if you wish to specify distance-dependent\
+        weights or delays - not implemented
     """
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
             verbose=False):
-        AbstractConnector.__init__(self, safe, verbose)
+        super(FixedProbabilityConnector, self).__init__(safe, verbose)
         self._p_connect = p_connect
         self._allow_self_connections = allow_self_connections
 
@@ -32,15 +38,18 @@ class FixedProbabilityConnector(AbstractConnector):
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons, self._p_connect))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of):
@@ -48,10 +57,12 @@ class FixedProbabilityConnector(AbstractConnector):
             self._n_pre_neurons * self._n_post_neurons, out_of,
             self._p_connect)
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(post_vertex_slice.n_atoms)
 
         if min_delay is None or max_delay is None:
@@ -61,39 +72,49 @@ class FixedProbabilityConnector(AbstractConnector):
             self._delays, self._n_pre_neurons * self._n_post_neurons,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_n_connections(pre_vertex_slice.n_atoms)
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
         return self._get_weight_maximum(
             self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return (
             not self._generate_lists_on_host(self._weights) and
             not self._generate_lists_on_host(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-
+        # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
@@ -106,10 +127,9 @@ class FixedProbabilityConnector(AbstractConnector):
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
-        block = numpy.zeros(
-            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
+        block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
-            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(

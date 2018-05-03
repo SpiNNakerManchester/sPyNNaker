@@ -1,3 +1,5 @@
+from __future__ import print_function
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -9,43 +11,55 @@ logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractConnector):
-    """ Connects a fixed number of post-synaptic neurons selected at random,
+    """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons
     """
+
+    __slots__ = [
+        "_allow_self_connections",
+        "_n_post",
+        "_post_neurons",
+        "_post_neurons_set",
+        "_with_replacement"]
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
             safe=True, verbose=False):
         """
-        :param `int` n:
+        :param n: \
             number of random post-synaptic neurons connected to pre-neurons
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
-            Population.
-        :param `bool` with_replacement:
-            this flag determines how the random selection of post-synaptic
-            neurons is performed; if true, then every post-synaptic neuron
-            can be chosen on each occasion, and so multiple connections
-            between neuron pairs are possible; if false, then once a post-
-            synaptic neuron has been connected to a pre-neuron, it can't be
-            connected again
+        :type n: int
+        :param allow_self_connections: \
+            if the connector is used to connect a Population to itself, this\
+            flag determines whether a neuron is allowed to connect to itself,\
+            or only to other neurons in the Population.
+        :type allow_self_connections: bool
+        :param with_replacement: \
+            this flag determines how the random selection of post-synaptic\
+            neurons is performed; if true, then every post-synaptic neuron\
+            can be chosen on each occasion, and so multiple connections\
+            between neuron pairs are possible; if false, then once a\
+            post-synaptic neuron has been connected to a pre-neuron, it can't\
+            be connected again
+        :type with_replacement: bool
         """
-        AbstractConnector.__init__(self, safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
         self._with_replacement = with_replacement
         self._verbose = verbose
         self._post_neurons_set = False
 
+    @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._delays, self._get_n_connections(self._n_post))
 
+    @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_post_neurons(self):
@@ -58,12 +72,12 @@ class FixedNumberPostConnector(AbstractConnector):
             if self._verbose:
                 filename = self._pre_population.label + '_to_' + \
                     self._post_population.label + '_fixednumberpost-conn.csv'
-                print 'Output post-connectivity to ', filename
-                file_handle = file(filename, 'w')
-                numpy.savetxt(file_handle,
-                              [(self._n_pre_neurons, self._n_post_neurons,
-                                self._n_post)],
-                              fmt="%u,%u,%u")
+                print('Output post-connectivity to ', filename)
+                with open(filename, 'w') as file_handle:
+                    numpy.savetxt(file_handle,
+                                  [(self._n_pre_neurons, self._n_post_neurons,
+                                    self._n_post)],
+                                  fmt="%u,%u,%u")
 
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):
@@ -128,10 +142,12 @@ class FixedNumberPostConnector(AbstractConnector):
                 self._n_pre_neurons, self._n_post * out_of,
                 1.0 / self._n_post_neurons, chance=(1.0 / 100000.0))
 
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
+        # pylint: disable=too-many-arguments
 
         # Get probable max number of connections
         n_connections = self._n_post
@@ -143,39 +159,49 @@ class FixedNumberPostConnector(AbstractConnector):
             self._delays, self._n_post * self._n_pre_neurons,
             n_connections, None, min_delay, max_delay)
 
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-
+        # pylint: disable=too-many-arguments
         return int(math.ceil(
             self._get_n_connections(pre_vertex_slice.n_atoms)))
 
+    @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
+    @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             self._n_post * self._n_pre_neurons)
         return self._get_weight_maximum(self._weights, n_connections, None)
 
+    @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
+        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
+    @overrides(AbstractConnector.generate_on_machine)
     def generate_on_machine(self):
         return (
             not self._generate_lists_on_host(self._weights) and
             not self._generate_lists_on_host(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = pre_vertex_slice.lo_atom
         hi = pre_vertex_slice.hi_atom
