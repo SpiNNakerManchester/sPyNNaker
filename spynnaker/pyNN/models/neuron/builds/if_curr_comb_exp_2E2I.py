@@ -13,14 +13,14 @@ import numpy
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 32
+_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 class IFCurrCombExp2E2I(AbstractPopulationVertex):
-    """ Leaky integrate and fire neuron with 2 excitatory and 2 inhibitory\
-        synapses, each comprised of a combination of exponential functions:\
-        synaptic response = Ae^(-t/tau_a) + Be^(-t/tau_b)
+    """ Leaky integrate and fire neuron with 2 excitatory and 2 inhibitory \
+        synapses, each responding accodring to a combination of exponential \
+        functions: Ae^(-t/tau_a) + Be^(-t/tau_b)
     """
 
-    _max_feasible_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
@@ -64,11 +64,13 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
         'inh2_b_tau': 1}
         ##############################
 
+    initialize_parameters = {'v_init': None}
 
     def __init__(
             self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
             incoming_spike_buffer_size=None, constraints=None, label=None,
             tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
+            v_init=initialize_parameters['v_init'],
             v_rest=default_parameters['v_rest'],
             v_reset=default_parameters['v_reset'],
             v_thresh=default_parameters['v_thresh'],
@@ -153,15 +155,16 @@ class IFCurrCombExp2E2I(AbstractPopulationVertex):
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
 
-        AbstractPopulationVertex.__init__(
-            self, n_neurons=n_neurons, binary="IF_curr_comb_exp_2E2I.aplx", label=label,
+        super(IFCurrCombExp2E2I, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_comb_exp_2E2I.aplx", label=label,
             max_atoms_per_core=IFCurrCombExp2E2I._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="IF_curr_comb_exp_2E2I", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints, max_feasible_atoms_per_core=IFCurrCombExp2E2I._max_feasible_max_atoms_per_core)
+            threshold_type=threshold_type, constraints=constraints
+            )
 
     @staticmethod
     def set_model_max_atoms_per_core(
