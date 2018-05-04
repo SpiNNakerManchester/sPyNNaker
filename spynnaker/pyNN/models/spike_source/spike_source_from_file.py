@@ -34,7 +34,7 @@ class SpikeSourceFromFile(SpikeSourceArray):
         sub_sampled_array = {}
         for neuron in spike_array:
             times = [t for t in spike_array[neuron] if start <= t < stop]
-            interval = step / 2
+            interval = step // 2
             t_start = times[0]
             t_last = len(times)
             t_index = 0

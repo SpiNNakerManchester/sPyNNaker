@@ -11,8 +11,9 @@
 #include "threshold_types/threshold_type.h"
 #include "synapse_types/synapse_types.h"
 #include "plasticity/synapse_dynamics.h"
-#include "../common/out_spikes.h"
-#include "recording.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
+#include <common/out_spikes.h>
+#include <recording.h>
 #include <debug.h>
 #include <string.h>
 
@@ -213,41 +214,41 @@ void _reset_record_counter(){
 bool _neuron_load_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
-    log_info("loading parameters");
-    //log_info("loading global record parameters");
+    log_debug("loading parameters");
+    //log_debug("loading global record parameters");
     memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
-    //log_info("loading indexes parameters");
+    //log_debug("loading indexes parameters");
     memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
     //    indexes_t indexes = &indexes_array[neuron_index];
-    //    log_info("neuron = %u, spike index = %u, v index = %u,"
+    //    log_debug("neuron = %u, spike index = %u, v index = %u,"
     //        "exc index = %u, inh index = %u", neuron_index,
     //        indexes->spike, indexes->v,
     //        indexes->exc, indexes->inh);
     //}
 
-    //log_info("loading neuron global parameters");
+    //log_debug("loading neuron global parameters");
     memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
-    //log_info("loading neuron local parameters");
+    log_debug("loading neuron local parameters");
     memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
-    //log_info("loading input type parameters");
+    log_debug("loading input type parameters");
     memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
-    //log_info("loading additional input type parameters");
+    log_debug("loading additional input type parameters");
     memcpy(additional_input_array, &address[next],
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
-    //log_info("loading threshold type parameters");
+    log_debug("loading threshold type parameters");
     memcpy(threshold_type_array, &address[next],
            n_neurons * sizeof(threshold_type_t));
 
@@ -262,7 +263,7 @@ bool _neuron_load_neuron_parameters(address_t address){
 //! \return bool which is true if the reload of the neuron parameters was
 //! successful or not
 bool neuron_reload_neuron_parameters(address_t address){
-    log_info("neuron_reloading_neuron_parameters: starting");
+    log_debug("neuron_reloading_neuron_parameters: starting");
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
@@ -281,11 +282,11 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size) {
-    log_info("neuron_initialise: starting");
+    log_debug("neuron_initialise: starting");
 
     random_backoff = address[RANDOM_BACKOFF];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
-    log_info(
+    log_debug(
         "\t back off = %u, time between spikes %u",
         random_backoff, time_between_spikes);
 
@@ -297,9 +298,9 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
 
     // output if this model is expecting to transmit
     if (!use_key){
-        log_info("\tThis model is not expecting to transmit as it has no key");
+        log_debug("\tThis model is not expecting to transmit as it has no key");
     } else{
-        log_info("\tThis model is expected to transmit with key = %08x", key);
+        log_debug("\tThis model is expected to transmit with key = %08x", key);
     }
 
     // Read the neuron details
@@ -310,7 +311,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
 
     // log message for debug purposes
-    log_info(
+    log_debug(
         "\t neurons = %u, spike buffer size = %u, params size = %u,"
         "input type size = %u, threshold size = %u", n_neurons,
         *incoming_spike_buffer_size, sizeof(neuron_t),
@@ -418,7 +419,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         voltages = (timed_state_t *) spin1_malloc(
             voltages_size + sizeof(state_t));
     }
-    //log_info("voltage_size = %u", voltages_size);
+    //log_debug("voltage_size = %u", voltages_size);
 
     if (global_record_params->exc_recording == n_neurons){
         exc_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -430,7 +431,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_excitatory = (timed_input_t *) spin1_malloc(
             exc_size + sizeof(input_struct_t));
     }
-    //log_info("exc_size = %u", exc_size);
+    //log_debug("exc_size = %u", exc_size);
 
     if (global_record_params->inh_recording == n_neurons){
         inh_size = sizeof(uint32_t) + sizeof(input_struct_t) * n_neurons;
@@ -442,7 +443,7 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
         inputs_inhibitory = (timed_input_t *) spin1_malloc(
             inh_size + sizeof(input_struct_t));
     }
-    //log_info("inh_size = %u", inh_size);
+    //log_debug("inh_size = %u", inh_size);
 
     _print_neuron_parameters();
 
@@ -455,34 +456,34 @@ void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
-    log_info("writing parameters");
+    log_debug("writing parameters");
 
-    //log_info("writing gobal recordi parameters");
+    log_debug("writing gobal recordi parameters");
     memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
-    //log_info("writing index local parameters");
+    log_debug("writing index local parameters");
     memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
-    //log_info("writing neuron global parameters");
+    //log_debug("writing neuron global parameters");
     memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
-    //log_info("writing neuron local parameters");
+    log_debug("writing neuron local parameters");
     memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
-    //log_info("writing input type parameters");
+    log_debug("writing input type parameters");
     memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
-    //log_info("writing additional input type parameters");
+    log_debug("writing additional input type parameters");
     memcpy(&address[next], additional_input_array,
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
-    //log_info("writing threshold type parameters");
+    log_debug("writing threshold type parameters");
     memcpy(&address[next], threshold_type_array,
            n_neurons * sizeof(threshold_type_t));
 }
@@ -544,23 +545,23 @@ void neuron_do_timestep_update(timer_t time) {
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
         input_t* exc_syn_input = input_type_get_input_value(
-        		synapse_types_get_excitatory_input(
-        				&(neuron_synapse_shaping_params[neuron_index])),
-						input_type, NUM_EXCITATORY_RECEPTORS);
+                synapse_types_get_excitatory_input(
+                        &(neuron_synapse_shaping_params[neuron_index])),
+                        input_type, NUM_EXCITATORY_RECEPTORS);
         input_t* inh_syn_input = input_type_get_input_value(
-        		synapse_types_get_inhibitory_input(
-        				&(neuron_synapse_shaping_params[neuron_index])),
-						input_type, NUM_INHIBITORY_RECEPTORS);
+                synapse_types_get_inhibitory_input(
+                        &(neuron_synapse_shaping_params[neuron_index])),
+                        input_type, NUM_INHIBITORY_RECEPTORS);
 
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
         REAL total_inh = 0;
 
         for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        	total_exc += exc_syn_input[i];
+            total_exc += exc_syn_input[i];
         }
         for (int i=0; i< NUM_INHIBITORY_RECEPTORS; i++){
-        	total_inh += inh_syn_input[i];
+            total_inh += inh_syn_input[i];
         }
 
         // record these neuron parameter. Just as cheap to set then to gate
@@ -570,9 +571,9 @@ void neuron_do_timestep_update(timer_t time) {
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
         input_type_convert_excitatory_input_to_current(
-        		exc_syn_input, input_type, voltage);
+                exc_syn_input, input_type, voltage);
         input_type_convert_inhibitory_input_to_current(
-        		inh_syn_input, input_type, voltage);
+                inh_syn_input, input_type, voltage);
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
@@ -583,15 +584,15 @@ void neuron_do_timestep_update(timer_t time) {
         // Update neuron parameters
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
-			NUM_INHIBITORY_RECEPTORS, inh_syn_input,
-			external_bias, neuron);
+            NUM_INHIBITORY_RECEPTORS, inh_syn_input,
+            external_bias, neuron);
 
         // Determine if a spike should occur
         bool spike = threshold_type_is_above_threshold(result, threshold_type);
 
         // If the neuron has spiked
         if (spike) {
-            //log_info("neuron %u spiked at time %u", neuron_index, time);
+            //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
             neuron_model_has_spiked(neuron);
@@ -623,11 +624,9 @@ void neuron_do_timestep_update(timer_t time) {
 
 
         } else {
-            #if LOG_LEVEL >= LOG_DEBUG
-                log_debug("the neuron %d has been determined to not spike",
-                          neuron_index);
-            #endif // LOG_LEVEL >= LOG_DEBUG
-        }
+            log_debug("the neuron %d has been determined to not spike",
+                      neuron_index);
+         }
     }
 
     // Disable interrupts to avoid possible concurrent access

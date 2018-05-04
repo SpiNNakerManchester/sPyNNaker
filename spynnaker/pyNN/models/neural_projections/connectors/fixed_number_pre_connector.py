@@ -92,11 +92,11 @@ class FixedNumberPreConnector(AbstractConnector):
             if self._verbose:
                 filename = self._pre_population.label + '_to_' + \
                     self._post_population.label + '_fixednumberpre-conn.csv'
-                file_handle = file(filename, 'w')
-                numpy.savetxt(file_handle,
-                              [(self._n_pre_neurons, self._n_post_neurons,
-                                self._n_pre)],
-                              fmt="%u,%u,%u")
+                with open(filename, 'w') as file_handle:
+                    numpy.savetxt(file_handle,
+                                  [(self._n_pre_neurons, self._n_post_neurons,
+                                    self._n_pre)],
+                                  fmt="%u,%u,%u")
 
             # Loop over all the post neurons
             for m in range(0, self._n_post_neurons):

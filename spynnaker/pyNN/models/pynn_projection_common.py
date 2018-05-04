@@ -90,7 +90,7 @@ class PyNNProjectionCommon(object):
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
 
-        if max_delay > (user_max_delay / (machine_time_step / 1000.0)):
+        if max_delay > user_max_delay / (machine_time_step / 1000.0):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 

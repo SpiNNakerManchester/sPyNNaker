@@ -95,7 +95,7 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters,
     while True:
         try:
             for iterator in iterators:
-                (cmd_word_list, cmd_string) = iterator.next()
+                (cmd_word_list, cmd_string) = next(iterator)
                 spec.write_command_to_files(cmd_word_list, cmd_string)
         except StopIteration:
             return
@@ -198,7 +198,7 @@ def read_in_data_from_file(
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
             else:
-                print "failed to enter {}:{}".format(neuron_id, time)
+                print("failed to enter {}:{}".format(neuron_id, time))
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
     return result[numpy.lexsort((times, atom_ids))]
