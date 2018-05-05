@@ -154,7 +154,7 @@ class PopulationMachineVertex(
             report=n_saturations > 0,
             message=(
                 "The weights from the plastic synapses for {} on {}, {}, {} "
-                "saturated {} times. If this causes issue sincrease the "
+                "saturated {} times. If this causes issue increase the "
                 "spikes_per_second and / or ring_buffer_sigma values located "
                 "within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_plastic_saturations))))
