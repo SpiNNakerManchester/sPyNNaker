@@ -287,8 +287,6 @@ uint32_t spike_processing_get_ghost_pop_table_searches(){
 	return population_table_get_ghost_pop_table_searches();
 }
 
-
-
 //! \brief get the address of the circular buffer used for buffering received
 //! spikes before processing them
 //! \return address of circular buffer

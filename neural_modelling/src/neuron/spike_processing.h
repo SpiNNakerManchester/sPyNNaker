@@ -52,7 +52,6 @@ bool get_dma_busy();
 //! \return bool: currently, always true
 bool do_rewiring(int number_of_rew);
 
-
 //! exposing this so that other classes can call it
 void _setup_synaptic_dma_read();
 
