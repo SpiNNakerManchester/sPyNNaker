@@ -59,6 +59,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
+uint32_t synapse_dynamics_get_plastic_saturation_count(){
+	return 0;
+}
 
 //! \brief  Don't search the synaptic row for the the connection with the
 //!         specified post-synaptic id -- no rewiring here
@@ -103,3 +106,4 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
     use(type);
     return false;
 }
+
