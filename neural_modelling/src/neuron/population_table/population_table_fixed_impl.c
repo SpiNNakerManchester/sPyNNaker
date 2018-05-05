@@ -9,6 +9,7 @@
 static uint16_t master_population_table[MASTER_POPULATION_MAX];
 static address_t synaptic_rows_base_address;
 static uint32_t row_size_table[ROW_SIZE_TABLE_MAX];
+uint32_t ghost_pop_table_searches = 0;
 
 static inline void _print_master_population_table() {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -147,6 +148,7 @@ bool population_table_get_first_address(
         log_debug(
             "spike %u (= %x): population not found in master population table",
             spike, spike);
+        ghost_pop_table_searches++;
         return false;
     }
 
@@ -180,4 +182,8 @@ bool population_table_get_next_address(
 
     // We assume there is only one row in this representation
     return false;
+}
+
+uint32_t population_table_get_ghost_pop_table_searches(){
+	return ghost_pop_table_searches;
 }

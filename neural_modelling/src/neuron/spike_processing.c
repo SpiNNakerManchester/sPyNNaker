@@ -283,6 +283,12 @@ uint32_t spike_processing_get_buffer_overflows() {
     return in_spikes_get_n_buffer_overflows();
 }
 
+uint32_t spike_processing_get_ghost_pop_table_searches(){
+	return population_table_get_ghost_pop_table_searches();
+}
+
+
+
 //! \brief get the address of the circular buffer used for buffering received
 //! spikes before processing them
 //! \return address of circular buffer

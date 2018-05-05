@@ -41,7 +41,8 @@ class PopulationMachineVertex(
         names=[("PRE_SYNAPTIC_EVENT_COUNT", 0),
                ("SATURATION_COUNT", 1),
                ("BUFFER_OVERFLOW_COUNT", 2),
-               ("CURRENT_TIMER_TIC", 3)])
+               ("CURRENT_TIMER_TIC", 3),
+               ("GHOST_POP_TABLE_SEARCHES", 4)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -112,6 +113,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.PRE_SYNAPTIC_EVENT_COUNT.value]
         last_timer_tick = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TIC.value]
+        n_ghost_searches = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.GHOST_POP_TABLE_SEARCHES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -143,6 +146,16 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Last_timer_tic_the_core_ran_to"),
             last_timer_tick))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number of failed pop table searches"),
+            n_ghost_searches,
+            report=n_ghost_searches >= 0,
+            message=(
+                "The number of failed population table searches for {} on {},"
+                " {}, {} was {}. If this number is large relative to the "
+                "predicted incoming spike rate, try increasing source and "
+                "target neruons per core".format(
+                    label, x, y, p, n_ghost_searches))))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)

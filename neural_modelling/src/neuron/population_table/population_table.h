@@ -32,4 +32,7 @@ bool population_table_get_first_address(
 bool population_table_get_next_address(
     address_t* row_address, size_t* n_bytes_to_transfer);
 
+
+uint32_t population_table_get_ghost_pop_table_searches();
+
 #endif // _POPULATION_TABLE_H_
