@@ -41,7 +41,7 @@ class PopulationMachineVertex(
         names=[("PRE_SYNAPTIC_EVENT_COUNT", 0),
                ("SATURATION_COUNT", 1),
                ("BUFFER_OVERFLOW_COUNT", 2),
-               ("CURRENT_TIMER_TIC", 3)
+               ("CURRENT_TIMER_TIC", 3),
                ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4)])
 
     PROFILE_TAG_LABELS = {
