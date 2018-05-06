@@ -114,9 +114,8 @@ class PopulationMachineVertex(
         last_timer_tick = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TIC.value]
         n_plastic_saturations = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES. \
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
-
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -149,7 +148,8 @@ class PopulationMachineVertex(
             self._add_name(names, "Last_timer_tic_the_core_ran_to"),
             last_timer_tick))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_plastic_synaptic_weights_have_saturated"),
+            self._add_name(names,
+                           "Times_plastic_synaptic_weights_have_saturated"),
             n_plastic_saturations,
             report=n_saturations > 0,
             message=(
