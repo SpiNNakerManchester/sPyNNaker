@@ -106,4 +106,3 @@ bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
     use(type);
     return false;
 }
-
