@@ -22,6 +22,7 @@ static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
+uint32_t plastic_saturation_count = 0;
 
 //---------------------------------------
 // Macros
@@ -294,8 +295,17 @@ bool synapse_dynamics_process_plastic_synapses(
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
-        ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
-            final_state);
+
+        uint32_t accumulation = ring_buffers[ring_buffer_index] +
+        		synapse_structure_get_final_weight(final_state);
+
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test){
+        	accumulation = sat_test - 1;
+        	plastic_saturation_count += 1;
+        }
+
+        ring_buffers[ring_buffer_index] = accumulation;
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
@@ -328,6 +338,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
+uint32_t synapse_dynamics_get_plastic_saturation_count(){
+	return plastic_saturation_count;
+}
 
 #if SYNGEN_ENABLED == 1
 
