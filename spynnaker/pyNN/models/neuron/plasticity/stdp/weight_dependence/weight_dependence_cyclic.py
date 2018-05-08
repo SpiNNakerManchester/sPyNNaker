@@ -2,9 +2,9 @@ from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence\
     .abstract_weight_dependence import AbstractWeightDependence
+from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 
-
-class WeightDependenceCyclic(AbstractWeightDependence):
+class WeightDependenceCyclic(AbstractWeightDependence, AbstractHasAPlusAMinus):
     default_parameters = {
         'w_min_excit': 1,
         'w_max_excit': 2,
