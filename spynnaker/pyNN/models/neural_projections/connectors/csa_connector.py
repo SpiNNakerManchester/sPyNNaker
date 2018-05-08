@@ -70,10 +70,10 @@ class CSAConnector(AbstractConnector):
         self._post_neurons = [x[1] for x in self._pair_list]
 
         if self._verbose:
-            print 'full cset: ', self._full_cset
-            print 'this vertex pair_list: ', self._pair_list
-            print 'this vertex pre_neurons: ', self._pre_neurons
-            print 'this vertex post_neurons: ', self._post_neurons
+            print('full cset: ', self._full_cset)
+            print('this vertex pair_list: ', self._pair_list)
+            print('this vertex pre_neurons: ', self._pre_neurons)
+            print('this vertex post_neurons: ', self._post_neurons)
 
         n_connections = len(self._pre_neurons)  # size of the array created
         return n_connections
