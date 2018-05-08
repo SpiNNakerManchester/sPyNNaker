@@ -18,5 +18,5 @@ __all__ = ["AbstractConnector", "AllToAllConnector", "ArrayConnector",
            "CSAConnector", "DistanceDependentProbabilityConnector",
            "FixedNumberPostConnector", "FixedNumberPreConnector",
            "FixedProbabilityConnector", "FromFileConnector",
-           "FromListConnector", "MultapseConnector", "OneToOneConnector",
-           "SmallWorldConnector", ]
+           "FromListConnector", "IndexBasedProbabilityConnector",
+           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector", ]
