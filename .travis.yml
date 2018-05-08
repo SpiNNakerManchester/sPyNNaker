@@ -1,6 +1,9 @@
 language: python
-python: "2.7"
+python:
+  - 2.7
+  - 3.6
 dist: trusty
+cache: pip
 
 addons:
   apt:
@@ -10,8 +13,6 @@ addons:
       - libxml2-utils
       - gcc-arm-none-eabi
       - libnewlib-arm-none-eabi
-
-cache: pip
 
 before_install:
   # Work around ludicrous Travis bug

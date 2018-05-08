@@ -11,13 +11,14 @@ from unittests.mocks import MockSimulator
 
 import os
 import struct
+from six.moves import xrange
 
 
 def _iterate_parameter_values(iterator, data_type):
     alist = list()
     while True:
         try:
-            (cmd_word_list, _) = iterator.next()
+            (cmd_word_list, _) = next(iterator)
             data = struct.unpack_from(
                 "<I{}".format(data_type.struct_encoding),
                 cmd_word_list)[1]

@@ -1,3 +1,4 @@
+from __future__ import print_function
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities import utility_calls
@@ -71,12 +72,12 @@ class FixedNumberPostConnector(AbstractConnector):
             if self._verbose:
                 filename = self._pre_population.label + '_to_' + \
                     self._post_population.label + '_fixednumberpost-conn.csv'
-                print 'Output post-connectivity to ', filename
-                file_handle = file(filename, 'w')
-                numpy.savetxt(file_handle,
-                              [(self._n_pre_neurons, self._n_post_neurons,
-                                self._n_post)],
-                              fmt="%u,%u,%u")
+                print('Output post-connectivity to ', filename)
+                with open(filename, 'w') as file_handle:
+                    numpy.savetxt(file_handle,
+                                  [(self._n_pre_neurons, self._n_post_neurons,
+                                    self._n_post)],
+                                  fmt="%u,%u,%u")
 
         # Loop over all the pre neurons
         for m in range(0, self._n_pre_neurons):

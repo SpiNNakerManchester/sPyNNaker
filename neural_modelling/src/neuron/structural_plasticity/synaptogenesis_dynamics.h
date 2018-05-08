@@ -11,7 +11,7 @@
 #define _SYNAPTOGENESIS_DYNAMICS_H_
 
 
-#include "../spike_processing.h"
+#include <neuron/spike_processing.h>
 
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //! parameters (random seed, spread of receptive field etc.)
@@ -19,7 +19,7 @@
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(
-	address_t sdram_sp_address);
+    address_t sdram_sp_address);
 
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring

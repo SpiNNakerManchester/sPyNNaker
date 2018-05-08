@@ -1,4 +1,4 @@
-from six import add_metaclass
+from six import add_metaclass, string_types
 from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -327,14 +327,14 @@ class AbstractConnector(object):
             return numpy.concatenate([
                 values[connection_slice]
                 for connection_slice in connection_slices]).astype("float64")
-        elif isinstance(values, basestring) or callable(values):
+        elif isinstance(values, string_types) or callable(values):
             if self._space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
                         self._pre_population, self._post_population))
 
             expand_distances = True
-            if isinstance(values, basestring):
+            if isinstance(values, string_types):
                 expand_distances = self._expand_distances(values)
 
             d = self._space.distances(
@@ -342,7 +342,7 @@ class AbstractConnector(object):
                 self._post_population.positions,
                 expand_distances)
 
-            if isinstance(values, basestring):
+            if isinstance(values, string_types):
                 return _expr_context.eval(values)
             return values(d)
         raise Exception("what on earth are you giving me?")

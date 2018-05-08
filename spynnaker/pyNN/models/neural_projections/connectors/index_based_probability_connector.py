@@ -1,75 +1,67 @@
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
 import logging
 import numpy
 import math
 
-# support for arbitrary expression for the distance dependence
+# support for arbitrary expression for the indices
 from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
 from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
 from numpy import log, log10, modf, power, sin, sinh, sqrt
 from numpy import tan, tanh, maximum, minimum, e, pi
 
 logger = logging.getLogger(__name__)
-_d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
-                           cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
-                           log, log10, modf, power, sin, sinh, sqrt, tan, tanh,
-                           maximum, minimum, e=e, pi=pi)
+_index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
+                               ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
+                               ldexp, log, log10, modf, power, sin, sinh, sqrt,
+                               tan, tanh, maximum, minimum, e=e, pi=pi)
 
 
-class DistanceDependentProbabilityConnector(AbstractConnector):
-    """ Make connections using a distribution which varies with distance.
+class IndexBasedProbabilityConnector(AbstractConnector):
+    """ Make connections using a probability distribution which varies
+        dependent upon the indices of the pre- and post-populations.
     """
 
-    __slots__ = [
+    __slots = [
         "_allow_self_connections",
-        "_d_expression",
+        "_index_expression",
         "_probs"]
 
     def __init__(
-            self, d_expression, allow_self_connections=True, safe=True,
-            verbose=False, n_connections=None):
+            self, index_expression, allow_self_connections=True, rng=None,
+            safe=True, callback=None, verbose=False):
         """
-        :param `string` d_expression:\
-            the right-hand side of a valid python expression for\
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
-            that can be parsed by eval(), that computes the distance\
-            dependent distribution
-        :param `bool` allow_self_connections:\
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
-            or only to other neurons in the Population.
-        :param `pyNN.Space` space:\
-            a Space object, needed if you wish to specify distance-dependent\
-            weights or delays
-        :param `int` n_connections:\
-            The number of efferent synaptic connections per neuron.
+
+        :param `string` index_expression:
+            the right-hand side of a valid python expression for
+            probability, involving the indices of the pre and post populations,
+            that can be parsed by eval(), that computes a probability dist.
+        :param `bool` allow_self_connections:
+            if the connector is used to connect a
+            Population to itself, this flag determines whether a neuron is
+            allowed to connect to itself, or only to other neurons in the
+            Population.
         """
-        # pylint: disable=too-many-arguments
-        super(DistanceDependentProbabilityConnector, self).__init__(
-            safe, verbose)
-        self._d_expression = d_expression
+        super(IndexBasedProbabilityConnector, self).__init__(safe, verbose)
+        self._index_expression = index_expression
         self._allow_self_connections = allow_self_connections
 
-        if n_connections is not None:
-            raise NotImplementedError(
-                "n_connections is not implemented for"
-                " DistanceDependentProbabilityConnector on this platform")
+        self._probs = None
 
-        # Get the probabilities up-front for now
-        # TODO: Work out how this can be done statistically
-        expand_distances = self._expand_distances(self._d_expression)
-        pre_positions = self._pre_population.positions
-        post_positions = self._post_population.positions
-
-        d = self._space.distances(
-            pre_positions, post_positions, expand_distances)
-        self._probs = _d_expr_context.eval(self._d_expression, d=d)
+    def _update_probs_from_index_expression(self):
+        # note: this only needs to be done once
+        if self._probs is None:
+            # numpy array of probabilities using the index_expression
+            self._probs = numpy.fromfunction(
+                lambda i, j: _index_expr_context.eval(
+                    self._index_expression, i=i, j=j),
+                (self._n_pre_neurons, self._n_post_neurons))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
+        self._update_probs_from_index_expression()
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
@@ -80,10 +72,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
+        self._update_probs_from_index_expression()
         max_prob = numpy.amax(
             self._probs[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
         return utility_calls.get_probable_maximum_selected(
@@ -95,7 +87,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             post_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
@@ -110,7 +101,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
         return self._get_n_connections(
             pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
 
@@ -118,14 +108,12 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
         return self._get_weight_mean(self._weights, None)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
             pre_vertex_slice, post_vertex_slice)
@@ -136,7 +124,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
     @overrides(AbstractConnector.generate_on_machine)
@@ -148,14 +135,18 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        # pylint: disable=too-many-arguments
+
+        # setup probs here
+        self._update_probs_from_index_expression()
+
         probs = self._probs[
-            pre_slice_index.to_slice, post_slice_index.to_slice]
+            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
+
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
-        # If self connections are not allowed, remove possibility the self
-        # connections by setting them to a value of infinity
+        # If self connections are not allowed, remove the possibility of self
+        # connections by setting the probability to a value of infinity
         if not self._allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
@@ -164,9 +155,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         n_connections = numpy.sum(present)
 
         block = numpy.zeros(
-            n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
+            n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = (
-            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+            (ids / post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
@@ -177,8 +168,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         return block
 
     def __repr__(self):
-        return "DistanceDependentProbabilityConnector({})".format(
-            self._d_expression)
+        return "IndexBasedProbabilityConnector({})".format(
+            self._index_expression)
 
     @property
     def allow_self_connections(self):
@@ -189,9 +180,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         self._allow_self_connections = new_value
 
     @property
-    def d_expression(self):
-        return self._d_expression
+    def index_expression(self):
+        return self._index_expression
 
-    @d_expression.setter
-    def d_expression(self, new_value):
-        self._d_expression = new_value
+    @index_expression.setter
+    def index_expression(self, new_value):
+        self._index_expression = new_value

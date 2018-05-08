@@ -1,9 +1,9 @@
 #ifndef _SYNAPSE_DYNAMICS_H_
 #define _SYNAPSE_DYNAMICS_H_
 
-#include "../../common/neuron-typedefs.h"
-#include "../synapse_row.h"
-#include "../../common/sp_structs.h"
+#include <common/neuron-typedefs.h>
+#include <neuron/synapse_row.h>
+#include <neuron/structural_plasticity/sp_structs.h>
 
 address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons,
@@ -29,6 +29,10 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
+//! \brief returns the number of ring buffer saturation events due to adding
+//! plastic weights.
+//! return coutner for saturation events or 0
+uint32_t synapse_dynamics_get_plastic_saturation_count();
 
 //-----------------------------------------------------------------------------
 // Synaptic rewiring functions

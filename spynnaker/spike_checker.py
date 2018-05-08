@@ -4,7 +4,7 @@ import numpy
 def synfire_spike_checker(spikes, nNeurons):
     if isinstance(spikes, numpy.ndarray):
         sorted_spikes = spikes[spikes[:, 1].argsort()]
-        print len(sorted_spikes)
+        print(len(sorted_spikes))
         num = 0
         for row in sorted_spikes:
             if num != round(row[0]):
@@ -51,7 +51,7 @@ def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
     if False in used:
         numpy.savetxt("sorted_spikes.csv", sorted_spikes, fmt=['%d', '%d'],
                       delimiter=',')
-        print used
+        print(used)
         raise Exception("Expected " + str(lines) + " spike lines")
 
 
