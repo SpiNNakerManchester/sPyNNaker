@@ -74,17 +74,6 @@ static inline void synapse_types_shape_input(
 	_exp_shaping(&parameter->inh);
 }
 
-//! \brief helper function to add input for a given timer period to a given
-//! neuron
-//! \param[in]  parameter: the pointer to the parameters to use
-//! \param[in] input the inputs to add.
-//! \return None
-static inline void _add_input_exp(exp_params_t* exp_params, input_t input){
-
-	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			decay_s1615(input, exp_params->init);
-}
-
 //! \brief adds the inputs for a give timer period to a given neuron that is
 //! being simulated by this model
 //! \param[in] synapse_type_index the type of input that this input is to be
@@ -92,6 +81,12 @@ static inline void _add_input_exp(exp_params_t* exp_params, input_t input){
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
+static inline void _add_input_exp(exp_params_t* exp_params, input_t input){
+
+	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
+			decay_s1615(input, exp_params->init);
+}
+
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
