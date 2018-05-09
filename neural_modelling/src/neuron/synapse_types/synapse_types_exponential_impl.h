@@ -32,13 +32,15 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
+typedef struct exp_params_t{
+	decay_t decay;
+    decay_t init;
+    input_t synaptic_input_value;
+}exp_params_t;
+
 typedef struct synapse_param_t {
-    decay_t exc_decay;
-    decay_t exc_init;
-    decay_t inh_decay;
-    decay_t inh_init;
-    input_t input_buffer_excitatory_value;
-    input_t input_buffer_inhibitory_value;
+	exp_params_t exc;
+	exp_params_t inh;
 } synapse_param_t;
 
 typedef enum input_buffer_regions {
@@ -57,15 +59,19 @@ typedef enum input_buffer_regions {
 //! to the neuron.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
+static inline void _exp_shaping(exp_params_t* exp_params){
+
+    // decay value according to decay constant
+	exp_params->synaptic_input_value =
+			decay_s1615(exp_params->synaptic_input_value,
+					exp_params->decay);
+}
+
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
 
-    parameter->input_buffer_excitatory_value = decay_s1615(
-        parameter->input_buffer_excitatory_value,
-        parameter->exc_decay);
-    parameter->input_buffer_inhibitory_value = decay_s1615(
-        parameter->input_buffer_inhibitory_value,
-        parameter->inh_decay);
+	_exp_shaping(&parameter->exc);
+	_exp_shaping(&parameter->inh);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -75,18 +81,21 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs for that given synapse_type.
 //! \return None
+static inline void _add_input_exp(exp_params_t* exp_params, input_t input){
+
+	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
+			decay_s1615(input, exp_params->init);
+}
+
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
+
     if (synapse_type_index == EXCITATORY) {
-        parameter->input_buffer_excitatory_value =
-            parameter->input_buffer_excitatory_value +
-            decay_s1615(input, parameter->exc_init);
+    	_add_input_exp(&parameter->exc, input);
 
     } else if (synapse_type_index == INHIBITORY) {
-        parameter->input_buffer_inhibitory_value =
-            parameter->input_buffer_inhibitory_value +
-            decay_s1615(input, parameter->inh_init);
+    	_add_input_exp(&parameter->inh, input);
     }
 }
 
@@ -96,7 +105,7 @@ static inline void synapse_types_add_neuron_input(
 //! \return the excitatory input buffers for a given neuron id.
 static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
-    excitatory_response[0] = parameter->input_buffer_excitatory_value;
+    excitatory_response[0] = parameter->exc.synaptic_input_value;
     return &excitatory_response[0];
 }
 
@@ -106,7 +115,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 //! \return the inhibitory input buffers for a given neuron id.
 static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
-    inhibitory_response[0] = parameter->input_buffer_inhibitory_value;
+    inhibitory_response[0] = parameter->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }
 
@@ -136,22 +145,22 @@ static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
     io_printf(
         IO_BUF, "%12.6k - %12.6k",
-        parameter->input_buffer_excitatory_value,
-        parameter->input_buffer_inhibitory_value);
+        parameter->exc.synaptic_input_value,
+        parameter->inh.synaptic_input_value);
 }
 
 //! \brief printer call
 //! \param[in] parameter: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(
         synapse_param_pointer_t parameter) {
-    log_debug("exc_decay = %R\n", (unsigned fract) parameter->exc_decay);
-    log_debug("exc_init  = %R\n", (unsigned fract) parameter->exc_init);
-    log_debug("inh_decay = %R\n", (unsigned fract) parameter->inh_decay);
-    log_debug("inh_init  = %R\n", (unsigned fract) parameter->inh_init);
+    log_debug("exc_decay = %R\n", (unsigned fract) parameter->exc.decay);
+    log_debug("exc_init  = %R\n", (unsigned fract) parameter->exc.init);
+    log_debug("inh_decay = %R\n", (unsigned fract) parameter->inh.decay);
+    log_debug("inh_init  = %R\n", (unsigned fract) parameter->inh.init);
     log_debug("gsyn_excitatory_initial_value = %11.4k\n",
-              parameter->input_buffer_excitatory_value);
+              parameter->exc.synaptic_input_value);
     log_debug("gsyn_inhibitory_initial_value = %11.4k\n",
-              parameter->input_buffer_inhibitory_value);
+              parameter->inh.synaptic_input_value);
 }
 
 #endif  // _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
