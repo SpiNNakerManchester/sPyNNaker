@@ -153,21 +153,18 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
             self._data[TAU_SYN_I], machine_time_step)
 
         return [
-            # excitatory
             NeuronParameter(e_decay, _DUAL_EXP_TYPES.E_DECAY.data_type),
             NeuronParameter(e_init, _DUAL_EXP_TYPES.E_INIT.data_type),
+            NeuronParameter(e_decay2, _DUAL_EXP_TYPES.E2_DECAY.data_type),
+            NeuronParameter(e_init2, _DUAL_EXP_TYPES.E2_INIT.data_type),
+            NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
+            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
                 self._data[INITIAL_INPUT_EXC],
                 _DUAL_EXP_TYPES.INITIAL_EXC.data_type),
-            # excitatory2
-            NeuronParameter(e_decay2, _DUAL_EXP_TYPES.E2_DECAY.data_type),
-            NeuronParameter(e_init2, _DUAL_EXP_TYPES.E2_INIT.data_type),
             NeuronParameter(
                 self._data[INITIAL_INPUT_EXC2],
                 _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
-            # inhibitory
-            NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
-            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
                 self._data[INITIAL_INPUT_INH],
                 _DUAL_EXP_TYPES.INITIAL_INH.data_type)
