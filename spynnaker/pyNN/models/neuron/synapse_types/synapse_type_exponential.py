@@ -137,12 +137,14 @@ class SynapseTypeExponential(AbstractSynapseType, AbstractContainsUnits):
             self._data[TAU_SYN_I], machine_time_step)
 
         return [
+            # Excitatory
             NeuronParameter(e_decay, _EXP_TYPES.E_DECAY.data_type),
             NeuronParameter(e_init, _EXP_TYPES.E_INIT.data_type),
-            NeuronParameter(i_decay, _EXP_TYPES.I_DECAY.data_type),
-            NeuronParameter(i_init, _EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
                 self._data[GSYN_EXC], _EXP_TYPES.INITIAL_EXC.data_type),
+            # Inhibitory
+            NeuronParameter(i_decay, _EXP_TYPES.I_DECAY.data_type),
+            NeuronParameter(i_init, _EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
                 self._data[GSYN_INH], _EXP_TYPES.INITIAL_INH.data_type)
         ]
