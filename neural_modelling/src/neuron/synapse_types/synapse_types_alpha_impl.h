@@ -26,7 +26,7 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-typedef struct alpha_params{
+typedef struct alpha_params_t{
     // buffer for linear term
     input_t lin_buff;
 
@@ -38,11 +38,11 @@ typedef struct alpha_params{
 
     // Exponential decay multiplier
     decay_t decay;
-}alpha_params;
+}alpha_params_t;
 
 typedef struct synapse_param_t {
-    alpha_params exc;
-    alpha_params inh;
+    alpha_params_t exc;
+    alpha_params_t inh;
 } synapse_param_t;
 
 //! human readable definition for the positions in the input regions for the
@@ -55,7 +55,7 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
-static inline void _alpha_shaping(alpha_params* a_params){
+static inline void _alpha_shaping(alpha_params_t* a_params){
     a_params->lin_buff = a_params->lin_buff + a_params->dt_divided_by_tau_sqr;
 
     // Update exponential buffer
@@ -75,7 +75,12 @@ static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
             parameter->exc.lin_buff * parameter->exc.exp_buff); */
 }
 
-static inline void _add_input_alpha(alpha_params* a_params, input_t input){
+//! \brief helper function to add input for a given timer period to a given
+//! neuron
+//! \param[in]  parameter: the pointer to the parameters to use
+//! \param[in] input the inputs to add.
+//! \return None
+static inline void _add_input_alpha(alpha_params_t* a_params, input_t input){
     a_params->exp_buff = (a_params->exp_buff * input) + ONE;
 
     a_params->lin_buff = (a_params->lin_buff
