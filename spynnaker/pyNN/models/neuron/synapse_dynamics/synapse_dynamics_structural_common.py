@@ -107,8 +107,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         'grid': np.array([16, 16]), 'lateral_inhibition': 0,
         'random_partner': False}
 
-    BIT_MASK_8_BIT = 2**8-1
-    BIT_MASK_16_BIT = 2**16-1
+    BIT_MASK_8_BIT = 2 ** 8 - 1
+    BIT_MASK_16_BIT = 2 ** 16 - 1
     OFFSET_MASKED_POP = 32 - 8
     OFFSET_MASKED_SUB_POP = 16
 
@@ -418,6 +418,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         # Compute the max number of presynaptic subpopulations
         population_to_subpopulation_information = collections.OrderedDict()
+        projection_types = collections.OrderedDict()
 
         # Can figure out the presynaptic subvertices (machine vertices)
         # for the current machine vertex
@@ -438,6 +439,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                         structural_application_edges.append(app_edge)
                         population_to_subpopulation_information[
                             app_edge.pre_vertex] = []
+                        projection_types[
+                            app_edge.pre_vertex] = synapse_info.synapse_type
                         break
 
         no_pre_populations = len(structural_application_edges)
@@ -479,7 +482,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             current_key = current_key.first_key
         else:
             current_key = -1
-        return (population_to_subpopulation_information, current_key,
+        return (population_to_subpopulation_information, projection_types,
+                current_key,
                 no_pre_populations)
 
     def __write_presynaptic_information(self, spec, application_graph,
@@ -515,15 +519,19 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: None
         """
         # Compute all the auxiliary stuff
-        pop_to_subpop_info, current_key, no_prepops = self.__compute_aux(
-            application_graph, machine_graph, app_vertex, machine_vertex,
-            graph_mapper, routing_info)
+        pop_to_subpop_info, projection_types, \
+        current_key, no_prepops = \
+            self.__compute_aux(
+                application_graph, machine_graph, app_vertex, machine_vertex,
+                graph_mapper, routing_info)
 
         # Table header
         spec.write_value(data=no_prepops)
 
         total_words_written = 0
-        for subpopulation_list in itervalues(pop_to_subpop_info):
+        for subpopulation_list, syn_type in zip(
+                itervalues(pop_to_subpop_info),
+                itervalues(projection_types)):
             # Population header(s)
             # Number of subpopulations
             spec.write_value(data=len(subpopulation_list),
@@ -532,13 +540,18 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             # Custom header for commands / controls
             # currently, controls = True if the subvertex (on the current core)
             # is part of this population
+            # In other words, controls is 0 if connection is considered FF
+            # otherwise the connections if lat
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
+            # TODO Write connection type
+
+            spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
 
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
                     subpopulation_list) > 0 else 0)
-            words_written = 2
+            words_written = 2 + 1
 
             # Ensure the following values are written in ascending
             # order of low_atom (implicit)
@@ -560,7 +573,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 words_written += 4
 
             total_words_written += words_written
-
+        # TODO This should be done in a FormationRule object
         # Now we write the probability tables for formation
         # (feedforward and lateral)
         spec.write_value(data=self._ff_distance_probabilities.size)

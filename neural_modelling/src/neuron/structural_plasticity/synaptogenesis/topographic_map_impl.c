@@ -73,7 +73,7 @@ typedef struct {
 
 //! individual pre-synaptic sub-population information
 typedef struct {
-    int16_t no_pre_vertices, sp_control;
+    int16_t no_pre_vertices, sp_control, connection_type;
     int32_t total_no_atoms;
     key_atom_info_t *key_atom_info;
 } subpopulation_info_t;
@@ -122,6 +122,7 @@ typedef struct {
     uint32_t current_time;
     // what is the current control word
     int16_t current_controls;
+    int32_t connection_type;
     // what are the global pre- and post-synaptic neuron ids
     uint32_t global_pre_syn_id, global_post_syn_id;
     // does the post to pre table have contain a connection for the selected
@@ -185,7 +186,7 @@ static inline int pack(
 //! \return address_t Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
 {
-    log_debug("SR init.");
+    log_info("SR init.");
     log_debug("Registering DMA callback");
     simulation_dma_transfer_done_callback_on(
 	    DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING,
@@ -197,6 +198,9 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     rewiring_data.p_rew = *sp_word++;
     rewiring_data.weight[0] = *sp_word++;
     rewiring_data.weight[1] = *sp_word++;
+
+    log_info("w[%d, %d]",rewiring_data.weight[0],rewiring_data.weight[1]);
+
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
@@ -247,6 +251,8 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         subpopinfo->no_pre_vertices = *half_word++;
         subpopinfo->sp_control = *half_word++;
         sp_word = (int32_t *) half_word;
+        subpopinfo->connection_type = *sp_word++;
+        log_info("syn_type %d", subpopinfo->connection_type);
         subpopinfo->total_no_atoms = *sp_word++;
         subpopinfo->key_atom_info = sark_alloc(
         	subpopinfo->no_pre_vertices, sizeof(key_atom_info_t));
@@ -464,6 +470,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     current_state.post_syn_id = post_id;
     current_state.current_controls = rewiring_data.pre_pop_info_table
             .subpop_info[pre_app_pop].sp_control;
+    current_state.connection_type = rewiring_data.pre_pop_info_table
+            .subpop_info[pre_app_pop].connection_type;
 
     // Compute distances
     // To do this I need to take the DIV and MOD of the
@@ -568,9 +576,7 @@ bool synaptogenesis_dynamics_elimination_rule(void)
 {
     // Is synaptic weight <.5 g_max? (i.e. synapse is depressed)
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
-    int appr_scaled_weight = rewiring_data.lateral_inhibition ?
-            rewiring_data.weight[current_state.current_controls] :
-            rewiring_data.weight[0];
+    int appr_scaled_weight = rewiring_data.weight[current_state.connection_type];
     if (current_state.sp_data.weight < (appr_scaled_weight / 2) &&
             r > rewiring_data.p_elim_dep) {
         return false;
@@ -628,13 +634,11 @@ bool synaptogenesis_dynamics_formation_rule(void)
     if (r > probability) {
         return false;
     }
-    int appr_scaled_weight = rewiring_data.weight[
-	    rewiring_data.lateral_inhibition ? current_state.current_controls : 0];
+    int appr_scaled_weight = rewiring_data.weight[current_state.connection_type];
 
     if (!add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             appr_scaled_weight, rewiring_data.delay,
-            rewiring_data.lateral_inhibition ?
-            current_state.current_controls : 0)) {
+            current_state.connection_type)) {
         return false;
     }
     DMA_WRITEBACK("DMA queue full-formation");
