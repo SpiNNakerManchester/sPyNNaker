@@ -25,11 +25,12 @@ from data_specification.enums import DataType
 # spynnaker
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors \
-    import OneToOneConnector
+    import OneToOneConnector, AbstractGenerateConnectorOnMachine
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic, AbstractSynapseDynamicsStructural
+    import SynapseDynamicsStatic, AbstractSynapseDynamicsStructural, \
+    AbstractGenerateOnMachine
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
@@ -66,6 +67,7 @@ _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
+_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 24 # TODO: Check
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
@@ -298,6 +300,29 @@ class SynapticManager(object):
 
         return memory_size * _SYNAPSE_SDRAM_OVERSCALE
 
+    def _get_size_of_generator_information(self, in_edges):
+        gen_on_machine = False
+        size = 0
+        for in_edge in in_edges:
+            if isinstance(in_edge, ProjectionApplicationEdge):
+                connector = in_edge.synapse_information.connector
+                synapse_dynamics = in_edge.synapse_information.synapse_dynamics
+                connector_gen = isinstance(
+                    connector, AbstractGenerateConnectorOnMachine)
+                synapse_gen = isinstance(
+                    synapse_dynamics, AbstractGenerateOnMachine)
+                if connector_gen and synapse_gen:
+                    gen_on_machine = True
+                    size += sum((
+                        connector.gen_delay_params_size_in_bytes,
+                        connector.gen_weight_params_size_in_bytes,
+                        connector.gen_connector_params_size_in_bytes,
+                        synapse_dynamics.gen_matrix_params_size_in_bytes
+                    ))
+        if gen_on_machine:
+            size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
+        return size
+
     def _get_size_of_synapse_information(
             self, synapse_information, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
@@ -344,7 +369,8 @@ class SynapticManager(object):
             self._get_estimate_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
             self._poptable_type.get_master_population_table_size(
-                vertex_slice, in_edges))
+                vertex_slice, in_edges) +
+            self._get_size_of_generator_information(in_edges))
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
