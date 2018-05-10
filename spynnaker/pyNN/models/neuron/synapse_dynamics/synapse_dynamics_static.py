@@ -171,6 +171,6 @@ class SynapseDynamicsStatic(
         return n_words
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_id)
-    def gen_on_machine_matrix_id(self):
+    @overrides(AbstractGenerateOnMachine.gen_matrix_id)
+    def gen_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value

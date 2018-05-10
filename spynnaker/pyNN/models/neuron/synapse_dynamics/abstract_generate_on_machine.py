@@ -22,14 +22,14 @@ class AbstractGenerateOnMachine(object):
         return True
 
     @abstractproperty
-    def gen_on_machine_matrix_id(self):
+    def gen_matrix_id(self):
         """ The ID of the on-machine matrix generator
 
         :rtype: int
         """
 
     @property
-    def gen_on_machine_matrix_params(self):
+    def gen_matrix_params(self):
         """ Any parameters required by the matrix generator
 
         :rtype: numpy array of uint32
@@ -37,7 +37,7 @@ class AbstractGenerateOnMachine(object):
         return numpy.zeros(0, dtype="uint32")
 
     @property
-    def gen_on_machine_matrix_params_size_in_bytes(self):
+    def gen_matrix_params_size_in_bytes(self):
         """ The size of the parameters of the matrix generator in bytes
 
         :rtype: int

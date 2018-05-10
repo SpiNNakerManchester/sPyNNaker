@@ -366,17 +366,17 @@ class SynapseDynamicsSTDP(
         return n_connections
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_id)
-    def gen_on_machine_matrix_id(self):
+    @overrides(AbstractGenerateOnMachine.gen_matrix_id)
+    def gen_matrix_id(self):
         return MatrixGeneratorID.STDP_MATRIX.value
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_params)
-    def gen_on_machine_matrix_params(self):
+    @overrides(AbstractGenerateOnMachine.gen_matrix_params)
+    def gen_matrix_params(self):
         return numpy.zeros(0, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateOnMachine.
-               gen_on_machine_matrix_params_size_in_bytes)
-    def gen_on_machine_matrix_params_size_in_bytes(self):
+               gen_matrix_params_size_in_bytes)
+    def gen_matrix_params_size_in_bytes(self):
         return 0

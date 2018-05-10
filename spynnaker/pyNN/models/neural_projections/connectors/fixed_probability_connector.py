@@ -140,20 +140,20 @@ class FixedProbabilityConnector(AbstractConnector):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.gen_on_machine_connector_id)
-    def gen_on_machine_connector_id(self):
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
-               gen_on_machine_connector_params)
-    def gen_on_machine_connector_params(self):
+               gen_connector_params)
+    def gen_connector_params(self):
         return numpy.array([
             self.allow_self_connections,
             int(self._p_connect * DataType.S1615.scale)], dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
-               gen_on_machine_connector_params_size_in_bytes)
-    def gen_on_machine_connector_params_size_in_bytes(self):
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
         return 8

@@ -198,18 +198,18 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         self._allow_self_connections = new_value
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.gen_on_machine_connector_id)
-    def gen_on_machine_connector_id(self):
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
-               gen_on_machine_connector_params)
-    def gen_on_machine_connector_params(self):
+               gen_connector_params)
+    def gen_connector_params(self):
         return numpy.array([self.allow_self_connections], dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
-               gen_on_machine_connector_params_size_in_bytes)
-    def gen_on_machine_connector_params_size_in_bytes(self):
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
         return 4

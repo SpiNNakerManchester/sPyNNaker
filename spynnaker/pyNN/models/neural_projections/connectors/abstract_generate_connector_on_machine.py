@@ -102,7 +102,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
                 self._generate_lists_on_machine(self._delays))
 
     @property
-    def gen_on_machine_weights_id(self):
+    def gen_weights_id(self):
         """ Get the id of the weight generator on the machine
 
         :rtype: int
@@ -110,7 +110,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_id(self._weights)
 
     @property
-    def gen_on_machine_weights_params(self):
+    def gen_weights_params(self):
         """ Get the parameters of the weight generator on the machine
 
         :rtype: numpy array of uint32
@@ -118,7 +118,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_params(self._weights)
 
     @property
-    def gen_on_machine_weight_params_size_in_bytes(self):
+    def gen_weight_params_size_in_bytes(self):
         """ The size of the weight parameters in bytes
 
         :rtype: int
@@ -126,7 +126,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_params_size_in_bytes(self._weights)
 
     @property
-    def gen_on_machine_delays_id(self):
+    def gen_delays_id(self):
         """ Get the id of the delay generator on the machine
 
         :rtype: int
@@ -134,7 +134,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_id(self._delays)
 
     @property
-    def gen_on_machine_delay_params(self):
+    def gen_delay_params(self):
         """ Get the parameters of the delay generator on the machine
 
         :rtype: numpy array of uint32
@@ -142,7 +142,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_params(self._delays)
 
     @property
-    def gen_on_machine_delay_params_size_in_bytes(self):
+    def gen_delay_params_size_in_bytes(self):
         """ The size of the delay parameters in bytes
 
         :rtype: int
@@ -150,14 +150,14 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return self._param_generator_params_size_in_bytes(self._delays)
 
     @abstractproperty
-    def gen_on_machine_connector_id(self):
+    def gen_connector_id(self):
         """ Get the id of the connection generator on the machine
 
         :rtype: int
         """
 
     @property
-    def gen_on_machine_connector_params(self):
+    def gen_connector_params(self):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32
@@ -165,7 +165,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return numpy.zeros(0, dtype="uint32")
 
     @property
-    def gen_on_machine_connector_params_size_in_bytes(self):
+    def gen_connector_params_size_in_bytes(self):
         """ The size of the connector parameters in bytes.
 
         :rtype: int
