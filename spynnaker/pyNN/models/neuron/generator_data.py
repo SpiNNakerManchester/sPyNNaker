@@ -32,7 +32,7 @@ class GeneratorData(object):
 
         connector = synapse_information.connector
         synapse_dynamics = synapse_information.synapse_dynamics
-        self._connector_type_hash = connector.gen_on_machine_connector_id
-        self._matrix_type_hash = synapse_dynamics.gen_on_machine_matrix_id
-        self._weight_type_hash = connector.gen_on_machine_weights_id
-        self._delay_type_hash = connector.gen_on_machine_delays_id
+        self._connector_type_hash = connector.gen_connector_id
+        self._matrix_type_hash = synapse_dynamics.gen_matrix_id
+        self._weight_type_hash = connector.gen_weights_id
+        self._delay_type_hash = connector.gen_delays_id
