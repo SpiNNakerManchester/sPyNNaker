@@ -174,8 +174,3 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_id)
     def gen_on_machine_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value
-
-    @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_params)
-    def gen_on_machine_matrix_params(self):
-        return numpy.zeros(0, dtype="uint32")

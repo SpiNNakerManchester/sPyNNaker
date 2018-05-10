@@ -1,6 +1,7 @@
 from six import add_metaclass
 from enum import Enum
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+import numpy
 
 
 class MatrixGeneratorID(Enum):
@@ -27,9 +28,10 @@ class AbstractGenerateOnMachine(object):
         :rtype: int
         """
 
-    @abstractproperty
+    @property
     def gen_on_machine_matrix_params(self):
         """ Any parameters required by the matrix generator
 
         :rtype: numpy array of uint32
         """
+        return numpy.zeros(0, dtype="uint32")
