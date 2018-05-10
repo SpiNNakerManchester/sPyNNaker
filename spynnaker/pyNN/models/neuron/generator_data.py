@@ -1,15 +1,4 @@
-from enum import IntEnum, auto
-
-
-class _ConnectorType(IntEnum):
-    ONE_TO_ONE = auto()
-    FIXED_PROBABILITY = auto()
-
-
-class _MatrixType(IntEnum):
-    STATIC = auto()
-    STDP = auto()
-
+import numpy
 
 
 class GeneratorData(object):
@@ -24,15 +13,36 @@ class GeneratorData(object):
         self._delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self._max_row_length = max_row_length
         self._max_delayed_row_length = max_delayed_row_length
-        self._pre_slice_start = pre_vertex_slice.lo_atom
-        self._pre_slice_count = pre_vertex_slice.n_atoms
-        self._delay_chip = (delay_placement.y << 8) | delay_placement.x
-        self._delay_core = delay_placement.p
-        self._synapse_type = synapse_information.synapse_type
+        self._pre_vertex_slice = pre_vertex_slice
+        self._delay_placement = delay_placement
+        self._synapse_information = synapse_information
 
-        connector = synapse_information.connector
-        synapse_dynamics = synapse_information.synapse_dynamics
-        self._connector_type_hash = connector.gen_connector_id
-        self._matrix_type_hash = synapse_dynamics.gen_matrix_id
-        self._weight_type_hash = connector.gen_weights_id
-        self._delay_type_hash = connector.gen_delays_id
+    @property
+    def gen_data(self):
+        """ Get the data to be written for this connection
+
+        :rtype: numpy array of uint32
+        """
+        connector = self._synapse_information.connector
+        synapse_dynamics = self._synapse_information.synapse_dynamics
+        items = list()
+        items.append(numpy.array([
+            self._synaptic_matrix_offset,
+            self._delayed_synaptic_matrix_offset,
+            self._max_row_length,
+            self._max_delayed_row_length,
+            self._pre_vertex_slice.lo_atom,
+            self._pre_vertex_slice.n_atoms,
+            (self._delay_placement.y << 8) | self._delay_placement.x,
+            self._delay_placement.p,
+            self._synapse_information.synapse_type,
+            synapse_dynamics.gen_matrix_id,
+            connector.gen_connector_id,
+            connector.gen_weights_id,
+            connector.get_delays_id],
+            dtype="uint32"))
+        items.append(synapse_dynamics.gen_matrix_params)
+        items.append(connector.gen_connector_params)
+        items.append(connector.gen_weights_params)
+        items.append(connector.gen_delay_params)
+        return numpy.concatenate(items)

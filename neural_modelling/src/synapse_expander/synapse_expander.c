@@ -75,8 +75,8 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t delay_core = *region++;
     const uint32_t synapse_type = *region++;
 
-    const uint32_t connector_type_hash = *region++;
     const uint32_t matrix_type_hash = *region++;
+    const uint32_t connector_type_hash = *region++;
     const uint32_t weight_type_hash = *region++;
     const uint32_t delay_type_hash = *region++;
 
