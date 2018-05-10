@@ -150,3 +150,9 @@ class FixedProbabilityConnector(AbstractConnector):
         return numpy.array([
             self.allow_self_connections,
             int(self._p_connect * DataType.S1615.scale)], dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateOnMachine.
+               gen_on_machine_connector_params_size_in_bytes)
+    def gen_on_machine_connector_params_size_in_bytes(self):
+        return 8

@@ -68,6 +68,16 @@ class AbstractGenerateOnMachine(AbstractConnector):
 
         raise ValueError("Unexpected value {}".format(values))
 
+    def _param_generator_params_size_in_bytes(self, values):
+        if numpy.isscalar(values):
+            return 4
+
+        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
+            parameters = random.available_distributions[values.name]
+            return len(parameters) * 4
+
+        raise ValueError("Unexpected value {}".format(values))
+
     def _param_generator_id(self, values):
         if numpy.isscalar(values):
             return PARAM_TYPE_STATIC_ID
@@ -108,6 +118,14 @@ class AbstractGenerateOnMachine(AbstractConnector):
         return self._param_generator_params(self._weights)
 
     @property
+    def gen_on_machine_weight_params_size_in_bytes(self):
+        """ The size of the weight parameters in bytes
+
+        :rtype: int
+        """
+        return self._param_generator_params_size_in_bytes(self._weights)
+
+    @property
     def gen_on_machine_delays_id(self):
         """ Get the id of the delay generator on the machine
 
@@ -123,6 +141,14 @@ class AbstractGenerateOnMachine(AbstractConnector):
         """
         return self._param_generator_params(self._delays)
 
+    @property
+    def gen_on_machine_delay_params_size_in_bytes(self):
+        """ The size of the delay parameters in bytes
+
+        :rtype: int
+        """
+        return self._param_generator_params_size_in_bytes(self._delays)
+
     @abstractproperty
     def gen_on_machine_connector_id(self):
         """ Get the id of the connection generator on the machine
@@ -132,8 +158,16 @@ class AbstractGenerateOnMachine(AbstractConnector):
 
     @property
     def gen_on_machine_connector_params(self):
-        """ Get the parameters of the on machine generation
+        """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32
         """
         return numpy.zeros(0, dtype="uint32")
+
+    @property
+    def gen_on_machine_connector_params_size_in_bytes(self):
+        """ The size of the connector parameters in bytes.
+
+        :rtype: int
+        """
+        return 0

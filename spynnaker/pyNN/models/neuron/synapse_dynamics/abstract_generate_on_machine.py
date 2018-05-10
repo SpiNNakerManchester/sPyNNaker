@@ -35,3 +35,11 @@ class AbstractGenerateOnMachine(object):
         :rtype: numpy array of uint32
         """
         return numpy.zeros(0, dtype="uint32")
+
+    @property
+    def gen_on_machine_matrix_params_size_in_bytes(self):
+        """ The size of the parameters of the matrix generator in bytes
+
+        :rtype: int
+        """
+        return 0

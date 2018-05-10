@@ -374,3 +374,9 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_params)
     def gen_on_machine_matrix_params(self):
         return numpy.zeros(0, dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateOnMachine.
+               gen_on_machine_matrix_params_size_in_bytes)
+    def gen_on_machine_matrix_params_size_in_bytes(self):
+        return 0
