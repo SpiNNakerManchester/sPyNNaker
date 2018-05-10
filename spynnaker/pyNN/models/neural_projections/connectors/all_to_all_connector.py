@@ -1,14 +1,14 @@
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    ConnectorIDs
+from .abstract_generate_connector_on_machine \
+    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 import numpy
 import logging
 
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(AbstractGenerateOnMachine):
+class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population
     """
@@ -198,17 +198,18 @@ class AllToAllConnector(AbstractGenerateOnMachine):
         self._allow_self_connections = new_value
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_on_machine_connector_id)
     def gen_on_machine_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_on_machine_connector_params)
     def gen_on_machine_connector_params(self):
         return numpy.array([self.allow_self_connections], dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateOnMachine.
+    @overrides(AbstractGenerateConnectorOnMachine.
                gen_on_machine_connector_params_size_in_bytes)
     def gen_on_machine_connector_params_size_in_bytes(self):
         return 4

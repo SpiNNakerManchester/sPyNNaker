@@ -31,7 +31,7 @@ class ConnectorIDs(Enum):
 
 
 @add_metaclass(AbstractBase)
-class AbstractGenerateOnMachine(AbstractConnector):
+class AbstractGenerateConnectorOnMachine(AbstractConnector):
     """ Indicates that the connectivity can be generated on the machine
     """
 

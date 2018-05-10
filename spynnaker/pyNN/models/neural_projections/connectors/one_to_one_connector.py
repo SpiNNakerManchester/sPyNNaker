@@ -1,11 +1,11 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    ConnectorIDs
+from .abstract_generate_connector_on_machine \
+    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 
 
-class OneToOneConnector(AbstractGenerateOnMachine):
+class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and postsynaptic populations have the same size, connect\
     cell i in the presynaptic pynn_population.py to cell i in the\
@@ -171,6 +171,6 @@ class OneToOneConnector(AbstractGenerateOnMachine):
     def __repr__(self):
         return "OneToOneConnector()"
 
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_on_machine_connector_id)
     def gen_on_machine_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value

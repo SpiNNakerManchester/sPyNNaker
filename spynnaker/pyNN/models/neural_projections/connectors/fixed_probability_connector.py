@@ -1,8 +1,8 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    ConnectorIDs
+from .abstract_generate_connector_on_machine \
+    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import math
 import numpy
@@ -140,19 +140,20 @@ class FixedProbabilityConnector(AbstractConnector):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_on_machine_connector_id)
     def gen_on_machine_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR
 
     @property
-    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_on_machine_connector_params)
     def gen_on_machine_connector_params(self):
         return numpy.array([
             self.allow_self_connections,
             int(self._p_connect * DataType.S1615.scale)], dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateOnMachine.
+    @overrides(AbstractGenerateConnectorOnMachine.
                gen_on_machine_connector_params_size_in_bytes)
     def gen_on_machine_connector_params_size_in_bytes(self):
         return 8
