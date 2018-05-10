@@ -1,9 +1,12 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    ConnectorIDs
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import math
 import numpy
+from data_specification.enums.data_type import DataType
 
 
 class FixedProbabilityConnector(AbstractConnector):
@@ -29,9 +32,8 @@ class FixedProbabilityConnector(AbstractConnector):
     """
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False, generate_on_machine=False):
-        super(FixedProbabilityConnector, self).__init__(
-            safe, verbose, generate_on_machine=generate_on_machine)
+            verbose=False):
+        super(FixedProbabilityConnector, self).__init__(safe, verbose)
         self._p_connect = p_connect
         self._allow_self_connections = allow_self_connections
 
@@ -104,12 +106,6 @@ class FixedProbabilityConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return (self._gen_on_spinn and \
-                self._generate_lists_on_machine(self._weights) and \
-                self._generate_lists_on_machine(self._delays))
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -143,6 +139,14 @@ class FixedProbabilityConnector(AbstractConnector):
     def __repr__(self):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
-    def gen_on_machine_info(self):
-        return [self._allow_self_connections,
-                numpy.uint32(numpy.floor(self._p_connect * float(1 << 31)))]
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    def gen_on_machine_connector_id(self):
+        return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_params)
+    def gen_on_machine_connector_params(self):
+        return numpy.array([
+            self.allow_self_connections,
+            int(self._p_connect * DataType.S1615.scale)], dtype="uint32")

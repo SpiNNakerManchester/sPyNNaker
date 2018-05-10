@@ -99,10 +99,6 @@ class SmallWorldConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         return self._get_weight_variance(self._weights, None)
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

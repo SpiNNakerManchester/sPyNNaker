@@ -199,12 +199,6 @@ class MultapseConnector(AbstractConnector):
             pre_slice_index, post_slice_index)
         return self._get_weight_variance(self._weights, [connection_slice])
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return (
-            not self._generate_lists_on_host(self._weights) and
-            not self._generate_lists_on_host(self._delays))
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

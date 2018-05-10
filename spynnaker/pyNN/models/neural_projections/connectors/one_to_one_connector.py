@@ -1,9 +1,11 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    ConnectorIDs
 
 
-class OneToOneConnector(AbstractConnector):
+class OneToOneConnector(AbstractGenerateOnMachine):
     """
     Where the pre- and postsynaptic populations have the same size, connect\
     cell i in the presynaptic pynn_population.py to cell i in the\
@@ -12,13 +14,11 @@ class OneToOneConnector(AbstractConnector):
     __slots__ = ["_random_number_class"]
 
     def __init__(
-            self, random_number_class, safe=True, verbose=False,
-            generate_on_machine=False):
+            self, random_number_class, safe=True, verbose=False):
         """
         """
         self._random_number_class = random_number_class
-        super(OneToOneConnector, self).__init__(
-            safe, verbose, generate_on_machine=generate_on_machine)
+        super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
@@ -144,12 +144,6 @@ class OneToOneConnector(AbstractConnector):
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_variance(self._weights, [connection_slice])
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return (self._gen_on_spinn and \
-                self._generate_lists_on_machine(self._weights) and \
-                self._generate_lists_on_machine(self._delays))
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -177,5 +171,6 @@ class OneToOneConnector(AbstractConnector):
     def __repr__(self):
         return "OneToOneConnector()"
 
-    def gen_on_machine_info(self):
-        return []
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    def gen_on_machine_connector_id(self):
+        return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value

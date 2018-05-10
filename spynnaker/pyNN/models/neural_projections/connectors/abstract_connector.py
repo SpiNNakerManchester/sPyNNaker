@@ -44,11 +44,9 @@ class AbstractConnector(object):
         "_n_clipped_delays",
         "_min_delay",
         "_weights",
-        "_delays",
-        "_gen_on_spinn"]
+        "_delays"]
 
-    def __init__(self, safe=True, verbose=False,
-                 generate_on_machine=False):
+    def __init__(self, safe=True, verbose=False):
         self._safe = safe
         self._space = None
         self._verbose = verbose
@@ -63,7 +61,6 @@ class AbstractConnector(object):
         self._min_delay = 0
         self._weights = None
         self._delays = None
-        self._gen_on_spinn = generate_on_machine
 
     def set_space(self, space):
         """ allows setting of the space object after instantiation
@@ -396,31 +393,6 @@ class AbstractConnector(object):
 
         return self._clip_delays(delays)
 
-    def _generate_lists_on_host(self, values):
-        """ Checks if the connector should generate lists on host rather than\
-            trying to generate the connectivity data on the machine, based on\
-            the types of the weights and/or delays
-        """
-
-        # Scalars are fine on the machine
-        if numpy.isscalar(values):
-            return True
-
-        # Only certain types of random distributions are supported for\
-        # generation on the machine
-        if get_simulator().is_a_pynn_random(values):
-            return values.name in (
-                "uniform", "uniform_int", "poisson", "normal", "exponential")
-
-        return False
-
-    @abstractmethod
-    def generate_on_machine(self):
-        """ Determines if the connector generation is supported on the machine\
-            or if the connector must be generated on the host
-        """
-        pass
-
     @abstractmethod
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -479,53 +451,3 @@ class AbstractConnector(object):
     @property
     def post_population(self):
         return self._post_population
-
-    def _generate_lists_on_machine(self, values):
-        """ Checks if the connector should generate lists on MACHINE, based on\
-            the types of the weights and/or delays. Method above is WRONG
-        """
-
-        # Scalars are fine on the machine
-        if numpy.isscalar(values):
-            return True
-
-        # Only certain types of random distributions are supported for\
-        # generation on the machine
-        if isinstance(values, RandomDistribution):
-            return values.name in ("uniform",
-                                   # "uniform_int", "poisson",
-                                   "normal", "exponential")
-
-        if isinstance(values, ConvolutionKernel):
-            return True
-
-        return False
-
-    def name_hash(self):
-        """Transform class name into a crc32 code hash, this will be taken by
-           the C SpiNNaker code to generate the given connector on the machine
-        """
-        return numpy.uint32( binascii.crc32(self.__class__.__name__) )
-
-
-    def _param_hash(self, values):
-        """Generate a hash code for the parameter type, two special cases will
-           be constant and kernel-based. Everything else is RandomDistribution
-           names. We should check if the parameters are supported before.
-        """
-
-        if numpy.isscalar(values):
-            return numpy.uint32( binascii.crc32("constant") )
-
-        elif isinstance(values, RandomDistribution):
-            return numpy.uint32( binascii.crc32(values.name) )
-
-        elif isinstance(values, ConvolutionKernel):
-            return numpy.uint32( binascii.crc32("kernel") )
-
-        return 0
-
-    @abstractmethod
-    def gen_on_machine_info(self):
-        """Does this connector require more info than general ones? if so, return a
-        list of this data, each element should be a 32-bit int"""

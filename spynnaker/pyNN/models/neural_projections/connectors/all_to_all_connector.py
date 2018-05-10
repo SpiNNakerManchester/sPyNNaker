@@ -1,12 +1,14 @@
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    ConnectorIDs
 import numpy
 import logging
 
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(AbstractConnector):
+class AllToAllConnector(AbstractGenerateOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population
     """
@@ -14,8 +16,7 @@ class AllToAllConnector(AbstractConnector):
     __slots__ = [
         "_allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None,
-                 generate_on_machine=False):
+    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
 
         :param `bool` allow_self_connections:
@@ -24,8 +25,7 @@ class AllToAllConnector(AbstractConnector):
             allowed to connect to itself, or only to other neurons in the
             Population.
     """
-        super(AllToAllConnector, self).__init__(
-            safe, verbose, generate_on_machine=generate_on_machine)
+        super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
         self._weights = None
         self._delays = None
@@ -147,12 +147,6 @@ class AllToAllConnector(AbstractConnector):
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_variance(self._weights, connection_slices)
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return (self._gen_on_spinn and \
-                self._generate_lists_on_machine(self._weights) and \
-                self._generate_lists_on_machine(self._delays))
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -203,5 +197,12 @@ class AllToAllConnector(AbstractConnector):
     def allow_self_connections(self, new_value):
         self._allow_self_connections = new_value
 
-    def gen_on_machine_info(self):
-        return [self.allow_self_connections]
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_id)
+    def gen_on_machine_connector_id(self):
+        return ConnectorIDs.ALL_TO_ALL_CONNECTOR
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_connector_params)
+    def gen_on_machine_connector_params(self):
+        return numpy.array([self.allow_self_connections], dtype="uint32")

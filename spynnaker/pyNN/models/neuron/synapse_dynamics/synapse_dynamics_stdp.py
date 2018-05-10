@@ -5,6 +5,8 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    MatrixGeneratorID
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
 # How large are the time-stamps stored with each event
@@ -16,7 +18,7 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????????
         "_change_requires_mapping",
@@ -362,3 +364,13 @@ class SynapseDynamicsSTDP(
             n_connections -= 1
 
         return n_connections
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_id)
+    def gen_on_machine_matrix_id(self):
+        return MatrixGeneratorID.STDP_MATRIX.value
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_params)
+    def gen_on_machine_matrix_params(self):
+        return numpy.zeros(0, dtype="uint32")

@@ -5,13 +5,15 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    MatrixGeneratorID
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????
         "_change_requires_mapping",
@@ -167,3 +169,13 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):
         return n_words
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_id)
+    def gen_on_machine_matrix_id(self):
+        return MatrixGeneratorID.STATIC_MATRIX.value
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_on_machine_matrix_params)
+    def gen_on_machine_matrix_params(self):
+        return numpy.zeros(0, dtype="uint32")

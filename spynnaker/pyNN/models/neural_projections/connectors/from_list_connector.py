@@ -228,10 +228,6 @@ class FromListConnector(AbstractConnector):
             return 0
         return numpy.var(weights)
 
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
@@ -262,11 +258,3 @@ class FromListConnector(AbstractConnector):
     @conn_list.setter
     def conn_list(self, new_value):
         self._conn_list = new_value
-
-    def _set_data(self, new_value, name):
-        for index in self._conn_list:
-            for (source, dest) in self._conn_list[index]:  # @UnusedVariable
-                pass
-
-    def gen_on_machine_info(self):
-        return []
