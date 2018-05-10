@@ -13,6 +13,7 @@ from pacman.model.graphs.common import Slice
 
 # spinn utilities
 from spinn_utilities.helpful_functions import get_valid_components
+from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 
 # front-end common
 from spinn_front_end_common.utilities.helpful_functions \
@@ -90,7 +91,9 @@ class SynapticManager(object):
         "_synapse_dynamics",
         "_synapse_io",
         "_synapse_type",
-        "_weight_scales"]
+        "_weight_scales",
+        "_delay_placement_index",
+        "_generator_data"]
 
     def __init__(self, synapse_type, ring_buffer_sigma,
                  spikes_per_second, config, population_table_type=None,
@@ -756,13 +759,14 @@ class SynapticManager(object):
                     machine_time_step, app_edge)
 
         # Skip over the normal bytes and write a master pop entry
+        synaptic_matrix_offset = 0xFFFFFFFF
         if n_bytes_undelayed:
-            block_addr = self._poptable_type.get_next_allowed_address(
-                block_addr)
+            synaptic_matrix_offset = \
+                self._poptable_type.get_next_allowed_address(block_addr)
             self._poptable_type.update_master_population_table(
-                spec, block_addr, undelayed_max_length,
+                spec, synaptic_matrix_offset, undelayed_max_length,
                 rinfo.first_key_and_mask, master_pop_table_region)
-            block_addr += n_bytes_undelayed
+            block_addr = synaptic_matrix_offset + n_bytes_undelayed
         elif rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -773,18 +777,20 @@ class SynapticManager(object):
                     block_addr, all_syn_block_sz))
 
         # Skip over the delayed bytes and write a master pop entry
+        delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if n_bytes_delayed:
-            block_addr = self._poptable_type.get_next_allowed_address(
-                block_addr)
+            delayed_synaptic_matrix_offset = \
+                self._poptable_type.get_next_allowed_address(
+                    block_addr)
             self._poptable_type.update_master_population_table(
-                spec, block_addr, delayed_max_length,
+                spec, delayed_synaptic_matrix_offset, delayed_max_length,
                 delay_rinfo.first_key_and_mask, master_pop_table_region)
-            block_addr += n_bytes_delayed
+            block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
         elif delay_rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
@@ -797,7 +803,13 @@ class SynapticManager(object):
                     block_addr, all_syn_block_sz))
 
         # Get additional data for the synapse expander
-
+        delay_placement = self._delay_placement_index.get((
+            app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+            pre_vertex_slice.hi_atom))
+        self._generator_data.append(GeneratorData(
+            synaptic_matrix_offset, delayed_synaptic_matrix_offset,
+            undelayed_max_length, delayed_max_length, pre_vertex_slice,
+            delay_placement, synapse_info))
 
         return block_addr
 

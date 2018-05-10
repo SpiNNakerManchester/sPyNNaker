@@ -25,6 +25,12 @@ class GeneratorData(object):
         """
         connector = self._synapse_information.connector
         synapse_dynamics = self._synapse_information.synapse_dynamics
+        delay_chip = 0xFFFFFFFF
+        delay_core = 0xFFFFFFFF
+        if self._delay_placement is not None:
+            delay_chip = (
+                (self._delay_placement.y << 8) | self._delay_placement.x)
+            delay_core = self._delay_placement.p
         items = list()
         items.append(numpy.array([
             self._synaptic_matrix_offset,
@@ -33,8 +39,7 @@ class GeneratorData(object):
             self._max_delayed_row_length,
             self._pre_vertex_slice.lo_atom,
             self._pre_vertex_slice.n_atoms,
-            (self._delay_placement.y << 8) | self._delay_placement.x,
-            self._delay_placement.p,
+            delay_chip, delay_core,
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
