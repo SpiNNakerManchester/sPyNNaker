@@ -1,6 +1,7 @@
+#include "delay_extension.h"
+
 #include <common/neuron-typedefs.h>
 #include <common/in_spikes.h>
-
 #include <bit_field.h>
 #include <data_specification.h>
 #include <debug.h>
@@ -9,23 +10,10 @@
 
 #include <string.h>
 
-// Constants
-#define DELAY_STAGE_LENGTH  16
-
 //! values for the priority for each callback
 typedef enum callback_priorities {
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
 } callback_priorities;
-
-//! region identifiers
-typedef enum region_identifiers{
-    SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
-} region_identifiers;
-
-enum parameter_positions {
-    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES,
-    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, DELAY_BLOCKS
-};
 
 typedef enum extra_provenance_data_region_entries{
     N_PACKETS_RECEIVED = 0,
@@ -223,7 +211,7 @@ static inline key_t _key_n(key_t k) {
 
 static void spike_process() {
 
-    // turn off inturppts as this function is criticle for
+    // turn off interrupts as this function is critical for
     // keeping time in sync.
     uint state = spin1_int_disable();
 
@@ -258,7 +246,7 @@ static void spike_process() {
         }
     }
 
-    // reactivate interupts as criticle section complete
+    // reactivate interrupts as critical section complete
     spin1_mode_restore(state);
 }
 

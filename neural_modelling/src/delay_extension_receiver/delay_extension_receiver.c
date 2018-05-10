@@ -1,188 +1,124 @@
-#include "src/common/neuron-typedefs.h"
-#include "src/common/in_spikes.h"
-#include "delay_block.h"
-
-#include <bit_field.h>
-#include <data_specification.h>
+#include <stdbool.h>
 #include <debug.h>
-#include <simulation.h>
-#include <spin1_api.h>
+#include <data_specification.h>
+#include <bit_field.h>
+#include <delay_extension/delay_extension.h>
 
-#include <string.h>
+// The number of post vertices
+static uint32_t n_post_vertices;
 
-//#define DEBUG_MESSAGES
+// The number of post vertices that have completed
+static uint32_t n_post_vertices_finished = 0;
 
-// Constants
-#define MAX_DELAY  16
-#define SDRAM_TAG 160
-#define CLEAR_MEMORY_FLAG 0x55555555
-#define DELAY_PARAMS 1
-#define SLEEP_TIME 4711
+// The list of post vertices that have completed to check for duplicates
+static uint32_t *post_vertices_finished;
 
-enum parameter_positions {
-    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES,
-    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, DELAY_BLOCKS
-};
+static uint32_t num_neurons;
 
-// Globals
+static uint32_t num_delay_stages;
 
-static uint32_t num_neurons = 0;
-static uint32_t num_delay_stages = 0;
-static uint32_t neuron_bit_field_words = 0;
-static uint32_t* delay_block = NULL;
+static uint32_t neuron_bit_field_words;
 
-void clear_memory(uint32_t memory_size, uint32_t *syn_mtx_addr){
-    for(uint32_t w = 0; w < memory_size; w++){
-        syn_mtx_addr[w] = 0;
-    }
+static bit_field_t *neuron_delay_stage_config;
 
+static void read_params(address_t address) {
+    n_post_vertices = address[N_OUTGOING_EDGES];
+    post_vertices_finished = spin1_malloc(n_post_vertices * sizeof(uint32_t));
+    sark_word_set(
+        post_vertices_finished, 0, n_post_vertices * sizeof(uint32_t));
+    log_debug("%u post vertices", n_post_vertices);
+
+    num_neurons = address[N_ATOMS];
+    neuron_bit_field_words = get_bit_field_size(num_neurons);
+    num_delay_stages = address[N_DELAY_STAGES];
+    neuron_delay_stage_config = (bit_field_t *) address[DELAY_BLOCKS];
 }
 
 // Sends an acknowledgement response to an SDP
 static void send_ack_response(sdp_msg_t *msg) {
-//#ifdef DEBUG_MESSAGES
-    log_info("ACK to 0x%04x.%02u:%u,", msg->srce_addr,
-             msg->srce_port &((1 << PORT_SHIFT) - 1), msg->srce_port >> PORT_SHIFT);
-//#endif
-
-    uint8_t *data = (uint8_t *) &msg->cmd_rc;
-    data[0] = RC_OK;
-    msg->length = sizeof(sdp_hdr_t) + 1;
-    uint8_t  old_dest_port = msg->dest_port;
-    uint16_t old_dest_addr = msg->dest_addr;
-
+    msg->cmd_rc = RC_OK;
+    msg->length = 12;
+    uint dest_port = msg->dest_port;
+    uint dest_addr = msg->dest_addr;
     msg->dest_port = msg->srce_port;
+    msg->srce_port = dest_port;
     msg->dest_addr = msg->srce_addr;
-
-    msg->srce_port = old_dest_port;
-    msg->srce_addr = old_dest_addr;
-
-    if(spin1_send_sdp_msg(msg, 1) == 0){
-        log_info("Failed to send Acknowledge Message!");
-    }
-    spin1_delay_us(3+sark_core_id());
-
+    msg->srce_addr = dest_addr;
+    spin1_send_sdp_msg(msg, 10);
 }
 
-//TODO*** define this somewhere else!
-#define BUILD_IN_MACHINE_PORT 1
-#define BUILD_IN_MACHINE_TAG  111
-//TODO - END
-
+// Handle an incoming SDP message
 void handle_sdp_message(uint mailbox, uint port) {
+    use(port);
 
-    if(port != BUILD_IN_MACHINE_PORT){
-        return;
-    }
     // Read the message
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint16_t *data = &(msg->cmd_rc);
+    uint32_t *data = (uint32_t *) &(msg->cmd_rc);
     uint16_t n_delays = data[0];
 
-//    log_info("n delays %u\tpre slice start %u", n_delays, pre_slice_start);
+    // If the number of delays is 0, this is a finish message
     if (n_delays == 0) {
-//        log_info("\tAll delays received");
+
         // Send a response to say the message was received
-        spin1_delay_us(SLEEP_TIME + spin1_get_core_id());
         send_ack_response(msg);
+
+        // Check if the source has been seen before
+        uint32_t source = (msg->srce_addr << 16) | (msg->srce_port & 0x1F);
+        bool seen = false;
+        for (uint32_t i = 0; i < n_post_vertices_finished; i++) {
+            if (source == post_vertices_finished[i]) {
+                seen = true;
+                break;
+            }
+        }
 
         // Free the message as no longer needed
         spin1_msg_free(msg);
-//        done_receiving = true;
-//        spin1_delay_us(1000);
-//        sark_cpu_state(CPU_STATE_EXIT);
-//        spin1_exit(0);
-//        return;
-    }
-    else if (n_delays <= 100){
 
-        uint32_t state = spin1_irq_disable();
-        // Otherwise, continue reading
-//        log_info("%u delays\tpre start %u", n_delays, pre_slice_start);
-
-        delay_msg_t *delays = (delay_msg_t *) &(data[2]);
-//        log_info("delay_block address = 0x%08x", delay_block);
-
-        for (uint32_t i = 0; i < n_delays; i++) {
-            uint32_t delay_shift = 1;
-            if(delays[i].delay%MAX_DELAY == 0){ delay_shift++; }
-            uint32_t stage = delays[i].delay/MAX_DELAY - delay_shift;
-#ifdef DEBUG_MESSAGES
-            log_info("\tPre id %u, delay %u, stage %u",
-                     delays[i].source_neuron_id, delays[i].delay, stage);
-#endif
-            if (delays[i].delay == 0){
-                log_info("Delay = 0? What happened?");
-                break;
+        // If the source hasn't been seen, mark it as finished
+        if (!seen) {
+            post_vertices_finished[n_post_vertices_finished] = source;
+            n_post_vertices_finished += 1;
+            log_debug(
+                "%u of %u post vertices complete",
+                n_post_vertices_finished, n_post_vertices);
+            if (n_post_vertices_finished == n_post_vertices) {
+                log_info("All post vertices complete: exiting");
+                sark_cpu_state(CPU_STATE_EXIT);
             }
-            bit_field_set(delay_block + stage*neuron_bit_field_words,
-                          delays[i].source_neuron_id);
-
         }
-//        for(uint32_t i = 0; i < num_delay_stages; i++){
-//            log_info("delay_block[%u] = 0x%08x", i, delay_block[i] );
-//        }
-        // Send the acknowledgement
-//        send_ack_response(msg);
-        spin1_mode_restore(state);
-
-        // Free the message
-        spin1_delay_us(SLEEP_TIME + spin1_get_core_id());
-        send_ack_response(msg);
-
-        spin1_msg_free(msg);
+        return;
     }
 
+    // Otherwise, continue reading
+    log_debug("Reading %u delays", n_delays);
 
+    uint16_t *delays = (uint16_t *) &(data[1]);
+    for (uint32_t i = 0; i < n_delays; i++) {
+        uint8_t neuron_id = unpack_delay_index(delays[i]);
+        uint8_t stage = unpack_delay_stage(delays[i]);
+        log_debug(
+            "Delay %u, source neuron id = %u, delay stage = %u",
+            i, neuron_id, stage);
+        bit_field_set(neuron_delay_stage_config[stage], neuron_id);
+    }
+
+    // Send the acknowledgement
+    send_ack_response(msg);
+
+    // Free the message
+    spin1_msg_free(msg);
 }
 
-void app_start(uint a0, uint a1){
-    use(a0);
-    use(a1);
-    sark_cpu_state(CPU_STATE_RUN);
+void c_main() {
 
-    uint32_t *clear_memory_ptr = (uint32_t *)sark_tag_ptr(SDRAM_TAG + spin1_get_core_id(),
-                                                          sark_app_id());
-
-
-    // Initialise
+    // Process the parameters
     address_t core_address = data_specification_get_data_address();
-    address_t delay_address = data_specification_get_region(DELAY_PARAMS, core_address);
-    log_info("delay_address = 0x%08x", delay_address);
+    address_t delay_address = data_specification_get_region(
+        DELAY_PARAMS, core_address);
+    read_params(delay_address);
 
-//    for(uint32_t i = 0; i < 16; i++){
-//        log_info("data at row %u = %u", i, delay_address[i]);
-//    }
-
-    num_neurons = delay_address[N_ATOMS];
-    neuron_bit_field_words = get_bit_field_size(num_neurons);
-    num_delay_stages = delay_address[N_DELAY_STAGES];
-
-    log_info("num_neurons = %d, neuron_bit_field_words = %d, num_delay_stages = %d",
-              num_neurons, neuron_bit_field_words, num_delay_stages);
-    delay_block = (uint32_t *)(&delay_address[DELAY_BLOCKS]);
-    log_info("delay_block address = 0x%08x", delay_block);
-
-    if( *clear_memory_ptr == CLEAR_MEMORY_FLAG){
-        log_info("Clearing Memory in Delay Extension Receiver");
-
-        clear_memory(neuron_bit_field_words*num_delay_stages, delay_block);
-    }
-
-    sark_xfree (sv->sdram_heap, clear_memory_ptr, ALLOC_LOCK);
-
-    log_info("Waiting for delay messages");
-
-}
-
-// Entry point
-void c_main(void) {
-
-    // Set timer tick (in microseconds)
-    spin1_schedule_callback(app_start, 0, 0, 2);
+    // Wait for SDP messages
     spin1_callback_on(SDP_PACKET_RX, handle_sdp_message, 1);
-
-    spin1_start(SYNC_NOWAIT);
-    // sark_cpu_state(CPU_STATE_RUN);
-
+    spin1_start(SYNC_WAIT);
 }
