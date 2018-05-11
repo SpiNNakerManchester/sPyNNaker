@@ -250,8 +250,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries = None
         self._n_addresses = 0
 
-        return pop_table, address_list
-
     def _make_pop_table_entry(self, entry, i, start, pop_table, address_list):
         # pylint: disable=too-many-arguments
         pop_table[i]["key"] = entry.routing_key

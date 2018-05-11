@@ -68,7 +68,13 @@ _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
-_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 24 # TODO: Check
+
+# 4 for n_edges
+# 8 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
+# 4 for n_synapse_types
+# 4 for n_synapse_type_bits
+# 4 for n_synapse_index_bits
+_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
@@ -147,14 +153,6 @@ class SynapticManager(object):
 
         # Store data for the on-chip synapse expander
         self._generator_data = list()
-
-        self._max_per_pre = 0
-        self._pop_table = None
-        self._address_list = None
-        self._any_gen_on_machine = False
-        self._matrix_size = 0
-        self._num_post_targets = {}
-        self._num_words_per_weight = {}
 
     @property
     def synapse_dynamics(self):
@@ -317,6 +315,7 @@ class SynapticManager(object):
                 if connector_gen and synapse_gen:
                     gen_on_machine = True
                     size += sum((
+                        GeneratorData.BASE_SIZE,
                         connector.gen_delay_params_size_in_bytes,
                         connector.gen_weight_params_size_in_bytes,
                         connector.gen_connector_params_size_in_bytes,
@@ -324,6 +323,7 @@ class SynapticManager(object):
                     ))
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
+            size += self._synapse_type.get_n_synapse_types() * 4
         return size
 
     def _get_size_of_synapse_information(
@@ -696,8 +696,13 @@ class SynapticManager(object):
 
                     # If connector is being built on SpiNNaker,
                     # compute matrix sizes only
-                    if synapse_info.connector.generate_on_machine():
-                        self._any_gen_on_machine = True
+                    connector = synapse_info.connector
+                    dynamics = synapse_info.synapse_dynamics
+                    if (isinstance(
+                            connector, AbstractGenerateConnectorOnMachine) and
+                            connector.generate_on_machine and
+                            isinstance(dynamics, AbstractGenerateOnMachine) and
+                            dynamics.generate_on_machine):
                         generate_on_machine.append((
                             synapse_info, pre_vertex_slice, pre_slice_idx,
                             app_edge, rinfo))
@@ -723,10 +728,8 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge)
 
-        pt, al = self._poptable_type.finish_master_pop_table(
+        self._poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
-        self._pop_table = pt
-        self._address_list = al
 
         # Write the size and data of single synapses to the end of the region
         spec.switch_write_focus(synaptic_matrix_region)
@@ -969,18 +972,8 @@ class SynapticManager(object):
 
         self._weight_scales[placement] = weight_scales
 
-        flags, n_edges = self._generate_on_machine_flags(
-            in_edges, graph_mapper)
-
-        delay_placements = self._get_placements_for_delayed(
-            in_edges, graph_mapper, placements)
-        data_block = self._generate_on_machine_params(
-            in_edges, graph_mapper, routing_info, placements,
-            weight_scales)
-
         self._write_on_machine_data_spec(
-            spec, n_edges, flags, delay_placements, data_block, weight_scales,
-            post_vertex_slice)
+            spec, post_vertex_slice, weight_scales)
 
     def clear_connection_cache(self):
         self._retrieved_blocks = dict()
@@ -1197,404 +1190,38 @@ class SynapticManager(object):
             spec, vertex_slice,
             self._synapse_type.get_synapse_type_parameters())
 
-    def _generate_on_machine_flags(self, in_edges, graph_mapper):
-        if not self._any_gen_on_machine:
-            return None, None
-
-        syn_infos = []
-        for edg in in_edges:
-            app_edge = graph_mapper.get_application_edge(edg)
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                for synapse_info in app_edge.synapse_information:
-                    syn_infos.append(synapse_info)
-
-        num_edges = len(syn_infos)
-        num_words = int(numpy.ceil(num_edges/32.))
-        flags = numpy.zeros(num_words, dtype=numpy.uint32)
-        for e, syn_info in enumerate(syn_infos):
-            conn = syn_info.connector
-            word = e // 32
-            shift = e % 32
-            if conn.generate_on_machine():
-                flags[word] |= 1 << shift
-
-        return flags, num_edges
-
-    def _get_placements_for_delayed(self, in_edges, graph_mapper, placements):
-        if not self._any_gen_on_machine:
-            return None
-
-        places = []
-
-        for edg in in_edges:
-            app_edge = graph_mapper.get_application_edge(edg)
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                place = placements.get_placement_of_vertex(edg.pre_vertex)
-                for synapse_info in app_edge.synapse_information:
-                    if self._is_delayed(synapse_info):
-                        if place not in places:
-                            places.append(place)
-
-        return places
-
-    def _get_place_for_delay_edge(self, app_edge, graph_mapper, placements):
-        if not self._any_gen_on_machine:
-            return None, None
-
-        if hasattr(app_edge, 'delay_edge') and app_edge.delay_edge is not None:
-            vertices = graph_mapper.get_machine_vertices(
-                app_edge.delay_edge.pre_vertex)
-            delayed_placements = []
-            delayed_slices = []
-            for machine_vertex in vertices:
-                delayed_slices.append(
-                            graph_mapper.get_slice(machine_vertex))
-                delayed_placements.append(
-                            placements.get_placement_of_vertex(machine_vertex))
-
-            return delayed_placements, delayed_slices
-
-        return [], []
-
-    def _get_key_mask_for_edge(self, mch_edge, graph_mapper, routing_infos):
-        if not self._any_gen_on_machine:
-            return None
-
-        app_edge = graph_mapper.get_application_edge(mch_edge)
-        if hasattr(app_edge, 'delay_edge') and app_edge.delay_edge is not None:
-            dly_mch_edges = graph_mapper.get_machine_edges(app_edge.delay_edge)
-
-            for de in dly_mch_edges:
-                s = graph_mapper.get_slice(de.pre_vertex)
-
-                if s.as_slice == slice.as_slice:
-                    ri = routing_infos.get_routing_info_for_edge(de)
-
-                    return ri.first_key_and_mask
-        else:
-            routing_info = routing_infos.get_routing_info_for_edge(mch_edge)
-            return routing_info.first_key_and_mask
-
-    def _generate_on_machine_params(
-            self, in_edges, graph_mapper, routing_infos, placements,
-            weight_scales):
-        if not self._any_gen_on_machine:
-            return None
-
-        # TODO: This should probably be merged with another loop so we don't
-        # visit the same data many times
-
-        addresses = [(a & 0x7FFFFF00) >> 8 for a in self._address_list]
-        row_lengths = [(a & 0xFF) for a in self._address_list]
-
-        syn_infos = []
-        param_block = []
-        slices = []
-        delayed_places = []
-        delayed_slices = []
-        keys = []
-        masks = []
-        num_seeds = 4
-        any_delayed = False
-        for edg in in_edges:
-            app_edge = graph_mapper.get_application_edge(edg)
-
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                pre_vertex_slice = graph_mapper.get_slice(edg.pre_vertex)
-                dplaces, dslices = self._get_place_for_delay_edge(
-                    app_edge, graph_mapper, placements)
-                key_and_mask = self._get_key_mask_for_edge(
-                    edg, graph_mapper, routing_infos)
-                key = key_and_mask.key
-                mask = key_and_mask.mask
-                for synapse_info in app_edge.synapse_information:
-                    keys.append(numpy.uint32(key))
-                    masks.append(numpy.uint32(mask))
-                    delayed_places.append(dplaces)
-                    delayed_slices.append(dslices)
-                    syn_infos.append(synapse_info)
-                    slices.append(pre_vertex_slice)
-                    any_delayed |= (
-                        synapse_info.connector.get_delay_maximum() > 16)
-
-        conn = None
-        dist = None
-        n_32bit_header_words = 0
-        max_n_pre_neurons = 0
-        for i in range(len(syn_infos)):
-
-            syn_info = syn_infos[i]
-
-            slice_start = numpy.uint32(slices[i].lo_atom)
-            slice_count = numpy.uint32(slices[i].n_atoms)
-            key = keys[i]
-            mask = masks[i]
-
-            address_delta = 0
-            row_len = 0
-            # print(key, mask)
-            # print(self._pop_table)
-            for addr_idx in range(len(self._pop_table)):
-
-                if (key == self._pop_table[addr_idx][0] and
-                        mask == self._pop_table[addr_idx][1]):
-                    address_delta = addresses[addr_idx]
-                    row_len = row_lengths[addr_idx]
-                    break
-
-            address_delta = numpy.uint32(address_delta)
-            conn = syn_info.connector
-            direct = numpy.uint32(isinstance(
-                syn_info.connector, OneToOneConnector))
-            # WRONG! should be 16*machine_time_step/1000.0
-            delayed = self._is_delayed(syn_info)
-            num_delayed = len(delayed_places[i])
-            dly_places = [
-                self._placement_to_uint32(dp) for dp in delayed_places[i]]
-            dly_slices = [ds for ds in delayed_slices[i]]
-
-            dyn_type = STATIC_HASH if syn_info.synapse_dynamics.is_static \
-                else PLASTIC_HASH
-            syn_type = numpy.uint32(syn_info.synapse_type)
-
-            n_pre_neurons = numpy.uint32(conn._n_pre_neurons)
-            if max_n_pre_neurons < n_pre_neurons:
-                max_n_pre_neurons = n_pre_neurons
-
-            if (conn.generate_on_machine() and
-                    syn_info in self._num_post_targets):
-
-                for _ in range(num_seeds):
-                    rnd_int = numpy.random.randint(1323, 2 ** 32)
-                    param_block.append(numpy.uint32(rnd_int))
-
-                param_block.append(conn.name_hash())
-                param_block.append(key)
-                param_block.append(mask)
-                param_block.append(address_delta)
-                param_block.append(row_len)
-                param_block.append(n_pre_neurons)
-                param_block.append(numpy.uint32(
-                    self._num_post_targets[syn_info]))
-                param_block.append(numpy.uint32(
-                    self._num_words_per_weight[syn_info]))
-                param_block.append(slice_start)
-                param_block.append(slice_count)
-                param_block.append(direct)
-                param_block.append(delayed)
-                param_block.append(num_delayed)
-
-                for i in range(num_delayed):
-                    param_block.append(dly_places[i])
-
-                for i in range(num_delayed):
-                    param_block.append(dly_slices[i].lo_atom)
-
-                for i in range(num_delayed):
-                    param_block.append(dly_slices[i].n_atoms)
-
-                # hash names of synapse, weights and delay types
-                param_block.append(dyn_type)  # static or plastic
-                param_block.append(syn_type)  # inhibitory, excitatory, etc.
-
-                # constant, random, etc.
-                param_block.append(conn._param_hash(conn._weights))
-                param_block.append(conn._param_hash(conn._delays))
-
-                # using signed weights or not (kernel yes, everything else no)
-                use_signed_weights = int(False)
-#                 if isinstance(conn, KernelConnector) and \
-#                    isinstance(conn._weights, ConvolutionKernel):
-#                     use_signed_weights = numpy.uint32(True)
-#                 else:
-#                     use_signed_weights = numpy.uint32(False)
-
-                param_block.append(use_signed_weights)
-
-                # header words for synapse row
-                if syn_info.synapse_dynamics.is_plastic:
-                    try:
-                        header_bytes = \
-                            syn_info.synapse_dynamics._n_header_bytes
-                    except Exception:
-                        header_bytes = 0
-
-                    n_32bit_header_words = numpy.uint32(
-                        header_bytes // 4 + (1 if header_bytes % 4 > 0 else 0))
-                else:
-                    n_32bit_header_words = 0
-
-                param_block.append(n_32bit_header_words)
-
-                # TODO: add a gen_on_machine_info method per connector
-                # connector-specific data
-                param_block += conn.gen_on_machine_info()
-
-                # weights in u1616 or s1516 fixed-point
-                if numpy.isscalar(conn._weights):
-                    ws = float(weight_scales[syn_type])
-                    ws *= float(conn._weights)
-                    w = numpy.uint32(ws)
-                    w = w << 16
-                    param_block.append(w)
-
-#                 elif isinstance(conn, KernelConnector) and \
-#                      isinstance(conn._weights, ConvolutionKernel):
-#
-#                     param_block += conn.gen_on_machine_info()
-#
-#                     for r in range(conn._weights.shape[0]):
-#                         for c in range(conn._weights.shape[1]):
-#                             w = numpy.int32(
-#                                 float(conn._weights[r, c]) * (1 << 16))
-#                             param_block.append(w)
-                else:
-                    dist = conn._weights.name
-
-                    for i in range(len(DEFAULT_CONN_PARAMS_KEYS[dist])):
-
-                        # stupid non-named parameters!
-                        if i < len(conn._weights.parameters):
-                            v = conn._weights.parameters[i]
-                        else:
-                            p = DEFAULT_CONN_PARAMS_KEYS[dist][i]
-                            v = DEFAULT_CONN_PARAMS_VALS[dist][p]
-
-                        param_block.append(v)
-
-                # delays (needed to be in
-                if numpy.isscalar(conn._delays):
-                    param_block.append(numpy.uint32(conn._delays) << 16)
-
-#                 elif isinstance(conn, KernelConnector) and \
-#                      isinstance(conn._delays, ConvolutionKernel):
-#                     param_block += conn.gen_on_machine_info()
-#                     for r in range(conn._delays.shape[0]):
-#                         for c in range(conn._delays.shape[1]):
-#                             d = numpy.uint32(conn._delays[r, c])
-#                             d = d << 16
-#                             param_block.append(d)
-                else:
-                    dist = conn._delays.name
-
-                    for i in range(len(DEFAULT_CONN_PARAMS_KEYS[dist])):
-                        # stupid non-named parameters!
-                        if i < len(conn._delays.parameters):
-                            v = float(conn._delays.parameters[i])
-                        else:
-                            p = DEFAULT_CONN_PARAMS_KEYS[dist][i]
-                            v = DEFAULT_CONN_PARAMS_VALS[dist][p]
-
-                        param_block.append(v)
-
-        # print(max_per_dyn_type)
-        # sys.exit(0)
-        # param_block = max_per_dyn_type + param_block
-
-        # print("in generate_on_machine_params:")
-        # print("\t- param_block -")
-        # for i in param_block:
-        #     if isinstance(i, numpy.uint32) or isinstance(i, (int, long)):
-        #         print("\t\t%010u" % i)
-        #     else:
-        #         print("\t\t%f" % i)
-
-        return param_block
-
-    def _placement_to_uint32(self, placement):
-        if placement is None:
-            return 0
-
-        # [  placement x  |  placement y   |  placement p  ]
-        # [    13 bit     |     13 bit     |     6 bit     ]
-        PBITS = 6
-        XYBITS = (32 - PBITS) // 2
-        plc = numpy.uint32(0)
-        plc |= numpy.uint32(placement.p & ((1 << PBITS) - 1))
-        plc |= numpy.uint32((placement.y & ((1 << XYBITS) - 1)) << PBITS)
-        plc |= numpy.uint32((placement.x & ((1 << XYBITS) - 1)) <<
-                            (XYBITS + PBITS))
-        # print("==============_placement_to_uint32-=================")
-        # print("{0:d}, {1:d}, {2:d} == 0x{3:08x}".format(
-        #       placement.x, placement.y, placement.p, plc ))
-        return plc
-
-    def _is_delayed(self, synapse_info):
-        conn = synapse_info.connector
-        return numpy.uint32(conn.get_delay_maximum() > 16)
-
     def _write_on_machine_data_spec(
-            self, spec, n_edges, flags, delay_placements, data_block,
-            weight_scales, post_vertex_slice):
+            self, spec, post_vertex_slice, weight_scales):
         """
-        :param n_edges: how many edges in total land in this vertex
-        :param flags: \
-            which of the edges requires on machine generation, encoded as bits\
-            in 32-bit words
-        :param delay_placements:\
-            if the delays are larger than max per core, we need to
-            know the delay extension cores (unused here!)
-        :param data_block:\
-            data needed to generate connections, weights and delays
-        :param weight_scales:\
-            shifts from U88 fixed point to make better use of bits
+        :param spec: The specification to write to
+        :param post_vertex_slice: The slice of the vertex being written
+        :param weight_scales: scaling of weights on each synapse
         """
-        if not self._any_gen_on_machine:
+        if not self._generator_data:
             return
 
-        word_count = len(flags) + len(data_block) + len(weight_scales)
-
-        # 2 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
-        # 1 for n_edges
-        # 1 for size of data_block
-        # 1 for num_synapse_types
-        # 1 for synapse_bits
-        # 1 for num header words for plastic weights
-        total_count = word_count + 2 + 1 + 1 + 1 + 1 + 1
+        n_bytes = (
+            _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
+            (self._synapse_type.get_n_synapse_types() * 4))
+        for data in self._generator_data:
+            n_bytes += data.size
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value,
-            size=total_count * 4, label="ConnectorBuilderRegion")
-
-        # TODO: all 32-bit words =( we can compress many of these!!!
-
-        # print("Writing connector builder region")
-        # print("Reserved a total of %u bytes"%(total_count*4))
+            size=n_bytes, label="ConnectorBuilderRegion")
         spec.switch_write_focus(
             region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
 
-        spec.write_value(numpy.uint32(n_edges), data_type=DataType.UINT32)
-
-        spec.write_value(post_vertex_slice.lo_atom, data_type=DataType.UINT32)
-        spec.write_value(post_vertex_slice.n_atoms, data_type=DataType.UINT32)
-
-        # how many synapse types do we have
-        spec.write_value(len(weight_scales), data_type=DataType.UINT32)
-
-        # how many bits needed to encode all synapse types
-        spec.write_value(int(numpy.ceil(numpy.log2(len(weight_scales)))),
-                         data_type=DataType.UINT32)
-
-        # what are the weight scales for each synapse type
+        spec.write_value(len(self._generator_data))
+        spec.write_value(post_vertex_slice.lo_atom)
+        spec.write_value(post_vertex_slice.n_atoms)
+        spec.write_value(self._synapse_type.get_n_synapse_types())
+        spec.write_value(self._synapse_type.get_n_synapse_type_bits())
+        n_neuron_id_bits = int(
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+        spec.write_value(n_neuron_id_bits)
         for w in weight_scales:
-            # print("Weights scales %f"%w)
-            v = numpy.log2(w)
-            if v < 0:
-                v = 0.
-            else:
-                v = numpy.ceil(v)
-            v = numpy.int32(v)
-            spec.write_value(v, data_type=DataType.INT32)
+            spec.write_value(w, data_type=DataType.S1615)
 
-        # how many bytes we need to copy the data-block
-        spec.write_value(len(data_block) * 4, data_type=DataType.UINT32)
-
-        for i in range(len(data_block)):
-            w = data_block[i]
-            if numpy.issubdtype(type(w), numpy.integer):
-                data_block[i] = w  # numpy.int32(w)
-            else:
-                data_block[i] = numpy.int32(
-                    numpy.abs(numpy.round(w * (1 << 16))))
-
-        spec.write_array(data_block)
+        for data in self._generator_data:
+            spec.write_array(data.gen_data)
