@@ -28,12 +28,12 @@ class GeneratorData(object):
         connector = self._synapse_information.connector
         dynamics = self._synapse_information.synapse_dynamics
 
-        return sum(self.BASE_SIZE,
-                   dynamics.gen_matrix_params_size_in_bytes,
-                   connector.gen_connector_params_size_in_bytes,
-                   connector.gen_weight_params_size_in_bytes,
-                   connector.gen_delay_params_size_in_bytes,
-                   connector.gen_rng_params_size_in_bytes)
+        return sum((self.BASE_SIZE,
+                    dynamics.gen_matrix_params_size_in_bytes,
+                    connector.gen_connector_params_size_in_bytes,
+                    connector.gen_weight_params_size_in_bytes,
+                    connector.gen_delay_params_size_in_bytes,
+                    connector.gen_rng_params_size_in_bytes))
 
     @property
     def gen_data(self):
@@ -62,7 +62,7 @@ class GeneratorData(object):
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
             connector.gen_weights_id,
-            connector.get_delays_id],
+            connector.gen_delays_id],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params)

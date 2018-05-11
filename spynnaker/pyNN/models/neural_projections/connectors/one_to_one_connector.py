@@ -171,6 +171,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "OneToOneConnector()"
 
+    @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value

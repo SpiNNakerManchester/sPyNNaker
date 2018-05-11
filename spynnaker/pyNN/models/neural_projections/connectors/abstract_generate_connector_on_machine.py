@@ -7,6 +7,7 @@ from spynnaker.pyNN.models.neural_projections.connectors\
 from data_specification.enums.data_type import DataType
 from distutils.version import StrictVersion
 from enum import Enum
+import decimal
 
 # Travis fix - when sPyNNaker is installed, you will likely always have
 # PyNN installed as well, but sPyNNaker itself doesn't rely on PyNN
@@ -64,15 +65,16 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
     def _param_generator_params(self, values):
         if numpy.isscalar(values):
             return numpy.array(
-                [round(values / DataType.S1615.scale)], dtype="uint32")
+                [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
+                dtype="uint32")
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
             values = [
                 values.parameters.get(param, None) for param in parameters]
             values = [
-                round(value / DataType.S1615.scale) for value in values
-                if value is not None]
+                round(decimal.Decimal(str(value)) * DataType.S1615.scale)
+                for value in values if value is not None]
             return numpy.array(values, dtype="uint32")
 
         raise ValueError("Unexpected value {}".format(values))
@@ -150,6 +152,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         return self._param_generator_params(self._delays)
 
+    @property
     def gen_rng_params_size_in_bytes(self):
         """ The size of the rng parameters in bytes
 

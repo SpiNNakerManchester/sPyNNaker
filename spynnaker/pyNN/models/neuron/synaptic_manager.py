@@ -306,22 +306,23 @@ class SynapticManager(object):
         size = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
-                connector = in_edge.synapse_information.connector
-                synapse_dynamics = in_edge.synapse_information.synapse_dynamics
-                connector_gen = isinstance(
-                    connector, AbstractGenerateConnectorOnMachine)
-                synapse_gen = isinstance(
-                    synapse_dynamics, AbstractGenerateOnMachine)
-                if connector_gen and synapse_gen:
-                    gen_on_machine = True
-                    size += sum((
-                        GeneratorData.BASE_SIZE,
-                        connector.gen_delay_params_size_in_bytes,
-                        connector.gen_weight_params_size_in_bytes,
-                        connector.gen_connector_params_size_in_bytes,
-                        connector.gen_rng_params_size_in_bytes,
-                        synapse_dynamics.gen_matrix_params_size_in_bytes
-                    ))
+                for synapse_info in in_edge.synapse_information:
+                    connector = synapse_info.connector
+                    dynamics = synapse_info.synapse_dynamics
+                    connector_gen = isinstance(
+                        connector, AbstractGenerateConnectorOnMachine)
+                    synapse_gen = isinstance(
+                        dynamics, AbstractGenerateOnMachine)
+                    if connector_gen and synapse_gen:
+                        gen_on_machine = True
+                        size += sum((
+                            GeneratorData.BASE_SIZE,
+                            connector.gen_delay_params_size_in_bytes,
+                            connector.gen_weight_params_size_in_bytes,
+                            connector.gen_connector_params_size_in_bytes,
+                            connector.gen_rng_params_size_in_bytes,
+                            dynamics.gen_matrix_params_size_in_bytes
+                        ))
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
             size += self._synapse_type.get_n_synapse_types() * 4
