@@ -150,6 +150,22 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         return self._param_generator_params(self._delays)
 
+    def gen_rng_params_size_in_bytes(self):
+        """ The size of the rng parameters in bytes
+
+        :rtype: int
+        """
+        return 16
+
+    @property
+    def gen_rng_params(self):
+        """ Get the parameters of the rng on the machine
+
+        :rtype: numpy array of uint32
+        """
+        return numpy.array(
+            [int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)], dtype="uint32")
+
     @property
     def gen_delay_params_size_in_bytes(self):
         """ The size of the delay parameters in bytes

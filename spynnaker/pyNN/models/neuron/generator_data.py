@@ -32,7 +32,8 @@ class GeneratorData(object):
                    dynamics.gen_matrix_params_size_in_bytes,
                    connector.gen_connector_params_size_in_bytes,
                    connector.gen_weight_params_size_in_bytes,
-                   connector.gen_delay_params_size_in_bytes)
+                   connector.gen_delay_params_size_in_bytes,
+                   connector.gen_rng_params_size_in_bytes)
 
     @property
     def gen_data(self):
@@ -67,4 +68,5 @@ class GeneratorData(object):
         items.append(connector.gen_connector_params)
         items.append(connector.gen_weights_params)
         items.append(connector.gen_delay_params)
+        items.append(connector.gen_rng_params)
         return numpy.concatenate(items)

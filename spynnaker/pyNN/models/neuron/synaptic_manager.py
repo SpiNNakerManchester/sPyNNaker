@@ -319,6 +319,7 @@ class SynapticManager(object):
                         connector.gen_delay_params_size_in_bytes,
                         connector.gen_weight_params_size_in_bytes,
                         connector.gen_connector_params_size_in_bytes,
+                        connector.gen_rng_params_size_in_bytes,
                         synapse_dynamics.gen_matrix_params_size_in_bytes
                     ))
         if gen_on_machine:

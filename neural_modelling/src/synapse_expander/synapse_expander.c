@@ -62,9 +62,6 @@ bool read_connection_builder_region(address_t *in_region,
 
     uint32_t *region = *in_region;
 
-    // Read RNG seed for this matrix
-    rng_t rng = rng_init(&region);
-
     const uint32_t synaptic_matrix_offset = *region++;
     const uint32_t delayed_synaptic_matrix_offset = *region++;
     const uint32_t max_row_length = *region++;
@@ -99,6 +96,9 @@ bool read_connection_builder_region(address_t *in_region,
         &region);
     weight_generator = param_generator_init(weight_type_hash, &region);
     delay_generator = param_generator_init(delay_type_hash, &region);
+
+    // Read RNG parameters for this matrix
+    rng_t rng = rng_init(&region);
 
     *in_region = region;
 
