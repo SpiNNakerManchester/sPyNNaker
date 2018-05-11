@@ -165,9 +165,9 @@ bool read_sdram_data(
     return true;
 }
 
-void app_start(uint a0, uint a1) {
-    _unused(a0);
-    _unused(a1);
+void c_main(void) {
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    sark_cpu_state(CPU_STATE_RUN);
 
     // Register matrix generators with factories
     // **NOTE** plastic matrix generator is capable of generating
@@ -227,16 +227,9 @@ void app_start(uint a0, uint a1) {
         rt_error(RTE_ABORT);
     }
 
+    if (delay_initialised) {
+        delay_sender_close();
+    }
+
     log_info("Finished On Machine Connectors!");
-    spin1_exit(0);
-}
-
-void c_main(void) {
-    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
-
-    // kick-start the process
-    spin1_schedule_callback(app_start, 0, 0, 2);
-
-    // go
-    spin1_start(SYNC_NOWAIT);
 }
