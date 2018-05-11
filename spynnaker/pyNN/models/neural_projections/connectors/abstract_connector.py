@@ -40,11 +40,7 @@ class AbstractConnector(object):
         "_safe",
         "_space",
         "_verbose",
-        "_weights",
-        "_n_clipped_delays",
-        "_min_delay",
-        "_weights",
-        "_delays"]
+        "_weights"]
 
     def __init__(self, safe=True, verbose=False):
         self._safe = safe
@@ -135,7 +131,6 @@ class AbstractConnector(object):
             return delays
         elif hasattr(delays, "__getitem__"):
             return numpy.max(delays)
-
         raise Exception("Unrecognised delay format: {:s}".format(type(delays)))
 
     @abstractmethod
@@ -365,7 +360,6 @@ class AbstractConnector(object):
                     " in projection {}->{}".format(
                         self._pre_population.label,
                         self._post_population.label))
-
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
