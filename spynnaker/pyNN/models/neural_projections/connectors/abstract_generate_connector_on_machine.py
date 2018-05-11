@@ -5,9 +5,18 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neural_projections.connectors\
     import AbstractConnector
 from data_specification.enums.data_type import DataType
-from pyNN import __version__ as pyNNVersion, random
 from distutils.version import StrictVersion
 from enum import Enum
+
+# Travis fix - when sPyNNaker is installed, you will likely always have
+# PyNN installed as well, but sPyNNaker itself doesn't rely on PyNN
+# explicitly as it tries to be version agnostic.  In this case, PyNN 0.7
+# random doesn't give us enough information to load the data, so PyNN >= 0.8
+# is required here...
+try:
+    from pyNN import __version__ as pyNNVersion, random
+except ImportError:
+    pyNNVersion = "0.7"
 
 IS_PYNN_8 = StrictVersion(pyNNVersion) >= StrictVersion("0.8")
 
