@@ -748,7 +748,7 @@ class AbstractPopulationVertex(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 
-        # Skip the recorder globals as these are not change on machione
+        # Skip the recorder globals as these are not change on machine
         # Just written out in case data is changed and written back
         offset = self._neuron_recorder.get_size_of_global_parameters(
             vertex_slice)
@@ -949,3 +949,7 @@ class AbstractPopulationVertex(
 
     def __repr__(self):
         return self.__str__()
+
+    @property
+    def gen_on_machine(self):
+        return self._synapse_manager.gen_on_machine

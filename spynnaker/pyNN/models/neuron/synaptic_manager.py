@@ -1226,3 +1226,9 @@ class SynapticManager(object):
 
         for data in self._generator_data:
             spec.write_array(data.gen_data)
+
+    @property
+    def gen_on_machine(self):
+        """ True if the synapses should be generated on the machine
+        """
+        return len(self._generator_data) > 0
