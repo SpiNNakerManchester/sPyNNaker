@@ -20,7 +20,7 @@ struct param_generator_info {
 
 struct param_generator_info param_generators[N_PARAM_GENERATORS];
 
-void register_matrix_generators() {
+void register_param_generators() {
 
     // TODO: Fill in the generators
 }
