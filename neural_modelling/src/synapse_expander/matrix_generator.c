@@ -21,13 +21,14 @@ struct matrix_generator_info {
     uint32_t hash;
     void* (*initialize)(address_t *region);
     void (*write_row)(
-        address_t synaptic_matrix,
-        address_t delayed_synaptic_matrix,
+        void *data,
+        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, int32_t *delays, int32_t *weights);
+        uint16_t *indices, int32_t *delays, int32_t *weights,
+        uint32_t max_stage);
     void (*free)(void *data);
 };
 
@@ -77,7 +78,7 @@ bool matrix_generator_generate(
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
         param_generator_t delay_generator, param_generator_t weight_generator,
-        rng_t rng) {
+        rng_t rng, uint32_t max_stage) {
 
     uint32_t n_connections = 0;
     uint32_t pre_slice_end = pre_slice_start + pre_slice_count;
@@ -105,11 +106,11 @@ bool matrix_generator_generate(
 
         // Write row
         matrix_generators[generator->index].write_row(
-            synaptic_matrix, delayed_synaptic_matrix,
+            generator->data, synaptic_matrix, delayed_synaptic_matrix,
             pre_slice_count, pre_neuron_index,
             max_row_length, max_delayed_row_length,
             n_synapse_type_bits, n_synapse_index_bits,
-            synapse_type, n_indices, indices, delays, weights);
+            synapse_type, n_indices, indices, delays, weights, max_stage);
 
         n_connections += n_indices;
     }

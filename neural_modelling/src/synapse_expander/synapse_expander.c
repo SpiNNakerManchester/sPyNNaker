@@ -70,6 +70,7 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t pre_slice_count = *region++;
     const uint32_t delay_chip = *region++;
     const uint32_t delay_core = *region++;
+    const uint32_t max_stage = *region++;
     const uint32_t synapse_type = *region++;
 
     const uint32_t matrix_type_hash = *region++;
@@ -120,7 +121,8 @@ bool read_connection_builder_region(address_t *in_region,
         synapse_type, weight_scales,
         post_slice_start, post_slice_count,
         pre_slice_start, pre_slice_count,
-        connection_generator, delay_generator, weight_generator, rng);
+        connection_generator, delay_generator, weight_generator,
+        rng, max_stage);
 
     matrix_generator_free(matrix_generator);
     connection_generator_free(connection_generator);

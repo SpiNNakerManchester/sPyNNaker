@@ -5,12 +5,12 @@ class GeneratorData(object):
     """ Data for each connection of the synapse generator
     """
 
-    BASE_SIZE = 13 * 4
+    BASE_SIZE = 14 * 4
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             max_row_length, max_delayed_row_length, pre_vertex_slice,
-            delay_placement, synapse_information):
+            delay_placement, synapse_information, max_stage):
         self._synaptic_matrix_offset = synaptic_matrix_offset
         self._delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self._max_row_length = max_row_length
@@ -18,6 +18,7 @@ class GeneratorData(object):
         self._pre_vertex_slice = pre_vertex_slice
         self._delay_placement = delay_placement
         self._synapse_information = synapse_information
+        self._max_stage = max_stage
 
     @property
     def size(self):
@@ -57,7 +58,7 @@ class GeneratorData(object):
             self._max_delayed_row_length,
             self._pre_vertex_slice.lo_atom,
             self._pre_vertex_slice.n_atoms,
-            delay_chip, delay_core,
+            delay_chip, delay_core, self._max_stage,
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

@@ -163,7 +163,7 @@ class SynapseDynamicsSTDP(
             TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
 
         # The actual number of bytes is in a word-aligned struct, so work out
-        # the number of words
+        # the number of bytes as a number of words
         return int(math.ceil(float(n_bytes) / 4.0)) * 4
 
     def get_n_words_for_plastic_connections(self, n_connections):
@@ -175,7 +175,8 @@ class SynapseDynamicsSTDP(
             else (n_connections + 1) // 2)
         pp_size_bytes = (
             self._n_header_bytes +
-            (synapse_structure.get_n_bytes_per_connection() * n_connections))
+            (synapse_structure.get_n_half_words_per_connection() *
+             2 * n_connections))
         pp_size_words = int(math.ceil(float(pp_size_bytes) / 4.0))
 
         return fp_size_words + pp_size_words
@@ -212,11 +213,19 @@ class SynapseDynamicsSTDP(
             fixed_plastic_rows = self._pad_row(fixed_plastic_rows, 2)
         fp_data = self.get_words(fixed_plastic_rows)
 
-        # Get the plastic data
+        # Get the plastic data by inserting the weight into the half-word
+        # specified by the synapse structure
         synapse_structure = self._timing_dependence.synaptic_structure
-        plastic_plastic = synapse_structure.get_synaptic_data(connections)
-        plastic_headers = numpy.zeros(
-            (n_rows, self._n_header_bytes), dtype="uint8")
+        n_half_words = synapse_structure.get_n_half_words_per_connection()
+        half_word = synapse_structure.get_weight_half_word()
+        plastic_plastic = numpy.zeros(len(connections) * n_half_words)
+        plastic_plastic[half_word::n_half_words] = \
+            numpy.rint(numpy.abs(connections["weight"])).astype("uint16")
+
+        # Convert the plastic data into groups of bytes per connection and
+        # then into rows
+        plastic_plastic = plastic_plastic.view(dtype="uint8").reshape(
+            (-1, n_half_words * 2))
         plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows, plastic_plastic)
 
@@ -224,8 +233,9 @@ class SynapseDynamicsSTDP(
         if self._pad_to_length is not None:
             # Pad the data
             plastic_plastic_row_data = self._pad_row(
-                plastic_plastic_row_data,
-                synapse_structure.get_n_bytes_per_connection())
+                plastic_plastic_row_data, n_half_words * 2)
+        plastic_headers = numpy.zeros(
+            (n_rows, self._n_header_bytes), dtype="uint8")
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
@@ -282,14 +292,16 @@ class SynapseDynamicsSTDP(
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
         synapse_structure = self._timing_dependence.synaptic_structure
+        n_half_words = synapse_structure.get_n_half_words_per_connection()
+        half_word = synapse_structure.get_weight_half_word()
 
         connections = numpy.zeros(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
-        connections["weight"] = synapse_structure.read_synaptic_data(
-            fp_size, pp_without_headers)
+        connections["weight"] = pp_without_headers[:fp_size][
+            half_word::n_half_words]
         connections["delay"] = (data_fixed >> (n_neuron_id_bits
                                                + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
@@ -350,7 +362,7 @@ class SynapseDynamicsSTDP(
 
         # Get plastic plastic size per connection
         synapse_structure = self._timing_dependence.synaptic_structure
-        bytes_per_pp = synapse_structure.get_n_bytes_per_connection()
+        bytes_per_pp = synapse_structure.get_n_half_words_per_connection() * 2
 
         # The fixed plastic size per connection is 2 bytes
         bytes_per_fp = 2
@@ -373,10 +385,14 @@ class SynapseDynamicsSTDP(
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(self):
-        return numpy.zeros(0, dtype="uint32")
+        synapse_struct = self._timing_dependence.synapse_structure
+        return numpy.zeros([
+            self._n_header_bytes // 4,
+            synapse_struct.get_n_half_words_per_connection(),
+            synapse_struct.get_weight_half_word()], dtype="uint32")
 
     @property
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 0
+        return 3 * 4
