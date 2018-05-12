@@ -11,7 +11,8 @@ connection_generator_t connection_generator_init(
 
 void connection_generator_free(connection_generator_t generator);
 
-uint32_t connection_generator_generate(connection_generator_t generator,
-    uint32_t pre_block_start, uint32_t pre_block_count, uint32_t pre_idx,
-    uint32_t post_start, uint32_t post_count, uint32_t max_indices,
-    rng_t rng, uint16_t *indices);
+uint32_t connection_generator_generate(
+    connection_generator_t generator, uint32_t pre_slice_start,
+    uint32_t pre_slice_count, uint32_t pre_neuron_index,
+    uint32_t post_slice_start, uint32_t post_slice_count,
+    uint32_t max_row_length, rng_t rng, uint16_t *indices);

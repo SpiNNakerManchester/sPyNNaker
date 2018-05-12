@@ -96,7 +96,7 @@ bool matrix_generator_generate(
 
         uint16_t indices[max_row_length];
         uint32_t n_indices = connection_generator_generate(
-            connection_generator, pre_slice_start, pre_slice_end,
+            connection_generator, pre_slice_start, pre_slice_count,
             pre_neuron_index, post_slice_start, post_slice_count,
             max_row_length, rng, indices);
 
