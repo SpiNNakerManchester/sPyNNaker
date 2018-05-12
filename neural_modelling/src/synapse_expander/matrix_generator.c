@@ -108,7 +108,7 @@ bool matrix_generator_generate(
         int32_t weights[n_indices];
         param_generator_generate(
             weight_generator, n_indices, weight_scales[synapse_type],
-            indices, rng, weights);
+            rng, weights);
 
         // Write row
         matrix_generators[generator->index].write_row(

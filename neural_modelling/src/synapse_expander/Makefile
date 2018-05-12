@@ -1,6 +1,6 @@
 APP = synapse_expander
 BUILD_DIR = build/
-SOURCES = delay_sender.c matrix_generator.c synapse_expander.c
+SOURCES = delay_sender.c param_generator.c matrix_generator.c synapse_expander.c
 
 include ../common.mk
 
