@@ -3,9 +3,10 @@
 #include <debug.h>
 
 #include "matrix_generators/matrix_generator_static.h"
+#include "matrix_generators/matrix_generator_stdp.h"
 #include <delay_extension/delay_extension.h>
 
-#define N_MATRIX_GENERATORS 1
+#define N_MATRIX_GENERATORS 2
 #define MATRIX_GENERATOR_STATIC_HASH 0
 #define MATRIX_GENERATOR_PLASTIC_HASH 1
 #define MAX_DELAY 16
@@ -35,10 +36,18 @@ struct matrix_generator_info {
 struct matrix_generator_info matrix_generators[N_MATRIX_GENERATORS];
 
 void register_matrix_generators() {
-    matrix_generators[0].hash = 0;
+
+    // Static matrix
+    matrix_generators[0].hash = MATRIX_GENERATOR_STATIC_HASH;
     matrix_generators[0].initialize = matrix_generator_static_initialize;
     matrix_generators[0].write_row = matrix_generator_static_write_row;
     matrix_generators[0].free = matrix_generator_static_free;
+
+    // Plastic matrix
+    matrix_generators[1].hash = MATRIX_GENERATOR_PLASTIC_HASH;
+    matrix_generators[1].initialize = matrix_generator_stdp_initialize;
+    matrix_generators[1].write_row = matrix_generator_stdp_write_row;
+    matrix_generators[1].free = matrix_generator_stdp_free;
 }
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
@@ -93,16 +102,13 @@ bool matrix_generator_generate(
 
         // Generate delays for each index
         int32_t delays[n_indices];
-        log_debug("\t\t\t\tGenerating delays-------------------------");
-        param_generator_generate(
-            delay_generator, n_indices, 1, pre_neuron_index, post_slice_start,
-            indices, rng, delays);
+        param_generator_generate(delay_generator, n_indices, 1, rng, delays);
 
         // Generate weights for each index
         int32_t weights[n_indices];
         param_generator_generate(
             weight_generator, n_indices, weight_scales[synapse_type],
-            pre_neuron_index, post_slice_start, indices, rng, weights);
+            indices, rng, weights);
 
         // Write row
         matrix_generators[generator->index].write_row(
