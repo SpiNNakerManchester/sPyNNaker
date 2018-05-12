@@ -26,13 +26,13 @@ void matrix_generator_stdp_free(void *data) {
 }
 
 #define SYNAPSE_DELAY_MASK 0xFF
-#define PLASTIC_PLASTIC_SIZE 0
-#define PLASTIC_PLASTIC_OFFSET 1
+#define STDP_PLASTIC_PLASTIC_SIZE 0
+#define STDP_PLASTIC_PLASTIC_OFFSET 1
 
 // These values are based on the start of the fixed region itself
-#define FIXED_FIXED_SIZE 0
-#define FIXED_PLASTIC_SIZE 1
-#define FIXED_PLASTIC_OFFSET 2
+#define STDP_FIXED_FIXED_SIZE 0
+#define STDP_FIXED_PLASTIC_SIZE 1
+#define STDP_FIXED_PLASTIC_OFFSET 2
 
 
 uint16_t _build_fixed_plastic_half_word(
@@ -73,10 +73,10 @@ void matrix_generator_stdp_write_row(
 
     // Add the header half words (zero initialised) to each row
     for (uint32_t i = 0; i < max_stage; i++) {
-        row_address[i][PLASTIC_PLASTIC_SIZE] =
+        row_address[i][STDP_PLASTIC_PLASTIC_SIZE] =
             params->n_words_per_pp_row_header;
         for (uint32_t j = 0; j < params->n_words_per_pp_row_header; i++) {
-            row_address[i][j + PLASTIC_PLASTIC_OFFSET] = 0;
+            row_address[i][j + STDP_PLASTIC_PLASTIC_OFFSET] = 0;
         }
     }
 
@@ -87,7 +87,7 @@ void matrix_generator_stdp_write_row(
     for (uint32_t i = 0; i < max_stage; i++) {
         n_half_words_per_row[i] = 0;
         pp_address[i] = (uint16_t *) &(row_address[i][
-             PLASTIC_PLASTIC_OFFSET + params->n_words_per_pp_row_header]);
+             STDP_PLASTIC_PLASTIC_OFFSET + params->n_words_per_pp_row_header]);
     }
 
     // Write the plastic-plastic part of the row
@@ -120,21 +120,21 @@ void matrix_generator_stdp_write_row(
     // Add padding to any rows that are not word-aligned
     // and set the size in words
     for (uint32_t i = 0; i < max_stage; i++) {
-        if (n_half_words_per_row[i] & 0x1 != 0) {
+        if ((n_half_words_per_row[i] & 0x1) != 0) {
             pp_address[i][0] = 0;
             pp_address[i] = &pp_address[i][1];
             n_half_words_per_row[i] += 1;
         }
-        row_address[i][PLASTIC_PLASTIC_SIZE] += n_half_words_per_row[i] >> 2;
+        row_address[i][STDP_PLASTIC_PLASTIC_SIZE] += n_half_words_per_row[i] >> 2;
     }
 
     // PP address is now fixed region address
     // Set the fixed-fixed size to 0 and point to the fixed-plastic region
     uint16_t *fp_address[max_stage];
     for (uint32_t i = 0; i < max_stage; i++) {
-        pp_address[i][FIXED_FIXED_SIZE] = 0;
-        pp_address[i][FIXED_PLASTIC_SIZE] = 0;
-        fp_address[i] = (uint16_t *) &(pp_address[i][FIXED_PLASTIC_OFFSET]);
+        pp_address[i][STDP_FIXED_FIXED_SIZE] = 0;
+        pp_address[i][STDP_FIXED_PLASTIC_SIZE] = 0;
+        fp_address[i] = (uint16_t *) &(pp_address[i][STDP_FIXED_PLASTIC_OFFSET]);
     }
 
     // Write the fixed-plastic part of the row
@@ -155,6 +155,6 @@ void matrix_generator_stdp_write_row(
         *write_ptr++ = fp_half_word;
 
         // Increment the size of the current row
-        pp_address[delay.stage][FIXED_PLASTIC_SIZE] += 1;
+        pp_address[delay.stage][STDP_FIXED_PLASTIC_SIZE] += 1;
     }
 }

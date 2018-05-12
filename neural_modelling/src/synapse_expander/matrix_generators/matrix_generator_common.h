@@ -1,3 +1,6 @@
+#ifndef __MATRIX_GENERATOR_COMMON_H__
+#define __MATRIX_GENERATOR_COMMON_H__
+
 #define MAX_DELAY 16
 
 struct delay_value {
@@ -20,3 +23,5 @@ struct delay_value get_delay(uint32_t delay_value, uint32_t max_stage) {
     delay = ((delay - 1) % MAX_DELAY) + 1;
     return (struct delay_value) {.delay = delay, .stage = stage};
 }
+
+#endif // __MATRIX_GENERATOR_COMMON_H__
