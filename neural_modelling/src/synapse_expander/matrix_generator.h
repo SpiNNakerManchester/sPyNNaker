@@ -26,4 +26,3 @@ bool matrix_generator_generate(
     connection_generator_t connection_generator,
     param_generator_t delay_generator, param_generator_t weight_generator,
     rng_t rng, uint32_t max_stage);
-
