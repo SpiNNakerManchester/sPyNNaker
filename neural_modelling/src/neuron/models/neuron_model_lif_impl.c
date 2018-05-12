@@ -3,11 +3,25 @@
 #include <debug.h>
 
 #define MULT_ROUND_NEAREST(x, y) (kbits(__stdfix_smul_k_round_nearest(bitsk(x), bitsk(y))))
+#define MULT_ROUND_STOCHASTIC(x, y) (kbits(__stdfix_smul_k_round_stochastic(bitsk(x), bitsk(y))))
 
-//! \brief Saturated multiplicaion of the underlying integer representations
-//! \param[in] x A 32-bit integer representing of a accum.
-//! \param[in] y A 32-bit integer representing of a accum.
-//! \return The value of x*y saturated to 32 bits representing of a accum.
+static inline int32_t __stdfix_smul_k_round_stochastic(
+    int32_t x,
+    int32_t y)
+{
+    if (x == INT32_MIN && y == INT32_MIN) { // special case for -1.0*-1.0
+        return INT32_MAX;
+    }
+
+    int64_t result = __I64(x) * __I64(y);
+
+    uint32_t p = mars_kiss32() & 0x7FFF;
+    uint32_t dropped_bits = result & 0x7FFF;
+
+    if (p <= dropped_bits)
+        return __stdfix_sat_k((__I64(x) * __I64(y)) >> 15) + 0x1;
+    else return __stdfix_sat_k((__I64(x) * __I64(y)) >> 15);
+}
 
 static inline int32_t __stdfix_smul_k_round_nearest(
     int32_t x,
@@ -18,17 +32,18 @@ static inline int32_t __stdfix_smul_k_round_nearest(
     }
 
     return __stdfix_sat_k(__stdfix_round_s64((__I64(x) * __I64(y)), 15) >> 15);
- }
+}
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
 //    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
-    REAL alpha = MULT_ROUND_NEAREST(input_this_timestep, neuron->R_membrane) + neuron->V_rest;
+    REAL alpha = MULT_ROUND_STOCHASTIC(input_this_timestep, neuron->R_membrane) + neuron->V_rest;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (MULT_ROUND_NEAREST(neuron->exp_TC, (alpha - V_prev)));
+    neuron->V_membrane = alpha - (MULT_ROUND_STOCHASTIC(neuron->exp_TC, (alpha - V_prev)));
+//    neuron->V_membrane = alpha - neuron->exp_TC * (alpha - V_prev);
 }
 
 void neuron_model_set_global_neuron_params(
