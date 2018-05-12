@@ -128,6 +128,7 @@ bool read_connection_builder_region(address_t *in_region,
     connection_generator_free(connection_generator);
     param_generator_free(weight_generator);
     param_generator_free(delay_generator);
+    rng_free(rng);
 
     if (!status) {
         log_error("\tMatrix generation failed");
