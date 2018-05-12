@@ -42,7 +42,7 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
             return generator;
         }
     }
-    log_error("Matrix generator with hash %u not found", hash);
+    log_error("Param generator with hash %u not found", hash);
     return NULL;
 }
 
