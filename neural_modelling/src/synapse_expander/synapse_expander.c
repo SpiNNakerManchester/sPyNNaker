@@ -172,13 +172,6 @@ void c_main(void) {
     log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     sark_cpu_state(CPU_STATE_RUN);
 
-    // Register matrix generators with factories
-    // **NOTE** plastic matrix generator is capable of generating
-    // both standard and extended plastic matrices
-    // log_info("Matrix generators");
-    // REGISTER_FACTORY_CLASS("StaticSynapticMatrix", MatrixGenerator, Static);
-    // REGISTER_FACTORY_CLASS("PlasticSynapticMatrix", MatrixGenerator, Plastic);
-    // REGISTER_FACTORY_CLASS("ExtendedPlasticSynapticMatrix", MatrixGenerator, Plastic);
     register_matrix_generators();
 
     // Register connector generators with factories
@@ -202,20 +195,9 @@ void c_main(void) {
     // REGISTER_FACTORY_CLASS("exponential", ParamGenerator, Exponential);
     register_param_generators();
 
-    // Allocate buffers for placement new from factories
-    // **NOTE** we need to be able to simultaneously allocate a delay and
-    // a weight generator so we need two buffers for parameter allocation
-    // g_MatrixGeneratorBuffer = g_MatrixGeneratorFactory.Allocate();
-    // g_ConnectorGeneratorBuffer = g_ConnectorGeneratorFactory.Allocate();
-    // g_DelayParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
-    // g_WeightParamGeneratorBuffer = g_ParamGeneratorFactory.Allocate();
-
-    // Get this core's base address using alloc tag
-    // uint32_t *params_address = Config::GetBaseAddressAllocTag();
     log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
 
     log_info("Starting To Build Connectors");
-    // If reading SDRAM data fails
 
     address_t core_address = data_specification_get_data_address();
     address_t params_address = data_specification_get_region(
