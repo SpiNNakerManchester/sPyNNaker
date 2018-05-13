@@ -1,6 +1,7 @@
 #include "neuron_model_izh_impl.h"
 
 #include <debug.h>
+#include <round.h>
 
 static global_neuron_params_pointer_t global_params;
 
@@ -50,16 +51,17 @@ static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
 
     REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
     REAL alpha = pre_alph
-                 + ( REAL_CONST(5.0) + REAL_CONST(0.0400) * lastV1) * lastV1;
-    REAL eta = lastV1 + REAL_HALF(h * alpha);
+                 + MULT_ROUND_STOCHASTIC(( REAL_CONST(5.0) + MULT_ROUND_STOCHASTIC(REAL_CONST(0.0400), lastV1)),lastV1);
+    REAL eta = lastV1 + REAL_HALF(MULT_ROUND_STOCHASTIC(h, alpha));
 
     // could be represented as a long fract?
-    REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
+    REAL beta = REAL_HALF(MULT_ROUND_STOCHASTIC(MULT_ROUND_STOCHASTIC(h, (MULT_ROUND_STOCHASTIC(b, lastV1) - lastU1)), a));
 
-    neuron->V += h * (pre_alph - beta
-                      + ( REAL_CONST(5.0) + REAL_CONST(0.0400) * eta) * eta);
+    REAL temp = MULT_ROUND_STOCHASTIC(h, (pre_alph - beta + MULT_ROUND_STOCHASTIC(( REAL_CONST(5.0) + MULT_ROUND_STOCHASTIC(REAL_CONST(0.0400), eta)), eta)));
+    neuron->V += temp;
 
-    neuron->U += a * h * (-lastU1 - beta + b * eta);
+    temp = MULT_ROUND_STOCHASTIC(a, MULT_ROUND_STOCHASTIC(h, (-lastU1 - beta + MULT_ROUND_STOCHASTIC(b, eta))));
+    neuron->U += temp;
 }
 
 void neuron_model_set_global_neuron_params(
