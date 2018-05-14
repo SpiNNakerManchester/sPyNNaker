@@ -60,7 +60,7 @@ static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
     REAL temp = MULT_ROUND_STOCHASTIC(h, (pre_alph - beta + MULT_ROUND_STOCHASTIC(( REAL_CONST(5.0) + MULT_ROUND_STOCHASTIC(REAL_CONST(0.0400), eta)), eta)));
     neuron->V += temp;
 
-    temp = MULT_ROUND_STOCHASTIC(a, MULT_ROUND_STOCHASTIC(h, (-lastU1 - beta + MULT_ROUND_STOCHASTIC(b, eta))));
+    temp = MULT_ROUND_STOCHASTIC(MULT_ROUND_STOCHASTIC(a,h), (-lastU1 - beta + MULT_ROUND_STOCHASTIC(b, eta)));
     neuron->U += temp;
 }
 
