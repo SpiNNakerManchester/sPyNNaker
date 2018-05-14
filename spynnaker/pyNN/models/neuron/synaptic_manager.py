@@ -950,7 +950,7 @@ class SynapticManager(object):
         # read in the synaptic block
         if using_extra_monitor_cores:
             return data_receiver.get_data(
-                transceiver, sender_extra_monitor_core_placement, address,
+                sender_extra_monitor_core_placement, address,
                 synaptic_block_size, fixed_routes)
         return transceiver.read_memory(
             placement.x, placement.y, address, synaptic_block_size)
