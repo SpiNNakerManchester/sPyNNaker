@@ -16,7 +16,10 @@ DELAY_RECEIVER = "delay_extension_receiver.aplx"
 
 def synapse_expander(
         app_graph, graph_mapper, placements, transceiver,
-        provenance_file_path):
+        provenance_file_path, executable_finder):
+
+    synapse_expander = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
+    delay_receiver = executable_finder.get_executable_path(DELAY_RECEIVER)
 
     progress = ProgressBar(len(app_graph.vertices) + 4, "Expanding Synapses")
 
@@ -34,7 +37,7 @@ def synapse_expander(
                 for m_vertex in graph_mapper.get_machine_vertices(vertex):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     synapse_expander_cores.add_processor(
-                        SYNAPSE_EXPANDER, placement.x, placement.y,
+                        synapse_expander, placement.x, placement.y,
                         placement.p)
 
                 # Go through the edges arriving at the vertex and add a
@@ -46,7 +49,7 @@ def synapse_expander(
                             placement = placements.get_placement_of_vertex(
                                 m_vertex)
                             delay_receiver_cores.add_processor(
-                                DELAY_RECEIVER, placement.x, placement.y,
+                                delay_receiver, placement.x, placement.y,
                                 placement.p)
 
     # Launch the delay receivers
