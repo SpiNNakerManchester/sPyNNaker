@@ -24,7 +24,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     :param weight: Initial weight assigned to a newly formed connection
     :type weight: float
     :param delay: Delay assigned to a newly formed connection
-    :type delay: int
+    :type delay: int or Iterable
     :param s_max: Maximum fan-in per target layer neuron
     :type s_max: int
     :param sigma_form_forward: Spread of feed-forward formation receptive field
@@ -359,7 +359,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # scale the inhibitory weight appropriately
         spec.write_value(
             data=int(round(self._initial_weight * weight_scales[1])))
-        spec.write_value(data=self._initial_delay)
+        if isinstance(self._initial_delay, collections.Iterable):
+            spec.write_array(self._initial_delay)
+        else:
+            spec.write_value(data=self._initial_delay)
+            spec.write_value(data=self._initial_delay)
         spec.write_value(data=int(self._s_max))
         spec.write_value(data=int(self._lateral_inhibition),
                          data_type=DataType.INT32)

@@ -86,7 +86,7 @@ typedef struct {
 
 //! parameters of the synaptic rewiring model
 typedef struct {
-    uint32_t p_rew, fast, weight[2], delay, s_max, app_no_atoms,
+    uint32_t p_rew, fast, weight[2], delay_lo, delay_hi, s_max, app_no_atoms,
         machine_no_atoms, low_atom, high_atom,
         size_ff_prob, size_lat_prob, grid_x, grid_y, p_elim_dep, p_elim_pot;
     // the 2 seeds that are used: shared for sync, local for everything else
@@ -201,7 +201,8 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
 
     log_info("w[%d, %d]",rewiring_data.weight[0],rewiring_data.weight[1]);
 
-    rewiring_data.delay = *sp_word++;
+    rewiring_data.delay_lo = *sp_word++;
+    rewiring_data.delay_hi = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
     rewiring_data.random_partner = *sp_word++;
@@ -636,8 +637,13 @@ bool synaptogenesis_dynamics_formation_rule(void)
     }
     int appr_scaled_weight = rewiring_data.weight[current_state.connection_type];
 
+    uint  actual_delay;
+    int offset = rewiring_data.delay_hi - rewiring_data.delay_lo;
+    actual_delay = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+	    offset + rewiring_data.delay_lo;
+
     if (!add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
-            appr_scaled_weight, rewiring_data.delay,
+            appr_scaled_weight, actual_delay,
             current_state.connection_type)) {
         return false;
     }
