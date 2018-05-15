@@ -5,6 +5,7 @@ import numpy
 import os
 import logging
 import struct
+import math
 
 from spinn_utilities.safe_eval import SafeEval
 
@@ -365,3 +366,13 @@ def check_sampling_interval(sampling_interval):
               "".format(sampling_interval, step * MAX_RATE)
         raise ConfigurationException(msg)
     return sampling_interval
+
+
+def get_n_bits(n_values):
+    """ Determine how many bits are required for the given number of values
+    """
+    if n_values == 0:
+        return 0
+    if n_values == 1:
+        return 1
+    return int(math.ceil(math.log(n_values, 2)))

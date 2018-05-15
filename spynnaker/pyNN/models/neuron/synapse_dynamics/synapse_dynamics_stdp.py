@@ -8,6 +8,7 @@ from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
     MatrixGeneratorID
 from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
@@ -185,9 +186,9 @@ class SynapseDynamicsSTDP(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        n_neuron_id_bits = int(
-            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         dendritic_delays = (
             connections["delay"] * self._dendritic_delay_fraction)
@@ -203,7 +204,7 @@ class SynapseDynamicsSTDP(
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
-              post_vertex_slice.lo_atom) & 0xFF))
+              post_vertex_slice.lo_atom) & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
@@ -282,9 +283,9 @@ class SynapseDynamicsSTDP(
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
 
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        n_neuron_id_bits = int(
-            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         data_fixed = numpy.concatenate([
             fp_data[i].view(dtype="uint16")[0:fp_size[i]]
@@ -299,7 +300,8 @@ class SynapseDynamicsSTDP(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
-        connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
+        connections["target"] = (
+            (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = pp_without_headers[:fp_size][
             half_word::n_half_words]
         connections["delay"] = (data_fixed >> (n_neuron_id_bits
