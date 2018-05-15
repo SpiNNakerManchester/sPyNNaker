@@ -36,7 +36,7 @@ void matrix_generator_stdp_free(void *data) {
 
 
 uint16_t _build_fixed_plastic_half_word(
-        uint32_t delay, uint32_t type,
+        uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
     uint16_t synapse_index_mask = ((1 << synapse_index_bits) - 1);
@@ -55,7 +55,7 @@ void matrix_generator_stdp_write_row(
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, int32_t *delays, int32_t *weights,
+        uint16_t *indices, uint16_t *delays, int32_t *weights,
         uint32_t max_stage) {
     struct matrix_generator_stdp *params =
         (struct matrix_generator_stdp *) data;

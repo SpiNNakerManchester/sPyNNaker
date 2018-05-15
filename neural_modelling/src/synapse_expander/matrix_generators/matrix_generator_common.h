@@ -4,17 +4,17 @@
 #define MAX_DELAY 16
 
 struct delay_value {
-    uint32_t delay;
-    uint32_t stage;
+    uint16_t delay;
+    uint16_t stage;
 };
 
-struct delay_value get_delay(uint32_t delay_value, uint32_t max_stage) {
-    int32_t delay = delay_value;
+struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
+    uint16_t delay = delay_value;
     if (delay < 1) {
         log_warning("Delay of %u is too small", delay);
         delay = 1;
     }
-    uint32_t stage = (delay - 1) / MAX_DELAY;
+    uint16_t stage = (delay - 1) / MAX_DELAY;
     if (stage > max_stage) {
         log_warning("Delay of %u is too big", delay);
         stage = max_stage;

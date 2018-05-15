@@ -2,7 +2,9 @@
 #include <spin1_api.h>
 #include <debug.h>
 
-#define N_PARAM_GENERATORS 0
+#include "param_generators/param_generator_constant.h"
+
+#define N_PARAM_GENERATORS 1
 
 struct param_generator {
     uint32_t index;
@@ -13,16 +15,17 @@ struct param_generator_info {
     uint32_t hash;
     void* (*initialize)(address_t *region);
     void (*generate)(
-        void *data, uint32_t n_synapses, int32_t scale, rng_t rng,
-        int32_t *values);
+        void *data, uint32_t n_synapses, rng_t rng, accum *values);
     void (*free)(void *data);
 };
 
 struct param_generator_info param_generators[N_PARAM_GENERATORS];
 
 void register_param_generators() {
-
-    // TODO: Fill in the generators
+    param_generators[0].hash = 0;
+    param_generators[0].initialize = param_generator_constant_initialize;
+    param_generators[0].generate = param_generator_constant_generate;
+    param_generators[0].free = param_generator_constant_free;
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
@@ -47,10 +50,10 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
 }
 
 void param_generator_generate(
-        param_generator_t generator, uint32_t n_indices, uint32_t scale,
-        rng_t rng, int32_t *values) {
+        param_generator_t generator, uint32_t n_indices, rng_t rng,
+        accum *values) {
     param_generators[generator->index].generate(
-        generator->data, n_indices, scale, rng, values);
+        generator->data, n_indices, rng, values);
 }
 
 void param_generator_free(param_generator_t generator) {

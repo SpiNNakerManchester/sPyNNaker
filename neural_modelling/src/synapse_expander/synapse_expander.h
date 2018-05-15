@@ -10,5 +10,6 @@ typedef enum regions_e {
     RECORDING_REGION,        // 6
     PROVENANCE_DATA_REGION,  // 7
     PROFILING_REGION,        // 8
-    CONNECTOR_BUILDER_REGION // 9
+    CONNECTOR_BUILDER_REGION,// 9
+    DIRECT_MATRIX,           // 10
 } regions_e;

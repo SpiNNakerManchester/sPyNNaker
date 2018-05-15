@@ -2,7 +2,9 @@
 #include <spin1_api.h>
 #include <debug.h>
 
-#define N_CONNECTION_GENERATORS 0
+#include "connection_generators/connection_generator_one_to_one.h"
+
+#define N_CONNECTION_GENERATORS 1
 
 struct connection_generator {
     uint32_t index;
@@ -23,8 +25,13 @@ struct connection_generator_info {
 struct connection_generator_info connection_generators[N_CONNECTION_GENERATORS];
 
 void register_connection_generators() {
-
-    // TODO: Fill in the generators
+    connection_generators[0].hash = 0;
+    connection_generators[0].initialize =
+        connection_generator_one_to_one_initialise;
+    connection_generators[0].generate =
+        connection_generator_one_to_one_generate;
+    connection_generators[0].free =
+        connection_generator_one_to_one_free;
 }
 
 connection_generator_t connection_generator_init(
@@ -33,8 +40,9 @@ connection_generator_t connection_generator_init(
         if (hash == connection_generators[i].hash) {
 
             address_t region = *in_region;
-            connection_generator_t generator = spin1_malloc(
-                sizeof(connection_generator_t));
+            log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+            struct connection_generator *generator = spin1_malloc(
+                sizeof(struct connection_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;

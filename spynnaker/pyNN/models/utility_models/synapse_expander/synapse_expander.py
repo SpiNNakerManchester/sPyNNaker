@@ -7,6 +7,7 @@ from spinnman.model.enums import CPUState
 import logging
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.progress_bar import ProgressBar
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -63,31 +64,32 @@ def synapse_expander(
     progress.update()
 
     # Wait for everything to finish
-    finished = False
+    finished_expander = False
+    finished_receiver = False
     try:
         transceiver.wait_for_cores_to_be_in_state(
             synapse_expander_cores.all_core_subsets, synapse_app_id,
             [CPUState.FINISHED])
         progress.update()
+        finished_expander = True
         transceiver.wait_for_cores_to_be_in_state(
             delay_receiver_cores.all_core_subsets, delay_app_id,
             [CPUState.FINISHED])
-        finished = True
+        finished_receiver = True
         progress.update()
         progress.end()
+    except Exception:
+        traceback.print_exc()
     finally:
-        # get the debug data
-        if not finished:
-            _handle_failure(
-                synapse_expander_cores, delay_receiver_cores,
-                transceiver, provenance_file_path)
-
+        _handle_failure(
+            synapse_expander_cores, delay_receiver_cores,
+            transceiver, provenance_file_path)
         transceiver.stop_application(synapse_app_id)
         transceiver.app_id_tracker.free_id(synapse_app_id)
         transceiver.stop_application(delay_app_id)
         transceiver.app_id_tracker.free_id(delay_app_id)
 
-        if not finished:
+        if not finished_expander or not finished_receiver:
             raise SpynnakerException(
                 "The synapse expander failed to complete")
 
@@ -101,13 +103,12 @@ def _handle_failure(
     :param provenance_file_path:
     :rtype: None
     """
-    logger.info("Synapse expander has failed")
-    iobuf_extractor = ChipIOBufExtractor()
+    logger.error("Synapse expander has failed")
     for executable_targets in (synapse_expander_cores, delay_receiver_cores):
-        io_errors, io_warnings = iobuf_extractor(
-            transceiver, executable_targets.all_core_subsets,
-            provenance_file_path)
-        for warning in io_warnings:
-            logger.warning(warning)
-        for error in io_errors:
-            logger.error(error)
+        core_subsets = executable_targets.all_core_subsets
+        error_cores = transceiver.get_cores_not_in_state(
+            core_subsets, [CPUState.RUNNING, CPUState.FINISHED])
+        logger.error(transceiver.get_core_status_string(error_cores))
+        io_buffers = transceiver.get_iobuf(core_subsets)
+        for io_buf in io_buffers:
+            logger.error("\n" + str(io_buf))

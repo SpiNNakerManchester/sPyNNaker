@@ -5,7 +5,6 @@
 #include "rng.h"
 #include "delay_sender.h"
 
-#include <stdbool.h>
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
@@ -60,7 +59,7 @@ bool read_connection_builder_region(address_t *in_region,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
         uint32_t n_synapse_index_bits, int32_t *weight_scales) {
 
-    uint32_t *region = *in_region;
+    address_t region = *in_region;
 
     const uint32_t synaptic_matrix_offset = *region++;
     const uint32_t delayed_synaptic_matrix_offset = *region++;
@@ -71,6 +70,8 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t delay_chip = *region++;
     const uint32_t delay_core = *region++;
     const uint32_t max_stage = *region++;
+    accum timestep_per_delay;
+    spin1_memcpy(&timestep_per_delay, region++, sizeof(accum));
     const uint32_t synapse_type = *region++;
 
     const uint32_t matrix_type_hash = *region++;
@@ -114,6 +115,8 @@ bool read_connection_builder_region(address_t *in_region,
         &(synaptic_matrix_region[synaptic_matrix_offset]);
     address_t delayed_synaptic_matrix =
         &(synaptic_matrix_region[delayed_synaptic_matrix_offset]);
+    log_info("Generating matrix at 0x%08x, delayed at 0x%08x",
+            synaptic_matrix, delayed_synaptic_matrix);
     bool status = matrix_generator_generate(
         matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
         max_row_length, max_delayed_row_length,
@@ -122,7 +125,7 @@ bool read_connection_builder_region(address_t *in_region,
         post_slice_start, post_slice_count,
         pre_slice_start, pre_slice_count,
         connection_generator, delay_generator, weight_generator,
-        rng, max_stage);
+        rng, max_stage, timestep_per_delay);
 
     matrix_generator_free(matrix_generator);
     connection_generator_free(connection_generator);
@@ -169,7 +172,6 @@ bool read_sdram_data(
 }
 
 void c_main(void) {
-    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     sark_cpu_state(CPU_STATE_RUN);
 
     register_matrix_generators();
@@ -205,7 +207,8 @@ void c_main(void) {
     address_t syn_mtx_addr = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, core_address);
 
-    log_info("\tReading SDRAM at 0x%08x", params_address);
+    log_info("\tReading SDRAM at 0x%08x, writing to matrix at 0x%08x",
+            params_address, syn_mtx_addr);
 
     if (!read_sdram_data(params_address, syn_mtx_addr)) {
         log_info("!!!   Error reading SDRAM data   !!!");

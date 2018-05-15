@@ -1,5 +1,3 @@
-#include <stdbool.h>
-#include <stdint.h>
 #include <common-typedefs.h>
 
 #include "connection_generator.h"
@@ -25,4 +23,4 @@ bool matrix_generator_generate(
     uint32_t pre_slice_start, uint32_t pre_slice_count,
     connection_generator_t connection_generator,
     param_generator_t delay_generator, param_generator_t weight_generator,
-    rng_t rng, uint32_t max_stage);
+    rng_t rng, uint32_t max_stage, accum timestep_per_delay);

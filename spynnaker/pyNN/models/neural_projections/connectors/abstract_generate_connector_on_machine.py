@@ -21,7 +21,7 @@ except ImportError:
 
 IS_PYNN_8 = StrictVersion(pyNNVersion) >= StrictVersion("0.8")
 
-PARAM_TYPE_STATIC_ID = 0
+PARAM_TYPE_CONSTANT_ID = 0
 
 PARAM_TYPE_BY_NAME = {
     "uniform": 1,
@@ -91,7 +91,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
     def _param_generator_id(self, values):
         if numpy.isscalar(values):
-            return PARAM_TYPE_STATIC_ID
+            return PARAM_TYPE_CONSTANT_ID
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             return PARAM_TYPE_BY_NAME[values.name]
