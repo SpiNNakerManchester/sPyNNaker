@@ -7,12 +7,12 @@
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
-//    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
-    REAL alpha = MULT_ROUND_STOCHASTIC(input_this_timestep, neuron->R_membrane) + neuron->V_rest;
+    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
+//    REAL alpha = MULT_ROUND_STOCHASTIC(input_this_timestep, neuron->R_membrane) + neuron->V_rest;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (MULT_ROUND_STOCHASTIC(neuron->exp_TC, (alpha - V_prev)));
-//    neuron->V_membrane = alpha - neuron->exp_TC * (alpha - V_prev);
+    neuron->V_membrane = alpha - neuron->exp_TC * (alpha - V_prev);
+//    neuron->V_membrane = alpha - (MULT_ROUND_STOCHASTIC(neuron->exp_TC, (alpha - V_prev)));
     log_info("%k \n", neuron->V_membrane);
 }
 
