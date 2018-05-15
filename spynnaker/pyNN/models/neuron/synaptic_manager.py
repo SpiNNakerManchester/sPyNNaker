@@ -39,7 +39,7 @@ from spynnaker.pyNN.utilities.constants \
     import POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.utility_calls \
     import get_maximum_probable_value, write_parameters_per_neuron, \
-    translate_parameters
+    translate_parameters, get_n_bits
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 
@@ -651,7 +651,8 @@ class SynapticManager(object):
     def _write_synaptic_matrix_and_master_population_table(
             self, spec, post_slices, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_table_region, synaptic_matrix_region, routing_info,
+            master_pop_table_region, synaptic_matrix_region,
+            direct_matrix_region, routing_info,
             graph_mapper, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
@@ -673,7 +674,6 @@ class SynapticManager(object):
         # initially 0
         single_synapses = list()
         spec.switch_write_focus(synaptic_matrix_region)
-        spec.write_value(0)
         single_addr = 0
 
         # Store a list of synapse info to be generated on the machine
@@ -734,17 +734,20 @@ class SynapticManager(object):
             spec, master_pop_table_region)
 
         # Write the size and data of single synapses to the end of the region
-        spec.switch_write_focus(synaptic_matrix_region)
         if single_synapses:
             single_data = numpy.concatenate(single_synapses)
+            spec.reserve_memory_region(
+                region=direct_matrix_region,
+                size=len(single_data * 4) + 4,
+                label='DirectMatrix')
+            spec.switch_write_focus(direct_matrix_region)
             spec.write_value(len(single_data) * 4)
             spec.write_array(single_data)
         else:
+            spec.reserve_memory_region(
+                region=direct_matrix_region, size=4, label="DirectMatrix")
+            spec.switch_write_focus(direct_matrix_region)
             spec.write_value(0)
-
-        # Write the position of the single synapses
-        spec.set_write_pointer(0)
-        spec.write_value(block_addr)
 
     def __generate_on_chip_data(
             self, spec, synapse_info, pre_slices,
@@ -814,7 +817,8 @@ class SynapticManager(object):
         self._generator_data.append(GeneratorData(
             synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             undelayed_max_length, delayed_max_length, pre_vertex_slice,
-            delay_placement, synapse_info, app_edge.n_delay_stages + 1))
+            delay_placement, synapse_info, app_edge.n_delay_stages + 1,
+            machine_time_step))
 
         return block_addr
 
@@ -953,6 +957,7 @@ class SynapticManager(object):
             post_vertex_slice, all_syn_block_sz, weight_scales,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
         if isinstance(self._synapse_dynamics,
@@ -1046,13 +1051,10 @@ class SynapticManager(object):
         synaptic_matrix = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             transceiver)
-        direct_synapses = (
-            self._get_static_synaptic_matrix_sdram_requirements() +
-            synaptic_matrix + _ONE_WORD.unpack_from(
-                transceiver.read_memory(
-                    placement.x, placement.y, synaptic_matrix, 4))[0])
-        indirect_synapses = synaptic_matrix + 4
-        return master_pop_table, direct_synapses, indirect_synapses
+        direct_synapses = locate_memory_region_for_placement(
+            placement, POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            transceiver)
+        return master_pop_table, direct_synapses, synaptic_matrix
 
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
@@ -1219,11 +1221,10 @@ class SynapticManager(object):
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(self._synapse_type.get_n_synapse_types())
         spec.write_value(self._synapse_type.get_n_synapse_type_bits())
-        n_neuron_id_bits = int(
-            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
         for w in weight_scales:
-            spec.write_value(w, data_type=DataType.S1615)
+            spec.write_value(w, data_type=DataType.INT32)
 
         for data in self._generator_data:
             spec.write_array(data.gen_data)

@@ -1,16 +1,19 @@
 import numpy
+import decimal
+from data_specification.enums.data_type import DataType
 
 
 class GeneratorData(object):
     """ Data for each connection of the synapse generator
     """
 
-    BASE_SIZE = 14 * 4
+    BASE_SIZE = 15 * 4
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             max_row_length, max_delayed_row_length, pre_vertex_slice,
-            delay_placement, synapse_information, max_stage):
+            delay_placement, synapse_information, max_stage,
+            machine_time_step):
         self._synaptic_matrix_offset = synaptic_matrix_offset
         self._delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self._max_row_length = max_row_length
@@ -19,6 +22,7 @@ class GeneratorData(object):
         self._delay_placement = delay_placement
         self._synapse_information = synapse_information
         self._max_stage = max_stage
+        self._machine_time_step = machine_time_step
 
     @property
     def size(self):
@@ -59,6 +63,8 @@ class GeneratorData(object):
             self._pre_vertex_slice.lo_atom,
             self._pre_vertex_slice.n_atoms,
             delay_chip, delay_core, self._max_stage,
+            (decimal.Decimal(str(float(self._machine_time_step) / 1000.0)) *
+             DataType.S1615.scale),
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

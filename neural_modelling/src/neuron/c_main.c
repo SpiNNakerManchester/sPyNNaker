@@ -47,7 +47,9 @@ typedef enum regions_e{
     SYNAPSE_DYNAMICS_REGION,
     RECORDING_REGION,
     PROVENANCE_DATA_REGION,
-    PROFILER_REGION
+    PROFILER_REGION,
+    CONNECTION_GENERATOR_REGION,
+    DIRECT_MATRIX_REGION
 } regions_e;
 
 typedef enum extra_provenance_data_region_entries{
@@ -162,14 +164,15 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the synapses
     synapse_param_t *neuron_synapse_shaping_params;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address;
+    address_t indirect_synapses_address = data_specification_get_region(
+        SYNAPTIC_MATRIX_REGION, address);
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            data_specification_get_region(DIRECT_MATRIX_REGION, address),
             n_neurons, &neuron_synapse_shaping_params,
             &ring_buffer_to_input_buffer_left_shifts,
-            &indirect_synapses_address, &direct_synapses_address)) {
+            &direct_synapses_address)) {
         return false;
     }
 

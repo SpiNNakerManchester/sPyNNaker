@@ -52,10 +52,10 @@ static inline void synapses_print_weight(
 }
 
 bool synapses_initialise(
-    address_t synapse_params_address, address_t synaptic_matrix_address,
+    address_t synapse_params_address, address_t direct_matrix_address,
     uint32_t n_neurons, synapse_param_t **neuron_synapse_shaping_params_value,
     uint32_t **ring_buffer_to_input_buffer_left_shifts,
-    address_t *indirect_synapses_address, address_t *direct_synapses_address);
+    address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 

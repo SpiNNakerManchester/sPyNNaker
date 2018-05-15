@@ -221,11 +221,10 @@ static inline void _print_synapse_parameters() {
 
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
-        address_t synapse_params_address, address_t synaptic_matrix_address,
-        uint32_t n_neurons_value,
+        address_t synapse_params_address,
+        address_t direct_matrix_address, uint32_t n_neurons_value,
         synapse_param_t **neuron_synapse_shaping_params_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *indirect_synapses_address,
         address_t *direct_synapses_address) {
 
     log_debug("synapses_initialise: starting");
@@ -273,10 +272,7 @@ bool synapses_initialise(
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
-    uint32_t direct_matrix_offset = (synaptic_matrix_address[0] >> 2) + 1;
-    log_debug("Indirect matrix is %u words in size", direct_matrix_offset - 1);
-    uint32_t direct_matrix_size =
-        synaptic_matrix_address[direct_matrix_offset];
+    uint32_t direct_matrix_size = direct_matrix_address[0];
     log_debug("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
@@ -291,11 +287,9 @@ bool synapses_initialise(
             "Copying %u bytes of direct synapses to 0x%08x",
             direct_matrix_size, *direct_synapses_address);
         spin1_memcpy(
-            *direct_synapses_address,
-            &(synaptic_matrix_address[direct_matrix_offset + 1]),
+            *direct_synapses_address, &(direct_matrix_address[1]),
             direct_matrix_size);
     }
-    *indirect_synapses_address = &(synaptic_matrix_address[1]);
 
     log_debug("synapses_initialise: completed successfully");
     _print_synapse_parameters();
