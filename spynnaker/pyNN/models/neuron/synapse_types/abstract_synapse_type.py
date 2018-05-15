@@ -1,7 +1,7 @@
-import math
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 @add_metaclass(AbstractBase)
@@ -77,7 +77,7 @@ class AbstractSynapseType(object):
         :return: the number of bits
         :rtype: int
         """
-        return int(math.ceil(math.log(self.get_n_synapse_types(), 2)))
+        return get_n_bits(self.get_n_synapse_types())
 
     def get_sdram_usage_per_neuron_in_bytes(self):
         """ Get the SDRAM usage of the synapse type per neuron in bytes
