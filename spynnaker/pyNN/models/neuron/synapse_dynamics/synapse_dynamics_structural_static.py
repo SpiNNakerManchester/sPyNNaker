@@ -43,7 +43,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
     :param weight: Initial weight assigned to a newly formed connection
     :type weight: float
     :param delay: Delay assigned to a newly formed connection
-    :type delay: int
+    :type delay: int or Iterable
     :param s_max: Maximum fan-in per target layer neuron
     :type s_max: int
     :param sigma_form_forward: Spread of feed-forward formation receptive field
