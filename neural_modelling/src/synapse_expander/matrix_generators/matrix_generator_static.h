@@ -23,7 +23,7 @@ void matrix_generator_static_free(void *data) {
 
 
 uint32_t _build_static_word(
-        uint32_t weight, uint16_t delay, uint32_t type,
+        uint16_t weight, uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
     uint32_t synapse_index_mask = ((1 << synapse_index_bits) - 1);
@@ -44,7 +44,7 @@ void matrix_generator_static_write_row(
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, int32_t *weights,
+        uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage) {
     use(data);
 
@@ -52,10 +52,11 @@ void matrix_generator_static_write_row(
     // delay stage)
     address_t row_address[max_stage];
     row_address[0] =
-        &(synaptic_matrix[pre_neuron_index * max_row_length]);
+        &(synaptic_matrix[pre_neuron_index * (max_row_length + 3)]);
     address_t delayed_address =
-        &(delayed_synaptic_matrix[pre_neuron_index * max_delayed_row_length]);
-    uint32_t single_matrix_size = n_pre_neurons * max_delayed_row_length;
+        &(delayed_synaptic_matrix[
+            pre_neuron_index * (max_delayed_row_length + 3)]);
+    uint32_t single_matrix_size = n_pre_neurons * (max_delayed_row_length + 3);
     for (uint32_t i = 1; i < max_stage; i++) {
         row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
     }
@@ -73,10 +74,7 @@ void matrix_generator_static_write_row(
         uint32_t post_index = indices[synapse];
 
         // Weight
-        int32_t weight = weights[synapse];
-        if (weight < 0) {
-            weight = -weight;
-        }
+        uint16_t weight = weights[synapse];
 
         // Delay
         struct delay_value delay = get_delay(delays[synapse], max_stage);
@@ -91,9 +89,11 @@ void matrix_generator_static_write_row(
 
         // Write the word
         address_t write_ptr = write_address[delay.stage];
+        log_info("Writing to 0x%08x", write_ptr);
         *write_ptr++ = word;
 
         // Increment the size of the current row
+        log_info("Updating 0x%08x", row_address[delay.stage]);
         row_address[delay.stage][STATIC_FIXED_FIXED_SIZE] += 1;
     }
 }

@@ -99,7 +99,7 @@ class SynapticManager(object):
         "_synapse_type",
         "_weight_scales",
         "_delay_placement_index",
-        "_generator_data"]
+        "_gen_on_machine"]
 
     def __init__(self, synapse_type, ring_buffer_sigma,
                  spikes_per_second, config, population_table_type=None,
@@ -151,8 +151,9 @@ class SynapticManager(object):
         # TODO: Hard-coded to 0 to disable as currently broken!
         self._one_to_one_connection_dtcm_max_bytes = 0
 
-        # Store data for the on-chip synapse expander
-        self._generator_data = list()
+        # Whether to generate on machine or not (assumed true for all
+        # machine vertices when the app vertex says so)
+        self._gen_on_machine = False
 
     @property
     def synapse_dynamics(self):
@@ -721,6 +722,7 @@ class SynapticManager(object):
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
+        generator_data = list()
         for (synapse_info, pre_vertex_slice, pre_slice_idx, app_edge,
                 rinfo) in generate_on_machine:
             block_addr = self.__generate_on_chip_data(
@@ -728,12 +730,13 @@ class SynapticManager(object):
                 pre_slices, pre_slice_idx, post_slices,
                 post_slice_index, pre_vertex_slice,
                 post_vertex_slice, master_pop_table_region, rinfo,
-                all_syn_block_sz, block_addr, machine_time_step, app_edge)
+                all_syn_block_sz, block_addr, machine_time_step, app_edge,
+                generator_data)
 
         self._poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
 
-        # Write the size and data of single synapses to the end of the region
+        # Write the size and data of single synapses to the direct region
         if single_synapses:
             single_data = numpy.concatenate(single_synapses)
             spec.reserve_memory_region(
@@ -749,12 +752,14 @@ class SynapticManager(object):
             spec.switch_write_focus(direct_matrix_region)
             spec.write_value(0)
 
+        return generator_data
+
     def __generate_on_chip_data(
             self, spec, synapse_info, pre_slices,
             pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, master_pop_table_region, rinfo,
             all_syn_block_sz, block_addr, machine_time_step,
-            app_edge):
+            app_edge, generator_data):
 
         # Get the size of the matrices that will be required
         (n_bytes_undelayed, n_bytes_delayed,
@@ -814,11 +819,12 @@ class SynapticManager(object):
         delay_placement = self._delay_placement_index.get((
             app_edge.pre_vertex, pre_vertex_slice.lo_atom,
             pre_vertex_slice.hi_atom))
-        self._generator_data.append(GeneratorData(
-            synaptic_matrix_offset, delayed_synaptic_matrix_offset,
+        generator_data.append(GeneratorData(
+            synaptic_matrix_offset / 4, delayed_synaptic_matrix_offset / 4,
             undelayed_max_length, delayed_max_length, pre_vertex_slice,
             delay_placement, synapse_info, app_edge.n_delay_stages + 1,
             machine_time_step))
+        self._gen_on_machine = True
 
         return block_addr
 
@@ -952,7 +958,7 @@ class SynapticManager(object):
             spec, machine_vertex, machine_graph, graph_mapper, post_slices,
             post_slice_idx, post_vertex_slice, input_type, machine_time_step)
 
-        self._write_synaptic_matrix_and_master_population_table(
+        gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -980,7 +986,7 @@ class SynapticManager(object):
         self._weight_scales[placement] = weight_scales
 
         self._write_on_machine_data_spec(
-            spec, post_vertex_slice, weight_scales)
+            spec, post_vertex_slice, weight_scales, gen_data)
 
     def clear_connection_cache(self):
         self._retrieved_blocks = dict()
@@ -1195,19 +1201,19 @@ class SynapticManager(object):
             self._synapse_type.get_synapse_type_parameters())
 
     def _write_on_machine_data_spec(
-            self, spec, post_vertex_slice, weight_scales):
+            self, spec, post_vertex_slice, weight_scales, generator_data):
         """
         :param spec: The specification to write to
         :param post_vertex_slice: The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
         """
-        if not self._generator_data:
+        if not generator_data:
             return
 
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self._synapse_type.get_n_synapse_types() * 4))
-        for data in self._generator_data:
+        for data in generator_data:
             n_bytes += data.size
 
         spec.reserve_memory_region(
@@ -1216,7 +1222,7 @@ class SynapticManager(object):
         spec.switch_write_focus(
             region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
 
-        spec.write_value(len(self._generator_data))
+        spec.write_value(len(generator_data))
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(self._synapse_type.get_n_synapse_types())
@@ -1226,11 +1232,11 @@ class SynapticManager(object):
         for w in weight_scales:
             spec.write_value(w, data_type=DataType.INT32)
 
-        for data in self._generator_data:
+        for data in generator_data:
             spec.write_array(data.gen_data)
 
     @property
     def gen_on_machine(self):
         """ True if the synapses should be generated on the machine
         """
-        return len(self._generator_data) > 0
+        return self._gen_on_machine

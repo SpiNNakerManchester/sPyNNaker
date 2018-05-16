@@ -1,5 +1,3 @@
-from spinn_front_end_common.interface.interface_functions\
-     import ChipIOBufExtractor
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spinnman.model import ExecutableTargets
@@ -7,7 +5,6 @@ from spinnman.model.enums import CPUState
 import logging
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.progress_bar import ProgressBar
-import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +76,7 @@ def synapse_expander(
         progress.update()
         progress.end()
     except Exception:
-        traceback.print_exc()
+        logger.exception("Synapse expander has failed")
     finally:
         _handle_failure(
             synapse_expander_cores, delay_receiver_cores,
@@ -103,7 +100,6 @@ def _handle_failure(
     :param provenance_file_path:
     :rtype: None
     """
-    logger.error("Synapse expander has failed")
     for executable_targets in (synapse_expander_cores, delay_receiver_cores):
         core_subsets = executable_targets.all_core_subsets
         error_cores = transceiver.get_cores_not_in_state(

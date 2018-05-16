@@ -55,7 +55,7 @@ void matrix_generator_stdp_write_row(
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, int32_t *weights,
+        uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage) {
     struct matrix_generator_stdp *params =
         (struct matrix_generator_stdp *) data;
@@ -94,10 +94,7 @@ void matrix_generator_stdp_write_row(
     for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
 
         // Weight
-        int32_t weight = weights[synapse];
-        if (weight < 0) {
-            weight = -weight;
-        }
+        uint16_t weight = weights[synapse];
 
         // Delay (mostly to get the stage)
         struct delay_value delay = get_delay(delays[synapse], max_stage);

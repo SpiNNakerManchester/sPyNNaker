@@ -57,7 +57,7 @@ uint32_t max_matrix_size(uint32_t max_n_static, uint32_t max_n_plastic,
 bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
-        uint32_t n_synapse_index_bits, int32_t *weight_scales) {
+        uint32_t n_synapse_index_bits, uint32_t *weight_scales) {
 
     address_t region = *in_region;
 
@@ -154,7 +154,7 @@ bool read_sdram_data(
     uint32_t n_synapse_type_bits = *params_address++;
     uint32_t n_synapse_index_bits = *params_address++;
 
-    int32_t weight_scales[n_synapse_types];
+    uint32_t weight_scales[n_synapse_types];
     for (uint32_t i = 0; i < n_synapse_types; i++) {
         weight_scales[i] = *params_address++;
     }

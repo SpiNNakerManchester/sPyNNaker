@@ -30,6 +30,5 @@ uint32_t connection_generator_one_to_one_generate(
 
     // Pre-index = (core-relative) post-index
     indices[0] = pre_neuron_index - post_slice_start;
-    log_info("One to One connection from %u to %u", pre_neuron_index, indices[0]);
     return 1;
 }

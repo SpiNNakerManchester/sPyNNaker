@@ -28,7 +28,7 @@ struct matrix_generator_info {
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, int32_t *weights,
+        uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage);
     void (*free)(void *data);
 };
@@ -80,7 +80,7 @@ bool matrix_generator_generate(
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t max_row_length, uint32_t max_delayed_row_length,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-        uint32_t synapse_type, int32_t *weight_scales,
+        uint32_t synapse_type, uint32_t *weight_scales,
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
@@ -92,8 +92,6 @@ bool matrix_generator_generate(
     for (uint32_t pre_neuron_index = pre_slice_start;
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
 
-
-        log_info("Generating row for pre neuron %u", pre_neuron_index);
         uint16_t indices[max_row_length];
         uint32_t n_indices = connection_generator_generate(
             connection_generator, pre_slice_start, pre_slice_count,
@@ -118,10 +116,14 @@ bool matrix_generator_generate(
         accum weight_params[n_indices];
         param_generator_generate(
             weight_generator, n_indices, rng, weight_params);
-        int32_t weights[n_indices];
+        uint16_t weights[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
-            accum weight = weight_params[i] * weight_scales[synapse_type];
-            weights[i] = (int32_t) weight;
+            accum weight = weight_params[i];
+            if (weight < 0) {
+                weight = -weight;
+            }
+            weight = weight * weight_scales[synapse_type];
+            weights[i] = (uint16_t) weight;
             if (weight != weights[i]) {
                 log_warning("Rounded weight %k to %u", weight, weights[i]);
             }
