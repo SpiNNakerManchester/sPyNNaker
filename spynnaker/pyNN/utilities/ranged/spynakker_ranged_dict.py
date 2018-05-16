@@ -5,7 +5,7 @@ from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
 
 class SpynakkerRangeDictionary(RangeDictionary):
 
-    def list_factory(self, size, value, key):
+    def list_factory(self, size=None, value=None, key=None):
         """
         Defines which class or subclass of RangedList to use
 
