@@ -71,7 +71,7 @@ class AbstractPopulationInitializable(object):
         :type variable: str
         :param value: New value for the variable
         :param selector: a description of the subrange to accept. \
-            Or None for all.å \
+            Or None for all. \
             See: _selector_to_ids in \
             SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
         :return: A list or an Object which act like a list
