@@ -9,7 +9,7 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application \
     import ApplicationSpiNNakerLinkVertex, ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 from spinn_front_end_common.abstract_models import\
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from spinn_front_end_common.abstract_models\
@@ -109,7 +109,7 @@ class MunichMotorDevice(
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
-            sdram=SDRAMResource(
+            sdram=ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE),
             dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 

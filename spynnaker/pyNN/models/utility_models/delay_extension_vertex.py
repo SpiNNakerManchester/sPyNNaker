@@ -14,7 +14,7 @@ from pacman.model.constraints.partitioner_constraints \
     import SameAtomsAsVertexConstraint
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 
 from spinn_front_end_common.abstract_models \
     import AbstractProvidesNKeysForPartition
@@ -86,7 +86,7 @@ class DelayExtensionVertex(
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
-            sdram=SDRAMResource(
+            sdram=ConstantSDRAM(
                 self.get_sdram_usage_for_atoms()),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(

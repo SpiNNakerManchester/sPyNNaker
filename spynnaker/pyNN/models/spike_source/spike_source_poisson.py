@@ -14,7 +14,7 @@ from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.resources import ResourceContainer, ConstantSDRAM
 
 from spinn_front_end_common.abstract_models import \
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints
@@ -219,7 +219,7 @@ class SpikeSourcePoisson(
 
         # build resources as i currently know
         container = ResourceContainer(
-            sdram=SDRAMResource(self.get_sdram_usage_for_atoms(vertex_slice)),
+            sdram=ConstantSDRAM(self.get_sdram_usage_for_atoms(vertex_slice)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms()),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms()))
