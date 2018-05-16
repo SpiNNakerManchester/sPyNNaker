@@ -21,8 +21,9 @@ class AbstractPopulationSettable(AbstractSettable):
         """" See ApplicationVertex.n_atoms """
 
     def get_value_by_selector(self, selector, key):
-        """
-        Gets the value for a particular key but only for the selected subset
+        """ Gets the value for a particular key but only for the selected\
+            subset
+
         :param selector: See RangedList.get_value_by_selector as this is just \
             a pass through method
         :param key: the name of the parameter to change
@@ -40,9 +41,10 @@ class AbstractPopulationSettable(AbstractSettable):
         return ranged_list.get_values(selector)
 
     def set_value_by_selector(self, selector, key, value):
-        """
-        Sets the value for a particular key but only for the selected subset
-        :param selector: See RangedList.set_value_by_selector as this is just \
+        """ Sets the value for a particular key but only for the selected \
+            subset
+
+        :param selector: See RangedList.set_value_by_selector as this is just 
             a pass through method
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign

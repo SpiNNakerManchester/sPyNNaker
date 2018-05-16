@@ -336,10 +336,10 @@ class NeuronRecorder(object):
             if set(self._indexes[variable]).issubset(set(indexes)):
                 # overwriting all previous so OK!
                 return
-        msg = "Current implementation does not support multiple " \
-              "sampling_intervals for {} on one population. " \
-            .format(variable)
-        raise ConfigurationException(msg)
+        raise ConfigurationException(
+            "Current implementation does not support multiple " \
+            "sampling_intervals for {} on one population.".format(
+                variable))
 
     def _turn_on_recording(self, variable, sampling_interval, indexes):
 
