@@ -44,7 +44,7 @@ class AbstractPopulationSettable(AbstractSettable):
         """ Sets the value for a particular key but only for the selected \
             subset
 
-        :param selector: See RangedList.set_value_by_selector as this is just 
+        :param selector: See RangedList.set_value_by_selector as this is just\
             a pass through method
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign

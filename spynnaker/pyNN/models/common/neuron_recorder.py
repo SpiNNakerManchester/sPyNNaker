@@ -337,7 +337,7 @@ class NeuronRecorder(object):
                 # overwriting all previous so OK!
                 return
         raise ConfigurationException(
-            "Current implementation does not support multiple " \
+            "Current implementation does not support multiple "
             "sampling_intervals for {} on one population.".format(
                 variable))
 
