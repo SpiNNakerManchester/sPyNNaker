@@ -20,6 +20,8 @@ TAU_SYN_E = "tau_syn_E"
 INH_RESPONSE = "inh_response"
 INH_EXP_RESPONSE = "inh_exp_response"
 TAU_SYN_I = "tau_syn_I"
+Q_EXC = "q_exc"
+Q_INH = "q_inh"
 
 
 class _COMB_EXP_TYPES(Enum):
@@ -27,10 +29,12 @@ class _COMB_EXP_TYPES(Enum):
     RESPONSE_EXC_EXP = (2, DataType.S1615)
     CONST_EXC = (3, DataType.S1615)
     DECAY_EXC = (4, DataType.UINT32)
-    RESPONSE_INH = (5, DataType.S1615)
-    RESPONSE_INH_EXP = (6, DataType.S1615)
-    CONST_INH = (7, DataType.S1615)
-    DECAY_INH = (8, DataType.UINT32)
+    Q_EXC = (5, DataType.S1615)
+    RESPONSE_INH = (6, DataType.S1615)
+    RESPONSE_INH_EXP = (7, DataType.S1615)
+    CONST_INH = (8, DataType.S1615)
+    DECAY_INH = (9, DataType.UINT32)
+    Q_INH = (10, DataType.S1615)
 
     def __new__(cls, value, data_type, doc=""):
         # pylint: disable=protected-access
@@ -53,7 +57,9 @@ class SynapseTypeAlpha(AbstractSynapseType):
         "_inh_exp_response",
         "_inh_response",
         "_tau_syn_E",
-        "_tau_syn_I"]
+        "_tau_syn_I",
+        "_q_exc",
+        "_q_inh"]
 
     def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
@@ -65,6 +71,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self._data[INH_RESPONSE] = inh_response
         self._data[INH_EXP_RESPONSE] = inh_exp_response
         self._data[TAU_SYN_I] = tau_syn_I
+        self._data[Q_EXC] = 0
+        self._data[Q_INH] = 0
 
         self._exc_response = convert_param_to_numpy(exc_response, n_neurons)
         self._exc_exp_response = convert_param_to_numpy(
@@ -75,6 +83,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
         self._inh_exp_response = convert_param_to_numpy(
             inh_exp_response, n_neurons)
         self._tau_syn_I = convert_param_to_numpy(tau_syn_I, n_neurons)
+        self._q_exc = convert_param_to_numpy(0, n_neurons)
+        self._q_inh = convert_param_to_numpy(0, n_neurons)
 
     @property
     def exc_response(self):
@@ -127,7 +137,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
     def get_n_synapse_type_parameters(self):
-        return 8
+        return 10
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_synapse_type_parameters(self, machine_time_step):
@@ -155,6 +165,8 @@ class SynapseTypeAlpha(AbstractSynapseType):
             NeuronParameter(dt_divided_by_tau_syn_E_sqr,
                             _COMB_EXP_TYPES.CONST_EXC.data_type),
             NeuronParameter(e_decay, _COMB_EXP_TYPES.DECAY_EXC.data_type),
+            NeuronParameter(self._q_exc, _COMB_EXP_TYPES.Q_EXC.data_type),
+
 
             NeuronParameter(self._data[INH_RESPONSE],
                             _COMB_EXP_TYPES.RESPONSE_INH.data_type),
@@ -163,6 +175,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
             NeuronParameter(dt_divided_by_tau_syn_I_sqr,
                             _COMB_EXP_TYPES.CONST_INH.data_type),
             NeuronParameter(i_decay, _COMB_EXP_TYPES.DECAY_INH.data_type),
+            NeuronParameter(self._q_inh, _COMB_EXP_TYPES.Q_EXC.data_type),
         ]
 
     @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
