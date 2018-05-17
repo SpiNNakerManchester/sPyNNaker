@@ -6,7 +6,6 @@
 #include <debug.h>
 #include <simulation.h>
 #include <spin1_api.h>
-#include <strings.h>
 
 // Constants
 #define DELAY_STAGE_LENGTH  16
@@ -69,6 +68,18 @@ static uint32_t expected_time;
 
 static uint32_t n_delays = 0;
 
+//---------------------------------------
+// Because we don't want to include string.h or strings.h for memset
+static inline void zero_spike_counters(void *location, uint32_t num_items)
+{
+    uint32_t i;
+    for (i = 0 ; i < num_items - 3 ; i += 4) {
+        ((uint32_t *) location)[i] = 0;
+    }
+    for (; i < num_items ; i++) {
+        ((uint8_t *) location)[i] = 0;
+    }
+}
 
 static inline uint32_t round_to_next_pot(uint32_t v) {
     v--;
@@ -151,7 +162,7 @@ static bool read_parameters(address_t address) {
         // Allocate an array of counters for each neuron and zero
         spike_counters[s] = (uint8_t*) spin1_malloc(
             num_neurons * sizeof(uint8_t));
-        memset(spike_counters[s], 0, num_neurons * sizeof(uint8_t));
+        zero_spike_counters(spike_counters[s], num_neurons);
     }
 
     log_debug("read_parameters: completed successfully");
@@ -357,9 +368,7 @@ void timer_callback(uint unused0, uint unused1) {
 
     // Zero all counters in current time slot
     uint32_t current_time_slot = time & num_delay_slots_mask;
-    uint8_t *current_time_slot_spike_counters =
-        spike_counters[current_time_slot];
-    memset(current_time_slot_spike_counters, 0, sizeof(uint8_t) * num_neurons);
+    zero_spike_counters(spike_counters[current_time_slot], num_neurons);
 }
 
 // Entry point
