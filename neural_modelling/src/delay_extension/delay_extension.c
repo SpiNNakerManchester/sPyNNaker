@@ -6,6 +6,7 @@
 #include <debug.h>
 #include <simulation.h>
 #include <spin1_api.h>
+#include <strings.h>
 
 // Constants
 #define DELAY_STAGE_LENGTH  16
