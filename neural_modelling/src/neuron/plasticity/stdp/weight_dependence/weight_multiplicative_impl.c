@@ -36,8 +36,10 @@ uint32_t *weight_initialise(uint32_t *address,
             s,
 			plasticity_weight_region_data[s].min_weight >> weight_multiply_right_shift[s],
             plasticity_weight_region_data[s].max_weight >> weight_multiply_right_shift[s],
-            plasticity_weight_region_data[s].a2_plus >> weight_multiply_right_shift[s],
-            plasticity_weight_region_data[s].a2_minus >> weight_multiply_right_shift[s],
+            //plasticity_weight_region_data[s].a2_plus >> weight_multiply_right_shift[s],
+            //plasticity_weight_region_data[s].a2_minus >> weight_multiply_right_shift[s],
+            plasticity_weight_region_data[s].a2_plus,
+            plasticity_weight_region_data[s].a2_minus,
             weight_multiply_right_shift[s]);
     }
 
