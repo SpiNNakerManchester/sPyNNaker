@@ -7,8 +7,6 @@
 #include <simulation.h>
 #include <spin1_api.h>
 
-#include <string.h>
-
 // Constants
 #define DELAY_STAGE_LENGTH  16
 
@@ -133,7 +131,7 @@ static bool read_parameters(address_t address) {
         // Copy delay stage configuration bits into delay stage configuration bit-field
         address_t neuron_delay_stage_config_data_address =
             &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
-        memcpy(neuron_delay_stage_config[d],
+        spin1_memcpy(neuron_delay_stage_config[d],
                neuron_delay_stage_config_data_address,
                neuron_bit_field_words * sizeof(uint32_t));
 
