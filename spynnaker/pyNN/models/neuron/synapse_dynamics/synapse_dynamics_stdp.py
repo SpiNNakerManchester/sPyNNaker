@@ -295,6 +295,10 @@ class SynapseDynamicsSTDP(
         synapse_structure = self._timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
+        pp_half_words = numpy.concatenate([
+            pp[:size * n_half_words * 2].view("uint16")[
+                half_word::n_half_words]
+            for pp, size in zip(pp_without_headers, fp_size)])
 
         connections = numpy.zeros(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
@@ -302,8 +306,7 @@ class SynapseDynamicsSTDP(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
         connections["target"] = (
             (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
-        connections["weight"] = pp_without_headers[:fp_size][
-            half_word::n_half_words]
+        connections["weight"] = pp_half_words
         connections["delay"] = (data_fixed >> (n_neuron_id_bits
                                                + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
@@ -387,8 +390,8 @@ class SynapseDynamicsSTDP(
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(self):
-        synapse_struct = self._timing_dependence.synapse_structure
-        return numpy.zeros([
+        synapse_struct = self._timing_dependence.synaptic_structure
+        return numpy.array([
             self._n_header_bytes // 4,
             synapse_struct.get_n_half_words_per_connection(),
             synapse_struct.get_weight_half_word()], dtype="uint32")
