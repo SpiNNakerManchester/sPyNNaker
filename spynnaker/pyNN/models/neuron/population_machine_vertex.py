@@ -161,6 +161,11 @@ class PopulationMachineVertex(
 
         return provenance_items
 
+    @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
+    def get_recorded_region_ids(self):
+        return recording_utilities.get_recorded_region_ids(
+            self._buffered_sdram_per_timestep)
+
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
         return locate_memory_region_for_placement(
