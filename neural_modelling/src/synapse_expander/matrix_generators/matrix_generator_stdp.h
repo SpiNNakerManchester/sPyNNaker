@@ -155,8 +155,8 @@ void matrix_generator_stdp_write_row(
             synapse_index_bits);
 
         // Write the half-word
-        uint16_t *write_ptr = fp_address[delay.stage];
-        *write_ptr++ = fp_half_word;
+        fp_address[delay.stage][0] = fp_half_word;
+        fp_address[delay.stage] = &(fp_address[delay.stage][1]);
 
         // Increment the size of the current row
         fixed_address[delay.stage][STDP_FIXED_PLASTIC_SIZE] += 1;

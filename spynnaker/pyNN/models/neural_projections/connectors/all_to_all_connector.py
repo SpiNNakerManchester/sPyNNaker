@@ -200,7 +200,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
-        return ConnectorIDs.ALL_TO_ALL_CONNECTOR
+        return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
