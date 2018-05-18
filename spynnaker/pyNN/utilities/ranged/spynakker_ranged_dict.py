@@ -1,6 +1,5 @@
 from spinn_utilities.ranged.range_dictionary import RangeDictionary
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
-    SpynakkerRangedList
+from .spynakker_ranged_list import SpynakkerRangedList
 
 
 class SpynakkerRangeDictionary(RangeDictionary):

@@ -41,8 +41,7 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
-    SpynakkerRangedList
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangedList
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \

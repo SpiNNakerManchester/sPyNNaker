@@ -2,8 +2,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
 
 INITIAL_INPUT_EXC = "initial_input_exc"
 INITIAL_INPUT_INH = "initial_input_inh"
