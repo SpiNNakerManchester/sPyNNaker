@@ -57,15 +57,15 @@ typedef enum input_buffer_regions {
 //! to the neuron.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
-static inline void _delta_shaping(delta_params_t* delta_params){
+static inline void delta_shaping(delta_params_t* delta_params){
 	delta_params->synaptic_input_value = 0;
 }
 
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
-	_delta_shaping(&parameter->exc);
-	_delta_shaping(&parameter->inh);
 
+	delta_shaping(&parameter->exc);
+	delta_shaping(&parameter->inh);
 }
 
 //! \brief helper function to add input for a given timer period to a given
@@ -73,7 +73,7 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void _add_input_delta(delta_params_t* delta_params, input_t input){
+static inline void add_input_delta(delta_params_t* delta_params, input_t input){
 	delta_params->synaptic_input_value += input;
 }
 
@@ -89,13 +89,11 @@ static inline void synapse_types_add_neuron_input(
         input_t input) {
 
     if (synapse_type_index == EXCITATORY) {
-    	_add_input_delta(&parameter->exc, input);
-
-//        parameter->input_buffer_excitatory_value += input;
+    	add_input_delta(&parameter->exc, input);
 
     } else if (synapse_type_index == INHIBITORY) {
-    	_add_input_delta(&parameter->inh, input);
-//        parameter->input_buffer_inhibitory_value += input;
+    	add_input_delta(&parameter->inh, input);
+
     }
 }
 

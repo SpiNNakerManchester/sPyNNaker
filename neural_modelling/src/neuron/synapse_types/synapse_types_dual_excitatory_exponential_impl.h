@@ -62,7 +62,7 @@ typedef enum input_buffer_regions {
 //! to the neuron.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
-static inline void _exp_shaping(exp_params_t* exp_params){
+static inline void exp_shaping(exp_params_t* exp_params){
 
     // decay value according to decay constant
 	exp_params->synaptic_input_value =
@@ -73,9 +73,9 @@ static inline void _exp_shaping(exp_params_t* exp_params){
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
 
-	_exp_shaping(&parameter->exc);
-	_exp_shaping(&parameter->exc2);
-	_exp_shaping(&parameter->inh);
+	exp_shaping(&parameter->exc);
+	exp_shaping(&parameter->exc2);
+	exp_shaping(&parameter->inh);
 }
 
 //! \brief helper function to add input for a given timer period to a given
@@ -83,7 +83,7 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void _add_input_exp(exp_params_t* exp_params, input_t input){
+static inline void add_input_exp(exp_params_t* exp_params, input_t input){
 
 	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
 			decay_s1615(input, exp_params->init);
@@ -100,13 +100,13 @@ static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
     if (synapse_type_index == EXCITATORY_ONE) {
-    	_add_input_exp(&parameter->exc, input);
+    	add_input_exp(&parameter->exc, input);
 
     } else if (synapse_type_index == EXCITATORY_TWO) {
-    	_add_input_exp(&parameter->exc2, input);
+    	add_input_exp(&parameter->exc2, input);
 
     } else if (synapse_type_index == INHIBITORY) {
-    	_add_input_exp(&parameter->inh, input);
+    	add_input_exp(&parameter->inh, input);
     }
 }
 
