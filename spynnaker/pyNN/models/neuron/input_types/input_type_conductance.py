@@ -2,8 +2,7 @@ from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
 
 from .abstract_input_type import AbstractInputType
 

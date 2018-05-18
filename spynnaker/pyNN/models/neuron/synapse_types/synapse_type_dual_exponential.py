@@ -4,8 +4,7 @@ from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
 

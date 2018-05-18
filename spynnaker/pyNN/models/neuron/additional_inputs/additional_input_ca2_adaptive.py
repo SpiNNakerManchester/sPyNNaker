@@ -3,8 +3,7 @@ from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AbstractAdditionalInput
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
 
 import numpy
 from enum import Enum

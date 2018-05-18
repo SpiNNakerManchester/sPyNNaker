@@ -1,7 +1,6 @@
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict \
-    import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 
