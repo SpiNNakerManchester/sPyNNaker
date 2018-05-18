@@ -258,7 +258,7 @@ class AbstractPopulationVertex(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variableSDRAM.extend(constantSDRAM),
+            sdram=variableSDRAM + constantSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self._get_cpu_usage_for_atoms(vertex_slice)),
