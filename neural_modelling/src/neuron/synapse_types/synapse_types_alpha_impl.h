@@ -66,8 +66,8 @@ static inline void alpha_shaping(alpha_params_t* a_params){
 
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(synapse_param_pointer_t parameter){
-    _alpha_shaping(&parameter->exc);
-    _alpha_shaping(&parameter->inh);
+    alpha_shaping(&parameter->exc);
+    alpha_shaping(&parameter->inh);
 
     /*log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k",
             parameter->exc.lin_buff,
