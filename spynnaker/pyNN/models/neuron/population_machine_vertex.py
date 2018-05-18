@@ -151,7 +151,7 @@ class PopulationMachineVertex(
             self._add_name(names,
                            "Times_plastic_synaptic_weights_have_saturated"),
             n_plastic_saturations,
-            report=n_saturations > 0,
+            report=n_plastic_saturations > 0,
             message=(
                 "The weights from the plastic synapses for {} on {}, {}, {} "
                 "saturated {} times. If this causes issue increase the "
