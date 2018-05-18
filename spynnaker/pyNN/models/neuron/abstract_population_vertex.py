@@ -253,7 +253,7 @@ class AbstractPopulationVertex(
             vertex_slice)
         variableSDRAM.set_assumed_timesteps(n_machine_time_steps)
         constantSDRAM = ConstantSDRAM(
-                self.get_sdram_usage_for_atoms(
+                self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
@@ -261,7 +261,7 @@ class AbstractPopulationVertex(
             sdram=variableSDRAM.extend(constantSDRAM),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)),
+                self._get_cpu_usage_for_atoms(vertex_slice)),
             iptags=ip_tags)
 
         # return the total resources.
@@ -326,7 +326,7 @@ class AbstractPopulationVertex(
         # return machine vertex
         return vertex
 
-    def get_cpu_usage_for_atoms(self, vertex_slice):
+    def _get_cpu_usage_for_atoms(self, vertex_slice):
         per_neuron_cycles = (
             _NEURON_BASE_N_CPU_CYCLES_PER_NEURON +
             self._neuron_model.get_n_cpu_cycles_per_neuron() +
@@ -381,7 +381,7 @@ class AbstractPopulationVertex(
                     .get_sdram_usage_for_global_parameters_in_bytes() +
                 (per_neuron_usage * vertex_slice.n_atoms))
 
-    def get_sdram_usage_for_atoms(
+    def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
         sdram_requirement = (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
