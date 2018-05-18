@@ -424,30 +424,6 @@ class NeuronRecorder(object):
         else:
             return data_size // rate
 
-    def get_sampling_overflow_sdram(self, vertex_slice):
-        """ Gets the extra sdram that should be reserved if using per_timestep
-
-        This is the extra that must be reserved if per_timestep is an average\
-        rather than fixed for every timestep.
-
-        When sampling the average * time_steps may not be quite enough.\
-        This returns the extra space in the worst case\
-        where time_steps is a multiple of sampling rate + 1,\
-        and recording is done in the first and last time_step
-
-        :param vertex_slice:
-        :return: Highest possible overflow needed
-        """
-        overflow = 0
-        for variable, rate in iteritems(self._sampling_rates):
-            # If rate is 0 no recording so no overflow
-            # If rate is 1 there is no overflow as average is exact
-            if rate > 1:
-                data_size = self.get_buffered_sdram_per_record(
-                    variable,  vertex_slice)
-                overflow += data_size // rate * (rate - 1)
-        return overflow
-
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
         """ Returns the sdram used for this may timesteps
 

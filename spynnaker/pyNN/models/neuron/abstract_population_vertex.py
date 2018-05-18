@@ -276,18 +276,6 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self._change_requires_mapping = False
 
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        return [
-            self._neuron_recorder.get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice),
-            self._neuron_recorder.get_buffered_sdram_per_timestep(
-                "v", vertex_slice),
-            self._neuron_recorder.get_buffered_sdram_per_timestep(
-                "gsyn_exc", vertex_slice),
-            self._neuron_recorder.get_buffered_sdram_per_timestep(
-                "gsyn_inh", vertex_slice)
-        ]
-
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         return [
             self._neuron_recorder.get_buffered_sdram(
@@ -308,18 +296,9 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             label=None, constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        is_recording = len(self._neuron_recorder.recording_variables) > 0
-        buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
-            vertex_slice)
-        buffered_sdram = self._get_buffered_sdram(
-            vertex_slice, n_machine_time_steps)
-        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
-            buffered_sdram, self._minimum_buffer_sdram)
-        overflow_sdram = self._neuron_recorder.get_sampling_overflow_sdram(
-            vertex_slice)
         vertex = PopulationMachineVertex(
-            resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, label, constraints, overflow_sdram)
+            resources_required, self._neuron_recorder.recording_variables,
+            label, constraints)
 
         AbstractPopulationVertex._n_vertices += 1
 
