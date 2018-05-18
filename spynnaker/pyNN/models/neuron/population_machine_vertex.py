@@ -165,12 +165,6 @@ class PopulationMachineVertex(
     def get_minimum_buffer_sdram_usage(self):
         return sum(self._minimum_buffer_sdram_usage)
 
-    @overrides(AbstractReceiveBuffersToHost.get_n_timesteps_in_buffer_space)
-    def get_n_timesteps_in_buffer_space(self, buffer_space, machine_time_step):
-        safe_space = buffer_space - self._overflow_sdram
-        return recording_utilities.get_n_timesteps_in_buffer_space(
-            safe_space, self._buffered_sdram_per_timestep)
-
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
         return recording_utilities.get_recorded_region_ids(
