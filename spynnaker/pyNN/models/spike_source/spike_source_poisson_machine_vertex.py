@@ -62,10 +62,6 @@ class SpikeSourcePoissonMachineVertex(
     def is_recording(self):
         return self._is_recording
 
-    @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)
-    def get_minimum_buffer_sdram_usage(self):
-        return self._minimum_buffer_sdram
-
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
         if self._is_recording:
