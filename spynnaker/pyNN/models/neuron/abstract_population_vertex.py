@@ -8,7 +8,8 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.resources import (
+    ConstantSDRAM, IPtagResource, ResourceContainer)
 
 # front end common imports
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -129,6 +130,9 @@ class AbstractPopulationVertex(
     # 6 elements before the start of global parameters
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 24
 
+    # The Buffer traffic type
+    TRAFFIC_IDENTIFIER = "BufferTraffic"
+
     _n_vertices = 0
 
     non_pynn_default_parameters = {
@@ -224,7 +228,7 @@ class AbstractPopulationVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "n_machine_time_steps": "MinimumAutoTimeSteps",
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
@@ -233,27 +237,32 @@ class AbstractPopulationVertex(
             "graph", "n_machine_time_steps", "machine_time_step"
         }
     )
+
     def get_resources_used_by_atoms(
             self, vertex_slice, graph, n_machine_time_steps,
             machine_time_step):
         # pylint: disable=arguments-differ
 
+        ip_tags = list()
+        if self._receive_buffer_host is not None:
+            ip_tags.append(IPtagResource(
+                self._receive_buffer_host, self._receive_buffer_port,
+                True, tag=None, traffic_identifier=self.TRAFFIC_IDENTIFIER))
+
+        variableSDRAM = self._neuron_recorder.get_variable_sdram_usage(
+            vertex_slice)
+        variableSDRAM.set_assumed_timesteps(n_machine_time_steps)
+        constantSDRAM = ConstantSDRAM(
+                self.get_sdram_usage_for_atoms(
+                    vertex_slice, graph, machine_time_step))
+
         # set resources required from this object
         container = ResourceContainer(
-            sdram=SDRAMResource(
-                self.get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step)),
+            sdram=variableSDRAM.extend(constantSDRAM),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)))
-
-        recording_sizes = recording_utilities.get_recording_region_sizes(
-            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
-            self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
-            self._using_auto_pause_and_resume)
-        container.extend(recording_utilities.get_recording_resources(
-            recording_sizes, self._receive_buffer_host,
-            self._receive_buffer_port))
+                self.get_cpu_usage_for_atoms(vertex_slice)),
+            iptags=ip_tags)
 
         # return the total resources.
         return container

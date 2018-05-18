@@ -6,6 +6,7 @@ import numpy
 from six import iteritems, raise_from
 from six.moves import range, xrange
 
+from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
@@ -448,12 +449,11 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the sdram used per timestep
+        """ Returns the sdram used for this may timesteps
 
-        In the case where sampling is used it returns the average\
-        for recording and none recording based on the recording rate
+        If required the total is rounded up so the space will always fit
 
-        :param variable:
+        :param variable: The
         :param vertex_slice:
         :return:
         """
@@ -476,6 +476,34 @@ class NeuronRecorder(object):
         :return:
         """
         return len(self._sampling_rates) * self.N_BYTES_PER_INDEX
+
+    def get_variable_sdram_usage(self, vertex_slice):
+        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+
+        fixed_sdram = 0
+        per_timestep_sdram = 0
+        for variable in self._sampling_rates:
+            # Recording rate for each neuron
+            fixed_sdram += self.N_BYTES_PER_RATE
+            # Number of recording neurons
+            fixed_sdram += self.N_BYTES_PER_INDEX
+            # index_parameters one per neuron
+            # even if not recording as also act as a gate
+            fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
+            rate = self._sampling_rates[variable]
+            if rate > 0:
+                per_record = self.get_buffered_sdram_per_record(
+                    variable, vertex_slice)
+                if rate == 1:
+                    # Add size for one record as recording every timestep
+                    per_timestep_sdram += per_record
+                else:
+                    # Get the average cost per timestep
+                    average_per_timestep = per_record // rate
+                    per_timestep_sdram += average_per_timestep
+                    # Add the rest once to fixed for worst case
+                    fixed_sdram += (per_record - average_per_timestep)
+        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
