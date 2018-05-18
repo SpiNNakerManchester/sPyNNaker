@@ -245,11 +245,11 @@ class DelayExtensionVertex(
         # Write the actual delay blocks (create a new one if it doesn't exist)
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key in self._delay_blocks:
-            delay_block = self._delay_blocks[key].delay_block
+            delay_block = self._delay_blocks[key]
         else:
             delay_block = DelayBlock(
                 self._n_delay_stages, self._delay_per_stage, vertex_slice)
-        spec.write_array(array_values=delay_block)
+        spec.write_array(array_values=delay_block.delay_block)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

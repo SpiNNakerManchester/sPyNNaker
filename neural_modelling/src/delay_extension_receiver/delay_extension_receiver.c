@@ -36,15 +36,17 @@ static void read_params(address_t address) {
 
 // Sends an acknowledgement response to an SDP
 static void send_ack_response(sdp_msg_t *msg) {
-    msg->cmd_rc = RC_OK;
-    msg->length = 12;
+    msg->length = sizeof(sdp_hdr_t) + sizeof(uint16_t);
     uint dest_port = msg->dest_port;
     uint dest_addr = msg->dest_addr;
     msg->dest_port = msg->srce_port;
     msg->srce_port = dest_port;
     msg->dest_addr = msg->srce_addr;
     msg->srce_addr = dest_addr;
-    spin1_send_sdp_msg(msg, 10);
+    log_info("Sending ACK of %u to 0x%04x, %u", msg->cmd_rc, msg->dest_addr, msg->dest_port);
+    while (!spin1_send_sdp_msg(msg, 10)) {
+        // Do Nothing
+    }
 }
 
 // Handle an incoming SDP message
@@ -53,17 +55,18 @@ void handle_sdp_message(uint mailbox, uint port) {
 
     // Read the message
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint32_t *data = (uint32_t *) &(msg->cmd_rc);
-    uint16_t n_delays = data[0];
+    uint16_t *data = (uint16_t *) &(msg->cmd_rc);
+    uint16_t n_delays = data[1];
 
     // If the number of delays is 0, this is a finish message
     if (n_delays == 0) {
+
+        uint32_t source = (msg->srce_addr << 16) | (msg->srce_port & 0x1F);
 
         // Send a response to say the message was received
         send_ack_response(msg);
 
         // Check if the source has been seen before
-        uint32_t source = (msg->srce_addr << 16) | (msg->srce_port & 0x1F);
         bool seen = false;
         for (uint32_t i = 0; i < n_post_vertices_finished; i++) {
             if (source == post_vertices_finished[i]) {
@@ -79,7 +82,7 @@ void handle_sdp_message(uint mailbox, uint port) {
         if (!seen) {
             post_vertices_finished[n_post_vertices_finished] = source;
             n_post_vertices_finished += 1;
-            log_debug(
+            log_info(
                 "%u of %u post vertices complete",
                 n_post_vertices_finished, n_post_vertices);
             if (n_post_vertices_finished == n_post_vertices) {
@@ -91,13 +94,14 @@ void handle_sdp_message(uint mailbox, uint port) {
     }
 
     // Otherwise, continue reading
-    log_debug("Reading %u delays", n_delays);
+    log_info("Reading %u delays from 0x%04x, %u",
+            n_delays, msg->srce_addr, msg->srce_port);
 
-    uint16_t *delays = (uint16_t *) &(data[1]);
+    uint16_t *delays = (uint16_t *) &(data[2]);
     for (uint32_t i = 0; i < n_delays; i++) {
         uint8_t neuron_id = unpack_delay_index(delays[i]);
         uint8_t stage = unpack_delay_stage(delays[i]);
-        log_debug(
+        log_info(
             "Delay %u, source neuron id = %u, delay stage = %u",
             i, neuron_id, stage);
         bit_field_set(neuron_delay_stage_config[stage], neuron_id);
@@ -120,5 +124,5 @@ void c_main() {
 
     // Wait for SDP messages
     spin1_callback_on(SDP_PACKET_RX, handle_sdp_message, 1);
-    spin1_start(SYNC_WAIT);
+    spin1_start(SYNC_NOWAIT);
 }
