@@ -780,6 +780,7 @@ class SynapticManager(object):
                 spec, synaptic_matrix_offset, undelayed_max_length,
                 rinfo.first_key_and_mask, master_pop_table_region)
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
+            synaptic_matrix_offset = synaptic_matrix_offset // 4
         elif rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -804,6 +805,8 @@ class SynapticManager(object):
                 spec, delayed_synaptic_matrix_offset, delayed_max_length,
                 delay_rinfo.first_key_and_mask, master_pop_table_region)
             block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
+            delayed_synaptic_matrix_offset = \
+                delayed_synaptic_matrix_offset // 4
         elif delay_rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
@@ -820,7 +823,7 @@ class SynapticManager(object):
             app_edge.pre_vertex, pre_vertex_slice.lo_atom,
             pre_vertex_slice.hi_atom))
         generator_data.append(GeneratorData(
-            synaptic_matrix_offset / 4, delayed_synaptic_matrix_offset / 4,
+            synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             undelayed_max_length, delayed_max_length, pre_vertex_slice,
             delay_placement, synapse_info, app_edge.n_delay_stages + 1,
             machine_time_step))

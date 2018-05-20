@@ -110,11 +110,21 @@ bool read_connection_builder_region(address_t *in_region,
         return false;
     }
 
+    log_info("Synaptic matrix offset = %u, delayed offset = %u",
+            synaptic_matrix_offset, delayed_synaptic_matrix_offset);
+    log_info("Max row length = %u, max delayed row length = %u",
+            max_row_length, max_delayed_row_length);
+
     // Generate matrix
-    address_t synaptic_matrix =
-        &(synaptic_matrix_region[synaptic_matrix_offset]);
-    address_t delayed_synaptic_matrix =
-        &(synaptic_matrix_region[delayed_synaptic_matrix_offset]);
+    address_t synaptic_matrix = NULL;
+    if (synaptic_matrix_offset != 0xFFFFFFFF) {
+        synaptic_matrix = &(synaptic_matrix_region[synaptic_matrix_offset]);
+    }
+    address_t delayed_synaptic_matrix = NULL;
+    if (delayed_synaptic_matrix_offset != 0xFFFFFFFF) {
+        delayed_synaptic_matrix =
+            &(synaptic_matrix_region[delayed_synaptic_matrix_offset]);
+    }
     log_info("Generating matrix at 0x%08x, delayed at 0x%08x",
             synaptic_matrix, delayed_synaptic_matrix);
     bool status = matrix_generator_generate(

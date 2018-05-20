@@ -92,11 +92,13 @@ bool matrix_generator_generate(
     for (uint32_t pre_neuron_index = pre_slice_start;
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
 
-        uint16_t indices[max_row_length + max_delayed_row_length];
+        uint32_t max_n_synapses =
+            max_row_length + (max_delayed_row_length * (max_stage - 1));
+        uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
             connection_generator, pre_slice_start, pre_slice_count,
             pre_neuron_index, post_slice_start, post_slice_count,
-            max_row_length, rng, indices);
+            max_n_synapses, rng, indices);
         log_info("Generated %u synapses", n_indices);
 
         // Generate delays for each index
