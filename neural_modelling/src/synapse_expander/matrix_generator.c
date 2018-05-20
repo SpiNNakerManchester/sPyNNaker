@@ -108,6 +108,9 @@ bool matrix_generator_generate(
         uint16_t delays[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
             accum delay = delay_params[i] * timestep_per_delay;
+            if (delay < 0) {
+                delay = 1;
+            }
             delays[i] = (uint16_t) delay;
             if (delay != delays[i]) {
                 log_warning("Rounded delay %k to %u", delay, delays[i]);

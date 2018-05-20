@@ -15,9 +15,9 @@ struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
         delay = 1;
     }
     uint16_t stage = (delay - 1) / MAX_DELAY;
-    if (stage > max_stage) {
+    if (stage >= max_stage) {
         log_warning("Delay of %u is too big", delay);
-        stage = max_stage;
+        stage = max_stage - 1;
         delay = (stage * MAX_DELAY);
     }
     delay = ((delay - 1) % MAX_DELAY) + 1;
