@@ -4,8 +4,9 @@
 
 #include "param_generators/param_generator_constant.h"
 #include "param_generators/param_generator_uniform.h"
+#include "param_generators/param_generator_normal.h"
 
-#define N_PARAM_GENERATORS 2
+#define N_PARAM_GENERATORS 3
 
 struct param_generator {
     uint32_t index;
@@ -32,6 +33,11 @@ void register_param_generators() {
     param_generators[1].initialize = param_generator_uniform_initialize;
     param_generators[1].generate = param_generator_uniform_generate;
     param_generators[1].free = param_generator_uniform_free;
+
+    param_generators[2].hash = 2;
+    param_generators[2].initialize = param_generator_normal_initialize;
+    param_generators[2].generate = param_generator_normal_generate;
+    param_generators[2].free = param_generator_normal_free;
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {

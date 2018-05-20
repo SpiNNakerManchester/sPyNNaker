@@ -195,22 +195,13 @@ void c_main(void) {
 
     register_matrix_generators();
 
-    // Register connector generators with factories
-    // log_info("Connector generators");
-    // REGISTER_FACTORY_CLASS("AllToAllConnector", ConnectorGenerator, AllToAll);
-    // REGISTER_FACTORY_CLASS("OneToOneConnector", ConnectorGenerator, OneToOne);
     // REGISTER_FACTORY_CLASS("FixedProbabilityConnector", ConnectorGenerator, FixedProbability);
     // REGISTER_FACTORY_CLASS("KernelConnector", ConnectorGenerator, Kernel);
     // REGISTER_FACTORY_CLASS("MappingConnector", ConnectorGenerator, Mapping);
     // REGISTER_FACTORY_CLASS("FixedTotalNumberConnector", ConnectorGenerator, FixedTotalNumber);
     register_connection_generators();
 
-    // Register parameter generators with factories
-    // log_info("Parameter generators");
-    // REGISTER_FACTORY_CLASS("constant", ParamGenerator, Constant);
     // REGISTER_FACTORY_CLASS("kernel",   ParamGenerator, ConvKernel);
-    // REGISTER_FACTORY_CLASS("uniform",  ParamGenerator, Uniform);
-    // REGISTER_FACTORY_CLASS("normal",   ParamGenerator, Normal);
     //  REGISTER_FACTORY_CLASS("normal_clipped", ParamGenerator, NormalClipped);
     //  REGISTER_FACTORY_CLASS("normal_clipped_to_boundary", ParamGenerator, NormalClippedToBoundary);
     // REGISTER_FACTORY_CLASS("exponential", ParamGenerator, Exponential);
