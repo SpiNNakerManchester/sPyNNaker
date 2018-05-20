@@ -26,11 +26,10 @@ PARAM_TYPE_CONSTANT_ID = 0
 PARAM_TYPE_BY_NAME = {
     "uniform": 1,
     "uniform_int": 1,
-    "poisson": 2,
-    "normal": 3,
-    "normal_clipped": 4,
-    "normal_clipped_to_boundary": 5,
-    "exponential": 6
+    "normal": 2,
+    "normal_clipped": 3,
+    "normal_clipped_to_boundary": 4,
+    "exponential": 5
 }
 
 
