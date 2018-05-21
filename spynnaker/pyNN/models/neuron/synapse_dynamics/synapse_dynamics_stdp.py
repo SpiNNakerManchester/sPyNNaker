@@ -219,7 +219,8 @@ class SynapseDynamicsSTDP(
         synapse_structure = self._timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
-        plastic_plastic = numpy.zeros(len(connections) * n_half_words)
+        plastic_plastic = numpy.zeros(
+            len(connections) * n_half_words, dtype="uint16")
         plastic_plastic[half_word::n_half_words] = \
             numpy.rint(numpy.abs(connections["weight"])).astype("uint16")
 
