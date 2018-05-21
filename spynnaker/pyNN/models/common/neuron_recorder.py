@@ -240,9 +240,17 @@ class NeuronRecorder(object):
     @property
     def recording_variables(self):
         results = list()
-        for key in self._sampling_rates:
-            if self.is_recording(key):
-                results.append(key)
+        for region, rate in self._sampling_rates.items():
+            if rate > 0:
+                results.append(region)
+        return results
+
+    @property
+    def recorded_region_ids(self):
+        results = list()
+        for id, rate in enumerate(self._sampling_rates.values()):
+            if rate > 0:
+                results.append(id)
         return results
 
     def _compute_rate(self, sampling_interval):

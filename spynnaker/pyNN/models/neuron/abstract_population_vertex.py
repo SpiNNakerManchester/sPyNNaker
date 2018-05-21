@@ -296,7 +296,7 @@ class AbstractPopulationVertex(
             label=None, constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = PopulationMachineVertex(
-            resources_required, self._neuron_recorder.recording_variables,
+            resources_required, self._neuron_recorder.recorded_region_ids,
             label, constraints)
 
         AbstractPopulationVertex._n_vertices += 1
