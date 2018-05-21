@@ -2,8 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ranged.abstract_list import AbstractList
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_list import \
-    SpynakkerRangedList
+from spynnaker.pyNN.utilities.ranged import SpynakkerRangedList
 
 from .abstract_settable import AbstractSettable
 
