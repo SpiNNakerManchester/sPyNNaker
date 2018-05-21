@@ -73,10 +73,8 @@ static uint32_t n_delays = 0;
 static inline void zero_spike_counters(void *location, uint32_t num_items)
 {
     uint32_t i;
-    for (i = 0 ; i < num_items - 3 ; i += 4) {
-        ((uint32_t *) location)[i] = 0;
-    }
-    for (; i < num_items ; i++) {
+
+    for (i = 0 ; i < num_items ; i++) {
         ((uint8_t *) location)[i] = 0;
     }
 }
