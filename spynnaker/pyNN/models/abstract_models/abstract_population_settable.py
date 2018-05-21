@@ -2,7 +2,7 @@ from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ranged.abstract_list import AbstractList
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangedList
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
 from .abstract_settable import AbstractSettable
 
@@ -33,7 +33,7 @@ class AbstractPopulationSettable(AbstractSettable):
             ranged_list = old_values
         else:
             # Keep all the getting stuff in one place by creating a RangedList
-            ranged_list = SpynakkerRangedList(
+            ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=old_values)
             # Now that we have created a RangedList why not use it.
             self.set_value(key, ranged_list)
@@ -53,7 +53,7 @@ class AbstractPopulationSettable(AbstractSettable):
             ranged_list = old_values
         else:
             # Keep all the setting stuff in one place by creating a RangedList
-            ranged_list = SpynakkerRangedList(
+            ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=old_values)
             self.set_value(key, ranged_list)
         ranged_list.set_value_by_selector(selector, value)
