@@ -5,8 +5,10 @@
 #include "param_generators/param_generator_constant.h"
 #include "param_generators/param_generator_uniform.h"
 #include "param_generators/param_generator_normal.h"
+#include "param_generators/param_generator_normal_clipped.h"
+#include "param_generators/param_generator_normal_clipped_to_boundary.h"
 
-#define N_PARAM_GENERATORS 3
+#define N_PARAM_GENERATORS 5
 
 struct param_generator {
     uint32_t index;
@@ -38,6 +40,18 @@ void register_param_generators() {
     param_generators[2].initialize = param_generator_normal_initialize;
     param_generators[2].generate = param_generator_normal_generate;
     param_generators[2].free = param_generator_normal_free;
+
+    param_generators[3].hash = 3;
+    param_generators[3].initialize = param_generator_normal_clipped_initialize;
+    param_generators[3].generate = param_generator_normal_clipped_generate;
+    param_generators[3].free = param_generator_normal_clipped_free;
+
+    param_generators[4].hash = 4;
+    param_generators[4].initialize =
+        param_generator_normal_clipped_boundary_initialize;
+    param_generators[4].generate =
+        param_generator_normal_clipped_boundary_generate;
+    param_generators[4].free = param_generator_normal_clipped_boundary_free;
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
