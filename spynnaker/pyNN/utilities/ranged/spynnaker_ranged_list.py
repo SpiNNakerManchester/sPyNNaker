@@ -3,7 +3,7 @@ from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_front_end_common.utilities import globals_variables
 
 
-class SpynakkerRangedList(RangedList):
+class SpynnakerRangedList(RangedList):
 
     @staticmethod
     @overrides(RangedList.is_list)

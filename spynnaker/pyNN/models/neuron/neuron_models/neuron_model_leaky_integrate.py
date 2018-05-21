@@ -2,7 +2,7 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 from .abstract_neuron_model import AbstractNeuronModel
 
 from data_specification.enums import DataType
@@ -57,7 +57,7 @@ class NeuronModelLeakyIntegrate(AbstractNeuronModel, AbstractContainsUnits):
         self._n_neurons = n_neurons
         if v_init is None:
             v_init = v_rest
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[V_INIT] = v_init
         self._data[V_REST] = v_rest
         self._data[TAU_M] = tau_m
