@@ -5,6 +5,8 @@
 #include <stdbool.h>
 #include <delay_extension/delay_extension.h>
 
+extern void spin1_wfi();
+
 #define SLEEP_TIME 10000
 #define MAX_DELAYS_PER_PACKET 127
 #define MAX_SEQUENCE 0xFFFF
@@ -54,8 +56,8 @@ static void wait_for_delay_response() {
     while (delay_response_received != sequence) {
 
         // Wait for a time for a response
-        log_debug("Waiting for response from last delay message");
-        spin1_delay_us(SLEEP_TIME);
+        log_info("Waiting for response %u from last delay message", sequence);
+        spin1_wfi();
 
         // Re-send the message
         if (delay_response_received != sequence) {

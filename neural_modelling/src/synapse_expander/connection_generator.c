@@ -4,8 +4,9 @@
 
 #include "connection_generators/connection_generator_one_to_one.h"
 #include "connection_generators/connection_generator_all_to_all.h"
+#include "connection_generators/connection_generator_fixed_prob.h"
 
-#define N_CONNECTION_GENERATORS 2
+#define N_CONNECTION_GENERATORS 3
 
 struct connection_generator {
     uint32_t index;
@@ -41,6 +42,14 @@ void register_connection_generators() {
         connection_generator_all_to_all_generate;
     connection_generators[1].free =
         connection_generator_all_to_all_free;
+
+    connection_generators[2].hash = 2;
+    connection_generators[2].initialize =
+        connection_generator_fixed_prob_initialise;
+    connection_generators[2].generate =
+        connection_generator_fixed_prob_generate;
+    connection_generators[2].free =
+        connection_generator_fixed_prob_free;
 }
 
 connection_generator_t connection_generator_init(

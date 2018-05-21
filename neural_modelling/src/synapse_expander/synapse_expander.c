@@ -187,6 +187,11 @@ void _start_expander(uint params_address, uint syn_mtx_addr) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);
     }
+
+    if (delay_initialised) {
+        log_info("Closing delay");
+        delay_sender_close();
+    }
     spin1_exit(0);
 }
 
@@ -195,16 +200,12 @@ void c_main(void) {
 
     register_matrix_generators();
 
-    // REGISTER_FACTORY_CLASS("FixedProbabilityConnector", ConnectorGenerator, FixedProbability);
     // REGISTER_FACTORY_CLASS("KernelConnector", ConnectorGenerator, Kernel);
     // REGISTER_FACTORY_CLASS("MappingConnector", ConnectorGenerator, Mapping);
     // REGISTER_FACTORY_CLASS("FixedTotalNumberConnector", ConnectorGenerator, FixedTotalNumber);
     register_connection_generators();
 
     // REGISTER_FACTORY_CLASS("kernel",   ParamGenerator, ConvKernel);
-    //  REGISTER_FACTORY_CLASS("normal_clipped", ParamGenerator, NormalClipped);
-    //  REGISTER_FACTORY_CLASS("normal_clipped_to_boundary", ParamGenerator, NormalClippedToBoundary);
-    // REGISTER_FACTORY_CLASS("exponential", ParamGenerator, Exponential);
     register_param_generators();
 
     log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
@@ -224,11 +225,6 @@ void c_main(void) {
         _start_expander, (uint) params_address, (uint) syn_mtx_addr, 1);
 
     spin1_start(SYNC_NOWAIT);
-
-    if (delay_initialised) {
-        log_info("Closing delay");
-        delay_sender_close();
-    }
 
     log_info("Finished On Machine Connectors!");
 }

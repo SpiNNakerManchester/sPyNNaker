@@ -1,6 +1,7 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+import decimal
 from .abstract_generate_connector_on_machine \
     import AbstractGenerateConnectorOnMachine, ConnectorIDs
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -9,7 +10,7 @@ import numpy
 from data_specification.enums.data_type import DataType
 
 
-class FixedProbabilityConnector(AbstractConnector):
+class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     __slots__ = [
         "_allow_self_connections",
         "_p_connect"]
@@ -142,7 +143,7 @@ class FixedProbabilityConnector(AbstractConnector):
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
-        return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR
+        return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
@@ -150,7 +151,9 @@ class FixedProbabilityConnector(AbstractConnector):
     def gen_connector_params(self):
         return numpy.array([
             self.allow_self_connections,
-            round(self._p_connect * DataType.S1615.scale)], dtype="uint32")
+            round(decimal.Decimal(
+                str(self._p_connect)) * DataType.U032.scale)],
+            dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
