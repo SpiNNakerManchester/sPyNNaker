@@ -2,7 +2,7 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 INITIAL_INPUT_EXC = "initial_input_exc"
 INITIAL_INPUT_INH = "initial_input_inh"
@@ -15,7 +15,7 @@ class SynapseTypeDelta(AbstractSynapseType):
         "_data"]
 
     def __init__(self, n_neurons, initial_input_exc, initial_input_inh):
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[INITIAL_INPUT_EXC] = initial_input_exc
         self._data[INITIAL_INPUT_INH] = initial_input_inh
 

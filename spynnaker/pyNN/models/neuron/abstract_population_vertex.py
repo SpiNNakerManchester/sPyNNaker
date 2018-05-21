@@ -42,7 +42,7 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities.ranged import SpynakkerRangedList
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
@@ -716,7 +716,7 @@ class AbstractPopulationVertex(
             ranged_list = full
         else:
             # Keep all the getting stuff in one place by creating a RangedList
-            ranged_list = SpynakkerRangedList(
+            ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=full)
             # Now that we have created a RangedList why not use it.
             self.initialize(key, ranged_list)
@@ -732,7 +732,7 @@ class AbstractPopulationVertex(
             ranged_list = full
         else:
             # Keep all the setting stuff in one place by creating a RangedList
-            ranged_list = SpynakkerRangedList(
+            ranged_list = SpynnakerRangedList(
                 size=self.n_atoms, value=full)
             # Now that we have created a RangedList why not use it.
             self.initialize(key, ranged_list)
