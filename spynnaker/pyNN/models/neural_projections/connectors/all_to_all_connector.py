@@ -205,7 +205,10 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params)
     def gen_connector_params(self, pre_vertex_slice, post_vertex_slice):
-        return numpy.array([self.allow_self_connections], dtype="uint32")
+        return numpy.array([
+            self.allow_self_connections and
+            pre_vertex_slice is post_vertex_slice],
+            dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
