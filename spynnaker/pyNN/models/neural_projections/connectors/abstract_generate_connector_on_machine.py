@@ -183,8 +183,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         :rtype: int
         """
 
-    @property
-    def gen_connector_params(self):
+    def gen_connector_params(self, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32

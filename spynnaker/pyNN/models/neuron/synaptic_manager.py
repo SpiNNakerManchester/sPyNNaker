@@ -825,8 +825,8 @@ class SynapticManager(object):
         generator_data.append(GeneratorData(
             synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             undelayed_max_length, delayed_max_length, pre_vertex_slice,
-            delay_placement, synapse_info, app_edge.n_delay_stages + 1,
-            machine_time_step))
+            post_vertex_slice, delay_placement, synapse_info,
+            app_edge.n_delay_stages + 1, machine_time_step))
         self._gen_on_machine = True
 
         return block_addr
