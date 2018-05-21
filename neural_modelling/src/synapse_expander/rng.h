@@ -6,4 +6,8 @@ rng_t rng_init(address_t *region);
 
 uint32_t rng_generator(rng_t rng);
 
+accum rng_exponential(rng_t rng);
+
+accum rng_normal(rng_t rng);
+
 void rng_free(rng_t rng);

@@ -33,8 +33,7 @@ void param_generator_normal_clipped_generate(
         (struct param_generator_normal_clipped *) data;
     for (uint32_t i = 0; i < n_synapses; i++) {
         do {
-            uint32_t random_value = rng_generator(rng);
-            accum value = norminv_urt(random_value);
+            accum value = rng_normal(rng);
             values[i] = params->mu + (value * params->sigma);
         } while (values[i] < params->low || values[i] > params->high);
         log_info("Produced %k", values[i]);

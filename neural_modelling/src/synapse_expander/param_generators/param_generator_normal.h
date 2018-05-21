@@ -27,8 +27,7 @@ void param_generator_normal_generate(
     struct param_generator_normal *params =
         (struct param_generator_normal *) data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        uint32_t random_value = rng_generator(rng);
-        accum value = norminv_urt(random_value);
+        accum value = rng_normal(rng);
         values[i] = params->mu + (value * params->sigma);
         log_info("Produced %k", values[i]);
     }

@@ -33,8 +33,7 @@ void param_generator_normal_clipped_boundary_generate(
     struct param_generator_normal_clipped_boundary *params =
         (struct param_generator_normal_clipped_boundary *) data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        uint32_t random_value = rng_generator(rng);
-        accum value = norminv_urt(random_value);
+        accum value = rng_normal(rng);
         values[i] = params->mu + (value * params->sigma);
         if (values[i] < params->low) {
             values[i] = params->low;
