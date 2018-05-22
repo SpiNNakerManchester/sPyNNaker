@@ -1,7 +1,6 @@
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict \
-    import SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
 
@@ -58,7 +57,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def __init__(self, n_neurons, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         # pylint: disable=too-many-arguments
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[EXC_RESPONSE] = exc_response
         self._data[EXC_EXP_RESPONSE] = exc_exp_response
         self._data[TAU_SYN_E] = tau_syn_E

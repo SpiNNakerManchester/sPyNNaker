@@ -5,7 +5,6 @@
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
-#include <string.h>
 #include <utils.h>
 
 //! if using profiler import profiler tags
@@ -252,8 +251,8 @@ bool synapses_initialise(
             "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
             synapse_params_address +
             ((n_neurons * sizeof(synapse_param_t)) / 4));
-        memcpy(neuron_synapse_shaping_params, synapse_params_address,
-               n_neurons * sizeof(synapse_param_t));
+        spin1_memcpy(neuron_synapse_shaping_params, synapse_params_address,
+                n_neurons * sizeof(synapse_param_t));
     }
 
     // Get the ring buffer left shifts

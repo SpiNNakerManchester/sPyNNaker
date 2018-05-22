@@ -13,7 +13,6 @@
 #include <random.h>
 #include <simulation.h>
 #include <spin1_api.h>
-#include <string.h>
 #include <bit_field.h>
 
 // Declare spin1_wfi
