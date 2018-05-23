@@ -120,8 +120,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         return self._param_generator_id(self._weights)
 
-    @property
-    def gen_weights_params(self):
+    def gen_weights_params(self, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the weight generator on the machine
 
         :rtype: numpy array of uint32
@@ -144,8 +143,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         return self._param_generator_id(self._delays)
 
-    @property
-    def gen_delay_params(self):
+    def gen_delay_params(self, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the delay generator on the machine
 
         :rtype: numpy array of uint32

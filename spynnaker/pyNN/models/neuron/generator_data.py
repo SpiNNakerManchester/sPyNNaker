@@ -87,7 +87,9 @@ class GeneratorData(object):
             self._pre_slices, self._pre_slice_index, self._post_slices,
             self._post_slice_index, self._pre_vertex_slice,
             self._post_vertex_slice, self._synapse_information.synapse_type))
-        items.append(connector.gen_weights_params)
-        items.append(connector.gen_delay_params)
+        items.append(connector.gen_weights_params(
+            self._pre_vertex_slice, self._post_vertex_slice))
+        items.append(connector.gen_delay_params(
+            self._pre_vertex_slice, self._post_vertex_slice))
         items.append(connector.gen_rng_params)
         return numpy.concatenate(items)
