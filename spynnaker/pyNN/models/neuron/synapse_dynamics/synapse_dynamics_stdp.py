@@ -395,7 +395,7 @@ class SynapseDynamicsSTDP(
     def gen_matrix_params(self):
         synapse_struct = self._timing_dependence.synaptic_structure
         return numpy.array([
-            self._n_header_bytes // 4,
+            self._n_header_bytes // 2,
             synapse_struct.get_n_half_words_per_connection(),
             synapse_struct.get_weight_half_word()], dtype="uint32")
 

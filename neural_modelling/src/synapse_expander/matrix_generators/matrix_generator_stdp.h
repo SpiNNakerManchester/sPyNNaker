@@ -6,7 +6,7 @@
 #include "matrix_generator_common.h"
 
 struct matrix_generator_stdp {
-    uint32_t n_words_per_pp_row_header;
+    uint32_t n_half_words_per_pp_row_header;
     uint32_t n_half_words_per_pp_synapse;
     uint32_t weight_half_word;
 };
@@ -90,11 +90,14 @@ void matrix_generator_stdp_write_row(
     for (uint32_t i = 0; i < max_stage; i++) {
         if (row_address[i] != NULL) {
             row_address[i][STDP_PLASTIC_PLASTIC_SIZE] =
-                params->n_words_per_pp_row_header;
-            for (uint32_t j = 0; j < params->n_words_per_pp_row_header; j++) {
-                row_address[i][j + STDP_PLASTIC_PLASTIC_OFFSET] = 0;
+                params->n_half_words_per_pp_row_header >> 1;
+            uint16_t *header = (uint16_t *)
+                &(row_address[i][STDP_PLASTIC_PLASTIC_OFFSET]);
+            for (uint32_t j = 0;
+                    j < params->n_half_words_per_pp_row_header; j++) {
+                header[j] = 0;
             }
-            space_half_words[i] -= params->n_words_per_pp_row_header * 2;
+            space_half_words[i] -= params->n_half_words_per_pp_row_header;
         }
     }
 
@@ -107,7 +110,7 @@ void matrix_generator_stdp_write_row(
         if (row_address[i] != NULL) {
             pp_address[i] = (uint16_t *) &(row_address[i][
                 STDP_PLASTIC_PLASTIC_OFFSET +
-                params->n_words_per_pp_row_header]);
+                (params->n_half_words_per_pp_row_header >> 1)]);
         } else {
             pp_address[i] = NULL;
         }
