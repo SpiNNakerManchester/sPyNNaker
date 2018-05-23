@@ -12,7 +12,7 @@ from spynnaker.pyNN.models.neuron.abstract_population_vertex \
 import numpy
 
 # global objects
-DEFAULT_MAX_ATOMS_PER_CORE = 32
+DEFAULT_MAX_ATOMS_PER_CORE = 256
 _apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 class IFCurrCombExp2E2I(AbstractPopulationVertex):
