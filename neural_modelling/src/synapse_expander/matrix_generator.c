@@ -105,7 +105,8 @@ bool matrix_generator_generate(
         // Generate delays for each index
         accum delay_params[n_indices];
         param_generator_generate(
-            delay_generator, n_indices, rng, delay_params);
+            delay_generator, n_indices, rng, pre_neuron_index, indices,
+            delay_params);
         uint16_t delays[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
             accum delay = delay_params[i] * timestep_per_delay;
@@ -121,7 +122,8 @@ bool matrix_generator_generate(
         // Generate weights for each index
         accum weight_params[n_indices];
         param_generator_generate(
-            weight_generator, n_indices, rng, weight_params);
+            weight_generator, n_indices, rng, pre_neuron_index, indices,
+            weight_params);
         uint16_t weights[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
             accum weight = weight_params[i];

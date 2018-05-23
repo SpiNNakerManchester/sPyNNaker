@@ -22,7 +22,10 @@ void param_generator_exponential_free(void *data) {
 }
 
 void param_generator_exponential_generate(
-        void *data, uint32_t n_synapses, rng_t rng, accum *values) {
+        void *data, uint32_t n_synapses, rng_t rng, uint32_t pre_neuron_index,
+        uint16_t *indices, accum *values) {
+    use(pre_neuron_index);
+    use(indices);
     struct param_generator_exponential *params =
         (struct param_generator_exponential *) data;
     for (uint32_t i = 0; i < n_synapses; i++) {

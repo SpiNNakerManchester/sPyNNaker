@@ -22,7 +22,10 @@ void param_generator_uniform_free(void *data) {
 }
 
 void param_generator_uniform_generate(
-        void *data, uint32_t n_synapses, rng_t rng, accum *values) {
+        void *data, uint32_t n_synapses, rng_t rng, uint32_t pre_neuron_index,
+        uint16_t *indices, accum *values) {
+    use(pre_neuron_index);
+    use(indices);
     struct param_generator_uniform *params =
         (struct param_generator_uniform *) data;
     accum range = params->high - params->low;
