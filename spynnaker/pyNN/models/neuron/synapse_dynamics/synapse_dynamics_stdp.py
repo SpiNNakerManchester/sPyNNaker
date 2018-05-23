@@ -171,6 +171,8 @@ class SynapseDynamicsSTDP(
         synapse_structure = self._timing_dependence.synaptic_structure
         if self._pad_to_length is not None:
             n_connections = max(n_connections, self._pad_to_length)
+        if n_connections == 0:
+            return 0
         fp_size_words = (
             n_connections // 2 if n_connections % 2 == 0
             else (n_connections + 1) // 2)

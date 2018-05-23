@@ -19,12 +19,12 @@ void connection_generator_fixed_prob_free(void *data) {
 }
 
 uint32_t connection_generator_fixed_prob_generate(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_end,
+        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, rng_t rng,
         uint16_t *indices) {
     use(pre_slice_start);
-    use(pre_slice_end);
+    use(pre_slice_count);
     use(rng);
 
     struct fixed_prob *params = (struct fixed_prob *) data;
@@ -45,8 +45,7 @@ uint32_t connection_generator_fixed_prob_generate(
         }
         unsigned long fract value = ulrbits(rng_generator(rng));
         if ((value <= params->probability) && (n_conns < max_row_length)) {
-            indices[i] = i;
-            n_conns++;
+            indices[n_conns++] = i;
         } else if (n_conns >= max_row_length) {
             log_warning("Row overflow");
         }

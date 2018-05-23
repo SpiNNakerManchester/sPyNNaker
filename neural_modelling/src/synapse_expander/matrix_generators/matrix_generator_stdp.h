@@ -53,7 +53,7 @@ void matrix_generator_stdp_write_row(
         void *data,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_length, uint32_t max_delayed_row_length,
+        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
@@ -63,9 +63,11 @@ void matrix_generator_stdp_write_row(
 
     // Row address for each possible delay stage (including no delay stage)
     address_t row_address[max_stage];
-    uint32_t n_row_words = max_row_length + 3;
-    uint32_t n_delay_row_words = max_delayed_row_length + 3;
+    uint16_t space_half_words[max_stage];
+    uint32_t n_row_words = max_row_n_words + 3;
+    uint32_t n_delay_row_words = max_delayed_row_n_words + 3;
     row_address[0] = NULL;
+    space_half_words[0] = max_row_n_words * 2;
     if (synaptic_matrix != NULL) {
         row_address[0] = &(synaptic_matrix[pre_neuron_index * n_row_words]);
     }
@@ -75,10 +77,12 @@ void matrix_generator_stdp_write_row(
         uint32_t single_matrix_size = n_pre_neurons * n_delay_row_words;
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
+            space_half_words[i] = max_delayed_row_n_words * 2;
         }
     } else {
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = NULL;
+            space_half_words[i] = 0;
         }
     }
 
@@ -90,6 +94,7 @@ void matrix_generator_stdp_write_row(
             for (uint32_t j = 0; j < params->n_words_per_pp_row_header; j++) {
                 row_address[i][j + STDP_PLASTIC_PLASTIC_OFFSET] = 0;
             }
+            space_half_words[i] -= params->n_words_per_pp_row_header * 2;
         }
     }
 
@@ -125,6 +130,15 @@ void matrix_generator_stdp_write_row(
             log_error("Delay stage %u has not been initialised", delay.stage);
             rt_error(RTE_SWERR);
         }
+        if (space_half_words[delay.stage] <
+                params->n_half_words_per_pp_synapse) {
+            log_warning(
+                "Row %u only has %u half words of %u free - not writing",
+                delay.stage, space_half_words[delay.stage],
+                params->n_half_words_per_pp_synapse);
+            continue;
+        }
+
         uint16_t *weight_words = pp_address[delay.stage];
         pp_address[delay.stage] =
             &(pp_address[delay.stage][params->n_half_words_per_pp_synapse]);
@@ -134,6 +148,7 @@ void matrix_generator_stdp_write_row(
         weight_words[params->weight_half_word] = weight;
         n_half_words_per_row[delay.stage] +=
             params->n_half_words_per_pp_synapse;
+        space_half_words[delay.stage] -= params->n_half_words_per_pp_synapse;
     }
 
     // Add padding to any rows that are not word-aligned

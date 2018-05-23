@@ -33,7 +33,6 @@ uint32_t _build_static_word(
     wrd |= ((delay & SYNAPSE_DELAY_MASK) <<
             (synapse_index_bits + synapse_type_bits));
     wrd |= ((weight & SYNAPSE_WEIGHT_MASK) << SYNAPSE_WEIGHT_SHIFT);
-    log_info("Writing word 0x%08x (index_bits = %u, type_bits = %u", wrd, synapse_index_bits, synapse_type_bits);
     return wrd;
 }
 
@@ -41,7 +40,7 @@ void matrix_generator_static_write_row(
         void *data,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_length, uint32_t max_delayed_row_length,
+        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
@@ -51,23 +50,27 @@ void matrix_generator_static_write_row(
     // Row address and position for each possible delay stage (including no
     // delay stage)
     address_t row_address[max_stage];
+    uint16_t space[max_stage];
     row_address[0] = NULL;
+    space[0] = max_row_n_words;
     if (synaptic_matrix != NULL) {
         row_address[0] =
-            &(synaptic_matrix[pre_neuron_index * (max_row_length + 3)]);
+            &(synaptic_matrix[pre_neuron_index * (max_row_n_words + 3)]);
     }
     if (delayed_synaptic_matrix != NULL) {
         address_t delayed_address =
             &(delayed_synaptic_matrix[
-                pre_neuron_index * (max_delayed_row_length + 3)]);
+                pre_neuron_index * (max_delayed_row_n_words + 3)]);
         uint32_t single_matrix_size =
-            n_pre_neurons * (max_delayed_row_length + 3);
+            n_pre_neurons * (max_delayed_row_n_words + 3);
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
+            space[i] = max_delayed_row_n_words;
         }
     } else {
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = NULL;
+            space[i] = 0;
         }
     }
     address_t write_address[max_stage];
@@ -99,6 +102,10 @@ void matrix_generator_static_write_row(
             log_error("Delay stage %u has not been initialised", delay.stage);
             rt_error(RTE_SWERR);
         }
+        if (space[delay.stage] == 0) {
+            log_warning("Row for delay stage %u is full - word not added!");
+            continue;
+        }
 
         // Build synaptic word
         uint32_t word = _build_static_word(
@@ -106,12 +113,11 @@ void matrix_generator_static_write_row(
             synapse_index_bits);
 
         // Write the word
-        log_info("Writing to 0x%08x for stage %u", write_address[delay.stage], delay.stage);
         write_address[delay.stage][0] = word;
         write_address[delay.stage] = &(write_address[delay.stage][1]);
 
         // Increment the size of the current row
-        log_info("Updating 0x%08x", row_address[delay.stage]);
         row_address[delay.stage][STATIC_FIXED_FIXED_SIZE] += 1;
+        space[delay.stage] -= 1;
     }
 }

@@ -335,7 +335,7 @@ class SynapticManager(object):
             n_delay_stages, machine_time_step, in_edge):
         memory_size = 0
         for synapse_info in synapse_information:
-            undelayed_size, delayed_size, _, _ = \
+            undelayed_size, delayed_size, _, _, _, _ = \
                 self._synapse_io.get_sdram_usage_in_bytes(
                     synapse_info, pre_slices,
                     pre_slice_index, post_slices, post_slice_index,
@@ -763,7 +763,8 @@ class SynapticManager(object):
 
         # Get the size of the matrices that will be required
         (n_bytes_undelayed, n_bytes_delayed,
-            undelayed_max_length, delayed_max_length) = \
+            undelayed_max_n_words, delayed_max_n_words,
+            undelayed_max_synapses, delayed_max_synapses) = \
                 self._synapse_io.get_sdram_usage_in_bytes(
                     synapse_info, pre_slices,
                     pre_slice_index, post_slices, post_slice_index,
@@ -777,7 +778,7 @@ class SynapticManager(object):
             synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(block_addr)
             self._poptable_type.update_master_population_table(
-                spec, synaptic_matrix_offset, undelayed_max_length,
+                spec, synaptic_matrix_offset, undelayed_max_n_words,
                 rinfo.first_key_and_mask, master_pop_table_region)
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
             synaptic_matrix_offset = synaptic_matrix_offset // 4
@@ -802,7 +803,7 @@ class SynapticManager(object):
                 self._poptable_type.get_next_allowed_address(
                     block_addr)
             self._poptable_type.update_master_population_table(
-                spec, delayed_synaptic_matrix_offset, delayed_max_length,
+                spec, delayed_synaptic_matrix_offset, delayed_max_n_words,
                 delay_rinfo.first_key_and_mask, master_pop_table_region)
             block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
             delayed_synaptic_matrix_offset = \
@@ -824,9 +825,11 @@ class SynapticManager(object):
             pre_vertex_slice.hi_atom))
         generator_data.append(GeneratorData(
             synaptic_matrix_offset, delayed_synaptic_matrix_offset,
-            undelayed_max_length, delayed_max_length, pre_vertex_slice,
-            post_vertex_slice, delay_placement, synapse_info,
-            app_edge.n_delay_stages + 1, machine_time_step))
+            undelayed_max_n_words, delayed_max_n_words, undelayed_max_synapses,
+            delayed_max_synapses, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            delay_placement, synapse_info, app_edge.n_delay_stages + 1,
+            machine_time_step))
         self._gen_on_machine = True
 
         return block_addr

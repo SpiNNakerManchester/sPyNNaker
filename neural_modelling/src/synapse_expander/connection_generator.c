@@ -5,8 +5,9 @@
 #include "connection_generators/connection_generator_one_to_one.h"
 #include "connection_generators/connection_generator_all_to_all.h"
 #include "connection_generators/connection_generator_fixed_prob.h"
+#include "connection_generators/connection_generator_fixed_total.h"
 
-#define N_CONNECTION_GENERATORS 3
+#define N_CONNECTION_GENERATORS 4
 
 struct connection_generator {
     uint32_t index;
@@ -17,7 +18,7 @@ struct connection_generator_info {
     uint32_t hash;
     void* (*initialize)(address_t *region);
     uint32_t (*generate)(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_end,
+        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, rng_t rng,
         uint16_t *indices);
@@ -50,6 +51,14 @@ void register_connection_generators() {
         connection_generator_fixed_prob_generate;
     connection_generators[2].free =
         connection_generator_fixed_prob_free;
+
+    connection_generators[3].hash = 3;
+    connection_generators[3].initialize =
+        connection_generator_fixed_total_initialise;
+    connection_generators[3].generate =
+        connection_generator_fixed_total_generate;
+    connection_generators[3].free =
+        connection_generator_fixed_total_free;
 }
 
 connection_generator_t connection_generator_init(

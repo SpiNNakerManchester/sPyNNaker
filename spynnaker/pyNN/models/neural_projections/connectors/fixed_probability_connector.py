@@ -147,7 +147,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params)
-    def gen_connector_params(self, pre_vertex_slice, post_vertex_slice):
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
         return numpy.array([
             self.allow_self_connections,
             round(decimal.Decimal(

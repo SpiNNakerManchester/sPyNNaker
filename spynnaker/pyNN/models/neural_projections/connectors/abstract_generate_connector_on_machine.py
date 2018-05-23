@@ -37,6 +37,7 @@ class ConnectorIDs(Enum):
     ONE_TO_ONE_CONNECTOR = 0
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2
+    FIXED_TOTAL_NUMBER_CONNECTOR = 3
 
 
 @add_metaclass(AbstractBase)
@@ -183,7 +184,10 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         :rtype: int
         """
 
-    def gen_connector_params(self, pre_vertex_slice, post_vertex_slice):
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32

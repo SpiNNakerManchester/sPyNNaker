@@ -56,8 +56,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     @overrides(AbstractSynapseIO.get_sdram_usage_in_bytes,
                additional_arguments=["machine_time_step", "in_edge"])
     def get_sdram_usage_in_bytes(
-            self, synapse_info, n_pre_slices, pre_slice_index,
-            n_post_slices, post_slice_index, pre_vertex_slice,
+            self, synapse_info, pre_slices, pre_slice_index,
+            post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             machine_time_step, in_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
@@ -74,18 +74,18 @@ class SynapseIORowBased(AbstractSynapseIO):
                 max_delay_supported + numpy.finfo(numpy.double).tiny)
 
         # row length for the non-delayed synaptic matrix
-        max_undelayed_row_length = synapse_info.connector \
+        max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                n_pre_slices, pre_slice_index, n_post_slices,
+                pre_slices, pre_slice_index, post_slices,
                 post_slice_index, pre_vertex_slice, post_vertex_slice,
                 0, max_delay_supported)
 
         # determine the max row length in the delay extension
-        max_delayed_row_length = 0
+        max_delayed_n_synapses = 0
         if n_delay_stages > 0:
-            max_delayed_row_length = synapse_info.connector \
+            max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    n_pre_slices, pre_slice_index, n_post_slices,
+                    pre_slices, pre_slice_index, post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
                     min_delay_for_delay_extension, max_delay)
 
@@ -93,38 +93,39 @@ class SynapseIORowBased(AbstractSynapseIO):
         dynamics = synapse_info.synapse_dynamics
         if (isinstance(dynamics, AbstractStaticSynapseDynamics) or
                 isinstance(dynamics, SynapseDynamicsStructuralStatic)):
-            undelayed_size = dynamics.get_n_words_for_static_connections(
-                max_undelayed_row_length)
-            delayed_size = dynamics.get_n_words_for_static_connections(
-                max_delayed_row_length)
+            undelayed_n_words = dynamics.get_n_words_for_static_connections(
+                max_undelayed_n_synapses)
+            delayed_n_words = dynamics.get_n_words_for_static_connections(
+                max_delayed_n_synapses)
         else:
-            undelayed_size = dynamics.get_n_words_for_plastic_connections(
-                max_undelayed_row_length)
-            delayed_size = dynamics.get_n_words_for_plastic_connections(
-                max_delayed_row_length)
+            undelayed_n_words = dynamics.get_n_words_for_plastic_connections(
+                max_undelayed_n_synapses)
+            delayed_n_words = dynamics.get_n_words_for_plastic_connections(
+                max_delayed_n_synapses)
 
         # Adjust for the allowed row lengths from the population table
-        undelayed_max_length = self._get_max_row_length(
-            undelayed_size, dynamics, population_table, in_edge,
-            max_undelayed_row_length)
-        delayed_max_length = self._get_max_row_length(
-            delayed_size, dynamics, population_table, in_edge,
-            max_delayed_row_length)
+        undelayed_max_n_words = self._get_max_row_length(
+            undelayed_n_words, dynamics, population_table, in_edge,
+            max_undelayed_n_synapses)
+        delayed_max_n_words = self._get_max_row_length(
+            delayed_n_words, dynamics, population_table, in_edge,
+            max_delayed_n_synapses)
 
         # Add on the header words and multiply by the number of rows in the
         # block
         n_bytes_undelayed = 0
-        if undelayed_max_length > 0:
+        if undelayed_max_n_words > 0:
             n_bytes_undelayed = (
-                ((_N_HEADER_WORDS + undelayed_max_length) * 4) *
+                ((_N_HEADER_WORDS + undelayed_max_n_words) * 4) *
                 pre_vertex_slice.n_atoms)
         n_bytes_delayed = 0
-        if delayed_max_length > 0:
+        if delayed_max_n_words > 0:
             n_bytes_delayed = (
-                ((_N_HEADER_WORDS + delayed_max_length) * 4) *
+                ((_N_HEADER_WORDS + delayed_max_n_words) * 4) *
                 pre_vertex_slice.n_atoms * n_delay_stages)
         return (n_bytes_undelayed, n_bytes_delayed,
-                undelayed_max_length, delayed_max_length)
+                undelayed_max_n_words, delayed_max_n_words,
+                max_undelayed_n_synapses, max_delayed_n_synapses)
 
     @staticmethod
     def _get_max_row_length_and_row_data(
@@ -176,8 +177,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Add some padding
         row_lengths = [
-            3 + pp_data[i].size + fp_data[i].size + ff_data[i].size
-            for i in row_ids]
+            _N_HEADER_WORDS + pp_data[i].size + fp_data[i].size +
+            ff_data[i].size for i in row_ids]
         max_length = max(row_lengths) - _N_HEADER_WORDS
         max_row_length = population_table.get_allowed_row_length(max_length)
         padding = [

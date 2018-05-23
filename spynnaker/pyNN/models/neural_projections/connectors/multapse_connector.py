@@ -1,6 +1,8 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine \
+    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.abstract_base import abstractmethod
 
@@ -8,7 +10,7 @@ import numpy.random
 from six import raise_from
 
 
-class MultapseConnector(AbstractConnector):
+class MultapseConnector(AbstractGenerateConnectorOnMachine):
     """
     Create a multapse connector. The size of the source and destination\
     populations are obtained when the projection is connected. The number of\
@@ -88,6 +90,9 @@ class MultapseConnector(AbstractConnector):
                 for pre in pre_slices for post in post_slices]
             self._synapses_per_edge = self.get_rng_next(
                 self._num_synapses, prob_connect)
+            if sum(self._synapses_per_edge) != self._num_synapses:
+                raise Exception("{} of {} synapses generated".format(
+                    sum(self._synapses_per_edge), self._num_synapses))
             self._pre_slices = pre_slices
             self._post_slices = post_slices
 
@@ -115,19 +120,11 @@ class MultapseConnector(AbstractConnector):
             pre_slice_index, post_slice_index)
         if n_total_connections == 0:
             return 0
-        prob_per_atom = (
-            float(n_total_connections) /
-            float(pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms))
-        full_connections = 0
-        while prob_per_atom > 1.0:
-            full_connections += 1
-            prob_per_atom -= 1.0
+        prob_of_choosing_pre_atom = 1.0 / float(pre_vertex_slice.n_atoms)
         n_connections_per_pre_atom = \
             utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
-                post_vertex_slice.n_atoms, prob_per_atom)
-        n_connections_per_pre_atom += (
-            full_connections * post_vertex_slice.n_atoms)
+                n_total_connections, prob_of_choosing_pre_atom)
 
         if min_delay is None or max_delay is None:
             return n_connections_per_pre_atom
@@ -148,17 +145,14 @@ class MultapseConnector(AbstractConnector):
             pre_slice_index, post_slice_index)
         if n_total_connections == 0:
             return 0
-        prob_per_atom = (
-            float(n_total_connections) /
-            float(pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms))
-        full_connections = 0
-        while prob_per_atom > 1.0:
-            full_connections += 1
-            prob_per_atom -= 1.0
-        return (utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            pre_vertex_slice.n_atoms, prob_per_atom) +
-            (full_connections * pre_vertex_slice.n_atoms))
+        n_total_connections = self._get_n_connections(
+            pre_slice_index, post_slice_index)
+        if n_total_connections == 0:
+            return 0
+        prob_of_choosing_post_atom = 1.0 / float(post_vertex_slice.n_atoms)
+        return utility_calls.get_probable_maximum_selected(
+                self._n_pre_neurons * self._n_post_neurons,
+                n_total_connections, prob_of_choosing_post_atom)
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
@@ -252,3 +246,29 @@ class MultapseConnector(AbstractConnector):
 
     def __repr__(self):
         return "MultapseConnector({})".format(self._num_synapses)
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
+        return ConnectorIDs.FIXED_TOTAL_NUMBER_CONNECTOR.value
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params)
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
+        n_connections = self._get_n_connections(
+            pre_slice_index, post_slice_index)
+        return numpy.array([
+            self._allow_self_connections,
+            self._with_replacement,
+            n_connections,
+            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms],
+            dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
+        return 16

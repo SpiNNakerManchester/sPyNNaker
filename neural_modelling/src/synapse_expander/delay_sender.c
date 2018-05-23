@@ -28,6 +28,7 @@ static void _handle_sdp_message(uint mailbox, uint sdp_port) {
     uint16_t *data = (uint16_t *) &(msg->cmd_rc);
     log_info("\t\tACK received for sequence %u, waiting for %u", data[0], sequence);
     delay_response_received = data[0];
+    spin1_msg_free(msg);
 }
 
 void delay_sender_initialize(uint32_t delay_chip, uint32_t delay_core) {
@@ -112,12 +113,11 @@ void delay_sender_close() {
         delay_sender_flush();
         wait_for_delay_response();
     }
-    log_debug("Sending end message to 0x%04x, %u", chip_id, core_id);
+    log_info("Sending end message %u to 0x%04x, %u", sequence, chip_id, core_id);
     *delay_message_sequence = sequence;
     *delay_message_n_delays = 0;
     delay_message.length =
         sizeof(sdp_hdr_t) + sizeof(uint16_t) + sizeof(uint16_t);
     spin1_send_sdp_msg(&delay_message, 1);
     wait_for_delay_response();
-    return;
 }

@@ -63,8 +63,10 @@ bool read_connection_builder_region(address_t *in_region,
 
     const uint32_t synaptic_matrix_offset = *region++;
     const uint32_t delayed_synaptic_matrix_offset = *region++;
-    const uint32_t max_row_length = *region++;
-    const uint32_t max_delayed_row_length = *region++;
+    const uint32_t max_row_n_words = *region++;
+    const uint32_t max_delayed_row_n_words = *region++;
+    const uint32_t max_row_n_synapses = *region++;
+    const uint32_t max_delayed_row_n_synapses = *region++;
     const uint32_t pre_slice_start = *region++;
     const uint32_t pre_slice_count = *region++;
     const uint32_t delay_chip = *region++;
@@ -112,8 +114,8 @@ bool read_connection_builder_region(address_t *in_region,
 
     log_info("Synaptic matrix offset = %u, delayed offset = %u",
             synaptic_matrix_offset, delayed_synaptic_matrix_offset);
-    log_info("Max row length = %u, max delayed row length = %u",
-            max_row_length, max_delayed_row_length);
+    log_info("Max row synapses = %u, max delayed row synapses = %u",
+            max_row_n_synapses, max_delayed_row_n_synapses);
 
     // Generate matrix
     address_t synaptic_matrix = NULL;
@@ -129,7 +131,8 @@ bool read_connection_builder_region(address_t *in_region,
             synaptic_matrix, delayed_synaptic_matrix);
     bool status = matrix_generator_generate(
         matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
-        max_row_length, max_delayed_row_length,
+        max_row_n_words, max_delayed_row_n_words,
+        max_row_n_synapses, max_delayed_row_n_synapses,
         n_synapse_type_bits, n_synapse_index_bits,
         synapse_type, weight_scales,
         post_slice_start, post_slice_count,
@@ -163,6 +166,9 @@ bool read_sdram_data(
     uint32_t n_synapse_types = *params_address++;
     uint32_t n_synapse_type_bits = *params_address++;
     uint32_t n_synapse_index_bits = *params_address++;
+
+    log_info("Generating %u edges for %u atoms starting at %u",
+        n_in_edges, post_slice_count, post_slice_start);
 
     uint32_t weight_scales[n_synapse_types];
     for (uint32_t i = 0; i < n_synapse_types; i++) {

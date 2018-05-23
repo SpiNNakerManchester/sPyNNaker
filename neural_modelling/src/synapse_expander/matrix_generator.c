@@ -25,7 +25,7 @@ struct matrix_generator_info {
         void *data,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_length, uint32_t max_delayed_row_length,
+        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
         uint32_t synapse_type_bits, uint32_t synapse_index_bits,
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
@@ -78,7 +78,8 @@ void matrix_generator_free(matrix_generator_t generator) {
 bool matrix_generator_generate(
         matrix_generator_t generator,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-        uint32_t max_row_length, uint32_t max_delayed_row_length,
+        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
+        uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
         uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
         uint32_t synapse_type, uint32_t *weight_scales,
         uint32_t post_slice_start, uint32_t post_slice_count,
@@ -93,7 +94,7 @@ bool matrix_generator_generate(
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
 
         uint32_t max_n_synapses =
-            max_row_length + (max_delayed_row_length * (max_stage - 1));
+            max_row_n_synapses + max_delayed_row_n_synapses;
         uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
             connection_generator, pre_slice_start, pre_slice_count,
@@ -138,7 +139,7 @@ bool matrix_generator_generate(
         matrix_generators[generator->index].write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
             pre_slice_count, pre_neuron_index,
-            max_row_length, max_delayed_row_length,
+            max_row_n_words, max_delayed_row_n_words,
             n_synapse_type_bits, n_synapse_index_bits,
             synapse_type, n_indices, indices, delays, weights, max_stage);
 

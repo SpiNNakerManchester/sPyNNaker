@@ -16,7 +16,8 @@ void matrix_generator_free(matrix_generator_t generator);
 bool matrix_generator_generate(
     matrix_generator_t generator,
     address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-    uint32_t max_row_length, uint32_t max_delayed_row_length,
+    uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
+    uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
     uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
     uint32_t synapse_type, uint32_t *weight_scales,
     uint32_t post_slice_start, uint32_t post_slice_count,
