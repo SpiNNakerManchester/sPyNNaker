@@ -64,7 +64,11 @@ void handle_sdp_message(uint mailbox, uint port) {
         uint32_t source = (msg->srce_addr << 16) | (msg->srce_port & 0x1F);
 
         // Send a response to say the message was received
+        log_info("Received exit from 0x%04x, %u", msg->srce_addr, msg->srce_port);
         send_ack_response(msg);
+
+        // Free the message as no longer needed
+        spin1_msg_free(msg);
 
         // Check if the source has been seen before
         bool seen = false;
@@ -74,9 +78,6 @@ void handle_sdp_message(uint mailbox, uint port) {
                 break;
             }
         }
-
-        // Free the message as no longer needed
-        spin1_msg_free(msg);
 
         // If the source hasn't been seen, mark it as finished
         if (!seen) {
