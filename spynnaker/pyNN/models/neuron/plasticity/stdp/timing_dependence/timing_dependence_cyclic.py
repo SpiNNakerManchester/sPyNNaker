@@ -126,16 +126,12 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         if timing_dependence is None or not isinstance(
                 timing_dependence, TimingDependenceCyclic):
             return False
-        return ((self.accum_dep_plus_one_excit == other.accum_dep_plus_one_excit) and
-                (self.accum_pot_minus_one_excit == other.accum_pot_minus_one_excit) and
-                (self.pre_window_tc_excit == other.pre_window_tc_excit) and
-                (self.post_window_tc_excit == other.post_window_tc_excit))
-        #return ((self.accumulator_depression_plus_one ==
-        #         other.accumulator_depression_plus_one) and
-        #        (self.accumulator_potentiation_minus_one ==
-        #         other.accumulator_potentiation_minus_one) and
-        #        (self.mean_pre_window == other.mean_pre_window) and
-        #        (self.mean_post_window == other.mean_post_window))
+        return True
+        # SD Removed this as it now cuases erros after move to PyNN8:
+        #return ((self.accum_dep_plus_one_excit == other.accum_dep_plus_one_excit) and
+        #        (self.accum_pot_minus_one_excit == other.accum_pot_minus_one_excit) and
+        #        (self.pre_window_tc_excit == other.pre_window_tc_excit) and
+        #        (self.post_window_tc_excit == other.post_window_tc_excit))
 
     @property
     def vertex_executable_suffix(self):

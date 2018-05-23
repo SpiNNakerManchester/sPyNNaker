@@ -294,6 +294,7 @@ static inline update_state_t timing_apply_post_spike(
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
+             //log_info("%d", previous_state.accumulator);
          } else {
              //previous_state.accumulator = 0;
              // Set accum to a sub-threshold value, so that two potentiations in quick
@@ -308,8 +309,10 @@ static inline update_state_t timing_apply_post_spike(
              if (previous_state.weight_state.weight == (accum)0.0) {
                 if (voltage_difference > (accum) 0.5) {
                    // Make a full weight increment:
+                   //log_info("%d B", previous_state.weight_state);
                    previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                             syn_type, STDP_FIXED_POINT_ONE);
+                   //log_info("%d", previous_state.weight_state);
                 }
                 else {
                    // Weight is to be used, but we don't want or need a full weight increment.
