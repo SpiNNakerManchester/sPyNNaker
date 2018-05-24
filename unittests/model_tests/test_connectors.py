@@ -6,6 +6,8 @@ import functools
 from spynnaker.pyNN.models.neural_projections.connectors \
     import FixedNumberPreConnector, FixedNumberPostConnector, \
     FixedProbabilityConnector, IndexBasedProbabilityConnector
+from spynnaker.pyNN.models.neuron.synapse_dynamics \
+    import SynapseDynamicsStatic
 from unittests.mocks import MockSimulator, MockPopulation
 
 
@@ -95,8 +97,9 @@ def test_connectors(
         post_slice = post_slices[post_slice_index]
         pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
+        dynamics = SynapseDynamicsStatic()
 
-        max_delay = connector.get_delay_maximum()
+        max_delay = connector.get_delay_maximum(dynamics)
         max_weight = connector.get_weight_maximum(
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice)
