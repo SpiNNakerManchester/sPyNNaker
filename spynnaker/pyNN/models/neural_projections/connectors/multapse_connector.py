@@ -61,23 +61,23 @@ class MultapseConnector(AbstractConnector):
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
-        if self._weights is not None:
-            logger.warning(
-                'Weights were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
-        if self._delays is not None:
-            logger.warning(
-                'Delays were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
+#         if self._weights is not None:
+#             logger.warning(
+#                 'Weights were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
+#         if self._delays is not None:
+#             logger.warning(
+#                 'Delays were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
-        self._check_parameters(weights, delays, allow_lists=True)
+        self._check_parameters(self._weights, self._delays, allow_lists=True)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._delays, self._num_synapses)
+    def get_delay_maximum(self, dynamics):
+        return self._get_delay_maximum(delays, self._num_synapses)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(

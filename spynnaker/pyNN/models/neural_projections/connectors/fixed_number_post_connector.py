@@ -51,9 +51,9 @@ class FixedNumberPostConnector(AbstractConnector):
         self._post_neurons_set = False
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, dynamics):
         return self._get_delay_maximum(
-            self._delays, self._get_n_connections(self._n_post))
+            delays, self._get_n_connections(self._n_post))
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(

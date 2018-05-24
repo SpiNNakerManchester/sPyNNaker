@@ -69,7 +69,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, dynamics):
+        if self._delays is None:
+            self._delays = dynamics.delay
         return self._get_delay_maximum(
             self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,

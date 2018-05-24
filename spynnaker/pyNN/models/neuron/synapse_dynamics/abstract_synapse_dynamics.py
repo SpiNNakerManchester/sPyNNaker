@@ -60,10 +60,10 @@ class AbstractSynapseDynamics(object):
         """
         return list()
 
-    def get_delay_maximum(self, connector):
+    def get_delay_maximum(self, connector, dynamics):
         """ Get the maximum delay for the synapses
         """
-        return connector.get_delay_maximum()
+        return connector.get_delay_maximum(dynamics)
 
     def get_delay_variance(
             self, connector, n_pre_slices, pre_slice_index, n_post_slices,

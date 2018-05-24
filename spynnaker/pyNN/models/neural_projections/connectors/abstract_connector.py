@@ -55,6 +55,7 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
+#        self._synapse_type = None
         self._weights = None
         self._delays = None
 
@@ -79,19 +80,27 @@ class AbstractConnector(object):
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
-        if self._weights is not None:
-            logger.warning(
-                'Weights were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
-        if self._delays is not None:
-            logger.warning(
-                'Delays were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
+#         if self._weights is not None:
+#             logger.warning(
+#                 'Weights were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
+#         if self._delays is not None:
+#             logger.warning(
+#                 'Delays were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays)
+
+#     def set_synapse_type(self, synapse_type):
+#         """ sets the synapse type, from which weights and delays are obtained
+#
+#         :param: synapse_type:
+#             synapse type passed in
+#         """
+#         self._synapse_type = synapse_type
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -103,6 +112,7 @@ class AbstractConnector(object):
         if self._rng is None:
             self._rng = get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
+
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported
@@ -144,7 +154,7 @@ class AbstractConnector(object):
         raise Exception("Unrecognised delay format")
 
     @abstractmethod
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, dynamics):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded
         """

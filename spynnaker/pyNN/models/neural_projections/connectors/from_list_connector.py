@@ -131,8 +131,10 @@ class FromListConnector(AbstractConnector):
             self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return numpy.max(self._conn_list["delay"])
+    def get_delay_maximum(self, dynamics):
+        if self._delays is None:
+            self._delays = dynamics.delay
+        return numpy.max(self._delays)  # self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(

@@ -39,9 +39,9 @@ class FixedProbabilityConnector(AbstractConnector):
                 "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, dynamics):
         return self._get_delay_maximum(
-            self._delays, utility_calls.get_probable_maximum_selected(
+            delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons, self._p_connect))
 

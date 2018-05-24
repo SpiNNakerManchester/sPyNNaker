@@ -42,16 +42,16 @@ class AllToAllConnector(AbstractConnector):
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
-        if self._weights is not None:
-            logger.warning(
-                'Weights were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
-        if self._delays is not None:
-            logger.warning(
-                'Delays were already set in '+str(self)+', possibly in '
-                'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
+#         if self._weights is not None:
+#             logger.warning(
+#                 'Weights were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
+#         if self._delays is not None:
+#             logger.warning(
+#                 'Delays were already set in '+str(self)+', possibly in '
+#                 'another projection: currently this will overwrite the values '
+#                 'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)
@@ -73,9 +73,9 @@ class AllToAllConnector(AbstractConnector):
                 n_post_neurons)]
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, dynamics):
         return self._get_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons)
+            delays, self._n_pre_neurons * self._n_post_neurons)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
