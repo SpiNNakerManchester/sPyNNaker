@@ -28,8 +28,10 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, dynamics):
+        if self._delays is None:
+            self._delays = dynamics.delay
         n_connections_max = self._n_pre_neurons * self._n_post_neurons
-        return self._get_delay_maximum(dynamics.delay, n_connections_max)
+        return self._get_delay_maximum(self._delays, n_connections_max)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(

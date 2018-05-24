@@ -72,8 +72,10 @@ class FixedNumberPreConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, dynamics):
+        if self._delays is None:
+            self._delays = dynamics.delay
         return self._get_delay_maximum(
-            delays, self._n_pre * self._n_post_neurons)
+            self._delays, self._n_pre * self._n_post_neurons)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(

@@ -63,10 +63,11 @@ class SynapseIORowBased(AbstractSynapseIO):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Tell the connector the weights and delays it needs to use
-        # from the synapse dynamics
-        synapse_info.connector.set_weights_and_delays(
-            synapse_info.synapse_dynamics.weight,
-            synapse_info.synapse_dynamics.delay)
+        # from the synapse dynamics if the attribute is in the synapse dynamics
+        if hasattr(synapse_info.synapse_dynamics, 'weight'):
+            synapse_info.connector.set_weights_and_delays(
+                synapse_info.synapse_dynamics.weight,
+                synapse_info.synapse_dynamics.delay)
 
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
@@ -208,9 +209,10 @@ class SynapseIORowBased(AbstractSynapseIO):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Set the weights and delays in the connector here before making block
-        synapse_info.connector.set_weights_and_delays(
-            synapse_info.synapse_dynamics.weight,
-            synapse_info.synapse_dynamics.delay)
+        if hasattr(synapse_info.synapse_dynamics, 'weight'):
+            synapse_info.connector.set_weights_and_delays(
+                synapse_info.synapse_dynamics.weight,
+                synapse_info.synapse_dynamics.delay)
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)

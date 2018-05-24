@@ -61,9 +61,11 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, dynamics):
+        if self._delays is None:
+            self._delays = dynamics.delay
         self._update_probs_from_index_expression()
         return self._get_delay_maximum(
-            delays, utility_calls.get_probable_maximum_selected(
+            self._delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))

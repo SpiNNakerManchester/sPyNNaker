@@ -77,7 +77,9 @@ class MultapseConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, dynamics):
-        return self._get_delay_maximum(delays, self._num_synapses)
+        if self._delays is None:
+            self._delays = dynamics.delay
+        return self._get_delay_maximum(self._delays, self._num_synapses)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
