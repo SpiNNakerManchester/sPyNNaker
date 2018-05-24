@@ -94,7 +94,6 @@ class AbstractConnector(object):
             self._rng = get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
 
-
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported
         """
