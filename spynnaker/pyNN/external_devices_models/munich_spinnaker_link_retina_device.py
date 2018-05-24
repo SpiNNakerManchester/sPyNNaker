@@ -3,6 +3,7 @@ from pacman.model.constraints.key_allocator_constraints \
     import FixedKeyAndMaskConstraint
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
+from pacman.executor.injection_decorator import inject_items
 # front end common imports
 from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
