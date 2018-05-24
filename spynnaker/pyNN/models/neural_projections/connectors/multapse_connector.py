@@ -61,16 +61,6 @@ class MultapseConnector(AbstractConnector):
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
-#         if self._weights is not None:
-#             logger.warning(
-#                 'Weights were already set in '+str(self)+', possibly in '
-#                 'another projection: currently this will overwrite the values '
-#                 'in the previous projection. For now, set up a new connector.')
-#         if self._delays is not None:
-#             logger.warning(
-#                 'Delays were already set in '+str(self)+', possibly in '
-#                 'another projection: currently this will overwrite the values '
-#                 'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(self._weights, self._delays, allow_lists=True)
