@@ -170,4 +170,5 @@ class ExternalFPGARetinaDevice(
         return helpful_functions.\
             produce_key_constraint_based_off_outgoing_partitions(
                 machine_graph=machine_graph, vertex=self,
-                mask=self._fixed_mask, virtual_key=self._fixed_key)
+                mask=self._fixed_mask, virtual_key=self._fixed_key,
+                partition=partition)
