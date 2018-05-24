@@ -99,9 +99,16 @@ class MunichRetinaDevice(
             print("Warning, the retina will have {} neurons".format(
                 fixed_n_neurons))
 
-    def get_outgoing_partition_constraints(self, partition):
-        return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
+    @inject_items({"machine_graph": "MemoryMachineGraph"})
+    @overrides(
+        AbstractProvidesOutgoingPartitionConstraints.
+        get_outgoing_partition_constraints,
+        additional_arguments={"machine_graph": "MemoryMachineGraph"})
+    def get_outgoing_partition_constraints(self, partition, machine_graph):
+        return helpful_functions.\
+            produce_key_constraint_based_off_outgoing_partitions(
+                machine_graph=machine_graph, vertex=self,
+                mask=self._fixed_mask, virtual_key=self._fixed_key)
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
