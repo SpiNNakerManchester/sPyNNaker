@@ -55,8 +55,8 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
-        self._weights = None
-        self._delays = None
+#         self._weights = None
+#         self._delays = None
 
     def set_space(self, space):
         """ allows setting of the space object after instantiation
@@ -66,22 +66,22 @@ class AbstractConnector(object):
         """
         self._space = space
 
-    def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            May either be a float, a !RandomDistribution object, a list 1D\
-            array with at least as many items as connections to be created,\
-            or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic\
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler,\
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
-        self._weights = weights
-        self._delays = delays
-        self._check_parameters(weights, delays)
+#     def set_weights_and_delays(self, weights, delays):
+#         """ sets the weights and delays as needed
+#
+#         :param `float` weights:
+#             May either be a float, a !RandomDistribution object, a list 1D\
+#             array with at least as many items as connections to be created,\
+#             or a distance dependence as per a d_expression. Units nA.
+#         :param `float` delays:  -- as `weights`. If `None`, all synaptic\
+#             delays will be set to the global minimum delay.
+#         :raises Exception: when not a standard interface of list, scaler,\
+#             or random number generator
+#         :raises NotImplementedError: when lists are not supported and entered
+#         """
+#         self._weights = weights
+#         self._delays = delays
+#         self._check_parameters(weights, delays)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -134,7 +134,7 @@ class AbstractConnector(object):
         raise Exception("Unrecognised delay format")
 
     @abstractmethod
-    def get_delay_maximum(self, dynamics):
+    def get_delay_maximum(self, delays):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded
         """
@@ -155,7 +155,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the delays for this connection
         """
@@ -197,7 +197,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from each of\
@@ -236,7 +236,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the mean of the weights for this connection
         """
@@ -274,7 +274,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum of the weights for this connection
         """
@@ -297,7 +297,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the variance of the weights for this connection
         """
@@ -406,7 +406,7 @@ class AbstractConnector(object):
         return False
 
     @abstractmethod
-    def generate_on_machine(self):
+    def generate_on_machine(self, weights, delays):
         """ Determines if the connector generation is supported on the machine\
             or if the connector must be generated on the host
         """
@@ -414,7 +414,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         """ Create a synaptic block from the data

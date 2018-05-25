@@ -12,6 +12,7 @@ from pacman.model.graphs.common import Slice
 
 # spinn utils
 from spinn_utilities.helpful_functions import get_valid_components
+from numpy.distutils.fcompiler import none
 
 # fec
 from spinn_front_end_common.utilities.helpful_functions \
@@ -445,31 +446,42 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
+                    weights = None
+                    if hasattr(synapse_dynamics, 'weight'):
+                        weights = synapse_dynamics.weight
+                    else:
+                        weights = connector.get_weight()
+
+                    delays = None
+                    if hasattr(synapse_dynamics, 'delay'):
+                        delays = synapse_dynamics.delay
+                    else:
+                        delays = connector.get_delay()
                     weight_mean = abs(synapse_dynamics.get_weight_mean(
-                        connector, pre_slices, pre_slice_index,
-                        post_slices, post_slice_index, pre_vertex_slice,
-                        post_vertex_slice) * weight_scale)
+                        connector, weights, pre_slices, pre_slice_index,
+                        post_slices, post_slice_index,
+                        pre_vertex_slice, post_vertex_slice) * weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum(
                             pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice)
                     weight_variance = abs(synapse_dynamics.get_weight_variance(
-                        connector, pre_slices, pre_slice_index,
+                        connector, weights, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice) * weight_scale_squared)
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, pre_slices, pre_slice_index,
+                        connector, delays, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice)
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, pre_slices, pre_slice_index,
+                        connector, weights, pre_slices, pre_slice_index,
                         post_slices, post_slice_index, pre_vertex_slice,
                         post_vertex_slice) * weight_scale)
                     biggest_weight[synapse_type] = max(

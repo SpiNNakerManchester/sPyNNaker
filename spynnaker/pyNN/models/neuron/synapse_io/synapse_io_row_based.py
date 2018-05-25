@@ -62,13 +62,6 @@ class SynapseIORowBased(AbstractSynapseIO):
             machine_time_step, in_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
-        # Tell the connector the weights and delays it needs to use
-        # from the synapse dynamics if the attribute is in the synapse dynamics
-        if hasattr(synapse_info.synapse_dynamics, 'weight'):
-            synapse_info.connector.set_weights_and_delays(
-                synapse_info.synapse_dynamics.weight,
-                synapse_info.synapse_dynamics.delay)
-
         # Find the maximum row length - i.e. the maximum number of bytes
         # that will be needed by any row for both rows with delay extensions
         # and rows without
@@ -80,10 +73,18 @@ class SynapseIORowBased(AbstractSynapseIO):
         min_delay_for_delay_extension = (
                 max_delay_supported + numpy.finfo(numpy.double).tiny)
 
+        # get delays to pass into connector
+        delays = None
+        if hasattr(synapse_info.synapse_dynamics, 'delay'):
+            delays = synapse_info.synapse_dynamics.delay
+        else:
+            # delays come directly from the connector?
+            delays = synapse_info.connector.get_delay()
+
         # row length for the non-delayed synaptic matrix
         max_undelayed_row_length = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                n_pre_slices, pre_slice_index, n_post_slices,
+                delays, n_pre_slices, pre_slice_index, n_post_slices,
                 post_slice_index, pre_vertex_slice, post_vertex_slice,
                 0, max_delay_supported)
 
@@ -92,7 +93,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         if n_delay_stages > 0:
             max_delayed_row_length = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    n_pre_slices, pre_slice_index, n_post_slices,
+                    delays, n_pre_slices, pre_slice_index, n_post_slices,
                     post_slice_index, pre_vertex_slice, post_vertex_slice,
                     min_delay_for_delay_extension, max_delay)
 
@@ -208,11 +209,18 @@ class SynapseIORowBased(AbstractSynapseIO):
             app_edge, machine_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
-        # Set the weights and delays in the connector here before making block
+        # Get the weights and delays to pass into the connector
+        weights = None
+        delays = None
         if hasattr(synapse_info.synapse_dynamics, 'weight'):
-            synapse_info.connector.set_weights_and_delays(
-                synapse_info.synapse_dynamics.weight,
-                synapse_info.synapse_dynamics.delay)
+            weights = synapse_info.synapse_dynamics.weight
+        else:
+            weights = synapse_info.connector.get_weight()
+
+        if hasattr(synapse_info.synapse_dynamics, 'delay'):
+            delays = synapse_info.synapse_dynamics.delay
+        else:
+            delays = synapse_info.connector.get_delay()
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -221,7 +229,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices,
+            weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_info.synapse_type)
 

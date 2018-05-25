@@ -75,8 +75,11 @@ class PyNNProjectionCommon(object):
             machine_time_step)
 
         # handle max delay
-        max_delay = synapse_dynamics_stdp.get_delay_maximum(
-            connector, synapse_dynamics_stdp)
+        if hasattr(synapse_dynamics_stdp, 'delay'):
+            max_delay = synapse_dynamics_stdp.get_delay_maximum(
+                connector, synapse_dynamics_stdp.delay)
+        else:  # PyNN 0.7, get delay from connector?
+            max_delay = connector.get_delay()
         if max_delay is None:
             max_delay = user_max_delay
 

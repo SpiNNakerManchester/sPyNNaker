@@ -23,12 +23,11 @@ class FromListConnector(AbstractConnector):
         the index of the postsynaptic neuron.
     """
     __slots__ = [
-        "_conn_list",
-        "_converted_weights_and_delays"]
+        "_conn_list"]
 
-    CONN_LIST_DTYPE = numpy.dtype([
-        ("source", numpy.uint32), ("target", numpy.uint32),
-        ("weight", numpy.float64), ("delay", numpy.float64)])
+#     CONN_LIST_DTYPE = numpy.dtype([
+#         ("source", numpy.uint32), ("target", numpy.uint32),
+#         ("weight", numpy.float64), ("delay", numpy.float64)])
 
     def __init__(self, conn_list, safe=True, verbose=False):
         """
@@ -41,11 +40,6 @@ class FromListConnector(AbstractConnector):
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
         self._conn_list = conn_list
-
-        # supports setting these at different times
-        self._weights = None
-        self._delays = None
-        self._converted_weights_and_delays = False
 
     @staticmethod
     def _split_conn_list(conn_list, column_names):
@@ -94,69 +88,77 @@ class FromListConnector(AbstractConnector):
         # hand over splitted data
         return source_destination_conn_list, weights, delays, other_conn_list
 
-    @overrides(AbstractConnector.set_weights_and_delays)
-    def set_weights_and_delays(self, weights, delays):
-        """ allows setting of the weights and delays at separate times to the\
-            init, also sets the dtypes correctly.....
+    def set_conn_list(self, conn_list):
+        self._conn_list = conn_list
 
-        :param weights:
-        :param delays:
-        :return:
-        """
-        # set the data if not already set (supports none overriding via
-        # synapse data)
-        if self._weights is None:
-            self._weights = convert_param_to_numpy(
-                weights, len(self._conn_list))
-        if self._delays is None:
-            self._delays = convert_param_to_numpy(
-                delays, len(self._conn_list))
-
-        # if got data, build connlist with correct dtypes
-        if (self._weights is not None and self._delays is not None and not
-                self._converted_weights_and_delays):
-            # add weights and delays to the conn list
-            temp_conn_list = numpy.dstack(
-                (self._conn_list[:, 0], self._conn_list[:, 1],
-                 self._weights, self._delays))[0]
-
-            self._conn_list = list()
-            for element in temp_conn_list:
-                self._conn_list.append((element[0], element[1], element[2],
-                                        element[3]))
-
-            # set dtypes (cant we just set them within the array?)
-            self._conn_list = numpy.asarray(self._conn_list,
-                                            dtype=self.CONN_LIST_DTYPE)
-            self._converted_weights_and_delays = True
+#    moved this function to the sPyNNaker7/8 ends to deal with it there
+#     @overrides(AbstractConnector.set_weights_and_delays)
+#     def set_weights_and_delays(self, weights, delays):
+#         """ allows setting of the weights and delays at separate times to the\
+#             init, also sets the dtypes correctly.....
+#
+#         :param weights:
+#         :param delays:
+#         :return:
+#         """
+#         # set the data if not already set (supports none overriding via
+#         # synapse data)
+#         if self._weights is None:
+#             self._weights = convert_param_to_numpy(
+#                 weights, len(self._conn_list))
+#         if self._delays is None:
+#             self._delays = convert_param_to_numpy(
+#                 delays, len(self._conn_list))
+#
+#         # if got data, build connlist with correct dtypes
+#         if (self._weights is not None and self._delays is not None and not
+#                 self._converted_weights_and_delays):
+#             # add weights and delays to the conn list
+#             temp_conn_list = numpy.dstack(
+#                 (self._conn_list[:, 0], self._conn_list[:, 1],
+#                  self._weights, self._delays))[0]
+#
+#             self._conn_list = list()
+#             for element in temp_conn_list:
+#                 self._conn_list.append((element[0], element[1], element[2],
+#                                         element[3]))
+#
+#             # set dtypes (cant we just set them within the array?)
+#             self._conn_list = numpy.asarray(self._conn_list,
+#                                             dtype=self.CONN_LIST_DTYPE)
+#             self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, dynamics):
-        if self._delays is None:
-            self._delays = dynamics.delay
-        return numpy.max(self._delays)  # self._conn_list["delay"])
+    def get_delay_maximum(self, delays):
+        return numpy.max(delays)  # self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        delays = self._conn_list["delay"][mask]
+        # delays = self._conn_list["delay"][mask]
+        if self._conn_list["delay"] is not None:
+            print("delay_variance, conn_list delay is not None")
+        # what do we do here for PyNN 0.7 ?
         if delays.size == 0:
             return 0
         return numpy.var(delays)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         mask = None
+        print("conn_list: ", self._conn_list)
+        print("delays: ", delays, " min_delay: ", min_delay,
+              " max_delay: ", max_delay)
         if min_delay is None or max_delay is None:
             mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                     (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
@@ -167,8 +169,8 @@ class FromListConnector(AbstractConnector):
                     (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                     (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                     (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
-                    (self._conn_list["delay"] >= min_delay) &
-                    (self._conn_list["delay"] <= max_delay))
+                    (delays >= min_delay) &
+                    (delays <= max_delay))
         sources = self._conn_list["source"][mask]
         if sources.size == 0:
             return 0
@@ -190,53 +192,56 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
-        if weights.size == 0:
+        # weights = self._conn_list["weight"][mask] # PyNN 0.7 ?
+        # if weights.size == 0:
+        if weights is None:
             return 0
         return numpy.mean(weights)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
-        if weights.size == 0:
+        # weights = self._conn_list["weight"][mask]
+        # if weights.size == 0:
+        if weights is None:
             return 0
         return numpy.max(weights)
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        weights = self._conn_list["weight"][mask]
-        if weights.size == 0:
+        # weights = self._conn_list["weight"][mask]
+        # if weights.size == 0:
+        if weights is None:
             return 0
         return numpy.var(weights)
 
     @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
+    def generate_on_machine(self, weights, delays):
         return False
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -248,8 +253,8 @@ class FromListConnector(AbstractConnector):
         block = numpy.zeros(items.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = items["source"]
         block["target"] = items["target"]
-        block["weight"] = items["weight"]
-        block["delay"] = self._clip_delays(items["delay"])
+        block["weight"] = weights  # items["weight"]
+        block["delay"] = self._clip_delays(delays)  # items["delay"])
         block["synapse_type"] = synapse_type
         return block
 

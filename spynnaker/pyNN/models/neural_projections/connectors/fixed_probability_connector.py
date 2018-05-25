@@ -39,20 +39,18 @@ class FixedProbabilityConnector(AbstractConnector):
                 "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, dynamics):
-        if self._delays is None:
-            self._delays = dynamics.delay
+    def get_delay_maximum(self, delays):
         return self._get_delay_maximum(
-            self._delays, utility_calls.get_probable_maximum_selected(
+            delays, utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons, self._p_connect))
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        return self._get_delay_variance(self._delays, None)
+        return self._get_delay_variance(delays, None)
 
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
@@ -61,7 +59,7 @@ class FixedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
@@ -71,7 +69,7 @@ class FixedProbabilityConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
+            delays, self._n_pre_neurons * self._n_post_neurons,
             n_connections, None, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -83,37 +81,36 @@ class FixedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        return self._get_weight_mean(self._weights, None)
+        return self._get_weight_mean(weights, None)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
         n_connections = self._get_n_connections(
             pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms)
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
+        return self._get_weight_maximum(weights, n_connections, None)
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         # pylint: disable=too-many-arguments
-        return self._get_weight_variance(self._weights, None)
+        return self._get_weight_variance(weights, None)
 
     @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
+    def generate_on_machine(self, weights, delays):
         return (
-            not self._generate_lists_on_host(self._weights) and
-            not self._generate_lists_on_host(self._delays))
+            not self._generate_lists_on_host(weights) and
+            not self._generate_lists_on_host(delays))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -134,10 +131,8 @@ class FixedProbabilityConnector(AbstractConnector):
             (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
-        block["weight"] = self._generate_weights(
-            self._weights, n_connections, None)
-        block["delay"] = self._generate_delays(
-            self._delays, n_connections, None)
+        block["weight"] = self._generate_weights(weights, n_connections, None)
+        block["delay"] = self._generate_delays(delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
 
