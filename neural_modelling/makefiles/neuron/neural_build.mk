@@ -176,13 +176,13 @@ include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 # Rules to convert the source files
 $(MODIFIED_DIR)%.c: $(NEURON_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
+	python -m spinn_utilities.make_tools.converter $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 $(MODIFIED_DIR)%.h: $(NEURON_DIR)%.c
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
+	python -m spinn_utilities.make_tools.converter $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 $(MODIFIED_DICT_FILE): $(NEURON_DIR)
-	python -m spinn_utilities.make_tools.convertor $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
+	python -m spinn_utilities.make_tools.converter $(NEURON_DIR) $(MODIFIED_DIR) $(MODIFIED_DICT_FILE)
 
 LIBRARIES += -lspinn_frontend_common -lspinn_common -lm
 FEC_DEBUG := PRODUCTION_CODE
