@@ -291,8 +291,9 @@ class SynapseDynamicsSTDP(
         return connections
 
     def get_weight_mean(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            self, connector, weights, n_pre_slices, pre_slice_index,
+            n_post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the mean
@@ -300,8 +301,9 @@ class SynapseDynamicsSTDP(
         return self._weight_dependence.weight_maximum
 
     def get_weight_variance(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            self, connector, weights, n_pre_slices, pre_slice_index,
+            n_post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the variance
@@ -309,8 +311,9 @@ class SynapseDynamicsSTDP(
         return 0.0
 
     def get_weight_maximum(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+            self, connector, weights, n_pre_slices, pre_slice_index,
+            n_post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice):
         # pylint: disable=too-many-arguments
 
         # The maximum weight is the largest that it could be set to from

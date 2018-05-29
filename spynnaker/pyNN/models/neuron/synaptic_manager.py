@@ -12,7 +12,6 @@ from pacman.model.graphs.common import Slice
 
 # spinn utils
 from spinn_utilities.helpful_functions import get_valid_components
-from numpy.distutils.fcompiler import none
 
 # fec
 from spinn_front_end_common.utilities.helpful_functions \
@@ -450,13 +449,13 @@ class SynapticManager(object):
                     if hasattr(synapse_dynamics, 'weight'):
                         weights = synapse_dynamics.weight
                     else:
-                        weights = connector.get_weight()
+                        weights = synapse_info.weight
 
                     delays = None
                     if hasattr(synapse_dynamics, 'delay'):
                         delays = synapse_dynamics.delay
                     else:
-                        delays = connector.get_delay()
+                        delays = synapse_info.delay
                     weight_mean = abs(synapse_dynamics.get_weight_mean(
                         connector, weights, pre_slices, pre_slice_index,
                         post_slices, post_slice_index,
