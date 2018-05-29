@@ -215,12 +215,12 @@ class SynapseIORowBased(AbstractSynapseIO):
         if hasattr(synapse_info.synapse_dynamics, 'weight'):
             weights = synapse_info.synapse_dynamics.weight
         else:
-            weights = synapse_info.connector.get_weight()
+            weights = synapse_info.weight
 
         if hasattr(synapse_info.synapse_dynamics, 'delay'):
             delays = synapse_info.synapse_dynamics.delay
         else:
-            delays = synapse_info.connector.get_delay()
+            delays = synapse_info.delay
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
