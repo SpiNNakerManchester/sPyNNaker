@@ -47,4 +47,3 @@ class SynapseInformation(object):
     @property
     def delay(self):
         return self._delay
-
