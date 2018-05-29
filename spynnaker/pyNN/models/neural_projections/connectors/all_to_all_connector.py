@@ -25,26 +25,6 @@ class AllToAllConnector(AbstractConnector):
     """
         super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
-#         self._weights = None
-#         self._delays = None
-#
-#     @overrides(AbstractConnector.set_weights_and_delays)
-#     def set_weights_and_delays(self, weights, delays):
-#         """ sets the weights and delays as needed
-#
-#         :param `float` weights:
-#             may either be a float, a !RandomDistribution object, a list \
-#             1D array with at least as many items as connections to be \
-#             created, or a distance dependence as per a d_expression. Units nA.
-#         :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-#             delays will be set to the global minimum delay.
-#         :raises Exception: when not a standard interface of list, scaler, \
-#             or random number generator
-#         :raises NotImplementedError: when lists are not supported and entered
-#         """
-#         self._weights = weights
-#         self._delays = delays
-#         self._check_parameters(weights, delays, allow_lists=True)
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections

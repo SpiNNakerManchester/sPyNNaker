@@ -6,8 +6,6 @@ import functools
 from spynnaker.pyNN.models.neural_projections.connectors \
     import FixedNumberPreConnector, FixedNumberPostConnector, \
     FixedProbabilityConnector, IndexBasedProbabilityConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic
 from unittests.mocks import MockSimulator, MockPopulation
 
 

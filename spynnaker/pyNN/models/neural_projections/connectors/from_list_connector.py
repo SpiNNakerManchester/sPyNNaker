@@ -136,10 +136,8 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        # delays = self._conn_list["delay"][mask]
-        # what do we do here for PyNN 0.7 ?
-        # if delays.size == 0:
-        if delays is None:
+        delays = self._conn_list["delay"][mask]
+        if delays.size == 0:
             return 0
         return numpy.var(delays)
 
@@ -190,9 +188,8 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        # weights = self._conn_list["weight"][mask] # PyNN 0.7 ?
-        # if weights.size == 0:
-        if weights is None:
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
             return 0
         return numpy.mean(weights)
 
@@ -205,9 +202,8 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        # weights = self._conn_list["weight"][mask]
-        # if weights.size == 0:
-        if weights is None:
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
             return 0
         return numpy.max(weights)
 
@@ -220,9 +216,8 @@ class FromListConnector(AbstractConnector):
                 (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
                 (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                 (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        # weights = self._conn_list["weight"][mask]
-        # if weights.size == 0:
-        if weights is None:
+        weights = self._conn_list["weight"][mask]
+        if weights.size == 0:
             return 0
         return numpy.var(weights)
 
