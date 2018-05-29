@@ -82,7 +82,9 @@ def test_connectors(
             pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
             rng=None, machine_time_step=1000)
-        connector.set_weights_and_delays(weight, delay)
+        # do we keep this line here? the function only "exists" for
+        # the FromListConnector now...
+        # connector.set_weights_and_delays(weight, delay)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]
@@ -97,21 +99,21 @@ def test_connectors(
         post_slice = post_slices[post_slice_index]
         pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
-        dynamics = SynapseDynamicsStatic()
 
-        max_delay = connector.get_delay_maximum(dynamics)
+        max_delay = connector.get_delay_maximum(delay)
         max_weight = connector.get_weight_maximum(
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
+            weight, pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice)
         max_row_length = connector.get_n_connections_from_pre_vertex_maximum(
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
+            delay, pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice)
         max_col_length = connector.get_n_connections_to_post_vertex_maximum(
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice)
         synaptic_block = connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice, synapse_type)
+            weight, delay, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type)
         source_histogram = numpy.histogram(
             synaptic_block["source"], pre_range)[0]
         target_histogram = numpy.histogram(
@@ -127,16 +129,18 @@ def test_connectors(
         if len(post_slices) > post_slice_index + 1:
             test_post_slice = post_slices[post_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index, post_slices, post_slice_index + 1,
-                pre_vertex_slice, test_post_slice, synapse_type)
+                weight, delay, pre_slices, pre_slice_index, post_slices,
+                post_slice_index + 1, pre_vertex_slice, test_post_slice,
+                synapse_type)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)
         if len(pre_slices) > pre_slice_index + 1:
             test_pre_slice = pre_slices[pre_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                pre_slices, pre_slice_index + 1, post_slices, post_slice_index,
-                test_pre_slice, post_vertex_slice, synapse_type)
+                weight, delay, pre_slices, pre_slice_index + 1, post_slices,
+                post_slice_index, test_pre_slice, post_vertex_slice,
+                synapse_type)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)

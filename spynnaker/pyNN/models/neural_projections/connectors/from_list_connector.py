@@ -40,6 +40,7 @@ class FromListConnector(AbstractConnector):
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
         self._conn_list = conn_list
+        self._converted_weights_and_delays = False
 
     @staticmethod
     def _split_conn_list(conn_list, column_names):
