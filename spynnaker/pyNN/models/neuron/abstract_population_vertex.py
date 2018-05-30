@@ -32,6 +32,8 @@ from spinn_front_end_common.interface.buffer_management\
     import recording_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
 
+from spinn_utilities.ranged.abstract_list import AbstractList
+
 # spynnaker imports
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.utilities import utility_calls
@@ -39,7 +41,9 @@ from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.utilities import constants
-from .population_machine_vertex import PopulationMachineVertex
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
+from spynnaker.pyNN.models.neuron.population_machine_vertex \
+    import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
@@ -687,10 +691,66 @@ class AbstractPopulationVertex(
         initialize_attr = getattr(
             self._neuron_model, "initialize_%s" % variable, None)
         if initialize_attr is None or not callable(initialize_attr):
-            raise Exception("Vertex does not support initialisation of"
-                            " parameter {}".format(variable))
+            raise KeyError("Vertex does not support initialisation of"
+                           " parameter {}".format(variable))
         initialize_attr(value)
         self._change_requires_neuron_parameters_reload = True
+
+    def _get_init_key_and_parameter(self, variable):
+        if variable.endswith("_init"):
+            # method called with "V_int"
+            key = variable[:-5]
+            if hasattr(self._neuron_model, variable):
+                # variable is v and parameter is v_init
+                return (key, variable)
+            elif hasattr(self._neuron_model, key):
+                # Oops neuron defines v and not v init
+                return (key, key)
+        else:
+            # methon called with "v"
+            if hasattr(self._neuron_model, variable + "_init"):
+                # variable is v and parameter is v_init
+                return (variable, variable + "_init")
+            if hasattr(self._neuron_model, variable):
+                # Oops neuron defines v and not v init
+                return (variable, variable)
+        # parameter not found for this variable
+
+        raise KeyError("Variable {} has not getter".format(variable))
+
+    @overrides(AbstractPopulationInitializable.get_initial_value)
+    def get_initial_value(self, variable, selector=None):
+        (key, parameter) = self._get_init_key_and_parameter(variable)
+
+        full = getattr(self._neuron_model, parameter)
+        if selector is None:
+            return full
+        if isinstance(full, AbstractList):
+            ranged_list = full
+        else:
+            # Keep all the getting stuff in one place by creating a RangedList
+            ranged_list = SpynnakerRangedList(
+                size=self.n_atoms, value=full)
+            # Now that we have created a RangedList why not use it.
+            self.initialize(key, ranged_list)
+
+        return ranged_list.get_values(selector)
+
+    @overrides(AbstractPopulationInitializable.set_initial_value)
+    def set_initial_value(self, variable, value, selector=None):
+        (key, parameter) = self._get_init_key_and_parameter(variable)
+
+        full = getattr(self._neuron_model, parameter)
+        if isinstance(full, AbstractList):
+            ranged_list = full
+        else:
+            # Keep all the setting stuff in one place by creating a RangedList
+            ranged_list = SpynnakerRangedList(
+                size=self.n_atoms, value=full)
+            # Now that we have created a RangedList why not use it.
+            self.initialize(key, ranged_list)
+
+        ranged_list.set_value_by_selector(selector, value)
 
     @property
     def input_type(self):
