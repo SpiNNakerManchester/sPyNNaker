@@ -283,6 +283,7 @@ class TestSynapticManager(unittest.TestCase):
         master_pop_region = 0
         all_syn_block_sz = 2000
         synapse_region = 1
+        direct_region = 2
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
         spec.reserve_memory_region(synapse_region, all_syn_block_sz)
 
@@ -294,8 +295,8 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, routing_info, graph_mapper,
-            graph, machine_time_step)
+            master_pop_region, synapse_region, direct_region, routing_info,
+            graph_mapper, graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 

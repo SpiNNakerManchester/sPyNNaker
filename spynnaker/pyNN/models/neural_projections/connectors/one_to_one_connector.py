@@ -72,12 +72,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             return 0
         if min_delay is None or max_delay is None:
             return 1
-        if isinstance(self._delays, self._random_number_class):
-            return 1
-        elif numpy.isscalar(self._delays):
+        if numpy.isscalar(self._delays):
             if self._delays >= min_delay and self._delays <= max_delay:
                 return 1
             return 0
+        if isinstance(self._delays, self._random_number_class):
+            return 1
 
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         slice_min_delay = min(self._delays[connection_slice])
