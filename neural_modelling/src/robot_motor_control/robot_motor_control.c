@@ -4,7 +4,6 @@
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>
-#include <string.h>
 
 // Counters
 #define N_COUNTERS         6
