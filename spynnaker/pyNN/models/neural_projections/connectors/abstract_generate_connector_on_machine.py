@@ -73,6 +73,10 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
             values = [
                 values.parameters.get(param, None) for param in parameters]
             values = [
+                DataType.S1615.max if value == numpy.inf
+                else DataType.S1615.min if value == -numpy.inf else value
+                for value in values if value is not None]
+            values = [
                 round(decimal.Decimal(str(value)) * DataType.S1615.scale)
                 for value in values if value is not None]
             return numpy.array(values, dtype="uint32")
