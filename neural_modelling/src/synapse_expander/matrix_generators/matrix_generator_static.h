@@ -76,6 +76,9 @@ void matrix_generator_static_write_row(
     address_t write_address[max_stage];
     for (uint32_t i = 0; i < max_stage; i++) {
         if (row_address[i] != NULL) {
+            log_debug(
+                "Row size at 0x%08x for stage %u",
+                &(row_address[i][STATIC_FIXED_FIXED_SIZE]), i);
             row_address[i][STATIC_FIXED_FIXED_SIZE] = 0;
             row_address[i][STATIC_PLASTIC_PLASTIC_SIZE] = 0;
             row_address[i][STATIC_FIXED_PLASTIC_SIZE] = 0;
@@ -113,6 +116,7 @@ void matrix_generator_static_write_row(
             synapse_index_bits);
 
         // Write the word
+        log_debug("Writing word to 0x%08x", &(write_address[delay.stage][0]));
         write_address[delay.stage][0] = word;
         write_address[delay.stage] = &(write_address[delay.stage][1]);
 

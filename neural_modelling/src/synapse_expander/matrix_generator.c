@@ -100,7 +100,7 @@ bool matrix_generator_generate(
             connection_generator, pre_slice_start, pre_slice_count,
             pre_neuron_index, post_slice_start, post_slice_count,
             max_n_synapses, rng, indices);
-        log_info("Generated %u synapses", n_indices);
+        log_debug("Generated %u synapses", n_indices);
 
         // Generate delays for each index
         accum delay_params[n_indices];
@@ -115,7 +115,7 @@ bool matrix_generator_generate(
             }
             delays[i] = (uint16_t) delay;
             if (delay != delays[i]) {
-                log_warning("Rounded delay %k to %u", delay, delays[i]);
+                log_debug("Rounded delay %k to %u", delay, delays[i]);
             }
         }
 
@@ -133,21 +133,21 @@ bool matrix_generator_generate(
             weight = weight * weight_scales[synapse_type];
             weights[i] = (uint16_t) weight;
             if (weight != weights[i]) {
-                log_warning("Rounded weight %k to %u", weight, weights[i]);
+                log_debug("Rounded weight %k to %u", weight, weights[i]);
             }
         }
 
         // Write row
         matrix_generators[generator->index].write_row(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
-            pre_slice_count, pre_neuron_index,
+            pre_slice_count, pre_neuron_index - pre_slice_start,
             max_row_n_words, max_delayed_row_n_words,
             n_synapse_type_bits, n_synapse_index_bits,
             synapse_type, n_indices, indices, delays, weights, max_stage);
 
         n_connections += n_indices;
     }
-    log_info("\t\tTotal synapses generated = %u . Done!",
+    log_debug("\t\tTotal synapses generated = %u . Done!",
             n_connections);
 
     return true;
