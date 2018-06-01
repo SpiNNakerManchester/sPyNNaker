@@ -707,8 +707,8 @@ class SynapticManager(object):
                             isinstance(dynamics, AbstractGenerateOnMachine) and
                             dynamics.generate_on_machine):
                         generate_on_machine.append((
-                            synapse_info, pre_vertex_slice, pre_slice_idx,
-                            app_edge, rinfo))
+                            synapse_info, pre_slices, pre_vertex_slice,
+                            pre_slice_idx, app_edge, rinfo))
                     else:
                         block_addr, single_addr = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
@@ -723,8 +723,8 @@ class SynapticManager(object):
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
-        for (synapse_info, pre_vertex_slice, pre_slice_idx, app_edge,
-                rinfo) in generate_on_machine:
+        for (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
+                app_edge, rinfo) in generate_on_machine:
             block_addr = self.__generate_on_chip_data(
                 spec, synapse_info,
                 pre_slices, pre_slice_idx, post_slices,
