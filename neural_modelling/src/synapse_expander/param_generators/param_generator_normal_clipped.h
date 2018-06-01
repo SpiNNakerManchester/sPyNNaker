@@ -39,6 +39,5 @@ void param_generator_normal_clipped_generate(
             accum value = rng_normal(rng);
             values[i] = params->mu + (value * params->sigma);
         } while (values[i] < params->low || values[i] > params->high);
-        log_info("Produced %k", values[i]);
     }
 }

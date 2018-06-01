@@ -32,6 +32,5 @@ void param_generator_normal_generate(
     for (uint32_t i = 0; i < n_synapses; i++) {
         accum value = rng_normal(rng);
         values[i] = params->mu + (value * params->sigma);
-        log_info("Produced %k", values[i]);
     }
 }

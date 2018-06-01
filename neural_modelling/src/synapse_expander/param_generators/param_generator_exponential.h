@@ -31,6 +31,5 @@ void param_generator_exponential_generate(
     for (uint32_t i = 0; i < n_synapses; i++) {
         accum value = rng_exponential(rng);
         values[i] = value * params->beta;
-        log_info("Produced %k", values[i]);
     }
 }

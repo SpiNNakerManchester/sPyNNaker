@@ -44,6 +44,5 @@ void param_generator_normal_clipped_boundary_generate(
         if (values[i] > params->high) {
             values[i] = params->high;
         }
-        log_info("Produced %k", values[i]);
     }
 }

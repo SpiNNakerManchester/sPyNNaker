@@ -11,12 +11,12 @@ struct delay_value {
 struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
     uint16_t delay = delay_value;
     if (delay < 1) {
-        log_warning("Delay of %u is too small", delay);
+        log_debug("Delay of %u is too small", delay);
         delay = 1;
     }
     uint16_t stage = (delay - 1) / MAX_DELAY;
     if (stage >= max_stage) {
-        log_warning("Delay of %u is too big", delay);
+        log_debug("Delay of %u is too big", delay);
         stage = max_stage - 1;
         delay = (stage * MAX_DELAY);
     }

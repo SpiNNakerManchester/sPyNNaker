@@ -31,6 +31,5 @@ void param_generator_uniform_generate(
     accum range = params->high - params->low;
     for (uint32_t i = 0; i < n_synapses; i++) {
         values[i] = params->low + (ulrbits(rng_generator(rng)) * range);
-        log_info("Produced %k", values[i]);
     }
 }
