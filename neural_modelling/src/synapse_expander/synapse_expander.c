@@ -112,9 +112,9 @@ bool read_connection_builder_region(address_t *in_region,
         return false;
     }
 
-    log_info("Synaptic matrix offset = %u, delayed offset = %u",
+    log_debug("Synaptic matrix offset = %u, delayed offset = %u",
             synaptic_matrix_offset, delayed_synaptic_matrix_offset);
-    log_info("Max row synapses = %u, max delayed row synapses = %u",
+    log_debug("Max row synapses = %u, max delayed row synapses = %u",
             max_row_n_synapses, max_delayed_row_n_synapses);
 
     // Generate matrix
@@ -127,7 +127,7 @@ bool read_connection_builder_region(address_t *in_region,
         delayed_synaptic_matrix =
             &(synaptic_matrix_region[delayed_synaptic_matrix_offset]);
     }
-    log_info("Generating matrix at 0x%08x, delayed at 0x%08x",
+    log_debug("Generating matrix at 0x%08x, delayed at 0x%08x",
             synaptic_matrix, delayed_synaptic_matrix);
     bool status = matrix_generator_generate(
         matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
@@ -214,7 +214,7 @@ void c_main(void) {
     // REGISTER_FACTORY_CLASS("kernel",   ParamGenerator, ConvKernel);
     register_param_generators();
 
-    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_debug("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
 
     log_info("Starting To Build Connectors");
 
@@ -230,7 +230,7 @@ void c_main(void) {
     spin1_schedule_callback(
         _start_expander, (uint) params_address, (uint) syn_mtx_addr, 1);
 
-    spin1_start(SYNC_NOWAIT);
+    spin1_start_paused();
 
     log_info("Finished On Machine Connectors!");
 }

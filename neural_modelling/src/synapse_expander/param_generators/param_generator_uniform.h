@@ -13,7 +13,7 @@ void *param_generator_uniform_initialize(address_t *region) {
             spin1_malloc(sizeof(struct param_generator_uniform));
     spin1_memcpy(params, *region, sizeof(struct param_generator_uniform));
     *region += sizeof(struct param_generator_uniform) >> 2;
-    log_info("Uniform low = %k, high = %k", params->low, params->high);
+    log_debug("Uniform low = %k, high = %k", params->low, params->high);
     return params;
 }
 

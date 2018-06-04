@@ -17,7 +17,7 @@ void *param_generator_normal_clipped_initialize(address_t *region) {
     spin1_memcpy(
         params, *region, sizeof(struct param_generator_normal_clipped));
     *region += sizeof(struct param_generator_normal_clipped) >> 2;
-    log_info(
+    log_debug(
         "normal clipped mu = %k, sigma = %k, low = %k, high = %k",
         params->mu, params->sigma, params->low, params->high);
     return params;

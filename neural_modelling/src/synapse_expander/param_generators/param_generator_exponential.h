@@ -13,7 +13,7 @@ void *param_generator_exponential_initialize(address_t *region) {
             spin1_malloc(sizeof(struct param_generator_exponential));
     spin1_memcpy(params, *region, sizeof(struct param_generator_exponential));
     *region += sizeof(struct param_generator_exponential) >> 2;
-    log_info("exponential beta = %k", params->beta);
+    log_debug("exponential beta = %k", params->beta);
     return params;
 }
 

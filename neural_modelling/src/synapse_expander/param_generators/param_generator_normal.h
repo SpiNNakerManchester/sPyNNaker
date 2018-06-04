@@ -14,7 +14,7 @@ void *param_generator_normal_initialize(address_t *region) {
             spin1_malloc(sizeof(struct param_generator_normal));
     spin1_memcpy(params, *region, sizeof(struct param_generator_normal));
     *region += sizeof(struct param_generator_normal) >> 2;
-    log_info("normal mu = %k, sigma = %k", params->mu, params->sigma);
+    log_debug("normal mu = %k, sigma = %k", params->mu, params->sigma);
     return params;
 }
 

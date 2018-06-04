@@ -18,7 +18,7 @@ void *param_generator_normal_clipped_boundary_initialize(address_t *region) {
         params, *region,
         sizeof(struct param_generator_normal_clipped_boundary));
     *region += sizeof(struct param_generator_normal_clipped_boundary) >> 2;
-    log_info(
+    log_debug(
         "normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
         params->mu, params->sigma, params->low, params->high);
     return params;

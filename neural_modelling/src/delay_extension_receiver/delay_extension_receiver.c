@@ -31,7 +31,7 @@ static void read_params(address_t address) {
     num_neurons = address[N_ATOMS];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
     num_delay_stages = address[N_DELAY_STAGES];
-    neuron_delay_stage_config = (bit_field_t *) address[DELAY_BLOCKS];
+    neuron_delay_stage_config = (bit_field_t *) &(address[DELAY_BLOCKS]);
 }
 
 // Sends an acknowledgement response to an SDP
@@ -47,6 +47,7 @@ static void send_ack_response(sdp_msg_t *msg) {
     while (!spin1_send_sdp_msg(msg, 10)) {
         // Do Nothing
     }
+    log_info("Sent ACK of %u", msg->cmd_rc);
 }
 
 // Handle an incoming SDP message
@@ -64,7 +65,6 @@ void handle_sdp_message(uint mailbox, uint port) {
         uint32_t source = (msg->srce_addr << 16) | (msg->srce_port & 0x1F);
 
         // Send a response to say the message was received
-        log_info("Received exit from 0x%04x, %u", msg->srce_addr, msg->srce_port);
         send_ack_response(msg);
 
         // Free the message as no longer needed
@@ -75,6 +75,7 @@ void handle_sdp_message(uint mailbox, uint port) {
         for (uint32_t i = 0; i < n_post_vertices_finished; i++) {
             if (source == post_vertices_finished[i]) {
                 seen = true;
+                log_info("Received exit from 0x%04x, %u", msg->srce_addr, msg->srce_port);
                 break;
             }
         }
@@ -95,14 +96,14 @@ void handle_sdp_message(uint mailbox, uint port) {
     }
 
     // Otherwise, continue reading
-    log_info("Reading %u delays from 0x%04x, %u",
+    log_debug("Reading %u delays from 0x%04x, %u",
             n_delays, msg->srce_addr, msg->srce_port);
 
     uint16_t *delays = (uint16_t *) &(data[2]);
     for (uint32_t i = 0; i < n_delays; i++) {
         uint8_t neuron_id = unpack_delay_index(delays[i]);
         uint8_t stage = unpack_delay_stage(delays[i]);
-        log_info(
+        log_debug(
             "Delay %u, source neuron id = %u, delay stage = %u",
             i, neuron_id, stage);
         bit_field_set(neuron_delay_stage_config[stage], neuron_id);
@@ -117,6 +118,8 @@ void handle_sdp_message(uint mailbox, uint port) {
 
 void c_main() {
 
+    log_info("Starting Delay Extension Receiver");
+
     // Process the parameters
     address_t core_address = data_specification_get_data_address();
     address_t delay_address = data_specification_get_region(
@@ -124,6 +127,6 @@ void c_main() {
     read_params(delay_address);
 
     // Wait for SDP messages
-    spin1_callback_on(SDP_PACKET_RX, handle_sdp_message, 1);
+    spin1_callback_on(SDP_PACKET_RX, handle_sdp_message, 0);
     spin1_start(SYNC_NOWAIT);
 }

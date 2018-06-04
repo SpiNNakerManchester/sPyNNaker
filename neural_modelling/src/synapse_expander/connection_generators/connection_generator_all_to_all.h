@@ -30,7 +30,7 @@ uint32_t connection_generator_all_to_all_generate(
     use(pre_slice_count);
     use(rng);
 
-    log_info("Generating for %u", pre_neuron_index);
+    log_debug("Generating for %u", pre_neuron_index);
 
     struct all_to_all *params = (struct all_to_all *) data;
 
@@ -46,7 +46,7 @@ uint32_t connection_generator_all_to_all_generate(
         // ... unless this is a self connection and these are disallowed
         if (!params->allow_self_connections &&
                 (pre_neuron_index == (post_slice_start + i))) {
-            log_info("Not generating for post %u", post_slice_start + i);
+            log_debug("Not generating for post %u", post_slice_start + i);
             continue;
         }
         indices[n_conns++] = i;

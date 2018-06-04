@@ -6,12 +6,12 @@
 #include <delay_extension/delay_extension.h>
 
 extern void spin1_wfi();
+extern void configure_timer1(uint time, uint phase);
 
-#define SLEEP_TIME 10000
+#define TIMER_TICK_VALUE 1000000
 #define MAX_DELAYS_PER_PACKET 127
 #define MAX_SEQUENCE 0xFFFF
 
-static uint16_t delay_response_received = MAX_SEQUENCE;
 static sdp_msg_t delay_message;
 static uint16_t *delay_message_sequence;
 static uint16_t *delay_message_n_delays;
@@ -21,14 +21,25 @@ static uint16_t core_id;
 static uint16_t delays[MAX_DELAYS_PER_PACKET];
 static uint32_t n_delays;
 static uint16_t sequence = MAX_SEQUENCE;
+static bool response_received = false;
 
 static void _handle_sdp_message(uint mailbox, uint sdp_port) {
     use(sdp_port);
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
     uint16_t *data = (uint16_t *) &(msg->cmd_rc);
-    log_info("\t\tACK received for sequence %u, waiting for %u", data[0], sequence);
-    delay_response_received = data[0];
+    log_info("\t\tACK %u from 0x%04x %u, waiting for %u from 0x%04x %u", data[0], msg->srce_addr, msg->srce_port, sequence, delay_message.dest_addr, delay_message.dest_port);
+    if (data[0] == sequence && msg->srce_addr == delay_message.dest_addr &&
+            msg->srce_port == delay_message.dest_port) {
+        response_received = true;
+    }
     spin1_msg_free(msg);
+}
+
+static void _handle_timeout(uint unused0, uint unused1) {
+    // Does Nothing - just used to detect timeout
+    use(unused0);
+    use(unused1);
+    log_info("Timeout");
 }
 
 void delay_sender_initialize(uint32_t delay_chip, uint32_t delay_core) {
@@ -48,26 +59,34 @@ void delay_sender_initialize(uint32_t delay_chip, uint32_t delay_core) {
     delay_message_n_delays = &(data[1]);
     delay_message_delays = &(data[2]);
 
+    spin1_set_timer_tick(TIMER_TICK_VALUE + (spin1_get_core_id() * 3));
+
     spin1_callback_on(SDP_PACKET_RX, _handle_sdp_message, 0);
+    spin1_callback_on(TIMER_TICK, _handle_timeout, -1);
 }
 
 static void wait_for_delay_response() {
 
+    log_info("Waiting for response %u", sequence);
+
     // Wait until the response to the last message has been received
-    while (delay_response_received != sequence) {
+    while (!response_received) {
 
         // Wait for a time for a response
-        log_info("Waiting for response %u from last delay message", sequence);
+        spin1_resume(SYNC_NOWAIT);
         spin1_wfi();
+        spin1_pause();
 
         // Re-send the message
-        if (delay_response_received != sequence) {
-            spin1_send_sdp_msg(&delay_message, 1);
+        if (!response_received) {
+            log_info("Sending message");
+            while (!spin1_send_sdp_msg(&delay_message, 10)) {
+
+                // Do Nothing
+            }
+            log_info("Message Sent");
         }
     }
-
-    // Move on to the next sequence
-    sequence = sequence + 1;
 }
 
 void delay_sender_flush() {
@@ -88,6 +107,8 @@ void delay_sender_flush() {
             sizeof(sdp_hdr_t) + sizeof(uint16_t) + sizeof(uint16_t) +
             (sizeof(uint16_t) * n_delays_in_packet);
 
+        response_received = false;
+        sequence = sequence + 1;
         *delay_message_sequence = sequence;
         *delay_message_n_delays = n_delays_in_packet;
         spin1_memcpy(
@@ -113,6 +134,8 @@ void delay_sender_close() {
         delay_sender_flush();
         wait_for_delay_response();
     }
+    sequence = sequence + 1;
+    response_received = false;
     log_info("Sending end message %u to 0x%04x, %u", sequence, chip_id, core_id);
     *delay_message_sequence = sequence;
     *delay_message_n_delays = 0;
@@ -120,4 +143,6 @@ void delay_sender_close() {
         sizeof(sdp_hdr_t) + sizeof(uint16_t) + sizeof(uint16_t);
     spin1_send_sdp_msg(&delay_message, 1);
     wait_for_delay_response();
+    spin1_callback_off(SDP_PACKET_RX);
+    spin1_callback_off(TIMER_TICK);
 }

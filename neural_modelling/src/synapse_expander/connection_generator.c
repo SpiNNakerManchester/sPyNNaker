@@ -67,7 +67,6 @@ connection_generator_t connection_generator_init(
         if (hash == connection_generators[i].hash) {
 
             address_t region = *in_region;
-            log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
             struct connection_generator *generator = spin1_malloc(
                 sizeof(struct connection_generator));
             if (generator == NULL) {
