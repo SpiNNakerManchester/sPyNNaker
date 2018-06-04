@@ -20,7 +20,7 @@ struct param_generator_info {
     uint32_t hash;
     void* (*initialize)(address_t *region);
     void (*generate)(
-        void *data, uint32_t n_synapses, rng_t rng, uint32_t pre_neuron_index,
+        void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values);
     void (*free)(void *data);
 };
@@ -83,10 +83,10 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
 }
 
 void param_generator_generate(
-        param_generator_t generator, uint32_t n_indices, rng_t rng,
+        param_generator_t generator, uint32_t n_indices,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
     param_generators[generator->index].generate(
-        generator->data, n_indices, rng, pre_neuron_index, indices, values);
+        generator->data, n_indices, pre_neuron_index, indices, values);
 }
 
 void param_generator_free(param_generator_t generator) {

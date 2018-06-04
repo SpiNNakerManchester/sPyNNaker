@@ -151,14 +151,15 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        return numpy.array([
+        params = [
             self.allow_self_connections,
             round(decimal.Decimal(
-                str(self._p_connect)) * DataType.U032.scale)],
-            dtype="uint32")
+                str(self._p_connect)) * DataType.U032.scale)]
+        params.extend([int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)])
+        return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 8
+        return 8 + 16

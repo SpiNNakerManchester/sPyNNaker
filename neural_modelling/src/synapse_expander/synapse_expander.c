@@ -2,7 +2,6 @@
 #include "matrix_generator.h"
 #include "connection_generator.h"
 #include "param_generator.h"
-#include "rng.h"
 #include "delay_sender.h"
 
 #include <spin1_api.h>
@@ -101,9 +100,6 @@ bool read_connection_builder_region(address_t *in_region,
     weight_generator = param_generator_init(weight_type_hash, &region);
     delay_generator = param_generator_init(delay_type_hash, &region);
 
-    // Read RNG parameters for this matrix
-    rng_t rng = rng_init(&region);
-
     *in_region = region;
 
     // If any components couldn't be created return false
@@ -138,13 +134,12 @@ bool read_connection_builder_region(address_t *in_region,
         post_slice_start, post_slice_count,
         pre_slice_start, pre_slice_count,
         connection_generator, delay_generator, weight_generator,
-        rng, max_stage, timestep_per_delay);
+        max_stage, timestep_per_delay);
 
     matrix_generator_free(matrix_generator);
     connection_generator_free(connection_generator);
     param_generator_free(weight_generator);
     param_generator_free(delay_generator);
-    rng_free(rng);
 
     if (!status) {
         log_error("\tMatrix generation failed");

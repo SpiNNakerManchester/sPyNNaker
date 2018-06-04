@@ -10,6 +10,7 @@ void *param_generator_constant_initialize(address_t *region) {
         (struct param_generator_constant *)
             spin1_malloc(sizeof(struct param_generator_constant));
     spin1_memcpy(&params->value, *region, sizeof(accum));
+    log_info("Constant value %k", params->value);
     *region += 1;
     return params;
 }
@@ -19,9 +20,8 @@ void param_generator_constant_free(void *data) {
 }
 
 void param_generator_constant_generate(
-        void *data, uint32_t n_synapses, rng_t rng, uint32_t pre_neuron_index,
+        void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
-    use(rng);
     use(pre_neuron_index);
     use(indices);
     struct param_generator_constant *params =

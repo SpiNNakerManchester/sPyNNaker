@@ -46,8 +46,7 @@ class GeneratorData(object):
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
                     connector.gen_weight_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes,
-                    connector.gen_rng_params_size_in_bytes))
+                    connector.gen_delay_params_size_in_bytes))
 
     @property
     def gen_data(self):
@@ -91,5 +90,4 @@ class GeneratorData(object):
             self._pre_vertex_slice, self._post_vertex_slice))
         items.append(connector.gen_delay_params(
             self._pre_vertex_slice, self._post_vertex_slice))
-        items.append(connector.gen_rng_params)
         return numpy.concatenate(items)

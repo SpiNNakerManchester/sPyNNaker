@@ -321,7 +321,6 @@ class SynapticManager(object):
                             connector.gen_delay_params_size_in_bytes,
                             connector.gen_weight_params_size_in_bytes,
                             connector.gen_connector_params_size_in_bytes,
-                            connector.gen_rng_params_size_in_bytes,
                             dynamics.gen_matrix_params_size_in_bytes
                         ))
         if gen_on_machine:
@@ -724,7 +723,7 @@ class SynapticManager(object):
         # to the master population table
         generator_data = list()
         order = numpy.arange(len(generate_on_machine))
-        numpy.random.shuffle(order)
+        # numpy.random.shuffle(order)
         for index in order:
             (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
                 app_edge, rinfo) = generate_on_machine[index]

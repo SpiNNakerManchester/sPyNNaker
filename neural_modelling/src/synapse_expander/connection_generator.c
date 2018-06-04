@@ -20,8 +20,7 @@ struct connection_generator_info {
     uint32_t (*generate)(
         void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, rng_t rng,
-        uint16_t *indices);
+        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
     void (*free)(void *data);
 };
 
@@ -87,11 +86,11 @@ uint32_t connection_generator_generate(
         connection_generator_t generator, uint32_t pre_slice_start,
         uint32_t pre_slice_count, uint32_t pre_neuron_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
-        uint32_t max_row_length, rng_t rng, uint16_t *indices) {
+        uint32_t max_row_length, uint16_t *indices) {
     return connection_generators[generator->index].generate(
         generator->data, pre_slice_start, pre_slice_count,
         pre_neuron_index, post_slice_start, post_slice_count,
-        max_row_length, rng, indices);
+        max_row_length, indices);
 }
 
 void connection_generator_free(connection_generator_t generator) {

@@ -86,7 +86,7 @@ bool matrix_generator_generate(
         uint32_t pre_slice_start, uint32_t pre_slice_count,
         connection_generator_t connection_generator,
         param_generator_t delay_generator, param_generator_t weight_generator,
-        rng_t rng, uint32_t max_stage, accum timestep_per_delay) {
+        uint32_t max_stage, accum timestep_per_delay) {
 
     uint32_t n_connections = 0;
     uint32_t pre_slice_end = pre_slice_start + pre_slice_count;
@@ -99,13 +99,13 @@ bool matrix_generator_generate(
         uint32_t n_indices = connection_generator_generate(
             connection_generator, pre_slice_start, pre_slice_count,
             pre_neuron_index, post_slice_start, post_slice_count,
-            max_n_synapses, rng, indices);
+            max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
         // Generate delays for each index
         accum delay_params[n_indices];
         param_generator_generate(
-            delay_generator, n_indices, rng, pre_neuron_index, indices,
+            delay_generator, n_indices, pre_neuron_index, indices,
             delay_params);
         uint16_t delays[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
@@ -122,7 +122,7 @@ bool matrix_generator_generate(
         // Generate weights for each index
         accum weight_params[n_indices];
         param_generator_generate(
-            weight_generator, n_indices, rng, pre_neuron_index, indices,
+            weight_generator, n_indices, pre_neuron_index, indices,
             weight_params);
         uint16_t weights[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {

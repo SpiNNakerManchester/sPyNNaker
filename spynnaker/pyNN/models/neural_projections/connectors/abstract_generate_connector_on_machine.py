@@ -70,16 +70,17 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            values = [
+            params = [
                 values.parameters.get(param, None) for param in parameters]
-            values = [
-                DataType.S1615.max if value == numpy.inf
-                else DataType.S1615.min if value == -numpy.inf else value
-                for value in values if value is not None]
-            values = [
-                round(decimal.Decimal(str(value)) * DataType.S1615.scale)
-                for value in values if value is not None]
-            return numpy.array(values, dtype="uint32")
+            params = [
+                DataType.S1615.max if param == numpy.inf
+                else DataType.S1615.min if param == -numpy.inf else param
+                for param in params if param is not None]
+            params = [
+                round(decimal.Decimal(str(param)) * DataType.S1615.scale)
+                for param in params if param is not None]
+            params.extend([int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)])
+            return numpy.array(params, dtype="uint32")
 
         raise ValueError("Unexpected value {}".format(values))
 
@@ -89,7 +90,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            return len(parameters) * 4
+            return (len(parameters) + 4) * 4
 
         raise ValueError("Unexpected value {}".format(values))
 
@@ -153,23 +154,6 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         :rtype: numpy array of uint32
         """
         return self._param_generator_params(self._delays)
-
-    @property
-    def gen_rng_params_size_in_bytes(self):
-        """ The size of the rng parameters in bytes
-
-        :rtype: int
-        """
-        return 16
-
-    @property
-    def gen_rng_params(self):
-        """ Get the parameters of the rng on the machine
-
-        :rtype: numpy array of uint32
-        """
-        return numpy.array(
-            [int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)], dtype="uint32")
 
     @property
     def gen_delay_params_size_in_bytes(self):

@@ -275,15 +275,16 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             synapse_type):
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
-        return numpy.array([
+        params = [
             self._allow_self_connections,
             self._with_replacement,
             n_connections,
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms],
-            dtype="uint32")
+            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms]
+        params.extend([int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)])
+        return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16
+        return 16 + 16

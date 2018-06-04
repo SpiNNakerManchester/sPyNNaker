@@ -21,7 +21,7 @@ static uint16_t core_id;
 static uint16_t delays[MAX_DELAYS_PER_PACKET];
 static uint32_t n_delays;
 static uint16_t sequence = MAX_SEQUENCE;
-static bool response_received = false;
+static bool response_received = true;
 
 static void _handle_sdp_message(uint mailbox, uint sdp_port) {
     use(sdp_port);
