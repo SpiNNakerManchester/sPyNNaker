@@ -8,31 +8,7 @@
 #include <data_specification.h>
 #include <debug.h>
 
-//#define DEBUG_MESSAGES
-#define SARK_HEAP 1
-
-//----------------------------------------------------------------------------
-// Module level variables
-//----------------------------------------------------------------------------
-#define SDRAM_TAG          140
-#define MESSAGES_SDRAM_TAG 200
-#define ID_DELAY_SDRAM_TAG 180
-#define CLEAR_MEMORY_FLAG 0x55555555
-#define SLEEP_TIME 10311
-
-//TODO*** define this somewhere else!
-#define BUILD_IN_MACHINE_PORT 1
-#define BUILD_IN_MACHINE_TAG  111
-#define MAX_N_DELAYS_PER_PACKET 100 // memory limits this
-#define MAX_RETRIES 20
-//TODO-END
-
 #define _unused(x) ((void)(x))
-
-matrix_generator_t matrix_generator;
-connection_generator_t connection_generator;
-param_generator_t weight_generator;
-param_generator_t delay_generator;
 
 bool delay_initialised = false;
 uint32_t last_delay_chip = 0xFFFFFFFF;
@@ -94,11 +70,14 @@ bool read_connection_builder_region(address_t *in_region,
     }
 
     // Generate matrix, connector, delays and weights
-    matrix_generator = matrix_generator_init(matrix_type_hash, &region);
-    connection_generator = connection_generator_init(connector_type_hash,
-        &region);
-    weight_generator = param_generator_init(weight_type_hash, &region);
-    delay_generator = param_generator_init(delay_type_hash, &region);
+    matrix_generator_t matrix_generator =
+        matrix_generator_init(matrix_type_hash, &region);
+    connection_generator_t connection_generator =
+        connection_generator_init(connector_type_hash, &region);
+    param_generator_t weight_generator =
+        param_generator_init(weight_type_hash, &region);
+    param_generator_t delay_generator =
+        param_generator_init(delay_type_hash, &region);
 
     *in_region = region;
 
