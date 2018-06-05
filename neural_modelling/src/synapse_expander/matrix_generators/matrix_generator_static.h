@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include <debug.h>
 #include <delay_extension/delay_extension.h>
-#include <synapse_expander/delay_sender.h>
 #include "matrix_generator_common.h"
 
 void *matrix_generator_static_initialize(address_t *region) {
@@ -98,9 +97,6 @@ void matrix_generator_static_write_row(
 
         // Delay
         struct delay_value delay = get_delay(delays[synapse], max_stage);
-        if (delay.stage > 0) {
-            delay_sender_send(pre_neuron_index, delay.stage - 1);
-        }
         if (write_address[delay.stage] == NULL) {
             log_error("Delay stage %u has not been initialised", delay.stage);
             rt_error(RTE_SWERR);

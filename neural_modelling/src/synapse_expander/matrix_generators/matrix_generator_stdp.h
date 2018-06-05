@@ -2,7 +2,6 @@
 #include <spin1_api.h>
 #include <debug.h>
 #include <delay_extension/delay_extension.h>
-#include <synapse_expander/delay_sender.h>
 #include "matrix_generator_common.h"
 
 struct matrix_generator_stdp {
@@ -124,9 +123,6 @@ void matrix_generator_stdp_write_row(
 
         // Delay (mostly to get the stage)
         struct delay_value delay = get_delay(delays[synapse], max_stage);
-        if (delay.stage > 0) {
-            delay_sender_send(pre_neuron_index, delay.stage - 1);
-        }
 
         // Put the weight words in place
         if (pp_address[delay.stage] == NULL) {

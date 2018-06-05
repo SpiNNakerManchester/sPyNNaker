@@ -308,6 +308,19 @@ class SynapticManager(object):
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
+
+                    # Get the number of likely vertices
+                    max_atoms = sys.maxsize
+                    edge_pre_vertex = in_edge.pre_vertex
+                    if (isinstance(
+                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+                        max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                    if in_edge.pre_vertex.n_atoms < max_atoms:
+                        max_atoms = in_edge.pre_vertex.n_atoms
+                    n_edge_vertices = int(math.ceil(
+                        float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+
+                    # Get the size
                     connector = synapse_info.connector
                     dynamics = synapse_info.synapse_dynamics
                     connector_gen = isinstance(
@@ -316,13 +329,14 @@ class SynapticManager(object):
                         dynamics, AbstractGenerateOnMachine)
                     if connector_gen and synapse_gen:
                         gen_on_machine = True
-                        size += sum((
+                        gen_size = sum((
                             GeneratorData.BASE_SIZE,
                             connector.gen_delay_params_size_in_bytes,
                             connector.gen_weight_params_size_in_bytes,
                             connector.gen_connector_params_size_in_bytes,
                             dynamics.gen_matrix_params_size_in_bytes
                         ))
+                        size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
             size += self._synapse_type.get_n_synapse_types() * 4
@@ -774,6 +788,17 @@ class SynapticManager(object):
                     app_edge.n_delay_stages, self._poptable_type,
                     machine_time_step, app_edge)
 
+        if n_bytes_delayed > 0 and app_edge.delay_edge is not None:
+            app_edge.delay_edge.pre_vertex.add_generator_data(
+                undelayed_max_synapses, delayed_max_synapses,
+                pre_slices, pre_slice_index, post_slices, post_slice_index,
+                pre_vertex_slice, post_vertex_slice, synapse_info,
+                app_edge.n_delay_stages + 1, machine_time_step)
+        elif n_bytes_delayed != 0:
+            raise Exception(
+                "Found delayed items but no delay "
+                "machine edge for {}".format(app_edge.label))
+
         # Skip over the normal bytes and write a master pop entry
         synaptic_matrix_offset = 0xFFFFFFFF
         if n_bytes_undelayed:
@@ -822,15 +847,12 @@ class SynapticManager(object):
                     block_addr, all_syn_block_sz))
 
         # Get additional data for the synapse expander
-        delay_placement = self._delay_placement_index.get((
-            app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-            pre_vertex_slice.hi_atom))
         generator_data.append(GeneratorData(
             synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             undelayed_max_n_words, delayed_max_n_words, undelayed_max_synapses,
             delayed_max_synapses, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            delay_placement, synapse_info, app_edge.n_delay_stages + 1,
+            synapse_info, app_edge.n_delay_stages + 1,
             machine_time_step))
         self._gen_on_machine = True
 

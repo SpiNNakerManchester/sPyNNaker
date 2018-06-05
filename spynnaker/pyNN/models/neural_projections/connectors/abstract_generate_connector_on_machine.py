@@ -45,6 +45,18 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
     """ Indicates that the connectivity can be generated on the machine
     """
 
+    __slots__ = [
+        "_delay_seed",
+        "_weight_seed",
+        "_connector_seed"
+    ]
+
+    def __init__(self, safe=True, verbose=False):
+        AbstractConnector.__init__(self, safe=safe, verbose=verbose)
+        self._delay_seed = dict()
+        self._weight_seed = dict()
+        self._connector_seed = dict()
+
     def _generate_lists_on_machine(self, values):
         """ Checks if the connector should generate lists on machine rather\
             than trying to generate the connectivity data on host, based on\
@@ -62,7 +74,23 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         return False
 
-    def _param_generator_params(self, values):
+    def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
+        key = (id(pre_vertex_slice), id(post_vertex_slice))
+        if key not in self._connector_seed:
+            self._connector_seed[key] = [
+                int(i * 0xFFFFFFFF) for i in rng.next(n=4)]
+        return self._connector_seed[key]
+
+    def _generate_param_seed(
+            self, pre_vertex_slice, post_vertex_slice, values, seeds):
+        if not get_simulator().is_a_pynn_random(values):
+            return None
+        key = (id(pre_vertex_slice), id(post_vertex_slice))
+        if key not in seeds:
+            seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
+        return seeds[key]
+
+    def _param_generator_params(self, values, seed):
         if numpy.isscalar(values):
             return numpy.array(
                 [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
@@ -79,7 +107,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
             params = [
                 round(decimal.Decimal(str(param)) * DataType.S1615.scale)
                 for param in params if param is not None]
-            params.extend([int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)])
+            params.extend(seed)
             return numpy.array(params, dtype="uint32")
 
         raise ValueError("Unexpected value {}".format(values))
@@ -130,7 +158,10 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         :rtype: numpy array of uint32
         """
-        return self._param_generator_params(self._weights)
+        seed = self._generate_param_seed(
+            pre_vertex_slice, post_vertex_slice, self._weights,
+            self._weight_seed)
+        return self._param_generator_params(self._weights, seed)
 
     @property
     def gen_weight_params_size_in_bytes(self):
@@ -153,7 +184,10 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         :rtype: numpy array of uint32
         """
-        return self._param_generator_params(self._delays)
+        seed = self._generate_param_seed(
+            pre_vertex_slice, post_vertex_slice, self._delays,
+            self._delay_seed)
+        return self._param_generator_params(self._delays, seed)
 
     @property
     def gen_delay_params_size_in_bytes(self):

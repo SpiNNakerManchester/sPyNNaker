@@ -155,7 +155,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self.allow_self_connections,
             round(decimal.Decimal(
                 str(self._p_connect)) * DataType.U032.scale)]
-        params.extend([int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)])
+        params.extend(self._get_connector_seed(
+            pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
 
     @property

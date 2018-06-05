@@ -1,6 +1,8 @@
 #ifndef __MATRIX_GENERATOR_COMMON_H__
 #define __MATRIX_GENERATOR_COMMON_H__
 
+#include <debug.h>
+
 #define MAX_DELAY 16
 
 struct delay_value {

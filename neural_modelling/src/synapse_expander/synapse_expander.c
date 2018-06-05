@@ -2,17 +2,12 @@
 #include "matrix_generator.h"
 #include "connection_generator.h"
 #include "param_generator.h"
-#include "delay_sender.h"
 
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
 
 #define _unused(x) ((void)(x))
-
-bool delay_initialised = false;
-uint32_t last_delay_chip = 0xFFFFFFFF;
-uint32_t last_delay_core = 0xFFFFFFFF;
 
 uint32_t max_matrix_size(uint32_t max_n_static, uint32_t max_n_plastic,
         uint32_t plastic_header) {
@@ -44,8 +39,6 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t max_delayed_row_n_synapses = *region++;
     const uint32_t pre_slice_start = *region++;
     const uint32_t pre_slice_count = *region++;
-    const uint32_t delay_chip = *region++;
-    const uint32_t delay_core = *region++;
     const uint32_t max_stage = *region++;
     accum timestep_per_delay;
     spin1_memcpy(&timestep_per_delay, region++, sizeof(accum));
@@ -55,19 +48,6 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t connector_type_hash = *region++;
     const uint32_t weight_type_hash = *region++;
     const uint32_t delay_type_hash = *region++;
-
-    // Set up to send delays
-    if (delay_chip != 0xFFFFFFFF && delay_core != 0xFFFFFFFF) {
-        if (delay_chip != last_delay_chip || delay_core != last_delay_core) {
-            if (delay_initialised) {
-                delay_sender_close();
-            }
-            delay_sender_initialize(delay_chip, delay_core);
-            last_delay_chip = delay_chip;
-            last_delay_core = delay_core;
-            delay_initialised = true;
-        }
-    }
 
     // Generate matrix, connector, delays and weights
     matrix_generator_t matrix_generator =
@@ -166,11 +146,6 @@ void _start_expander(uint params_address, uint syn_mtx_addr) {
             (address_t) params_address, (address_t) syn_mtx_addr)) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);
-    }
-
-    if (delay_initialised) {
-        log_info("Closing delay");
-        delay_sender_close();
     }
     spin1_exit(0);
 }

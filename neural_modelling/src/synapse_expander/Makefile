@@ -1,7 +1,10 @@
-APP = synapse_expander
-BUILD_DIR = build/
-SOURCES = delay_sender.c rng.c param_generator.c connection_generator.c matrix_generator.c synapse_expander.c
+APPS = delay_expander.mk synapse_expander.mk
 
-include ../common.mk
+all: $(APPS)
+	for f in $(APPS); do $(MAKE) -f $$f || exit $$?; done
 
-CFLAGS += -I$(NEURAL_MODELLING_DIRS)/src
+%.aplx: %.mk
+	"$(MAKE)" -f $*
+
+clean: $(DIRS)
+	for f in $(APPS); do $(MAKE) -f $$f clean || exit $$?; done
