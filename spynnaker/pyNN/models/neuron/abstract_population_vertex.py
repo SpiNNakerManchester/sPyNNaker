@@ -1010,6 +1010,5 @@ class AbstractPopulationVertex(
     def __repr__(self):
         return self.__str__()
 
-    @property
-    def gen_on_machine(self):
-        return self._synapse_manager.gen_on_machine
+    def gen_on_machine(self, vertex_slice):
+        return self._synapse_manager.gen_on_machine(vertex_slice)

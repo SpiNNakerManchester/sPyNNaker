@@ -2,6 +2,7 @@ import logging
 import math
 import random
 import sys
+from collections import defaultdict
 
 from spinn_utilities.overrides import overrides
 
@@ -45,7 +46,7 @@ _DELAY_PARAM_HEADER_WORDS = 7
 _DEFAULT_MALLOCS_USED = 2
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
-_EXPANDER_BASE_PARAMS_SIZE = 2 * 4
+_EXPANDER_BASE_PARAMS_SIZE = 3 * 4
 
 
 class DelayExtensionVertex(
@@ -77,7 +78,7 @@ class DelayExtensionVertex(
         self._source_vertex = source_vertex
         self._n_delay_stages = 0
         self._delay_per_stage = delay_per_stage
-        self._delay_generator_data = list()
+        self._delay_generator_data = defaultdict(list)
 
         # atom store
         self._n_atoms = n_neurons
@@ -146,11 +147,13 @@ class DelayExtensionVertex(
             max_stage, machine_time_step):
         """ Add delays for a connection to be generated
         """
-        self._delay_generator_data.append(DelayGeneratorData(
-            max_row_n_synapses, max_delayed_row_n_synapses,
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
-            pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, machine_time_step))
+        key = (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom)
+        self._delay_generator_data[key].append(
+            DelayGeneratorData(
+                max_row_n_synapses, max_delayed_row_n_synapses,
+                pre_slices, pre_slice_index, post_slices, post_slice_index,
+                pre_vertex_slice, post_vertex_slice,
+                synapse_information, max_stage, machine_time_step))
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -221,17 +224,19 @@ class DelayExtensionVertex(
             self._n_vertices, machine_time_step, time_scale_factor,
             n_outgoing_edges)
 
-        if self._delay_generator_data:
-            expander_size = sum(
-                data.size for data in self._delay_generator_data)
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        if key in self._delay_generator_data:
+            generator_data = self._delay_generator_data[key]
+            expander_size = sum(data.size for data in generator_data)
             expander_size += _EXPANDER_BASE_PARAMS_SIZE
             spec.reserve_memory_region(
                 region=_DELEXT_REGIONS.EXPANDER_REGION.value,
                 size=expander_size, label='delay_expander')
             spec.switch_write_focus(_DELEXT_REGIONS.EXPANDER_REGION.value)
+            spec.write_value(len(generator_data))
             spec.write_value(vertex_slice.lo_atom)
             spec.write_value(vertex_slice.n_atoms)
-            for data in self._delay_generator_data:
+            for data in generator_data:
                 spec.write_array(data.gen_data)
 
         # End-of-Spec:
@@ -369,6 +374,6 @@ class DelayExtensionVertex(
     def get_outgoing_partition_constraints(self, partition):
         return [ContiguousKeyRangeContraint()]
 
-    @property
-    def gen_on_machine(self):
-        return len(self._delay_generator_data) > 0
+    def gen_on_machine(self, vertex_slice):
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        return key in self._delay_generator_data

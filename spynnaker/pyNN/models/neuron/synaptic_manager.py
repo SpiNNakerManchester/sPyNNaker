@@ -151,9 +151,8 @@ class SynapticManager(object):
         # TODO: Hard-coded to 0 to disable as currently broken!
         self._one_to_one_connection_dtcm_max_bytes = 0
 
-        # Whether to generate on machine or not (assumed true for all
-        # machine vertices when the app vertex says so)
-        self._gen_on_machine = False
+        # Whether to generate on machine or not for a given vertex slice
+        self._gen_on_machine = dict()
 
     @property
     def synapse_dynamics(self):
@@ -854,7 +853,8 @@ class SynapticManager(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_info, app_edge.n_delay_stages + 1,
             machine_time_step))
-        self._gen_on_machine = True
+        key = (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom)
+        self._gen_on_machine[key] = True
 
         return block_addr
 
@@ -1265,8 +1265,8 @@ class SynapticManager(object):
         for data in generator_data:
             spec.write_array(data.gen_data)
 
-    @property
-    def gen_on_machine(self):
+    def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
         """
-        return self._gen_on_machine
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        return self._gen_on_machine.get(key, False)

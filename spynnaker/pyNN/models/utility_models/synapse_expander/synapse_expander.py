@@ -28,11 +28,12 @@ def synapse_expander(
         # Find population vertices
         if isinstance(
                 vertex, (AbstractPopulationVertex, DelayExtensionVertex)):
-            if vertex.gen_on_machine:
 
-                # Add all machine vertices of the population vertex to ones
-                # that need synapse expansion
-                for m_vertex in graph_mapper.get_machine_vertices(vertex):
+            # Add all machine vertices of the population vertex to ones
+            # that need synapse expansion
+            for m_vertex in graph_mapper.get_machine_vertices(vertex):
+                vertex_slice = graph_mapper.get_slice(m_vertex)
+                if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     if isinstance(vertex, AbstractPopulationVertex):
                         binary = synapse_expander
@@ -57,9 +58,9 @@ def synapse_expander(
         progress.end()
     except Exception:
         logger.exception("Synapse expander has failed")
-    finally:
         _handle_failure(
             expander_cores, transceiver, provenance_file_path)
+    finally:
         transceiver.stop_application(expander_app_id)
         transceiver.app_id_tracker.free_id(expander_app_id)
 

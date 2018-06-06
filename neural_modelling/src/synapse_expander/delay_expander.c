@@ -103,7 +103,6 @@ bool read_delay_builder_region(address_t *in_region,
 bool read_sdram_data(
         address_t delay_params_address, address_t params_address) {
 
-    uint32_t n_out_edges = delay_params_address[N_OUTGOING_EDGES];
     uint32_t num_neurons = delay_params_address[N_ATOMS];
     uint32_t neuron_bit_field_words = get_bit_field_size(num_neurons);
     uint32_t n_stages = delay_params_address[N_DELAY_STAGES];
@@ -118,6 +117,7 @@ bool read_sdram_data(
         clear_bit_field(neuron_delay_stage_config[d], neuron_bit_field_words);
     }
 
+    uint32_t n_out_edges = *params_address++;
     uint32_t pre_slice_start = *params_address++;
     uint32_t pre_slice_count = *params_address++;
 
