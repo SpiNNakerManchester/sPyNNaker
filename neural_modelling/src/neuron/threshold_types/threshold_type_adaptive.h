@@ -2,13 +2,14 @@
 #define _THRESHOLD_TYPE_STATIC_H_
 
 #include "threshold_type.h"
+#include <neuron/decay.h>
 
 typedef struct threshold_type_t {
 
     // The value of the static threshold
     REAL threshold_value;
     REAL threshold_resting;
-    REAL threshold_decay;
+    decay_t threshold_decay;
     REAL threshold_adaptation;
 } threshold_type_t;
 
@@ -16,7 +17,7 @@ typedef struct threshold_type_t {
 void _print_threshold_params(threshold_type_pointer_t threshold_type){
 	log_info("threshold_value: %k, "
 			"threhsold_resting: %k, "
-			"threshold_decay: %k, "
+			"threshold_decay: %u, "
 			"threshold_adaptation: %k",
 			threshold_type->threshold_value,
 			threshold_type->threshold_resting,

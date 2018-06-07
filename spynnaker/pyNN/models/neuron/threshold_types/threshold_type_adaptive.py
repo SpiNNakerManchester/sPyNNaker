@@ -19,7 +19,7 @@ V_THRESH_ADAPT = "v_thresh_adaptation"
 class _ADAPTIVE_TYPES(Enum):
     V_THRESH = (1, DataType.S1615) # instantaneous threshold level
     V_THRESH_RESTING = (2, DataType.S1615) # baseline threshold
-    EXP_THRESH_TAU = (3, DataType.S1615) # time constant for
+    EXP_THRESH_TAU = (3, DataType.UINT32) # time constant for
                                          # threshold to decay back to baseline
     V_THRESH_ADAPT = (4, DataType.S1615) # Adaptation on spiking
 
@@ -96,9 +96,10 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def _exp_thresh_tau(self, machine_time_step):
+        ulfract = pow(2, 32)
         return self._data[V_THRESH_TAU].apply_operation(
             operation=lambda x: numpy.exp(
-                float(-machine_time_step) / (1000.0 * x)))
+                float(-machine_time_step) / (1000.0 * x)) * ulfract)
 
 
     @overrides(AbstractThresholdType.get_threshold_parameters)
