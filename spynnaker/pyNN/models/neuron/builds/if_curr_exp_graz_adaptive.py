@@ -2,7 +2,7 @@ from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFire
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeAdaptive
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
@@ -23,7 +23,7 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
 
         # Adaptive threshold parameters
         'v_thresh': -50.0, 'v_thresh_resting': -50,
-        'v_thresh_tau': 5, 'v_thresh_adaptation': 20,
+        'v_thresh_tau': 100, 'v_thresh_adaptation': 50,
 
         'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
         'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
@@ -40,7 +40,7 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
             tau_m=default_parameters['tau_m'],
             cm=default_parameters['cm'],
             v_rest=default_parameters['v_rest'],
-#             v_reset=default_parameters['v_reset'],
+            v_reset=default_parameters['v_reset'],
 
             #Adaptive threshold parameters
             v_thresh=default_parameters['v_thresh'],
@@ -71,7 +71,7 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
 
         super(IFCurrExpGrazAdaptive, self).__init__(
             n_neurons=n_neurons, binary="IF_curr_exp_graz_adaptive.aplx", label=label,
-            max_atoms_per_core=IFCurrExpBase._model_based_max_atoms_per_core,
+            max_atoms_per_core=IFCurrExpGrazAdaptive._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
@@ -85,7 +85,7 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExpBase._model_based_max_atoms_per_core
+        return IFCurrExpGrazAdaptive._model_based_max_atoms_per_core
 
     @property
     def isyn_exc(self):
