@@ -536,7 +536,6 @@ void neuron_do_timestep_update(timer_t time) {
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
         indexes_t* indexes = &indexes_array[neuron_index];
 
         // Get the parameters for this neuron
@@ -548,8 +547,9 @@ void neuron_do_timestep_update(timer_t time) {
             &additional_input_array[neuron_index];
         state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
-        // record this neuron parameter. Just as cheap to set then to gate
-        voltages->states[indexes->v] = voltage;
+    	log_info("time: %u, old V: %k", time, voltage);
+//        // record this neuron parameter. Just as cheap to set then to gate
+//        voltages->states[indexes->v] = voltage;
 
         // Get excitatory and inhibitory input from synapses and convert it
         // to current input
@@ -576,7 +576,7 @@ void neuron_do_timestep_update(timer_t time) {
         // record these neuron parameter. Just as cheap to set then to gate
         inputs_excitatory->inputs[indexes->exc].input = total_exc;
         inputs_inhibitory->inputs[indexes->inh].input = // total_inh;
-        		threshold_type->threshold_value;
+        		threshold_type->B;
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
@@ -591,21 +591,27 @@ void neuron_do_timestep_update(timer_t time) {
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
 
+
+        REAL old_B = threshold_type->B;
+
+        // ******* Changed for GRAZ ********
+        // Determine if a spike should occur using old state
+        bool spike = threshold_type_is_above_threshold(voltage, threshold_type);
+
         // Update neuron parameters
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
             NUM_INHIBITORY_RECEPTORS, inh_syn_input,
             external_bias, neuron);
 
-        // Determine if a spike should occur
-        bool spike = threshold_type_is_above_threshold(result, threshold_type);
+        // *********************************
 
         // If the neuron has spiked
         if (spike) {
             //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
-            neuron_model_has_spiked(neuron);
+            neuron_model_has_spiked(neuron, threshold_type, old_B);
 
             // Tell the additional input
             additional_input_has_spiked(additional_input);
@@ -615,6 +621,8 @@ void neuron_do_timestep_update(timer_t time) {
 
             // Record the spike
             out_spikes_set_spike(indexes->spike);
+
+            log_info("neruon spiked at time: %u", time);
 
             if (use_key) {
 
@@ -637,6 +645,10 @@ void neuron_do_timestep_update(timer_t time) {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
          }
+
+        // record this neuron parameter. Just as cheap to set then to gate
+        voltages->states[indexes->v] =
+        		neuron_model_get_membrane_voltage(neuron);
     }
 
     // Disable interrupts to avoid possible concurrent access

@@ -92,7 +92,8 @@ state_t neuron_model_state_update(
     return neuron->V;
 }
 
-void neuron_model_has_spiked(neuron_pointer_t neuron) {
+void neuron_model_has_spiked(neuron_pointer_t neuron,
+		threshold_type_pointer_t threshold_type) {
 
     // reset membrane voltage
     neuron->V = neuron->C;

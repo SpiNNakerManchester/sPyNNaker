@@ -11,17 +11,23 @@ from data_specification.enums import DataType
 import numpy
 from enum import Enum
 
-V_THRESH = "v_thresh"
-V_THRESH_RESTING = "v_thresh_resting"
-V_THRESH_TAU = "v_thresh_tau"
-V_THRESH_ADAPT = "v_thresh_adaptation"
+BIG_B = "B"
+SMALL_B = "small_b"
+SMALL_B_0 = "small_b_0"
+TAU_A = "tau_a"
+BETA = "beta"
+ADPT = "adpt"
+Z = "z"
+
 
 class _ADAPTIVE_TYPES(Enum):
-    V_THRESH = (1, DataType.S1615) # instantaneous threshold level
-    V_THRESH_RESTING = (2, DataType.S1615) # baseline threshold
-    EXP_THRESH_TAU = (3, DataType.UINT32) # time constant for
-                                         # threshold to decay back to baseline
-    V_THRESH_ADAPT = (4, DataType.S1615) # Adaptation on spiking
+    BIG_B = (1, DataType.S1615) # instantaneous threshold level
+    SMALL_B = (2, DataType.S1615) # small b
+    SMALL_B_0 = (3, DataType.S1615) # baseline threshold
+    E_TO_DT_ON_TAU = (4, DataType.UINT32) # decay multiplier
+    BETA  = (5, DataType.S1615) # Adaptation on spiking
+    ADPT = (6, DataType.S1615) # beta/tau_a
+    Z = (7, DataType.S1615) # has spiked?
 
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
@@ -40,82 +46,110 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
         back to baseline with time
     """
 
-    def __init__(self, n_neurons, v_thresh,
-                 v_thresh_resting, v_thresh_tau, v_thresh_adaptation):
+    def __init__(self, n_neurons, B, small_b, small_b_0, tau_a, beta):
         AbstractThresholdType.__init__(self)
         AbstractContainsUnits.__init__(self)
 
-        self._units = {V_THRESH: "mV",
-                       V_THRESH_RESTING: "mV",
-                       V_THRESH_TAU: "ms",
-                       V_THRESH_ADAPT: "mV"}
+        self._units = {BIG_B: "mV",
+                       SMALL_B: "mV",
+                       SMALL_B_0: "mV",
+                       TAU_A: "ms",
+                       BETA: "NA",
+                       ADPT: "mv",
+                       Z: "NA"}
 
         self._n_neurons = n_neurons
         self._data = SpynakkerRangeDictionary(size=n_neurons)
-        self._data[V_THRESH] = v_thresh
-        self._data[V_THRESH_RESTING] = v_thresh_resting
-        self._data[V_THRESH_TAU] = v_thresh_tau
-        self._data[V_THRESH_ADAPT] = v_thresh_adaptation
+        self._data[BIG_B] = B
+        self._data[SMALL_B] = small_b
+        self._data[SMALL_B_0] = small_b_0
+        self._data[TAU_A] = tau_a
+        self._data[BETA] = beta
+        self._data[Z] = 0 # always initialized to zero
+
+
 
 
     @property
-    def v_thresh(self):
-        return self._data[V_THRESH]
+    def thresh_B(self):
+        return self._data[BIG_B]
 
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self._data.set_value(key=V_THRESH, value=v_thresh)
-
-    @property
-    def v_thresh_resting(self):
-        return self._data[V_THRESH_RESTING]
-
-    @v_thresh_resting.setter
-    def v_thresh_resting(self, v_thresh_resting):
-        self._data.set_value(key=V_THRESH_RESTING, value=v_thresh_resting)
+    @thresh_B.setter
+    def thresh_B(self, B):
+        self._data.set_value(key=BIG_B, value=B)
 
     @property
-    def v_thresh_tau(self):
-        return self._data[V_THRESH_TAU]
+    def thresh_b(self):
+        return self._data[SMALL_B]
 
-    @v_thresh_tau.setter
-    def v_thresh_tau(self, v_thresh_tau):
-        self._data.set_value(key=V_THRESH_TAU, value=v_thresh_tau)
+    @thresh_b.setter
+    def thresh_b(self, thresh_b):
+        self._data.set_value(key=SMALL_B, value=thresh_b)
 
     @property
-    def v_thresh_adaptation(self):
-        return self._data[V_THRESH_ADAPT]
+    def thresh_b_0(self):
+        return self._data[SMALL_B_0]
 
-    @v_thresh_adaptation.setter
-    def v_thresh_adaptation(self, v_thresh_adaptation):
-        self._data.set_value(key=V_THRESH_ADAPT, value=v_thresh_adaptation)
+    @thresh_b_0.setter
+    def thresh_b_0(self, thresh_b_0):
+        self._data.set_value(key=SMALL_B_0, value=thresh_b_0)
+
+    @property
+    def thresh_tau_a(self):
+        return self._data[TAU_A]
+
+    @thresh_tau_a.setter
+    def thresh_tau_a(self, thresh_tau_a):
+        self._data.set_value(key=TAU_A, value=thresh_tau_a)
+
+    @property
+    def thresh_beta(self):
+        return self._data[BETA]
+
+    @thresh_beta.setter
+    def thresh_beta(self, thesh_beta):
+        self._data.set_value(key=BETA, value=thresh_beta)
+
 
     @overrides(AbstractThresholdType.get_n_threshold_parameters)
     def get_n_threshold_parameters(self):
-        return 4
+        return 7
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def _exp_thresh_tau(self, machine_time_step):
         ulfract = pow(2, 32)
-        return self._data[V_THRESH_TAU].apply_operation(
+        return self._data[TAU_A].apply_operation(
             operation=lambda x: numpy.exp(
                 float(-machine_time_step) / (1000.0 * x)) * ulfract)
 
+    def _calc_adpt(self):
+        return self._data[BETA]/self._data[TAU_A]
+        #.apply_operation(
+        #   operation=lambda x: x/self._data[TAU_A])
 
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
         return [
-            NeuronParameter(self._data[V_THRESH],
-                            _ADAPTIVE_TYPES.V_THRESH.data_type),
+            NeuronParameter(self._data[BIG_B],
+                            _ADAPTIVE_TYPES.BIG_B.data_type),
 
-            NeuronParameter(self._data[V_THRESH_RESTING],
-                            _ADAPTIVE_TYPES.V_THRESH_RESTING.data_type),
+            NeuronParameter(self._data[SMALL_B],
+                            _ADAPTIVE_TYPES.SMALL_B.data_type),
+
+            NeuronParameter(self._data[SMALL_B_0],
+                            _ADAPTIVE_TYPES.SMALL_B_0.data_type),
 
             NeuronParameter(self._exp_thresh_tau(),
-                            _ADAPTIVE_TYPES.EXP_THRESH_TAU.data_type),
+                            _ADAPTIVE_TYPES.E_TO_DT_ON_TAU.data_type),
 
-            NeuronParameter(self._data[V_THRESH_ADAPT],
-                            _ADAPTIVE_TYPES.V_THRESH_ADAPT.data_type),
+            NeuronParameter(self._data[BETA],
+                            _ADAPTIVE_TYPES.BETA.data_type),
+
+            NeuronParameter(self._calc_adpt(),
+                            _ADAPTIVE_TYPES.ADPT.data_type),
+
+            NeuronParameter(self._data[Z],
+                            _ADAPTIVE_TYPES.Z.data_type),
         ]
 
     @overrides(AbstractThresholdType.get_threshold_parameter_types)

@@ -22,8 +22,12 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
         'tau_m': 20.0, 'cm': 1.0, 'v_rest': -65.0, 'v_reset': -65.0,
 
         # Adaptive threshold parameters
-        'v_thresh': -50.0, 'v_thresh_resting': -50,
-        'v_thresh_tau': 100, 'v_thresh_adaptation': 50,
+        'thresh_B': 10,
+        "thresh_b": 0,
+        "thresh_b_0": 10,
+        "thresh_tau_a": 500,
+        "thresh_beta": 1.8,
+
 
         'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
         'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
@@ -43,10 +47,11 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
             v_reset=default_parameters['v_reset'],
 
             #Adaptive threshold parameters
-            v_thresh=default_parameters['v_thresh'],
-            v_thresh_resting=default_parameters['v_thresh_resting'],
-            v_thresh_tau=default_parameters['v_thresh_tau'],
-            v_thresh_adaptation=default_parameters['v_thresh_adaptation'],
+            thresh_B=default_parameters['thresh_B'],
+            thresh_b=default_parameters['thresh_b'],
+            thresh_b_0=default_parameters['thresh_b_0'],
+            thresh_tau_a=default_parameters['thresh_tau_a'],
+            thresh_beta=default_parameters['thresh_beta'],
 
             tau_syn_E=default_parameters['tau_syn_E'],
             tau_syn_I=default_parameters['tau_syn_I'],
@@ -66,8 +71,12 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
 
         input_type = InputTypeCurrent()
 
-        threshold_type = ThresholdTypeAdaptive(n_neurons, v_thresh,
-                        v_thresh_resting, v_thresh_tau, v_thresh_adaptation)
+        threshold_type = ThresholdTypeAdaptive(n_neurons,
+                                               thresh_B,
+                                               thresh_b,
+                                               thresh_b_0,
+                                               thresh_tau_a,
+                                               thresh_beta)
 
         super(IFCurrExpGrazAdaptive, self).__init__(
             n_neurons=n_neurons, binary="IF_curr_exp_graz_adaptive.aplx", label=label,

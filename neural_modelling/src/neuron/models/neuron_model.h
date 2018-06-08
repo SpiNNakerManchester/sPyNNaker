@@ -7,6 +7,7 @@
 #define _NEURON_MODEL_H_
 
 #include <common/neuron-typedefs.h>
+#include "../threshold_types/threshold_type.h"
 
 //! Forward declaration of neuron type (creates a definition for a pointer to a
 //   Neuron parameter struct
@@ -43,7 +44,8 @@ state_t neuron_model_state_update(
 //! \brief Indicates that the neuron has spiked
 //! \param[in] neuron pointer to a neuron parameter struct which contains all
 //!     the parameters for a specific neuron
-void neuron_model_has_spiked(neuron_pointer_t neuron);
+void neuron_model_has_spiked(neuron_pointer_t neuron,
+		threshold_type_pointer_t threshold_type, REAL old_B);
 
 //! \brief get the neuron membrane voltage for a given neuron parameter set
 //! \param[in] neuron a pointer to a neuron parameter struct which contains
