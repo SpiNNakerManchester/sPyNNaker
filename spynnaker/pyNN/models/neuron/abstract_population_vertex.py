@@ -227,7 +227,7 @@ class AbstractPopulationVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "n_machine_time_steps": "MinimumAutoTimeSteps",
+        "n_machine_time_steps": "PlanNTimeSteps",
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
@@ -545,19 +545,19 @@ class AbstractPopulationVertex(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "tags": "MemoryTags",
-        "n_machine_time_steps": "TotalMachineTimeSteps"
+        "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info", "tags",
-            "n_machine_time_steps"
+            "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            tags, n_machine_time_steps):
+            tags, data_n_time_steps):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -588,7 +588,7 @@ class AbstractPopulationVertex(
             constants.POPULATION_BASED_REGIONS.RECORDING.value)
         ip_tags = tags.get_ip_tags_for_vertex(vertex)
         recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
+            self._get_buffered_sdram(vertex_slice, data_n_time_steps),
             self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes, self._time_between_requests,
