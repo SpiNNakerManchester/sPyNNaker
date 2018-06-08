@@ -11,8 +11,6 @@ from spinn_front_end_common.interface.provenance \
     import ProvidesProvenanceDataFromMachineImpl
 from spinn_front_end_common.interface.buffer_management.buffer_models \
     import AbstractReceiveBuffersToHost
-from spinn_front_end_common.interface.buffer_management \
-    import recording_utilities
 
 from spynnaker.pyNN.utilities.constants \
     import LIVE_POISSON_CONTROL_PARTITION_ID

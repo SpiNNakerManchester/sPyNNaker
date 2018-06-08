@@ -236,7 +236,6 @@ class AbstractPopulationVertex(
             "graph", "n_machine_time_steps", "machine_time_step"
         }
     )
-
     def get_resources_used_by_atoms(
             self, vertex_slice, graph, n_machine_time_steps,
             machine_time_step):
