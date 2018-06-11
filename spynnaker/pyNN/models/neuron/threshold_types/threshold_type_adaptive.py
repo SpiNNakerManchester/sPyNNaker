@@ -17,7 +17,6 @@ SMALL_B_0 = "small_b_0"
 TAU_A = "tau_a"
 BETA = "beta"
 ADPT = "adpt"
-Z = "z"
 
 
 class _ADAPTIVE_TYPES(Enum):
@@ -26,8 +25,7 @@ class _ADAPTIVE_TYPES(Enum):
     SMALL_B_0 = (3, DataType.S1615) # baseline threshold
     E_TO_DT_ON_TAU = (4, DataType.UINT32) # decay multiplier
     BETA  = (5, DataType.S1615) # Adaptation on spiking
-    ADPT = (6, DataType.S1615) # beta/tau_a
-    Z = (7, DataType.S1615) # has spiked?
+    ADPT = (6, DataType.UINT32) # beta/tau_a
 
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
@@ -55,8 +53,7 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
                        SMALL_B_0: "mV",
                        TAU_A: "ms",
                        BETA: "NA",
-                       ADPT: "mv",
-                       Z: "NA"}
+                       ADPT: "mv"}
 
         self._n_neurons = n_neurons
         self._data = SpynakkerRangeDictionary(size=n_neurons)
@@ -65,9 +62,6 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
         self._data[SMALL_B_0] = small_b_0
         self._data[TAU_A] = tau_a
         self._data[BETA] = beta
-        self._data[Z] = 0 # always initialized to zero
-
-
 
 
     @property
@@ -113,19 +107,21 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
 
     @overrides(AbstractThresholdType.get_n_threshold_parameters)
     def get_n_threshold_parameters(self):
-        return 7
+        return 6
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    def _exp_thresh_tau(self, machine_time_step):
+    @inject_items({"machine_timestep": "MachineTimeStep"})
+    def _exp_thresh_tau(self, machine_timestep):
         ulfract = pow(2, 32)
         return self._data[TAU_A].apply_operation(
             operation=lambda x: numpy.exp(
-                float(-machine_time_step) / (1000.0 * x)) * ulfract)
+                float(-machine_timestep) / (1000.0 * x)) * ulfract)
 
-    def _calc_adpt(self):
-        return self._data[BETA]/self._data[TAU_A]
-        #.apply_operation(
-        #   operation=lambda x: x/self._data[TAU_A])
+    @inject_items({"machine_timestep": "MachineTimeStep"})
+    def _calc_adpt(self, machine_timestep):
+        ulfract = pow(2,32)
+        return self._data[TAU_A].apply_operation(
+            operation=lambda x: (1 - numpy.exp(
+                float(-machine_timestep) / (1000.0 * x))) * ulfract)
 
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):
@@ -148,8 +144,6 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
             NeuronParameter(self._calc_adpt(),
                             _ADAPTIVE_TYPES.ADPT.data_type),
 
-            NeuronParameter(self._data[Z],
-                            _ADAPTIVE_TYPES.Z.data_type),
         ]
 
     @overrides(AbstractThresholdType.get_threshold_parameter_types)
@@ -157,8 +151,6 @@ class ThresholdTypeAdaptive(AbstractThresholdType, AbstractContainsUnits):
         return [item.data_type for item in _ADAPTIVE_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self):
-
-        # Just a comparison, but 2 just in case!
         return 10
 
     @overrides(AbstractContainsUnits.get_units)

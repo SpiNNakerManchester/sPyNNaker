@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
 typedef struct neuron_t {
+
     // membrane voltage [mV]
     REAL     V_membrane;
 
@@ -31,6 +32,15 @@ typedef struct neuron_t {
 
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
+
+    // Neuron spike train
+    REAL z;
+
+    // refractory multiplier - to allow evolution of neuronal dynamics during
+    // refractory period
+    REAL A;
+
+
 } neuron_t;
 
 typedef struct global_neuron_params_t {

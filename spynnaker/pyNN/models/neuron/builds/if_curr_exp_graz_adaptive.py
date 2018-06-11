@@ -1,5 +1,5 @@
 from spynnaker.pyNN.models.neuron.neuron_models \
-    import NeuronModelLeakyIntegrateAndFire
+    import NeuronModelLeakyIntegrateAndFireGrazAdaptive
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeAdaptive
@@ -62,7 +62,7 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
             isyn_inh=default_parameters['isyn_inh']):
         # pylint: disable=too-many-arguments, too-many-locals
 
-        neuron_model = NeuronModelLeakyIntegrateAndFire(
+        neuron_model = NeuronModelLeakyIntegrateAndFireGrazAdaptive(
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
 

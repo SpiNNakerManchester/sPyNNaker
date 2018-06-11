@@ -4,12 +4,14 @@
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
-        neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
+        neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep, input_t B_t) {
 
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
+	// include threshold_reset contribution gated by z
+    // (which a was gated by A at previous update)
+    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev)) - neuron->z * B_t;
 }
 
 void neuron_model_set_global_neuron_params(
@@ -22,31 +24,35 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
-		input_t external_bias, neuron_pointer_t neuron) {
+		input_t external_bias, neuron_pointer_t neuron,
+		input_t B_t) {
 
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
 
+	REAL total_exc = 0;
+	REAL total_inh = 0;
+
+	for (int i=0; i < num_excitatory_inputs; i++){
+		total_exc += exc_input[i];
+	}
+	for (int i=0; i< num_inhibitory_inputs; i++){
+		total_inh += inh_input[i];
+	}
+    // Get the input in nA
+    input_t input_this_timestep =
+        total_exc - total_inh + external_bias + neuron->I_offset;
+
+    _lif_neuron_closed_form(
+        neuron, neuron->V_membrane, input_this_timestep, B_t);
+
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
-		REAL total_exc = 0;
-		REAL total_inh = 0;
-
-		for (int i=0; i < num_excitatory_inputs; i++){
-			total_exc += exc_input[i];
-		}
-		for (int i=0; i< num_inhibitory_inputs; i++){
-			total_inh += inh_input[i];
-		}
-        // Get the input in nA
-        input_t input_this_timestep =
-            total_exc - total_inh + external_bias + neuron->I_offset;
-
-        _lif_neuron_closed_form(
-            neuron, neuron->V_membrane, input_this_timestep);
+    	// Allow spiking again
+    	neuron->A = 1;
     } else {
-
+    	// Neuron cannot fire, as neuron->A=0;
         // countdown refractory timer
         neuron->refract_timer -= 1;
     }
@@ -54,17 +60,14 @@ state_t neuron_model_state_update(
     return neuron->V_membrane;
 }
 
-void neuron_model_has_spiked(neuron_pointer_t neuron,
-		threshold_type_pointer_t threshold_type, REAL old_B) {
-
-    // reset membrane voltage
-    neuron->V_membrane -= old_B;
+void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset z to zero
-    threshold_type->z = 0;
+    neuron->z = 0;
 
     // reset refractory timer
     neuron->refract_timer  = neuron->T_refract;
+    neuron->A = 0;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {

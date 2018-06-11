@@ -12,4 +12,7 @@ typedef struct threshold_type_t* threshold_type_pointer_t;
 static bool threshold_type_is_above_threshold(
     state_t value, threshold_type_pointer_t threshold_type);
 
+static void threshold_type_update_threshold(state_t z,
+		threshold_type_pointer_t threshold_type);
+
 #endif // _THRESHOLD_TYPE_H_

@@ -39,13 +39,13 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, input_t* exc_input,
         uint16_t num_inhibitory_inputs, input_t* inh_input,
-        input_t external_bias, neuron_pointer_t neuron);
+        input_t external_bias, neuron_pointer_t neuron,
+		input_t B_t);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in] neuron pointer to a neuron parameter struct which contains all
 //!     the parameters for a specific neuron
-void neuron_model_has_spiked(neuron_pointer_t neuron,
-		threshold_type_pointer_t threshold_type, REAL old_B);
+void neuron_model_has_spiked(neuron_pointer_t neuron);
 
 //! \brief get the neuron membrane voltage for a given neuron parameter set
 //! \param[in] neuron a pointer to a neuron parameter struct which contains

@@ -13,8 +13,8 @@ typedef struct threshold_type_t {
     REAL b_0; // small b^0
     decay_t e_to_dt_on_tau_a; // rho
     REAL beta;
-    REAL adpt; // beta/tau_a
-    REAL z; // has spiked at time=t
+    decay_t adpt; // beta/tau_a
+
 } threshold_type_t;
 
 
@@ -24,43 +24,44 @@ static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 			"b_0: %k, "
 			"e_to_dt_on_tau_a: %u, "
 			"beta: %k, "
-			"adpt: %k, "
-			"z: %k",
+			"adpt: %u, ",
 			threshold_type->B,
 			threshold_type->b,
 			threshold_type->b_0,
 			threshold_type->e_to_dt_on_tau_a,
 			threshold_type->beta,
-			threshold_type->adpt,
-			threshold_type->z);
+			threshold_type->adpt
+			);
 }
 
 
 static inline bool threshold_type_is_above_threshold(state_t value,
                         threshold_type_pointer_t threshold_type) {
 
+	// test for exceeding threshold at previous timestep
+
+    return false;
+}
+
+static inline void threshold_type_update_threshold(state_t z,
+		threshold_type_pointer_t threshold_type){
+
 	_print_threshold_params(threshold_type);
 
-	// test for exceeding threshold at previous timestep
-	bool crossed_at_previous = REAL_COMPARE(value, >=, threshold_type->B);
-
-	// calculate z from previous timestep
-	if (crossed_at_previous){
-		// Set z=1 for use on next timestep
-		threshold_type->z=1;
-	}
-
-	// Evolve threshold dynamics (decay to baseline)
+	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
 	// Update small b (same regardless of spike - uses z from previous timestep)
 	threshold_type->b =
 			decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a)
-			+ (1k - decay_s1615(1k,threshold_type->e_to_dt_on_tau_a)) * 1000 * threshold_type->z;
-//			+ (threshold_type->adpt) * threshold_type->z;
+			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
+//			+ (1k - decay_s1615(1k,threshold_type->e_to_dt_on_tau_a))
+//			* 1000 // factor of 1000 for range scaling
+			* z; // stored on neuron
 
 	// Update large B
-	threshold_type->B = threshold_type->b_0 + threshold_type->beta*threshold_type->b;
+	threshold_type->B = threshold_type->b_0 +
+			threshold_type->beta*threshold_type->b;
 
-    return crossed_at_previous;
 }
+
 
 #endif // _THRESHOLD_TYPE_ADAPTIVE_H_

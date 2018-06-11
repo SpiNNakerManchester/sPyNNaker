@@ -16,6 +16,10 @@
 #include <recording.h>
 #include <debug.h>
 
+
+#include "threshold_types/threshold_type_adaptive.h"
+#include "models/neuron_model_lif_graz_adaptive_impl.h"
+
 // declare spin1_wfi
 void spin1_wfi();
 
@@ -545,9 +549,18 @@ void neuron_do_timestep_update(timer_t time) {
             &threshold_type_array[neuron_index];
         additional_input_pointer_t additional_input =
             &additional_input_array[neuron_index];
-        state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
-    	log_info("time: %u, old V: %k", time, voltage);
+        // *********************************************************
+        // Cache variables from previous timestep
+        state_t voltage = neuron_model_get_membrane_voltage(neuron);
+        state_t B_t = threshold_type->B;
+        state_t z_t = neuron->z;
+
+    	log_info("time: %u, old V: %k, old B: %k, z_t: %k",
+    			time, voltage, B_t, z_t);
+        // *********************************************************
+
+// 		Swithced recording to end of timestep
 //        // record this neuron parameter. Just as cheap to set then to gate
 //        voltages->states[indexes->v] = voltage;
 
@@ -591,27 +604,34 @@ void neuron_do_timestep_update(timer_t time) {
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
 
+        // *********************************************************
+        // Update threshold
+        threshold_type_update_threshold(neuron->z, threshold_type);
 
-        REAL old_B = threshold_type->B;
-
-        // ******* Changed for GRAZ ********
-        // Determine if a spike should occur using old state
-        bool spike = threshold_type_is_above_threshold(voltage, threshold_type);
-
-        // Update neuron parameters
+        // Update neuron parameters (need z in here, so update after)
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
             NUM_INHIBITORY_RECEPTORS, inh_syn_input,
-            external_bias, neuron);
+            external_bias, neuron, B_t);
 
-        // *********************************
+        // Also update Z (including using refractory period information)
+        state_t nu = (voltage - B_t)/B_t;
+        if REAL_COMPARE(nu, >, ZERO){
+        	neuron->z = 1 * neuron->A;
+        }
+
+        // *********************************************************
+
+        // Record Z
+        // Record  V (just as cheap to set then to gate later)
+        voltages->states[indexes->v] = result;
 
         // If the neuron has spiked
-        if (spike) {
+        if (REAL_COMPARE(z_t, >, ZERO)) {
             //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Tell the neuron model
-            neuron_model_has_spiked(neuron, threshold_type, old_B);
+            neuron_model_has_spiked(neuron);
 
             // Tell the additional input
             additional_input_has_spiked(additional_input);
@@ -646,9 +666,7 @@ void neuron_do_timestep_update(timer_t time) {
                       neuron_index);
          }
 
-        // record this neuron parameter. Just as cheap to set then to gate
-        voltages->states[indexes->v] =
-        		neuron_model_get_membrane_voltage(neuron);
+
     }
 
     // Disable interrupts to avoid possible concurrent access
