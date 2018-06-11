@@ -52,7 +52,7 @@ class DelayGeneratorData(object):
             self._post_vertex_slice.lo_atom,
             self._post_vertex_slice.n_atoms,
             self._max_stage,
-            (decimal.Decimal(str(float(self._machine_time_step) / 1000.0)) *
+            (decimal.Decimal(str(1000.0 / float(self._machine_time_step))) *
              DataType.S1615.scale),
             connector.gen_connector_id,
             connector.gen_delays_id],

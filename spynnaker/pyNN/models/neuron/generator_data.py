@@ -65,7 +65,7 @@ class GeneratorData(object):
             self._pre_vertex_slice.lo_atom,
             self._pre_vertex_slice.n_atoms,
             self._max_stage,
-            (decimal.Decimal(str(float(self._machine_time_step) / 1000.0)) *
+            (decimal.Decimal(str(1000.0 / float(self._machine_time_step))) *
              DataType.S1615.scale),
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
