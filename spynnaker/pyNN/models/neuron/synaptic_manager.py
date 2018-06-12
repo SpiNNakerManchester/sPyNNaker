@@ -658,11 +658,10 @@ class SynapticManager(object):
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
-        order = numpy.arange(len(generate_on_machine))
         # numpy.random.shuffle(order)
-        for index in order:
+        for gen_data in generate_on_machine:
             (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
-                app_edge, rinfo) = generate_on_machine[index]
+                app_edge, rinfo) = gen_data
             block_addr = self.__generate_on_chip_data(
                 spec, synapse_info,
                 pre_slices, pre_slice_idx, post_slices,
