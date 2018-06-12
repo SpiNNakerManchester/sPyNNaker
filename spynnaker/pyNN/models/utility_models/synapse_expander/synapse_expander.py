@@ -5,6 +5,7 @@ from spinnman.model.enums import CPUState
 import logging
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.progress_bar import ProgressBar
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +70,16 @@ def synapse_expander(
                 "The synapse expander failed to complete")
 
 
+def _extract_iobuf(expander_cores, transceiver, provenance_file_path):
+    io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
+    for io_buf in io_buffers:
+        file_path = os.path.join(
+            provenance_file_path, "expander_{}_{}_{}.txt".format(
+                io_buf.x, io_buf.y, io_buf.p))
+        with open(file_path, "w") as writer:
+            writer.write(io_buf.iobuf)
+
+
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
     """
     :param executable_targets:
@@ -80,6 +91,4 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
     error_cores = transceiver.get_cores_not_in_state(
         core_subsets, [CPUState.RUNNING, CPUState.FINISHED])
     logger.error(transceiver.get_core_status_string(error_cores))
-    io_buffers = transceiver.get_iobuf(core_subsets)
-    for io_buf in io_buffers:
-        logger.error("\n" + str(io_buf))
+    _extract_iobuf(expander_cores, transceiver, provenance_file_path)
