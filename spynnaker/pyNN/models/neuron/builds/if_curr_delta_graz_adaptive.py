@@ -1,6 +1,6 @@
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFireGrazAdaptive
-from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeAdaptive
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -10,7 +10,7 @@ DEFAULT_MAX_ATOMS_PER_CORE = 255
 _apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
 
 
-class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
+class IFCurrDeltaGrazAdaptive(AbstractPopulationVertex):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input, and adaptive threshold which increases on spiking
         before decaying back to a baseline threshold.
@@ -28,9 +28,11 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
         "thresh_tau_a": 500,
         "thresh_beta": 1.8,
 
+#         'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
+        'tau_refrac': 0.1, 'i_offset': 0,
 
-        'tau_syn_E': 5.0, 'tau_syn_I': 5.0,
-        'tau_refrac': 0.1, 'i_offset': 0, 'isyn_exc': 0.0, 'isyn_inh': 0.0}
+        # Synapse type parameters
+        'isyn_exc': 0.0, 'isyn_inh': 0.0}
 
     initialize_parameters = {'v_init': None}
 
@@ -53,8 +55,8 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
             thresh_tau_a=default_parameters['thresh_tau_a'],
             thresh_beta=default_parameters['thresh_beta'],
 
-            tau_syn_E=default_parameters['tau_syn_E'],
-            tau_syn_I=default_parameters['tau_syn_I'],
+#             tau_syn_E=default_parameters['tau_syn_E'],
+#             tau_syn_I=default_parameters['tau_syn_I'],
             tau_refrac=default_parameters['tau_refrac'],
             i_offset=default_parameters['i_offset'],
             v_init=initialize_parameters['v_init'],
@@ -66,8 +68,10 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
             n_neurons, v_init, v_rest, tau_m, cm, i_offset,
             v_reset, tau_refrac)
 
-        synapse_type = SynapseTypeExponential(
-            n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
+        synapse_type = SynapseTypeDelta(
+            n_neurons=n_neurons, initial_input_inh=isyn_inh,
+            initial_input_exc=isyn_exc)
+
 
         input_type = InputTypeCurrent()
 
@@ -78,23 +82,23 @@ class IFCurrExpGrazAdaptive(AbstractPopulationVertex):
                                                thresh_tau_a,
                                                thresh_beta)
 
-        super(IFCurrExpGrazAdaptive, self).__init__(
-            n_neurons=n_neurons, binary="IF_curr_exp_graz_adaptive.aplx", label=label,
-            max_atoms_per_core=IFCurrExpGrazAdaptive._model_based_max_atoms_per_core,
+        super(IFCurrDeltaGrazAdaptive, self).__init__(
+            n_neurons=n_neurons, binary="IF_curr_delta_graz_adaptive.aplx", label=label,
+            max_atoms_per_core=IFCurrDeltaGrazAdaptive._model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="IF_curr_exp_graz_adaptive", neuron_model=neuron_model,
+            model_name="IF_curr_delta_graz_adaptive", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type, constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-        IFCurrExpGrazAdaptive._model_based_max_atoms_per_core = new_value
+        IFCurrDeltaGrazAdaptive._model_based_max_atoms_per_core = new_value
 
     @staticmethod
     def get_max_atoms_per_core():
-        return IFCurrExpGrazAdaptive._model_based_max_atoms_per_core
+        return IFCurrDeltaGrazAdaptive._model_based_max_atoms_per_core
 
     @property
     def isyn_exc(self):

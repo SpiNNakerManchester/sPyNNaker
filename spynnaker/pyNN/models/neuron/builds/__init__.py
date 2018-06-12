@@ -11,10 +11,10 @@ from .izk_curr_exp_base import IzkCurrExpBase
 from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
-from .if_curr_exp_graz_adaptive import IFCurrExpGrazAdaptive
+from .if_curr_delta_graz_adaptive import IFCurrDeltaGrazAdaptive
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
-           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpGrazAdaptive"]
+           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrDeltaGrazAdaptive"]
