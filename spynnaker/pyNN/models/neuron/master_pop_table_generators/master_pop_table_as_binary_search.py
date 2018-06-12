@@ -7,7 +7,8 @@ from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
-from spynnaker.pyNN.exceptions import SynapseRowTooBigException
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException,\
+    SynapticConfigurationException
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 # general imports
@@ -84,6 +85,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     SINGLE_BIT_FLAG_BIT = 0x80000000
     ROW_LENGTH_MASK = 0xFF
     ADDRESS_MASK = 0x7FFFFF00
+    ADDRESS_SCALE = 16
+    ADDRESS_SCALED_SHIFT = 8 - 4
 
     def __init__(self):
         self._entries = None
@@ -168,6 +171,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
         """
+        next_address = (
+            (next_address + (self.ADDRESS_SCALE - 1)) //
+            self.ADDRESS_SCALE) * self.ADDRESS_SCALE
+        if (next_address / self.ADDRESS_SCALE) > 0x7FFFFF:
+            raise SynapticConfigurationException(
+                "Address {} is out of range for this population table!".format(
+                    hex(next_address)))
         return next_address
 
     def initialise_table(self, spec, master_population_table_region):
@@ -205,7 +215,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # if single, don' t add to start address as its going in its own block
         if not is_single:
-            start_addr = block_start_addr // 4
+            start_addr = block_start_addr // self.ADDRESS_SCALE
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
@@ -311,7 +321,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             if is_single:
                 address = address >> 8
             else:
-                address = address >> 6
+                address = address >> self.ADDRESS_SCALED_SHIFT
 
             addresses.append((row_length, address, is_single))
         return addresses
