@@ -586,10 +586,6 @@ void neuron_do_timestep_update(timer_t time) {
             total_inh += inh_syn_input[i];
         }
 
-        // record these neuron parameter. Just as cheap to set then to gate
-        inputs_excitatory->inputs[indexes->exc].input = total_exc;
-        inputs_inhibitory->inputs[indexes->inh].input = // total_inh;
-        		threshold_type->B;
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
@@ -612,7 +608,7 @@ void neuron_do_timestep_update(timer_t time) {
         state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_syn_input,
             NUM_INHIBITORY_RECEPTORS, inh_syn_input,
-            external_bias, neuron, B_t);
+            external_bias, neuron, threshold_type->B);
 
         // Also update Z (including using refractory period information)
         state_t nu = (voltage - B_t)/B_t;
@@ -621,12 +617,18 @@ void neuron_do_timestep_update(timer_t time) {
         }
 
         // *********************************************************
+        // Record updated state
+        // Record  V (just as cheap to set then to gate later)
+        voltages->states[indexes->v] = voltage; // result;
 
         // Record Z
-        // Record  V (just as cheap to set then to gate later)
-        voltages->states[indexes->v] = result;
+        inputs_excitatory->inputs[indexes->exc].input = z_t;
 
-        // If the neuron has spiked
+        // Record B
+        inputs_inhibitory->inputs[indexes->inh].input = B_t; // threshold_type->B;
+
+
+        // If the neuron spiked at previous tick
         if (REAL_COMPARE(z_t, >, ZERO)) {
             //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
