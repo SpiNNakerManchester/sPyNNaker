@@ -21,7 +21,7 @@ void *param_generator_uniform_initialize(address_t *region) {
         &(params->params), *region,
         sizeof(struct param_generator_uniform_params));
     *region += sizeof(struct param_generator_uniform_params) >> 2;
-    log_info("Uniform low = %k, high = %k",
+    log_debug("Uniform low = %k, high = %k",
         params->params.low, params->params.high);
     params->rng = rng_init(region);
     return params;

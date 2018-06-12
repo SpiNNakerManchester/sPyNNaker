@@ -1,6 +1,6 @@
 void *connection_generator_one_to_one_initialise(address_t *region) {
     use(region);
-    log_info("One to One connector");
+    log_debug("One to One connector");
     return NULL;
 }
 

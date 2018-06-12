@@ -21,7 +21,7 @@ void *param_generator_exponential_initialize(address_t *region) {
         (&params->params), *region,
         sizeof(struct param_generator_exponential_params));
     *region += sizeof(struct param_generator_exponential_params) >> 2;
-    log_info("exponential beta = %k", params->params.beta);
+    log_debug("exponential beta = %k", params->params.beta);
     params->rng = rng_init(region);
     return params;
 }

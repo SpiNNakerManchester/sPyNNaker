@@ -10,7 +10,7 @@ void *connection_generator_all_to_all_initialise(address_t *region) {
     address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct all_to_all));
     params_sdram = &(params_sdram[sizeof(struct all_to_all) >> 2]);
-    log_info("All to all connector, allow self connections = %u",
+    log_debug("All to all connector, allow self connections = %u",
             params->allow_self_connections);
 
     *region = params_sdram;

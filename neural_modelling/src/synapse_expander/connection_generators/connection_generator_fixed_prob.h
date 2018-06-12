@@ -19,7 +19,7 @@ void *connection_generator_fixed_prob_initialise(address_t *region) {
     params_sdram = &(params_sdram[sizeof(struct fixed_prob_params) >> 2]);
     params->rng = rng_init(&params_sdram);
     *region = params_sdram;
-    log_info(
+    log_debug(
         "Fixed Probability Connector, allow self connections = %u, "
         "probability = %k", params->params.allow_self_connections,
         (accum) params->params.probability);

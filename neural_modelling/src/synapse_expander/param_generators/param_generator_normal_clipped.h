@@ -24,7 +24,7 @@ void *param_generator_normal_clipped_initialize(address_t *region) {
         &(params->params), *region,
         sizeof(struct param_generator_normal_clipped_params));
     *region += sizeof(struct param_generator_normal_clipped_params) >> 2;
-    log_info(
+    log_debug(
         "normal clipped mu = %k, sigma = %k, low = %k, high = %k",
         params->params.mu, params->params.sigma, params->params.low,
         params->params.high);

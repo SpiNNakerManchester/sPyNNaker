@@ -10,7 +10,7 @@ void *param_generator_constant_initialize(address_t *region) {
         (struct param_generator_constant *)
             spin1_malloc(sizeof(struct param_generator_constant));
     spin1_memcpy(&params->value, *region, sizeof(accum));
-    log_info("Constant value %k", params->value);
+    log_debug("Constant value %k", params->value);
     *region += 1;
     return params;
 }

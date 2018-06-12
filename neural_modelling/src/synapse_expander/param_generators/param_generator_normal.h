@@ -22,7 +22,7 @@ void *param_generator_normal_initialize(address_t *region) {
         &(params->params), *region,
         sizeof(struct param_generator_normal_params));
     *region += sizeof(struct param_generator_normal_params) >> 2;
-    log_info("normal mu = %k, sigma = %k",
+    log_debug("normal mu = %k, sigma = %k",
         params->params.mu, params->params.sigma);
     params->rng = rng_init(region);
     return params;
