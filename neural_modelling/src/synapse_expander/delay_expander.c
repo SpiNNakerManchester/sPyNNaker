@@ -88,7 +88,7 @@ bool read_delay_builder_region(address_t *in_region,
             struct delay_value delay_value = get_delay(delays[i], max_stage);
             if (delay_value.stage > 0) {
                 bit_field_set(neuron_delay_stage_config[delay_value.stage - 1],
-                    pre_neuron_index);
+                    pre_neuron_index - pre_slice_start);
             }
         }
     }
@@ -121,7 +121,7 @@ bool read_sdram_data(
     uint32_t pre_slice_start = *params_address++;
     uint32_t pre_slice_count = *params_address++;
 
-    log_info("Generating %u delay edges for %u atoms starting at %u",
+    log_debug("Generating %u delay edges for %u atoms starting at %u",
         n_out_edges, pre_slice_count, pre_slice_start);
 
     for (uint32_t edge = 0; edge < n_out_edges; edge++) {
@@ -157,7 +157,7 @@ void c_main(void) {
 
     log_debug("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
 
-    log_info("Starting To Build Connectors");
+    log_info("Starting To Build Delays");
 
     address_t core_address = data_specification_get_data_address();
     address_t delay_params_address = data_specification_get_region(
@@ -174,5 +174,5 @@ void c_main(void) {
 
     spin1_start_paused();
 
-    log_info("Finished On Machine Connectors!");
+    log_info("Finished On Machine Delays!");
 }
