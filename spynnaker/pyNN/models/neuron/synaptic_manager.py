@@ -150,9 +150,6 @@ class SynapticManager(object):
         self._one_to_one_connection_dtcm_max_bytes = config.getint(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
-        # TODO: Hard-coded to 0 to disable as currently broken!
-        self._one_to_one_connection_dtcm_max_bytes = 0
-
         # Whether to generate on machine or not for a given vertex slice
         self._gen_on_machine = dict()
 
@@ -640,7 +637,10 @@ class SynapticManager(object):
                             connector, AbstractGenerateConnectorOnMachine) and
                             connector.generate_on_machine and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
-                            dynamics.generate_on_machine):
+                            dynamics.generate_on_machine and
+                            not self.__is_direct(
+                                single_addr, connector, pre_vertex_slice,
+                                post_vertex_slice)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_idx, app_edge, rinfo))
@@ -678,7 +678,7 @@ class SynapticManager(object):
             single_data = numpy.concatenate(single_synapses)
             spec.reserve_memory_region(
                 region=direct_matrix_region,
-                size=len(single_data * 4) + 4,
+                size=(len(single_data) * 4) + 4,
                 label='DirectMatrix')
             spec.switch_write_focus(direct_matrix_region)
             spec.write_value(len(single_data) * 4)
@@ -819,7 +819,8 @@ class SynapticManager(object):
 
         if row_data.size:
             block_addr, single_addr = self.__write_row_data(
-                spec, synapse_info, row_length, row_data, rinfo,
+                spec, synapse_info.connector, pre_vertex_slice,
+                post_vertex_slice, row_length, row_data, rinfo,
                 single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr)
         elif rinfo is not None:
@@ -839,7 +840,8 @@ class SynapticManager(object):
             delay_rinfo = self._delay_key_index[delay_key]
         if delayed_row_data.size:
             block_addr, single_addr = self.__write_row_data(
-                spec, synapse_info, delayed_row_length, delayed_row_data,
+                spec, synapse_info.connector, pre_vertex_slice,
+                post_vertex_slice, delayed_row_length, delayed_row_data,
                 delay_rinfo, single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr)
         elif delay_rinfo is not None:
@@ -854,14 +856,22 @@ class SynapticManager(object):
                     block_addr, all_syn_block_sz))
         return block_addr, single_addr
 
+    def __is_direct(
+            self, single_addr, connector, pre_vertex_slice, post_vertex_slice):
+        return (
+            isinstance(connector, OneToOneConnector) and
+            (single_addr + (pre_vertex_slice.n_atoms * 4) <=
+                self._one_to_one_connection_dtcm_max_bytes) and
+            (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
+            (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
+
     def __write_row_data(
-            self, spec, synapse_info, row_length, row_data, rinfo,
-            single_synapses, master_pop_table_region, synaptic_matrix_region,
+            self, spec, connector, pre_vertex_slice, post_vertex_slice,
+            row_length, row_data, rinfo, single_synapses,
+            master_pop_table_region, synaptic_matrix_region,
             block_addr, single_addr):
-        if (row_length == 1 and
-                isinstance(synapse_info.connector, OneToOneConnector) and
-                single_addr + len(row_data) <=
-                self._one_to_one_connection_dtcm_max_bytes):
+        if row_length == 1 and self.__is_direct(
+                single_addr, connector, pre_vertex_slice, post_vertex_slice):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             single_synapses.append(single_rows)
             self._poptable_type.update_master_population_table(
