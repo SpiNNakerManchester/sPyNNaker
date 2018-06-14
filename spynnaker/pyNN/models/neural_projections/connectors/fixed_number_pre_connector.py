@@ -4,6 +4,7 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 import numpy
 import logging
+import math
 
 logger = logging.getLogger(__file__)
 
@@ -136,13 +137,23 @@ class FixedNumberPreConnector(AbstractConnector):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
+        prob_selection = 1.0 / float(self._n_pre_neurons)
+        n_connections_total = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre * self._n_post_neurons, prob_selection,
+            chance=1.0/10000.0)
+        prob_in_slice = (
+            float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            n_connections_total, prob_in_slice)
 
         if min_delay is None or max_delay is None:
-            return post_vertex_slice.n_atoms
+            return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre * self._n_post_neurons,
-            post_vertex_slice.n_atoms, min_delay, max_delay)
+            self._n_pre_neurons * self._n_post_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):

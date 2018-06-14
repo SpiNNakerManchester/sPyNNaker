@@ -43,11 +43,11 @@ def n_in_slice(request):
         "FixedNumberPreConnector1-",
         "FixedNumberPostConnector1-",
         "FixedNumberPreConnector2-",
-        "FixedNumberPreConnector2-",
+        "FixedNumberPostConnector2-",
         "FixedNumberPreConnector5Replace-",
-        "FixedNumberPreConnector5Replace-",
+        "FixedNumberPostConnector5Replace-",
         "FixedNumberPreConnector20Replace-",
-        "FixedNumberPreConnector20Replace-",
+        "FixedNumberPostConnector20Replace-",
         "FixedProbabilityConnector0.1-",
         "FixedProbabilityConnector0.5-",
         "IndexBasedProbabilityConnector"]
@@ -139,11 +139,11 @@ def test_connectors(
             assert matrix_max_weight <= max_weight
             assert matrix_max_delay <= max_delay
         except Exception:
-            print(connector.__class__.__name__)
+            print(connector, n_pre, n_post, n_in_slice)
             print(max_row_length, max(source_histogram), source_histogram)
             print(max_col_length, max(target_histogram), target_histogram)
             print(max_weight, matrix_max_weight, synaptic_block["weight"])
             print(max_delay, matrix_max_delay, synaptic_block["delay"])
             raise
-    print(connector.__class__.__name__, n_pre, n_post, max_row_length,
+    print(connector, n_pre, n_post, n_in_slice, max_row_length,
           max_source, max_col_length, max_target)
