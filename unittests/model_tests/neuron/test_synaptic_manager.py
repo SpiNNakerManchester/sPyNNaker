@@ -232,15 +232,18 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_1.set_weights_and_delays(1.5, 1.0)
+        one_to_one_connector_1.set_weights_and_delays(
+            [1.5 for _ in range(10)], 1.0)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_2.set_weights_and_delays(2.5, 2.0)
+        one_to_one_connector_2.set_weights_and_delays(
+            [2.5 for _ in range(10)], 2.0)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector.set_weights_and_delays(4.5, 4.0)
+        all_to_all_connector.set_weights_and_delays(
+            [4.5 for _ in range(10) for _ in range(10)], 4.0)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, SynapseDynamicsStatic(), 0)
         direct_synapse_information_2 = SynapseInformation(
@@ -307,18 +310,21 @@ class TestSynapticManager(unittest.TestCase):
 
         master_pop_table = executor.get_region(0)
         synaptic_matrix = executor.get_region(1)
+        direct_matrix = executor.get_region(2)
 
         all_data = bytearray()
         all_data.extend(master_pop_table.region_data[
             :master_pop_table.max_write_pointer])
         all_data.extend(synaptic_matrix.region_data[
             :synaptic_matrix.max_write_pointer])
+        all_data.extend(direct_matrix.region_data[
+            :direct_matrix.max_write_pointer])
         master_pop_table_address = 0
         synaptic_matrix_address = master_pop_table.max_write_pointer
-        direct_synapses_address = struct.unpack_from(
-            "<I", synaptic_matrix.region_data)[0]
-        direct_synapses_address += synaptic_matrix_address + 8
-        indirect_synapses_address = synaptic_matrix_address + 4
+        direct_synapses_address = (
+            synaptic_matrix_address + synaptic_matrix.max_write_pointer)
+        direct_synapses_address += 4
+        indirect_synapses_address = synaptic_matrix_address
         placement = Placement(None, 0, 0, 1)
         transceiver = MockTransceiverRawData(all_data)
 
@@ -332,9 +338,7 @@ class TestSynapticManager(unittest.TestCase):
         # the second is potentially direct, but has been restricted by the
         # restriction on the size of the direct matrix
         assert len(items) == 3
-
-        # TODO: This has been changed because direct matrices are disabled!
-        assert not items[0][2]
+        assert items[0][2]
         assert not items[1][2]
         assert not items[2][2]
 
