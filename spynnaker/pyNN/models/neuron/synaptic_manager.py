@@ -1,5 +1,4 @@
 import math
-import binascii
 import scipy.stats  # @UnresolvedImport
 import struct
 import sys
@@ -43,24 +42,6 @@ from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 
 TIME_STAMP_BYTES = 4
-
-DEFAULT_CONN_PARAMS_KEYS = {
-    'uniform': ['low', 'high'],
-    'normal':  ['mean', 'std_dev'],
-    'normal_clipped': ['mean', 'std_dev', 'low', 'high'],
-    'exponential': ['beta']
-}
-
-DEFAULT_CONN_PARAMS_VALS = {
-    'constants': {'values': 1.},
-    'uniform': {'low': 0., 'high': 1.},
-    'normal':  {'mean': 0., 'std_dev': 1.},
-    'normal_clipped': {'mean': 0., 'std_dev': 1., 'low':  0., 'high': 0.5},
-    'exponential': {'beta': 1.}
-}
-STATIC_HASH = numpy.uint32(binascii.crc32("StaticSynapticMatrix"))
-PLASTIC_HASH = numpy.uint32(binascii.crc32("PlasticSynapticMatrix"))
-MAX_32 = numpy.uint32(0xFFFFFFFF)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
