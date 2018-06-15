@@ -621,7 +621,7 @@ class SynapticManager(object):
                             dynamics.generate_on_machine and
                             not self.__is_direct(
                                 single_addr, connector, pre_vertex_slice,
-                                post_vertex_slice)):
+                                post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_idx, app_edge, rinfo))
@@ -803,7 +803,7 @@ class SynapticManager(object):
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, row_length, row_data, rinfo,
                 single_synapses, master_pop_table_region,
-                synaptic_matrix_region, block_addr, single_addr)
+                synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -824,7 +824,7 @@ class SynapticManager(object):
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, delayed_row_length, delayed_row_data,
                 delay_rinfo, single_synapses, master_pop_table_region,
-                synaptic_matrix_region, block_addr, single_addr)
+                synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif delay_rinfo is not None:
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
@@ -838,8 +838,10 @@ class SynapticManager(object):
         return block_addr, single_addr
 
     def __is_direct(
-            self, single_addr, connector, pre_vertex_slice, post_vertex_slice):
+            self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
+            app_edge):
         return (
+            app_edge.n_delay_stages == 0 and
             isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self._one_to_one_connection_dtcm_max_bytes) and
@@ -850,9 +852,10 @@ class SynapticManager(object):
             self, spec, connector, pre_vertex_slice, post_vertex_slice,
             row_length, row_data, rinfo, single_synapses,
             master_pop_table_region, synaptic_matrix_region,
-            block_addr, single_addr):
+            block_addr, single_addr, app_edge):
         if row_length == 1 and self.__is_direct(
-                single_addr, connector, pre_vertex_slice, post_vertex_slice):
+                single_addr, connector, pre_vertex_slice, post_vertex_slice,
+                app_edge):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             single_synapses.append(single_rows)
             self._poptable_type.update_master_population_table(
@@ -1018,7 +1021,7 @@ class SynapticManager(object):
             transceiver)
         direct_synapses = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            transceiver)
+            transceiver) + 4
         return master_pop_table, direct_synapses, synaptic_matrix
 
     def _retrieve_synaptic_block(
