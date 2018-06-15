@@ -1,18 +1,73 @@
+/**
+ *! \file
+ *! \brief STDP synaptic matrix implementation
+ */
+
+
 #include <stdbool.h>
 #include <spin1_api.h>
 #include <debug.h>
 #include <delay_extension/delay_extension.h>
 #include "matrix_generator_common.h"
 
+/**
+ *! \brief The mask for a delay before shifting
+ */
+#define SYNAPSE_DELAY_MASK 0xFF
+
+/**
+ *! \brief The position of the plastic-plastic size within the row
+ */
+#define STDP_PLASTIC_PLASTIC_SIZE 0
+
+/**
+ *! \brief The position of the plastic-plastic data within the row
+ */
+#define STDP_PLASTIC_PLASTIC_OFFSET 1
+
+/**
+ *! \brief The position of the fixed-fixed size within the fixed region
+ */
+#define STDP_FIXED_FIXED_SIZE 0
+
+/**
+ *! \brief The position of the fixed-plastic size within the fixed region
+ */
+#define STDP_FIXED_PLASTIC_SIZE 1
+
+/**
+ *! \brief The position of the fixed-plastic data within the fixed region
+ */
+#define STDP_FIXED_PLASTIC_OFFSET 2
+
+/**
+ *! \brief Data for the generator
+ */
 struct matrix_generator_stdp {
+
+    /**
+     *! \brief The number of half-words in a plastic-plastic row header
+     */
     uint32_t n_half_words_per_pp_row_header;
+
+    /**
+     *! \brief The number of half-words in each plastic-plastic synapse
+     */
     uint32_t n_half_words_per_pp_synapse;
+
+    /**
+     *! \brief The index of the half-word that will contain the weight
+     */
     uint32_t weight_half_word;
 };
 
 void *matrix_generator_stdp_initialize(address_t *region) {
+
+    // Allocate memory for the parameters
     struct matrix_generator_stdp *params = (struct matrix_generator_stdp *)
         spin1_malloc(sizeof(struct matrix_generator_stdp));
+
+    // Copy the parameters in
     address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct matrix_generator_stdp));
     params_sdram = &(params_sdram[sizeof(struct matrix_generator_stdp) >> 2]);
@@ -25,16 +80,15 @@ void matrix_generator_stdp_free(void *data) {
     sark_free(data);
 }
 
-#define SYNAPSE_DELAY_MASK 0xFF
-#define STDP_PLASTIC_PLASTIC_SIZE 0
-#define STDP_PLASTIC_PLASTIC_OFFSET 1
-
-// These word offsets are based on the start of the fixed region itself
-#define STDP_FIXED_FIXED_SIZE 0
-#define STDP_FIXED_PLASTIC_SIZE 1
-#define STDP_FIXED_PLASTIC_OFFSET 2
-
-
+/**
+ *! \brief Build a fixed-plastic half-word from the components
+ *! \param[in] delay The delay of the synapse
+ *! \param[in] type The synapse type
+ *! \param[in] post_index The core-relative index of the target neuron
+ *! \param[in[ synapse_type_bits The number of bits for the synapse type
+ *! \param[in] synapse_index_bits The number of bits for the target neuron id
+ *! \return A half-word fixed-plastic synapse
+ */
 static uint16_t _build_fixed_plastic_half_word(
         uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
@@ -62,14 +116,22 @@ void matrix_generator_stdp_write_row(
 
     // Row address for each possible delay stage (including no delay stage)
     address_t row_address[max_stage];
+
+    // Space available in each row
     uint16_t space_half_words[max_stage];
+
+    // The number of words in a row including headers
     uint32_t n_row_words = max_row_n_words + 3;
     uint32_t n_delay_row_words = max_delayed_row_n_words + 3;
+
+    // The normal row position and space available - might be 0 if all delayed
     row_address[0] = NULL;
     space_half_words[0] = max_row_n_words * 2;
     if (synaptic_matrix != NULL) {
         row_address[0] = &(synaptic_matrix[pre_neuron_index * n_row_words]);
     }
+
+    // The delayed row positions and space available
     if (delayed_synaptic_matrix != NULL) {
         address_t delayed_address =
             &(delayed_synaptic_matrix[pre_neuron_index * n_delay_row_words]);
@@ -124,11 +186,13 @@ void matrix_generator_stdp_write_row(
         // Delay (mostly to get the stage)
         struct delay_value delay = get_delay(delays[synapse], max_stage);
 
-        // Put the weight words in place
+        // Check that the position is valid
         if (pp_address[delay.stage] == NULL) {
             log_error("Delay stage %u has not been initialised", delay.stage);
             rt_error(RTE_SWERR);
         }
+
+        // Check there is enough space
         if (space_half_words[delay.stage] <
                 params->n_half_words_per_pp_synapse) {
             log_warning(
@@ -138,6 +202,7 @@ void matrix_generator_stdp_write_row(
             continue;
         }
 
+        // Put the weight words in place
         uint16_t *weight_words = pp_address[delay.stage];
         pp_address[delay.stage] =
             &(pp_address[delay.stage][params->n_half_words_per_pp_synapse]);

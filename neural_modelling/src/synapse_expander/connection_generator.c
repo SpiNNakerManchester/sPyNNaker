@@ -39,7 +39,7 @@ struct connection_generator_info {
      *! \brief Initialise the generator
      *! \param[in/out] region Region to read parameters from.  Should be updated
      *!                       to position just after parameters after calling.
-     *! \return An data to be passed in to other functions later on
+     *! \return A data item to be passed in to other functions later on
      */
     void* (*initialize)(address_t *region);
 
@@ -69,13 +69,15 @@ struct connection_generator_info {
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
 
     /**
-     *! \brief Free any data for the connector
+     *! \brief Free any data for the generator
      *! \param[in] data The data to free
      */
     void (*free)(void *data);
 };
 
-//! \brief An Array of known generators
+/**
+ *! \brief An Array of known generators
+ */
 struct connection_generator_info connection_generators[N_CONNECTION_GENERATORS];
 
 void register_connection_generators() {
