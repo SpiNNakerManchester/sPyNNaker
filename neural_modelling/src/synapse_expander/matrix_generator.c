@@ -1,3 +1,7 @@
+/**
+ *! \file
+ *! \brief The implementation of the matrix generator
+ */
 #include "matrix_generator.h"
 #include <spin1_api.h>
 #include <debug.h>
@@ -9,9 +13,6 @@
 #define N_MATRIX_GENERATORS 2
 #define MATRIX_GENERATOR_STATIC_HASH 0
 #define MATRIX_GENERATOR_PLASTIC_HASH 1
-#define MAX_DELAY 16
-#define EMPTY_VAL 0xFF
-#define MAX_ROW_LENGTH 256
 
 struct matrix_generator {
     uint32_t index;
