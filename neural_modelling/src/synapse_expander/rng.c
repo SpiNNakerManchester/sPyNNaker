@@ -1,8 +1,15 @@
+/**
+ *! \file
+ *! \brief An implementation of random number generation
+ */
 #include "rng.h"
 #include <random.h>
 #include <spin1_api.h>
 #include <normal.h>
 
+/**
+ *! \brief The Random number generator parameters
+ */
 struct rng {
     mars_kiss64_seed_t seed;
 };
