@@ -126,15 +126,6 @@ bool read_sdram_data(
     return true;
 }
 
-void _start_expander(uint params_address, uint syn_mtx_addr) {
-    if (!read_sdram_data(
-            (address_t) params_address, (address_t) syn_mtx_addr)) {
-        log_info("!!!   Error reading SDRAM data   !!!");
-        rt_error(RTE_ABORT);
-    }
-    spin1_exit(0);
-}
-
 void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
 
@@ -161,10 +152,11 @@ void c_main(void) {
     log_info("\tReading SDRAM at 0x%08x, writing to matrix at 0x%08x",
             params_address, syn_mtx_addr);
 
-    spin1_schedule_callback(
-        _start_expander, (uint) params_address, (uint) syn_mtx_addr, 1);
-
-    spin1_start_paused();
+    if (!read_sdram_data(
+            (address_t) params_address, (address_t) syn_mtx_addr)) {
+        log_info("!!!   Error reading SDRAM data   !!!");
+        rt_error(RTE_ABORT);
+    }
 
     log_info("Finished On Machine Connectors!");
 }
