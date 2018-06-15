@@ -16,9 +16,9 @@
 
 /**
  *! \brief Generate the data for a single connector
- *! \param[in/out] region The address to read the parameters from.  Should be
- *!                       updated to the position just after the parameters
- *!                       after calling.
+ *! \param[in/out] in_region The address to read the parameters from.  Should be
+ *!                          updated to the position just after the parameters
+ *!                          after calling.
  *! \param[in/out] neuron_delay_stage_config Bit fields into which to write the
  *!                                          delay information
  *! \param[in] pre_slice_start The start of the slice of the delay extension to
@@ -162,7 +162,6 @@ void c_main(void) {
     // Register each of the components
     register_connection_generators();
     register_param_generators();
-
 
     // Get the addresses of the regions
     log_info("Starting To Build Delays");
