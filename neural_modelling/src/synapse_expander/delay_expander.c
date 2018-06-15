@@ -10,21 +10,6 @@
 
 #define _unused(x) ((void)(x))
 
-uint32_t max_matrix_size(uint32_t max_n_static, uint32_t max_n_plastic,
-        uint32_t plastic_header) {
-    // both plastic-plastic and plastic-fixed are 16-bit data
-
-    uint32_t plastic_word_size = (max_n_plastic / 2) + (max_n_plastic % 2);
-    log_debug("header: %u, static: %u, plastic: %u ; %u, def: 3",
-        plastic_header, max_n_static, max_n_plastic, plastic_word_size);
-
-    return 1 + plastic_header + max_n_plastic + 1 + 1 + max_n_static
-        + plastic_word_size;
-
-    // n_plastic was already multiplied before
-    // return 1 + plastic_word_size + 1 + 1 + n_static + n_plastic;
-}
-
 bool read_delay_builder_region(address_t *in_region,
         bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
         uint32_t pre_slice_count) {
