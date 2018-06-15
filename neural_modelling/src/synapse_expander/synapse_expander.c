@@ -1,4 +1,4 @@
-#include "synapse_expander.h"
+#include <neuron/regions.h>
 #include "matrix_generator.h"
 #include "connection_generator.h"
 #include "param_generator.h"

@@ -16,6 +16,7 @@
  */
 
 #include <common/in_spikes.h>
+#include "regions.h"
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
@@ -37,27 +38,12 @@
        constant
 #endif
 
-//! human readable definitions of each region in SDRAM
-typedef enum regions_e{
-    SYSTEM_REGION,
-    NEURON_PARAMS_REGION,
-    SYNAPSE_PARAMS_REGION,
-    POPULATION_TABLE_REGION,
-    SYNAPTIC_MATRIX_REGION,
-    SYNAPSE_DYNAMICS_REGION,
-    RECORDING_REGION,
-    PROVENANCE_DATA_REGION,
-    PROFILER_REGION,
-    CONNECTION_GENERATOR_REGION,
-    DIRECT_MATRIX_REGION
-} regions_e;
-
 typedef enum extra_provenance_data_region_entries{
     NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
     SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
-	PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -118,7 +104,7 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-    		synapse_dynamics_get_plastic_saturation_count();
+            synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
 

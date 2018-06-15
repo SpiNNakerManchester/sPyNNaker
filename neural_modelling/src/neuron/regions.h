@@ -9,7 +9,7 @@ typedef enum regions_e {
     SYNAPSE_DYNAMICS_REGION,  // 5
     RECORDING_REGION,         // 6
     PROVENANCE_DATA_REGION,   // 7
-    PROFILING_REGION,         // 8
+    PROFILER_REGION,          // 8
     CONNECTOR_BUILDER_REGION, // 9
-    DIRECT_MATRIX,            // 10
+    DIRECT_MATRIX_REGION      // 10
 } regions_e;
