@@ -59,6 +59,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
     return 0;
 }
 
+uint32_t synapse_dynamics_get_plastic_saturation_count(){
+	return 0;
+}
 
 //! \brief  Don't search the synaptic row for the the connection with the
 //!         specified post-synaptic id -- no rewiring here

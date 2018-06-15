@@ -289,7 +289,7 @@ static void neuron_impl_initialise_recording(uint32_t n_neurons)
 //! \brief return value for spike size
 static size_t neuron_impl_spike_size(uint32_t n_neurons)
 {
-	size_t spike_size;
+    size_t spike_size;
 
     if (global_record_params->spike_recording == n_neurons){
         spike_size = n_neurons;
@@ -297,7 +297,7 @@ static size_t neuron_impl_spike_size(uint32_t n_neurons)
         spike_size = global_record_params->spike_recording + 1;
     }
 
-	return spike_size;
+    return spike_size;
 }
 
 //! \brief Add inputs as required to the implementation
@@ -305,50 +305,54 @@ static size_t neuron_impl_spike_size(uint32_t n_neurons)
 //! \param[in] parameter parameters for synapse shaping
 //! \param[in] weights_this_timestep Weight inputs to be added
 static void neuron_impl_add_inputs(
-		index_t synapse_type_index, synapse_param_pointer_t parameter,
-		input_t weights_this_timestep)
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
+        input_t weights_this_timestep)
 {
-	// simple wrapper to synapse type input function
-	synapse_types_add_neuron_input(synapse_type_index,
-			parameter, weights_this_timestep);
+    // simple wrapper to synapse type input function
+    synapse_types_add_neuron_input(synapse_type_index,
+            parameter, weights_this_timestep);
 }
 
 //! \bried Load in the neuron parameters
 //! \return None
 static void neuron_impl_load_neuron_parameters(
-		address_t address, uint32_t next, uint32_t n_neurons)
+        address_t address, uint32_t next, uint32_t n_neurons)
 {
     log_debug("writing parameters, next is %u ", next);
 
     log_debug("writing global recording parameters");
-    memcpy(global_record_params, &address[next], sizeof(global_record_params_t));
+    spin1_memcpy(global_record_params, &address[next],
+            sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
     log_debug("writing index local parameters");
-    memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
+    spin1_memcpy(indexes_array, &address[next], n_neurons * sizeof(indexes_t));
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //log_debug("writing neuron global parameters");
-    memcpy(global_parameters, &address[next], sizeof(global_neuron_params_t));
+    spin1_memcpy(global_parameters, &address[next],
+            sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
     log_debug("writing neuron local parameters");
-    memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
+    spin1_memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
     log_debug("writing input type parameters");
-    memcpy(input_type_array, &address[next], n_neurons * sizeof(input_type_t));
+    spin1_memcpy(input_type_array, &address[next],
+            n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
     log_debug("writing additional input type parameters");
-    memcpy(additional_input_array, &address[next],
+    spin1_memcpy(additional_input_array, &address[next],
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
     log_debug("writing threshold type parameters");
-    memcpy(threshold_type_array, &address[next],
+    spin1_memcpy(threshold_type_array, &address[next],
            n_neurons * sizeof(threshold_type_t));
 
+    neuron_model_set_global_neuron_params(global_parameters);
 }
 
 //! \brief Wrapper to set global neuron parameters ?
@@ -365,9 +369,9 @@ static void neuron_impl_wait_for_recordings_and_reset_out_spikes() {
     while (n_recordings_outstanding > 0) {
         spin1_wfi();
     }
-	if (spike_index == 1) {
-	    out_spikes_reset();
-	}
+    if (spike_index == 1) {
+        out_spikes_reset();
+    }
 }
 
 //! \brief Do the timestep update for the particular implementation
@@ -375,10 +379,10 @@ static void neuron_impl_wait_for_recordings_and_reset_out_spikes() {
 //! \return bool value for whether a spike has occurred
 static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
 {
-	// Array for index recording
+    // Array for index recording
     indexes_t* indexes = &indexes_array[neuron_index];
 
-	// Get the neuron itself
+    // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
     // Get the input_type parameters and voltage for this neuron
@@ -398,27 +402,27 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
 
     // Get the exc and inh values from the synapses
     input_t* exc_value = synapse_types_get_excitatory_input(
-    		&(neuron_synapse_shaping_params[neuron_index]));
+            &(neuron_synapse_shaping_params[neuron_index]));
     input_t* inh_value = synapse_types_get_inhibitory_input(
-    		&(neuron_synapse_shaping_params[neuron_index]));
+            &(neuron_synapse_shaping_params[neuron_index]));
 
     // Call functions to obtain exc_input and inh_input
     input_t* exc_input_value = input_type_get_input_value(
-    		exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
+            exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
     input_t* inh_input_value = input_type_get_input_value(
-    		inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
+            inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
     // Call functions to convert exc_input to current
     input_type_convert_excitatory_input_to_current(
-    		exc_input_value, input_type, voltage);
+            exc_input_value, input_type, voltage);
 
     // Set the inhibitory multiplicator value
     input_type_set_inhibitory_multiplicator_value(
-    		exc_input_value, input_type, inh_input_value);
+            exc_input_value, input_type, inh_input_value);
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_inhibitory_input_to_current(
-    		inh_input_value, input_type, voltage);
+            inh_input_value, input_type, voltage);
 
     // Sum g_syn contributions from all receptors for recording
     REAL total_exc = 0;
@@ -443,9 +447,9 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
-    		NUM_EXCITATORY_RECEPTORS, exc_input_value,
-			NUM_INHIBITORY_RECEPTORS, inh_input_value,
-			external_bias, neuron);
+            NUM_EXCITATORY_RECEPTORS, exc_input_value,
+            NUM_INHIBITORY_RECEPTORS, inh_input_value,
+            external_bias, neuron);
 
     // determine if a spike should occur
     bool spike = threshold_type_is_above_threshold(result, threshold_type);
@@ -453,11 +457,11 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
     // If spike occurs, communicate to relevant parts of model
     if (spike) {
         // Call relevant model-based functions
-    	// Tell the neuron model
-    	neuron_model_has_spiked(neuron);
+        // Tell the neuron model
+        neuron_model_has_spiked(neuron);
 
-    	// Tell the additional input
-    	additional_input_has_spiked(additional_input);
+        // Tell the additional input
+        additional_input_has_spiked(additional_input);
 
         // Do any required synapse processing
         synapse_dynamics_process_post_synaptic_event(time, neuron_index);
@@ -473,7 +477,7 @@ static bool neuron_impl_do_timestep_update(timer_t time, index_t neuron_index)
 //! \setter for the internal input buffers
 //! \param[in] input_buffers_value the new input buffers
 static void neuron_impl_set_neuron_synapse_shaping_params(
-		synapse_param_t *neuron_synapse_shaping_params_value)
+        synapse_param_t *neuron_synapse_shaping_params_value)
 {
     neuron_synapse_shaping_params = neuron_synapse_shaping_params_value;
 }
@@ -481,50 +485,53 @@ static void neuron_impl_set_neuron_synapse_shaping_params(
 //! \brief Wrapper for the neuron model's print state variables function
 static void neuron_impl_print_state_variables(index_t neuron_index)
 {
-	// wrapper to the model print function
-	neuron_model_print_state_variables(&(neuron_array[neuron_index]));
+    // wrapper to the model print function
+    neuron_model_print_state_variables(&(neuron_array[neuron_index]));
 }
 
 //! \brief Wrapper for the neuron model's print parameters function
 static void neuron_impl_print_parameters(index_t neuron_index)
 {
-	neuron_model_print_parameters(&(neuron_array[neuron_index]));
+    neuron_model_print_parameters(&(neuron_array[neuron_index]));
 }
 
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store
 static void neuron_impl_store_neuron_parameters(
-		address_t address, uint32_t next, uint32_t n_neurons)
+        address_t address, uint32_t next, uint32_t n_neurons)
 {
     log_debug("writing parameters");
 
     log_debug("writing global recording parameters");
-    memcpy(&address[next], global_record_params, sizeof(global_record_params_t));
+    spin1_memcpy(&address[next], global_record_params,
+            sizeof(global_record_params_t));
     next += sizeof(global_record_params_t) / 4;
 
     log_debug("writing index local parameters");
-    memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
+    spin1_memcpy(&address[next], indexes_array, n_neurons * sizeof(indexes_t));
     next += (n_neurons * sizeof(indexes_t)) / 4;
 
     //log_debug("writing neuron global parameters");
-    memcpy(&address[next], global_parameters, sizeof(global_neuron_params_t));
+    spin1_memcpy(&address[next], global_parameters,
+            sizeof(global_neuron_params_t));
     next += sizeof(global_neuron_params_t) / 4;
 
     log_debug("writing neuron local parameters");
-    memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
+    spin1_memcpy(&address[next], neuron_array, n_neurons * sizeof(neuron_t));
     next += (n_neurons * sizeof(neuron_t)) / 4;
 
     log_debug("writing input type parameters");
-    memcpy(&address[next], input_type_array, n_neurons * sizeof(input_type_t));
+    spin1_memcpy(&address[next], input_type_array,
+            n_neurons * sizeof(input_type_t));
     next += (n_neurons * sizeof(input_type_t)) / 4;
 
     log_debug("writing additional input type parameters");
-    memcpy(&address[next], additional_input_array,
+    spin1_memcpy(&address[next], additional_input_array,
            n_neurons * sizeof(additional_input_t));
     next += (n_neurons * sizeof(additional_input_t)) / 4;
 
     log_debug("writing threshold type parameters");
-    memcpy(&address[next], threshold_type_array,
+    spin1_memcpy(&address[next], threshold_type_array,
            n_neurons * sizeof(threshold_type_t));
 }
 
@@ -596,7 +603,7 @@ static void neuron_impl_record_spikes(timer_t time)
 static input_t neuron_impl_get_membrane_voltage(index_t neuron_index)
 {
     neuron_pointer_t neuron = &neuron_array[neuron_index];
-	return neuron_model_get_membrane_voltage(neuron);
+    return neuron_model_get_membrane_voltage(neuron);
 }
 
 #endif // _NEURON_IMPL_SEMD_H_

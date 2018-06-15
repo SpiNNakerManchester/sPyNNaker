@@ -7,7 +7,6 @@
 #include "neuron.h"
 #include "implementations/neuron_impl.h"
 #include <debug.h>
-#include <string.h>
 
 // declare spin1_wfi
 //void spin1_wfi();

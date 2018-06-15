@@ -12,12 +12,12 @@ typedef struct synapse_impl_t {
 //! \param[in] parameter parameters for synapse shaping
 //! \param[in] weights_this_timestep Weight inputs to be added
 static void synapse_impl_add_inputs(
-		index_t synapse_type_index, synapse_param_pointer_t parameter,
-		input_t weights_this_timestep)
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
+        input_t weights_this_timestep)
 {
-	// simple wrapper to synapse type input function
-	synapse_types_add_neuron_input(synapse_type_index,
-			parameter, weights_this_timestep);
+    // simple wrapper to synapse type input function
+    synapse_types_add_neuron_input(synapse_type_index,
+            parameter, weights_this_timestep);
 }
 
 #endif // _SYNAPSE_IMPL_STANDARD_H_
