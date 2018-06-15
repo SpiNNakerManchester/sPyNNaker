@@ -19,10 +19,13 @@ try:
 except ImportError:
     pyNNVersion = "0.7"
 
+# Generation on host only works for PyNN >= 0.8
 IS_PYNN_8 = StrictVersion(pyNNVersion) >= StrictVersion("0.8")
 
+# Hash of the constant parameter generator
 PARAM_TYPE_CONSTANT_ID = 0
 
+# Hashes of the parameter generators supported by the synapse expander
 PARAM_TYPE_BY_NAME = {
     "uniform": 1,
     "uniform_int": 1,
@@ -33,6 +36,7 @@ PARAM_TYPE_BY_NAME = {
 }
 
 
+# Hashes of the connection generators supported by the synapse expander
 class ConnectorIDs(Enum):
     ONE_TO_ONE_CONNECTOR = 0
     ALL_TO_ALL_CONNECTOR = 1
@@ -75,6 +79,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         return False
 
     def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
+        """ Get the seed of the connector for a given pre-post pairing
+        """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self._connector_seed:
             self._connector_seed[key] = [
@@ -83,14 +89,18 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
     def _generate_param_seed(
             self, pre_vertex_slice, post_vertex_slice, values, seeds):
+        """ Get the seed of a parameter generator for a given pre-post pairing
+        """
         if not get_simulator().is_a_pynn_random(values):
             return None
-        key = (id(pre_vertex_slice), id(post_vertex_slice))
+        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         if key not in seeds:
             seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
         return seeds[key]
 
     def _param_generator_params(self, values, seed):
+        """ Get the parameter generator parameters as a numpy array
+        """
         if numpy.isscalar(values):
             return numpy.array(
                 [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
@@ -113,6 +123,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         raise ValueError("Unexpected value {}".format(values))
 
     def _param_generator_params_size_in_bytes(self, values):
+        """ Get the size of the parameter generator parameters in bytes
+        """
         if numpy.isscalar(values):
             return 4
 
@@ -123,6 +135,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         raise ValueError("Unexpected value {}".format(values))
 
     def _param_generator_id(self, values):
+        """ Get the id of the parameter generator
+        """
         if numpy.isscalar(values):
             return PARAM_TYPE_CONSTANT_ID
 

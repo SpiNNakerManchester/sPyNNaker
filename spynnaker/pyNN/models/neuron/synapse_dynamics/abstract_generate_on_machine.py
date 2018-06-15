@@ -11,6 +11,8 @@ class MatrixGeneratorID(Enum):
 
 @add_metaclass(AbstractBase)
 class AbstractGenerateOnMachine(object):
+    """ A synapse dynamics that can be generated on the machine
+    """
 
     def generate_on_machine(self):
         """ Determines if this instance should be generated on the machine.

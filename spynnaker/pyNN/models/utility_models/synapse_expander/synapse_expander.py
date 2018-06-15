@@ -16,6 +16,8 @@ DELAY_EXPANDER = "delay_expander.aplx"
 def synapse_expander(
         app_graph, graph_mapper, placements, transceiver,
         provenance_file_path, executable_finder):
+    """ Run the synapse expander - needs to be done after data has been loaded
+    """
 
     synapse_expander = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
     delay_expander = executable_finder.get_executable_path(DELAY_EXPANDER)
@@ -71,6 +73,8 @@ def synapse_expander(
 
 
 def _extract_iobuf(expander_cores, transceiver, provenance_file_path):
+    """ Extract IOBuf from the cores
+    """
     io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
     for io_buf in io_buffers:
         file_path = os.path.join(
@@ -81,7 +85,8 @@ def _extract_iobuf(expander_cores, transceiver, provenance_file_path):
 
 
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
-    """
+    """ Handle failure of the expander
+
     :param executable_targets:
     :param txrx:
     :param provenance_file_path:

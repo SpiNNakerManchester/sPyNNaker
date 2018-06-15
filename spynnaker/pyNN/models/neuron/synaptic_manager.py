@@ -79,7 +79,6 @@ class SynapticManager(object):
         "_synapse_type",
         "_weight_scales",
         "_ring_buffer_shifts",
-        "_delay_placement_index",
         "_gen_on_machine",
         "_max_row_info"]
 
@@ -120,7 +119,6 @@ class SynapticManager(object):
         self._weight_scales = dict()
         self._ring_buffer_shifts = None
         self._delay_key_index = dict()
-        self._delay_placement_index = dict()
         self._retrieved_blocks = dict()
 
         # A list of connection holders to be filled in pre-run, indexed by
@@ -216,6 +214,8 @@ class SynapticManager(object):
     def _get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
             machine_time_step):
+        """ Get the maximum size of each row for a given slice of the vertex
+        """
         key = (synapse_info, post_vertex_slice.lo_atom,
                post_vertex_slice.hi_atom)
         if key not in self._max_row_info:
@@ -227,6 +227,8 @@ class SynapticManager(object):
 
     def _get_synaptic_blocks_size(
             self, post_vertex_slice, in_edges, machine_time_step):
+        """ Get the size of the synaptic blocks in bytes
+        """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
 
         for in_edge in in_edges:
@@ -248,6 +250,8 @@ class SynapticManager(object):
         return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
 
     def _get_size_of_generator_information(self, in_edges):
+        """ Get the size of the synaptic expander parameters
+        """
         gen_on_machine = False
         size = 0
         for in_edge in in_edges:
@@ -678,11 +682,15 @@ class SynapticManager(object):
             post_vertex_slice, master_pop_table_region, rinfo,
             all_syn_block_sz, block_addr, machine_time_step,
             app_edge, generator_data):
+        """ Generate data for the synapse expander
+        """
 
         # Get the size of the matrices that will be required
         max_row_info = self._get_max_row_info(
             synapse_info, post_vertex_slice, app_edge, machine_time_step)
 
+        # If delay edge exists, tell this about the data too, so it can
+        # generate its own data
         if (max_row_info.delayed_max_n_synapses > 0 and
                 app_edge.delay_edge is not None):
             app_edge.delay_edge.pre_vertex.add_generator_data(
@@ -696,7 +704,7 @@ class SynapticManager(object):
                 "Found delayed items but no delay "
                 "machine edge for {}".format(app_edge.label))
 
-        # Skip over the normal bytes and write a master pop entry
+        # Skip over the normal bytes but still write a master pop entry
         synaptic_matrix_offset = 0xFFFFFFFF
         if max_row_info.undelayed_max_n_synapses:
             synaptic_matrix_offset = \
@@ -708,6 +716,8 @@ class SynapticManager(object):
             n_bytes_undelayed = (
                 max_row_info.undelayed_max_bytes * pre_vertex_slice.n_atoms)
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
+
+            # The synaptic matrix offset is in words for the generator
             synaptic_matrix_offset = synaptic_matrix_offset // 4
         elif rinfo is not None:
             self._poptable_type.update_master_population_table(
@@ -718,7 +728,7 @@ class SynapticManager(object):
                 "Too much synaptic memory has been written: {} of {} ".format(
                     block_addr, all_syn_block_sz))
 
-        # Skip over the delayed bytes and write a master pop entry
+        # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
         n_delay_stages = app_edge.n_delay_stages
@@ -738,6 +748,8 @@ class SynapticManager(object):
                 max_row_info.delayed_max_bytes * pre_vertex_slice.n_atoms *
                 n_delay_stages)
             block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
+
+            # The delayed synaptic matrix offset is in words for the generator
             delayed_synaptic_matrix_offset = \
                 delayed_synaptic_matrix_offset // 4
         elif delay_rinfo is not None:
@@ -840,6 +852,9 @@ class SynapticManager(object):
     def __is_direct(
             self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
             app_edge):
+        """ Determine if the given connection can be done with a "direct"\
+            synaptic matrix - this must have an exactly 1 entry per row
+        """
         return (
             app_edge.n_delay_stages == 0 and
             isinstance(connector, OneToOneConnector) and
@@ -876,6 +891,8 @@ class SynapticManager(object):
     def _get_ring_buffer_shifts(
             self, application_vertex, application_graph, machine_timestep,
             input_type):
+        """ Get the ring buffer shifts for this vertex
+        """
         if self._ring_buffer_shifts is None:
             self._ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
@@ -897,10 +914,6 @@ class SynapticManager(object):
                                       pre_vertex_slice.lo_atom,
                                       pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
-                self._delay_placement_index[app_edge.pre_vertex.source_vertex,
-                                            pre_vertex_slice.lo_atom,
-                                            pre_vertex_slice.hi_atom] = \
-                    placements.get_placement_of_vertex(m_edge.pre_vertex)
 
         post_slices = graph_mapper.get_slices(application_vertex)
         post_slice_idx = graph_mapper.get_machine_vertex_index(machine_vertex)
@@ -1164,7 +1177,8 @@ class SynapticManager(object):
 
     def _write_on_machine_data_spec(
             self, spec, post_vertex_slice, weight_scales, generator_data):
-        """
+        """ Write the data spec for the synapse expander
+
         :param spec: The specification to write to
         :param post_vertex_slice: The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse

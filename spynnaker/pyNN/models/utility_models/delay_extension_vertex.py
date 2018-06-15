@@ -310,6 +310,8 @@ class DelayExtensionVertex(
                 self._get_size_of_generator_information(out_edges))
 
     def _get_edge_generator_size(self, synapse_info):
+        """ Get the size of the generator data for a given synapse info object
+        """
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
@@ -325,6 +327,8 @@ class DelayExtensionVertex(
         return 0
 
     def _get_size_of_generator_information(self, out_edges):
+        """ Get the size of the generator data for all edges
+        """
         gen_on_machine = False
         size = 0
         for out_edge in out_edges:
@@ -375,5 +379,7 @@ class DelayExtensionVertex(
         return [ContiguousKeyRangeContraint()]
 
     def gen_on_machine(self, vertex_slice):
+        """ Determine if the given slice needs to be generated on the machine
+        """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return key in self._delay_generator_data
