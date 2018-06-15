@@ -65,8 +65,8 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
     // reset z to zero
     neuron->z = 0;
 
-    // reset refractory timer
-    neuron->refract_timer  = neuron->T_refract;
+    // Set refractory timer
+    neuron->refract_timer  = neuron->T_refract - 1;
     neuron->A = 0;
 }
 

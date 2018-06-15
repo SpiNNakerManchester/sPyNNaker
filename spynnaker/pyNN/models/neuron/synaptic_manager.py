@@ -520,11 +520,16 @@ class SynapticManager(object):
             0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
             for w in max_weights)
 
+#         max_weight_powers = (
+#             8 if w >=8 else 8 for w in max_weight_powers)
+
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
         max_weight_powers = (
             w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
+
+
 
         # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows

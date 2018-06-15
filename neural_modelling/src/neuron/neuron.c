@@ -611,7 +611,7 @@ void neuron_do_timestep_update(timer_t time) {
             external_bias, neuron, threshold_type->B);
 
         // Also update Z (including using refractory period information)
-        state_t nu = (voltage - B_t)/B_t;
+        state_t nu = (voltage - threshold_type->B)/threshold_type->B;
         if REAL_COMPARE(nu, >, ZERO){
         	neuron->z = 1 * neuron->A;
         }

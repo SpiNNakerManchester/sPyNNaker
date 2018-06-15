@@ -7,13 +7,12 @@
 
 typedef struct threshold_type_t {
 
-    // The value of the static threshold
     REAL B; // Capital B(t)
     REAL b; // b(t)
     REAL b_0; // small b^0
     decay_t e_to_dt_on_tau_a; // rho
     REAL beta;
-    decay_t adpt; // beta/tau_a
+    decay_t adpt; // (1-rho)
 
 } threshold_type_t;
 
@@ -38,7 +37,7 @@ static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 static inline bool threshold_type_is_above_threshold(state_t value,
                         threshold_type_pointer_t threshold_type) {
 
-	// test for exceeding threshold at previous timestep
+	// Not used
 
     return false;
 }
@@ -53,8 +52,6 @@ static inline void threshold_type_update_threshold(state_t z,
 	threshold_type->b =
 			decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a)
 			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
-//			+ (1k - decay_s1615(1k,threshold_type->e_to_dt_on_tau_a))
-//			* 1000 // factor of 1000 for range scaling
 			* z; // stored on neuron
 
 	// Update large B
