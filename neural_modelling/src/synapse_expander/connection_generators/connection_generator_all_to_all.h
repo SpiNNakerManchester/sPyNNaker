@@ -1,12 +1,24 @@
+/**
+ *! \file
+ *! \brief All-to-All connection generator implementation
+ */
+
 #include <stdbool.h>
 
+/**
+ *! \brief The parameters to be passed around for this connector
+ */
 struct all_to_all {
     uint32_t allow_self_connections;
 };
 
 void *connection_generator_all_to_all_initialise(address_t *region) {
+
+    // Allocate the data structure for parameters
     struct all_to_all *params = (struct all_to_all *)
         spin1_malloc(sizeof(struct all_to_all));
+
+    // Copy the parameters into the data structure
     address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct all_to_all));
     params_sdram = &(params_sdram[sizeof(struct all_to_all) >> 2]);

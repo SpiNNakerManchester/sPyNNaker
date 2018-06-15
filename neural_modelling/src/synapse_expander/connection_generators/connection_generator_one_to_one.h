@@ -1,3 +1,8 @@
+/**
+ *! \file
+ *! \brief One-to-One Connection generator implementation
+ */
+
 void *connection_generator_one_to_one_initialise(address_t *region) {
     use(region);
     log_debug("One to One connector");

@@ -1,6 +1,14 @@
+/**
+ *! \file
+ *! \brief Fixed-Total-Number (Multapse) Connection generator implementation
+ */
+
 #include <log.h>
 #include <synapse_expander/rng.h>
 
+/**
+ *! \brief The parameters that can be copied from SDRAM
+ */
 struct fixed_total_params {
     uint32_t allow_self_connections;
     uint32_t with_replacement;
@@ -8,18 +16,28 @@ struct fixed_total_params {
     uint32_t n_potential_synapses;
 };
 
+/**
+ *! \brief The data to be passed around.  This includes the parameters, and the
+ *!        RNG of the connector
+ */
 struct fixed_total {
     struct fixed_total_params params;
     rng_t rng;
 };
 
 void *connection_generator_fixed_total_initialise(address_t *region) {
+
+    // Allocate memory for the parameters
     struct fixed_total *params = (struct fixed_total *) spin1_malloc(
         sizeof(struct fixed_total));
+
+    // Copy the parameters in
     address_t params_sdram = *region;
     spin1_memcpy(
         &(params->params), params_sdram, sizeof(struct fixed_total_params));
     params_sdram = &(params_sdram[sizeof(struct fixed_total_params) >> 2]);
+
+    // Initialise the RNG
     params->rng = rng_init(&params_sdram);
     *region = params_sdram;
     log_debug(
@@ -35,6 +53,14 @@ void connection_generator_fixed_total_free(void *data) {
     sark_free(data);
 }
 
+/**
+ *! \brief Draw from a binomial distribution i.e. with replacement
+ *! \param[in] n The number of times the experiment is run
+ *! \param[in] N The number of items in the bag
+ *! \param[in] K The number of items that are valid
+ *! \param[in] rng The uniform random number generator
+ *! \return The number of times a valid item was drawn
+ */
 static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t count = 0;
     uint32_t not_K = N - K;
@@ -48,6 +74,14 @@ static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     return count;
 }
 
+/**
+ * \brief Draw from a hyper-geometric distribution i.e. without replacement
+ * \param[in] n The number of times the experiment is run
+ * \param[in] N The number of items in the bag at the start
+ * \param[in] K The number of valid items in the bag at the start
+ * \param[in] rng The uniform random number generator
+ * \return The number of times a valid item was drawn
+ */
 static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t count = 0;
     uint32_t K_remaining = K;
@@ -92,11 +126,15 @@ uint32_t connection_generator_fixed_total_generate(
         n_conns = params->params.n_connections;
 
     } else {
+
+        // If with replacement, generate a binomial for this row
         if (params->params.with_replacement) {
             n_conns = binomial(
                 params->params.n_connections,
                 params->params.n_potential_synapses, n_values,
                 params->rng);
+
+        // If without replacement, generate a hyper-geometric for this row
         } else {
             n_conns = hypergeom(
                 params->params.n_connections,
@@ -105,6 +143,7 @@ uint32_t connection_generator_fixed_total_generate(
         }
     }
 
+    // If too many connections, limit
     if (n_conns > max_row_length) {
         if (pre_neuron_index == (pre_slice_start + pre_slice_count - 1)) {
             log_warning(
