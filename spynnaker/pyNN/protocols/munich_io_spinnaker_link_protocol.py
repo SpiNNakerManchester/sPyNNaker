@@ -800,7 +800,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_transmission(
             self, retina_key=RetinaKey.NATIVE_128_X_128,
             retina_payload=None, time=None):
-        """ set the retina transmission key
+        """ Set the retina transmission key
 
         :param retina_key: the new key for the retina
         :param retina_payload: \

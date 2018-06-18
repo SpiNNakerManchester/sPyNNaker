@@ -21,7 +21,7 @@ _expr_context = SafeEval(
 
 @add_metaclass(AbstractBase)
 class AbstractConnector(object):
-    """ Abstract class which PyNN Connectors extend
+    """ Abstract class that all PyNN Connectors extend.
     """
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
@@ -59,7 +59,7 @@ class AbstractConnector(object):
         self._delays = None
 
     def set_space(self, space):
-        """ allows setting of the space object after instantiation
+        """ Set the space object (allowed after instantiation).
 
         :param space:
         :return:
@@ -67,15 +67,15 @@ class AbstractConnector(object):
         self._space = space
 
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
+        """ Set the weights and delays as needed
 
-        :param `float` weights:
+        :param weights:
             May either be a float, a !RandomDistribution object, a list 1D\
             array with at least as many items as connections to be created,\
             or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic\
+        :param delays: -- as `weights`. If `None`, all synaptic\
             delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler,\
+        :raises Exception: when not a standard interface of list, scalar,\
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
@@ -176,7 +176,7 @@ class AbstractConnector(object):
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             delays, n_total_connections, n_connections, connection_slices,
             min_delay, max_delay):
-        """ Gets the expected number of delays that will fall within min_delay\
+        """ Get the expected number of delays that will fall within min_delay\
             and max_delay given given a float, RandomDistribution or list of\
             delays
         """
@@ -417,10 +417,9 @@ class AbstractConnector(object):
 
     @abstractmethod
     def generate_on_machine(self):
-        """ Determines if the connector generation is supported on the machine\
+        """ Determine if the connector generation is supported on the machine\
             or if the connector must be generated on the host
         """
-        pass
 
     @abstractmethod
     def create_synaptic_block(
@@ -430,7 +429,6 @@ class AbstractConnector(object):
         """ Create a synaptic block from the data
         """
         # pylint: disable=too-many-arguments
-        pass
 
     def get_provenance_data(self):
         name = "{}_{}_{}".format(

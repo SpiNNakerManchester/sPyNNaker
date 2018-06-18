@@ -357,10 +357,10 @@ class AbstractPopulationVertex(
         return per_neuron_usage
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
-        """ calculates the sdram usage for just the neuron parameters region
+        """ Calculate the SDRAM usage for just the neuron parameters region
 
         :param vertex_slice: the slice of atoms.
-        :return:  The sdram required for the neuron region
+        :return: The SDRAM required for the neuron region
         """
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
@@ -421,9 +421,9 @@ class AbstractPopulationVertex(
         vertex.reserve_provenance_data_region(spec)
 
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
-        """ reserve the neuron parameter data region
+        """ Reserve the neuron parameter data region
 
-        :param spec: the spec to write the dsg region to
+        :param spec: the spec to write the DSG region to
         :param vertex_slice: the slice of atoms from the application vertex
         :return: None
         """
@@ -949,7 +949,7 @@ class AbstractPopulationVertex(
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):
-        """ clears a recorded data region from the buffer manager
+        """ Clear a recorded data region from the buffer manager
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object

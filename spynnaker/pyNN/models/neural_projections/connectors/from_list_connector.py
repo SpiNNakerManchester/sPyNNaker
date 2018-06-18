@@ -49,7 +49,7 @@ class FromListConnector(AbstractConnector):
 
     @staticmethod
     def _split_conn_list(conn_list, column_names):
-        """ takes the conn list and separates them into the blocks needed
+        """ Separate the connection list into the blocks needed
 
         :param conn_list: the original conn list
         :param column_names: the column names if exist
@@ -96,8 +96,8 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ allows setting of the weights and delays at separate times to the\
-            init, also sets the dtypes correctly.....
+        """ Set the weights and delays at separate times to the\
+            init; also sets the dtypes correctly.....
 
         :param weights:
         :param delays:

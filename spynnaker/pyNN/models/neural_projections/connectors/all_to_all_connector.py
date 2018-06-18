@@ -16,13 +16,13 @@ class AllToAllConnector(AbstractConnector):
 
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
-
-        :param `bool` allow_self_connections:
+        :param allow_self_connections:
             if the connector is used to connect a
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-    """
+        :type allow_self_connections: bool
+        """
         super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
         self._weights = None
@@ -30,7 +30,7 @@ class AllToAllConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
+        """ Set the weights and delays as needed
 
         :param `float` weights:
             may either be a float, a !RandomDistribution object, a list \

@@ -21,7 +21,7 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class _MasterPopEntry(object):
-    """ internal class that contains a master pop entry
+    """ Internal class that contains a master population table entry
     """
     __slots__ = [
         "_addresses_and_row_lengths",
@@ -66,7 +66,7 @@ class _MasterPopEntry(object):
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
-    """ binary search master pop class.
+    """ Master population table, implemented as binary search master.
     """
     __slots__ = [
         "_entries",
@@ -172,7 +172,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         return next_address
 
     def initialise_table(self, spec, master_population_table_region):
-        """ Initialises the master pop data structure
+        """ Initialise the master pop data structure
 
         :param spec: the DSG writer
         :param master_population_table_region: \
@@ -187,7 +187,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ Adds a entry in the binary search to deal with the synaptic matrix
+        """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
@@ -213,7 +213,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Completes any operations required after all entries have been added
+        """ Complete any operations required after all entries have been added
 
         :param spec: the writer for the DSG
         :param master_pop_table_region: \
@@ -318,7 +318,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @staticmethod
     def _locate_entry(entries, key):
-        """ Searches the binary tree structure for the correct entry.
+        """ Search the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
         :return: the entry for this given key
@@ -340,7 +340,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
-        """ Returns any constraints placed on the edges because of having this\
+        """ Return any constraints placed on the edges because of having this\
             master pop table implemented in the cores.
         """
         return list()

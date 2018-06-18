@@ -36,7 +36,7 @@ class AbstractMasterPopTableFactory(object):
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ updates a spec with a master pop entry in some form
+        """ Update a spec with a master pop entry in some form
 
         :param spec: the spec to write the master pop entry to
         :param block_start_addr: the start address of the row in the region
@@ -54,7 +54,7 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ completes the master pop table in the spec
+        """ Complete the master pop table in the spec
 
         :param spec: the spec to write the master pop entry to
         :param master_pop_table_region: \

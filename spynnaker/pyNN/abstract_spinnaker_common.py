@@ -33,8 +33,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 @add_metaclass(AbstractBase)
 class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                               SpynnakerSimulatorInterface):
-    """ main interface for neural code
-
+    """ Main interface for neural code
     """
 
     CONFIG_FILE_NAME = "spynnaker.cfg"
@@ -221,7 +220,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 "****************************************************")
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
-        """ Iterates though the graph and looks changes
+        """ Iterate though the graph and look for changes
         """
         changed = super(AbstractSpiNNakerCommon, self).\
             _detect_if_graph_has_changed(reset_flags)
@@ -314,8 +313,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @property
     def time_scale_factor(self):
-        """ the multiplicative scaling from application time to real\
-            execution time
+        """ The multiplicative scaling from application time to real\
+            execution time.
 
         :return: the time scale factor
         """
@@ -323,7 +322,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @staticmethod
     def register_binary_search_path(search_path):
-        """ Registers an additional binary search path for executables
+        """ Register an additional binary search path for executables
 
         :param search_path: absolute search path for binaries
         """
@@ -402,11 +401,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):
-        """ locates receivers and their corresponding monitor cores for\
-            setting router time outs
+        """ Locate receivers and their corresponding monitor cores for\
+            setting router time-outs
 
         :param projections: the projections going to be read
-        :param gatherers: the gathers per ethernet chip
+        :param gatherers: the gatherers per ethernet chip
         :param extra_monitors_per_chip: the extra monitor cores per chip
         :return: list of tuples with gatherer and its extra monitor cores
         """
@@ -439,7 +438,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @property
     def id_counter(self):
-        """ property for id_counter, currently used by the populations.\
+        """ Getter for id_counter, currently used by the populations.\
             (maybe it could live in the pop class???)
 
         :return:
@@ -448,7 +447,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @id_counter.setter
     def id_counter(self, new_value):
-        """ setter for id_counter, currently used by the populations.\
+        """ Setter for id_counter, currently used by the populations.\
             (maybe it could live in the pop class???)
 
         :param new_value: new value for id_counter

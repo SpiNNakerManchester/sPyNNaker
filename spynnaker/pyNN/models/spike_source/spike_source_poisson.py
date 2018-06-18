@@ -100,7 +100,7 @@ class SpikeSourcePoisson(
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
         AbstractRewritesDataSpecification, SimplePopulationSettable,
         ProvidesKeyToAtomMappingImpl):
-    """ A Poisson Spike source object
+    """ A Poisson-distributed Spike source object
     """
 
     _N_POPULATION_RECORDING_REGIONS = 1
@@ -310,7 +310,7 @@ class SpikeSourcePoisson(
 
     @staticmethod
     def get_params_bytes(vertex_slice):
-        """ Gets the size of the poisson parameters in bytes
+        """ Gets the size of the Poisson parameters in bytes
 
         :param vertex_slice:
         """
@@ -318,7 +318,7 @@ class SpikeSourcePoisson(
                 (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON)) * 4
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
-        """ Reserve memory regions for poisson source parameters and output\
+        """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
         :param spec: the data specification writer
@@ -344,7 +344,7 @@ class SpikeSourcePoisson(
         placement.vertex.reserve_provenance_data_region(spec)
 
     def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
-        """ does the allocation for the poisson params region itself, as\
+        """ Allocate space for the Poisson parameter region itself, as\
             it can be reused for setters after an initial run
 
         :param placement: the location on machine for this vertex
@@ -537,10 +537,10 @@ class SpikeSourcePoisson(
         return globals_variables.get_simulator().machine_time_step
 
     def get_sdram_usage_for_atoms(self, vertex_slice):
-        """ calculates total sdram usage for a set of atoms
+        """ Calculate total SDRAM usage for a set of atoms
 
-        :param vertex_slice: the atoms to calculate sdram usage for
-        :return: sdram usage as a number of bytes
+        :param vertex_slice: the atoms to calculate SDRAM usage for
+        :return: SDRAM usage as a number of bytes
         """
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         total_size = (
@@ -552,7 +552,7 @@ class SpikeSourcePoisson(
         return total_size
 
     def _get_number_of_mallocs_used_by_dsg(self):
-        """ Works out how many allocation requests are required by the tools
+        """ Work out how many allocation requests are required by the tools
 
         :return: the number of allocation requests
         """
@@ -752,14 +752,13 @@ class SpikeSourcePoisson(
                 SpikeSourcePoisson.SPIKE_RECORDING_REGION_ID)
 
     def describe(self):
-        """
-        Returns a human-readable description of the cell or synapse type.
+        """ Return a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template
-        together with an associated template engine
+        The output may be customised by specifying a different template\
+        together with an associated template engine\
         (see ``pyNN.descriptions``).
 
-        If template is None, then a dictionary containing the template context
+        If template is None, then a dictionary containing the template context\
         will be returned.
         """
 

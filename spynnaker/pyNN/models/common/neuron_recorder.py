@@ -58,7 +58,7 @@ class NeuronRecorder(object):
         return recording
 
     def get_neuron_sampling_interval(self, variable):
-        """ Returns the current sampling interval for this variable
+        """ Return the current sampling interval for this variable
 
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
@@ -69,12 +69,12 @@ class NeuronRecorder(object):
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, n_machine_time_steps):
-        """ method for reading a uint32 mapped to time and neuron ids from\
-            the SpiNNaker machine
+        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
+            machine.
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
-        :param region: the dsg region id used for this data
+        :param region: the DSG region ID used for this data
         :param placements: the placements object
         :param graph_mapper: \
             the mapping between application and machine vertices
@@ -245,11 +245,10 @@ class NeuronRecorder(object):
         return results
 
     def _compute_rate(self, sampling_interval):
-        """ Converts a sampling interval into a rate
+        """ Convert a sampling interval into a rate. \
+            Remember, machine time step is in nanoseconds
 
-        Remember machine time step is in nano seconds
-
-        :param sampling_interval: interval between samples in micro seconds
+        :param sampling_interval: interval between samples in microseconds
         :return: rate
         """
         if sampling_interval is None:
@@ -382,7 +381,7 @@ class NeuronRecorder(object):
                 variable))
 
     def get_buffered_sdram_per_record(self, variable, vertex_slice):
-        """ Returns the sdram used per record
+        """ Return the SDRAM used per record
 
         :param variable:
         :param vertex_slice:
@@ -404,7 +403,7 @@ class NeuronRecorder(object):
                         n_neurons * self.N_BYTES_PER_VALUE
 
     def get_buffered_sdram_per_timestep(self, variable, vertex_slice):
-        """ Returns the sdram used per timestep
+        """ Return the SDRAM used per timestep.
 
         In the case where sampling is used it returns the average\
         for recording and none recording based on the recording rate
@@ -424,7 +423,7 @@ class NeuronRecorder(object):
             return data_size // rate
 
     def get_sampling_overflow_sdram(self, vertex_slice):
-        """ Gets the extra sdram that should be reserved if using per_timestep
+        """ Get the extra SDRAM that should be reserved if using per_timestep
 
         This is the extra that must be reserved if per_timestep is an average\
         rather than fixed for every timestep.
@@ -448,7 +447,7 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the sdram used per timestep
+        """ Return the SDRAM used per timestep
 
         In the case where sampling is used it returns the average\
         for recording and none recording based on the recording rate
@@ -471,7 +470,7 @@ class NeuronRecorder(object):
                (self.N_BYTES_PER_RATE + self.N_BYTES_PER_INDEX)
 
     def get_sdram_usage_per_neuron_in_bytes(self):
-        """ Gets the sdram usage for indexing and other controls
+        """ Get the SDRAM usage for indexing and other controls
 
         :return:
         """

@@ -46,20 +46,20 @@ class MultapseConnector(AbstractConnector):
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required rngs
+        """ Get the required RNGs
         """
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
+        """ Set the weights and delays as needed
 
-        :param `float` weights:
+        :param weights:
             may either be a float, a !RandomDistribution object, a list \
             1D array with at least as many items as connections to be \
             created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
+        :param delays:  -- as `weights`. If `None`, all synaptic \
             delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
+        :raises Exception: when not a standard interface of list, scalar, \
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """

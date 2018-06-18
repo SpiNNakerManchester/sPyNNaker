@@ -54,5 +54,5 @@ class AbstractAcceptsIncomingSynapses(object):
 
     @abstractmethod
     def clear_connection_cache(self):
-        """ clears the connection data stored in the vertex so far.
+        """ Clear the connection data stored in the vertex so far.
         """
