@@ -21,9 +21,9 @@ class AbstractSynapseType(object):
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the id of a synapse given the name
+        """ Get the ID of a synapse given the name
 
-        :return: The id of the synapse
+        :return: The ID of the synapse
         :rtype: int
         """
 

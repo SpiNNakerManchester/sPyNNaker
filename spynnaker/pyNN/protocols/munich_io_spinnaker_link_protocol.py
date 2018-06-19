@@ -272,7 +272,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param mode: The mode of operation of the protocol
         :param instance_key: The optional instance key to use
-        :param uart_id: The id of the UART when needed
+        :param uart_id: The ID of the UART when needed
         """
         self._mode = mode
 

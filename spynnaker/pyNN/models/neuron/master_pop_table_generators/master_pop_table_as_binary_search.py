@@ -193,7 +193,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
-        :param master_pop_table_region: the region id for the master pop
+        :param master_pop_table_region: the region ID for the master pop
         :param is_single: \
             Flag that states if the entry is a direct entry for a single row.
         :rtype: None

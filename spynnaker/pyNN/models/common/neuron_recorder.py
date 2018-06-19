@@ -142,7 +142,7 @@ class NeuronRecorder(object):
             if data is None:
                 data = fragment
             else:
-                # Add the slice fragment on axis 1 which is ids/ channel_index
+                # Add the slice fragment on axis 1 which is IDs/channel_index
                 data = numpy.append(data, fragment, axis=1)
         if len(missing_str) > 0:
             logger.warn(

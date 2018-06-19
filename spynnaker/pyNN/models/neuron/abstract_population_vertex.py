@@ -107,7 +107,7 @@ class AbstractPopulationVertex(
 
     BASIC_MALLOC_USAGE = 2
 
-    # recording region ids
+    # recording region IDs
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
     GSYN_EXCITATORY_RECORDING_REGION = 2
@@ -525,7 +525,7 @@ class AbstractPopulationVertex(
         self._reserve_neuron_params_data_region(
             spec, graph_mapper.get_slice(placement.vertex))
 
-        # write the neuron params into the new dsg region
+        # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
@@ -785,7 +785,7 @@ class AbstractPopulationVertex(
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
 
-        # locate sdram address to where the neuron parameters are stored
+        # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
                 placement,
@@ -954,7 +954,7 @@ class AbstractPopulationVertex(
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
-        :param recording_region_id: the recorded region id for clearing
+        :param recording_region_id: the recorded region ID for clearing
         :rtype: None
         """
         machine_vertices = graph_mapper.get_machine_vertices(self)

@@ -334,7 +334,7 @@ class SpikeSourcePoisson(
             size=SYSTEM_BYTES_REQUIREMENT,
             label='setup')
 
-        # reserve poisson params dsg region
+        # reserve poisson params DSG region
         self._reserve_poisson_params_region(placement, graph_mapper, spec)
 
         spec.reserve_memory_region(
@@ -349,7 +349,7 @@ class SpikeSourcePoisson(
 
         :param placement: the location on machine for this vertex
         :param graph_mapper: the mapping between machine and application graphs
-        :param spec: the dsg writer
+        :param spec: the DSG writer
         :return:  None
         """
         spec.reserve_memory_region(
@@ -443,7 +443,7 @@ class SpikeSourcePoisson(
         spec.write_value(
             data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
-        # Write the lo_atom id
+        # Write the lo_atom ID
         spec.write_value(data=vertex_slice.lo_atom)
 
         # Write the number of sources
@@ -612,7 +612,7 @@ class SpikeSourcePoisson(
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
 
-        # locate sdram address to where the neuron parameters are stored
+        # locate SDRAM address to where the neuron parameters are stored
         poisson_parameter_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
                 placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)

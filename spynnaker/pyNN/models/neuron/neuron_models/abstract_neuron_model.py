@@ -72,7 +72,7 @@ class AbstractNeuronModel(object):
         """
 
     def get_sdram_usage_per_neuron_in_bytes(self):
-        """ Get the total sdram usage in bytes
+        """ Get the total SDRAM usage in bytes
 
         :return: The SDRAM usage
         :rtype: int
