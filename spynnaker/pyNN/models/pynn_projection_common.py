@@ -330,8 +330,9 @@ class PyNNProjectionCommon(object):
 
     def size(self, gather=True):
         """ Return the total number of connections.
-         - only local connections, if gather is False,
-         - all connections, if gather is True (default)
+
+        :param gather: If False, only get the number of connections locally.\
+            Which means nothing on SpiNNaker...
         """
         # TODO
         raise NotImplementedError
