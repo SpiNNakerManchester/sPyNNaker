@@ -6,7 +6,7 @@
 #include <neuron/structural_plasticity/sp_structs.h>
 
 address_t synapse_dynamics_initialise(
-    address_t address, uint32_t n_neurons,
+    address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
     uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 bool synapse_dynamics_process_plastic_synapses(

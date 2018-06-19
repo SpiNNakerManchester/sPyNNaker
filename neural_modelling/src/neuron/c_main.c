@@ -55,7 +55,7 @@ typedef enum extra_provenance_data_region_entries{
     SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
-	PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -116,7 +116,7 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-    		synapse_dynamics_get_plastic_saturation_count();
+            synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
 
@@ -155,29 +155,26 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up the neurons
     uint32_t n_neurons;
+    uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, address),
-            recording_flags, &n_neurons, &incoming_spike_buffer_size)) {
+            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size)) {
         return false;
     }
 
     // Set up the synapses
-    synapse_param_t *neuron_synapse_shaping_params;
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address;
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
-            n_neurons, &neuron_synapse_shaping_params,
+            n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
             &indirect_synapses_address, &direct_synapses_address)) {
         return false;
     }
-
-    // set the neuron up properly
-    neuron_set_neuron_synapse_shaping_params(neuron_synapse_shaping_params);
 
     // Set up the population table
     uint32_t row_max_n_words;
@@ -191,8 +188,8 @@ static bool initialise(uint32_t *timer_period) {
     address_t synapse_dynamics_region_address =
         data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
-            synapse_dynamics_region_address,
-            n_neurons, ring_buffer_to_input_buffer_left_shifts);
+            synapse_dynamics_region_address, n_neurons, n_synapse_types,
+            ring_buffer_to_input_buffer_left_shifts);
 
     if (synapse_dynamics_region_address && !syn_dyn_end_address) {
         return false;

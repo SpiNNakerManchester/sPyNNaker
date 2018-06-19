@@ -3,6 +3,7 @@
 
 #include <common/neuron-typedefs.h>
 #include <common/in_spikes.h>
+#include <spin1_api.h>
 
 bool spike_processing_initialise(
     size_t row_max_n_bytes, uint mc_packet_callback_priority,

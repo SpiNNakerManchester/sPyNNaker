@@ -21,19 +21,11 @@ typedef struct input_type_t {
 static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
-    for (int i=0; i< num_receptors; i++){
-    	value[i] = value[i];  // NOTE: this will be edited in future to be
-    	                      //       multiplied by a scaling factor
+    for (int i = 0; i < num_receptors; i++) {
+        value[i] = value[i];  // NOTE: this will be edited in future to be
+                              //       multiplied by a scaling factor
     }
     return &value[0];
-}
-
-static void input_type_set_inhibitory_multiplicator_value(
-		input_t* value, input_type_pointer_t input_type, input_t* inh_input)
-{
-	use(value);
-	use(input_type);
-	use(inh_input);
 }
 
 static inline void input_type_convert_excitatory_input_to_current(

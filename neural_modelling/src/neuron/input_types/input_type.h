@@ -16,10 +16,6 @@ static input_t* input_type_get_input_value(
     input_t* value, input_type_pointer_t input_type,
     uint16_t num_receptors);
 
-// ! \brief Set the multiplicator in the input_type to value based on inh input
-static void input_type_set_inhibitory_multiplicator_value(
-		input_t* value, input_type_pointer_t input_type, input_t* inh_input);
-
 //! \brief Converts an excitatory input into an excitatory current
 //! \param[in/out] exc_input Pointer to array of excitatory inputs from
 //! different receptors this timestep - note that this will already have been
