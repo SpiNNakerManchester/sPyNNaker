@@ -130,7 +130,7 @@ class PyNNProjectionCommon(object):
                 time_scale_factor)
             self._projection_edge.delay_edge = delay_edge
 
-        # add projection to the spinnaker control system
+        # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the

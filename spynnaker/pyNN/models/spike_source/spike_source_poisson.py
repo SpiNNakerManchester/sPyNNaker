@@ -121,7 +121,7 @@ class SpikeSourcePoisson(
     default_parameters = {
         'start': 0.0, 'duration': None, 'rate': 1.0}
 
-    # parameters expected by spinnaker
+    # parameters expected by SpiNNaker
     non_pynn_default_parameters = {
         'constraints': None, 'seed': None, 'label': None}
 

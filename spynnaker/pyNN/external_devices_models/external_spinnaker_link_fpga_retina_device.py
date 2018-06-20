@@ -81,7 +81,7 @@ class ExternalFPGARetinaDevice(
         :param mode: The retina "mode"
         :param retina_key: The value of the top 16-bits of the key
         :param spinnaker_link_id: \
-            The spinnaker link to which the retina is connected
+            The SpiNNaker link to which the retina is connected
         :param polarity: The "polarity" of the retina data
         :param label:
         :param n_neurons: The number of neurons in the population

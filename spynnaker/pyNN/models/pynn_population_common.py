@@ -51,7 +51,7 @@ class PyNNPopulationCommon(object):
         self._vertex = vertex
 
         # copy the parameters so that the end users are not exposed to the
-        # additions placed by spinnaker.
+        # additions placed by SpiNNaker.
         if initial_values is not None:
             for name, value in iteritems(initial_values):
                 self._vertex.set_value(name, value)
@@ -82,7 +82,7 @@ class PyNNPopulationCommon(object):
         else:
             self._structure = None
 
-        # add objects to the spinnaker control class
+        # add objects to the SpiNNaker control class
         self._spinnaker_control.add_population(self)
         self._spinnaker_control.add_application_vertex(self._vertex)
 

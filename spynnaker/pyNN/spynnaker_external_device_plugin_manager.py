@@ -93,13 +93,14 @@ class SpynnakerExternalDevicePluginManager(object):
         :param port: \
             The UDP port to which the live spikes will be sent. If not\
             specified, the port will be taken from the "live_spike_port"\
-            parameter in the "Recording" section of the spynnaker cfg file.
+            parameter in the "Recording" section of the sPyNNaker\
+            configuration file.
         :type port: int
         :param host: \
             The host name or IP address to which the live spikes will be\
             sent. If not specified, the host will be taken from the\
             "live_spike_host" parameter in the "Recording" section of the\
-            spynnaker cfg file.
+            sPyNNaker configuration file.
         :type host: str
         :param tag: \
             The IP tag to be used for the spikes. If not specified, one will\
@@ -122,7 +123,7 @@ class SpynnakerExternalDevicePluginManager(object):
         if host is None:
             host = config.get("Recording", "live_spike_host")
 
-        # add new edge and vertex if required to spinnaker graph
+        # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
             population._vertex, port, host, tag, board_address, strip_sdp,
             use_prefix, key_prefix, prefix_type, message_type, right_shift,

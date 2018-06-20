@@ -45,7 +45,7 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
 setup(
     name="sPyNNaker",
     version=__version__,
-    description="Spinnaker implementation of PyNN",
+    description="SpiNNaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=packages,
     package_data=package_data,

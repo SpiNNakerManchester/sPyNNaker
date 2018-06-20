@@ -64,7 +64,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._command_edge_count = 0
         self._live_spike_recorder = dict()
 
-        # create xml path for where to locate spynnaker related functions when
+        # create XML path for where to locate sPyNNaker related functions when
         # using auto pause and resume
         extra_algorithm_xml_path = list()
         extra_algorithm_xml_path.append(os.path.join(
@@ -215,7 +215,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             logger.warning(
                 "*** wall clock timer tick that is currently not  ***")
             logger.warning(
-                "*** reliably supported by the spinnaker machine. ***")
+                "*** reliably supported by the SpiNNaker machine. ***")
             logger.warning(
                 "****************************************************")
 
