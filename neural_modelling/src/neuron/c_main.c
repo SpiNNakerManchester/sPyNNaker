@@ -222,7 +222,7 @@ static bool initialise(uint32_t *timer_period) {
 }
 
 //! \brief the function to call when resuming a simulation
-//! return None
+//! \return None
 void resume_callback() {
     recording_reset();
 

@@ -291,7 +291,7 @@ circular_buffer get_circular_buffer(){
 }
 
 //! \brief set the DMA status
-//! param[in] busy: bool
+//! \param[in] busy: bool
 //! \return None
 void set_dma_busy(bool busy) {
     dma_busy = busy;

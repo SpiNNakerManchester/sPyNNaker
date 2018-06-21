@@ -24,7 +24,7 @@ class AbstractAdditionalInput(object):
 
         :return: An array of parameters
         :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+            :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
         """
 
     @abstractmethod
@@ -32,7 +32,7 @@ class AbstractAdditionalInput(object):
         """ Get the types of the parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.DataType`
+        :rtype: list(:py:class:`data_specification.enums.DataType`)
         """
 
     @abstractmethod

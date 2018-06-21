@@ -26,7 +26,7 @@ class AbstractNeuronModel(object):
 
         :return: an array of parameters
         :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+            :py:class:`spynnaker.pyNN.models.neural_properties.NeuronParameter`
         """
 
     @abstractmethod
@@ -34,7 +34,7 @@ class AbstractNeuronModel(object):
         """ Get the types of the neural parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.DataType`
+        :rtype: list(:py:class:`data_specification.enums.DataType`)
         """
 
     @abstractmethod
@@ -50,7 +50,7 @@ class AbstractNeuronModel(object):
         """ Get the types of the global parameters
 
         :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.DataType`
+        :rtype: list(:py:class:`data_specification.enums.DataType`)
         """
 
     @abstractmethod
@@ -59,7 +59,7 @@ class AbstractNeuronModel(object):
 
         :return: an array of parameters
         :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
+            :py:class:`spynnaker.pyNN.models.neural_properties.NeuronParameter`
         """
 
     @abstractmethod

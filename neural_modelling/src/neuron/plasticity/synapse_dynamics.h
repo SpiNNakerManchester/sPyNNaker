@@ -31,7 +31,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
 //! \brief returns the number of ring buffer saturation events due to adding
 //! plastic weights.
-//! return coutner for saturation events or 0
+//! \return counter for saturation events or 0
 uint32_t synapse_dynamics_get_plastic_saturation_count();
 
 //-----------------------------------------------------------------------------
