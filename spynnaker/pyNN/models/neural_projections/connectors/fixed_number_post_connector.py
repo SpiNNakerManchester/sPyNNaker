@@ -100,8 +100,8 @@ class FixedNumberPostConnector(AbstractConnector):
 
                         # Create a list without the pre_neuron in it
                         no_self_post_neurons = numpy.concatenate(
-                            numpy.arange(0, m),
-                            numpy.arange(m + 1, self._n_post_neurons))
+                            [numpy.arange(0, m),
+                             numpy.arange(m + 1, self._n_post_neurons)])
 
                         # Now use this list in the random choice
                         self._post_neurons[m] = numpy.random.choice(
