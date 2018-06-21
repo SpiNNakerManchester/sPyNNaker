@@ -60,7 +60,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         my_repeat_reg = 4
         spec.set_register_value(register_id=my_repeat_reg,
                                 data=MASTER_POPULATION_ENTRIES)
-        spec.write_repeat_value(data=0, repeats_register=my_repeat_reg,
+        spec.write_repeated_value(data=0, repeats_register=my_repeat_reg,
                                 data_type=DataType.UINT16)
 
         spec.comment("\nWriting Row Length Translation Table:\n")
