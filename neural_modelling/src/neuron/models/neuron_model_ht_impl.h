@@ -26,8 +26,29 @@ typedef struct neuron_t {
     // exp(-(machine time step in ms)/(R * C)) [.]
     REAL exp_TC;
 
-    // post-spike reset membrane voltage [mV]
+    REAL tau_m;
+
+    REAL exp_TC_spike;
+
+    REAL tau_spike;
+
+    REAL g_spike_var;
+    REAL g_spike;
+
+    REAL t_spike;
+
     REAL I_offset;
+
+    // Refractory period counter
+    uint32_t ref_counter;
+
+    REAL A;
+    REAL B;
+    REAL A_SPIKE;
+    REAL B_SPIKE;
+    REAL A_INV;
+    REAL A_SPIKE_INV;
+
 
 } neuron_t;
 

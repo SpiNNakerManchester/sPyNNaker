@@ -15,7 +15,19 @@ E_NA = "E_Na"
 G_K = "g_K"
 E_K = "E_K"
 TAU_M = "tau_m"
+G_SPIKE = "g_spike"
+TAU_SPIKE = "tau_spike"
+T_SPIKE = "t_spike"
 I_OFFSET = "i_offset"
+REF_COUNTER = "refractory_counter"
+A = "A"
+B = "B"
+A_SPIKE = "A_SPIKE"
+B_SPIKE = "B_SPIKE"
+A_INV = "A_INV"
+A_SPIKE_INV = "A_SPIKE_INV"
+EXPONENT = "exponent"
+EXPONENT_SPIKE = "exponent_spike"
 
 _CPU_CYCLES = 70
 
@@ -27,7 +39,19 @@ class _HT_TYPES(Enum):
     G_K = (4, DataType.S1615)
     E_K = (5, DataType.S1615)
     EXP_TC = (6, DataType.S1615)
-    I_OFFSET = (7, DataType.S1615)
+    TAU_M = (7, DataType.S1615)
+    EXP_TC_SPIKE = (8, DataType.S1615)
+    TAU_SPIKE = (9, DataType.S1615)
+    G_SPIKE = (10, DataType.S1615)
+    T_SPIKE = (11, DataType.S1615)
+    I_OFFSET = (12, DataType.S1615)
+    REF_COUNTER = (13, DataType.INT32)
+    A = (14, DataType.S1615)
+    B = (15, DataType.S1615)
+    A_SPIKE = (16, DataType.S1615)
+    B_SPIKE = (17, DataType.S1615)
+    A_INV = (18, DataType.S1615)
+    A_SPIKE_INV =(19, DataType.S1615)
 
     def __new__(cls, value, data_type, doc=""):
         # pylint: disable=protected-access
@@ -53,7 +77,9 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
             v_init,
             g_Na, E_rev_Na,
             g_K, E_rev_K,
-            tau_m, i_offset):
+            tau_m,
+            g_spike, tau_spike, t_spike,
+            i_offset):
 
         # pylint: disable=too-many-arguments
         self._data = SpynnakerRangeDictionary(size=n_neurons)
@@ -63,7 +89,34 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
         self._data[G_K] = g_K
         self._data[E_K] = E_rev_K
         self._data[TAU_M] = tau_m
+        self._data[G_SPIKE] = g_spike
+        self._data[TAU_SPIKE] = tau_spike
+        self._data[T_SPIKE] = t_spike
         self._data[I_OFFSET] = i_offset
+
+        self._data[A] = (self._data[TAU_SPIKE] *
+            (self._data[G_NA] + self._data[G_K]))
+        self._data[B] = (self._data[TAU_SPIKE] *
+            (self._data[G_NA] * self._data[E_NA] +
+             self._data[G_K] * self._data[E_K]))
+
+        self._data[A_SPIKE] = (self._data[TAU_SPIKE] *
+            (self._data[G_NA] + self._data[G_K]) + (self._data[TAU_M] *
+                                                    self._data[G_SPIKE]))
+        self._data[B_SPIKE] =(self._data[TAU_SPIKE] *
+            (self._data[G_NA] * self._data[E_NA] +
+             self._data[G_K] * self._data[E_K]) +
+                              self._data[TAU_M]* self._data[G_SPIKE]
+                              * self._data[E_K])
+
+        self._data[A_INV] = self._data[A] # initialise now, and invert with lambda
+        self._data[A_SPIKE_INV] = self._data[A_SPIKE] # initialise now, and invert with lambda
+
+        self._data[EXPONENT] = self._data[A]/(self._data[TAU_M]*self._data[TAU_SPIKE])
+
+        self._data[EXPONENT_SPIKE] = (self._data[A_SPIKE] /
+                                      (self._data[TAU_M]*self._data[TAU_SPIKE]))
+
         self._units = {
             V_INIT: 'mV',
             G_NA: 'microS',
@@ -71,6 +124,9 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
             G_K: 'microS',
             E_K: 'mV',
             TAU_M: 'ms',
+            G_SPIKE: 'microS',
+            TAU_SPIKE: 'ms',
+            T_SPIKE: 'ms',
             I_OFFSET: 'nA'}
 
     @property
@@ -122,22 +178,62 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
         self._data.set_value(key=TAU_M, value=tau_m)
 
     @property
+    def g_spike(self):
+        return self._data[G_SPIKE]
+
+    @g_spike.setter
+    def g_spike(self, g_spike):
+        self._data.set_value(key=G_SPIKE, value=g_spike)
+
+    @property
+    def tau_spike(self):
+        return self._data[TAU_SPIKE]
+
+    @tau_spike.setter
+    def tau_spike(self, tau_spike):
+        self._data.set_value(key=TAU_SPIKE, value=tau_spike)
+
+    @property
+    def t_spike(self):
+        return self._data[T_SPIKE]
+
+    @t_spike.setter
+    def t_spike(self, t_spike):
+        self._data.set_value(key=T_SPIKE, value=t_spike)
+    @property
     def i_offset(self):
         return self._data[I_OFFSET]
 
     @i_offset.setter
-    def tau_m(self, i_offset):
+    def i_offset(self, i_offset):
         self._data.set_value(key=I_OFFSET, value=i_offset)
 
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
-        return 7
+        return 20
+
+    def _tau_refrac_timesteps(self, machine_time_step):
+        return self._data[T_SPIKE].apply_operation(
+            operation=lambda x: numpy.ceil(x / (machine_time_step / 1000.0)))
 
     def _exp_tc(self, machine_time_step):
-        return self._data[TAU_M].apply_operation(
+        return self._data[EXPONENT].apply_operation(
             operation=lambda x: numpy.exp(
-                float(-machine_time_step) / (1000.0 * x)))
+                (float(-machine_time_step) * x) / (1000.0)))
+
+    def _exp_tc_spike(self, machine_time_step):
+        return self._data[EXPONENT_SPIKE].apply_operation(
+            operation=lambda x: numpy.exp(
+                (float(-machine_time_step) * x) / (1000.0)))
+
+    def _inv_A(self):
+        return self._data[A_INV].apply_operation(
+            operation=lambda x: 1 / x)
+
+    def _inv_A_SPIKE(self):
+        return self._data[A_SPIKE_INV].apply_operation(
+            operation=lambda x: 1 / x)
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_neural_parameters,
@@ -166,13 +262,68 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
                 self._data[E_K],
                 _HT_TYPES.E_K.data_type),
 
+            # No-spike time constant multiplier
             NeuronParameter(
                 self._exp_tc(machine_time_step),
                 _HT_TYPES.EXP_TC.data_type),
 
             NeuronParameter(
+                self._data[TAU_M],
+                _HT_TYPES.TAU_M.data_type),
+
+            # Including spike multiplier
+            NeuronParameter(
+                self._exp_tc_spike(machine_time_step),
+                _HT_TYPES.EXP_TC_SPIKE.data_type),
+
+            NeuronParameter(
+                self._data[TAU_SPIKE],
+                _HT_TYPES.TAU_SPIKE.data_type),
+
+            # variable
+            NeuronParameter(
+                0,
+                _HT_TYPES.G_SPIKE.data_type),
+
+            # value to switch to
+            NeuronParameter(
+                self._data[G_SPIKE],
+                _HT_TYPES.G_SPIKE.data_type),
+
+            NeuronParameter(
+                self._tau_refrac_timesteps(machine_time_step),
+                _HT_TYPES.T_SPIKE.data_type),
+
+            NeuronParameter(
                 self._data[I_OFFSET],
                 _HT_TYPES.I_OFFSET.data_type),
+
+            NeuronParameter(
+                0, _HT_TYPES.REF_COUNTER.data_type),
+
+            NeuronParameter(
+                self._data[A],
+                _HT_TYPES.A.data_type),
+
+            NeuronParameter(
+                self._data[B],
+                _HT_TYPES.B.data_type),
+
+            NeuronParameter(
+                self._data[A_SPIKE],
+                _HT_TYPES.A_SPIKE.data_type),
+
+            NeuronParameter(
+                self._data[B_SPIKE],
+                _HT_TYPES.B_SPIKE.data_type),
+
+            NeuronParameter(
+                self._inv_A(),
+                _HT_TYPES.A_INV.data_type),
+
+            NeuronParameter(
+                self._inv_A_SPIKE(),
+                _HT_TYPES.A_SPIKE_INV.data_type)
         ])
         return params
 

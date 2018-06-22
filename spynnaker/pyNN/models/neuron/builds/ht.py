@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelHT
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeHTDynamic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
@@ -26,7 +26,15 @@ class HillTononiNeuron(AbstractPopulationVertex):
         'tau_m': 16,
         'i_offset': 0.0,
 
-        'v_thresh': -30,
+        'g_spike': 1.0,
+        'tau_spike': 1.75,
+        't_spike': 2.0,
+
+        'v_thresh': -50,
+        'v_thresh_resting': -50,
+        'v_thresh_tau':2,
+        'v_thresh_Na_reversal':30,
+
         'isyn_exc': 0.0,
         'isyn_inh': 0.0,
         'tau_syn_E': 5.0,
@@ -51,7 +59,15 @@ class HillTononiNeuron(AbstractPopulationVertex):
             tau_m=default_parameters['tau_m'],
             i_offset=default_parameters['i_offset'],
 
+            g_spike=default_parameters['g_spike'],
+            tau_spike=default_parameters['tau_spike'],
+            t_spike=default_parameters['t_spike'],
+
             v_thresh=default_parameters['v_thresh'],
+            v_thresh_resting=default_parameters['v_thresh_resting'],
+            v_thresh_tau=default_parameters['v_thresh_tau'],
+            v_thresh_Na_reversal=default_parameters['v_thresh_Na_reversal'],
+
             tau_syn_E=default_parameters['tau_syn_E'],
             tau_syn_I=default_parameters['tau_syn_I'],
             isyn_exc=default_parameters['isyn_exc'],
@@ -65,11 +81,16 @@ class HillTononiNeuron(AbstractPopulationVertex):
             g_K,
             E_K,
             tau_m,
+            g_spike,
+            tau_spike,
+            t_spike,
             i_offset)
         synapse_type = SynapseTypeExponential(
             n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
-        threshold_type = ThresholdTypeStatic(n_neurons, v_thresh)
+        threshold_type = ThresholdTypeHTDynamic(n_neurons,
+                                v_thresh, v_thresh_resting,
+                                v_thresh_tau, v_thresh_Na_reversal)
 
         super(HillTononiNeuron, self).__init__(
             n_neurons=n_neurons, binary="ht.aplx", label=label,
@@ -79,7 +100,8 @@ class HillTononiNeuron(AbstractPopulationVertex):
             incoming_spike_buffer_size=incoming_spike_buffer_size,
             model_name="ht", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type, constraints=constraints)
+            threshold_type=threshold_type,
+            constraints=constraints)
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
