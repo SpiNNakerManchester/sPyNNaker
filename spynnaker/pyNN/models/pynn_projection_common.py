@@ -55,8 +55,8 @@ class PyNNProjectionCommon(object):
                 " synaptic projections")
 
         # sort out synapse type
-        synapse_type = post_synaptic_population._get_vertex \
-            .synapse_type.get_synapse_id_by_target(target)
+        synapse_type = post_synaptic_population._get_vertex\
+            .get_synapse_id_by_target(target)
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(

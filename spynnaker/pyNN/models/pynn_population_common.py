@@ -6,7 +6,6 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet, AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -143,7 +142,7 @@ class PyNNPopulationCommon(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        return isinstance(self._vertex.input_type, InputTypeConductance)
+        return self._vertex.is_conductance_based
 
     def __getitem__(self, index_or_slice):
         # Note: This is supported by sPyNNaker8

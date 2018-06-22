@@ -7,15 +7,13 @@
 #include "neuron.h"
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
+#include <common/out_spikes.h>
 #include <debug.h>
 
 // declare spin1_wfi
 void spin1_wfi();
 
 #define SPIKE_RECORDING_CHANNEL 0
-#define V_RECORDING_CHANNEL 1
-#define GSYN_EXCITATORY_RECORDING_CHANNEL 2
-#define GSYN_INHIBITORY_RECORDING_CHANNEL 3
 
 //! The key to be used for this core (will be ORed with neuron id)
 static key_t key;

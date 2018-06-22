@@ -129,36 +129,37 @@ static void neuron_impl_add_inputs(
 
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
-    log_debug("writing parameters, next is %u, n_neurons is %u ",
+    log_debug("reading parameters, next is %u, n_neurons is %u ",
         next, n_neurons);
 
     //log_debug("writing neuron global parameters");
     spin1_memcpy(global_parameters, &address[next],
             sizeof(global_neuron_params_t));
-    next += sizeof(global_neuron_params_t) / 4;
+    next += (sizeof(global_neuron_params_t) + 3) / 4;
 
-    log_debug("writing neuron local parameters");
+    log_debug("reading neuron local parameters");
     spin1_memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
-    next += (n_neurons * sizeof(neuron_t)) / 4;
+    next += ((n_neurons * sizeof(neuron_t)) + 3) / 4;
 
-    log_debug("writing input type parameters");
+    log_debug("reading input type parameters");
     spin1_memcpy(input_type_array, &address[next],
             n_neurons * sizeof(input_type_t));
-    next += (n_neurons * sizeof(input_type_t)) / 4;
+    next += ((n_neurons * sizeof(input_type_t)) + 3) / 4;
 
-    log_debug("writing additional input type parameters");
-    spin1_memcpy(additional_input_array, &address[next],
-           n_neurons * sizeof(additional_input_t));
-    next += (n_neurons * sizeof(additional_input_t)) / 4;
-
-    log_debug("writing threshold type parameters");
+    log_debug("reading threshold type parameters");
     spin1_memcpy(threshold_type_array, &address[next],
            n_neurons * sizeof(threshold_type_t));
-    next += (n_neurons * sizeof(threshold_type_t)) / 4;
+    next += ((n_neurons * sizeof(threshold_type_t)) + 3) / 4;
 
-    log_debug("writing synapse parameters");
+    log_debug("reading synapse parameters");
     spin1_memcpy(neuron_synapse_shaping_params, &address[next],
            n_neurons * sizeof(synapse_param_t));
+    next += ((n_neurons * sizeof(synapse_param_t)) + 3) / 4;
+
+    log_debug("reading additional input type parameters");
+        spin1_memcpy(additional_input_array, &address[next],
+               n_neurons * sizeof(additional_input_t));
+    next += ((n_neurons * sizeof(additional_input_t)) + 3) / 4;
 
     neuron_model_set_global_neuron_params(global_parameters);
 
@@ -266,31 +267,32 @@ static void neuron_impl_store_neuron_parameters(
     //log_debug("writing neuron global parameters");
     spin1_memcpy(&address[next], global_parameters,
             sizeof(global_neuron_params_t));
-    next += sizeof(global_neuron_params_t) / 4;
+    next += (sizeof(global_neuron_params_t) + 3) / 4;
 
     log_debug("writing neuron local parameters");
     spin1_memcpy(&address[next], neuron_array,
             n_neurons * sizeof(neuron_t));
-    next += (n_neurons * sizeof(neuron_t)) / 4;
+    next += ((n_neurons * sizeof(neuron_t)) + 3) / 4;
 
     log_debug("writing input type parameters");
     spin1_memcpy(&address[next], input_type_array,
             n_neurons * sizeof(input_type_t));
-    next += (n_neurons * sizeof(input_type_t)) / 4;
-
-    log_debug("writing additional input type parameters");
-    spin1_memcpy(&address[next], additional_input_array,
-            n_neurons * sizeof(additional_input_t));
-    next += (n_neurons * sizeof(additional_input_t)) / 4;
+    next += ((n_neurons * sizeof(input_type_t)) + 3) / 4;
 
     log_debug("writing threshold type parameters");
     spin1_memcpy(&address[next], threshold_type_array,
             n_neurons * sizeof(threshold_type_t));
-    next += (n_neurons * sizeof(threshold_type_t)) / 4;
+    next += ((n_neurons * sizeof(threshold_type_t)) + 3) / 4;
 
     log_debug("writing synapse parameters");
     spin1_memcpy(&address[next], neuron_synapse_shaping_params,
             n_neurons * sizeof(synapse_param_t));
+    next += ((n_neurons * sizeof(synapse_param_t)) + 3) / 4;
+
+    log_debug("writing additional input type parameters");
+    spin1_memcpy(&address[next], additional_input_array,
+            n_neurons * sizeof(additional_input_t));
+    next += ((n_neurons * sizeof(additional_input_t)) + 3) / 4;
 }
 
 #endif // _NEURON_IMPL_STANDARD_H_

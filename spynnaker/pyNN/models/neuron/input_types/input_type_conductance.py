@@ -1,88 +1,99 @@
 from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 from .abstract_input_type import AbstractInputType
-
-from enum import Enum
+from spynnaker.pyNN.utilities import utility_calls
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
 
-
-class _CONDUCTANCE_TYPES(Enum):
-    E_REV_E = (1, DataType.S1615)
-    E_REV_I = (2, DataType.S1615)
-
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    E_REV_E: "mV",
+    E_REV_I: "mV"
+}
 
 
 class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     """ The conductance input type
     """
     __slots__ = [
-        "_data",
-        "_n_neurons",
-        "_units"]
+        "_e_rev_E",
+        "_e_rev_I"]
 
-    def __init__(self, n_neurons, e_rev_E, e_rev_I):
-        self._units = {
-            E_REV_E: "mV",
-            E_REV_I: "mV"}
+    def __init__(self, e_rev_E, e_rev_I):
+        self._e_rev_E = e_rev_E
+        self._e_rev_I = e_rev_I
 
-        self._n_neurons = n_neurons
-        self._data = SpynnakerRangeDictionary(size=n_neurons)
-        self._data[E_REV_E] = e_rev_E
-        self._data[E_REV_I] = e_rev_I
+    @overrides(AbstractInputType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 10 * n_neurons
 
-    @property
-    def e_rev_E(self):
-        return self._data[E_REV_E]
+    @overrides(AbstractInputType.get_dtcm_usage_in_bytes)
+    def get_dtcm_usage_in_bytes(self, n_neurons):
+        # 2 parameters per neuron (4 bytes each)
+        return (2 * 4 * n_neurons)
 
-    @e_rev_E.setter
-    def e_rev_E(self, e_rev_E):
-        self._data.set_value(key=E_REV_E, value=e_rev_E)
+    @overrides(AbstractInputType.get_sdram_usage_in_bytes)
+    def get_sdram_usage_in_bytes(self, n_neurons):
+        # 2 parameters per neuron (4 bytes each)
+        return (2 * 4 * n_neurons)
 
-    @property
-    def e_rev_I(self):
-        return self._data[E_REV_I]
+    @overrides(AbstractInputType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters.set_value(E_REV_E, self._e_rev_E)
+        parameters.set_value(E_REV_I, self._e_rev_I)
 
-    @e_rev_I.setter
-    def e_rev_I(self, e_rev_I):
-        self._data.set_value(key=E_REV_I, value=e_rev_I)
+    @overrides(AbstractInputType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        pass
 
+    @overrides(AbstractInputType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractInputType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @overrides(AbstractInputType.get_data)
+    def get_data(self, parameters, state_variables, vertex_slice):
+
+        # Add the rest of the data
+        items = [
+            (parameters[E_REV_E], DataType.S1615),
+            (parameters[E_REV_I], DataType.S1615),
+        ]
+        return utility_calls.get_parameter_data(items, vertex_slice)
+
+    @overrides(AbstractInputType.read_data)
+    def read_data(
+            self, data, offset, vertex_slice, parameters, state_variables):
+
+        # Read the data
+        types = [DataType.S1615 * 2]
+        offset, (_e_rev_E, _e_rev_I) = \
+            utility_calls.read_parameter_data(
+                types, data, offset, vertex_slice.n_atoms)
+        return offset
+
+    @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
         return 1024.0
 
-    def get_n_input_type_parameters(self):
-        return 2
+    @property
+    def e_rev_E(self):
+        return self._e_rev_E
 
-    def get_input_type_parameters(self):
-        return [
-            NeuronParameter(
-                self._data[E_REV_E], _CONDUCTANCE_TYPES.E_REV_E.data_type),
-            NeuronParameter(
-                self._data[E_REV_I], _CONDUCTANCE_TYPES.E_REV_I.data_type)
-        ]
+    @e_rev_E.setter
+    def e_rev_E(self, e_rev_E):
+        self._e_rev_E = e_rev_E
 
-    def get_input_type_parameter_types(self):
-        return [item.data_type for item in _CONDUCTANCE_TYPES]
+    @property
+    def e_rev_I(self):
+        return self._e_rev_I
 
-    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
-        return 10
-
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]
+    @e_rev_I.setter
+    def e_rev_I(self, e_rev_I):
+        self._e_rev_I = e_rev_I
