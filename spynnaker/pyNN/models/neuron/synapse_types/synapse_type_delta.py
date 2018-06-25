@@ -47,7 +47,7 @@ class SynapseTypeDelta(AbstractSynapseType):
         return variable in UNITS
 
     @overrides(AbstractSynapseType.get_values)
-    def get_values(self, parameters, state_variables):
+    def get_values(self, parameters, state_variables, vertex_slice):
 
         # Add the rest of the data
         return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]

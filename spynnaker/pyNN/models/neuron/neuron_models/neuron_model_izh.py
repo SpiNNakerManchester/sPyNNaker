@@ -80,16 +80,15 @@ class NeuronModelIzh(AbstractNeuronModel):
     def get_global_values(self, machine_time_step):
         return [machine_time_step]
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values,
-               additional_arguments={'machine_time_step'})
-    def get_values(self, parameters, state_variables, machine_time_step):
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
             state_variables[V], state_variables[U], parameters[I_OFFSET],
-            float(machine_time_step) / 1000.0
+            float(ts) / 1000.0
         ]
 
     @overrides(AbstractNeuronModel.update_values)

@@ -75,9 +75,8 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         return variable in UNITS
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_values,
-               additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, ts):
+    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         decay = lambda x: int(numpy.exp(-ts / x) * ulfract)  # noqa E731
         init = lambda x: (x / ts) * (1.0 - numpy.exp(-ts / x))  # noqa E731

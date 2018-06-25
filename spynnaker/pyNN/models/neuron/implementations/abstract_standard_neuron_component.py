@@ -77,7 +77,7 @@ class AbstractStandardNeuronComponent(object):
         """
 
     @abstractmethod
-    def get_values(self, parameters, state_variables):
+    def get_values(self, parameters, state_variables, vertex_slice):
         """ Get the values to be written to the machine for this model
 
         :param parameters: The holder of the parameters
@@ -86,6 +86,7 @@ class AbstractStandardNeuronComponent(object):
         :param state_variables: The holder of the state variables
         :type state_variables:\
             :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param vertex_slice: The slice of variables being retrieved
         :return: A list with the same length as self.struct.field_types
         :rtype: A list of (single value or list of values or RangedList)
         """
@@ -102,7 +103,7 @@ class AbstractStandardNeuronComponent(object):
         :param vertex_slice: The slice of the vertex to generate parameters for
         :rtype: numpy array of uint32
         """
-        values = self.get_values(parameters, state_variables)
+        values = self.get_values(parameters, state_variables, vertex_slice)
         return self.struct.get_data(
             values, vertex_slice.lo_atom, vertex_slice.n_atoms)
 

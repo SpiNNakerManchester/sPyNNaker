@@ -2,6 +2,7 @@ from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
+from spinn_utilities.index_is_value import IndexIsValue
 
 DEVICE = "device"
 TIME_UNTIL_SEND = "time_until_send"
@@ -19,21 +20,18 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     __slots__ = ["_device"]
 
     def __init__(self, device):
+        super(ThresholdTypeMulticastDeviceControl, self).__init__([
+            DataType.UINT32,   # control_key
+            DataType.UINT32,   # control_uses_payload
+            DataType.S1615,    # min_value
+            DataType.S1615,    # max_value
+            DataType.UINT32,   # time steps between sending
+            DataType.UINT32])  # time steps until next send
         self._device = device
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         return 10 * n_neurons
-
-    @overrides(AbstractThresholdType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 6 parameter per device (4 bytes each)
-        return (6 * 4 * n_neurons)
-
-    @overrides(AbstractThresholdType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 6 parameter per device (4 bytes each)
-        return (6 * 4 * n_neurons)
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
@@ -51,34 +49,28 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractThresholdType.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    @overrides(AbstractThresholdType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
 
         # Add the rest of the data
-        items = [
-            (parameters[DEVICE].apply_operation(
-                lambda x: x.control_key), DataType.UINT32),
-            (parameters[DEVICE].apply_operation(
-                lambda x: x.device_control_uses_payload), DataType.UINT32),
-            (parameters[DEVICE].apply_operation(
-                lambda x: x.device_control_min_value), DataType.S1615),
-            (parameters[DEVICE].apply_operation(
-                lambda x: x.device_control_max_value), DataType.S1615),
-            (parameters[DEVICE].apply_operation(
-                lambda x: x.device_control_timesteps_between_sending),
-                DataType.UINT32),
+        return [parameters[DEVICE].apply_operation(
+                    lambda x: x.control_key),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_uses_payload),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_min_value),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_max_value),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_timesteps_between_sending),
 
-            # This is the "state" variable that keeps track of how many
-            # timesteps to go before a send is done
-            # Initially set this to a different number for each device, to
-            # avoid them being in step with each other
-            ([i for i in range(vertex_slice.n_atoms)], DataType.UINT32)
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+                # This is the "state" variable that keeps track of how many
+                # timesteps to go before a send is done
+                # Set to a different value for each item to avoid being in step
+                [i for i in range(vertex_slice.n_atoms)]]
 
-    @overrides(AbstractThresholdType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractThresholdType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
         types = [DataType.UINT32, DataType.UINT32, DataType.S1615,
