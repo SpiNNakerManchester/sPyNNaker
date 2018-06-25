@@ -227,18 +227,16 @@ class AbstractPopulationVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "n_machine_time_steps": "PlanNTimeSteps",
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
         ApplicationVertex.get_resources_used_by_atoms,
         additional_arguments={
-            "graph", "n_machine_time_steps", "machine_time_step"
+            "graph", "machine_time_step"
         }
     )
     def get_resources_used_by_atoms(
-            self, vertex_slice, graph, n_machine_time_steps,
-            machine_time_step):
+            self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
         ip_tags = list()
@@ -249,7 +247,6 @@ class AbstractPopulationVertex(
 
         variableSDRAM = self._neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
-        variableSDRAM.set_assumed_timesteps(n_machine_time_steps)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
