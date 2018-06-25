@@ -20,7 +20,8 @@ class MultapseConnector(AbstractConnector):
     with replacement. Uniform selection probability is assumed.
     """
     def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, verbose=False):
+                 with_replacement=True, safe=True, verbose=False,
+                 rng=None):
         """
         Creates a new connector.
 
@@ -41,6 +42,7 @@ class MultapseConnector(AbstractConnector):
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
+        self._rng = rng
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
