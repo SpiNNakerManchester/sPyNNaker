@@ -1,8 +1,6 @@
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
-from spynnaker.pyNN.utilities import utility_calls
-
 from data_specification.enums import DataType
 
 import numpy
@@ -39,6 +37,16 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
+        super(NeuronModelLeakyIntegrateAndFire, self).__init__(
+            [DataType.S1615,   # v
+             DataType.S1615,   # v_rest
+             DataType.S1615,   # r_membrane (= tau_m / cm)
+             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
+             DataType.S1615,   # i_offset
+             DataType.INT32,   # count_refrac
+             DataType.S1615,   # v_reset
+             DataType.INT32])  # tau_refrac
+
         if v_init is None:
             v_init = v_rest
         self._v_init = v_init
@@ -53,16 +61,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 100 * n_neurons
-
-    @overrides(AbstractNeuronModel.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 8 items per neuron (4 bytes each)
-        return 8 * 4 * n_neurons
-
-    @overrides(AbstractNeuronModel.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 8 items per neuron (4 bytes each)
-        return 8 * 4 * n_neurons
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
@@ -87,47 +85,32 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         return variable in UNITS
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_data,
+    @overrides(AbstractNeuronModel.get_values,
                additional_arguments={'machine_time_step'})
-    def get_data(
-            self, parameters, state_variables, vertex_slice,
-            machine_time_step):
+    def get_values(self, parameters, state_variables, machine_time_step):
 
         # Add the rest of the data
-        items = [
-            (state_variables[V], DataType.S1615),
-            (parameters[V_REST], DataType.S1615),
-            (parameters[TAU_M] / parameters[CM], DataType.S1615),
-            (parameters[TAU_M].apply_operation(
-                operation=lambda x:
-                    numpy.exp(float(-machine_time_step) / (1000.0 * x))),
-                DataType.S1615),
-            (parameters[I_OFFSET], DataType.S1615),
-            (state_variables[COUNT_REFRAC], DataType.INT32),
-            (parameters[V_RESET], DataType.S1615),
-            (parameters[TAU_REFRAC].apply_operation(
-                operation=lambda x:
-                    numpy.ceil(x / (machine_time_step / 1000.0)),
-                DataType.INT32))
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [state_variables[V], parameters[V_REST],
+                parameters[TAU_M] / parameters[CM],
+                parameters[TAU_M].apply_operation(
+                    operation=lambda x:
+                        numpy.exp(float(-machine_time_step) / (1000.0 * x))),
+                parameters[I_OFFSET], state_variables[COUNT_REFRAC],
+                parameters[V_RESET],
+                parameters[TAU_REFRAC].apply_operation(
+                    operation=lambda x:
+                        numpy.ceil(x / (machine_time_step / 1000.0)))]
 
-    @overrides(AbstractNeuronModel.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractNeuronModel.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.S1615 * 8]
-        offset, (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-                 _v_reset, _tau_refrac) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
+        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
+         _v_reset, _tau_refrac) = values
 
         # Copy the changed data only
-        utility_calls.copy_values(v, state_variables[V], vertex_slice)
-        utility_calls.copy_values(
-            count_refrac, state_variables[COUNT_REFRAC], vertex_slice)
-        return offset
+        state_variables[V] = v
+        state_variables[COUNT_REFRAC] = count_refrac
 
     @property
     def v_init(self):

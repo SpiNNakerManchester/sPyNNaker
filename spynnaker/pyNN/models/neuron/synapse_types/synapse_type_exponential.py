@@ -1,9 +1,8 @@
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
 import numpy
-from spynnaker.pyNN.utilities import utility_calls
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_I = 'tau_syn_I'
@@ -26,6 +25,13 @@ class SynapseTypeExponential(AbstractSynapseType):
         "_isyn_inh"]
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
+        super(SynapseTypeExponential, self).__init__([
+            DataType.U032,    # decay_E
+            DataType.U032,    # init_E
+            DataType.U032,    # decay_I
+            DataType.U032,    # init_I
+            DataType.S1615,   # isyn_exc
+            DataType.S1615])  # isyn_inh
         self._tau_syn_E = tau_syn_E
         self._tau_syn_I = tau_syn_I
         self._isyn_exc = isyn_exc
@@ -34,16 +40,6 @@ class SynapseTypeExponential(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         return 100 * n_neurons
-
-    @overrides(AbstractSynapseType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 3 parameters per neuron per synapse type (4 bytes each)
-        return (3 * 2 * 4 * n_neurons)
-
-    @overrides(AbstractSynapseType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 3 parameters per neuron per synapse type (4 bytes each)
-        return (3 * 2 * 4 * n_neurons)
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
@@ -64,42 +60,27 @@ class SynapseTypeExponential(AbstractSynapseType):
         return variable in UNITS
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_data,
-               additional_arguments={'ts'})
-    def get_data(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, ts):
 
         decay = lambda x: int(numpy.exp(-ts / x) * ulfract)  # noqa E731
         init = lambda x: (x / ts) * (1.0 - numpy.exp(-ts / x))  # noqa E731
 
         # Add the rest of the data
-        items = [
-            (parameters[TAU_SYN_E].apply_operation(decay), DataType.U032),
-            (parameters[TAU_SYN_E].apply_operation(init), DataType.U032),
-            (parameters[TAU_SYN_I].apply_operation(decay), DataType.U032),
-            (parameters[TAU_SYN_I].apply_operation(init), DataType.U032),
-            (state_variables[ISYN_EXC], DataType.S1615),
-            (state_variables[ISYN_INH], DataType.S1615)
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [parameters[TAU_SYN_E].apply_operation(decay),
+                parameters[TAU_SYN_E].apply_operation(init),
+                parameters[TAU_SYN_I].apply_operation(decay),
+                parameters[TAU_SYN_I].apply_operation(init),
+                state_variables[ISYN_EXC], state_variables[ISYN_INH]]
 
     @overrides(AbstractSynapseType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.U032, DataType.U032, DataType.U032, DataType.U032,
-                 DataType.U032, DataType.U032, DataType.S1615, DataType.S1615,
-                 DataType.S1615]
-        offset, (_decay_E, _init_E, _decay_I, _init_I, isyn_exc, isyn_inh) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
+        (_decay_E, _init_E, _decay_I, _init_I, isyn_exc, isyn_inh) = values
 
-        utility_calls.copy_values(
-            isyn_exc, state_variables[ISYN_EXC], vertex_slice)
-        utility_calls.copy_values(
-            isyn_inh, state_variables[ISYN_INH], vertex_slice)
-
-        return offset
+        state_variables[ISYN_EXC] = isyn_exc
+        state_variables[ISYN_INH] = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

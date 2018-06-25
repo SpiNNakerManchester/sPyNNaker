@@ -1,7 +1,6 @@
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
-from spynnaker.pyNN.utilities import utility_calls
+from .abstract_threshold_type import AbstractThresholdType
 from pacman.executor.injection_decorator import inject_items
 
 DU_TH = "du_th"
@@ -24,6 +23,11 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         "_v_thresh"]
 
     def __init__(self, du_th, tau_th, v_thresh):
+        super(ThresholdTypeMaassStochastic, self).__init__([
+            DataType.S1615,   # 1 / du_th
+            DataType.S1615,   # 1 / tau_th
+            DataType.S1615,   # v_thresh
+            DataType.S1615])  # ts / 10
         self._du_th = du_th
         self._tau_th = tau_th
         self._v_thresh = v_thresh
@@ -31,16 +35,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         return 30 * n_neurons
-
-    @overrides(AbstractThresholdType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 4 parameters per neuron (4 bytes each)
-        return (4 * 4 * n_neurons)
-
-    @overrides(AbstractThresholdType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 4 parameters per neuron (4 bytes each)
-        return (4 * 4 * n_neurons)
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
@@ -60,35 +54,20 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractThresholdType.get_data,
-               additional_arguments={'machine_time_step'})
-    def get_data(
-            self, parameters, state_variables, vertex_slice,
-            machine_time_step):
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractThresholdType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, ts):
 
         # Add the rest of the data
-        items = [
-            (parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
-             DataType.S1615),
-            (parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
-             DataType.S1615),
-            (parameters[V_THRESH], DataType.S1615),
-            (float(machine_time_step) / 10000.0, DataType.S1615)
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
+                parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
+                parameters[V_THRESH], float(ts) / 10000.0]
 
-    @overrides(AbstractThresholdType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractThresholdType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.S1615 * 4]
-        offset, (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
-
-        return offset
+        (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
 
     @property
     def v_thresh(self):

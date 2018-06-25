@@ -1,7 +1,6 @@
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.utilities import utility_calls
+from .abstract_synapse_type import AbstractSynapseType
 
 ISYN_EXC = "isyn_exc"
 ISYN_INH = "isyn_inh"
@@ -20,22 +19,15 @@ class SynapseTypeDelta(AbstractSynapseType):
         "_isyn_inh"]
 
     def __init__(self, isyn_exc, isyn_inh):
+        super(SynapseTypeDelta, self).__init__([
+            DataType.S1615,   # isyn_exc
+            DataType.S1615])  # isyn_inh
         self._isyn_exc = isyn_exc
         self._isyn_inh = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         return 1 * n_neurons
-
-    @overrides(AbstractSynapseType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 1 parameter per neuron per synapse type (4 bytes each)
-        return (2 * 1 * 4 * n_neurons)
-
-    @overrides(AbstractSynapseType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 1 parameter per neuron per synapse type (4 bytes each)
-        return (2 * 1 * 4 * n_neurons)
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
@@ -54,32 +46,20 @@ class SynapseTypeDelta(AbstractSynapseType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractSynapseType.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    @overrides(AbstractSynapseType.get_values)
+    def get_values(self, parameters, state_variables):
 
         # Add the rest of the data
-        items = [
-            (state_variables[ISYN_EXC], DataType.S1615),
-            (state_variables[ISYN_INH], DataType.S1615)
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]
 
-    @overrides(AbstractSynapseType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractSynapseType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.S1615 * 2]
-        offset, (isyn_exc, isyn_inh) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
+        (isyn_exc, isyn_inh) = values
 
-        utility_calls.copy_values(
-            isyn_exc, state_variables[ISYN_EXC], vertex_slice)
-        utility_calls.copy_values(
-            isyn_inh, state_variables[ISYN_INH], vertex_slice)
-
-        return offset
+        state_variables[ISYN_EXC] = isyn_exc
+        state_variables[ISYN_INH] = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

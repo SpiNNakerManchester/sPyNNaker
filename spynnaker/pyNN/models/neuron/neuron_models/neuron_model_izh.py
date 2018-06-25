@@ -1,10 +1,7 @@
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
-
-from spynnaker.pyNN.utilities import utility_calls
 from pacman.executor.injection_decorator import inject_items
-import numpy
 
 A = 'a'
 B = 'b'
@@ -32,6 +29,17 @@ class NeuronModelIzh(AbstractNeuronModel):
     ]
 
     def __init__(self, a, b, c, d,  i_offset, v_init, u_init):
+        super(NeuronModelIzh, self).__init__(
+            [DataType.S1615,   # a
+             DataType.S1615,   # b
+             DataType.S1615,   # c
+             DataType.S1615,   # d
+             DataType.S1615,   # v
+             DataType.S1615,   # u
+             DataType.S1615,   # i_offset
+             DataType.S1615]   # this_h (= machine_time_step)
+            [DataType.S1615])  # machine_time_step
+
         self._a = a
         self._b = b
         self._c = c
@@ -44,18 +52,6 @@ class NeuronModelIzh(AbstractNeuronModel):
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 150 * n_neurons
-
-    @overrides(AbstractNeuronModel.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # Timestep is global word (4 bytes)
-        # + 7 parameters per neuron (4 bytes each)
-        return 4 + (7 * 4 * n_neurons)
-
-    @overrides(AbstractNeuronModel.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # Timestep is global word (4 bytes)
-        # + 7 parameters per neuron (4 bytes each)
-        return 4 + (7 * 4 * n_neurons)
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
@@ -79,45 +75,32 @@ class NeuronModelIzh(AbstractNeuronModel):
         return variable in UNITS
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_data,
+    @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'machine_time_step'})
-    def get_data(
-            self, parameters, state_variables, vertex_slice,
-            machine_time_step):
+    def get_global_values(self, machine_time_step):
+        return [machine_time_step]
 
-        # Add the "global parameter" of the machine time step
-        data = list()
-        data.append(utility_calls.get_struct_as_array(
-            [(machine_time_step, DataType.S1615)]))
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_values,
+               additional_arguments={'machine_time_step'})
+    def get_values(self, parameters, state_variables, machine_time_step):
 
         # Add the rest of the data
-        items = [
-            (parameters[A], DataType.S1615),
-            (parameters[B], DataType.S1615),
-            (parameters[C], DataType.S1615),
-            (parameters[D], DataType.S1615),
-            (state_variables[V], DataType.S1615),
-            (state_variables[U], DataType.S1615),
-            (parameters[I_OFFSET], DataType.S1615)
+        return [
+            parameters[A], parameters[B], parameters[C], parameters[D],
+            state_variables[V], state_variables[U], parameters[I_OFFSET],
+            float(machine_time_step) / 1000.0
         ]
-        data.append(utility_calls.get_parameter_data(items, vertex_slice))
-        return numpy.concatenate(data)
 
-    @overrides(AbstractNeuronModel.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractNeuronModel.update_values)
+    def update_values(self, values, parameters, state_variables):
 
-        # Read the data, skipping the machine time step
-        # (4 bytes which won't have changed)
-        types = [DataType.S1615 * 7]
-        offset, (_a, _b, _c, _d, v, u, _i_offset) = \
-            utility_calls.read_parameter_data(
-                types, data, offset + 4, vertex_slice.n_atoms)
+        # Decode the values
+        _a, _b, _c, _d, v, u, _i_offset = values
 
         # Copy the changed data only
-        utility_calls.copy_values(v, state_variables[V], vertex_slice)
-        utility_calls.copy_values(u, state_variables[U], vertex_slice)
-        return offset
+        state_variables[V] = v
+        state_variables[U] = u
 
     @property
     def a(self):

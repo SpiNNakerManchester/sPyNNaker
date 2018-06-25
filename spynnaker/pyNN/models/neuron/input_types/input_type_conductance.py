@@ -1,9 +1,7 @@
 from data_specification.enums import DataType
-from spinn_utilities.overrides import overrides
+from spinn_utilities import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-
 from .abstract_input_type import AbstractInputType
-from spynnaker.pyNN.utilities import utility_calls
 
 E_REV_E = "e_rev_E"
 E_REV_I = "e_rev_I"
@@ -22,6 +20,9 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
         "_e_rev_I"]
 
     def __init__(self, e_rev_E, e_rev_I):
+        super(InputTypeConductance, self).__init__([
+            DataType.S1615,   # e_rev_E
+            DataType.S1615])  # e_rev_I
         self._e_rev_E = e_rev_E
         self._e_rev_I = e_rev_I
 
@@ -29,16 +30,6 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 10 * n_neurons
-
-    @overrides(AbstractInputType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 2 parameters per neuron (4 bytes each)
-        return (2 * 4 * n_neurons)
-
-    @overrides(AbstractInputType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 2 parameters per neuron (4 bytes each)
-        return (2 * 4 * n_neurons)
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
@@ -57,26 +48,17 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractInputType.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    @overrides(AbstractInputType.get_values)
+    def get_values(self, parameters, state_variables):
 
         # Add the rest of the data
-        items = [
-            (parameters[E_REV_E], DataType.S1615),
-            (parameters[E_REV_I], DataType.S1615),
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [parameters[E_REV_E], parameters[E_REV_I]]
 
-    @overrides(AbstractInputType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractInputType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.S1615 * 2]
-        offset, (_e_rev_E, _e_rev_I) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
-        return offset
+        (_e_rev_E, _e_rev_I) = values
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):

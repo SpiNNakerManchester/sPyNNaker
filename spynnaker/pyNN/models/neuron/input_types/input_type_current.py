@@ -1,6 +1,5 @@
 from spinn_utilities.overrides import overrides
 from .abstract_input_type import AbstractInputType
-import numpy
 
 
 class InputTypeCurrent(AbstractInputType):
@@ -8,16 +7,11 @@ class InputTypeCurrent(AbstractInputType):
     """
     __slots__ = []
 
+    def __init__(self):
+        super(InputTypeCurrent, self).__init__([])
+
     @overrides(AbstractInputType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
-        return 0
-
-    @overrides(AbstractInputType.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        return 0
-
-    @overrides(AbstractInputType.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
         return 0
 
     @overrides(AbstractInputType.add_parameters)
@@ -28,14 +22,13 @@ class InputTypeCurrent(AbstractInputType):
     def add_state_variables(self, state_variables):
         pass
 
-    @overrides(AbstractInputType.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
-        return numpy.zeros(0, dtype="uint32")
+    @overrides(AbstractInputType.get_values)
+    def get_values(self, parameters, state_variables):
+        return []
 
     @overrides(AbstractInputType.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
-        return offset
+    def update_values(self, values, parameters, state_variables):
+        pass
 
     @overrides(AbstractInputType.get_units)
     def get_units(self, variable):

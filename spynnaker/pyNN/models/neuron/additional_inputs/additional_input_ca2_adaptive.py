@@ -1,9 +1,7 @@
 from pacman.executor.injection_decorator import inject_items
 from data_specification.enums import DataType
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neuron.additional_inputs \
-    import AbstractAdditionalInput
+from spinn_utilities import overrides
+from .abstract_additional_input import AbstractAdditionalInput
 
 import numpy
 
@@ -25,6 +23,10 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
         "_i_alpha"]
 
     def __init__(self,  tau_ca2, i_ca2, i_alpha):
+        super(AdditionalInputCa2Adaptive, self).__init__([
+            DataType.S1615,   # e^(-ts / tau_ca2)
+            DataType.S1615,   # i_ca_2
+            DataType.S1615])  # i_alpha
         self._tau_ca2 = tau_ca2
         self._i_ca2 = i_ca2
         self._i_alpha = i_alpha
@@ -33,16 +35,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 3 * n_neurons
-
-    @overrides(AbstractAdditionalInput.get_dtcm_usage_in_bytes)
-    def get_dtcm_usage_in_bytes(self, n_neurons):
-        # 3 parameters per neuron (4 bytes each)
-        return (3 * 4 * n_neurons)
-
-    @overrides(AbstractAdditionalInput.get_sdram_usage_in_bytes)
-    def get_sdram_usage_in_bytes(self, n_neurons):
-        # 3 parameters per neuron (4 bytes each)
-        return (3 * 4 * n_neurons)
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
@@ -61,37 +53,23 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractAdditionalInput.get_data,
-               additional_arguments={'machine_time_step'})
-    def get_data(
-            self, parameters, state_variables, vertex_slice,
-            machine_time_step):
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, ts):
 
         # Add the rest of the data
-        items = [
-            (parameters[TAU_CA2].apply_operation(
-                operation=lambda x:
-                    numpy.exp(float(-machine_time_step) / (1000.0 * x))),
-             DataType.S1615),
-            (state_variables[I_CA2], DataType.S1615),
-            (parameters[I_ALPHA], DataType.S1615)
-        ]
-        return utility_calls.get_parameter_data(items, vertex_slice)
+        return [parameters[TAU_CA2].apply_operation(
+                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                state_variables[I_CA2], parameters[I_ALPHA]]
 
-    @overrides(AbstractAdditionalInput.read_data)
-    def read_data(
-            self, data, offset, vertex_slice, parameters, state_variables):
+    @overrides(AbstractAdditionalInput.update_values)
+    def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.S1615 * 3]
-        offset, (_exp_tau_ca2, i_ca2, _i_alpha) = \
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
+        (_exp_tau_ca2, i_ca2, _i_alpha) = values
 
         # Copy the changed data only
-        utility_calls.copy_values(i_ca2, state_variables[I_CA2], vertex_slice)
-        return offset
+        state_variables[I_CA2] = i_ca2
 
     @property
     def tau_ca2(self):

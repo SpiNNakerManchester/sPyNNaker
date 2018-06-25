@@ -1,8 +1,9 @@
 from six import add_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-
-_BYTES_PER_PARAMETER = 4
+from .struct import Struct
+from spinn_utilities.helpful_functions import is_singleton
+import numpy
+import itertools
 
 
 @add_metaclass(AbstractBase)
@@ -10,7 +11,24 @@ class AbstractStandardNeuronComponent(object):
     """ Represents a component of a standard neural model
     """
 
-    __slots__ = ()
+    __slots__ = ("_struct")
+
+    def __init__(self, data_types):
+        """
+
+        :param data_types:\
+            A list of data types in the component structure, in the order that\
+            they appear
+        """
+        self._struct = Struct(data_types)
+
+    @property
+    def struct(self):
+        """ The structure of the component
+
+        :rtype:\
+            :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
+        """
 
     @abstractmethod
     def get_n_cpu_cycles(self, n_neurons):
@@ -21,7 +39,6 @@ class AbstractStandardNeuronComponent(object):
         :rtype: int
         """
 
-    @abstractmethod
     def get_dtcm_usage_in_bytes(self, n_neurons):
         """ Get the DTCM memory usage required
 
@@ -29,8 +46,8 @@ class AbstractStandardNeuronComponent(object):
         :type n_neurons: int
         :rtype: int
         """
+        return self.struct.get_size_in_whole_words(n_neurons) * 4
 
-    @abstractmethod
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the SDRAM memory usage required
 
@@ -38,6 +55,7 @@ class AbstractStandardNeuronComponent(object):
         :type n_neurons: int
         :rtype: int
         """
+        return self.struct.get_size_in_whole_words(n_neurons) * 4
 
     @abstractmethod
     def add_parameters(self, parameters):
@@ -59,6 +77,19 @@ class AbstractStandardNeuronComponent(object):
         """
 
     @abstractmethod
+    def get_values(self, parameters, state_variables):
+        """ Get the values to be written to the machine for this model
+
+        :param parameters: The holder of the parameters
+        :type parameters:\
+            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :param state_variables: The holder of the state variables
+        :type state_variables:\
+            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :return: A list with the same length as self.struct.field_types
+        :rtype: A list of (single value or list of values or RangedList)
+        """
+
     def get_data(self, parameters, state_variables, vertex_slice):
         """ Get the data to be written to the machine for this model
 
@@ -71,8 +102,22 @@ class AbstractStandardNeuronComponent(object):
         :param vertex_slice: The slice of the vertex to generate parameters for
         :rtype: numpy array of uint32
         """
+        values = self.get_values(parameters, state_variables)
+        return self.struct.get_data(
+            values, vertex_slice.lo_atom, vertex_slice.n_atoms)
 
     @abstractmethod
+    def update_values(self, values, parameters, state_variables):
+        """ Update the parameters and state variables with the given struct\
+            values that have been read from the machine
+
+        :param values:\
+            The values read from the machine, one for each struct element
+        :type value: A list of lists
+        :param parameters: The holder of the parameters to update
+        :param state_variables: The holder of the state variables to update
+        """
+
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
         """ Read the parameters and state variables of the model from the\
@@ -89,6 +134,13 @@ class AbstractStandardNeuronComponent(object):
             :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
         :return: The offset after reading the data
         """
+        values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
+        new_offset = offset + self.struct.get_size_in_whole_words(
+            vertex_slice.n_atoms)
+        params = _RangedDictVertexSlice(parameters, vertex_slice)
+        variables = _RangedDictVertexSlice(state_variables, vertex_slice)
+        self.update_values(values, params, variables)
+        return new_offset
 
     @abstractmethod
     def has_variable(self, variable):
@@ -106,3 +158,45 @@ class AbstractStandardNeuronComponent(object):
         :param variable: The name of the variable
         :type variable: str
         """
+
+
+class _RangedDictVertexSlice(object):
+    """ A slice of a ranged dict to be used to update values
+    """
+
+    def __init__(self, ranged_dict, vertex_slice):
+        self._ranged_dict = ranged_dict
+        self._vertex_slice = vertex_slice
+
+    def __getitem__(self, key):
+        if not isinstance(key, "str"):
+            raise KeyError("Key must be a string")
+        return _RangedListVertexSlice(
+            self._ranged_dict[key], self._vertex_slice)
+
+
+class _RangedListVertexSlice(object):
+    """ A slice of ranged list to be used to update values
+    """
+
+    def __init__(self, ranged_list, vertex_slice):
+        self._ranged_list = ranged_list
+        self._vertex_slice = vertex_slice
+
+    def __setitem__(self, value):
+
+        if is_singleton(value):
+            self._ranged_list.set_value_by_slice(
+                self._vertex_slice.lo_atom, self._vertex_slice.hi_atom, value)
+        else:
+
+            # Find the ranges where the data is the same
+            changes = numpy.nonzero(numpy.diff(value))[0] + 1
+
+            # Go through and set the data in ranges
+            start_index = 0
+            for end_index in itertools.chain(
+                    changes, [self._vertex_slice.n_items]):
+                self._ranged_list.set_value_by_slice(
+                    start_index, end_index, value[start_index])
+                start_index = end_index
