@@ -28,6 +28,8 @@ class NeuronRecorder(object):
     N_CPU_CYCLES_PER_NEURON = 8
     N_BYTES_PER_WORD = 4
     N_BYTES_PER_POINTER = 4
+    SARK_BLOCK_SIZE = 8  # Seen in sark.c
+
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(self, allowed_variables, n_neurons):
@@ -461,21 +463,26 @@ class NeuronRecorder(object):
         """
         return len(self._sampling_rates) * self.N_BYTES_PER_INDEX
 
-    def get_variable_sdram_usage(self, vertex_slice):
+    def _get_fixed_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        fixed_sdram = 0
+        # Recording rate for each neuron
+        fixed_sdram += self.N_BYTES_PER_RATE
+        # Number of recording neurons
+        fixed_sdram += self.N_BYTES_PER_INDEX
+        # index_parameters one per neuron
+        # even if not recording as also act as a gate
+        fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
+        return fixed_sdram
 
+    def get_variable_sdram_usage(self, vertex_slice):
         fixed_sdram = 0
         per_timestep_sdram = 0
         for variable in self._sampling_rates:
-            # Recording rate for each neuron
-            fixed_sdram += self.N_BYTES_PER_RATE
-            # Number of recording neurons
-            fixed_sdram += self.N_BYTES_PER_INDEX
-            # index_parameters one per neuron
-            # even if not recording as also act as a gate
-            fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
             rate = self._sampling_rates[variable]
+            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
             if rate > 0:
+                fixed_sdram += self.SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
                     variable, vertex_slice)
                 if rate == 1:
@@ -483,7 +490,7 @@ class NeuronRecorder(object):
                     per_timestep_sdram += per_record
                 else:
                     # Get the average cost per timestep
-                    average_per_timestep = per_record // rate
+                    average_per_timestep = per_record / rate
                     per_timestep_sdram += average_per_timestep
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
