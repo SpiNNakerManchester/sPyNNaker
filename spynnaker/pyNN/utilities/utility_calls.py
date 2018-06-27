@@ -208,6 +208,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                           min_time=0, max_time=float('inf'), split_value="\t"):
     """ Read spikes from a file formatted as:\
         <time>\t<neuron ID>
+
     :param file_path: absolute path to a file containing spike values
     :type file_path: str
     :param min_atom: min neuron ID to which neurons to read in
@@ -223,7 +224,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :return:\
         a numpy array with max_atom elements each of which is a list of\
         spike times.
-    :rtype: numpy array of (int, int)
+    :rtype: numpy.array(int, int)
     """
     # pylint: disable=too-many-arguments
 

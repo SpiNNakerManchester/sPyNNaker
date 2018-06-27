@@ -22,6 +22,7 @@ class AbstractMasterPopTableFactory(object):
             the source key which the synaptic matrix needs to be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
         :param txrx: the transceiver object from spinnman
+        :type txrx: :py:class:`spinnman.transceiver.Transceiver`
         :param chip_y: the y coordinate of the chip of this master pop
         :param chip_x: the x coordinate of the chip of this master pop
         :type incoming_key: int
@@ -46,7 +47,7 @@ class AbstractMasterPopTableFactory(object):
             master pop table; the whole edge will become multiple calls to\
             this function
         :type key_and_mask: \
-            :py:class:`pacman.model.routing_info.KeyAndMask`
+            :py:class:`pacman.model.routing_info.BaseKeyAndMask`
         :param master_pop_table_region: \
             The region to which the master pop table is being stored
         :param is_single: True if this is a single synapse, False otherwise
