@@ -1,7 +1,6 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
-#include <string.h>
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -114,8 +113,9 @@ bool population_table_initialise(
         n_address_list_bytes);
 
     // Copy the master population table
-    memcpy(master_population_table, &(table_address[2]), n_master_pop_bytes);
-    memcpy(
+    spin1_memcpy(master_population_table, &(table_address[2]),
+            n_master_pop_bytes);
+    spin1_memcpy(
         address_list, &(table_address[2 + n_master_pop_words]),
         n_address_list_bytes);
 

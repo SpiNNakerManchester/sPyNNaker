@@ -146,17 +146,56 @@ class PyNNPopulationCommon(object):
         return isinstance(self._vertex.input_type, InputTypeConductance)
 
     def __getitem__(self, index_or_slice):
+        # Note: This is supported by sPyNNaker8
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, parameter_name, gather=False):
+    def get(self, parameter_names, gather=False):
         """ Get the values of a parameter for every local cell in the\
             population.
+
+        :param parameter_names: Name of parameter. This is either a single\
+            string or a list of strings
+        :return: A single list of values (or possibly a single value) if\
+            paramter_names is a string, or a dict of these if parameter names\
+            is a list.
+        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
-        if self._vertex_population_settable:
-            return self._vertex.get_value(parameter_name)
-        raise KeyError("Population does not have a property {}".format(
-            parameter_name))
+        if not self._vertex_population_settable:
+            raise KeyError("Population does not support setting")
+        if isinstance(parameter_names, string_types):
+            return self._vertex.get_value(parameter_names)
+        results = dict()
+        for parameter_name in parameter_names:
+            results[parameter_name] = self._vertex.get_value(parameter_name)
+        return results
+
+    # NON-PYNN API CALL
+    def get_by_selector(self, selector, parameter_names):
+        """ Get the values of a parameter for the selected cell in the\
+            population.
+
+        :param parameter_names: Name of parameter. This is either a\
+            single string or a list of strings
+        :param selector: a description of the subrange to accept. \
+            Or None for all. \
+            See: _selector_to_ids in \
+            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :return: A single list of values (or possibly a single value) if\
+            paramter_names is a string or a dict of these if parameter names\
+            is a list.
+        :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
+        """
+        if not self._vertex_population_settable:
+            raise KeyError("Population does not support setting")
+        if isinstance(parameter_names, string_types):
+            return self._vertex.get_value_by_selector(
+                selector, parameter_names)
+        results = dict()
+        for parameter_name in parameter_names:
+            results[parameter_name] = self._vertex.get_value_by_selector(
+                selector, parameter_name)
+        return results
 
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
@@ -172,9 +211,8 @@ class PyNNPopulationCommon(object):
         return id - self._first_id
 
     def index_to_id(self, index):
-        """
-        Given the index (order in the Population) of cell(s) in the
-        Population, return their ID(s)
+        """ Given the index (order in the Population) of cell(s) in the\
+            Population, return their ID(s)
         """
         if not numpy.iterable(index):
             if index > self._last_id - self._first_id:
@@ -196,7 +234,6 @@ class PyNNPopulationCommon(object):
     def initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
-
         """
         if not self._vertex_population_initializable:
             raise KeyError(
@@ -209,6 +246,8 @@ class PyNNPopulationCommon(object):
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
+
+        Note: This is supported by sPyNNaker8
         """
 
         # TODO: Needs a more precise recording mechanism (coming soon)
@@ -223,6 +262,8 @@ class PyNNPopulationCommon(object):
 
     def __iter__(self):
         """ Iterate over local cells
+
+        Note: This is supported by sPyNNaker8
         """
 
         # TODO:
@@ -251,20 +292,8 @@ class PyNNPopulationCommon(object):
         # Doesn't make much sense on SpiNNaker
         return self._size
 
-    def set(self, parameter, value=None):
-        """ Set one or more parameters for every cell in the population.
-
-        param can be a dict, in which case value should not be supplied, or a\
-        string giving the parameter name, in which case value is the parameter\
-        value. value can be a numeric value, or list of such\
-        (e.g. for setting spike times)::
-
-          p.set("tau_m", 20.0).
-          p.set({'tau_m':20, 'v_rest':-65})
-
-        :param parameter: the parameter to set
-        :type parameter: str or dict
-        :param value: the value of the parameter to set.
+    def _set_check(self, parameter, value):
+        """ Checks for various set methods.
         """
         if not self._vertex_population_settable:
             raise KeyError("Population does not have property {}".format(
@@ -273,16 +302,70 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception(
-                "This population does not support changes to settings after"
                 " run has been called")
 
+        if isinstance(parameter, string_types):
+            if value is None:
+                raise Exception("A value (not None) must be specified")
+        elif type(parameter) is not dict:
+            raise Exception(
+                "Parameter must either be the name of a single parameter to"
+                " set, or a dict of parameter: value items to set")
+
+        self._read_parameters_before_set()
+
+    def set(self, parameter, value=None):
+        """ Set one or more parameters for every cell in the population.
+
+        param can be a dict, in which case value should not be supplied, or a\
+        string giving the parameter name, in which case value is the parameter\
+        value. value can be a numeric value, or list of such\
+        (e.g. for setting spike times)::
+
+            p.set("tau_m", 20.0).
+            p.set({'tau_m':20, 'v_rest':-65})
+
+        :param parameter: the parameter to set
+        :type parameter: str or dict
+        :param value: the value of the parameter to set.
+        """
+        self._set_check(parameter, value)
+
+        # set new parameters
         if isinstance(parameter, string_types):
             if value is None:
                 raise Exception("A value (not None) must be specified")
             self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
+        for (key, value) in parameter.iteritems():
+            self._vertex.set_value(key, value)
 
+    # NON-PYNN API CALL
+    def set_by_selector(self, selector, parameter, value=None):
+        """ Set one or more parameters for selected cell in the population.
+
+        param can be a dict, in which case value should not be supplied, or a\
+        string giving the parameter name, in which case value is the parameter\
+        value. value can be a numeric value, or list of such
+        (e.g. for setting spike times)::
+
+            p.set("tau_m", 20.0).
+            p.set({'tau_m':20, 'v_rest':-65})
+
+        :param selector: See RangedList.set_value_by_selector as this is just \
+            a pass through method
+        :param parameter: the parameter to set
+        :param value: the value of the parameter to set.
+        """
+        self._set_check(parameter, value)
+
+        # set new parameters
+        if type(parameter) is str:
+            self._vertex.set_value_by_selector(selector, parameter, value)
+            return
+        for (key, value) in parameter.iteritems():
+            self._vertex.set_value_by_selector(selector, key, value)
         if not isinstance(parameter, dict):
             raise Exception(
                 "Parameter must either be the name of a single parameter to"
@@ -342,7 +425,7 @@ class PyNNPopulationCommon(object):
         """
         return self._structure
 
-    # NONE PYNN API CALL
+    # NON-PYNN API CALL
     def set_constraint(self, constraint):
         """ Apply a constraint to a population that restricts the processor\
             onto which its atoms will be placed.
@@ -356,7 +439,7 @@ class PyNNPopulationCommon(object):
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
-    # NONE PYNN API CALL
+    # NON-PYNN API CALL
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
@@ -373,13 +456,13 @@ class PyNNPopulationCommon(object):
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
-    # NONE PYNN API CALL
+    # NON-PYNN API CALL
     def set_mapping_constraint(self, constraint_dict):
         """ Add a placement constraint - for backwards compatibility
 
         :param constraint_dict: A dictionary containing "x", "y" and\
             optionally "p" as keys, and ints as values
-        :type constraint_dict: dict of str->int
+        :type constraint_dict: dict(str, int)
         """
         globals_variables.get_simulator().verify_not_running()
         self.add_placement_constraint(**constraint_dict)
@@ -387,7 +470,7 @@ class PyNNPopulationCommon(object):
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
-    # NONE PYNN API CALL
+    # NON-PYNN API CALL
     def set_model_based_max_atoms_per_core(self, new_value):
         """ Supports the setting of each models max atoms per core parameter
 
@@ -424,7 +507,7 @@ class PyNNPopulationCommon(object):
 
     @staticmethod
     def create_label(model_label, pop_level_label):
-        """ helper method for choosing a label from model and population levels
+        """ Helper method for choosing a label from model and population levels
 
         :param model_label: the model level label
         :param pop_level_label: the pop level label
@@ -447,7 +530,7 @@ class PyNNPopulationCommon(object):
         return cell_label
 
     def _get_variable_unit(self, parameter_name):
-        """ helper method for getting units from a parameter used by the vertex
+        """ Helper method for getting units from a parameter used by the vertex
 
         :param parameter_name: the parameter name to find the units for
         :return: the units in string form
