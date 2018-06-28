@@ -130,7 +130,7 @@ class PyNNProjectionCommon(object):
                 time_scale_factor)
             self._projection_edge.delay_edge = delay_edge
 
-        # add projection to the spinnaker control system
+        # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
@@ -330,8 +330,9 @@ class PyNNProjectionCommon(object):
 
     def size(self, gather=True):
         """ Return the total number of connections.
-         - only local connections, if gather is False,
-         - all connections, if gather is True (default)
+
+        :param gather: If False, only get the number of connections locally.\
+            Which means nothing on SpiNNaker...
         """
         # TODO
         raise NotImplementedError

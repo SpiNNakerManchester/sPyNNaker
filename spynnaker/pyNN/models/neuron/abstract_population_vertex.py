@@ -107,7 +107,7 @@ class AbstractPopulationVertex(
 
     BASIC_MALLOC_USAGE = 2
 
-    # recording region ids
+    # recording region IDs
     SPIKE_RECORDING_REGION = 0
     V_RECORDING_REGION = 1
     GSYN_EXCITATORY_RECORDING_REGION = 2
@@ -357,10 +357,10 @@ class AbstractPopulationVertex(
         return per_neuron_usage
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
-        """ calculates the sdram usage for just the neuron parameters region
+        """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param vertex_slice: the slice of atoms.
-        :return:  The sdram required for the neuron region
+        :return: The SDRAM required for the neuron region
         """
         per_neuron_usage = \
             self._get_sdram_usage_for_neuron_params_per_neuron()
@@ -421,9 +421,9 @@ class AbstractPopulationVertex(
         vertex.reserve_provenance_data_region(spec)
 
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
-        """ reserve the neuron parameter data region
+        """ Reserve the neuron parameter data region.
 
-        :param spec: the spec to write the dsg region to
+        :param spec: the spec to write the DSG region to
         :param vertex_slice: the slice of atoms from the application vertex
         :return: None
         """
@@ -525,7 +525,7 @@ class AbstractPopulationVertex(
         self._reserve_neuron_params_data_region(
             spec, graph_mapper.get_slice(placement.vertex))
 
-        # write the neuron params into the new dsg region
+        # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
@@ -757,7 +757,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
-        """ Get a property of the overall model
+        """ Get a property of the overall model.
         """
         for obj in [self._neuron_model, self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
@@ -769,7 +769,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property of the overall model
+        """ Set a property of the overall model.
         """
         for obj in [self._neuron_model, self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
@@ -785,7 +785,7 @@ class AbstractPopulationVertex(
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
 
-        # locate sdram address to where the neuron parameters are stored
+        # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
                 placement,
@@ -915,7 +915,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex
+        """ Gets the constraints for partitions going into this vertex.
 
         :param partition: partition that goes into this vertex
         :return: list of constraints
@@ -925,7 +925,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex
+        """ Gets the constraints for partitions going out of this vertex.
 
         :param partition: the partition that leaves this vertex
         :return: list of constraints
@@ -949,12 +949,12 @@ class AbstractPopulationVertex(
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):
-        """ clears a recorded data region from the buffer manager
+        """ Clear a recorded data region from the buffer manager.
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
-        :param recording_region_id: the recorded region id for clearing
+        :param recording_region_id: the recorded region ID for clearing
         :rtype: None
         """
         machine_vertices = graph_mapper.get_machine_vertices(self)
@@ -981,14 +981,13 @@ class AbstractPopulationVertex(
                 "conductance component".format(variable))
 
     def describe(self):
-        """
-        Returns a human-readable description of the cell or synapse type.
+        """ Get a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template
-        together with an associated template engine
+        The output may be customised by specifying a different template\
+        together with an associated template engine\
         (see ``pyNN.descriptions``).
 
-        If template is None, then a dictionary containing the template context
+        If template is None, then a dictionary containing the template context\
         will be returned.
         """
         parameters = dict()

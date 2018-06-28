@@ -46,11 +46,11 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         :param label: \
             The label of the population from which the spike will originate
         :type label: str
-        :param neuron_id: The id of the neuron sending a spike
+        :param neuron_id: The ID of the neuron sending a spike
         :type neuron_id: int
         :param send_full_keys: Determines whether to send full 32-bit keys,\
             getting the key for each neuron from the database, or whether to\
-            send 16-bit neuron ids directly
+            send 16-bit neuron IDs directly
         :type send_full_keys: bool
         """
         self.send_spikes(label, [neuron_id], send_full_keys)
@@ -61,11 +61,11 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
         :param label: \
             The label of the population from which the spikes will originate
         :type label: str
-        :param neuron_ids: array-like of neuron ids sending spikes
-        :type neuron_ids: [int]
+        :param neuron_ids: array-like of neuron IDs sending spikes
+        :type neuron_ids: list(int)
         :param send_full_keys: Determines whether to send full 32-bit keys,\
             getting the key for each neuron from the database, or whether to\
-            send 16-bit neuron ids directly
+            send 16-bit neuron IDs directly
         :type send_full_keys: bool
         """
         self.send_events(label, neuron_ids, send_full_keys)

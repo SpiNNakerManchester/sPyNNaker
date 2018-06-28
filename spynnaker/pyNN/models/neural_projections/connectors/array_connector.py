@@ -18,8 +18,7 @@ class ArrayConnector(AbstractConnector):
             self, array,
             safe=True, callback=None, verbose=False):
         """
-
-        :param `integer` array:
+        :param array:
             A (numpy) array of integers that specifies the connections
             between the pre- and post-populations
         """
