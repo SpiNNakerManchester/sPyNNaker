@@ -93,7 +93,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
-
         :param vertex_slice: the slice of the vertex
         :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
@@ -183,7 +182,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_addresses = 0
         self._n_single_entries = 0
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
+               extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
@@ -213,14 +213,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Complete any operations required after all entries have been added
-
-        :param spec: the writer for the DSG
-        :param master_pop_table_region: \
-            the region to which the master pop resides in
-        :rtype: None
-        """
-
         spec.switch_write_focus(region=master_pop_table_region)
 
         # sort entries by key
@@ -340,7 +332,4 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
-        """ Return any constraints placed on the edges because of having this\
-            master pop table implemented in the cores.
-        """
         return list()

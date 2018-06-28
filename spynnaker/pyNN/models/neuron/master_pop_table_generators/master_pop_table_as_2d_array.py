@@ -144,6 +144,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
             created synaptic block.
 
         An entry in the table is a 16-bit value, with the following structure:
+
         * Bits [2:0]  Row length information. This value (from 0->7) indicates\
             the maximum number of synapses in this block. It is translated in\
             the row length translation table by the executing code each time\

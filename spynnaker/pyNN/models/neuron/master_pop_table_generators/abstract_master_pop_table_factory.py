@@ -54,7 +54,7 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Complete the master pop table in the data specification
+        """ Complete the master pop table in the data specification.
 
         :param spec: the data specification to write the master pop entry to
         :param master_pop_table_region: \
@@ -63,8 +63,7 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def get_edge_constraints(self):
-        """ Gets the constraints for this table on edges coming in to a vertex
-            that uses
+        """ Gets the constraints for this table on edges coming in to a vertex.
 
         :return: a list of constraints
         :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)
