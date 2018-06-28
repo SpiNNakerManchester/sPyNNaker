@@ -33,7 +33,7 @@ logger = FormatAdapter(logging.getLogger(__name__))
 @add_metaclass(AbstractBase)
 class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                               SpynnakerSimulatorInterface):
-    """ Main interface for neural code
+    """ Main interface for neural code.
     """
 
     CONFIG_FILE_NAME = "spynnaker.cfg"
@@ -220,7 +220,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 "****************************************************")
 
     def _detect_if_graph_has_changed(self, reset_flags=True):
-        """ Iterate though the graph and look for changes
+        """ Iterate though the graph and look for changes.
         """
         changed = super(AbstractSpiNNakerCommon, self).\
             _detect_if_graph_has_changed(reset_flags)
@@ -243,13 +243,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @property
     def min_delay(self):
-        """ The minimum supported delay based in milliseconds
+        """ The minimum supported delay, in milliseconds.
         """
         return self._min_delay
 
     @property
     def max_delay(self):
-        """ The maximum supported delay based in milliseconds
+        """ The maximum supported delay, in milliseconds.
         """
         return self._max_delay
 
@@ -265,12 +265,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         return len(unique_keys)
 
     def add_population(self, population):
-        """ Called by each population to add itself to the list
+        """ Called by each population to add itself to the list.
         """
         self._populations.append(population)
 
     def add_projection(self, projection):
-        """ Called by each projection to add itself to the list
+        """ Called by each projection to add itself to the list.
         """
         self._projections.append(projection)
 
@@ -299,9 +299,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         globals_variables.unset_simulator()
 
     def run(self, run_time):
-        """ Run the model created
+        """ Run the model created.
 
-        :param run_time: the time in ms to run the simulation for
+        :param run_time: the time (in milliseconds) to run the simulation for
         """
         # pylint: disable=protected-access
 
@@ -322,7 +322,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @staticmethod
     def register_binary_search_path(search_path):
-        """ Register an additional binary search path for executables
+        """ Register an additional binary search path for executables.
 
         :param search_path: absolute search path for binaries
         """
@@ -356,7 +356,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :type projection_to_attribute_map: \
             dict of projection with set of attributes
         :return: a extracted data object with get method for getting the data
-        :rtype: ExtractedData object
+        :rtype: \
+            :py:class:`spynnaker.pyNN.utilities.extracted_data.ExtractedData`
         """
         # pylint: disable=protected-access
 
@@ -402,10 +403,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def _locate_receivers_from_projections(
             self, projections, gatherers, extra_monitors_per_chip):
         """ Locate receivers and their corresponding monitor cores for\
-            setting router time-outs
+            setting router time-outs.
 
         :param projections: the projections going to be read
-        :param gatherers: the gatherers per ethernet chip
+        :param gatherers: the gatherers per Ethernet chip
         :param extra_monitors_per_chip: the extra monitor cores per chip
         :return: list of tuples with gatherer and its extra monitor cores
         """
@@ -438,19 +439,25 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
     @property
     def id_counter(self):
-        """ Getter for id_counter, currently used by the populations.\
-            (maybe it could live in the pop class???)
+        """ Getter for id_counter, currently used by the populations.
+
+        .. note::
+            Maybe it could live in the pop class???
 
         :return:
+        :rtype: int
         """
         return self._id_counter
 
     @id_counter.setter
     def id_counter(self, new_value):
-        """ Setter for id_counter, currently used by the populations.\
-            (maybe it could live in the pop class???)
+        """ Setter for id_counter, currently used by the populations.
+
+        .. note::
+            Maybe it could live in the pop class???
 
         :param new_value: new value for id_counter
+        :type new_value: int
         :return:
         """
         self._id_counter = new_value

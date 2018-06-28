@@ -357,7 +357,7 @@ class AbstractPopulationVertex(
         return per_neuron_usage
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
-        """ Calculate the SDRAM usage for just the neuron parameters region
+        """ Calculate the SDRAM usage for just the neuron parameters region.
 
         :param vertex_slice: the slice of atoms.
         :return: The SDRAM required for the neuron region
@@ -421,7 +421,7 @@ class AbstractPopulationVertex(
         vertex.reserve_provenance_data_region(spec)
 
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
-        """ Reserve the neuron parameter data region
+        """ Reserve the neuron parameter data region.
 
         :param spec: the spec to write the DSG region to
         :param vertex_slice: the slice of atoms from the application vertex
@@ -757,7 +757,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
-        """ Get a property of the overall model
+        """ Get a property of the overall model.
         """
         for obj in [self._neuron_model, self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
@@ -769,7 +769,7 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property of the overall model
+        """ Set a property of the overall model.
         """
         for obj in [self._neuron_model, self._input_type,
                     self._threshold_type, self._synapse_manager.synapse_type,
@@ -915,7 +915,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex
+        """ Gets the constraints for partitions going into this vertex.
 
         :param partition: partition that goes into this vertex
         :return: list of constraints
@@ -925,7 +925,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex
+        """ Gets the constraints for partitions going out of this vertex.
 
         :param partition: the partition that leaves this vertex
         :return: list of constraints
@@ -949,7 +949,7 @@ class AbstractPopulationVertex(
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):
-        """ Clear a recorded data region from the buffer manager
+        """ Clear a recorded data region from the buffer manager.
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
@@ -981,14 +981,13 @@ class AbstractPopulationVertex(
                 "conductance component".format(variable))
 
     def describe(self):
-        """
-        Returns a human-readable description of the cell or synapse type.
+        """ Get a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template
-        together with an associated template engine
+        The output may be customised by specifying a different template\
+        together with an associated template engine\
         (see ``pyNN.descriptions``).
 
-        If template is None, then a dictionary containing the template context
+        If template is None, then a dictionary containing the template context\
         will be returned.
         """
         parameters = dict()

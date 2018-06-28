@@ -322,7 +322,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         :param key: the key to search the master pop table for a given entry
         :return: the entry for this given key
-        :rtype: _MasterPopEntry
+        :rtype: :py:class:`_MasterPopEntry`
         """
         imin = 0
         imax = len(entries)

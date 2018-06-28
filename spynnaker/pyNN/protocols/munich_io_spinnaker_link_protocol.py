@@ -808,7 +808,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :type retina_payload: enum or None
         :param time: when to transmit this packet
         :return: the command to send
-        :rtype: MultiCastCommand
+        :rtype: \
+            :py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
         """
 
         if retina_key == RetinaKey.FIXED_KEY and retina_payload is None:

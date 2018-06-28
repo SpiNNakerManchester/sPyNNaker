@@ -21,15 +21,14 @@ class AbstractMasterPopTableFactory(object):
         :param incoming_key: \
             the source key which the synaptic matrix needs to be mapped to
         :param master_pop_base_mem_address: the base address of the master pop
-        :param txrx: the transceiver object from spinnman
-        :type txrx: :py:class:`spinnman.transceiver.Transceiver`
+        :param txrx: the transceiver object
         :param chip_y: the y coordinate of the chip of this master pop
         :param chip_x: the x coordinate of the chip of this master pop
         :type incoming_key: int
         :type master_pop_base_mem_address: int
         :type chip_y: int
         :type chip_x: int
-        :type txrx: spinnman.transceiver.Transceiver
+        :type txrx: :py:class:`spinnman.transceiver.Transceiver`
         :return: a synaptic matrix memory position.
         """
 
@@ -37,9 +36,9 @@ class AbstractMasterPopTableFactory(object):
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ Update a spec with a master pop entry in some form
+        """ Update a data specification with a master pop entry in some form
 
-        :param spec: the spec to write the master pop entry to
+        :param spec: the data specification to write the master pop entry to
         :param block_start_addr: the start address of the row in the region
         :param row_length: the row length of this entry
         :param key_and_mask: a key_and_mask object used as part of describing\
@@ -55,9 +54,9 @@ class AbstractMasterPopTableFactory(object):
 
     @abstractmethod
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Complete the master pop table in the spec
+        """ Complete the master pop table in the data specification
 
-        :param spec: the spec to write the master pop entry to
+        :param spec: the data specification to write the master pop entry to
         :param master_pop_table_region: \
             the region to which the master pop table is being stored
         """
@@ -68,8 +67,7 @@ class AbstractMasterPopTableFactory(object):
             that uses
 
         :return: a list of constraints
-        :rtype: list of\
-            :py:class:`pacman.model.constraints.AbstractConstraint`
+        :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)
         """
 
     @abstractmethod

@@ -67,14 +67,14 @@ class AbstractConnector(object):
         self._space = space
 
     def set_weights_and_delays(self, weights, delays):
-        """ Set the weights and delays as needed
+        """ Set the weights and delays as needed.
 
         :param weights:
             May either be a float, a !RandomDistribution object, a list 1D\
             array with at least as many items as connections to be created,\
-            or a distance dependence as per a d_expression. Units nA.
+            or a distance dependence as per a d_expression. Units nA/uS.
         :param delays: -- as `weights`. If `None`, all synaptic\
-            delays will be set to the global minimum delay.
+            delays will be set to the global minimum delay. Units ms.
         :raises Exception: when not a standard interface of list, scalar,\
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
@@ -105,7 +105,7 @@ class AbstractConnector(object):
         self._min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
-        """ Check that the types of the values is supported
+        """ Check that the types of the values is supported.
         """
         if (not numpy.isscalar(values) and
                 not (get_simulator().is_a_pynn_random(values)) and
@@ -118,7 +118,7 @@ class AbstractConnector(object):
 
     def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\
-            be disallowed if desired
+            be disallowed if desired.
         """
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
@@ -126,7 +126,7 @@ class AbstractConnector(object):
     @staticmethod
     def _get_delay_maximum(delays, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
-            delays
+            delays.
         """
         if get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
@@ -146,12 +146,12 @@ class AbstractConnector(object):
     @abstractmethod
     def get_delay_maximum(self):
         """ Get the maximum delay specified by the user in ms, or None if\
-            unbounded
+            unbounded.
         """
 
     @staticmethod
     def _get_delay_variance(delays, connection_slices):
-        """ Get the variance of the delays
+        """ Get the variance of the delays.
         """
         if get_simulator().is_a_pynn_random(delays):
             return utility_calls.get_variance(delays)
@@ -167,10 +167,9 @@ class AbstractConnector(object):
     def get_delay_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the variance of the delays for this connection
+        """ Get the variance of the delays for this connection.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -178,7 +177,7 @@ class AbstractConnector(object):
             min_delay, max_delay):
         """ Get the expected number of delays that will fall within min_delay\
             and max_delay given given a float, RandomDistribution or list of\
-            delays
+            delays.
         """
         # pylint: disable=too-many-arguments
         if get_simulator().is_a_pynn_random(delays):
@@ -214,10 +213,9 @@ class AbstractConnector(object):
             the neurons in the pre_vertex_slice to neurons in the\
             post_vertex_slice, for connections with a delay between min_delay\
             and max_delay (inclusive) if both specified\
-            (otherwise all connections)
+            (otherwise all connections).
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(
@@ -225,14 +223,13 @@ class AbstractConnector(object):
             post_slice_index, pre_vertex_slice, post_vertex_slice):
         """ Get the maximum number of connections between those to each of the\
             neurons in the post_vertex_slice from neurons in the\
-            pre_vertex_slice
+            pre_vertex_slice.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @staticmethod
     def _get_weight_mean(weights, connection_slices):
-        """ Get the mean of the weights
+        """ Get the mean of the weights.
         """
         if get_simulator().is_a_pynn_random(weights):
             return abs(utility_calls.get_mean(weights))
@@ -248,14 +245,13 @@ class AbstractConnector(object):
     def get_weight_mean(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the mean of the weights for this connection
+        """ Get the mean of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @staticmethod
     def _get_weight_maximum(weights, n_connections, connection_slices):
-        """ Get the maximum of the weights
+        """ Get the maximum of the weights.
         """
         if get_simulator().is_a_pynn_random(weights):
             mean_weight = utility_calls.get_mean(weights)
@@ -286,14 +282,13 @@ class AbstractConnector(object):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the maximum of the weights for this connection
+        """ Get the maximum of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @staticmethod
     def _get_weight_variance(weights, connection_slices):
-        """ Get the variance of the weights
+        """ Get the variance of the weights.
         """
         if get_simulator().is_a_pynn_random(weights):
             return utility_calls.get_variance(weights)
@@ -309,17 +304,16 @@ class AbstractConnector(object):
     def get_weight_variance(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the variance of the weights for this connection
+        """ Get the variance of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     def _expand_distances(self, d_expression):
-        """ Check if a distance expression contains at least one term d[x]. \
+        """ Check if a distance expression contains at least one term `d[x]`.\
             If yes, then the distances are expanded to distances in the\
             separate coordinates rather than the overall distance over all\
             coordinates, and we assume the user has specified an expression\
-            such as d[0] + d[2].
+            such as `d[0] + d[2]`.
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
@@ -357,7 +351,7 @@ class AbstractConnector(object):
         raise Exception("what on earth are you giving me?")
 
     def _generate_weights(self, values, n_connections, connection_slices):
-        """ Generate weight values
+        """ Generate weight values.
         """
         weights = self._generate_values(
             values, n_connections, connection_slices)
@@ -373,7 +367,7 @@ class AbstractConnector(object):
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
-        """ Clip delay values, keeping track of how many have been clipped
+        """ Clip delay values, keeping track of how many have been clipped.
         """
 
         # count values that could be clipped
@@ -389,7 +383,7 @@ class AbstractConnector(object):
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
-        """ Generate valid delay values
+        """ Generate valid delay values.
         """
 
         delays = self._generate_values(
@@ -400,7 +394,7 @@ class AbstractConnector(object):
     def _generate_lists_on_host(self, values):
         """ Checks if the connector should generate lists on host rather than\
             trying to generate the connectivity data on the machine, based on\
-            the types of the weights and/or delays
+            the types of the weights and/or delays.
         """
 
         # Scalars are fine on the machine
@@ -418,7 +412,7 @@ class AbstractConnector(object):
     @abstractmethod
     def generate_on_machine(self):
         """ Determine if the connector generation is supported on the machine\
-            or if the connector must be generated on the host
+            or if the connector must be generated on the host.
         """
 
     @abstractmethod
@@ -426,7 +420,7 @@ class AbstractConnector(object):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        """ Create a synaptic block from the data
+        """ Create a synaptic block from the data.
         """
         # pylint: disable=too-many-arguments
 

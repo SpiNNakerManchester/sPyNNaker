@@ -32,20 +32,24 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, d_expression, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
         """
-        :param `string` d_expression:\
+        :param d_expression:\
             the right-hand side of a valid python expression for\
             probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
             that can be parsed by eval(), that computes the distance\
-            dependent distribution
-        :param `bool` allow_self_connections:\
+            dependent distribution.
+        :type d_expression: str
+        :param allow_self_connections:\
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :param `pyNN.Space` space:\
+        :type d_expression: bool
+        :param space:\
             a Space object, needed if you wish to specify distance-dependent\
-            weights or delays
-        :param `int` n_connections:\
+            weights or delays.
+        :type space: pyNN.Space
+        :param n_connections:\
             The number of efferent synaptic connections per neuron.
+        :type n_connections: int or None
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(

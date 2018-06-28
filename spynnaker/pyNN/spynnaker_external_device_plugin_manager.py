@@ -12,8 +12,7 @@ from spinn_front_end_common.utilities.utility_objs \
 
 
 class SpynnakerExternalDevicePluginManager(object):
-    """
-    main entrance for the external device plugin manager
+    """ User-level interface for the external device plugin manager.
     """
 
     @staticmethod
@@ -55,7 +54,7 @@ class SpynnakerExternalDevicePluginManager(object):
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0):
         """ Output the spikes from a given population from SpiNNaker as they\
-            occur in the simulation
+            occur in the simulation.
 
         :param population: The population to activate the live output for
         :type population: \
@@ -157,7 +156,7 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_socket_address(socket_address):
         """ Add a socket address to the list to be checked by the\
-            notification protocol
+            notification protocol.
 
         :param socket_address: the socket address
         :type socket_address:
@@ -175,8 +174,9 @@ class SpynnakerExternalDevicePluginManager(object):
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
             partition_id=None):
-        """ Add an edge from a vertex to the LPG object, builds as needed and\
-            has all the parameters for the creation of the LPG if needed
+        """ Add an edge from a vertex to the live packet gatherer, builds as\
+            needed and has all the parameters for the creation of the live\
+            packet gatherer if needed.
         """
         # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
@@ -201,7 +201,7 @@ class SpynnakerExternalDevicePluginManager(object):
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
             database_ack_port_num=None, notify=True):
-        """ Add a live rate controller to a Poisson population
+        """ Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
         :type poisson_population: \
@@ -242,7 +242,7 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_edge(vertex, device_vertex, partition_id):
         """ Add an edge between two vertices (often a vertex and a external\
-            device) on a given partition
+            device) on a given partition.
 
         :param vertex: the pre vertex to connect the edge from
         :param device_vertex: the post vertex to connect the edge to
