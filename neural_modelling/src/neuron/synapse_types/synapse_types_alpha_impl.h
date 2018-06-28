@@ -36,11 +36,12 @@ typedef struct alpha_params{
     // Inverse of tau pre-multiplied by dt
     input_t dt_divided_by_tau_sqr;
 
-
-
     // Exponential decay multiplier
     decay_t decay;
+
+    // Temporary value of
     input_t q_buff;
+
 }alpha_params;
 
 typedef struct synapse_param_t {
