@@ -156,7 +156,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
         return (
             (thirty_two_bit_wordlength * numParams)
-          + (sixteen_bit_wordlength * plasticity_helpers.STDP_FIXED_POINT_ONE * numLUTs)
+          + (sixteen_bit_wordlength * (plasticity_helpers.STDP_FIXED_POINT_ONE>>2) * numLUTs)
           + (thirty_two_bit_wordlength * numSeeds))
 
     @property
@@ -251,10 +251,10 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         return 1
 
     def _write_exp_dist_lut(self, spec, mean):
-        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
+        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE>>2):
 
             # Calculate inverse CDF
-            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
+            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE>>2)
             p_float = math.log(1.0 - x_float) * -mean
 
             p = round(p_float)
@@ -262,10 +262,10 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
     def _write_exp_dist_lut_print(self, spec, mean):
         count = 0
-        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
+        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE>>2):
 
             # Calculate inverse CDF
-            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
+            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE>>2)
             p_float = math.log(1.0 - x_float) * -mean
 
             p = round(p_float)

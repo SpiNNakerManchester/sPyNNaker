@@ -40,14 +40,14 @@ static inline weight_t weight_update_sub( weight_state_t state);
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern uint16_t pre_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE];
-extern uint16_t pre_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE];
-extern uint16_t pre_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE];
-extern uint16_t pre_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE];
-extern uint16_t post_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE];
+extern uint16_t pre_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t post_exp_dist_lookup_excit[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t pre_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t post_exp_dist_lookup_excit2[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t pre_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t post_exp_dist_lookup_inhib[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t pre_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE>>2];
+extern uint16_t post_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE>>2];
 extern plasticity_params_recurrent_t recurrent_plasticity_params;
 
 static uint32_t last_event_time;
@@ -104,7 +104,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
     last_event_time = last_time;
 
     // Pick random number and use to draw from exponential distribution
-    uint32_t random = mars_kiss64_seed( recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
+    uint32_t random = mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
    if (syn_type == 0)
       window_length = pre_exp_dist_lookup_excit[random];
    else if (syn_type == 1)
@@ -252,7 +252,7 @@ static inline update_state_t timing_apply_post_spike(
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
-   uint32_t random = mars_kiss64_seed(recurrentSeed) & (STDP_FIXED_POINT_ONE - 1);
+   uint32_t random = mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
    uint16_t window_length;
    if (syn_type == 0)
       window_length = post_exp_dist_lookup_excit[random];
