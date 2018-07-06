@@ -11,7 +11,6 @@
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
-#include <string.h>
 #include <debug.h>
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
@@ -23,6 +22,7 @@ static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
+uint32_t plastic_saturation_count = 0;
 
 //---------------------------------------
 // Macros
@@ -320,8 +320,17 @@ bool synapse_dynamics_process_plastic_synapses(
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
-        ring_buffers[ring_buffer_index] += synapse_structure_get_final_weight(
-            final_state);
+
+        uint32_t accumulation = ring_buffers[ring_buffer_index] +
+        		synapse_structure_get_final_weight(final_state);
+
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test){
+        	accumulation = sat_test - 1;
+        	plastic_saturation_count += 1;
+        }
+
+        ring_buffers[ring_buffer_index] = accumulation;
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
@@ -354,6 +363,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
+uint32_t synapse_dynamics_get_plastic_saturation_count(){
+	return plastic_saturation_count;
+}
 
 void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_plasticity = neuron_array;
@@ -372,8 +384,8 @@ void synapse_dynamics_set_additional_input_array(additional_input_pointer_t addi
 #if SYNGEN_ENABLED == 1
 
 //! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic id
-//! \param[in] id: the (core-local) id of the neuron to search for in the
+//!         specified post-synaptic ID
+//! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[out] sp_data: the address of a struct through which to return
@@ -462,7 +474,7 @@ static inline control_t _control_conversion(uint32_t id, uint32_t delay,
 }
 
 //! \brief  Add a plastic entry in the synaptic row
-//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection
