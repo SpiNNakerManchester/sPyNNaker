@@ -107,7 +107,7 @@ class PyNNPopulationCommon(object):
         self._structure = structure
         self._positions = None
 
-        # add objects to the spinnaker control class
+        # add objects to the SpiNNaker control class
         self._spinnaker_control.add_population(self)
         self._spinnaker_control.add_application_vertex(self._vertex)
 
@@ -128,7 +128,7 @@ class PyNNPopulationCommon(object):
         self._first_id = self._all_ids[0]
         self._last_id = self._all_ids[-1]
 
-        # update the simulators id_counter for giving a unique id for every
+        # update the simulators id_counter for giving a unique ID for every
         # atom
         globals_variables.get_simulator().id_counter += size
 
@@ -166,7 +166,7 @@ class PyNNPopulationCommon(object):
         raise NotImplementedError
 
     def all(self):
-        """ Iterator over cell ids on all nodes.
+        """ Iterator over cell IDs on all nodes.
         """
         # TODO: Return the cells when we have such a thing
         raise NotImplementedError
@@ -241,7 +241,7 @@ class PyNNPopulationCommon(object):
                 raise ValueError(
                     "id should be in the range [{},{}], actually {}".format(
                         self._first_id, self._last_id, id))
-            return int(id - self._first_id)  # this assumes ids are consecutive
+            return int(id - self._first_id)  # this assumes IDs are consecutive
         return id - self._first_id
 
     def index_to_id(self, index):
@@ -254,7 +254,7 @@ class PyNNPopulationCommon(object):
                     "indexes should be in the range [{},{}], actually {}"
                     "".format(0, self._last_id - self._first_id, index))
             return int(index + self._first_id)
-        # this assumes ids are consecutive
+        # this assumes IDs are consecutive
         return index + self._first_id
 
     def id_to_local_index(self, cell_id):
@@ -422,7 +422,7 @@ class PyNNPopulationCommon(object):
             for machine_vertex in machine_vertices:
 
                 # tell the core to rewrite neuron params back to the
-                # sdram space.
+                # SDRAM space.
                 placement = globals_variables.get_simulator().placements.\
                     get_placement_of_vertex(machine_vertex)
 
@@ -483,7 +483,7 @@ class PyNNPopulationCommon(object):
         :type x: int
         :param y: The y-coordinate of the placement constraint
         :type y: int
-        :param p: The processor id of the placement constraint (optional)
+        :param p: The processor ID of the placement constraint (optional)
         :type p: int
         """
         globals_variables.get_simulator().verify_not_running()

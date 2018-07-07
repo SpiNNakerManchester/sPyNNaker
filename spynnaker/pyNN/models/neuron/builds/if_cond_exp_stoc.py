@@ -11,6 +11,8 @@ from spynnaker.pyNN.models.neuron.threshold_types \
 
 
 class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
+    """ Leaky integrate and fire neuron with a stochastic threshold.
+    """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(

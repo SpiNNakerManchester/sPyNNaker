@@ -11,7 +11,7 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 class IFCondExpBase(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
-        conductance input
+        conductance input.
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})

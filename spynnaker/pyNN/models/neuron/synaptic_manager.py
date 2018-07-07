@@ -661,7 +661,7 @@ class SynapticManager(object):
                 pre_vertex_slice, delayed_source_ids, delay_stages)
         elif delayed_source_ids.size != 0:
             raise Exception(
-                "Found delayed source ids but no delay "
+                "Found delayed source IDs but no delay "
                 "machine edge for {}".format(app_edge.label))
 
         if (app_edge, synapse_info) in self._pre_run_connection_holders:

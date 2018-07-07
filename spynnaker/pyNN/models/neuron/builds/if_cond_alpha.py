@@ -5,7 +5,7 @@ from spynnaker.pyNN.models.neuron.implementations.defaults \
 
 @defaults
 class IFCondAlpha(object):
-    """ Leaky integrate and fire neuron with an alpha-shaped current input
+    """ Leaky integrate and fire neuron with an alpha-shaped current input.
     """
 
     # noinspection PyPep8Naming

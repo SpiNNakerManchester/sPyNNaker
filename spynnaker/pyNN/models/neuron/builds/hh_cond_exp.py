@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neuron.implementations.defaults \
 @defaults
 class HHCondExp(object):
     """ Single-compartment Hodgkin-Huxley model with exponentially decaying \
-        current input
+        current input.
     """
 
     # noinspection PyPep8Naming

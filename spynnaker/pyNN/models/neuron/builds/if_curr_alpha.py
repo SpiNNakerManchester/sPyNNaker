@@ -10,8 +10,8 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an alpha-shaped current-based
-     input
+    """ Leaky integrate and fire neuron with an alpha-shaped current-based\
+        input.
     """
 
     @default_initial_values({

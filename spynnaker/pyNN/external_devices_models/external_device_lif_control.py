@@ -2,7 +2,7 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.external_devices_models\
     .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from spynnaker.pyNN.models.abstract_models \
-    import AbstractPyNNNeuronModelStandard, AbstractPyNNModel
+    import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.neuron.implementations.defaults \
     import default_initial_values
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
-    """ Abstract control module for the pushbot, based on the LIF neuron,\
+    """ Abstract control module for the PushBot, based on the LIF neuron,\
         but without spikes, and using the voltage as the output to the various\
         devices
     """

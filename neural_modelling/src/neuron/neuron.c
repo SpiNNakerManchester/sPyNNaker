@@ -15,7 +15,7 @@ void spin1_wfi();
 
 #define SPIKE_RECORDING_CHANNEL 0
 
-//! The key to be used for this core (will be ORed with neuron id)
+//! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
 
 //! A checker that says if this model should be transmitting. If set to false
@@ -268,6 +268,8 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
     return true;
 }
 
+//! \brief stores neuron parameter back into SDRAM
+//! \param[in] address: the address in SDRAM to start the store
 void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;

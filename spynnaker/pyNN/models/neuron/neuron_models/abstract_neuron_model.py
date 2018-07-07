@@ -6,7 +6,7 @@ from spynnaker.pyNN.models.neuron.implementations \
 
 
 class AbstractNeuronModel(AbstractStandardNeuronComponent):
-    """ Represents a neuron model
+    """ Represents a neuron model.
     """
 
     __slots__ = ("_global_struct")

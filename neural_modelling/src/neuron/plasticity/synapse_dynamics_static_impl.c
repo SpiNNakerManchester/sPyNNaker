@@ -65,8 +65,8 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(){
 }
 
 //! \brief  Don't search the synaptic row for the the connection with the
-//!         specified post-synaptic id -- no rewiring here
-//! \param[in] id: the (core-local) id of the neuron to search for in the
+//!         specified post-synaptic ID -- no rewiring here
+//! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] sp_data: the address of a struct through which to return
@@ -92,7 +92,7 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
 }
 
 //! \brief  Don't add a plastic entry in the synaptic row -- no rewiring here
-//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
-    """ Control module for a pushbot connected to a SpiNNaker Link
+    """ Control module for a PushBot connected to a SpiNNaker Link
     """
     __slots__ = []
 

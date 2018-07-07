@@ -33,7 +33,6 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
         """
-
         :param `string` index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,

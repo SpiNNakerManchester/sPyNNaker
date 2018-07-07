@@ -4,14 +4,14 @@ from spynnaker.pyNN.models.neuron.implementations \
 
 
 class AbstractSynapseType(AbstractStandardNeuronComponent):
-    """ Represents the synapse types supported
+    """ Represents the synapse types supported.
     """
 
     __slots__ = ()
 
     @abstractmethod
     def get_n_synapse_types(self):
-        """ Get the number of synapse types supported
+        """ Get the number of synapse types supported.
 
         :return: The number of synapse types supported
         :rtype: int
@@ -19,16 +19,16 @@ class AbstractSynapseType(AbstractStandardNeuronComponent):
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the id of a synapse given the name
+        """ Get the ID of a synapse given the name.
 
-        :return: The id of the synapse
+        :return: The ID of the synapse
         :rtype: int
         """
 
     @abstractmethod
     def get_synapse_targets(self):
-        """ Get the target names of the synapse type
+        """ Get the target names of the synapse type.
 
         :return: an array of strings
-        :rtype: array of str
+        :rtype: array(str)
         """

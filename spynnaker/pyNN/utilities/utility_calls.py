@@ -74,14 +74,14 @@ def convert_to(value, data_type):
 def read_in_data_from_file(
         file_path, min_atom, max_atom, min_time, max_time, extra=False):
     """ Read in a file of data values where the values are in a format of:
-        <time>\t<atom id>\t<data value>
+        <time>\t<atom ID>\t<data value>
 
     :param file_path: absolute path to a file containing the data
-    :param min_atom: min neuron id to which neurons to read in
-    :param max_atom: max neuron id to which neurons to read in
+    :param min_atom: min neuron ID to which neurons to read in
+    :param max_atom: max neuron ID to which neurons to read in
     :param min_time: min time slot to read neurons values of.
     :param max_time: max time slot to read neurons values of.
-    :return: a numpy array of (time stamp, atom id, data value)
+    :return: a numpy array of (time stamp, atom ID, data value)
     """
     times = list()
     atom_ids = list()
@@ -113,12 +113,13 @@ def read_in_data_from_file(
 def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                           min_time=0, max_time=float('inf'), split_value="\t"):
     """ Read spikes from a file formatted as:\
-        <time>\t<neuron id>
+        <time>\t<neuron ID>
+
     :param file_path: absolute path to a file containing spike values
     :type file_path: str
-    :param min_atom: min neuron id to which neurons to read in
+    :param min_atom: min neuron ID to which neurons to read in
     :type min_atom: int
-    :param max_atom: max neuron id to which neurons to read in
+    :param max_atom: max neuron ID to which neurons to read in
     :type max_atom: int
     :param min_time: min time slot to read neurons values of.
     :type min_time: int
@@ -129,7 +130,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :return:\
         a numpy array with max_atom elements each of which is a list of\
         spike times.
-    :rtype: numpy array of (int, int)
+    :rtype: numpy.array(int, int)
     """
     # pylint: disable=too-many-arguments
 
