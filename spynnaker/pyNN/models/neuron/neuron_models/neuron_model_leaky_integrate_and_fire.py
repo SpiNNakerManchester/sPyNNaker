@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
@@ -64,17 +64,17 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(V_REST, self._v_rest)
-        parameters.set_value(TAU_M, self._tau_m)
-        parameters.set_value(CM, self._cm)
-        parameters.set_value(I_OFFSET, self._i_offset)
-        parameters.set_value(V_RESET, self._v_reset)
-        parameters.set_value(TAU_REFRAC, self._tau_refrac)
+        parameters[V_REST] = self._v_rest
+        parameters[TAU_M] = self._tau_m
+        parameters[CM] = self._cm
+        parameters[I_OFFSET] = self._i_offset
+        parameters[V_RESET] = self._v_reset
+        parameters[TAU_REFRAC] = self._tau_refrac
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(V, self._v_init)
-        state_variables.set_value(COUNT_REFRAC, 0)
+        state_variables[V] = self._v_init
+        state_variables[COUNT_REFRAC] = 0
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -119,48 +119,48 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def v_rest(self):
-        return self._data[V_REST]
+        return self._v_rest
 
     @v_rest.setter
     def v_rest(self, v_rest):
-        self._data.set_value(key=V_REST, value=v_rest)
+        self._v_rest = v_rest
 
     @property
     def tau_m(self):
-        return self._data[TAU_M]
+        return self._tau_m
 
     @tau_m.setter
     def tau_m(self, tau_m):
-        self._data.set_value(key=TAU_M, value=tau_m)
+        self._tau_m = tau_m
 
     @property
     def cm(self):
-        return self._data[CM]
+        return self._cm
 
     @cm.setter
     def cm(self, cm):
-        self._data.set_value(key=CM, value=cm)
+        self._cm = cm
 
     @property
     def i_offset(self):
-        return self._data[I_OFFSET]
+        return self._i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(key=I_OFFSET, value=i_offset)
+        self._i_offset = i_offset
 
     @property
     def v_reset(self):
-        return self._data[V_RESET]
+        return self._v_reset
 
     @v_reset.setter
     def v_reset(self, v_reset):
-        self._data.set_value(key=V_RESET, value=v_reset)
+        self._v_reset = v_reset
 
     @property
     def tau_refrac(self):
-        return self._data[TAU_REFRAC]
+        return self._tau_refrac
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
-        self._data.set_value(key=TAU_REFRAC, value=tau_refrac)
+        self._tau_refrac = tau_refrac

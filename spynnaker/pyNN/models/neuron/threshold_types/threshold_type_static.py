@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from .abstract_threshold_type import AbstractThresholdType
 from data_specification.enums import DataType
 
@@ -24,7 +24,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(V_THRESH, self._v_thresh)
+        parameters[V_THRESH] = self._v_thresh
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -38,13 +38,13 @@ class ThresholdTypeStatic(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractThresholdType.get_data)
+    @overrides(AbstractThresholdType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice):
 
         # Add the rest of the data
         return [parameters[V_THRESH]]
 
-    @overrides(AbstractThresholdType.read_data)
+    @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data

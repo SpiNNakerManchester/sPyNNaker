@@ -1,11 +1,17 @@
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint
+from pacman.model.constraints.partitioner_constraints\
+    import MaxVertexAtomsConstraint
+from pacman.model.graphs.application.application_vertex \
+    import ApplicationVertex
 
 from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet, AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models.abstract_pynn_model \
+    import AbstractPyNNModel
 
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -13,7 +19,7 @@ from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
 import numpy
 import logging
-from six import iteritems, string_types
+from six import string_types, iteritems
 logger = logging.getLogger(__file__)
 
 
@@ -35,25 +41,50 @@ class PyNNPopulationCommon(object):
         "_vertex",
         "_vertex_changeable_after_run",
         "_vertex_contains_units",
-        "_vertex_has_set_max_atoms_per_core",
         "_vertex_population_initializable",
         "_vertex_population_settable",
         "_vertex_read_parameters_before_set"]
 
     def __init__(
-            self, spinnaker_control, size, vertex, structure, initial_values):
+            self, spinnaker_control, size, label, constraints, model,
+            structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
-        if size is not None and size <= 0:
+
+        # Use a provided model to create a vertex
+        if isinstance(model, AbstractPyNNModel):
+            if size is not None and size <= 0:
+                raise ConfigurationException(
+                    "A population cannot have a negative or zero size.")
+            population_parameters = dict(model.default_population_parameters)
+            if additional_parameters is not None:
+                population_parameters.update(additional_parameters)
+            self._vertex = model.create_vertex(
+                size, label, constraints, **population_parameters)
+
+        # Use a provided application vertex directly
+        elif isinstance(model, ApplicationVertex):
+            if additional_parameters is not None:
+                raise ConfigurationException(
+                    "Cannot accept additional parameters {} when the cell is"
+                    " a vertex".format(additional_parameters))
+            self._vertex = model
+            if size is None:
+                size = self._vertex.n_atoms
+            elif size != self._vertex_n_atoms:
+                raise ConfigurationException(
+                    "Vertex size does not match Population size")
+            if label is not None:
+                raise ConfigurationException(
+                    "Cannot accept a label {} when the cell is a vertex"
+                    .format(label))
+            if constraints is not None:
+                self._vertex.add_constraints(constraints)
+
+        # Fail on anything else
+        else:
             raise ConfigurationException(
-                "A population cannot have a negative or zero size.")
-
-        self._vertex = vertex
-
-        # copy the parameters so that the end users are not exposed to the
-        # additions placed by spinnaker.
-        if initial_values is not None:
-            for name, value in iteritems(initial_values):
-                self._vertex.set_value(name, value)
+                "Model must be either an AbstractPyNNModel or an"
+                " ApplicationVertex")
 
         # Introspect properties of the vertex
         self._vertex_population_settable = \
@@ -66,8 +97,6 @@ class PyNNPopulationCommon(object):
             isinstance(self._vertex, AbstractReadParametersBeforeSet)
         self._vertex_contains_units = \
             isinstance(self._vertex, AbstractContainsUnits)
-        self._vertex_has_set_max_atoms_per_core = \
-            hasattr(self._vertex, "set_model_max_atoms_per_core")
 
         self._spinnaker_control = spinnaker_control
         self._delay_vertex = None
@@ -75,11 +104,8 @@ class PyNNPopulationCommon(object):
         # Internal structure now supported 23 November 2014 ADR
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
-        if structure:
-            self._structure = structure
-            self._positions = None
-        else:
-            self._structure = None
+        self._structure = structure
+        self._positions = None
 
         # add objects to the spinnaker control class
         self._spinnaker_control.add_population(self)
@@ -105,6 +131,13 @@ class PyNNPopulationCommon(object):
         # update the simulators id_counter for giving a unique id for every
         # atom
         globals_variables.get_simulator().id_counter += size
+
+        # set up initial values
+        initial_state_variables = dict(model.default_initial_values)
+        if initial_values is not None:
+            initial_state_variables.update(initial_values)
+        for variable, value in iteritems(initial_state_variables):
+            self._initialize(variable, value)
 
     @property
     def first_id(self):
@@ -142,7 +175,9 @@ class PyNNPopulationCommon(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        return self._vertex.is_conductance_based
+        if hasattr(self._vertex, "is_conductance_based"):
+            return self._vertex.is_conductance_based
+        return False
 
     def __getitem__(self, index_or_slice):
         # Note: This is supported by sPyNNaker8
@@ -230,7 +265,7 @@ class PyNNPopulationCommon(object):
         # TODO: Need __getitem__
         raise NotImplementedError
 
-    def initialize(self, variable, value):
+    def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
         """
@@ -334,7 +369,6 @@ class PyNNPopulationCommon(object):
         if isinstance(parameter, string_types):
             if value is None:
                 raise Exception("A value (not None) must be specified")
-            self._read_parameters_before_set()
             self._vertex.set_value(parameter, value)
             return
         for (key, value) in parameter.iteritems():
@@ -362,18 +396,9 @@ class PyNNPopulationCommon(object):
         # set new parameters
         if type(parameter) is str:
             self._vertex.set_value_by_selector(selector, parameter, value)
-            return
-        for (key, value) in parameter.iteritems():
-            self._vertex.set_value_by_selector(selector, key, value)
-        if not isinstance(parameter, dict):
-            raise Exception(
-                "Parameter must either be the name of a single parameter to"
-                " set, or a dict of parameter: value items to set")
-
-        # set new parameters
-        self._read_parameters_before_set()
-        for _key, _value in iteritems(parameter):
-            self._vertex.set_value(_key, _value)
+        else:
+            for (key, value) in parameter.iteritems():
+                self._vertex.set_value_by_selector(selector, key, value)
 
     def _read_parameters_before_set(self):
         """ Reads parameters from the machine before "set" completes
@@ -417,6 +442,18 @@ class PyNNPopulationCommon(object):
         for i in range(self._vertex.n_atoms):
             n_spikes[i] = counts[i]
         return n_spikes
+
+    @property
+    def positions(self):
+        """ Return the position array for structured populations.
+        """
+        if self._positions is None:
+            if self._structure is None:
+                raise ValueError("attempted to retrieve positions "
+                                 "for an unstructured population")
+            self._positions = self._structure.generate_positions(
+                self._vertex.n_atoms)
+        return self._positions
 
     @property
     def structure(self):
@@ -470,19 +507,15 @@ class PyNNPopulationCommon(object):
         self._change_requires_mapping = True
 
     # NON-PYNN API CALL
-    def set_model_based_max_atoms_per_core(self, new_value):
-        """ Supports the setting of each models max atoms per core parameter
+    def set_max_atoms_per_core(self, max_atoms_per_core):
+        """ Supports the setting of this population's max atoms per core
 
-        :param new_value: the new value for the max atoms per core.
+        :param max_atoms_per_core: the new value for the max atoms per core.
         """
-        if not self._vertex_has_set_max_atoms_per_core:
-            raise ConfigurationException(
-                "This population does not support its max_atoms_per_core "
-                "variable being adjusted by the end user")
-
         globals_variables.get_simulator().verify_not_running()
-        self._vertex.set_model_max_atoms_per_core(new_value)
-        # state that something has changed in the population,
+        self._vertex.add_constraint(
+            MaxVertexAtomsConstraint(max_atoms_per_core))
+        # state that something has changed in the population
         self._change_requires_mapping = True
 
     @property

@@ -1,88 +1,77 @@
-from data_specification.enums.data_type import DataType
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
-
 from .abstract_input_type import AbstractInputType
 
-from enum import Enum
 
 MULTIPLICATOR = "multiplicator"
 INH_INPUT_PREVIOUS = "inh_input_previous"
 
-
-class _CURRENT_SEMD_TYPES(Enum):
-    MULTIPLICATOR = (1, DataType.S1615)
-    INH_INPUT_PREVIOUS = (2, DataType.S1615)
-
-    def __new__(cls, value, data_type, doc=""):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    MULTIPLICATOR: "0",
+    INH_INPUT_PREVIOUS: "mV"
+}
 
 
-class InputTypeCurrentSEMD(AbstractInputType, AbstractContainsUnits):
+class InputTypeCurrentSEMD(AbstractInputType):
     """ The current sEMD input type
     """
     __slots__ = [
-        "_data",
-        "_n_neurons",
-        "_units"]
+        "_multiplicator",
+        "_inh_input_previous"]
 
-    def __init__(self, n_neurons, multiplicator, inh_input_previous):
-        self._units = {
-            MULTIPLICATOR: "0",
-            INH_INPUT_PREVIOUS: "mV"}
+    def __init__(self, multiplicator, inh_input_previous):
+        self._multiplicator = multiplicator
+        self._inh_input_previous = inh_input_previous
 
-        self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
-        self._data[MULTIPLICATOR] = multiplicator
-        self._data[INH_INPUT_PREVIOUS] = inh_input_previous
+    @overrides(AbstractInputType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 10 * n_neurons
+
+    @overrides(AbstractInputType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[MULTIPLICATOR] = self._multiplicator
+
+    @overrides(AbstractInputType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[INH_INPUT_PREVIOUS] = self._inh_input_previous
+
+    @overrides(AbstractInputType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractInputType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @overrides(AbstractInputType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
+
+        # Add the rest of the data
+        return [parameters[MULTIPLICATOR], state_variables[INH_INPUT_PREVIOUS]]
+
+    @overrides(AbstractInputType.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (_multiplicator, inh_input_previous) = values
+
+        state_variables[INH_INPUT_PREVIOUS] = inh_input_previous
 
     @property
     def multiplicator(self):
-        return self._data[MULTIPLICATOR]
+        return self._multiplicator
 
     @multiplicator.setter
     def multiplicator(self, multiplicator):
-        self._data.set_value(key=MULTIPLICATOR, value=multiplicator)
+        self._multiplicator = multiplicator
 
     @property
     def inh_input_previous(self):
-        return self._data[INH_INPUT_PREVIOUS]
+        return self._inh_input_previous
 
     @inh_input_previous.setter
     def inh_input_previous(self, inh_input_previous):
-        self._data.set_value(key=INH_INPUT_PREVIOUS, value=inh_input_previous)
+        self._inh_input_previous = inh_input_previous
 
     def get_global_weight_scale(self):
         return 1.0
-
-    def get_n_input_type_parameters(self):
-        return 2
-
-    def get_input_type_parameters(self):
-        return [
-            NeuronParameter(self._data[MULTIPLICATOR],
-                            _CURRENT_SEMD_TYPES.MULTIPLICATOR.data_type),
-            NeuronParameter(self._data[INH_INPUT_PREVIOUS],
-                            _CURRENT_SEMD_TYPES.INH_INPUT_PREVIOUS.data_type)
-        ]
-
-    def get_input_type_parameter_types(self):
-        return [item.data_type for item in _CURRENT_SEMD_TYPES]
-
-    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):  # n_synapse_types?
-        return 1
-
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]

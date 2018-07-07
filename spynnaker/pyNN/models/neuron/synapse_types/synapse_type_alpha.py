@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
@@ -56,15 +56,15 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(TAU_SYN_E, self._tau_syn_E)
-        parameters.set_value(TAU_SYN_I, self._tau_syn_I)
+        parameters[TAU_SYN_E] = self._tau_syn_E
+        parameters[TAU_SYN_I] = self._tau_syn_I
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(EXC_RESPONSE, self._exc_response)
-        state_variables.set_value(EXC_EXP_RESPONSE, self._exc_exp_response)
-        state_variables.set_value(INH_RESPONSE, self._inh_response)
-        state_variables.set_value(INH_EXP_RESPONSE, self._inh_exp_response)
+        state_variables[EXC_RESPONSE] = self._exc_response
+        state_variables[EXC_EXP_RESPONSE] = self._exc_exp_response
+        state_variables[INH_RESPONSE] = self._inh_response
+        state_variables[INH_EXP_RESPONSE] = self._inh_exp_response
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):

@@ -1,8 +1,6 @@
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
-from spinn_utilities.index_is_value import IndexIsValue
 
 DEVICE = "device"
 TIME_UNTIL_SEND = "time_until_send"
@@ -35,11 +33,11 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[DEVICE].set_value(self._device)
+        parameters[DEVICE] = self._device
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[TIME_UNTIL_SEND].set_value(0)
+        state_variables[TIME_UNTIL_SEND] = 0
 
     @overrides(AbstractThresholdType.get_units)
     def get_units(self, variable):
@@ -73,13 +71,5 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        types = [DataType.UINT32, DataType.UINT32, DataType.S1615,
-                 DataType.S1615, DataType.UINT32, DataType.UINT32]
-        offset, (_key, _uses_payload, _min, _max, _between, time_until_send) =\
-            utility_calls.read_parameter_data(
-                types, data, offset, vertex_slice.n_atoms)
-
-        utility_calls.copy_values(
-            time_until_send, state_variables[TIME_UNTIL_SEND], vertex_slice)
-
-        return offset
+        (_key, _uses_payload, _min, _max, _between, time_until_send) = values
+        state_variables[TIME_UNTIL_SEND] = time_until_send

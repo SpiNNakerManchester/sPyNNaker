@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
 from pacman.executor.injection_decorator import inject_items
@@ -38,9 +38,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(DU_TH, self._du_th)
-        parameters.set_value(TAU_TH, self._tau_th)
-        parameters.set_value(V_THRESH, self._v_thresh)
+        parameters[DU_TH] = self._du_th
+        parameters[TAU_TH] = self._tau_th
+        parameters[V_THRESH] = self._v_thresh
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):

@@ -8,19 +8,20 @@ class AbstractNeuronImpl(object):
     """ An abstraction of a whole neuron model including all parts
     """
 
-    @abstractproperty
-    @staticmethod
-    def default_parameters():
-        """ The default parameters of the model
-
-        :rtype: dict of str->value
-        """
+    __slots__ = ()
 
     @abstractproperty
     def model_name(self):
         """ The name of the model
 
         :rtype: str
+        """
+
+    @abstractproperty
+    def binary_name(self):
+        """ The name of the binary executable of this implementation
+
+        :rtype str
         """
 
     @abstractmethod
@@ -87,6 +88,7 @@ class AbstractNeuronImpl(object):
         :rtype: list of str
         """
 
+    @abstractmethod
     def get_recordable_units(self, variable):
         """ Get the units of the given variable that can be recorded
 

@@ -3,6 +3,7 @@ from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.utilities import helpful_functions
+from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 from spinn_front_end_common.utility_models \
     import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities.notification_protocol \
@@ -145,12 +146,18 @@ class SpynnakerExternalDevicePluginManager(object):
         :type population: \
             :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`
         :param device: \
-            The pyNN population external device to which the spikes will be\
+            The pyNN population or external device to which the spikes will be\
             sent.
+        :type device: \
+            :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`\
+            or :py:class:`pacman.model.graphs.application.ApplicationVertex`
         """
+        device_vertex = device
+        if isinstance(device, PyNNPopulationCommon):
+            device_vertex = device._get_vertex
         # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
-            population._get_vertex, device._get_vertex,
+            population._get_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)
 
     @staticmethod

@@ -37,13 +37,13 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
     def get_dtcm_usage_in_bytes(self, n_neurons):
         usage = super(AbstractNeuronModel, self).get_dtcm_usage_in_bytes(
             n_neurons)
-        usage += self.global_struct.get_size_in_whole_words() * 4
+        return usage + (self.global_struct.get_size_in_whole_words() * 4)
 
     @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
         usage = super(AbstractNeuronModel, self).get_sdram_usage_in_bytes(
             n_neurons)
-        usage += self.global_struct.get_size_in_whole_words() * 4
+        return usage + (self.global_struct.get_size_in_whole_words() * 4)
 
     def get_global_values(self):
         """ Get the global values to be written to the machine for this model

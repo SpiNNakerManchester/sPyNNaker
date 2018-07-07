@@ -1,6 +1,5 @@
 from data_specification.enums import DataType
-from spinn_utilities import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spinn_utilities.overrides import overrides
 from .abstract_input_type import AbstractInputType
 
 E_REV_E = "e_rev_E"
@@ -12,7 +11,7 @@ UNITS = {
 }
 
 
-class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
+class InputTypeConductance(AbstractInputType):
     """ The conductance input type
     """
     __slots__ = [
@@ -33,8 +32,8 @@ class InputTypeConductance(AbstractInputType, AbstractContainsUnits):
 
     @overrides(AbstractInputType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(E_REV_E, self._e_rev_E)
-        parameters.set_value(E_REV_I, self._e_rev_I)
+        parameters[E_REV_E] = self._e_rev_E
+        parameters[E_REV_I] = self._e_rev_I
 
     @overrides(AbstractInputType.add_state_variables)
     def add_state_variables(self, state_variables):

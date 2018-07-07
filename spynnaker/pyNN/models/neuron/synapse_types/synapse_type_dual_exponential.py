@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
@@ -56,15 +56,15 @@ class SynapseTypeDualExponential(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(TAU_SYN_E, self._tau_syn_E)
-        parameters.set_value(TAU_SYN_E2, self._tau_syn_E2)
-        parameters.set_value(TAU_SYN_I, self._tau_syn_I)
+        parameters[TAU_SYN_E] = self._tau_syn_E
+        parameters[TAU_SYN_E2] = self._tau_syn_E2
+        parameters[TAU_SYN_I] = self._tau_syn_I
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(ISYN_EXC, self._isyn_exc)
-        state_variables.set_value(ISYN_EXC2, self._isyn_exc2)
-        state_variables.set_value(ISYN_INH, self._isyn_inh)
+        state_variables[ISYN_EXC] = self._isyn_exc
+        state_variables[ISYN_EXC2] = self._isyn_exc2
+        state_variables[ISYN_INH] = self._isyn_inh
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):

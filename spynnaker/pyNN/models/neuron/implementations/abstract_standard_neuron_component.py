@@ -29,6 +29,7 @@ class AbstractStandardNeuronComponent(object):
         :rtype:\
             :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
         """
+        return self._struct
 
     @abstractmethod
     def get_n_cpu_cycles(self, n_neurons):

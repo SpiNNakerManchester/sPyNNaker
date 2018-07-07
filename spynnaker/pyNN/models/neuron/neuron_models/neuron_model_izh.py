@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -55,16 +55,16 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(A, self._a)
-        parameters.set_value(B, self._b)
-        parameters.set_value(C, self._c)
-        parameters.set_value(D, self._d)
-        parameters.set_value(I_OFFSET, self._i_offset)
+        parameters[A] = self._a
+        parameters[B] = self._b
+        parameters[C] = self._c
+        parameters[D] = self._d
+        parameters[I_OFFSET] = self._i_offset
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(V, self._v_init)
-        state_variables.set_value(U, self._u_init)
+        state_variables[V] = self._v_init
+        state_variables[U] = self._u_init
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):

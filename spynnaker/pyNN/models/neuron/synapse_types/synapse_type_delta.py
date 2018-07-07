@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
 
@@ -35,8 +35,8 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(ISYN_EXC, self._isyn_exc)
-        state_variables.set_value(ISYN_INH, self._isyn_inh)
+        state_variables[ISYN_EXC] = self._isyn_exc
+        state_variables[ISYN_INH] = self._isyn_inh
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):

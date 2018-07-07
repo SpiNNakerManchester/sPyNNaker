@@ -1,6 +1,6 @@
 from pacman.executor.injection_decorator import inject_items
 from data_specification.enums import DataType
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from .abstract_additional_input import AbstractAdditionalInput
 
 import numpy
@@ -38,12 +38,12 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(TAU_CA2, self._tau_ca2)
-        parameters.set_value(I_ALPHA, self._i_alpha)
+        parameters[TAU_CA2] = self._tau_ca2
+        parameters[I_ALPHA] = self._i_alpha
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(I_CA2, self._i_ca2)
+        state_variables[I_CA2] = self._i_ca2
 
     @overrides(AbstractAdditionalInput.get_units)
     def get_units(self, variable):

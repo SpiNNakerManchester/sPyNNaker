@@ -26,7 +26,7 @@ class InputTypeCurrent(AbstractInputType):
     def get_values(self, parameters, state_variables, vertex_slice):
         return []
 
-    @overrides(AbstractInputType.read_data)
+    @overrides(AbstractInputType.update_values)
     def update_values(self, values, parameters, state_variables):
         pass
 

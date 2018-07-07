@@ -10,6 +10,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     __slots__ = [
         "_model_name",
+        "_binary",
         "_neuron_model",
         "_input_type",
         "_synapse_type",
@@ -27,9 +28,10 @@ class NeuronImplStandard(AbstractNeuronImpl):
         'gsyn_inh': "uS"}
 
     def __init__(
-            self, model_name, neuron_model, input_type, synapse_type,
-            threshold_type, additional_input_type=None):
+            self, model_name, binary, neuron_model, input_type,
+            synapse_type, threshold_type, additional_input_type=None):
         self._model_name = model_name
+        self._binary = binary
         self._neuron_model = neuron_model
         self._input_type = input_type
         self._synapse_type = synapse_type
@@ -42,32 +44,24 @@ class NeuronImplStandard(AbstractNeuronImpl):
         if self._additional_input_type is not None:
             self._components.append(self._additional_input_type)
 
-    @staticmethod
-    def get_default_parameters(
-            neuron_model, input_type, synapse_type, threshold_type,
-            additional_input_type=None):
-        items = [neuron_model, input_type, synapse_type, threshold_type]
-        if additional_input_type is not None:
-            items.append(additional_input_type)
-        default_parameters = dict()
-        for item in items:
-            if hasattr(item, "default_parameters"):
-                default_parameters.update(getattr(item, "default_parameters"))
-        return default_parameters
-
     @property
     @overrides(AbstractNeuronImpl.model_name)
     def model_name(self):
         return self._model_name
 
+    @property
+    @overrides(AbstractNeuronImpl.binary_name)
+    def binary_name(self):
+        return self._binary
+
     @overrides(AbstractNeuronImpl.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         total = self._neuron_model.get_n_cpu_cycles(n_neurons)
-        total += self._synapse_model.get_n_cpu_cycles(n_neurons)
+        total += self._synapse_type.get_n_cpu_cycles(n_neurons)
         total += self._input_type.get_n_cpu_cycles(n_neurons)
         total += self._threshold_type.get_n_cpu_cycles(n_neurons)
-        if self._additional_input is not None:
-            total += self._additional_input.get_n_cpu_cycles(n_neurons)
+        if self._additional_input_type is not None:
+            total += self._additional_input_type.get_n_cpu_cycles(n_neurons)
         return total
 
     @overrides(AbstractNeuronImpl.get_dtcm_usage_in_bytes)
@@ -76,8 +70,9 @@ class NeuronImplStandard(AbstractNeuronImpl):
         total += self._synapse_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self._input_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self._threshold_type.get_dtcm_usage_in_bytes(n_neurons)
-        if self._additional_input is not None:
-            total += self._additional_input.get_dtcm_usage_in_bytes(n_neurons)
+        if self._additional_input_type is not None:
+            total += self._additional_input_type.get_dtcm_usage_in_bytes(
+                n_neurons)
         return total
 
     @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
@@ -86,8 +81,9 @@ class NeuronImplStandard(AbstractNeuronImpl):
         total += self._synapse_type.get_sdram_usage_in_bytes(n_neurons)
         total += self._input_type.get_sdram_usage_in_bytes(n_neurons)
         total += self._threshold_type.get_sdram_usage_in_bytes(n_neurons)
-        if self._additional_input is not None:
-            total += self._additional_input.get_sdram_usage_in_bytes(n_neurons)
+        if self._additional_input_type is not None:
+            total += self._additional_input_type.get_sdram_usage_in_bytes(
+                n_neurons)
         return total
 
     @overrides(AbstractNeuronImpl.get_global_weight_scale)
@@ -161,3 +157,21 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.is_conductance_based)
     def is_conductance_based(self):
         return isinstance(self._input_type, InputTypeConductance)
+
+    def __getitem__(self, key):
+        # Find the property in the components...
+        for component in self._components:
+            if hasattr(component, key):
+                return getattr(component, key)
+        # ... or fail
+        raise AttributeError("'{}' object has no attribute {}".format(
+            self.__class__.__name__, key))
+
+    def __setitem__(self, key, value):
+        # Find the property in the components...
+        for component in self._components:
+            if hasattr(component, key):
+                return setattr(component, key, value)
+        # ... or fail
+        raise AttributeError("'{}' object has no attribute {}".format(
+            self.__class__.__name__, key))

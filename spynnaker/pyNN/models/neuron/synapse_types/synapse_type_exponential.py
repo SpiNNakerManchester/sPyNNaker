@@ -1,4 +1,4 @@
-from spinn_utilities import overrides
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
@@ -43,13 +43,13 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters.set_value(TAU_SYN_E, self._tau_syn_E)
-        parameters.set_value(TAU_SYN_I, self._tau_syn_I)
+        parameters[TAU_SYN_E] = self._tau_syn_E
+        parameters[TAU_SYN_I] = self._tau_syn_I
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables.set_value(ISYN_EXC, self._isyn_exc)
-        state_variables.set_value(ISYN_INH, self._isyn_inh)
+        state_variables[ISYN_EXC] = self._isyn_exc
+        state_variables[ISYN_INH] = self._isyn_inh
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):
@@ -73,7 +73,7 @@ class SynapseTypeExponential(AbstractSynapseType):
                 parameters[TAU_SYN_I].apply_operation(init),
                 state_variables[ISYN_EXC], state_variables[ISYN_INH]]
 
-    @overrides(AbstractSynapseType.read_data)
+    @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data

@@ -1,7 +1,6 @@
 from spinn_utilities.overrides import overrides
 
 # pacman imports
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.executor.injection_decorator import inject_items
@@ -73,13 +72,12 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractHasGlobalMaxAtoms,
+        AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
-        "_binary",
         "_buffer_size_before_receive",
         "_change_requires_mapping",
         "_change_requires_neuron_parameters_reload",
@@ -91,6 +89,7 @@ class AbstractPopulationVertex(
         "_neuron_impl",
         "_neuron_recorder",
         "_parameters",
+        "_pynn_model",
         "_receive_buffer_host",
         "_receive_buffer_port",
         "_state_variables",
@@ -112,20 +111,14 @@ class AbstractPopulationVertex(
 
     _n_vertices = 0
 
-    non_pynn_default_parameters = {
-        'spikes_per_second': None, 'ring_buffer_sigma': None,
-        'incoming_spike_buffer_size': None, 'constraints': None,
-        'label': None}
-
     def __init__(
-            self, n_neurons, binary, label, max_atoms_per_core,
+            self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, constraints=None):
+            neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
 
-        self._binary = binary
         self._n_atoms = n_neurons
 
         # buffer data
@@ -139,6 +132,7 @@ class AbstractPopulationVertex(
                 "Simulation", "incoming_spike_buffer_size")
 
         self._neuron_impl = neuron_impl
+        self._pynn_model = pynn_model
         self._parameters = SpynnakerRangeDictionary(n_neurons)
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self._neuron_impl.add_parameters(self._parameters)
@@ -248,11 +242,11 @@ class AbstractPopulationVertex(
 
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         values = [self._neuron_recorder.get_buffered_sdram(
-                "spikes", vertex_slice)]
+                "spikes", vertex_slice, n_machine_time_steps)]
         for variable in self._neuron_impl.get_recordable_variables():
             values.append(
                 self._neuron_recorder.get_buffered_sdram(
-                    variable, vertex_slice))
+                    variable, vertex_slice, n_machine_time_steps))
         return values
 
     @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
@@ -313,7 +307,7 @@ class AbstractPopulationVertex(
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             recording_utilities.get_recording_header_size(
-                len(self._neuron_impl.get_recordable_variables() + 1)) +
+                len(self._neuron_impl.get_recordable_variables()) + 1) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
@@ -348,7 +342,7 @@ class AbstractPopulationVertex(
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.RECORDING.value,
             size=recording_utilities.get_recording_header_size(
-                len(self._neuron_impl.get_recordable_variables())))
+                len(self._neuron_impl.get_recordable_variables()) + 1))
 
         profile_utils.reserve_profile_region(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
@@ -418,7 +412,7 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         neuron_data = self._neuron_impl.get_data(
-            self._parameters, self._state_variables)
+            self._parameters, self._state_variables, vertex_slice)
         spec.write_array(neuron_data)
 
     @inject_items({
@@ -543,7 +537,8 @@ class AbstractPopulationVertex(
     def get_binary_file_name(self):
 
         # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(self._binary)
+        binary_title, binary_extension = os.path.splitext(
+            self._neuron_impl.binary_name)
 
         # Reunite title and extension and return
         return (binary_title + self._synapse_manager.vertex_executable_suffix +
@@ -612,6 +607,10 @@ class AbstractPopulationVertex(
                 " parameter {}".format(variable))
         self._state_variables.set_value(variable, value)
         self._change_requires_neuron_parameters_reload = True
+
+    @property
+    def initialize_parameters(self):
+        return self._state_variables.keys()
 
     def _get_parameter(self, variable):
         if variable.endswith("_init"):
@@ -845,13 +844,13 @@ class AbstractPopulationVertex(
         will be returned.
         """
         parameters = dict()
-        for parameter_name in self._neuron_impl.default_parameters:
+        for parameter_name in self._pynn_model.default_parameters:
             parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
             "name": self._neuron_impl.model_name,
-            "default_parameters": self._neuron_impl.default_parameters,
-            "default_initial_values": self._neuron_impl.default_parameters,
+            "default_parameters": self._pynn_model.default_parameters,
+            "default_initial_values": self._pynn_model.default_parameters,
             "parameters": parameters,
         }
         return context

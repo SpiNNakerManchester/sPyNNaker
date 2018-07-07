@@ -27,6 +27,7 @@ class Struct(object):
 
         :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
         """
+        return self._field_types
 
     @property
     def numpy_dtype(self):
@@ -35,7 +36,7 @@ class Struct(object):
         :rtype: :py:class:`numpy.dtype`
         """
         return numpy.dtype(
-            [("f" + i, numpy.dtype(data_type.structencoding))
+            [("f" + str(i), numpy.dtype(data_type.struct_encoding))
              for i, data_type in enumerate(self.field_types)],
             align=True)
 
@@ -46,8 +47,8 @@ class Struct(object):
         :param array_size: The number of elements in an array of structs
         :rtype: int
         """
-        datatype = self.get_numpy_dtype
-        size_in_bytes = array_size * datatype.item_size
+        datatype = self.numpy_dtype
+        size_in_bytes = array_size * datatype.itemsize
         return (size_in_bytes + 3) // 4
 
     def get_data(self, values, offset=0, array_size=1):
@@ -70,10 +71,10 @@ class Struct(object):
 
             if is_singleton(values):
                 data_value = convert_to(values, data_type)
-                data["f" + i] = data_value
+                data["f" + str(i)] = data_value
             elif not isinstance(values, RangedList):
                 data_value = [convert_to(v, data_type) for v in values]
-                data["f" + i] = data_value
+                data["f" + str(i)] = data_value
             else:
                 for start, end, value in values.iter_ranges_by_slice(
                         offset, offset + array_size):
@@ -84,7 +85,8 @@ class Struct(object):
                         data_value = [convert_to(v, data_type) for v in values]
                     else:
                         data_value = convert_to(value, data_type)
-                    data["f" + i][start - offset:end - offset] = data_value
+                    data["f" + str(i)][
+                        start - offset:end - offset] = data_value
 
         # Pad to whole number of uint32s
         overflow = (array_size * self.numpy_dtype.itemsize) % 4

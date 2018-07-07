@@ -30,7 +30,8 @@ from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import SynapseDynamicsStatic, AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source import SpikeSourcePoisson
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex \
+    import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants \
     import POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT
@@ -469,7 +470,8 @@ class SynapticManager(object):
                     spikes_per_tick = max(
                         1.0, self._spikes_per_second / steps_per_second)
                     spikes_per_second = self._spikes_per_second
-                    if isinstance(app_edge.pre_vertex, SpikeSourcePoisson):
+                    if isinstance(app_edge.pre_vertex,
+                                  SpikeSourcePoissonVertex):
                         spikes_per_second = app_edge.pre_vertex.rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
