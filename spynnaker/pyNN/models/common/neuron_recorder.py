@@ -3,7 +3,7 @@ from collections import OrderedDict
 import logging
 import math
 import numpy
-from six import raise_from
+from six import raise_from, iteritems
 from six.moves import range, xrange
 
 from pacman.model.resources.variable_sdram import VariableSDRAM
