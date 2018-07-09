@@ -47,7 +47,8 @@ class PushBotRetinaViewer(Thread):
             -float(self._frame_time_ms) / float(decay_time_constant_ms))
 
     def _init_socket(self, port):
-        """Open socket to receive UDP."""
+        """ Open socket to receive UDP.
+        """
         self._spike_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._spike_socket.bind(("0.0.0.0", port))
         self._spike_socket.setblocking(False)

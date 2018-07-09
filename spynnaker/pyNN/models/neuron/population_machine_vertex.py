@@ -51,7 +51,6 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, recorded_region_ids, label, constraints):
         """
-
         :param resources_required:
         :param recorded_region_ids:
         :param label:
