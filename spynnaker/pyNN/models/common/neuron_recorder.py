@@ -458,8 +458,7 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the sdram used for this may timesteps
-        """ Return the SDRAM used per timestep
+        """ Returns the SDRAM used for this may timesteps
 
         If required the total is rounded up so the space will always fit
 
