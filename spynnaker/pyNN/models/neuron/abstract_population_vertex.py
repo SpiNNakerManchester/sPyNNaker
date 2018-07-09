@@ -633,7 +633,7 @@ class AbstractPopulationVertex(
 
         # parameter not found for this variable
         raise KeyError("No variable {} found in {}".format(
-            variable, self._model_impl.model_name))
+            variable, self._neuron_impl.model_name))
 
     @overrides(AbstractPopulationInitializable.get_initial_value)
     def get_initial_value(self, variable, selector=None):
@@ -653,7 +653,7 @@ class AbstractPopulationVertex(
 
     @property
     def is_conductance_based(self):
-        return self._model_impl.is_conductance_based()
+        return self._neuron_impl.is_conductance_based()
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
