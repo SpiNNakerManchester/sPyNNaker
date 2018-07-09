@@ -36,4 +36,4 @@ def test_reset_max_atoms_per_core():
     _MyPyNNModelImpl.set_model_max_atoms_per_core()
     assert(_MyNeuronModelImpl.get_max_atoms_per_core() ==
            DEFAULT_MAX_ATOMS_PER_CORE)
-    assert(_MyPyNNModelImpl.get_max_atoms_per_core() == sys.maxint)
+    assert(_MyPyNNModelImpl.get_max_atoms_per_core() == sys.maxsize)
