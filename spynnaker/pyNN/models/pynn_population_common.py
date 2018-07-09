@@ -10,8 +10,7 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet, AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
-from spynnaker.pyNN.models.abstract_models.abstract_pynn_model \
-    import AbstractPyNNModel
+from .abstract_pynn_model import AbstractPyNNModel
 
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException

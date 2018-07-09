@@ -1,4 +1,4 @@
-from spynnaker.pyNN.models.neuron.implementations.defaults \
+from spynnaker.pyNN.models.defaults \
     import default_initial_values
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
     import PushBotTranslator

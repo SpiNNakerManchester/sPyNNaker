@@ -22,7 +22,7 @@ from spinn_front_end_common.abstract_models \
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron.implementations.defaults import defaults
+from spynnaker.pyNN.models import defaults.defaults
 
 logger = logging.getLogger(__name__)
 

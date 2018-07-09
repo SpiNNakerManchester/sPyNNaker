@@ -1,6 +1,6 @@
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.models.neuron.implementations.defaults \
+from spynnaker.pyNN.models.defaults \
     import default_initial_values
 
 import logging

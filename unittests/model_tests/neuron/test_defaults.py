@@ -1,7 +1,7 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
-from spynnaker.pyNN.models.neuron.implementations.defaults \
-    import defaults, default_parameters, default_initial_values
+from spynnaker.pyNN.models.neuron.implementations.defaults import default_parameters, default_initial_values
+from spynnaker.pyNN.models import defaults.defaults
 
 
 def test_nothing():

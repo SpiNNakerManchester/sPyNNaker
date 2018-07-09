@@ -4,7 +4,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod,\
 from collections import defaultdict
 import sys
 from spinn_utilities.classproperty import classproperty
-from spynnaker.pyNN.models.neuron.implementations.defaults \
+from spynnaker.pyNN.models.defaults \
     import get_dict_from_init
 
 

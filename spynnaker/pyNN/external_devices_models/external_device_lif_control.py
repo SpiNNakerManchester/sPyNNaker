@@ -2,7 +2,7 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.external_devices_models\
     .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.neuron.implementations.defaults \
+from spynnaker.pyNN.models.defaults \
     import default_initial_values
 
 from .threshold_type_multicast_device_control \

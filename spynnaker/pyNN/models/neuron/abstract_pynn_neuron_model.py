@@ -1,6 +1,6 @@
 from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.abstract_models import AbstractPyNNModel
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 
 DEFAULT_MAX_ATOMS_PER_CORE = 255

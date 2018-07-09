@@ -3,8 +3,7 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.neuron.implementations.defaults \
-    import default_initial_values
+from spynnaker.pyNN.models.defaults import default_initial_values
 
 _IZK_THRESHOLD = 30.0
 

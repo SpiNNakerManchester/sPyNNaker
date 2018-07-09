@@ -1,6 +1,5 @@
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models.abstract_pynn_model \
-    import AbstractPyNNModel
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from .spike_injector_vertex import SpikeInjectorVertex
 
 _population_parameters = {

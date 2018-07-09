@@ -1,6 +1,5 @@
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron.implementations.defaults \
-    import defaults, default_initial_values
+from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 
 
 @defaults

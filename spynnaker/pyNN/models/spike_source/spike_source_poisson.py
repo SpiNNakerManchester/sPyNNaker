@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.abstract_models import AbstractPyNNModel
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 _population_parameters = {"seed": None}
 
