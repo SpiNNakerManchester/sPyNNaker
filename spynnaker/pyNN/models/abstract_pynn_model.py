@@ -13,10 +13,10 @@ class AbstractPyNNModel(object):
     """ A Model that can be passed in to a Population object in PyNN
     """
 
-    _max_atoms_per_core = defaultdict(lambda: sys.maxint)
+    _max_atoms_per_core = defaultdict(lambda: sys.maxsize)
 
     @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=sys.maxint):
+    def set_model_max_atoms_per_core(cls, n_atoms=sys.maxsize):
         """ Set the maximum number of atoms per core for this model
 
         :param n_atoms: The new maximum, or None for the largest possible
