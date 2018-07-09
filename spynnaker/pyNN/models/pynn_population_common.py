@@ -174,8 +174,8 @@ class PyNNPopulationCommon(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        if hasattr(self._vertex, "is_conductance_based"):
-            return self._vertex.is_conductance_based
+        if hasattr(self._vertex, "conductance_based"):
+            return self._vertex.conductance_based
         return False
 
     def __getitem__(self, index_or_slice):

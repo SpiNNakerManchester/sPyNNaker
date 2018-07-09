@@ -652,7 +652,7 @@ class AbstractPopulationVertex(
         ranged_list.set_value_by_selector(selector, value)
 
     @property
-    def is_conductance_based(self):
+    def conductance_based(self):
         return self._neuron_impl.is_conductance_based()
 
     @overrides(AbstractPopulationSettable.get_value)
