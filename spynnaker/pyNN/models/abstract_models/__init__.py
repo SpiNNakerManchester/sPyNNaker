@@ -7,14 +7,9 @@ from .abstract_read_parameters_before_set \
     import AbstractReadParametersBeforeSet
 from .abstract_settable import AbstractSettable
 from .abstract_weight_updatable import AbstractWeightUpdatable
-from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
-from .abstract_pynn_neuron_model_standard \
-    import AbstractPyNNNeuronModelStandard
 from .abstract_pynn_model import AbstractPyNNModel
 
 __all__ = ["AbstractAcceptsIncomingSynapses", "AbstractContainsUnits",
            "AbstractFilterableEdge", "AbstractPopulationInitializable",
            "AbstractPopulationSettable", "AbstractReadParametersBeforeSet",
-           "AbstractSettable", "AbstractWeightUpdatable",
-           "AbstractPyNNNeuronModelStandard", "AbstractPyNNNeuronModel",
-           "AbstractPyNNModel"]
+           "AbstractSettable", "AbstractWeightUpdatable", "AbstractPyNNModel"]

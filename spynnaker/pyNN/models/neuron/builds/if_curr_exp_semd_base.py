@@ -1,8 +1,7 @@
 from spynnaker.pyNN.models.neuron.neuron_models\
     .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPyNNNeuronModelStandard
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import SynapseTypeExponential
 from spynnaker.pyNN.models.neuron.input_types.input_type_current_semd \

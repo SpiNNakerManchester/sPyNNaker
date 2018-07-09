@@ -1,6 +1,5 @@
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
-from spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard \
-    import NeuronImplStandard
+from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):

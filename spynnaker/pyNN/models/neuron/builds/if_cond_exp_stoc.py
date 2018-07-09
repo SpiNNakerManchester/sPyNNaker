@@ -1,5 +1,4 @@
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPyNNNeuronModelStandard
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.neuron.implementations.defaults \
     import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models \
