@@ -4,8 +4,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod,\
 from collections import defaultdict
 import sys
 from spinn_utilities.classproperty import classproperty
-from spynnaker.pyNN.models.defaults \
-    import get_dict_from_init
+from spynnaker.pyNN.models.defaults import get_dict_from_init
 
 
 @add_metaclass(AbstractBase)
@@ -62,6 +61,24 @@ class AbstractPyNNModel(object):
         if params is None and svars is None:
             return {}
         return get_dict_from_init(init, skip=params, include=svars)
+
+    @classmethod
+    def get_parameter_names(cls):
+        """ Get the names of the parameters of the model
+
+        :rtype: list(str)
+        """
+        return cls.default_parameters.keys()
+
+    @classmethod
+    def has_parameter(cls, name):
+        """ Determine if the model has a parameter with the given name
+
+        :param name: The name of the parameter to check for
+        :type name: str
+        :rtype: bool
+        """
+        return name in cls.default_parameters
 
     @abstractproperty
     @staticmethod
