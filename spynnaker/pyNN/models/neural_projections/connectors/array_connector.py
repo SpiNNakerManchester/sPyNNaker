@@ -33,10 +33,10 @@ class ArrayConnector(AbstractConnector):
         dims = array.shape
         for i in range(dims[0]):
             for j in range(dims[1]):
-                if array[i,j]==1:
+                if array[i, j] == 1:
                     n_total_connections += 1
 
-        self._n_total_connections =  n_total_connections
+        self._n_total_connections = n_total_connections
         self._array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -51,7 +51,7 @@ class ArrayConnector(AbstractConnector):
         post_hi = post_vertex_slice.hi_atom
         for i in range(self._array_dims[0]):
             for j in range(post_lo, post_hi+1):
-                if self._array[i,j]==1:
+                if self._array[i, j] == 1:
                     n_connections += 1
 
         if min_delay is None and max_delay is None:
@@ -62,16 +62,11 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
-#         n_connections = 0
-#         for i in range(self._array_dims[0]):
-#             for j in range(self._array_dims[1]):
-#                 if self._array[i,j]==1:
-#                     n_connections += 1
         return self._n_total_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
-        return self._get_weight_maximum(self._n_total_connections)  #len(self._array))
+        return self._get_weight_maximum(self._n_total_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -87,7 +82,7 @@ class ArrayConnector(AbstractConnector):
         post_hi = post_vertex_slice.hi_atom
         for i in range(pre_lo, pre_hi+1):
             for j in range(post_lo, post_hi+1):
-                if self._array[i,j]==1:
+                if self._array[i, j] == 1:
                     pre_neurons.append(i)
                     post_neurons.append(j)
                     n_connections += 1
