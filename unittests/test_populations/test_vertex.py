@@ -6,6 +6,7 @@ from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 import numpy
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.implementations \
     import AbstractStandardNeuronComponent
 
@@ -81,6 +82,7 @@ class _MyNeuronModel(AbstractNeuronModel):
 
 class FooBar(AbstractPyNNNeuronModelStandard):
 
+    @default_initial_values({"foo", "bar"})
     def __init__(self, foo=1, bar=11):
         super(FooBar, self).__init__(
             "FooBar", "foobar.aplx", _MyNeuronModel(foo, bar),
