@@ -80,8 +80,8 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._n_pre_neurons * self._n_post_neurons, n_connections,
+            min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
