@@ -610,7 +610,7 @@ class AbstractPopulationVertex(
 
     @property
     def initialize_parameters(self):
-        return self._state_variables.keys()
+        return self._pynn_model.default_initial_values.keys()
 
     def _get_parameter(self, variable):
         if variable.endswith("_init"):
@@ -653,7 +653,7 @@ class AbstractPopulationVertex(
 
     @property
     def conductance_based(self):
-        return self._neuron_impl.is_conductance_based()
+        return self._neuron_impl.is_conductance_based
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):

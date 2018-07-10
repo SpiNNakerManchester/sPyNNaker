@@ -9,7 +9,6 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.neuron.implementations import Struct
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.model.graphs.application import ApplicationVertex
@@ -36,14 +35,15 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import MultiSpikeRecorder
-from .spike_source_poisson_machine_vertex \
-    import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models\
     import AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.common.simple_population_settable \
     import SimplePopulationSettable
+from spynnaker.pyNN.models.neuron.implementations import Struct
+from .spike_source_poisson_machine_vertex \
+    import SpikeSourcePoissonMachineVertex
 
 logger = logging.getLogger(__name__)
 
@@ -94,7 +94,7 @@ class SpikeSourcePoissonVertex(
 
     def __init__(
             self, n_neurons, constraints, label, rate, start, duration, seed,
-            max_atoms_per_core):
+            max_atoms_per_core, model):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -104,6 +104,7 @@ class SpikeSourcePoissonVertex(
         # atoms params
         self._n_atoms = n_neurons
         self._model_name = "SpikeSourcePoisson"
+        self._model = model
         self._seed = None
 
         # check for changes parameters
@@ -717,13 +718,13 @@ class SpikeSourcePoissonVertex(
         """
 
         parameters = dict()
-        for parameter_name in self.default_parameters:
+        for parameter_name in self._model.default_parameters:
             parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
             "name": self._model_name,
-            "default_parameters": self.default_parameters,
-            "default_initial_values": self.default_parameters,
+            "default_parameters": self._model.default_parameters,
+            "default_initial_values": self._model.default_parameters,
             "parameters": parameters,
         }
         return context

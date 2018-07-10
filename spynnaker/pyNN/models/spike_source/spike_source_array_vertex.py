@@ -34,9 +34,10 @@ class SpikeSourceArrayVertex(
             board_address, max_on_chip_memory_usage_for_spikes_in_bytes,
             space_before_notification, constraints, label,
             spike_recorder_buffer_size, buffer_size_before_receive,
-            max_atoms_per_core):
+            max_atoms_per_core, model):
         # pylint: disable=too-many-arguments
         self._model_name = "SpikeSourceArray"
+        self._model = model
 
         config = globals_variables.get_simulator().config
         self._ip_address = ip_address
@@ -185,13 +186,13 @@ class SpikeSourceArrayVertex(
         """
 
         parameters = dict()
-        for parameter_name in self.default_parameters:
+        for parameter_name in self._model.default_parameters:
             parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
             "name": self._model_name,
-            "default_parameters": self.default_parameters,
-            "default_initial_values": self.default_parameters,
+            "default_parameters": self._model.default_parameters,
+            "default_initial_values": self._model.default_parameters,
             "parameters": parameters,
         }
         return context

@@ -34,4 +34,5 @@ class SpikeSourceArray(AbstractPyNNModel):
             n_neurons, self._spike_times, port, tag, ip_address, board_address,
             max_on_chip_memory_usage_for_spikes_in_bytes,
             space_before_notification, constraints, label,
-            spike_recorder_buffer_size, buffer_size_before_receive, max_atoms)
+            spike_recorder_buffer_size, buffer_size_before_receive, max_atoms,
+            self)

@@ -73,7 +73,8 @@ class Struct(object):
                 data_value = convert_to(values, data_type)
                 data["f" + str(i)] = data_value
             elif not isinstance(values, RangedList):
-                data_value = [convert_to(v, data_type) for v in values]
+                data_value = [convert_to(v, data_type)
+                              for v in values[offset:(offset + array_size)]]
                 data["f" + str(i)] = data_value
             else:
                 for start, end, value in values.iter_ranges_by_slice(

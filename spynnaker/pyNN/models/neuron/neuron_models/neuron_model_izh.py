@@ -37,7 +37,7 @@ class NeuronModelIzh(AbstractNeuronModel):
              DataType.S1615,   # v
              DataType.S1615,   # u
              DataType.S1615,   # i_offset
-             DataType.S1615]   # this_h (= machine_time_step)
+             DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
 
         self._a = a
