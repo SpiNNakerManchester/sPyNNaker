@@ -315,7 +315,8 @@ class DelayExtensionVertex(
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
-            connector, AbstractGenerateConnectorOnMachine)
+            connector, AbstractGenerateConnectorOnMachine) and \
+            connector.generate_on_machine
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
