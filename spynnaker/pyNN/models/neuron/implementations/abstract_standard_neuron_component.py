@@ -1,9 +1,7 @@
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .struct import Struct
-from spinn_utilities.helpful_functions import is_singleton
-import numpy
-import itertools
+from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
 @add_metaclass(AbstractBase)
@@ -139,8 +137,8 @@ class AbstractStandardNeuronComponent(object):
         values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
         new_offset = offset + self.struct.get_size_in_whole_words(
             vertex_slice.n_atoms)
-        params = _RangedDictVertexSlice(parameters, vertex_slice)
-        variables = _RangedDictVertexSlice(state_variables, vertex_slice)
+        params = RangedDictVertexSlice(parameters, vertex_slice)
+        variables = RangedDictVertexSlice(state_variables, vertex_slice)
         self.update_values(values, params, variables)
         return new_offset
 
@@ -160,45 +158,3 @@ class AbstractStandardNeuronComponent(object):
         :param variable: The name of the variable
         :type variable: str
         """
-
-
-class _RangedDictVertexSlice(object):
-    """ A slice of a ranged dict to be used to update values
-    """
-
-    def __init__(self, ranged_dict, vertex_slice):
-        self._ranged_dict = ranged_dict
-        self._vertex_slice = vertex_slice
-
-    def __getitem__(self, key):
-        if not isinstance(key, "str"):
-            raise KeyError("Key must be a string")
-        return _RangedListVertexSlice(
-            self._ranged_dict[key], self._vertex_slice)
-
-
-class _RangedListVertexSlice(object):
-    """ A slice of ranged list to be used to update values
-    """
-
-    def __init__(self, ranged_list, vertex_slice):
-        self._ranged_list = ranged_list
-        self._vertex_slice = vertex_slice
-
-    def __setitem__(self, value):
-
-        if is_singleton(value):
-            self._ranged_list.set_value_by_slice(
-                self._vertex_slice.lo_atom, self._vertex_slice.hi_atom, value)
-        else:
-
-            # Find the ranges where the data is the same
-            changes = numpy.nonzero(numpy.diff(value))[0] + 1
-
-            # Go through and set the data in ranges
-            start_index = 0
-            for end_index in itertools.chain(
-                    changes, [self._vertex_slice.n_items]):
-                self._ranged_list.set_value_by_slice(
-                    start_index, end_index, value[start_index])
-                start_index = end_index
