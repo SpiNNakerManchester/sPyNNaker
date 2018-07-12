@@ -18,8 +18,7 @@ class ArrayConnector(AbstractConnector):
             self, array,
             safe=True, callback=None, verbose=False):
         """
-
-        :param `integer` array:
+        :param array:
             An explicit boolean matrix that specifies the connections
             between the pre- and post-populations
             (see PyNN documentation)

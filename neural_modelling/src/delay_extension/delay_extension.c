@@ -212,7 +212,7 @@ void incoming_spike_callback(uint key, uint payload) {
     in_spikes_add_spike(key);
 }
 
-// Gets the neuron id of the incoming spike
+// Gets the neuron ID of the incoming spike
 static inline key_t _key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
@@ -237,7 +237,7 @@ static void spike_process() {
 
         if ((s & incoming_mask) == incoming_key) {
 
-            // Mask out neuron id
+            // Mask out neuron ID
             uint32_t neuron_id = _key_n(s);
             if (neuron_id < num_neurons) {
 

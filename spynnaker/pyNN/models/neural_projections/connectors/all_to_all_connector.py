@@ -10,7 +10,7 @@ logger = logging.getLogger(__file__)
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
-        the postsynaptic population
+        the postsynaptic population.
     """
 
     __slots__ = [
@@ -18,13 +18,13 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
-
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
+        :param allow_self_connections:
+            if the connector is used to connect a\
+            Population to itself, this flag determines whether a neuron is\
+            allowed to connect to itself, or only to other neurons in the\
             Population.
-    """
+        :type allow_self_connections: bool
+        """
         super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
 
@@ -34,7 +34,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             weights, delays, allow_lists=True)
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
-        """ Get a slice of the overall set of connections
+        """ Get a slice of the overall set of connections.
         """
         n_post_neurons = self._n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1

@@ -70,7 +70,14 @@ class DelayExtensionVertex(
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
                  label="DelayExtension"):
-        """Creates a new DelayExtension Object.
+        """
+        :param n_neurons: the number of neurons
+        :param delay_per_stage: the delay per stage
+        :param source_vertex: where messages are coming from
+        :param machine_time_step: how long is the machine time step
+        :param timescale_factor: what slowdown factor has been applied
+        :param constraints: the vertex constraints
+        :param label: the vertex label
         """
         # pylint: disable=too-many-arguments
         super(DelayExtensionVertex, self).__init__(label, constraints, 256)
@@ -252,7 +259,7 @@ class DelayExtensionVertex(
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            n_vertices, machine_time_step, time_scale_factor,
+            total_n_vertices, machine_time_step, time_scale_factor,
             n_outgoing_edges):
         """ Generate Delay Parameter data
         """
@@ -278,7 +285,7 @@ class DelayExtensionVertex(
         spec.write_value(data=self._n_delay_stages)
 
         # Write the random back off value
-        spec.write_value(random.randint(0, n_vertices))
+        spec.write_value(random.randint(0, total_n_vertices))
 
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms

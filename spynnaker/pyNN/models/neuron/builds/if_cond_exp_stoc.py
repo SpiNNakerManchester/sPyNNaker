@@ -11,6 +11,8 @@ DEFAULT_MAX_ATOMS_PER_CORE = 255
 
 
 class IFCondExpStoc(AbstractPopulationVertex):
+    """ Leaky integrate and fire neuron with a stochastic threshold.
+    """
 
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 

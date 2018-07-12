@@ -11,8 +11,8 @@ DEFAULT_MAX_ATOMS_PER_CORE = 255
 
 
 class IFCurrAlpha(AbstractPopulationVertex):
-    """ Leaky integrate and fire neuron with an alpha-shaped current-based
-     input
+    """ Leaky integrate and fire neuron with an alpha-shaped current-based\
+        input.
     """
 
     # noinspection PyPep8Naming

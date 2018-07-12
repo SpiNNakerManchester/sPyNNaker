@@ -15,19 +15,16 @@ logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine):
-    """
-    Create a multapse connector. The size of the source and destination\
-    populations are obtained when the projection is connected. The number of\
-    synapses is specified. when instantiated, the required number of synapses\
-    is created by selecting at random from the source and target populations\
-    with replacement. Uniform selection probability is assumed.
+    """ Create a multapse connector. The size of the source and destination\
+        populations are obtained when the projection is connected. The number\
+        of synapses is specified. when instantiated, the required number of\
+        synapses is created by selecting at random from the source and target\
+        populations with replacement. Uniform selection probability is assumed.
     """
     def __init__(self, num_synapses, allow_self_connections=True,
                  with_replacement=True, safe=True, verbose=False,
                  rng=None):
         """
-        Creates a new connector.
-
         :param num_synapses:
             This is the total number of synapses in the connection.
         :type num_synapses: int
@@ -49,7 +46,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required rngs
+        """ Get the required RNGs
         """
 
     @overrides(AbstractConnector.get_delay_maximum)

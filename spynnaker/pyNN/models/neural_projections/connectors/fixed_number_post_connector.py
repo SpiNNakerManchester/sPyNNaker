@@ -12,7 +12,7 @@ logger = logging.getLogger(__file__)
 
 class FixedNumberPostConnector(AbstractConnector):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
-        to all pre-synaptic neurons
+        to all pre-synaptic neurons.
     """
 
     __slots__ = [
@@ -27,7 +27,7 @@ class FixedNumberPostConnector(AbstractConnector):
             safe=True, verbose=False):
         """
         :param n: \
-            number of random post-synaptic neurons connected to pre-neurons
+            number of random post-synaptic neurons connected to pre-neurons.
         :type n: int
         :param allow_self_connections: \
             if the connector is used to connect a Population to itself, this\
@@ -40,7 +40,7 @@ class FixedNumberPostConnector(AbstractConnector):
             can be chosen on each occasion, and so multiple connections\
             between neuron pairs are possible; if false, then once a\
             post-synaptic neuron has been connected to a pre-neuron, it can't\
-            be connected again
+            be connected again.
         :type with_replacement: bool
         """
         super(FixedNumberPostConnector, self).__init__(safe, verbose)

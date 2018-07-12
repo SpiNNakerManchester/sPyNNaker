@@ -83,7 +83,7 @@ uint32_t count_rewires = 0;
 
 
 //! \brief Initialises the recording parts of the model
-//! \param[in] recording_address: the address in sdram where to store
+//! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(address_t recording_address){
@@ -211,7 +211,7 @@ static bool initialise(uint32_t *timer_period) {
 }
 
 //! \brief the function to call when resuming a simulation
-//! return None
+//! \return None
 void resume_callback() {
     recording_reset();
 
@@ -251,7 +251,7 @@ void timer_callback(uint timer_count, uint unused) {
 
         log_debug("Completed a run");
 
-        // rewrite neuron params to sdram for reading out if needed
+        // rewrite neuron params to SDRAM for reading out if needed
         address_t address = data_specification_get_data_address();
         neuron_store_neuron_parameters(
             data_specification_get_region(NEURON_PARAMS_REGION, address));

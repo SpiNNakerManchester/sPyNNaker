@@ -9,10 +9,9 @@ logger = logging.getLogger(__name__)
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine):
-    """
-    Where the pre- and postsynaptic populations have the same size, connect\
-    cell i in the presynaptic pynn_population.py to cell i in the\
-    postsynaptic pynn_population.py for all i.
+    """ Where the pre- and postsynaptic populations have the same size,\
+        connect cell i in the presynaptic pynn_population.py to cell i in the\
+        postsynaptic pynn_population.py for all i.
     """
     __slots__ = ["_random_number_class"]
 
@@ -25,18 +24,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
         if self._weights is not None:
             logger.warning(
                 'Weights were already set in '+str(self)+', possibly in '
