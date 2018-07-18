@@ -71,12 +71,12 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters,
         this slice.
 
         The default False say that the parameters are for full\
-        lists accross all slices. So that parameter[x] will be for the neuron\
-        x where x is the id which may or may nor be in the slice.
+        lists across all slices. So that parameter[x] will be for the neuron\
+        x where x is the ID which may or may nor be in the slice.
 
-        If True the parememter list will only contain values for this slice.\
-        So that parameter[x] is the xth neuron in the slice.\
-        ie the neuron with the id x + vertex_slice.lo_atom
+        If True the parameter list will only contain values for this slice.\
+        So that parameter[x] is the x'th neuron in the slice.\
+        i.e., the neuron with the ID x + vertex_slice.lo_atom
     """
     if len(parameters) == 0:
         return
@@ -95,7 +95,7 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters,
     while True:
         try:
             for iterator in iterators:
-                (cmd_word_list, cmd_string) = iterator.next()
+                (cmd_word_list, cmd_string) = next(iterator)
                 spec.write_command_to_files(cmd_word_list, cmd_string)
         except StopIteration:
             return
@@ -168,14 +168,14 @@ def set_slice_values(arrays, values, vertex_slice):
 def read_in_data_from_file(
         file_path, min_atom, max_atom, min_time, max_time, extra=False):
     """ Read in a file of data values where the values are in a format of:
-        <time>\t<atom id>\t<data value>
+        <time>\t<atom ID>\t<data value>
 
     :param file_path: absolute path to a file containing the data
-    :param min_atom: min neuron id to which neurons to read in
-    :param max_atom: max neuron id to which neurons to read in
+    :param min_atom: min neuron ID to which neurons to read in
+    :param max_atom: max neuron ID to which neurons to read in
     :param min_time: min time slot to read neurons values of.
     :param max_time: max time slot to read neurons values of.
-    :return: a numpy array of (time stamp, atom id, data value)
+    :return: a numpy array of (time stamp, atom ID, data value)
     """
     times = list()
     atom_ids = list()
@@ -198,7 +198,7 @@ def read_in_data_from_file(
                 atom_ids.append(neuron_id)
                 data_items.append(data_value)
             else:
-                print "failed to enter {}:{}".format(neuron_id, time)
+                print("failed to enter {}:{}".format(neuron_id, time))
 
     result = numpy.dstack((atom_ids, times, data_items))[0]
     return result[numpy.lexsort((times, atom_ids))]
@@ -207,12 +207,13 @@ def read_in_data_from_file(
 def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                           min_time=0, max_time=float('inf'), split_value="\t"):
     """ Read spikes from a file formatted as:\
-        <time>\t<neuron id>
+        <time>\t<neuron ID>
+
     :param file_path: absolute path to a file containing spike values
     :type file_path: str
-    :param min_atom: min neuron id to which neurons to read in
+    :param min_atom: min neuron ID to which neurons to read in
     :type min_atom: int
-    :param max_atom: max neuron id to which neurons to read in
+    :param max_atom: max neuron ID to which neurons to read in
     :type max_atom: int
     :param min_time: min time slot to read neurons values of.
     :type min_time: int
@@ -223,7 +224,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :return:\
         a numpy array with max_atom elements each of which is a list of\
         spike times.
-    :rtype: numpy array of (int, int)
+    :rtype: numpy.array(int, int)
     """
     # pylint: disable=too-many-arguments
 

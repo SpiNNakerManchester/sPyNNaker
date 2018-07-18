@@ -5,21 +5,23 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_utilities.abstract_base import abstractmethod
 
 import numpy.random
+from six import raise_from
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractConnector):
-    """
-    Create a multapse connector. The size of the source and destination\
-    populations are obtained when the projection is connected. The number of\
-    synapses is specified. when instantiated, the required number of synapses\
-    is created by selecting at random from the source and target populations\
-    with replacement. Uniform selection probability is assumed.
+    """ Create a multapse connector. The size of the source and destination\
+        populations are obtained when the projection is connected. The number\
+        of synapses is specified. when instantiated, the required number of\
+        synapses is created by selecting at random from the source and target\
+        populations with replacement. Uniform selection probability is assumed.
     """
     def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, verbose=False):
+                 with_replacement=True, safe=True, verbose=False,
+                 rng=None):
         """
-        Creates a new connector.
-
         :param num_synapses:
             This is the total number of synapses in the connection.
         :type num_synapses: int
@@ -37,26 +39,25 @@ class MultapseConnector(AbstractConnector):
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
+        self._rng = rng
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required rngs
+        """ Get the required RNGs
         """
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
+        if self._weights is not None:
+            logger.warning(
+                'Weights were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
+        if self._delays is not None:
+            logger.warning(
+                'Delays were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)
@@ -239,11 +240,11 @@ class MultapseConnector(AbstractConnector):
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self._with_replacement)
-        except Exception:
-            raise SpynnakerException(
+        except Exception as e:
+            raise_from(SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
-                "reduce the value specified in the connector")
+                "reduce the value specified in the connector"), e)
 
         # Set up synaptic block
         block["source"] = pairs[chosen, 0]

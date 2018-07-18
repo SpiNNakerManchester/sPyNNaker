@@ -11,7 +11,7 @@ logger = logging.getLogger(__file__)
 
 class FixedNumberPreConnector(AbstractConnector):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
-        to all post-synaptic neurons
+        to all post-synaptic neurons.
     """
 
     __slots__ = [
@@ -40,7 +40,7 @@ class FixedNumberPreConnector(AbstractConnector):
             can be chosen on each occasion, and so multiple connections\
             between neuron pairs are possible; if false, then once a\
             pre-synaptic neuron has been connected to a post-neuron, it\
-            can't be connected again
+            can't be connected again.
         :type with_replacement: bool
         """
         # :param space:
@@ -92,11 +92,11 @@ class FixedNumberPreConnector(AbstractConnector):
             if self._verbose:
                 filename = self._pre_population.label + '_to_' + \
                     self._post_population.label + '_fixednumberpre-conn.csv'
-                file_handle = file(filename, 'w')
-                numpy.savetxt(file_handle,
-                              [(self._n_pre_neurons, self._n_post_neurons,
-                                self._n_pre)],
-                              fmt="%u,%u,%u")
+                with open(filename, 'w') as file_handle:
+                    numpy.savetxt(file_handle,
+                                  [(self._n_pre_neurons, self._n_post_neurons,
+                                    self._n_pre)],
+                                  fmt="%u,%u,%u")
 
             # Loop over all the post neurons
             for m in range(0, self._n_post_neurons):

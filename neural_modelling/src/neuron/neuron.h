@@ -16,7 +16,7 @@
 #ifndef _NEURON_H_
 #define _NEURON_H_
 
-#include "../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
 #include "recording.h"
 
 //! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
@@ -54,7 +54,7 @@ void neuron_do_timestep_update(uint32_t time);
 //! successful or not
 bool neuron_reload_neuron_parameters(address_t address);
 
-//! \brief interface for rewriting the neuron parameters back into sdram
+//! \brief interface for rewriting the neuron parameters back into SDRAM
 //! \param[in] address the absolute address in SDRAM for the start of the
 //!            NEURON_PARAMS data region in SDRAM
 void neuron_store_neuron_parameters(address_t address);

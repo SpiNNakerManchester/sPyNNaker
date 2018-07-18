@@ -3,7 +3,7 @@ import numpy
 
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -15,7 +15,7 @@ NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+        AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun):
     __slots__ = [
         # ??????????????
@@ -33,9 +33,6 @@ class SynapseDynamicsSTDP(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             pad_to_length=None):
-        AbstractPlasticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -71,7 +68,7 @@ class SynapseDynamicsSTDP(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractPopulationSettable.get_value)
+    @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -81,7 +78,7 @@ class SynapseDynamicsSTDP(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractPopulationSettable.set_value)
+    @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 
@@ -183,6 +180,9 @@ class SynapseDynamicsSTDP(
             post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = int(
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+
         dendritic_delays = (
             connections["delay"] * self._dendritic_delay_fraction)
         axonal_delays = (
@@ -191,10 +191,11 @@ class SynapseDynamicsSTDP(
         # Get the fixed data
         fixed_plastic = (
             ((dendritic_delays.astype("uint16") & 0xF) <<
-             (8 + n_synapse_type_bits)) |
+             (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (12 + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype("uint16") << 8) |
+            (connections["synapse_type"].astype("uint16")
+             << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
               post_vertex_slice.lo_atom) & 0xFF))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
@@ -265,7 +266,11 @@ class SynapseDynamicsSTDP(
             fp_size, fp_data):
         # pylint: disable=too-many-arguments
         n_rows = len(fp_size)
+
         n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = int(
+            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+
         data_fixed = numpy.concatenate([
             fp_data[i].view(dtype="uint16")[0:fp_size[i]]
             for i in range(n_rows)])
@@ -280,7 +285,8 @@ class SynapseDynamicsSTDP(
         connections["target"] = (data_fixed & 0xFF) + post_vertex_slice.lo_atom
         connections["weight"] = synapse_structure.read_synaptic_data(
             fp_size, pp_without_headers)
-        connections["delay"] = (data_fixed >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"] = (data_fixed >> (n_neuron_id_bits
+                                               + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
@@ -334,7 +340,7 @@ class SynapseDynamicsSTDP(
     def get_max_synapses(self, n_words):
 
         # Subtract the header size that will always exist
-        n_header_words = self._n_header_bytes / 4
+        n_header_words = self._n_header_bytes // 4
         n_words_space = n_words - n_header_words
 
         # Get plastic plastic size per connection
@@ -345,7 +351,7 @@ class SynapseDynamicsSTDP(
         bytes_per_fp = 2
 
         # Maximum possible connections, ignoring word alignment
-        n_connections = (n_words_space * 4) / (bytes_per_pp + bytes_per_fp)
+        n_connections = (n_words_space * 4) // (bytes_per_pp + bytes_per_fp)
 
         # Reduce until correct
         while (self.get_n_words_for_plastic_connections(n_connections) >
