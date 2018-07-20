@@ -91,14 +91,17 @@ void matrix_generator_stdp_free(void *data) {
  */
 static uint16_t _build_fixed_plastic_half_word(
         uint16_t delay, uint32_t type,
-        uint16_t post_index, uint32_t synapse_type_bits,
+        uint32_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
+
     uint16_t synapse_index_mask = ((1 << synapse_index_bits) - 1);
+    uint16_t synapse_type_mask = ((1 << synapse_type_bits) - 1);
 
     uint16_t wrd  = post_index & synapse_index_mask;
-    wrd |= ((type & ((1 << synapse_type_bits) - 1)) << synapse_index_bits);
-    wrd |= ((delay & SYNAPSE_DELAY_MASK) <<
-            (synapse_index_bits + synapse_type_bits));
+    wrd |= ((type & synapse_type_mask) << synapse_index_bits);
+    wrd |= ((delay & SYNAPSE_DELAY_MASK) << synapse_type_bits);
+            // (synapse_index_bits + synapse_type_bits));
+
     return wrd;
 }
 

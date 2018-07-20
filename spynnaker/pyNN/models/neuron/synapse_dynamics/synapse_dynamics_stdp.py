@@ -181,6 +181,7 @@ class SynapseDynamicsSTDP(
 
         return fp_size_words + pp_size_words
 
+    @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):

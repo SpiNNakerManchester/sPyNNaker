@@ -58,6 +58,7 @@ def synapse_expander(
             [CPUState.FINISHED])
         progress.update()
         finished = True
+        _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
     except Exception:
         logger.exception("Synapse expander has failed")
