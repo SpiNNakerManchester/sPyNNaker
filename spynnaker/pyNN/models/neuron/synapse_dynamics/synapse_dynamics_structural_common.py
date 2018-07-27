@@ -519,8 +519,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: None
         """
         # Compute all the auxiliary stuff
-        pop_to_subpop_info, projection_types, \
-        current_key, no_prepops = \
+        pop_to_subpop_info, projection_types, current_key, no_prepops = \
             self.__compute_aux(
                 application_graph, machine_graph, app_vertex, machine_vertex,
                 graph_mapper, routing_info)

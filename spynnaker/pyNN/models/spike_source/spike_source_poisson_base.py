@@ -185,10 +185,10 @@ class SpikeSourcePoissonBase(
             durations = numpy.array(durations)
         else:
             if hasattr(rates[0], "__len__"):
-                durations = [numpy.array([None for r in rate])
-                             for rate in rates]
+                durations = [numpy.array([None for r in _rate])
+                             for _rate in rates]
             else:
-                durations = numpy.array([None for rate in rates])
+                durations = numpy.array([None for _rate in rates])
 
         # Check that there is either one list for all neurons,
         # or one per neuron
