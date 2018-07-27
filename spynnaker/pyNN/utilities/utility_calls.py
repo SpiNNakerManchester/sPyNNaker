@@ -101,13 +101,13 @@ def write_parameters_per_neuron(spec, vertex_slice, parameters,
             return
 
 
-def translate_parameters(types, byte_array, offset, vertex_slice):
+def translate_parameters(types, byte_array, offset, n_elements):
     """ Translate an array of data into a set of parameters
 
     :param types: the DataType of each of the parameters to translate
     :param byte_array: the byte array to read parameters out of
     :param offset: where in the byte array to start reading from
-    :param vertex_slice: the map of atoms from a application vertex
+    :param n_elements: the number of repeated elements to read
     :return: An array of arrays of parameter values, and the new offset
     """
 
@@ -121,7 +121,7 @@ def translate_parameters(types, byte_array, offset, vertex_slice):
         struct_data_format += param_type.struct_encoding
 
     # Get the struct-array format, consisting of repeating the struct
-    struct_array_format = "<" + (struct_data_format * vertex_slice.n_atoms)
+    struct_array_format = "<" + (struct_data_format * n_elements)
 
     # unpack the params from the byte array
     translated_parameters = numpy.asarray(
@@ -130,18 +130,17 @@ def translate_parameters(types, byte_array, offset, vertex_slice):
 
     # scale values with required scaling factor
     scales = numpy.tile(
-        [float(param_type.scale) for param_type in types],
-        vertex_slice.n_atoms)
+        [float(param_type.scale) for param_type in types], n_elements)
     scaled_parameters = translated_parameters / scales
 
     # sort the parameters into arrays of values, one array per parameter
     sorted_parameters = scaled_parameters.reshape(
-        (vertex_slice.n_atoms, len(types))).swapaxes(0, 1)
+        (n_elements, len(types))).swapaxes(0, 1)
 
     # Get the size of the parameters read
     parameter_size = sum(param_type.size for param_type in types)
 
-    return sorted_parameters, offset + (parameter_size * vertex_slice.n_atoms)
+    return sorted_parameters, offset + (parameter_size * n_elements)
 
 
 def get_parameters_size_in_bytes(parameters):

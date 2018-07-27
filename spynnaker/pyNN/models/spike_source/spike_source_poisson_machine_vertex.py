@@ -28,8 +28,9 @@ class SpikeSourcePoissonMachineVertex(
         value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3)])
+               ('RATES_REGION', 2),
+               ('SPIKE_HISTORY_REGION', 3),
+               ('PROVENANCE_REGION', 4)])
 
     def __init__(
             self, resources_required, is_recording, minimum_buffer_sdram,

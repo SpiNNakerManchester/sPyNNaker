@@ -1003,7 +1003,7 @@ class SynapticManager(object):
 
         synapse_params, _ = translate_parameters(
             self._synapse_type.get_synapse_type_parameter_types(),
-            byte_array, 0, vertex_slice)
+            byte_array, 0, vertex_slice.n_atoms)
         self._synapse_type.set_synapse_type_parameters(
             synapse_params, vertex_slice)
 

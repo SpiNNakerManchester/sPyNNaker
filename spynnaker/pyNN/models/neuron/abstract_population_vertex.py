@@ -5,7 +5,6 @@ from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.common import Slice
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
@@ -817,33 +816,33 @@ class AbstractPopulationVertex(
         # handle global params (only once, so given a slice of 0 to 0)
         global_params, offset = utility_calls.translate_parameters(
             self._neuron_model.get_global_parameter_types(),
-            byte_array, offset, Slice(0, 0))
+            byte_array, offset, 1)
         self._neuron_model.set_global_parameters(global_params)
 
         # handle state params for a neuron
         neuron_params, offset = utility_calls.translate_parameters(
             self._neuron_model.get_neural_parameter_types(),
-            byte_array, offset, vertex_slice)
+            byte_array, offset, vertex_slice.n_atoms)
         self._neuron_model.set_neural_parameters(neuron_params, vertex_slice)
 
         # handle input params
         input_params, offset = utility_calls.translate_parameters(
             self._input_type.get_input_type_parameter_types(),
-            byte_array, offset, vertex_slice)
+            byte_array, offset, vertex_slice.n_atoms)
         self._input_type.set_input_type_parameters(input_params, vertex_slice)
 
         # handle additional input params, if they exist
         if self._additional_input is not None:
             additional_params, offset = utility_calls.translate_parameters(
                 self._additional_input.get_parameter_types(),
-                byte_array, offset, vertex_slice)
+                byte_array, offset, vertex_slice.n_atoms)
             self._additional_input.set_parameters(
                 additional_params, vertex_slice)
 
         # handle threshold type params
         threshold_params, offset = utility_calls.translate_parameters(
             self._threshold_type.get_threshold_parameter_types(),
-            byte_array, offset, vertex_slice)
+            byte_array, offset, vertex_slice.n_atoms)
         self._threshold_type.set_threshold_parameters(
             threshold_params, vertex_slice)
 
