@@ -199,7 +199,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     rewiring_data.weight[0] = *sp_word++;
     rewiring_data.weight[1] = *sp_word++;
 
-    log_info("w[%d, %d]",rewiring_data.weight[0],rewiring_data.weight[1]);
+    log_info("w[%d, %d]", rewiring_data.weight[0], rewiring_data.weight[1]);
 
     rewiring_data.delay = *sp_word++;
     rewiring_data.s_max = *sp_word++;
