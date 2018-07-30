@@ -602,9 +602,6 @@ class SpikeSourcePoissonBase(
                 (isi_val * (2 ** 15)).astype("uint32"),
                 (time_to_spike * (2 ** 15)).astype("uint32")
             ))[0].flatten()
-            print ""
-            print self.label
-            print data.reshape((-1, 7))
             spec.write_array(data)
 
     @staticmethod
