@@ -44,12 +44,12 @@ class FromFileConnector(FromListConnector):
 
     @abstractmethod
     def get_reader(self, file):  # @ReservedAssignment
-        """ Get a filereader object, probably using the pynn methods.
+        """ Get a filereader object, probably using the PyNN methods.
 
-        For example calling:
+        For example, calling::
 
-        from pyNN.recording import files
-        return files.StandardTextFile(file, mode="r")
+            from pyNN.recording import files
+            return files.StandardTextFile(file, mode="r")
 
-        :return: A pynn StandardTextFile or similar
+        :return: A PyNN StandardTextFile or similar
         """

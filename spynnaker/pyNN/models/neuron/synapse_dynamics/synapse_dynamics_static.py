@@ -3,14 +3,14 @@ import math
 
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 
 
 class SynapseDynamicsStatic(
-        AbstractStaticSynapseDynamics, AbstractPopulationSettable,
+        AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun):
     __slots__ = [
         # ??????????
@@ -40,6 +40,7 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSynapseDynamics.write_parameters)
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
+        # Nothing to do here
         pass
 
     @overrides(
@@ -138,7 +139,7 @@ class SynapseDynamicsStatic(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractPopulationSettable.get_value)
+    @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -147,7 +148,7 @@ class SynapseDynamicsStatic(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractPopulationSettable.set_value)
+    @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 

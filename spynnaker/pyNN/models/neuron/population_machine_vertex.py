@@ -58,14 +58,13 @@ class PopulationMachineVertex(
             buffered_sdram_per_timestep, label, constraints=None,
             overflow_sdram=0):
         """
-
         :param resources_required:
         :param is_recording:
         :param minimum_buffer_sdram_usage:
         :param buffered_sdram_per_timestep:
         :param label:
         :param constraints:
-        :param overflow_sdram: Extra sdram that may be required if
+        :param overflow_sdram: Extra SDRAM that may be required if\
             buffered_sdram_per_timestep is an average
         :type sampling: bool
         """
@@ -151,7 +150,7 @@ class PopulationMachineVertex(
             self._add_name(names,
                            "Times_plastic_synaptic_weights_have_saturated"),
             n_plastic_saturations,
-            report=n_saturations > 0,
+            report=n_plastic_saturations > 0,
             message=(
                 "The weights from the plastic synapses for {} on {}, {}, {} "
                 "saturated {} times. If this causes issue increase the "

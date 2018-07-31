@@ -5,7 +5,6 @@
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
-#include <string.h>
 #include <utils.h>
 
 //! if using profiler import profiler tags
@@ -252,8 +251,8 @@ bool synapses_initialise(
             "\tCopying %u bytes from %u", n_neurons * sizeof(synapse_param_t),
             synapse_params_address +
             ((n_neurons * sizeof(synapse_param_t)) / 4));
-        memcpy(neuron_synapse_shaping_params, synapse_params_address,
-               n_neurons * sizeof(synapse_param_t));
+        spin1_memcpy(neuron_synapse_shaping_params, synapse_params_address,
+                n_neurons * sizeof(synapse_param_t));
     }
 
     // Get the ring buffer left shifts
@@ -436,8 +435,8 @@ uint32_t synapses_get_pre_synaptic_events() {
 
 
 //! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic id
-//! \param[in] id: the (core-local) id of the neuron to search for in the
+//!         specified post-synaptic ID
+//! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[out] sp_data: the address of a struct through which to return
@@ -516,7 +515,7 @@ static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
 }
 
 //! \brief  Add a static entry in the synaptic row
-//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection
