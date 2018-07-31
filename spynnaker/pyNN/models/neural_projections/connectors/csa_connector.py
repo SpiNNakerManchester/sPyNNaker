@@ -28,8 +28,7 @@ class CSAConnector(AbstractConnector):
         self._cset = cset
         self._verbose = verbose
 
-        # think this is probably needed here
-        self._pair_list = None
+        # Storage for full connection sets
         self._full_connection_set = None
         self._full_cset = None
 
@@ -61,29 +60,27 @@ class CSAConnector(AbstractConnector):
                 range(self._n_post_neurons)) * self._cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
-        self._pair_list = csa.cross(
+        pair_list = csa.cross(
             range(pre_lo, pre_hi+1),
             range(post_lo, post_hi+1)) * self._full_cset
 
-        # Get the lists of pre and post neurons that result from this
-        self._pre_neurons = [x[0] for x in self._pair_list]
-        self._post_neurons = [x[1] for x in self._pair_list]
-
         if self._verbose:
             print('full cset: ', self._full_cset)
-            print('this vertex pair_list: ', self._pair_list)
-            print('this vertex pre_neurons: ', self._pre_neurons)
-            print('this vertex post_neurons: ', self._post_neurons)
+            print('this vertex pair_list: ', pair_list)
+            print('this vertex pre_neurons: ',
+                  [x[0] for x in pair_list])
+            print('this vertex post_neurons: ',
+                  [x[1] for x in pair_list])
 
-        n_connections = len(self._pre_neurons)  # size of the array created
-        return n_connections
+        n_connections = len(pair_list)  # size of the array created
+        return n_connections, pair_list
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             min_delay=None, max_delay=None):
-        n_connections = self._get_n_connections(
+        n_connections, pair_list = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -94,8 +91,9 @@ class CSAConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_n_connections(
+        n_connections, pair_list = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
+        return n_connections
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(
@@ -107,7 +105,7 @@ class CSAConnector(AbstractConnector):
     def get_weight_maximum(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
+        n_connections, pair_list = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice)
         return self._get_weight_maximum(
             self._weights, n_connections, None)
@@ -127,22 +125,23 @@ class CSAConnector(AbstractConnector):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        n_connections = self._get_n_connections(pre_vertex_slice,
-                                                post_vertex_slice)
+        n_connections, pair_list = self._get_n_connections(
+            pre_vertex_slice, post_vertex_slice)
 
         # Use whatever has been set up in _get_n_connections here
         # to send into the block structure
 
         # Use the CSA implementation to show the connection structure?
         if self._full_connection_set is None:
-            self._full_connection_set = [x for x in self._pair_list]
+            self._full_connection_set = [x for x in pair_list]
         else:
-            self._full_connection_set += [x for x in self._pair_list]
+            self._full_connection_set += [x for x in pair_list]
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = self._pre_neurons
-        block["target"] = self._post_neurons
+        # source and target are the pre_neurons and post_neurons in pair_list
+        block["source"] = [x[0] for x in pair_list]
+        block["target"] = [x[1] for x in pair_list]
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
