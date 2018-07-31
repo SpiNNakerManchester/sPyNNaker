@@ -11,16 +11,6 @@ logger = logging.getLogger(__name__)
 
 class FromListConnector(AbstractConnector):
     """ Make connections according to a list.
-
-    :param: conn_list:
-        a list of tuples, one tuple for each connection. Each\
-        tuple should contain::
-
-         (pre_idx, post_idx, weight, delay)
-
-        where pre_idx is the index (i.e. order in the Population,\
-        not the ID) of the presynaptic neuron, and post_idx is\
-        the index of the postsynaptic neuron.
     """
     __slots__ = [
         "_conn_list",
@@ -32,7 +22,15 @@ class FromListConnector(AbstractConnector):
 
     def __init__(self, conn_list, safe=True, verbose=False):
         """
-        Creates a new FromListConnector.
+        :param: conn_list:
+            a list of tuples, one tuple for each connection. Each\
+            tuple should contain::
+
+                (pre_idx, post_idx, weight, delay)
+
+            where pre_idx is the index (i.e. order in the Population,\
+            not the ID) of the presynaptic neuron, and post_idx is\
+            the index of the postsynaptic neuron.
         """
         super(FromListConnector, self).__init__(safe, verbose)
         if conn_list is None or not len(conn_list):
@@ -49,9 +47,9 @@ class FromListConnector(AbstractConnector):
 
     @staticmethod
     def _split_conn_list(conn_list, column_names):
-        """ takes the conn list and separates them into the blocks needed
+        """ Separate the connection list into the blocks needed.
 
-        :param conn_list: the original conn list
+        :param conn_list: the original connection list
         :param column_names: the column names if exist
         :return: source dest list, weights list, delays list, extra list
         """
@@ -96,13 +94,6 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ allows setting of the weights and delays at separate times to the\
-            init, also sets the dtypes correctly.....
-
-        :param weights:
-        :param delays:
-        :return:
-        """
         # set the data if not already set (supports none overriding via
         # synapse data)
         if self._weights is None:

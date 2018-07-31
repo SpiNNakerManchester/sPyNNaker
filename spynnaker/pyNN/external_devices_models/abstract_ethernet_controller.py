@@ -26,7 +26,7 @@ class AbstractEthernetController(object):
 
     @abstractmethod
     def get_outgoing_partition_ids(self):
-        """ Get the partition ids of messages coming out of the controller
+        """ Get the partition IDs of messages coming out of the controller
 
-        :rtype: list of str
+        :rtype: list(str)
         """

@@ -437,8 +437,8 @@ uint32_t synapses_get_pre_synaptic_events() {
 
 
 //! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic id
-//! \param[in] id: the (core-local) id of the neuron to search for in the
+//!         specified post-synaptic ID
+//! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[out] sp_data: the address of a struct through which to return
@@ -517,7 +517,7 @@ static inline uint32_t _fixed_synapse_convert(uint32_t id, uint32_t weight,
 }
 
 //! \brief  Add a static entry in the synaptic row
-//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection
