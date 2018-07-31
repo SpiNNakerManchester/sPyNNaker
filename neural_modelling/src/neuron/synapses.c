@@ -296,10 +296,13 @@ bool synapses_initialise(
     *neuron_synapse_shaping_params_value = neuron_synapse_shaping_params;
 
     uint32_t n_neurons_power_2 = n_neurons;
-    if (!is_power_of_2(n_neurons)) {
-        n_neurons_power_2 = next_power_of_2(n_neurons);
+    uint32_t log_n_neurons = 1;
+    if (n_neurons != 1) {
+    	if (!is_power_of_2(n_neurons)) {
+    		n_neurons_power_2 = next_power_of_2(n_neurons);
+    	}
+    	log_n_neurons = ilog_2(n_neurons_power_2);
     }
-    uint32_t log_n_neurons = ilog_2(n_neurons_power_2);
     uint32_t n_ring_buffer_bits =
         log_n_neurons + SYNAPSE_TYPE_BITS + SYNAPSE_DELAY_BITS;
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);

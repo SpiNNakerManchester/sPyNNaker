@@ -99,8 +99,9 @@ static uint16_t _build_fixed_plastic_half_word(
 
     uint16_t wrd  = post_index & synapse_index_mask;
     wrd |= ((type & synapse_type_mask) << synapse_index_bits);
-    wrd |= ((delay & SYNAPSE_DELAY_MASK) << synapse_type_bits);
-            // (synapse_index_bits + synapse_type_bits));
+    wrd |= ((delay & SYNAPSE_DELAY_MASK) <<
+            (synapse_index_bits + synapse_type_bits));
+//    wrd |= ((delay & SYNAPSE_DELAY_MASK) << synapse_type_bits);
 
     return wrd;
 }

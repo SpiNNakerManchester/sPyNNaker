@@ -1207,7 +1207,7 @@ class SynapticManager(object):
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
         for w in weight_scales:
-            spec.write_value(w, data_type=DataType.INT32)
+            spec.write_value(int(w), data_type=DataType.INT32)
 
         for data in generator_data:
             spec.write_array(data.gen_data)
