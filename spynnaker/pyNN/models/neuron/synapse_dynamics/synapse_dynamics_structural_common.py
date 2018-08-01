@@ -543,8 +543,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             # otherwise the connections if lat
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
-            # TODO Write connection type
 
+            # Write connection type
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
 
             spec.write_value(
