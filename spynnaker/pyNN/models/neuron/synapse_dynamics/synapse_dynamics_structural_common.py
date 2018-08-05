@@ -203,6 +203,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         if type == 'manhattan':
             return np.abs(delta).sum(axis=-1)
+        elif type == 'equidistant':
+            p = 4
+            exponents = np.power(delta, [p] * delta.size)
+            return np.floor(np.power(exponents.sum(axis=-1), [1. / p]))
         return np.sqrt((delta ** 2).sum(axis=-1))
 
     def generate_distance_probability_array(self, probability, sigma):
@@ -225,8 +229,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     pre = (0, row % self._grid[1])
                     post = (0, column % self._grid[1])
 
+
+                # TODO Make distance metric "type" controllable
                 euclidian_distances[row, column] = \
-                    self.distance(pre, post, grid=self._grid, type='euclidian')
+                    self.distance(pre, post, grid=self._grid,
+                                  type='equidistant')
         largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
@@ -548,7 +555,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             # otherwise the connections if lat
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
-            # TODO Write connection type
+            # Write connection type
 
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
 
