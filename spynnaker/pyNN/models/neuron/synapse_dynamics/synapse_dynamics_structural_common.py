@@ -233,7 +233,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 # TODO Make distance metric "type" controllable
                 euclidian_distances[row, column] = \
                     self.distance(pre, post, grid=self._grid,
-                                  type='equidistant')
+                                  type='euclidian')
         largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
