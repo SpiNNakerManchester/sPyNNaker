@@ -42,12 +42,27 @@ POPULATION_TABLE_IMPL := binary_search
 # Define the directories
 # Path flag to replace with the modified dir  (abspath drops the final /)
 NEURON_DIR := $(abspath $(NEURAL_MODELLING_DIRS)/src)
+MODIFIED_DIR :=$(dir $(abspath $(NEURON_DIR)))modified_src/
 SOURCE_DIRS += $(NEURON_DIR)
-MODIFIED_DIR := $(NEURAL_MODELLING_DIRS)/modified_src/
 
-# define rule to strip and source_dirs from source_file
+# Define a rule to find the source directory of the given file.
+# This attempts to find each of SOURCE_DIRS within the given file name; the
+# first one that matches is then returned.  If none match, an empty string
+# will be returned.
+define get_source_dir#(file)
+$(firstword $(strip $(foreach d, $(sort $(SOURCE_DIRS)), $(findstring $(d), $(1)))))
+endef
+
+# Define rule to strip any SOURCE_DIRS from source_file to allow use via local.mk.
+# If no match is found, the value is returned untouched 
+# (though this will probably fail later).
 define strip_source_dirs#(source_file)
-$(or $(patsubst $(firstword $(strip $(foreach d, $(sort $(SOURCE_DIRS)), $(findstring $(d), $(1)))))/%,%,$(1)), $(1))
+$(or $(patsubst $(call get_source_dir, $(1))/%,%,$(1)), $(1))
+endef
+
+# Define a rule to replace any SOURCE_DIRS from header_file with the modified_src folder.
+define replace_source_dirs#(header_file)
+$(patsubst $(call get_source_dir, $(1))%, $(dir $(call get_source_dir, $(1)))modified_src%, $(1))
 endef
 
 # Need to build each neuron seperately or complier gets confused
@@ -63,43 +78,43 @@ endif
 ifndef ADDITIONAL_INPUT_H
     ADDITIONAL_INPUT_H = $(MODIFIED_DIR)neuron/additional_inputs/additional_input_none_impl.h
 else
-    ADDITIONAL_INPUT_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(ADDITIONAL_INPUT_H))
+    ADDITIONAL_INPUT_H := $(call replace_source_dirs,$(ADDITIONAL_INPUT_H))
 endif
 
 ifndef NEURON_MODEL
     $(error NEURON_MODEL is not set.  Please choose a neuron model to compile)
 else
     NEURON_MODEL := $(call strip_source_dirs,$(NEURON_MODEL))
-    $(info neuron model = $(NEURON_MODEL))
 endif
 
 ifndef NEURON_MODEL_H
     $(error NEURON_MODEL_H is not set.  Please select a neuron model header file)
 else
-    NEURON_MODEL_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(NEURON_MODEL_H))
+    NEURON_MODEL_H := $(call replace_source_dirs,$(NEURON_MODEL_H))
 endif
 
 ifndef INPUT_TYPE_H
     $(error INPUT_TYPE_H is not set.  Please select an input type header file)
 else
-    INPUT_TYPE_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(INPUT_TYPE_H))
+    INPUT_TYPE_H := $(call replace_source_dirs,$(INPUT_TYPE_H))
 endif
 
 ifndef THRESHOLD_TYPE_H
     $(error THRESHOLD_TYPE_H is not set.  Please select a threshold type header file)
 else
-    THRESHOLD_TYPE_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(THRESHOLD_TYPE_H))
+    THRESHOLD_TYPE_H := $(call replace_source_dirs,$(THRESHOLD_TYPE_H))
 endif
 
 ifndef SYNAPSE_TYPE_H
     $(error SYNAPSE_TYPE_H is not set.  Please select a synapse type header file)
 else
-    SYNAPSE_TYPE_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(SYNAPSE_TYPE_H))
+    SYNAPSE_TYPE_H := $(call replace_source_dirs,$(SYNAPSE_TYPE_H))
 endif
 
 ifndef SYNAPSE_DYNAMICS
     $(error SYNAPSE_DYNAMICS is not set.  Please select a synapse dynamics implementation)
 else
+    SYNAPSE_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPSE_DYNAMICS))
     SYNAPSE_DYNAMICS := $(call strip_source_dirs,$(SYNAPSE_DYNAMICS))
     SYNAPSE_DYNAMICS_O := $(BUILD_DIR)$(SYNAPSE_DYNAMICS:%.c=%.o)
     
@@ -118,13 +133,15 @@ else
 endif
 
 ifdef WEIGHT_DEPENDENCE
-    WEIGHT_DEPENDENCE_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(WEIGHT_DEPENDENCE_H))
+    WEIGHT_DEPENDENCE_H := $(call replace_source_dirs,$(WEIGHT_DEPENDENCE_H))
+    WEIGHT_DEPENDENCE_C := $(call replace_source_dirs,$(WEIGHT_DEPENDENCE))
     WEIGHT_DEPENDENCE := $(call strip_source_dirs,$(WEIGHT_DEPENDENCE))
     WEIGHT_DEPENDENCE_O := $(BUILD_DIR)$(WEIGHT_DEPENDENCE:%.c=%.o)
 endif
 
 ifdef TIMING_DEPENDENCE
-    TIMING_DEPENDENCE_H := $(MODIFIED_DIR)$(call strip_source_dirs,$(TIMING_DEPENDENCE_H))
+    TIMING_DEPENDENCE_H := $(call replace_source_dirs,$(TIMING_DEPENDENCE_H))
+    TIMING_DEPENDENCE_C := $(call replace_source_dirs,$(TIMING_DEPENDENCE))
     TIMING_DEPENDENCE := $(call strip_source_dirs,$(TIMING_DEPENDENCE))
     TIMING_DEPENDENCE_O := $(BUILD_DIR)$(TIMING_DEPENDENCE:%.c=%.o)
 endif
@@ -132,27 +149,29 @@ endif
 SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS_C := $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
     SYNGEN_ENABLED = 0
 else
+    SYNAPTOGENESIS_DYNAMICS_C := $(call replace_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
     SYNAPTOGENESIS_DYNAMICS := $(call strip_source_dirs,$(SYNAPTOGENESIS_DYNAMICS))
 endif
 SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 
-
-# List all the sources
+# List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
           neuron/c_main.c \
           neuron/synapses.c \
           neuron/neuron.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS)
+          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
+          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS)
 
 include $(SPINN_DIRS)/make/local.mk
 
 FEC_OPT = $(OSPACE)
 
-# Synapese build rules
+# Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -include $(SYNAPSE_TYPE_H)
 
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
@@ -185,12 +204,12 @@ ifeq ($(STDP_ENABLED), 1)
     STDP_INCLUDES:= -include $(SYNAPSE_TYPE_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
     STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
 
-    $(SYNAPSE_DYNAMICS_O): $(MODIFIED_DIR)$(SYNAPSE_DYNAMICS)
+    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O stdp
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
-    $(SYNAPTOGENESIS_DYNAMICS_O): $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
+    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
@@ -201,25 +220,25 @@ ifeq ($(STDP_ENABLED), 1)
 	$(STDP_COMPILE) -o $@ $<
 
 else
-    $(SYNAPTOGENESIS_DYNAMICS_O): $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
+    $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-    $(SYNAPSE_DYNAMICS_O): $(MODIFIED_DIR)$(SYNAPSE_DYNAMICS)
+    $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O Synapese
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 endif
 
-$(WEIGHT_DEPENDENCE_O): $(MODIFIED_DIR)$(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
+$(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
 	# WEIGHT_DEPENDENCE_O
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(TIMING_DEPENDENCE_O): $(MODIFIED_DIR)$(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
+$(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
 	# TIMING_DEPENDENCE_O
 	-mkdir -p $(dir $@)
@@ -228,7 +247,7 @@ $(TIMING_DEPENDENCE_O): $(MODIFIED_DIR)$(TIMING_DEPENDENCE) $(SYNAPSE_TYPE_H) \
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H) $(C_FILES_MODIFIED)
+                             $(SYNAPSE_TYPE_H)
 	# neuron.o
 	-mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) \
