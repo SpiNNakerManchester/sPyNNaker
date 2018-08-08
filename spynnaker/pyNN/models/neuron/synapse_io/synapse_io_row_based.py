@@ -1,5 +1,6 @@
 import numpy
 import math
+from six import raise_from
 from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neural_projections.connectors \
@@ -42,7 +43,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             return population_table.get_allowed_row_length(size) * 4
         except SynapseRowTooBigException as e:
             max_synapses = dynamics.get_max_synapses(e.max_size)
-            raise SynapseRowTooBigException(
+            raise_from(SynapseRowTooBigException(
                 max_synapses,
                 "The connection between {} and {} has more synapses ({}) than"
                 " can currently be supported on this implementation of PyNN"
@@ -50,7 +51,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 " Please reduce the size of the target population, or reduce"
                 " the number of neurons per core.".format(
                     in_edge.pre_vertex, in_edge.post_vertex, row_length,
-                    max_synapses))
+                    max_synapses)), e)
 
     @overrides(AbstractSynapseIO.get_sdram_usage_in_bytes,
                additional_arguments=["machine_time_step", "in_edge"])
@@ -345,7 +346,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
-        """Read static data"""
+        """ Read static data.
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []
 
@@ -366,7 +368,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
             synapse_ids = range(len(n_synapses))
             row_stage = numpy.array([
-                (i / pre_vertex_slice.n_atoms)
+                i // pre_vertex_slice.n_atoms
                 for i in synapse_ids], dtype="uint32")
             row_min_delay = (row_stage + 1) * 16
             connection_min_delay = numpy.concatenate([
@@ -403,7 +405,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_plastic_data(
             self, dynamics, pre_vertex_slice, post_vertex_slice,
             n_synapse_types, row_data, delayed_row_data):
-        """Read plastic data"""
+        """ Read plastic data.
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []
 
@@ -427,7 +430,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
             synapse_ids = range(len(n_synapses))
             row_stage = numpy.array([
-                (i / pre_vertex_slice.n_atoms)
+                (i // pre_vertex_slice.n_atoms)
                 for i in synapse_ids], dtype="uint32")
             row_min_delay = (row_stage + 1) * 16
             connection_min_delay = numpy.concatenate([
@@ -448,4 +451,4 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
-        return ((_N_HEADER_WORDS + max_row_length) * 4) * n_rows
+        return (_N_HEADER_WORDS + max_row_length) * 4 * n_rows

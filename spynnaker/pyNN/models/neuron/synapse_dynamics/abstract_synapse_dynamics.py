@@ -40,10 +40,10 @@ class AbstractSynapseDynamics(object):
 
     @abstractmethod
     def get_parameter_names(self):
-        """ return the parameter names available from the synapse \
+        """ Get the parameter names available from the synapse \
             dynamics components
 
-        :return: iterable list of basestring
+        :rtype: iterable(str)
         """
 
     @abstractmethod

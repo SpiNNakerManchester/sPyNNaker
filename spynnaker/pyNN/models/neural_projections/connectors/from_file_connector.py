@@ -2,7 +2,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .from_list_connector import FromListConnector
 import os
 import numpy
-from six import add_metaclass
+from six import add_metaclass, string_types
 
 
 @add_metaclass(AbstractBase)
@@ -14,7 +14,7 @@ class FromFileConnector(FromListConnector):
             self, file,  # @ReservedAssignment
             distributed=False, safe=True, verbose=False):
         self._file = file
-        if isinstance(file, basestring):
+        if isinstance(file, string_types):
             real_file = self.get_reader(file)
             try:
                 conn_list = self._read_conn_list(real_file, distributed)
@@ -44,12 +44,12 @@ class FromFileConnector(FromListConnector):
 
     @abstractmethod
     def get_reader(self, file):  # @ReservedAssignment
-        """ Get a filereader object, probably using the pynn methods.
+        """ Get a filereader object, probably using the PyNN methods.
 
-        For example calling:
+        For example, calling::
 
-        from pyNN.recording import files
-        return files.StandardTextFile(file, mode="r")
+            from pyNN.recording import files
+            return files.StandardTextFile(file, mode="r")
 
-        :return: A pynn StandardTextFile or similar
+        :return: A PyNN StandardTextFile or similar
         """

@@ -10,7 +10,7 @@ _extern_defaults = ExternalDeviceLifControl.default_parameters
 
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
-    """ Control module for a pushbot connected to a SpiNNaker Link
+    """ Control module for a PushBot connected to a SpiNNaker Link
     """
     __slots__ = ["_command_protocol"]
 

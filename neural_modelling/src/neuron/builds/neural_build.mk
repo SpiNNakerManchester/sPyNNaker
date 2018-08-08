@@ -64,11 +64,6 @@ endif
 
 SYNGEN_ENABLED = 1
 
-ifndef SYNAPTOGENESIS_DYNAMICS_H
-    SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
-    SYNGEN_ENABLED = 0
-endif
-
 ifndef SYNAPTOGENESIS_DYNAMICS
     SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNGEN_ENABLED = 0
@@ -100,8 +95,9 @@ ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_sta
     STDP_ENABLED = 1
 endif
 
-#include ../../../Makefile.common
-include $(SPINN_DIRS)/make/Makefile.SpiNNFrontEndCommon
+include $(SPINN_DIRS)/make/FrontEndCommon.mk
+FEC_OPT = $(OSPACE)
+CFLAGS += -I$(NEURAL_MODELLING_DIRS)/src
 
 define synapse_type_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
@@ -153,5 +149,4 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) \
-	      -include $(SYNAPTOGENESIS_DYNAMICS_H) -o $@ $<
+	      -include $(ADDITIONAL_INPUT_H) -o $@ $<

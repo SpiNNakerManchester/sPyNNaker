@@ -3,3 +3,5 @@ BUILD_DIR = build/
 SOURCES = spike_source_poisson.c
 
 include ../../common.mk
+
+CFLAGS += -I $(NEURAL_MODELLING_DIRS)/src

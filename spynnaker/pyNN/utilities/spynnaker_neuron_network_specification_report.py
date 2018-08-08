@@ -16,8 +16,8 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     def _get_diagram(label):
         # pylint: disable=import-error
         try:
-            import graphviz  # @UnresolvedImport
-        except Exception:
+            import graphviz
+        except ImportError:
             raise SpynnakerException(
                 "graphviz is required to use this report.  "
                 "Please install graphviz if you want to use this report.")

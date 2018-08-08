@@ -1,10 +1,9 @@
-#include "../common/neuron-typedefs.h"
-#include "../common/in_spikes.h"
+#include <common/neuron-typedefs.h>
+#include <common/in_spikes.h>
 
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>
-#include <string.h>
 
 // Counters
 #define N_COUNTERS         6

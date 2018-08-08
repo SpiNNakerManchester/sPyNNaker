@@ -20,8 +20,11 @@ class PushBotRetinaViewer(Thread):
             decay_time_constant_ms=_DECAY_TIME_CONSTANT_MS):
         # pylint: disable=too-many-arguments
         try:
-            import matplotlib  # @UnusedImport # NOQA
-        except Exception:
+            from matplotlib import pyplot  # NOQA
+            from matplotlib import animation  # NOQA
+            self.__pyplot = pyplot
+            self.__animation = animation
+        except ImportError:
             raise Exception("matplotlib must be installed to use this viewer")
 
         super(PushBotRetinaViewer, self).__init__(name="PushBotRetinaViewer")
@@ -44,7 +47,8 @@ class PushBotRetinaViewer(Thread):
             -float(self._frame_time_ms) / float(decay_time_constant_ms))
 
     def _init_socket(self, port):
-        """Open socket to receive UDP."""
+        """ Open socket to receive UDP.
+        """
         self._spike_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._spike_socket.bind(("0.0.0.0", port))
         self._spike_socket.setblocking(False)
@@ -92,18 +96,14 @@ class PushBotRetinaViewer(Thread):
         return [self._image]
 
     def run(self):
-        # pylint: disable=import-error
-        from matplotlib import pyplot
-        from matplotlib import animation
-
         # Create image plot of retina output
-        fig = pyplot.figure()
-        self._image = pyplot.imshow(
+        fig = self.__pyplot.figure()
+        self._image = self.__pyplot.imshow(
             self._image_data_view, cmap="jet", vmin=0.0,
             vmax=self._display_max)
 
         # Play animation
-        self._ani = animation.FuncAnimation(
+        self._ani = self.__animation.FuncAnimation(
             fig, self._updatefig, interval=self._frame_time_ms,
             blit=True)
-        pyplot.show()
+        self.__pyplot.show()

@@ -5,7 +5,7 @@
  *
  */
 
-#include "../../common/maths-util.h"
+#include <common/maths-util.h>
 
 #include <data_specification.h>
 #include <recording.h>
@@ -13,7 +13,6 @@
 #include <random.h>
 #include <simulation.h>
 #include <spin1_api.h>
-#include <string.h>
 #include <bit_field.h>
 
 // Declare spin1_wfi
@@ -37,7 +36,7 @@ typedef struct timed_out_spikes{
     uint32_t out_spikes[];
 } timed_out_spikes;
 
-//! spike source array region ids in human readable form
+//! spike source array region IDs in human readable form
 typedef enum region {
     SYSTEM, POISSON_PARAMS,
     SPIKE_HISTORY_REGION,
@@ -57,10 +56,10 @@ struct global_parameters {
     //! True if there is a key to transmit, False otherwise
     bool has_key;
 
-    //! The base key to send with (neuron id to be added to it), or 0 if no key
+    //! The base key to send with (neuron ID to be added to it), or 0 if no key
     uint32_t key;
 
-    //! The mask to work out the neuron id when setting the rate
+    //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
 
     //! The random backoff between timer ticks to desynchronize sources
@@ -78,7 +77,7 @@ struct global_parameters {
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
 
-    //! The id of the first source relative to the population as a whole
+    //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
 
     //! The number of sources in this sub-population
@@ -356,7 +355,7 @@ void resume_callback() {
 
     if (!read_poisson_parameters(
             data_specification_get_region(POISSON_PARAMS, address))){
-        log_error("failed to reread the poisson parameters from SDRAM");
+        log_error("failed to reread the Poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
 
@@ -375,7 +374,7 @@ void resume_callback() {
     // print_spike_sources();
 }
 
-//! \brief stores the poisson parameters back into sdram for reading by the
+//! \brief stores the Poisson parameters back into SDRAM for reading by the
 //! host when needed
 //! \return None
 bool store_poisson_parameters() {
@@ -388,7 +387,7 @@ bool store_poisson_parameters() {
     // Copy the global_parameters back to SDRAM
     spin1_memcpy(address, &global_parameters, sizeof(global_parameters));
 
-    // store spike source parameters into array into sdram for reading by
+    // store spike source parameters into array into SDRAM for reading by
     // the host
     if (global_parameters.n_spike_sources > 0) {
         uint32_t spikes_offset =
@@ -402,7 +401,7 @@ bool store_poisson_parameters() {
     return true;
 }
 
-//! \brief handles spreading of poisson spikes for even packet reception at
+//! \brief handles spreading of Poisson spikes for even packet reception at
 //! destination
 //! \param[in] spike_key: the key to transmit
 //! \return None
@@ -462,7 +461,7 @@ void recording_complete_callback() {
     recording_in_progress = false;
 }
 
-//! \brief writing spikes to sdram
+//! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void _record_spikes(uint32_t time) {
     while (recording_in_progress) {
@@ -495,9 +494,9 @@ void timer_callback(uint timer_count, uint unused) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
-        // rewrite poisson params to sdram for reading out if needed
+        // rewrite poisson params to SDRAM for reading out if needed
         if (!store_poisson_parameters()){
-            log_error("Failed to write poisson parameters to sdram");
+            log_error("Failed to write poisson parameters to SDRAM");
             rt_error(RTE_SWERR);
         }
 

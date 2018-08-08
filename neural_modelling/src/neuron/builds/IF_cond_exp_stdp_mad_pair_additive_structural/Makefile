@@ -10,7 +10,6 @@ TIMING_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timin
 TIMING_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/timing_dependence/timing_pair_impl.h
 WEIGHT_DEPENDENCE = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.c
 WEIGHT_DEPENDENCE_H = $(SOURCE_DIR)/neuron/plasticity/stdp/weight_dependence/weight_additive_one_term_impl.h
-SYNAPTOGENESIS_DYNAMICS_H = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis_dynamics.h
 SYNAPTOGENESIS_DYNAMICS = $(SOURCE_DIR)/neuron/structural_plasticity/synaptogenesis/topographic_map_impl.c
 
 

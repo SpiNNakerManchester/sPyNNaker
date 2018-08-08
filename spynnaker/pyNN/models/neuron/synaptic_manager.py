@@ -246,7 +246,7 @@ class SynapticManager(object):
 
                 # Get an estimate of the number of pre-vertices - clearly
                 # this will not be correct if the SDRAM usage is high!
-                n_atoms_per_machine_vertex = sys.maxint
+                n_atoms_per_machine_vertex = sys.maxsize
                 if isinstance(in_edge.pre_vertex, AbstractHasGlobalMaxAtoms):
                     n_atoms_per_machine_vertex = \
                         in_edge.pre_vertex.get_max_atoms_per_core()
@@ -672,7 +672,7 @@ class SynapticManager(object):
                 pre_vertex_slice, delayed_source_ids, delay_stages)
         elif delayed_source_ids.size != 0:
             raise Exception(
-                "Found delayed source ids but no delay "
+                "Found delayed source IDs but no delay "
                 "machine edge for {}".format(app_edge.label))
 
         if (app_edge, synapse_info) in self._pre_run_connection_holders:
@@ -875,9 +875,9 @@ class SynapticManager(object):
             transceiver)
         direct_synapses = (
             self._get_static_synaptic_matrix_sdram_requirements() +
-            synaptic_matrix + _ONE_WORD.unpack_from(str(
+            synaptic_matrix + _ONE_WORD.unpack_from(
                 transceiver.read_memory(
-                    placement.x, placement.y, synaptic_matrix, 4)))[0])
+                    placement.x, placement.y, synaptic_matrix, 4))[0])
         indirect_synapses = synaptic_matrix + 4
         return master_pop_table, direct_synapses, indirect_synapses
 
@@ -986,7 +986,7 @@ class SynapticManager(object):
 
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-        # locate sdram address to where the synapse parameters are stored
+        # locate SDRAM address to where the synapse parameters are stored
         synapse_region_sdram_address = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             transceiver)

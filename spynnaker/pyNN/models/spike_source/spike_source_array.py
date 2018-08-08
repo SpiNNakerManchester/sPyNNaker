@@ -27,14 +27,14 @@ class SpikeSourceArray(
     """ Model for play back of spikes
     """
 
-    _model_based_max_atoms_per_core = sys.maxint
+    _model_based_max_atoms_per_core = sys.maxsize
 
     # parameters expected by pynn
     default_parameters = {
         'spike_times': None
     }
 
-    # parameters expected by spinnaker
+    # parameters expected by SpiNNaker
     non_pynn_default_parameters = {
         'port': None, 'tag': None, 'ip_address': None, 'board_address': None,
         'max_on_chip_memory_usage_for_spikes_in_bytes': (
@@ -121,7 +121,7 @@ class SpikeSourceArray(
         if self._max_on_chip_memory_usage_for_spikes < 0:
             raise exceptions.ConfigurationException(
                 "The memory usage on chip is either beyond what is supportable"
-                " on the spinnaker board being supported or you have requested"
+                " on the SpiNNaker board being supported or you have requested"
                 " a negative value for a memory usage. Please correct and"
                 " try again")
 
@@ -199,7 +199,7 @@ class SpikeSourceArray(
                 SpikeSourceArray.SPIKE_RECORDING_REGION_ID)
 
     @staticmethod
-    def set_model_max_atoms_per_core(new_value=sys.maxint):
+    def set_model_max_atoms_per_core(new_value=sys.maxsize):
         SpikeSourceArray._model_based_max_atoms_per_core = new_value
 
     @staticmethod

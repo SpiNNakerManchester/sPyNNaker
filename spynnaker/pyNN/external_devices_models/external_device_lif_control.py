@@ -32,7 +32,7 @@ class ExternalDeviceLifControl(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractEthernetController,
         AbstractVertexWithEdgeToDependentVertices):
-    """ Abstract control module for the pushbot, based on the LIF neuron,\
+    """ Abstract control module for the PushBot, based on the LIF neuron,\
         but without spikes, and using the voltage as the output to the various\
         devices
     """
