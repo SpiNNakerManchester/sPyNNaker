@@ -143,9 +143,8 @@ class SpikeSourcePoisson(
         self._n_atoms = n_neurons
         self._model_name = "SpikeSourcePoisson"
         self._seed = seed
-        rng = numpy.random.RandomState(seed)
-        self._kiss_seed = [rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
-                           for _ in range(4)]
+        self._kiss_seed = dict()
+        self._rng = None
 
         # check for changes parameters
         self._change_requires_mapping = True
@@ -304,8 +303,8 @@ class SpikeSourcePoisson(
     @seed.setter
     def seed(self, seed):
         self._seed = seed
-        rng = numpy.random.RandomState(seed)
-        self._kiss_seed = [rng.randint(0xFFFFFFFF) for _ in range(4)]
+        self._kiss_seed = dict()
+        self._rng = None
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
@@ -457,7 +456,14 @@ class SpikeSourcePoisson(
         spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the random seed (4 words), generated randomly!
-        for value in self._kiss_seed:
+        kiss_key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        if kiss_key not in self._kiss_seed:
+            if self._rng is None:
+                self._rng = numpy.random.RandomState(self._seed)
+            self._kiss_seed[kiss_key] = [
+                self._rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
+                for _ in range(4)]
+        for value in self._kiss_seed[kiss_key]:
             spec.write_value(data=value)
 
         # Compute the start times in machine time steps
@@ -499,7 +505,8 @@ class SpikeSourcePoisson(
 
         # Get the time to spike value
         time_to_spike = self._time_to_spike[vertex_slice.as_slice]
-        changed_rates = self._rate_change.astype("bool") & elements
+        changed_rates = (
+            self._rate_change[vertex_slice.as_slice].astype("bool") & elements)
         time_to_spike[changed_rates] = 0.0
 
         # Merge the arrays as parameters per atom
