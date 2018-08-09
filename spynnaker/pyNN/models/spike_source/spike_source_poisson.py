@@ -142,7 +142,10 @@ class SpikeSourcePoisson(
         # atoms params
         self._n_atoms = n_neurons
         self._model_name = "SpikeSourcePoisson"
-        self._seed = None
+        self._seed = seed
+        rng = numpy.random.RandomState(seed)
+        self._kiss_seed = [rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
+                           for _ in range(4)]
 
         # check for changes parameters
         self._change_requires_mapping = True
@@ -150,12 +153,12 @@ class SpikeSourcePoisson(
 
         # Store the parameters
         self._rate = utility_calls.convert_param_to_numpy(rate, n_neurons)
+        self._rate_change = numpy.zeros(self._rate.size)
         self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
         self._duration = utility_calls.convert_param_to_numpy(
             duration, n_neurons)
         self._time_to_spike = utility_calls.convert_param_to_numpy(
             0, n_neurons)
-        self._rng = numpy.random.RandomState(seed)
         self._machine_time_step = None
 
         # Prepare for recording, and to get spikes
@@ -272,7 +275,9 @@ class SpikeSourcePoisson(
 
     @rate.setter
     def rate(self, rate):
-        self._rate = utility_calls.convert_param_to_numpy(rate, self._n_atoms)
+        new_rate = utility_calls.convert_param_to_numpy(rate, self._n_atoms)
+        self._rate_change = new_rate - self._rate
+        self._rate = new_rate
 
     @property
     def start(self):
@@ -299,6 +304,8 @@ class SpikeSourcePoisson(
     @seed.setter
     def seed(self, seed):
         self._seed = seed
+        rng = numpy.random.RandomState(seed)
+        self._kiss_seed = [rng.randint(0xFFFFFFFF) for _ in range(4)]
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
@@ -450,10 +457,8 @@ class SpikeSourcePoisson(
         spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the random seed (4 words), generated randomly!
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
-        spec.write_value(data=self._rng.randint(0x7FFFFFFF))
+        for value in self._kiss_seed:
+            spec.write_value(data=value)
 
         # Compute the start times in machine time steps
         start = self._start[vertex_slice.as_slice]
@@ -494,6 +499,8 @@ class SpikeSourcePoisson(
 
         # Get the time to spike value
         time_to_spike = self._time_to_spike[vertex_slice.as_slice]
+        changed_rates = self._rate_change.astype("bool") & elements
+        time_to_spike[changed_rates] = 0.0
 
         # Merge the arrays as parameters per atom
         data = numpy.dstack((
