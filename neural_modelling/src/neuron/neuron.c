@@ -19,6 +19,9 @@
 // declare spin1_wfi
 void spin1_wfi();
 
+// Spin1 API ticks - to know when the timer wraps
+extern uint ticks;
+
 #define SPIKE_RECORDING_CHANNEL 0
 #define V_RECORDING_CHANNEL 1
 #define GSYN_EXCITATORY_RECORDING_CHANNEL 2
@@ -108,10 +111,6 @@ static timed_input_t *inputs_excitatory;
 static timed_input_t *inputs_inhibitory;
 uint32_t exc_size;
 uint32_t inh_size;
-
-//! The number of clock ticks to back off before starting the timer, in an
-//! attempt to avoid overloading the network
-static uint32_t random_backoff;
 
 //! The number of clock ticks between sending each spike
 static uint32_t time_between_spikes;
@@ -285,14 +284,15 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t recording_flags_param,
-        uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size) {
+        uint32_t *n_neurons_value, uint32_t *incoming_spike_buffer_size,
+        uint32_t *random_backoff) {
     log_debug("neuron_initialise: starting");
 
-    random_backoff = address[RANDOM_BACKOFF];
+    *random_backoff = address[RANDOM_BACKOFF];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
     log_debug(
         "\t back off = %u, time between spikes %u",
-        random_backoff, time_between_spikes);
+        *random_backoff, time_between_spikes);
 
     // Check if there is a key to use
     use_key = address[HAS_KEY];
@@ -511,17 +511,11 @@ void recording_done_callback() {
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
 //! \param[in] time the timer tick  value currently being executed
-void neuron_do_timestep_update(timer_t time) {
-
-    // Wait a random number of clock cycles
-    uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
-    while (tc[T1_COUNT] > random_backoff_time) {
-
-        // Do Nothing
-    }
+void neuron_do_timestep_update(
+        timer_t time, uint timer_count, uint timer_period) {
 
     // Set the next expected time to wait for between spike sending
-    expected_time = tc[T1_COUNT] - time_between_spikes;
+    expected_time = sv->cpu_clk * timer_period;
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
@@ -618,7 +612,8 @@ void neuron_do_timestep_update(timer_t time) {
             if (use_key) {
 
                 // Wait until the expected time to send
-                while (tc[T1_COUNT] > expected_time) {
+                while ((ticks == timer_count) &&
+                        (tc[T1_COUNT] > expected_time)) {
 
                     // Do Nothing
                 }
