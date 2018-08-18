@@ -112,8 +112,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
    else if (syn_type == 2)
       window_length = pre_exp_dist_lookup_inhib[random];
    else
-      window_length = 50;   // 10ms at 0.2 ms timestep
-      //window_length = pre_exp_dist_lookup_inhib2[random];
+      window_length = pre_exp_dist_lookup_inhib2[random];
     // Return window length
     return window_length;
 }
@@ -148,11 +147,6 @@ static inline update_state_t timing_apply_pre_spike(
     // Decay accum value so that long periods without spikes cause it to forget:
     uint32_t time_since_last_event = time - last_event_time;
 
-    //// For inhib2-type synapses, always decay the weight a little:
-    //if (syn_type == 3) {
-    //   previous_state.weight_state.weight -= (accum) 0.01;
-    //}
-
     // Param accum_decay_per_ts is actually per 32 time steps now, to avoid rounding to zero errors:
     int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event>>5);
     //log_info("Acc step: %d,  time: %d, +/-: %d", recurrent_plasticity_params.accum_decay_per_ts, time_since_last_event, acc_change);
@@ -166,19 +160,6 @@ static inline update_state_t timing_apply_pre_spike(
         if (previous_state.accumulator > 0) {
             previous_state.accumulator = 0;
         }
-    }
-
-    // Debug:
-    // Check windows for syn_type 3 (inhibitory 2) which has special properties:
-    if (syn_type == 3) {
-       previous_state.weight_state.weight = weight_update_sub(previous_state.weight_state);
-       //log_info("D-");
-       // If we are inside a post-pre window, perform additive potentiation:
-       if (time < previous_state.longest_post_pre_window_closing_time) {
-          previous_state.weight_state.weight = weight_update_add(previous_state.weight_state);
-          //log_info("D+");
-       }
-       return previous_state;
     }
 
     // Check if there was a post window open when this pre arrived and if so,
@@ -195,8 +176,14 @@ static inline update_state_t timing_apply_pre_spike(
           } else {
              // Otherwise, reset accumulator and apply depression
              previous_state.accumulator = 0;
-             //## previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
-             //##                                                                    syn_type, STDP_FIXED_POINT_ONE);
+             // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
+             if (syn_type == 3) {
+                previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state,
+                                                                         syn_type, STDP_FIXED_POINT_ONE);
+             } else {
+                previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
+                                                                         syn_type, STDP_FIXED_POINT_ONE);
+                }
             }
        }
        // Set the post window to be just before this pre-spike. This is the only way I've found to
@@ -208,9 +195,7 @@ static inline update_state_t timing_apply_pre_spike(
 }
 
 // This routine has different functionality depending on synapse type.
-// For inhib-2-type synapses, it performs potentiation if the pre/post
-// pair occur close together. This subroutine is concerned only with the pre-post pair.
-// For other types it has two major responsibilities:
+// It has two major responsibilities:
 // 1) Generate the window size for this post spike and extend the window closure time
 //    if this is beyond the current value. This is used by a following pre-spike for depression
 // 2) Check if there is currently a pre-window open and then check if the post-spike is within
@@ -260,10 +245,8 @@ static inline update_state_t timing_apply_post_spike(
       window_length = post_exp_dist_lookup_excit2[random];
    else if (syn_type == 2)
       window_length = post_exp_dist_lookup_inhib[random];
-   else{
-      //window_length = 50;  // 10ms @ 0.2 ms timestep
+   else
       window_length = post_exp_dist_lookup_inhib2[random];
-   }
 
    uint32_t this_window_close_time = time + window_length;
 
@@ -275,15 +258,6 @@ static inline update_state_t timing_apply_post_spike(
    // Get time of event relative to last pre-synaptic event
    uint32_t time_since_last_pre = time - last_pre_time;
 
-   // For inhib-2-type (ID of 3) synapses, if we're inside the pre-post window
-   // perform potentiation:
-   if ((syn_type == 3) && (time_since_last_pre < last_pre_trace)) {
-         previous_state.weight_state.weight = weight_update_add(previous_state.weight_state);
-      //log_info("P+");
-      return previous_state;
-   }
-
-    // Debug:
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
@@ -294,35 +268,35 @@ static inline update_state_t timing_apply_post_spike(
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
-             //log_info("%d", previous_state.accumulator);
          } else {
-             //previous_state.accumulator = 0;
-             // Set accum to a sub-threshold value, so that two potentiations in quick
-             // succession are less likely:
              previous_state.accumulator = 0;
-             // SD Only update weight if we are not yet getting enough potential
-             // to fire neuron without teaching input:
-             //log_debug("Current V = %12.6k, V_hist = %12.6k",
-                   //post_synaptic_neuron->V_membrane, post_synaptic_neuron->V_mem_hist);
-             //log_debug("Threshhold value = %12.6k", post_synaptic_threshold->threshold_value);
-             //log_info("Prev_V: %k", post_synaptic_mem_V);
-             if (previous_state.weight_state.weight == (accum)0.0) {
-                if (voltage_difference > (accum) 0.5) {
-                   // Make a full weight increment:
-                   //log_info("%d B", previous_state.weight_state);
-                   previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
-                                                            syn_type, STDP_FIXED_POINT_ONE);
-                   //log_info("%d", previous_state.weight_state);
-                }
-                else {
-                   // Weight is to be used, but we don't want or need a full weight increment.
-                   // make a tiny weight change so that this weight does not get used again until it decays:
-                   previous_state.weight_state.weight = 1000; // Smallest posiive weight.
-                }
+             // If synapse is inhib-2, which his anti-Hebbian, perform depression:
+             if (syn_type == 3) {
+                previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
+                                                                      syn_type, STDP_FIXED_POINT_ONE);
+                return previous_state;
              }
-
-             //previous_state.weight_state = weight_two_term_apply_potentiation_sd(previous_state.weight_state,
-             //                                         voltage_difference, syn_type, STDP_FIXED_POINT_ONE);
+             // If synapse is not type inhib-2, perform potentiation:
+             if (syn_type == 0) {
+                if (previous_state.weight_state.weight == (accum)0.0) {
+                   if (voltage_difference > (accum) 0.5) {
+                      // Make a full weight increment:
+                      //log_info("%d B", previous_state.weight_state);
+                      previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
+                                                               syn_type, STDP_FIXED_POINT_ONE);
+                      //log_info("%d", previous_state.weight_state);
+                   }
+                   else {
+                      // Weight is to be used, but we don't want or need a full weight increment.
+                      // make a tiny weight change so that this weight does not get used again until it decays:
+                      previous_state.weight_state.weight = 10; // Smallest positive weight.
+                   }
+                }
+             } else { // syn_type excit 2 or inhib-1:
+                      previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
+                                                               syn_type, STDP_FIXED_POINT_ONE);
+             
+             }
          }
       }
    }
