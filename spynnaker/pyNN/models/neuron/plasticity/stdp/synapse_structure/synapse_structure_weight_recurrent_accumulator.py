@@ -29,5 +29,5 @@ class SynapseStructureWeightRecurrentAccumulator(AbstractSynapseStructure):
     def read_synaptic_data(self, pp_size, pp_data):
         # shift by 16 to remove accumulator
         return (numpy.concatenate([
-            pp_data[i][0:fp_size[i] * 4].view("uint32")
+            pp_data[i][0:pp_size[i] * 4].view("uint32")
             for i in range(len(pp_data))]) >> 16) & 0xFFFF
