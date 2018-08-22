@@ -206,7 +206,6 @@ static inline update_state_t timing_apply_pre_spike(
 //                  state machine back to idle (later post spikes will not cause an accum increment
 //                  until a new pre-spike has arrived).
 static inline update_state_t timing_apply_post_spike(
-
    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
    pre_trace_t last_pre_trace, uint32_t last_post_time,
    post_trace_t last_post_trace, update_state_t previous_state,
@@ -258,6 +257,7 @@ static inline update_state_t timing_apply_post_spike(
    // Get time of event relative to last pre-synaptic event
    uint32_t time_since_last_pre = time - last_pre_time;
 
+
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
@@ -289,7 +289,7 @@ static inline update_state_t timing_apply_post_spike(
                    else {
                       // Weight is to be used, but we don't want or need a full weight increment.
                       // make a tiny weight change so that this weight does not get used again until it decays:
-                      previous_state.weight_state.weight = 10; // Smallest positive weight.
+                      previous_state.weight_state.weight = 1; // Smallest non-zero weight.
                    }
                 }
              } else { // syn_type excit 2 or inhib-1:
