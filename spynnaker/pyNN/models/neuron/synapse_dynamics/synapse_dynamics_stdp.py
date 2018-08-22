@@ -196,11 +196,11 @@ class SynapseDynamicsSTDP(
             ((dendritic_delays.astype("uint16") & 0xF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
-             (12 + n_synapse_type_bits)) |
+             (4 + n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
-              post_vertex_slice.lo_atom) & 0xFF))
+              post_vertex_slice.lo_atom) & (n_neuron_id_bits+1)))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
