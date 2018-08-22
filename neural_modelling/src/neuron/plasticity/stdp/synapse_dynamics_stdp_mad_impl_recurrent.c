@@ -315,13 +315,6 @@ bool synapse_dynamics_process_plastic_synapses(
 
         uint32_t full_delay = delay_dendritic;
 
-        if (type == 3){
-           delay_dendritic = 1; // Inhib-2 synapses connect direct to the soma, so no backprop delay
-        }else {
-           delay_dendritic = 5; // Other synapse-types suffer a 1 ms delay at 200 micro s per timestep.
-    	};
-
-
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
