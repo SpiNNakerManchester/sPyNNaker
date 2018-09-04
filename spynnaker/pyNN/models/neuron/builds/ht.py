@@ -2,7 +2,7 @@ from sklearn.linear_model.tests.test_least_angle import default_parameter
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelHT
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeHT
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.input_types import InputTypeHTConductance
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeHTDynamic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
@@ -19,6 +19,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
+
         # #### Neuron model #####
         'g_Na': 0.2,
         'E_Na': 30.0,
@@ -26,7 +27,6 @@ class HillTononiNeuron(AbstractPopulationVertex):
         'E_K': -90.0,
         'tau_m': 16,
         'i_offset': 0.0,
-
         'g_spike': 1.0,
         'tau_spike': 1.75,
         't_spike': 2.0,
@@ -37,8 +37,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
         'v_thresh_tau':2,
         'v_thresh_Na_reversal':30,
 
-        # Synapse Model
-        # ##### Synapse Type #####
+        # ##### Synapse Model #####
         # AMPA - excitatory
         'exc_a_response': 0, 'exc_a_A': 1, 'exc_a_tau': 0.5,
         'exc_b_response': 0, 'exc_b_B': -1, 'exc_b_tau': 2.4,
@@ -51,9 +50,16 @@ class HillTononiNeuron(AbstractPopulationVertex):
         # GABA_B - inhibitory2
         'inh2_a_response': 0, 'inh2_a_A': 1, 'inh2_a_tau': 60,
         'inh2_b_response': 0, 'inh2_b_B':-1, 'inh2_b_tau': 200,
+
+        # #### Input Type ####
+        'ampa_rev_E': 0,
+        'nmda_rev_E': 0,
+        'gaba_a_rev_E': -70,
+        'gaba_b_rev_E': -90
+
         }
 
-    initialize_parameters = {'v_init': -65}
+    initialize_parameters = {'v_init': -78.25}
 
     def __init__(
             self, n_neurons,
@@ -118,7 +124,11 @@ class HillTononiNeuron(AbstractPopulationVertex):
             inh2_b_B=default_parameters['inh2_b_B'],
             inh2_b_tau=default_parameters['inh2_b_tau'],
 
-
+            # #### Input Type ####
+            ampa_rev_E=default_parameters['ampa_rev_E'],
+            nmda_rev_E=default_parameters['nmda_rev_E'],
+            gaba_a_rev_E=default_parameters['gaba_a_rev_E'],
+            gaba_b_rev_E=default_parameters['gaba_b_rev_E']
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelHT(
@@ -169,7 +179,12 @@ class HillTononiNeuron(AbstractPopulationVertex):
             )
 
 
-        input_type = InputTypeCurrent()
+        input_type = InputTypeHTConductance(
+            n_neurons,
+            ampa_rev_E,
+            nmda_rev_E,
+            gaba_a_rev_E,
+            gaba_b_rev_E)
 
 
         threshold_type = ThresholdTypeHTDynamic(n_neurons,

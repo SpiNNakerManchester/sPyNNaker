@@ -13,7 +13,7 @@ class InputTypeCurrent(AbstractInputType, AbstractContainsUnits):
         self._units = {}
 
     def get_global_weight_scale(self):
-        return 1024.0
+        return 1.0
 
     def get_n_input_type_parameters(self):
         return 0
