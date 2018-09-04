@@ -3,6 +3,7 @@ from six import add_metaclass
 from spinn_utilities.abstract_base import \
     AbstractBase, abstractmethod, abstractproperty
 
+import numpy
 
 @add_metaclass(AbstractBase)
 class AbstractTimingDependence(object):
@@ -23,6 +24,10 @@ class AbstractTimingDependence(object):
     def pre_trace_n_bytes(self):
         """ The number of bytes used by the pre-trace of the rule per neuron
         """
+    # function to initialise row headers - override for STP
+    def initialise_row_headers(self, n_rows, n_header_bytes):
+        return numpy.zeros(
+            (n_rows, n_header_bytes), dtype="uint8")
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(self):

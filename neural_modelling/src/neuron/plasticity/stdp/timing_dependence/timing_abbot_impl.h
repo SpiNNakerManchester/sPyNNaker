@@ -15,8 +15,8 @@ typedef int16_t pre_trace_t;
 #include <debug.h>
 
 // Include generic plasticity maths functions
-#include "../../common/maths.h"
-#include "../../common/stdp_typedefs.h"
+#include "../maths.h"
+#include "../stdp_typedefs.h"
 
 //---------------------------------------
 // Macros
