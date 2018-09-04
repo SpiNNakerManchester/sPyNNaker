@@ -12,19 +12,16 @@ logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractConnector):
-    """
-    Create a multapse connector. The size of the source and destination\
-    populations are obtained when the projection is connected. The number of\
-    synapses is specified. when instantiated, the required number of synapses\
-    is created by selecting at random from the source and target populations\
-    with replacement. Uniform selection probability is assumed.
+    """ Create a multapse connector. The size of the source and destination\
+        populations are obtained when the projection is connected. The number\
+        of synapses is specified. when instantiated, the required number of\
+        synapses is created by selecting at random from the source and target\
+        populations with replacement. Uniform selection probability is assumed.
     """
     def __init__(self, num_synapses, allow_self_connections=True,
                  with_replacement=True, safe=True, verbose=False,
                  rng=None):
         """
-        Creates a new connector.
-
         :param num_synapses:
             This is the total number of synapses in the connection.
         :type num_synapses: int
@@ -46,23 +43,11 @@ class MultapseConnector(AbstractConnector):
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required rngs
+        """ Get the required RNGs
         """
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
         if self._weights is not None:
             logger.warning(
                 'Weights were already set in '+str(self)+', possibly in '

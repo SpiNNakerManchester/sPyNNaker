@@ -51,7 +51,7 @@ static threshold_type_pointer_t threshold_type_array;
 //! Global parameters for the neurons
 static global_neuron_params_pointer_t global_parameters;
 
-//! The key to be used for this core (will be ORed with neuron id)
+//! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
 
 //! A checker that says if this model should be transmitting. If set to false
@@ -454,8 +454,8 @@ bool neuron_initialise(address_t address, uint32_t recording_flags_param,
     return true;
 }
 
-//! \brief stores neuron parameter back into sdram
-//! \param[in] address: the address in sdram to start the store
+//! \brief stores neuron parameter back into SDRAM
+//! \param[in] address: the address in SDRAM to start the store
 void neuron_store_neuron_parameters(address_t address){
 
     uint32_t next = START_OF_GLOBAL_PARAMETERS;

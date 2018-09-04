@@ -58,14 +58,13 @@ class PopulationMachineVertex(
             buffered_sdram_per_timestep, label, constraints=None,
             overflow_sdram=0):
         """
-
         :param resources_required:
         :param is_recording:
         :param minimum_buffer_sdram_usage:
         :param buffered_sdram_per_timestep:
         :param label:
         :param constraints:
-        :param overflow_sdram: Extra sdram that may be required if
+        :param overflow_sdram: Extra SDRAM that may be required if\
             buffered_sdram_per_timestep is an average
         :type sampling: bool
         """

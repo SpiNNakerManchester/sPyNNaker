@@ -20,7 +20,7 @@ before_install:
   - python support/travis_blocking_stdout.py
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
+  - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git

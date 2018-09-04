@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 
 class IFCondAlpha(AbstractPopulationVertex):
-    """ Leaky integrate and fire neuron with an alpha-shaped current input
+    """ Leaky integrate and fire neuron with an alpha-shaped current input.
     """
 
     # noinspection PyPep8Naming
@@ -19,4 +19,5 @@ class IFCondAlpha(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        pass
+        """ ???
+        """
