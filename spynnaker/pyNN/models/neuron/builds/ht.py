@@ -1,7 +1,7 @@
 from sklearn.linear_model.tests.test_least_angle import default_parameter
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelHT
-from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
+from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeHT
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeHTDynamic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
@@ -19,6 +19,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
     _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
 
     default_parameters = {
+        # #### Neuron model #####
         'g_Na': 0.2,
         'E_Na': 30.0,
         'g_K': 1.85,
@@ -30,17 +31,29 @@ class HillTononiNeuron(AbstractPopulationVertex):
         'tau_spike': 1.75,
         't_spike': 2.0,
 
+        # #### Threshold #####
         'v_thresh': -50,
         'v_thresh_resting': -50,
         'v_thresh_tau':2,
         'v_thresh_Na_reversal':30,
 
-        'isyn_exc': 0.0,
-        'isyn_inh': 0.0,
-        'tau_syn_E': 5.0,
-        'tau_syn_I': 5.0}
+        # Synapse Model
+        # ##### Synapse Type #####
+        # AMPA - excitatory
+        'exc_a_response': 0, 'exc_a_A': 1, 'exc_a_tau': 0.5,
+        'exc_b_response': 0, 'exc_b_B': -1, 'exc_b_tau': 2.4,
+        # NMDA - excitatory2
+        'exc2_a_response': 0, 'exc2_a_A': 1, 'exc2_a_tau': 4,
+        'exc2_b_response': 0, 'exc2_b_B': -1, 'exc2_b_tau': 40,
+        # GABA_A - inhibitory
+        'inh_a_response': 0, 'inh_a_A': 1, 'inh_a_tau': 1,
+        'inh_b_response': 0, 'inh_b_B': -1, 'inh_b_tau': 7,
+        # GABA_B - inhibitory2
+        'inh2_a_response': 0, 'inh2_a_A': 1, 'inh2_a_tau': 60,
+        'inh2_b_response': 0, 'inh2_b_B':-1, 'inh2_b_tau': 200,
+        }
 
-    initialize_parameters = {'v_init': None}
+    initialize_parameters = {'v_init': -65}
 
     def __init__(
             self, n_neurons,
@@ -49,6 +62,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
             incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
             constraints=_apv_defs['constraints'],
             label=_apv_defs['label'],
+
 
             # neuron model parameters
             v_init=initialize_parameters['v_init'],
@@ -63,15 +77,49 @@ class HillTononiNeuron(AbstractPopulationVertex):
             tau_spike=default_parameters['tau_spike'],
             t_spike=default_parameters['t_spike'],
 
+
+            # #### Threshold Paramters ####
             v_thresh=default_parameters['v_thresh'],
             v_thresh_resting=default_parameters['v_thresh_resting'],
             v_thresh_tau=default_parameters['v_thresh_tau'],
             v_thresh_Na_reversal=default_parameters['v_thresh_Na_reversal'],
 
-            tau_syn_E=default_parameters['tau_syn_E'],
-            tau_syn_I=default_parameters['tau_syn_I'],
-            isyn_exc=default_parameters['isyn_exc'],
-            isyn_inh=default_parameters['isyn_inh']):
+
+            # #### Synapse parameters ####
+            # AMPA - excitatory
+            exc_a_response=default_parameters['exc_a_response'],
+            exc_a_A=default_parameters['exc_a_A'],
+            exc_a_tau=default_parameters['exc_a_tau'],
+            exc_b_response=default_parameters['exc_b_response'],
+            exc_b_B=default_parameters['exc_b_B'],
+            exc_b_tau=default_parameters['exc_b_tau'],
+
+            # NMDA - excitatory2
+            exc2_a_response=default_parameters['exc2_a_response'],
+            exc2_a_A=default_parameters['exc2_a_A'],
+            exc2_a_tau=default_parameters['exc2_a_tau'],
+            exc2_b_response=default_parameters['exc2_b_response'],
+            exc2_b_B=default_parameters['exc2_b_B'],
+            exc2_b_tau=default_parameters['exc2_b_tau'],
+
+            # GABA_A - inhibitory
+            inh_a_response=default_parameters['inh_a_response'],
+            inh_a_A=default_parameters['inh_a_A'],
+            inh_a_tau=default_parameters['inh_a_tau'],
+            inh_b_response=default_parameters['inh_b_response'],
+            inh_b_B=default_parameters['inh_b_B'],
+            inh_b_tau=default_parameters['inh_b_tau'],
+
+            # GABA_B - inhibitory2
+            inh2_a_response=default_parameters['inh2_a_response'],
+            inh2_a_A=default_parameters['inh2_a_A'],
+            inh2_a_tau=default_parameters['inh2_a_tau'],
+            inh2_b_response=default_parameters['inh2_b_response'],
+            inh2_b_B=default_parameters['inh2_b_B'],
+            inh2_b_tau=default_parameters['inh2_b_tau'],
+
+
+            ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelHT(
             n_neurons,
@@ -85,12 +133,49 @@ class HillTononiNeuron(AbstractPopulationVertex):
             tau_spike,
             t_spike,
             i_offset)
-        synapse_type = SynapseTypeExponential(
-            n_neurons, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
+
+
+        synapse_type = SynapseTypeHT(
+
+            n_neurons,
+            # AMPA - excitatory
+            exc_a_response,
+            exc_a_A,
+            exc_a_tau,
+            exc_b_response,
+            exc_b_B,
+            exc_b_tau,
+            # NMDA - excitatory2
+            exc2_a_response,
+            exc2_a_A,
+            exc2_a_tau,
+            exc2_b_response,
+            exc2_b_B,
+            exc2_b_tau,
+            # GABA_A - inhibitory
+            inh_a_response,
+            inh_a_A,
+            inh_a_tau,
+            inh_b_response,
+            inh_b_B,
+            inh_b_tau,
+            # GABA_B - inhibitory2
+            inh2_a_response,
+            inh2_a_A,
+            inh2_a_tau,
+            inh2_b_response,
+            inh2_b_B,
+            inh2_b_tau
+            )
+
+
         input_type = InputTypeCurrent()
+
+
         threshold_type = ThresholdTypeHTDynamic(n_neurons,
                                 v_thresh, v_thresh_resting,
                                 v_thresh_tau, v_thresh_Na_reversal)
+
 
         super(HillTononiNeuron, self).__init__(
             n_neurons=n_neurons, binary="ht.aplx", label=label,

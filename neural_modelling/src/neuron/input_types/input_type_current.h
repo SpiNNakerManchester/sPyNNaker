@@ -22,7 +22,7 @@ static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
     for (int i=0; i< num_receptors; i++){
-    	value[i] = value[i];
+    	value[i] = value[i] >> 10;
     }
     return &value[0];
 }

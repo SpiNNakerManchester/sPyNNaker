@@ -575,8 +575,9 @@ void neuron_do_timestep_update(timer_t time) {
 
         // record these neuron parameter. Just as cheap to set then to gate
         inputs_excitatory->inputs[indexes->exc].input = total_exc;
-        inputs_inhibitory->inputs[indexes->inh].input = threshold_type->threshold_value;
-        		// total_inh;
+        inputs_inhibitory->inputs[indexes->inh].input =
+        		//threshold_type->threshold_value;
+        		 total_inh;
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
