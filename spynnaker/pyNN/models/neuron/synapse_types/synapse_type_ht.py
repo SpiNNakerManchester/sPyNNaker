@@ -12,6 +12,7 @@ from data_specification.enums.data_type import DataType
 from enum import Enum
 import numpy
 
+
 class _COMB_EXP_TYPES(Enum):
     SYN_A_RESPONSE = (1, DataType.S1615)
     SYN_A_A = (2, DataType.S1615)
@@ -19,7 +20,6 @@ class _COMB_EXP_TYPES(Enum):
     SYN_B_RESPONSE = (4, DataType.S1615)
     SYN_B_B = (5, DataType.S1615)
     SYN_B_DECAY = (6, DataType.UINT32)
-
 
     def __new__(cls, value, data_type):
         obj = object.__new__(cls)
@@ -35,85 +35,109 @@ class _COMB_EXP_TYPES(Enum):
 class SynapseTypeHT(AbstractSynapseType):
 
     def __init__(self,
-                n_neurons,
-                # excitatory - AMPA
-                exc_a_response,
-                exc_a_A,
-                exc_a_tau,
-                exc_b_response,
-                exc_b_B,
-                exc_b_tau,
-                # excitatory2 - NMDA
-                exc2_a_response,
-                exc2_a_A,
-                exc2_a_tau,
-                exc2_b_response,
-                exc2_b_B,
-                exc2_b_tau,
-                # inhibitory - GABA_A
-                inh_a_response,
-                inh_a_A,
-                inh_a_tau,
-                inh_b_response,
-                inh_b_B,
-                inh_b_tau,
-                # inhibitory2 - GABA_B
-                inh2_a_response,
-                inh2_a_A,
-                inh2_a_tau,
-                inh2_b_response,
-                inh2_b_B,
-                inh2_b_tau,
-                ):
-
+                 n_neurons,
+                 # excitatory - AMPA
+                 exc_a_response,
+                 exc_a_A,
+                 exc_a_tau,
+                 exc_b_response,
+                 exc_b_B,
+                 exc_b_tau,
+                 # excitatory2 - NMDA
+                 exc2_a_response,
+                 exc2_a_A,
+                 exc2_a_tau,
+                 exc2_b_response,
+                 exc2_b_B,
+                 exc2_b_tau,
+                 # inhibitory - GABA_A
+                 inh_a_response,
+                 inh_a_A,
+                 inh_a_tau,
+                 inh_b_response,
+                 inh_b_B,
+                 inh_b_tau,
+                 # inhibitory2 - GABA_B
+                 inh2_a_response,
+                 inh2_a_A,
+                 inh2_a_tau,
+                 inh2_b_response,
+                 inh2_b_B,
+                 inh2_b_tau,
+                 ):
 
         AbstractSynapseType.__init__(self)
         self._n_neurons = n_neurons
 
         # excitatory
-        self._exc_a_response = utility_calls.convert_param_to_numpy(exc_a_response, n_neurons)
-        self._exc_a_A = utility_calls.convert_param_to_numpy(exc_a_A, n_neurons)
-        self._exc_a_tau = utility_calls.convert_param_to_numpy(exc_a_tau, n_neurons)
-        self._exc_b_response = utility_calls.convert_param_to_numpy(exc_b_response, n_neurons)
-        self._exc_b_B = utility_calls.convert_param_to_numpy(exc_b_B, n_neurons)
-        self._exc_b_tau = utility_calls.convert_param_to_numpy(exc_b_tau, n_neurons)
+        self._exc_a_response = \
+            utility_calls.convert_param_to_numpy(exc_a_response, n_neurons)
+        self._exc_a_A = \
+            utility_calls.convert_param_to_numpy(exc_a_A, n_neurons)
+        self._exc_a_tau = \
+            utility_calls.convert_param_to_numpy(exc_a_tau, n_neurons)
+        self._exc_b_response = \
+            utility_calls.convert_param_to_numpy(exc_b_response, n_neurons)
+        self._exc_b_B = \
+            utility_calls.convert_param_to_numpy(exc_b_B, n_neurons)
+        self._exc_b_tau = \
+            utility_calls.convert_param_to_numpy(exc_b_tau, n_neurons)
 
-        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+        self.exc_a_A, self.exc_b_B = \
+            set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
 
         # excitatory2
-        self._exc2_a_response = utility_calls.convert_param_to_numpy(exc2_a_response, n_neurons)
-        self._exc2_a_A = utility_calls.convert_param_to_numpy(exc2_a_A, n_neurons)
-        self._exc2_a_tau = utility_calls.convert_param_to_numpy(exc2_a_tau, n_neurons)
-        self._exc2_b_response = utility_calls.convert_param_to_numpy(exc2_b_response, n_neurons)
-        self._exc2_b_B = utility_calls.convert_param_to_numpy(exc2_b_B, n_neurons)
-        self._exc2_b_tau = utility_calls.convert_param_to_numpy(exc2_b_tau, n_neurons)
+        self._exc2_a_response = \
+            utility_calls.convert_param_to_numpy(exc2_a_response, n_neurons)
+        self._exc2_a_A = \
+            utility_calls.convert_param_to_numpy(exc2_a_A, n_neurons)
+        self._exc2_a_tau = \
+            utility_calls.convert_param_to_numpy(exc2_a_tau, n_neurons)
+        self._exc2_b_response = \
+            utility_calls.convert_param_to_numpy(exc2_b_response, n_neurons)
+        self._exc2_b_B = \
+            utility_calls.convert_param_to_numpy(exc2_b_B, n_neurons)
+        self._exc2_b_tau = \
+            utility_calls.convert_param_to_numpy(exc2_b_tau, n_neurons)
 
-        self.exc2_a_A, self.exc2_b_B = set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
+        self.exc2_a_A, self.exc2_b_B = \
+            set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
 
+        # inhibitory
+        self._inh_a_response = \
+            utility_calls.convert_param_to_numpy(inh_a_response, n_neurons)
+        self._inh_a_A = \
+            utility_calls.convert_param_to_numpy(inh_a_A, n_neurons)
+        self._inh_a_tau = \
+            utility_calls.convert_param_to_numpy(inh_a_tau, n_neurons)
+        self._inh_b_response = \
+            utility_calls.convert_param_to_numpy(inh_b_response, n_neurons)
+        self._inh_b_B = \
+            utility_calls.convert_param_to_numpy(inh_b_B, n_neurons)
+        self._inh_b_tau = \
+            utility_calls.convert_param_to_numpy(inh_b_tau, n_neurons)
 
-        #inhibitory
-        self._inh_a_response = utility_calls.convert_param_to_numpy(inh_a_response, n_neurons)
-        self._inh_a_A = utility_calls.convert_param_to_numpy(inh_a_A, n_neurons)
-        self._inh_a_tau = utility_calls.convert_param_to_numpy(inh_a_tau, n_neurons)
-        self._inh_b_response = utility_calls.convert_param_to_numpy(inh_b_response, n_neurons)
-        self._inh_b_B = utility_calls.convert_param_to_numpy(inh_b_B, n_neurons)
-        self._inh_b_tau = utility_calls.convert_param_to_numpy(inh_b_tau, n_neurons)
-
-        self._inh_a_A, self._inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+        self._inh_a_A, self._inh_b_B = \
+            set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
         # inhibitory2
-        self._inh2_a_response = utility_calls.convert_param_to_numpy(inh2_a_response, n_neurons)
-        self._inh2_a_A = utility_calls.convert_param_to_numpy(inh2_a_A, n_neurons)
-        self._inh2_a_tau = utility_calls.convert_param_to_numpy(inh2_a_tau, n_neurons)
-        self._inh2_b_response = utility_calls.convert_param_to_numpy(inh2_b_response, n_neurons)
-        self._inh2_b_B = utility_calls.convert_param_to_numpy(inh2_b_B, n_neurons)
-        self._inh2_b_tau = utility_calls.convert_param_to_numpy(inh2_b_tau, n_neurons)
+        self._inh2_a_response = \
+            utility_calls.convert_param_to_numpy(inh2_a_response, n_neurons)
+        self._inh2_a_A = \
+            utility_calls.convert_param_to_numpy(inh2_a_A, n_neurons)
+        self._inh2_a_tau = \
+            utility_calls.convert_param_to_numpy(inh2_a_tau, n_neurons)
+        self._inh2_b_response = \
+            utility_calls.convert_param_to_numpy(inh2_b_response, n_neurons)
+        self._inh2_b_B = \
+            utility_calls.convert_param_to_numpy(inh2_b_B, n_neurons)
+        self._inh2_b_tau = \
+            utility_calls.convert_param_to_numpy(inh2_b_tau, n_neurons)
 
-        self._inh2_a_A, self._inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self._inh2_a_A, self._inh2_b_B = \
+            set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
-
-
-    #excitatory
+    # excitatory
     @property
     def exc_a_response(self):
         return self._exc_a_response
@@ -140,7 +164,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def exc_a_tau(self, exc_a_tau):
         self._exc_a_tau = utility_calls.convert_param_to_numpy(
             exc_a_tau, self._n_neurons)
-        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+        self.exc_a_A, self.exc_b_B = \
+            set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
 
     @property
     def exc_b_response(self):
@@ -168,11 +193,10 @@ class SynapseTypeHT(AbstractSynapseType):
     def exc_b_tau(self, exc_b_tau):
         self._exc_b_tau = utility_calls.convert_param_to_numpy(
             exc_b_tau, self._n_neurons)
-        self.exc_a_A, self.exc_b_B = set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
+        self.exc_a_A, self.exc_b_B = \
+            set_excitatory_scalar(self._exc_a_tau, self._exc_b_tau)
 
     # excitatory2
-
-    ################
     @property
     def exc2_a_response(self):
         return self._exc2_a_response
@@ -199,7 +223,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def exc2_a_tau(self, exc2_a_tau):
         self._exc2_a_tau = utility_calls.convert_param_to_numpy(
             exc2_a_tau, self._n_neurons)
-        self.exc2_a_A, self.exc2_b_B = set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
+        self.exc2_a_A, self.exc2_b_B = \
+            set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
 
     @property
     def exc2_b_response(self):
@@ -227,8 +252,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def exc2_b_tau(self, exc2_b_tau):
         self._exc2_b_tau = utility_calls.convert_param_to_numpy(
             exc2_b_tau, self._n_neurons)
-        self.exc2_a_A, self.exc2_b_B = set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
-
+        self.exc2_a_A, self.exc2_b_B = \
+            set_excitatory_scalar(self._exc2_a_tau, self._exc2_b_tau)
 
     # inhibitory
     @property
@@ -257,7 +282,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def inh_a_tau(self, inh_a_tau):
         self._inh_a_tau = utility_calls.convert_param_to_numpy(
             inh_a_tau, self._n_neurons)
-        self._inh_a_A, self._inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+        self._inh_a_A, self._inh_b_B = \
+            set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
     @property
     def inh_b_response(self):
@@ -285,8 +311,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def inh_b_tau(self, inh_b_tau):
         self._inh_b_tau = utility_calls.convert_param_to_numpy(
             inh_b_tau, self._n_neurons)
-        self._inh_a_A, self._inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
-
+        self._inh_a_A, self._inh_b_B = \
+            set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
     # inhibitory2
     @property
@@ -315,7 +341,8 @@ class SynapseTypeHT(AbstractSynapseType):
     def inh2_a_tau(self, inh2_a_tau):
         self._inh2_a_tau = utility_calls.convert_param_to_numpy(
             inh2_a_tau, self._n_neurons)
-        self._inh2_a_A, self._inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self._inh2_a_A, self._inh2_b_B = \
+            set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
     @property
     def inh2_b_response(self):
@@ -343,10 +370,11 @@ class SynapseTypeHT(AbstractSynapseType):
     def inh2_b_tau(self, inh2_b_tau):
         self._inh2_b_tau = utility_calls.convert_param_to_numpy(
             inh2_b_tau, self._n_neurons)
-        self._inh2_a_A, self._inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self._inh2_a_A, self._inh2_b_B = \
+            set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
     def get_n_synapse_types(self):
-        return 4 # AMPA, NMDA, GABA_A, GABA_B
+        return 4  # AMPA, NMDA, GABA_A, GABA_B
 
     def get_synapse_id_by_target(self, target):
 
@@ -381,8 +409,6 @@ class SynapseTypeHT(AbstractSynapseType):
         e2_b_decay, e2_b_init = get_exponential_decay_and_init(
             self._exc2_b_tau, machine_time_step)
 
-
-
         # inhibitory
         i_a_decay, i_a_init = get_exponential_decay_and_init(
             self._inh_a_tau, machine_time_step)
@@ -394,8 +420,6 @@ class SynapseTypeHT(AbstractSynapseType):
             self._inh2_a_tau, machine_time_step)
         i2_b_decay, i2_b_init = get_exponential_decay_and_init(
             self._inh2_b_tau, machine_time_step)
-
-
 
         return [
             # excitatory
@@ -420,8 +444,6 @@ class SynapseTypeHT(AbstractSynapseType):
             NeuronParameter(self._exc2_b_B, _COMB_EXP_TYPES.SYN_B_B.data_type),
             NeuronParameter(e2_b_decay, _COMB_EXP_TYPES.SYN_B_DECAY.data_type),
 
-
-
             # inhibitory
             NeuronParameter(self._inh_a_response,
                             _COMB_EXP_TYPES.SYN_A_RESPONSE.data_type),
@@ -443,9 +465,6 @@ class SynapseTypeHT(AbstractSynapseType):
                             _COMB_EXP_TYPES.SYN_B_RESPONSE.data_type),
             NeuronParameter(self._inh2_b_B, _COMB_EXP_TYPES.SYN_B_B.data_type),
             NeuronParameter(i2_b_decay, _COMB_EXP_TYPES.SYN_B_DECAY.data_type)
-
-
-
         ]
 
     def get_synapse_type_parameter_types(self):
@@ -457,18 +476,22 @@ class SynapseTypeHT(AbstractSynapseType):
         # a guess
         return 100
 
+
 def calc_rise_time(tau_a, tau_b, A=1, B=-1):
     try:
-        return numpy.log((A*tau_b) / (-B*tau_a)) * ( (tau_a*tau_b) / (tau_b - tau_a) )
+        return numpy.log((A*tau_b) / (-B*tau_a)) * (
+            (tau_a*tau_b) / (tau_b - tau_a))
     except:
         "calculation failed: ensure A!=B and that they are of opposite sign"
 
+
 def calc_scalar_f(tau_a, tau_b):
-    t_rise = calc_rise_time(tau_a = tau_a, tau_b=tau_b)
+    t_rise = calc_rise_time(tau_a=tau_a, tau_b=tau_b)
     return 1/(numpy.exp(-t_rise/tau_a) - numpy.exp(-t_rise/tau_b))
 
+
 def set_excitatory_scalar(exc_a_tau, exc_b_tau):
-    sf = calc_scalar_f(tau_a = exc_a_tau, tau_b=exc_b_tau)
+    sf = calc_scalar_f(tau_a=exc_a_tau, tau_b=exc_b_tau)
     a_A = sf
     b_B = -sf
     return a_A, b_B

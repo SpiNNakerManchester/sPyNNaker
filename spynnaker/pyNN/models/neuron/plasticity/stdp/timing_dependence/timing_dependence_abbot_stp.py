@@ -1,12 +1,12 @@
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers import STDP_FIXED_POINT_ONE
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers \
+    import STDP_FIXED_POINT_ONE
 from __builtin__ import property
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     import SynapseStructureWeightOnly
-from data_specification.enums import DataType
 
 import numpy
 import logging
@@ -26,9 +26,9 @@ class TimingDependenceAbbotSTP(AbstractTimingDependence):
     _tau_P_facil = 1
 
     def __init__(self, STP_type, f, P_baseline, tau_P,
-                # unused parameters, but required due to using
-                # existing STDP framework
-                tau_plus=20.0, tau_minus=20.0):
+                 # unused parameters, but required due to using
+                 # existing STDP framework
+                 tau_plus=20.0, tau_minus=20.0):
         AbstractTimingDependence.__init__(self)
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
@@ -107,8 +107,8 @@ class TimingDependenceAbbotSTP(AbstractTimingDependence):
     def get_parameters_sdram_usage_in_bytes(self):
         size = 0
         # two bytes per lookup table entry,
-        size += (2 * LOOKUP_TAU_P_SIZE) # depression
-        size += (2 * LOOKUP_TAU_P_SIZE) # facilitation
+        size += (2 * LOOKUP_TAU_P_SIZE)  # depression
+        size += (2 * LOOKUP_TAU_P_SIZE)  # facilitation
 
         # size += 2 * 4 # 1 parameters at 4 bytes
         return size
@@ -134,7 +134,6 @@ class TimingDependenceAbbotSTP(AbstractTimingDependence):
             spec, TimingDependenceAbbotSTP._tau_P_facil, LOOKUP_TAU_P_SIZE,
             LOOKUP_TAU_P_SHIFT)
 
-
     @property
     def synaptic_structure(self):
         return self._synapse_structure
@@ -153,7 +152,7 @@ class TimingDependenceAbbotSTP(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['STP_type', 'f', 'P_baseline','tau_P']
+        return ['STP_type', 'f', 'P_baseline', 'tau_P']
 
     @overrides(AbstractTimingDependence.initialise_row_headers)
     def initialise_row_headers(self, n_rows, n_header_bytes):
@@ -169,11 +168,13 @@ class TimingDependenceAbbotSTP(AbstractTimingDependence):
 
         # Initialise header parameters
         # header[0,0] = int(0.6 * STDP_FIXED_POINT_ONE) # STDP pre_trace
-        header[0,1] = int(self._P_baseline * STDP_FIXED_POINT_ONE) # P_Baseline
-        header[0,2] = int(self._P_baseline * STDP_FIXED_POINT_ONE) # STP trace
-        header[0,3] = int(self._STP_type) # STP type (enables facilitation and
-                                    # depression on same post-synaptic neuron)
-        header[0,4] = int(self._f * STDP_FIXED_POINT_ONE)
+        header[0, 1] = int(self._P_baseline *
+                           STDP_FIXED_POINT_ONE)  # P_Baseline
+        header[0, 2] = int(self._P_baseline *
+                           STDP_FIXED_POINT_ONE)  # STP trace
+        header[0, 3] = int(self._STP_type)  # STP type (enables facilitation &
+        # depression on same post-synaptic neuron)
+        header[0, 4] = int(self._f * STDP_FIXED_POINT_ONE)
         # header[0,5] = empty
         # header[0,6-7] = 32-bit timestamp
 

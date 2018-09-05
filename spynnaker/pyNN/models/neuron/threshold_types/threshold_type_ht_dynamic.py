@@ -16,6 +16,7 @@ V_THRESH_RESTING = "v_thresh_resting"
 V_THRESH_TAU = "v_thresh_tau"
 V_THRESH_NA_REVERSAL = "v_thresh_Na_reversal"
 
+
 class _HT_DYNAMIC_TYPES(Enum):
     V_THRESH = (1, DataType.S1615)
     V_THRESH_RESTING = (2, DataType.S1615)
@@ -35,8 +36,8 @@ class _HT_DYNAMIC_TYPES(Enum):
 
 class ThresholdTypeHTDynamic(AbstractThresholdType, AbstractContainsUnits):
 
-    """ A threshold which increases when the neuron spikes, and decays exponentially
-        back to baseline with time
+    """ A threshold which increases when the neuron spikes, and decays
+        exponentially back to baseline with time
     """
 
     def __init__(self, n_neurons, v_thresh_init,
@@ -55,7 +56,6 @@ class ThresholdTypeHTDynamic(AbstractThresholdType, AbstractContainsUnits):
         self._data[V_THRESH_RESTING] = v_thresh_resting
         self._data[V_THRESH_TAU] = v_thresh_tau
         self._data[V_THRESH_NA_REVERSAL] = v_thresh_Na_reversal
-
 
     @property
     def v_thresh(self):
@@ -87,7 +87,8 @@ class ThresholdTypeHTDynamic(AbstractThresholdType, AbstractContainsUnits):
 
     @v_thresh_Na_reversal.setter
     def v_thresh_Na_reversal(self, v_thresh_Na_reversal):
-        self._data.set_value(key=V_THRESH_NA_REVERSAL, value=v_thresh_Na_reversal)
+        self._data.set_value(key=V_THRESH_NA_REVERSAL,
+                             value=v_thresh_Na_reversal)
 
     @overrides(AbstractThresholdType.get_n_threshold_parameters)
     def get_n_threshold_parameters(self):
@@ -98,7 +99,6 @@ class ThresholdTypeHTDynamic(AbstractThresholdType, AbstractContainsUnits):
         return self._data[V_THRESH_TAU].apply_operation(
             operation=lambda x: numpy.exp(
                 float(-machine_time_step) / (1000.0 * x)))
-
 
     @overrides(AbstractThresholdType.get_threshold_parameters)
     def get_threshold_parameters(self):

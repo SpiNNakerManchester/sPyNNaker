@@ -51,7 +51,7 @@ class _HT_TYPES(Enum):
     A_SPIKE = (16, DataType.S1615)
     B_SPIKE = (17, DataType.S1615)
     A_INV = (18, DataType.S1615)
-    A_SPIKE_INV =(19, DataType.S1615)
+    A_SPIKE_INV = (19, DataType.S1615)
 
     def __new__(cls, value, data_type, doc=""):
         # pylint: disable=protected-access
@@ -95,27 +95,31 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
         self._data[I_OFFSET] = i_offset
 
         self._data[A] = (self._data[TAU_SPIKE] *
-            (self._data[G_NA] + self._data[G_K]))
+                         (self._data[G_NA] + self._data[G_K]))
         self._data[B] = (self._data[TAU_SPIKE] *
-            (self._data[G_NA] * self._data[E_NA] +
-             self._data[G_K] * self._data[E_K]))
+                         (self._data[G_NA] * self._data[E_NA] +
+                         self._data[G_K] * self._data[E_K]))
 
         self._data[A_SPIKE] = (self._data[TAU_SPIKE] *
-            (self._data[G_NA] + self._data[G_K]) + (self._data[TAU_M] *
-                                                    self._data[G_SPIKE]))
-        self._data[B_SPIKE] =(self._data[TAU_SPIKE] *
-            (self._data[G_NA] * self._data[E_NA] +
-             self._data[G_K] * self._data[E_K]) +
-                              self._data[TAU_M]* self._data[G_SPIKE]
-                              * self._data[E_K])
+                               (self._data[G_NA] + self._data[G_K]) +
+                               (self._data[TAU_M] * self._data[G_SPIKE]))
+        self._data[B_SPIKE] = (self._data[TAU_SPIKE] *
+                               (self._data[G_NA] * self._data[E_NA] +
+                               self._data[G_K] * self._data[E_K]) +
+                               self._data[TAU_M] * self._data[G_SPIKE]
+                               * self._data[E_K])
 
-        self._data[A_INV] = self._data[A] # initialise now, and invert with lambda
-        self._data[A_SPIKE_INV] = self._data[A_SPIKE] # initialise now, and invert with lambda
+        # initialise now, and invert with lambda
+        self._data[A_INV] = self._data[A]
+        # initialise now, and invert with lambda
+        self._data[A_SPIKE_INV] = self._data[A_SPIKE]
 
-        self._data[EXPONENT] = self._data[A]/(self._data[TAU_M]*self._data[TAU_SPIKE])
+        self._data[EXPONENT] = (self._data[A] /
+                                (self._data[TAU_M] * self._data[TAU_SPIKE]))
 
         self._data[EXPONENT_SPIKE] = (self._data[A_SPIKE] /
-                                      (self._data[TAU_M]*self._data[TAU_SPIKE]))
+                                      (self._data[TAU_M] *
+                                       self._data[TAU_SPIKE]))
 
         self._units = {
             V_INIT: 'mV',
@@ -200,6 +204,7 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
     @t_spike.setter
     def t_spike(self, t_spike):
         self._data.set_value(key=T_SPIKE, value=t_spike)
+
     @property
     def i_offset(self):
         return self._data[I_OFFSET]
@@ -207,7 +212,6 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
     @i_offset.setter
     def i_offset(self, i_offset):
         self._data.set_value(key=I_OFFSET, value=i_offset)
-
 
     @overrides(AbstractNeuronModel.get_n_neural_parameters)
     def get_n_neural_parameters(self):
@@ -239,7 +243,7 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractNeuronModel.get_neural_parameters,
                additional_arguments={'machine_time_step'})
     def get_neural_parameters(self, machine_time_step):
-        params =  []
+        params = []
         params.extend([
 
             NeuronParameter(
@@ -353,4 +357,3 @@ class NeuronModelHT(AbstractNeuronModel, AbstractContainsUnits):
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):
         return self._units[variable]
-

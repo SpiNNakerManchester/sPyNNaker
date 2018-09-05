@@ -1,4 +1,3 @@
-from sklearn.linear_model.tests.test_least_angle import default_parameter
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelHT
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeHT
@@ -34,8 +33,8 @@ class HillTononiNeuron(AbstractPopulationVertex):
         # #### Threshold #####
         'v_thresh': -50,
         'v_thresh_resting': -50,
-        'v_thresh_tau':2,
-        'v_thresh_Na_reversal':30,
+        'v_thresh_tau': 2,
+        'v_thresh_Na_reversal': 30,
 
         # ##### Synapse Model #####
         # AMPA - excitatory
@@ -49,7 +48,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
         'inh_b_response': 0, 'inh_b_B': -1, 'inh_b_tau': 7,
         # GABA_B - inhibitory2
         'inh2_a_response': 0, 'inh2_a_A': 1, 'inh2_a_tau': 60,
-        'inh2_b_response': 0, 'inh2_b_B':-1, 'inh2_b_tau': 200,
+        'inh2_b_response': 0, 'inh2_b_B': -1, 'inh2_b_tau': 200,
 
         # #### Input Type ####
         'ampa_rev_E': 0,
@@ -144,9 +143,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
             t_spike,
             i_offset)
 
-
         synapse_type = SynapseTypeHT(
-
             n_neurons,
             # AMPA - excitatory
             exc_a_response,
@@ -178,7 +175,6 @@ class HillTononiNeuron(AbstractPopulationVertex):
             inh2_b_tau
             )
 
-
         input_type = InputTypeHTConductance(
             n_neurons,
             ampa_rev_E,
@@ -186,15 +182,16 @@ class HillTononiNeuron(AbstractPopulationVertex):
             gaba_a_rev_E,
             gaba_b_rev_E)
 
-
         threshold_type = ThresholdTypeHTDynamic(n_neurons,
-                                v_thresh, v_thresh_resting,
-                                v_thresh_tau, v_thresh_Na_reversal)
-
+                                                v_thresh,
+                                                v_thresh_resting,
+                                                v_thresh_tau,
+                                                v_thresh_Na_reversal)
 
         super(HillTononiNeuron, self).__init__(
             n_neurons=n_neurons, binary="ht.aplx", label=label,
-            max_atoms_per_core=HillTononiNeuron._model_based_max_atoms_per_core,
+            max_atoms_per_core=HillTononiNeuron.
+                                        _model_based_max_atoms_per_core,
             spikes_per_second=spikes_per_second,
             ring_buffer_sigma=ring_buffer_sigma,
             incoming_spike_buffer_size=incoming_spike_buffer_size,

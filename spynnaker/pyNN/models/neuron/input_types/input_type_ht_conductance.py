@@ -74,7 +74,7 @@ class InputTypeHTConductance(AbstractInputType, AbstractContainsUnits):
     def nmda_rev_E(self):
         return self._data[NMDA_REV_E]
 
-    @ampa_rev_E.setter
+    @nmda_rev_E.setter
     def nmda_rev_E(self, nmda_rev_E):
         self._data.set_value(key=NMDA_REV_E, value=nmda_rev_E)
 
@@ -103,13 +103,17 @@ class InputTypeHTConductance(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return [
             NeuronParameter(
-                self._data[AMPA_REV_E], _CONDUCTANTCE_TYPES.AMPA_REV_E.data_type),
+                self._data[AMPA_REV_E],
+                _CONDUCTANTCE_TYPES.AMPA_REV_E.data_type),
             NeuronParameter(
-                self._data[NMDA_REV_E], _CONDUCTANTCE_TYPES.NMDA_REV_E.data_type),
+                self._data[NMDA_REV_E],
+                _CONDUCTANTCE_TYPES.NMDA_REV_E.data_type),
             NeuronParameter(
-                self._data[GABA_A_REV_E], _CONDUCTANTCE_TYPES.GABA_A_REV_E.data_type),
+                self._data[GABA_A_REV_E],
+                _CONDUCTANTCE_TYPES.GABA_A_REV_E.data_type),
             NeuronParameter(
-                self._data[GABA_B_REV_E], _CONDUCTANTCE_TYPES.GABA_B_REV_E.data_type)
+                self._data[GABA_B_REV_E],
+                _CONDUCTANTCE_TYPES.GABA_B_REV_E.data_type)
         ]
 
     def get_input_type_parameter_types(self):
