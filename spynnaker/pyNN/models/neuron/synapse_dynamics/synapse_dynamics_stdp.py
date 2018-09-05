@@ -285,9 +285,10 @@ class SynapseDynamicsSTDP(
             data_fixed.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, fp_size[i]) for i in range(len(fp_size))])
-        connections["target"] = (data_fixed & (n_neuron_id_bits+1)) + post_vertex_slice.lo_atom
+        connections["target"] = ((data_fixed & (n_neuron_id_bits+1))
+                                 + post_vertex_slice.lo_atom)
         connections["weight"] = synapse_structure.read_synaptic_data(
-            pp_size, pp_without_headers)
+            fp_size, pp_without_headers)
         connections["delay"] = (data_fixed >> (n_neuron_id_bits
                                                + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
