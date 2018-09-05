@@ -483,6 +483,7 @@ def calc_rise_time(tau_a, tau_b, A=1, B=-1):
             (tau_a*tau_b) / (tau_b - tau_a))
     except:
         "calculation failed: ensure A!=B and that they are of opposite sign"
+        return None
 
 
 def calc_scalar_f(tau_a, tau_b):
