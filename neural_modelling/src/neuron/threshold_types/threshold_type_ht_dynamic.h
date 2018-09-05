@@ -40,7 +40,7 @@ static inline bool threshold_type_is_above_threshold(state_t value,
     _print_threshold_type_params(threshold_type);
 
 	// If neuron has spiked
-	if REAL_COMPARE(value, >=, threshold_type->threshold_value) {
+	if (REAL_COMPARE(value, >=, threshold_type->threshold_value)) {
 
 		log_debug("HAS FIRED!!!");
 
@@ -56,7 +56,8 @@ static inline bool threshold_type_is_above_threshold(state_t value,
 	} else {
 		// Decay threshold value back towards resting threshold
 		threshold_type->threshold_value =
-				(threshold_type->threshold_value - threshold_type->threshold_resting) * threshold_type->threshold_decay
+				(threshold_type->threshold_value - threshold_type->threshold_resting) *
+				threshold_type->threshold_decay
 				+ threshold_type->threshold_resting;
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DYNAMIC_THRESHOLD);

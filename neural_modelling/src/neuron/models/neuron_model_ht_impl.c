@@ -34,8 +34,6 @@ static inline void _ht_closed_form(
 	    		(neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV) * neuron->exp_TC_spike +
 				((neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV);
 
-
-
 		neuron->ref_counter--;
 
 	} else {

@@ -23,8 +23,6 @@ typedef struct input_type_t {
 
 } input_type_t;
 
-
-
 static inline s1615 _evaluate_v_effect(state_t v){
 	s1615 v_dep = 0;
 	v = (v + 32k) >> 7; // add 32 to shift into range where it has greater variation with v
@@ -42,7 +40,6 @@ static inline s1615 _evaluate_v_effect(state_t v){
 	// log_info("v before: %k, v_dep: %k", v, v_dep);
 	return v_dep;
 }
-
 
 static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {

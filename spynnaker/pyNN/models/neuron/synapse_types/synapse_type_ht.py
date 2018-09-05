@@ -1,13 +1,11 @@
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
     import get_exponential_decay_and_init
-
 from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import \
     AbstractSynapseType
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.neural_properties.neural_parameter \
     import NeuronParameter
-
 from data_specification.enums.data_type import DataType
 from enum import Enum
 import numpy
@@ -481,7 +479,7 @@ def calc_rise_time(tau_a, tau_b, A=1, B=-1):
     try:
         return numpy.log((A*tau_b) / (-B*tau_a)) * (
             (tau_a*tau_b) / (tau_b - tau_a))
-    except:
+    except ValueError:
         "calculation failed: ensure A!=B and that they are of opposite sign"
         return None
 
