@@ -24,6 +24,26 @@ typedef struct input_type_t {
 } input_type_t;
 
 
+
+static inline s1615 _evaluate_v_effect(state_t v){
+	s1615 v_dep = 0;
+	v = (v + 32k) >> 7; // add 32 to shift into range where it has greater variation with v
+	if (v > -0.625k){ // -0.625k)
+		if (v <= 0.325k) {
+			v_dep = 0.783385k +  v * (1.42433k + v * (-3.00206k
+					+ v * (-3.70779k + v * (12.1412k + 15.3091k * v))));
+		} else {
+			v_dep = 1.0k;
+		}
+	} else {
+		v_dep = 0.0k;
+	}
+
+	// log_info("v before: %k, v_dep: %k", v, v_dep);
+	return v_dep;
+}
+
+
 static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
@@ -38,9 +58,15 @@ static inline void input_type_convert_excitatory_input_to_current(
         state_t membrane_voltage) {
 
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++){
-//    	log_info("reversal pot: %k", input_type->exc_rev_E[i]);
+
     	exc_input[i] = exc_input[i] *
 					(input_type->exc_rev_E[i] - membrane_voltage);
+
+    	if (i==1){
+    		// Gate NMDA conductance by voltage
+    		exc_input[i] = exc_input[i] * _evaluate_v_effect(membrane_voltage);
+    	}
+
     }
 
 }
