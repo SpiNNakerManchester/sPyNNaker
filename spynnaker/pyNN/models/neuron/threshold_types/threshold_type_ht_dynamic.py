@@ -3,8 +3,7 @@ from pacman.model.decorators import overrides
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 from .abstract_threshold_type import AbstractThresholdType
 
 from data_specification.enums import DataType
@@ -51,7 +50,7 @@ class ThresholdTypeHTDynamic(AbstractThresholdType, AbstractContainsUnits):
                        V_THRESH_NA_REVERSAL: "mV"}
 
         self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data[V_THRESH] = v_thresh_init
         self._data[V_THRESH_RESTING] = v_thresh_resting
         self._data[V_THRESH_TAU] = v_thresh_tau
