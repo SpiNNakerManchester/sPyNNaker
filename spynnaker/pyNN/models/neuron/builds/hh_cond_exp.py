@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 class HHCondExp(AbstractPopulationVertex):
     """ Single-compartment Hodgkin-Huxley model with exponentially decaying \
-        current input
+        current input.
     """
 
     # noinspection PyPep8Naming
@@ -21,4 +21,5 @@ class HHCondExp(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        pass
+        """ ???
+        """

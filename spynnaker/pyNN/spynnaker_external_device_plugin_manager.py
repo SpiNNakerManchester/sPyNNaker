@@ -12,8 +12,7 @@ from spinn_front_end_common.utilities.utility_objs \
 
 
 class SpynnakerExternalDevicePluginManager(object):
-    """
-    main entrance for the external device plugin manager
+    """ User-level interface for the external device plugin manager.
     """
 
     @staticmethod
@@ -55,7 +54,7 @@ class SpynnakerExternalDevicePluginManager(object):
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0):
         """ Output the spikes from a given population from SpiNNaker as they\
-            occur in the simulation
+            occur in the simulation.
 
         :param population: The population to activate the live output for
         :type population: \
@@ -93,13 +92,14 @@ class SpynnakerExternalDevicePluginManager(object):
         :param port: \
             The UDP port to which the live spikes will be sent. If not\
             specified, the port will be taken from the "live_spike_port"\
-            parameter in the "Recording" section of the spynnaker cfg file.
+            parameter in the "Recording" section of the sPyNNaker\
+            configuration file.
         :type port: int
         :param host: \
             The host name or IP address to which the live spikes will be\
             sent. If not specified, the host will be taken from the\
             "live_spike_host" parameter in the "Recording" section of the\
-            spynnaker cfg file.
+            sPyNNaker configuration file.
         :type host: str
         :param tag: \
             The IP tag to be used for the spikes. If not specified, one will\
@@ -122,7 +122,7 @@ class SpynnakerExternalDevicePluginManager(object):
         if host is None:
             host = config.get("Recording", "live_spike_host")
 
-        # add new edge and vertex if required to spinnaker graph
+        # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
             population._vertex, port, host, tag, board_address, strip_sdp,
             use_prefix, key_prefix, prefix_type, message_type, right_shift,
@@ -156,7 +156,7 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_socket_address(socket_address):
         """ Add a socket address to the list to be checked by the\
-            notification protocol
+            notification protocol.
 
         :param socket_address: the socket address
         :type socket_address:
@@ -174,8 +174,9 @@ class SpynnakerExternalDevicePluginManager(object):
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
             partition_id=None):
-        """ Add an edge from a vertex to the LPG object, builds as needed and\
-            has all the parameters for the creation of the LPG if needed
+        """ Add an edge from a vertex to the live packet gatherer, builds as\
+            needed and has all the parameters for the creation of the live\
+            packet gatherer if needed.
         """
         # pylint: disable=too-many-arguments, too-many-locals
         params = LivePacketGatherParameters(
@@ -200,7 +201,7 @@ class SpynnakerExternalDevicePluginManager(object):
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
             database_ack_port_num=None, notify=True):
-        """ Add a live rate controller to a Poisson population
+        """ Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
         :type poisson_population: \
@@ -241,7 +242,7 @@ class SpynnakerExternalDevicePluginManager(object):
     @staticmethod
     def add_edge(vertex, device_vertex, partition_id):
         """ Add an edge between two vertices (often a vertex and a external\
-            device) on a given partition
+            device) on a given partition.
 
         :param vertex: the pre vertex to connect the edge from
         :param device_vertex: the post vertex to connect the edge to

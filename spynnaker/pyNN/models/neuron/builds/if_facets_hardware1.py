@@ -19,4 +19,5 @@ class IFFacetsConductancePopulation(AbstractPopulationVertex):
 
     @staticmethod
     def set_model_max_atoms_per_core(new_value):
-        pass
+        """ ???
+        """

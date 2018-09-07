@@ -70,7 +70,8 @@ class NeuronModelLeakyIntegrateAndFire(NeuronModelLeakyIntegrate):
 
     def _tau_refrac_timesteps(self, machine_time_step):
         return self._data[TAU_REFRAC].apply_operation(
-            operation=lambda x: numpy.ceil(x / (machine_time_step / 1000.0)))
+            operation=lambda x: int(
+                numpy.ceil(x / (machine_time_step / 1000.0))))
 
     @inject_items({"machine_time_step": "MachineTimeStep"})
     def get_neural_parameters(self, machine_time_step):

@@ -76,7 +76,7 @@ bool population_table_initialise(address_t table_address,
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the x field of the key (assuming the key is in the format
@@ -87,7 +87,7 @@ static inline key_t _key_x(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the y field of the key (assuming the key is in the format
@@ -98,7 +98,7 @@ static inline key_t _key_y(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the p field of the key (assuming the key is in the format
@@ -109,7 +109,7 @@ static inline key_t _key_p(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the n field of the key (assuming the key is in the format
