@@ -14,8 +14,8 @@ int16_t tau_P_facilitation_lookup[TAU_P_SIZE];
 //---------------------------------------
 address_t timing_initialise(address_t address) {
 
-    log_info("timing_initialise: starting");
-    log_info("\tAbbot STP rule");
+//    log_info("timing_initialise: starting");
+//    log_info("\tAbbot STP rule");
 
     // Copy LUTs from following memory
     address_t next_param_address = maths_copy_int16_lut(&address[0],

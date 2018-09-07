@@ -282,7 +282,7 @@ bool synapse_dynamics_process_plastic_synapses(
     }
 
 
-    log_info("\n time: %u "
+    log_debug("\n time: %u "
     		 "\n pre_trace: %k "
     		 "\n P_0: %k "
     		 "\n STP Type: %u "
