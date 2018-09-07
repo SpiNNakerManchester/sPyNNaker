@@ -272,6 +272,45 @@ class HillTononiNeuron(AbstractPopulationVertex):
             gaba_a_rev_E,
             gaba_b_rev_E)
 
+        additional_input = AdditionalInputHTIntrinsicCurrents(
+            n_neurons,
+            # Pacemaker
+            I_H,
+            g_H,
+            E_H,
+            m_H,
+            m_inf_H,
+            e_to_t_on_tau_m_H,
+            # Calcium
+            I_T,
+            g_T,
+            E_T,
+            m_T,
+            m_inf_T,
+            e_to_t_on_tau_m_T,
+            h_T,
+            h_inf_T,
+            e_to_t_on_tau_h_T,
+            # Sodium
+            I_NaP,
+            g_NaP,
+            E_NaP,
+            m_inf_NaP,
+            # Potassium
+            I_DK,
+            g_DK,
+            E_DK,
+            m_inf_DK,
+            e_to_t_on_tau_m_DK,
+            D,
+            D_infinity,
+            # Voltage Clamp
+            v_clamp, s_clamp, t_clamp,
+
+            # Other
+            dt
+            )
+
         super(HillTononiNeuron, self).__init__(
             n_neurons=n_neurons, binary="ht.aplx", label=label,
             max_atoms_per_core=HillTononiNeuron.
@@ -282,6 +321,7 @@ class HillTononiNeuron(AbstractPopulationVertex):
             model_name="ht", neuron_model=neuron_model,
             input_type=input_type, synapse_type=synapse_type,
             threshold_type=threshold_type,
+            additional_input=additional_input,
             constraints=constraints)
 
     @staticmethod

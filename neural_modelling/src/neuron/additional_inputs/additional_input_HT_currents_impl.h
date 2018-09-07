@@ -56,16 +56,16 @@ static input_t additional_input_get_input_value_as_current(
         additional_input_pointer_t additional_input,
         state_t membrane_voltage) {
 
-	if (n_dt >= additional_input->s_clamp &&
-            n_dt < additional_input->s_clamp + additional_input->t_clamp){
-         // local_v +=1;
-         // membrane_voltage = local_v;
-            local_v = additional_input->v_clamp;
-        } else {
-            local_v = -65k;
-        }
+//		if (n_dt >= additional_input->s_clamp &&
+//            n_dt < additional_input->s_clamp + additional_input->t_clamp){
+//         // local_v +=1;
+//         // membrane_voltage = local_v;
+//            local_v = additional_input->v_clamp;
+//        } else {
+//            local_v = -65k;
+//        }
 
-        membrane_voltage = local_v;
+//        membrane_voltage = local_v;
 
         // log_info("membrane potential: %k", membrane_voltage);
 //------------------------------------------------------------------------

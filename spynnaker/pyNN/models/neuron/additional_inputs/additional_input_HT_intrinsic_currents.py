@@ -140,7 +140,7 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
                  dt
                  ):
         self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
+        self._data = SpynnakerRangeDictionary(size=n_neurons)
         self._data['I_H'] = I_H
         self._data['g_H'] = g_H
         self._data['E_H'] = E_H
@@ -301,7 +301,7 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def E_NaP(self):
         return self._data[E_NAP]
 
-    @ E_NaP.setter
+    @E_NaP.setter
     def E_NaP(self, new_E_NaP):
         self._data.set_value(key=E_NAP, value=new_E_NaP)
 

@@ -574,11 +574,6 @@ void neuron_do_timestep_update(timer_t time) {
             total_inh += inh_syn_input[i];
         }
 
-        // record these neuron parameter. Just as cheap to set then to gate
-        inputs_excitatory->inputs[indexes->exc].input = total_exc;
-        inputs_inhibitory->inputs[indexes->inh].input =
-        		//threshold_type->threshold_value;
-        		 total_inh;
 
         // Perform conversion of g_syn to current, including evaluation of
         // voltage-dependent inputs
@@ -589,7 +584,7 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
-            synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
+            //synapse_dynamics_get_intrinsic_bias(time, neuron_index) +
             additional_input_get_input_value_as_current(
                 additional_input, voltage);
 
@@ -601,6 +596,14 @@ void neuron_do_timestep_update(timer_t time) {
 
         // Determine if a spike should occur
         bool spike = threshold_type_is_above_threshold(result, threshold_type);
+
+
+        // record these neuron parameter. Just as cheap to set then to gate
+        inputs_excitatory->inputs[indexes->exc].input = total_exc;
+        inputs_inhibitory->inputs[indexes->inh].input =
+        		external_bias;
+        		//threshold_type->threshold_value;
+        		// total_inh;
 
         // If the neuron has spiked
         if (spike) {
