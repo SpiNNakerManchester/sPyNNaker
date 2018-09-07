@@ -78,6 +78,7 @@ authors:
   affiliation:  "University Of Manchester"
   email: oliver.rhodes@manchester.ac.uk
   website: http://apt.cs.manchester.ac.uk/people/orhodes/
+  orcid: https://orcid.org/0000-0003-1728-2828
 - family-names: Bogdan
   given-names: Petrut
   affiliation: "University Of Manchester"
@@ -111,11 +112,15 @@ authors:
   affiliation: "University Of Manchester"
   email: joanna.moy@manchester.ac.uk
   website: http://apt.cs.manchester.ac.uk/people/jmoy/
+- family-names: Hopkins
+  given-names: Michael
+  affiliation: "University Of Manchester"
+  email: michael.hopkins@manchester.ac.uk
+  website: http://apt.cs.manchester.ac.uk/people/mhopkins/
 
 title: The Common code for supporting the different PyNN Implementations for
 executing on SpiNNaker machines.
-version: "1!4.1.0"
-doi: 10.5281/zenodo.1255864
+version:
 date-released: 2017-09-17
 url: http://spinnakermanchester.github.io/
 repository: https://github.com/SpiNNakerManchester/sPyNNaker
