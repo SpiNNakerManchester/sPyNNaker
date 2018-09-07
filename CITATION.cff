@@ -118,14 +118,18 @@ authors:
   email: michael.hopkins@manchester.ac.uk
   website: http://apt.cs.manchester.ac.uk/people/mhopkins/
 
-title: The Common code for supporting the different PyNN Implementations for
-executing on SpiNNaker machines.
+title:
+  The common code for supporting the different PyNN Implementations for
+  executing on SpiNNaker machines.
 version:
 date-released: 2017-09-17
 url: http://spinnakermanchester.github.io/
 repository: https://github.com/SpiNNakerManchester/sPyNNaker
 contact:
-- name: SpiNNaker Software team
-address: IT 302, It building, Oxford road, University of Manchester, Manchester, M13 9PL
+- name: SpiNNaker Software Team
+  address: University of Manchester, Oxford Road
+  city: Manchester
+  post-code: M13 9PL
+  country: GB
 email: spinnakerusers@googlegroups.com
 
