@@ -103,17 +103,17 @@ class InputTypeConductance2E2I(AbstractInputType, AbstractContainsUnits):
     def get_input_type_parameters(self):
         return [
             NeuronParameter(
-                self._data[E_REV_E], _CONDUCTANTCE_TYPES.E_REV_E.data_type),
+                self._data[E_REV_E], _2E2I_CONDUCTANTCE_TYPES.E_REV_E.data_type),
             NeuronParameter(
-                self._data[E_REV_E2], _CONDUCTANTCE_TYPES.E_REV_E2.data_type),
+                self._data[E_REV_E2], _2E2I_CONDUCTANTCE_TYPES.E_REV_E2.data_type),
             NeuronParameter(
-                self._data[E_REV_I], _CONDUCTANTCE_TYPES.E_REV_I.data_type),
+                self._data[E_REV_I], _2E2I_CONDUCTANTCE_TYPES.E_REV_I.data_type),
             NeuronParameter(
-                self._data[E_REV_I2], _CONDUCTANTCE_TYPES.E_REV_I2.data_type)
+                self._data[E_REV_I2], _2E2I_CONDUCTANTCE_TYPES.E_REV_I2.data_type)
         ]
 
     def get_input_type_parameter_types(self):
-        return [item.data_type for item in _CONDUCTANTCE_TYPES]
+        return [item.data_type for item in _2E2I_CONDUCTANTCE_TYPES]
 
     def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
         return 10

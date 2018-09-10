@@ -77,13 +77,17 @@ class SynapseTypeExponential2E2I(AbstractSynapseType, AbstractContainsUnits):
                  tau_syn_E2,
                  tau_syn_I,
                  tau_syn_I2,
-                 initial_input_exc=0.0, initial_input_inh=0.0):
+                 initial_input_exc=0.0,
+                 initial_input_exc_2=1.0,
+                 initial_input_inh=0.0,
+                 initial_input_inh_2=1.0
+                 ):
         # pylint: disable=too-many-arguments
         self._units = {
             TAU_SYN_E: "mV",
-            TAU_SYN_E_2: "mV",
+            TAU_SYN_E2: "mV",
             TAU_SYN_I: 'mV',
-            TAU_SYN_I_2: 'mV',
+            TAU_SYN_I2: 'mV',
             GSYN_EXC: "uS",
             GSYN_EXC_2: "uS",
             GSYN_INH: "uS",
@@ -96,9 +100,9 @@ class SynapseTypeExponential2E2I(AbstractSynapseType, AbstractContainsUnits):
         self._data[TAU_SYN_I] = tau_syn_I
         self._data[TAU_SYN_I2] = tau_syn_I2
         self._data[GSYN_EXC] = initial_input_exc
-        self._data[GSYN_EXC_2] = initial_input_exc
+        self._data[GSYN_EXC_2] = initial_input_exc_2
         self._data[GSYN_INH] = initial_input_inh
-        self._data[GSYN_INH_2] = initial_input_inh
+        self._data[GSYN_INH_2] = initial_input_inh_2
 
     @property
     def tau_syn_E(self):
@@ -202,23 +206,25 @@ class SynapseTypeExponential2E2I(AbstractSynapseType, AbstractContainsUnits):
 
         return [
             # Shaping parameters
-            NeuronParameter(e_decay, _EXP_TYPES.E_DECAY.data_type),
-            NeuronParameter(e_init, _EXP_TYPES.E_INIT.data_type),
-            NeuronParameter(e_decay_2, _EXP_TYPES.E_DECAY_2.data_type),
-            NeuronParameter(e_init_2, _EXP_TYPES.E_INIT_2.data_type),
-            NeuronParameter(i_decay, _EXP_TYPES.I_DECAY.data_type),
-            NeuronParameter(i_init, _EXP_TYPES.I_INIT.data_type),
-            NeuronParameter(i_decay_2, _EXP_TYPES.I_DECAY_2.data_type),
-            NeuronParameter(i_init_2, _EXP_TYPES.I_INIT_2.data_type),
-            # Initialisation parameters
+            NeuronParameter(e_decay, _2E2I_EXP_TYPES.E_DECAY.data_type),
+            NeuronParameter(e_init, _2E2I_EXP_TYPES.E_INIT.data_type),
             NeuronParameter(
-                self._data[GSYN_EXC], _EXP_TYPES.INITIAL_EXC.data_type),
+                self._data[GSYN_EXC], _2E2I_EXP_TYPES.INITIAL_EXC.data_type),
+
+            NeuronParameter(e_decay_2, _2E2I_EXP_TYPES.E_DECAY_2.data_type),
+            NeuronParameter(e_init_2, _2E2I_EXP_TYPES.E_INIT_2.data_type),
             NeuronParameter(
-                self._data[GSYN_EXC_2], _EXP_TYPES.INITIAL_EXC_2.data_type),
+                self._data[GSYN_EXC_2], _2E2I_EXP_TYPES.INITIAL_EXC_2.data_type),
+
+            NeuronParameter(i_decay, _2E2I_EXP_TYPES.I_DECAY.data_type),
+            NeuronParameter(i_init, _2E2I_EXP_TYPES.I_INIT.data_type),
             NeuronParameter(
-                self._data[GSYN_INH], _EXP_TYPES.INITIAL_INH.data_type),
+                self._data[GSYN_INH], _2E2I_EXP_TYPES.INITIAL_INH.data_type),
+
+            NeuronParameter(i_decay_2, _2E2I_EXP_TYPES.I_DECAY_2.data_type),
+            NeuronParameter(i_init_2, _2E2I_EXP_TYPES.I_INIT_2.data_type),
             NeuronParameter(
-                self._data[GSYN_INH_2], _EXP_TYPES.INITIAL_INH_2.data_type)
+                self._data[GSYN_INH_2], _2E2I_EXP_TYPES.INITIAL_INH_2.data_type)
         ]
 
     @overrides(AbstractSynapseType.get_synapse_type_parameter_types)

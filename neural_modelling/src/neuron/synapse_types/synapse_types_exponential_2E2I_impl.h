@@ -89,19 +89,20 @@ static inline void add_input_exp(exp_params_t* exp_params, input_t input){
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
+	if (input > 0){
+		if (synapse_type_index == EXCITATORY) {
+			add_input_exp(&parameter->exc, input);
 
-    if (synapse_type_index == EXCITATORY) {
-    	add_input_exp(&parameter->exc, input);
+		} else if (synapse_type_index == EXCITATORY2) {
+			add_input_exp(&parameter->exc2, input);
 
-    } else if (synapse_type_index == EXCITATORY2) {
-    	add_input_exp(&parameter->exc2, input);
+		} else if (synapse_type_index == INHIBITORY) {
+			add_input_exp(&parameter->inh, input);
 
-    } else if (synapse_type_index == INHIBITORY) {
-    	add_input_exp(&parameter->inh, input);
-
-    } else if (synapse_type_index == INHIBITORY2) {
-    	add_input_exp(&parameter->inh2, input);
-    }
+		} else if (synapse_type_index == INHIBITORY2) {
+			add_input_exp(&parameter->inh2, input);
+		}
+	}
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available
@@ -111,6 +112,7 @@ static inline void synapse_types_add_neuron_input(
 static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
     excitatory_response[0] = parameter->exc.synaptic_input_value;
+    excitatory_response[1] = parameter->exc2.synaptic_input_value;
     return &excitatory_response[0];
 }
 
@@ -121,6 +123,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
     inhibitory_response[0] = parameter->inh.synaptic_input_value;
+    inhibitory_response[1] = parameter->inh2.synaptic_input_value;
     return &inhibitory_response[0];
 }
 
