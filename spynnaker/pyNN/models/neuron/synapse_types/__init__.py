@@ -3,6 +3,8 @@ from .synapse_type_dual_exponential import SynapseTypeDualExponential
 from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
+from .synapse_type_exponential import SynapseTypeExponential2E2I
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha"]
+           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha"
+           "SynapseTypeExponential2E2I"]
