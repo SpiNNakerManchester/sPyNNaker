@@ -23,16 +23,16 @@ class IFCondExp2E2I(AbstractPopulationVertex):
         'e_rev_I': -70.0,
         'e_rev_I2': -75.0,
         'v_rest': -65.0, 'v_reset': -65.0, 'v_thresh': -50.0,
-        'tau_syn_E': 25.0,
-        'tau_syn_E2': 5.0,
-        'tau_syn_I': 25.0,
-        'tau_syn_I2': 5.0,
+        'tau_syn_E': 10.0,
+        'tau_syn_E2': 10.0,
+        'tau_syn_I': 10.0,
+        'tau_syn_I2': 10.0,
         'tau_refrac': 0.1,
         'i_offset': 0,
         'isyn_exc': 0.0,
-        'isyn_exc_2': 1.0,
+        'isyn_exc_2': 0.0,
         'isyn_inh': 0.0,
-        'isyn_inh_2': 1.0
+        'isyn_inh_2': 0.0
         }
 
     initialize_parameters = {'v_init': None}
