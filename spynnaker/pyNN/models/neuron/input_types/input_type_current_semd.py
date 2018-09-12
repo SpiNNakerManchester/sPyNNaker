@@ -1,3 +1,4 @@
+from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from .abstract_input_type import AbstractInputType
 
@@ -19,6 +20,9 @@ class InputTypeCurrentSEMD(AbstractInputType):
         "_inh_input_previous"]
 
     def __init__(self, multiplicator, inh_input_previous):
+        super(InputTypeCurrentSEMD, self).__init__([
+            DataType.S1615,  # multiplicator
+            DataType.S1615]) # inh_input_previous
         self._multiplicator = multiplicator
         self._inh_input_previous = inh_input_previous
 
