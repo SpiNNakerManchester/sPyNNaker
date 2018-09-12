@@ -78,8 +78,9 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
-        decay = lambda x: numpy.exp(-ts / x)  # noqa E731
-        init = lambda x: (x / ts) * (1.0 - numpy.exp(-ts / x))  # noqa E731
+        tsfloat = float(ts) / 1000.0
+        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
+        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
 
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),
