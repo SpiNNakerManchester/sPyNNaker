@@ -17,7 +17,8 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
         input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
     """
 
-    @default_initial_values({"v", "isyn_exc", "isyn_inh", "inh_input_previous"})
+    @default_initial_values({"v", "isyn_exc", "isyn_inh",
+                             "inh_input_previous"})
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,

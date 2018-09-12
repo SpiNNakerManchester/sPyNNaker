@@ -21,8 +21,8 @@ class InputTypeCurrentSEMD(AbstractInputType):
 
     def __init__(self, multiplicator, inh_input_previous):
         super(InputTypeCurrentSEMD, self).__init__([
-            DataType.S1615,  # multiplicator
-            DataType.S1615]) # inh_input_previous
+            DataType.S1615,   # multiplicator
+            DataType.S1615])  # inh_input_previous
         self._multiplicator = multiplicator
         self._inh_input_previous = inh_input_previous
 
