@@ -29,11 +29,12 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(v_thresh)
-        additional_input = AdditionalInputCa2Adaptive(tau_ca2, i_ca2, i_alpha)
+        additional_input_type = AdditionalInputCa2Adaptive(
+            tau_ca2, i_ca2, i_alpha)
 
         super(IFCurrExpCa2Adaptive, self).__init__(
             model_name="IF_curr_exp_ca2_adaptive",
             binary="IF_curr_exp_ca2_adaptive.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type,
-            additional_input=additional_input)
+            additional_input_type=additional_input_type)
