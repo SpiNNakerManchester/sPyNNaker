@@ -122,7 +122,7 @@ title:
   The common code for supporting the different PyNN Implementations for
   executing on SpiNNaker machines.
 version:
-date-released: 2017-09-17
+date-released:
 url: http://spinnakermanchester.github.io/
 repository: https://github.com/SpiNNakerManchester/sPyNNaker
 contact:
