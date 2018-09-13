@@ -96,7 +96,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
                 parameters[I_OFFSET], state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: numpy.ceil(x / (ts / 1000.0)))]
+                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
@@ -163,4 +163,4 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
-        self._tau_refrac = tau_refrac
+       self._tau_refrac = tau_refrac
