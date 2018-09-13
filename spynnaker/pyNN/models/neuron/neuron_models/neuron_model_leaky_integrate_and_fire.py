@@ -163,4 +163,4 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
-       self._tau_refrac = tau_refrac
+        self._tau_refrac = tau_refrac
