@@ -13,7 +13,7 @@ class SpikeSourcePoisson(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    def __init__(self, rate=1.0, start=0, duration=1e10):
+    def __init__(self, rate=1.0, start=0, duration=None):
         self._rate = rate
         self._start = start
         self._duration = duration
