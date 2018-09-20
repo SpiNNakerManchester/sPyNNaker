@@ -36,12 +36,7 @@ class CSAConnector(AbstractConnector):
     def get_delay_maximum(self):
         n_connections_max = self._n_pre_neurons * self._n_post_neurons
         # we can probably look at the array and do better than this?
-        return self._get_delay_maximum(
-            self._delays, n_connections_max)
-
-    @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self):
-        return self._get_delay_variance(self._delays, None)
+        return self._get_delay_maximum(n_connections_max)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         # do the work from self._cset in here
@@ -75,48 +70,22 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        n_connections, pair_list = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
+            self, post_vertex_slice, min_delay=None, max_delay=None):
+        n_connections_max = post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._n_pre_neurons * self._n_post_neurons, n_connections_max,
+            min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections, pair_list = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
-        return n_connections
-
-    @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_mean(self._weights, None)
+    def get_n_connections_to_post_vertex_maximum(self):
+        n_connections_max = self._n_pre_neurons
+        return n_connections_max
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections, pair_list = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
-
-    @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_variance(self._weights, None)
-
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
+    def get_weight_maximum(self):
+        n_connections_max = self._n_pre_neurons * self._n_post_neurons
+        return self._get_weight_maximum(n_connections_max)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
