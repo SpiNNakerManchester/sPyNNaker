@@ -131,12 +131,10 @@ class PyNNPopulationCommon(object):
         # atom
         globals_variables.get_simulator().id_counter += size
 
-        # set up initial values
-        initial_state_variables = dict(model.default_initial_values)
+        # set up initial values if given
         if initial_values is not None:
-            initial_state_variables.update(initial_values)
-        for variable, value in iteritems(initial_state_variables):
-            self._initialize(variable, value)
+            for variable, value in iteritems(initial_values):
+                self._initialize(variable, value)
 
     @property
     def first_id(self):
