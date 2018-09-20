@@ -17,7 +17,7 @@ from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
-           "AllToAllConnector", "ArrayConnector",
+           "AllToAllConnector", "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromFileConnector", "FromListConnector",
