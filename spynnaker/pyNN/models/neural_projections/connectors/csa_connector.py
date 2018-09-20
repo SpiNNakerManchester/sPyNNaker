@@ -40,9 +40,7 @@ class CSAConnector(AbstractConnector):
             self._delays, n_connections_max)
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_delay_variance(self):
         return self._get_delay_variance(self._delays, None)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
