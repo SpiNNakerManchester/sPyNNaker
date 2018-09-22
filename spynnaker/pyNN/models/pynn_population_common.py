@@ -16,10 +16,13 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 
+from spinn_utilities.log import FormatAdapter
+
 import numpy
 import logging
 from six import string_types, iteritems
-logger = logging.getLogger(__file__)
+
+logger = FormatAdapter(logging.getLogger(__file__))
 
 
 class PyNNPopulationCommon(object):
@@ -29,6 +32,7 @@ class PyNNPopulationCommon(object):
         "_delay_vertex",
         "_first_id",
         "_has_read_neuron_parameters_this_run",
+        "_label",
         "_last_id",
         "_positions",
         "_record_gsyn_file",
@@ -48,6 +52,8 @@ class PyNNPopulationCommon(object):
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
+        self._label = label
+        size = self._roundsize(size)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -69,13 +75,11 @@ class PyNNPopulationCommon(object):
             self._vertex = model
             if size is None:
                 size = self._vertex.n_atoms
-            elif size != self._vertex_n_atoms:
+            elif size != self._vertex.n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
-            if label is not None:
-                raise ConfigurationException(
-                    "Cannot accept a label {} when the cell is a vertex"
-                    .format(label))
+            if label is None:
+                self._label = self._vertex.label
             if constraints is not None:
                 self._vertex.add_constraints(constraints)
 
@@ -84,6 +88,10 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "Model must be either an AbstractPyNNModel or an"
                 " ApplicationVertex")
+
+        if self._label is None:
+            self._label = "Population {}".format(
+                globals_variables.get_simulator().none_labelled_vertex_count)
 
         # Introspect properties of the vertex
         self._vertex_population_settable = \
@@ -309,11 +317,11 @@ class PyNNPopulationCommon(object):
     def label(self):
         """ The label of the population
         """
-        return self._vertex.label
+        return self._label
 
     @label.setter
-    def label(self, new_value):
-        self._vertex.label = new_value
+    def label(self, label):
+        self._label = label
 
     @property
     def local_size(self):
@@ -534,30 +542,6 @@ class PyNNPopulationCommon(object):
         self._delay_vertex = delay_vertex
         self._change_requires_mapping = True
 
-    @staticmethod
-    def create_label(model_label, pop_level_label):
-        """ Helper method for choosing a label from model and population levels
-
-        :param model_label: the model level label
-        :param pop_level_label: the pop level label
-        :return: the new model level label
-        """
-        cell_label = None
-        if model_label is None and pop_level_label is None:
-            cell_label = "Population {}".format(
-                globals_variables.get_simulator().none_labelled_vertex_count)
-            globals_variables.get_simulator(). \
-                increment_none_labelled_vertex_count()
-        elif model_label is None and pop_level_label is not None:
-            cell_label = pop_level_label
-        elif model_label is not None and pop_level_label is None:
-            cell_label = model_label
-        elif model_label is not None and pop_level_label is not None:
-            cell_label = pop_level_label
-            logger.warning("Don't know which label to use. Will use pop "
-                           "label and carry on")
-        return cell_label
-
     def _get_variable_unit(self, parameter_name):
         """ Helper method for getting units from a parameter used by the vertex
 
@@ -569,21 +553,19 @@ class PyNNPopulationCommon(object):
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _roundsize(self, size, label):
+    def _roundsize(self, size):
         if isinstance(size, int):
             return size
         # External device population can have a size of None so accept for now
         if size is None:
             return None
-        if label is None:
-            label = "None"
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
-            logger.warning("Size of the population with label %s rounded "
-                           "from %s to %d. Please use int values for size",
-                           label, size, temp)
+            logger.warning("Size of the population rounded "
+                           "from {} to {}. Please use int values for size",
+                           self.label, size, temp)
             return temp
         raise ConfigurationException(
             "Size of a population with label {} must be an int,"
-            " received {}".format(label, size))
+            " received {}".format(self.label, size))
