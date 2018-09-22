@@ -52,9 +52,9 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
         # Add the rest of the data
         return [parameters[DEVICE].apply_operation(
-                    lambda x: x.control_key),
+                    lambda x: x.device_control_key),
                 parameters[DEVICE].apply_operation(
-                    lambda x: x.device_control_uses_payload),
+                    lambda x: int(x.device_control_uses_payload)),
                 parameters[DEVICE].apply_operation(
                     lambda x: x.device_control_min_value),
                 parameters[DEVICE].apply_operation(
