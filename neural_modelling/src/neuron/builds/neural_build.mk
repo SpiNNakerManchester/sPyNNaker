@@ -5,16 +5,11 @@ endif
 
 ifeq ($(SPYNNAKER_DEBUG), DEBUG)
     NEURON_DEBUG = LOG_DEBUG
-    SYNAPSE_DEBUG = LOG_DEBUG
     PLASTIC_DEBUG = LOG_DEBUG
 endif
 
 ifndef NEURON_DEBUG
     NEURON_DEBUG = LOG_INFO
-endif
-
-ifndef SYNAPSE_DEBUG
-    SYNAPSE_DEBUG = LOG_INFO
 endif
 
 ifndef PLASTIC_DEBUG
@@ -79,14 +74,6 @@ SOURCES = $(SOURCE_DIR)/common/out_spikes.c \
 	      $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
 	      $(TIMING_DEPENDENCE) $(OTHER_SOURCES) $(SYNAPTOGENESIS_DYNAMICS)
 
-SYNAPSE_TYPE_SOURCES += $(SOURCE_DIR)/neuron/c_main.c \
-                        $(SOURCE_DIR)/neuron/synapses.c \
-                        $(SOURCE_DIR)/neuron/spike_processing.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_fixed_impl.c \
-                        $(SOURCE_DIR)/neuron/population_table/population_table_binary_search_impl.c \
-                        $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c \
-                        $(SYNAPTOGENESIS_DYNAMICS)
-
 STDP_ENABLED = 0
 ifneq ($(SYNAPSE_DYNAMICS), $(SOURCE_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c)
     STDP += $(SYNAPSE_DYNAMICS) \
@@ -98,15 +85,6 @@ endif
 include $(SPINN_DIRS)/make/FrontEndCommon.mk
 FEC_OPT = $(OSPACE)
 CFLAGS += -I$(NEURAL_MODELLING_DIRS)/src
-
-define synapse_type_rule
-$$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H)
-	-mkdir -p $$(dir $$@)
-	$$(CC) -D__FILE__=\"$$(notdir $$*.c)\" -DLOG_LEVEL=$(SYNAPSE_DEBUG) \
-	        $$(CFLAGS) \
-	        -DSTDP_ENABLED=$(STDP_ENABLED) \
-	        -include $(SYNAPSE_TYPE_H) -o $$@ $$<
-endef
 
 define stdp_rule
 $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
@@ -121,7 +99,6 @@ $$(call build_dir, $(1)): $(1) $$(SYNAPSE_TYPE_H) \
 	      -include $$(TIMING_DEPENDENCE_H) -o $$@ $$<
 endef
 
-$(foreach obj, $(SYNAPSE_TYPE_SOURCES), $(eval $(call synapse_type_rule, $(obj))))
 $(foreach obj, $(STDP), $(eval $(call stdp_rule, $(obj))))
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE) $(SYNAPSE_TYPE_H)
@@ -149,4 +126,5 @@ $(NEURON_O): $(SOURCE_DIR)/neuron/neuron.c $(NEURON_MODEL_H) \
 	      -include $(SYNAPSE_TYPE_H) \
 	      -include $(INPUT_TYPE_H) \
 	      -include $(THRESHOLD_TYPE_H) \
-	      -include $(ADDITIONAL_INPUT_H) -o $@ $<
+	      -include $(ADDITIONAL_INPUT_H) \
+	      -include $(SOURCE_DIR)/neuron/implementations/neuron_impl_standard.h -o $@ $<

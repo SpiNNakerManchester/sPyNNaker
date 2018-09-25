@@ -5,9 +5,9 @@ from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
 
 def test_selector():
     simulator = MockSimulator.setup()
-    vertex = IFCurrExpBase(5)
+    model = IFCurrExpBase()
     pop_1 = PyNNPopulationCommon(spinnaker_control=simulator, size=5,
-                                 vertex=vertex,
+                                 label="Test", constraints=None, model=model,
                                  structure=None, initial_values=None)
     pop_1.set("tau_m", 2)
     values = pop_1.get("tau_m")
