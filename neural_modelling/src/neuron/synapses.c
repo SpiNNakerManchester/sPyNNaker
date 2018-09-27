@@ -102,14 +102,16 @@ static inline void _print_ring_buffers(uint32_t time) {
             bool empty = true;
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                 empty = empty && (ring_buffers[
-                    synapses_get_ring_buffer_index(d + time, t, n)] == 0);
+                    synapses_get_ring_buffer_index(d + time, t, n,
+                       synapse_type_index_bits, synapse_index_bits)] == 0);
             }
             if (!empty) {
                 io_printf(IO_BUF, "%3d(%s):", n, type_string);
                 for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                     log_debug(" ");
                     uint32_t ring_buffer_index =
-                        synapses_get_ring_buffer_index(d + time, t, n);
+                        synapses_get_ring_buffer_index(d + time, t, n,
+                           synapse_type_index_bits, synapse_index_bits);
                     synapses_print_weight(ring_buffers[ring_buffer_index],
                                           ring_buffer_to_input_left_shifts[t]);
                 }
