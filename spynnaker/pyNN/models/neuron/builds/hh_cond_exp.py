@@ -1,25 +1,20 @@
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 
 
-class HHCondExp(AbstractPopulationVertex):
+@defaults
+class HHCondExp(object):
     """ Single-compartment Hodgkin-Huxley model with exponentially decaying \
         current input.
     """
 
     # noinspection PyPep8Naming
+    @default_initial_values({"v", "gsyn_exc", "gsyn_inh"})
     def __init__(
-            self, n_neurons, spikes_per_second=None, ring_buffer_sigma=None,
-            incoming_spike_buffer_size=None, constraints=None, label=None,
-            gbar_K=6.0, cm=0.2, e_rev_Na=50.0, tau_syn_E=0.2, tau_syn_I=2.0,
-            i_offset=0.0, g_leak=0.01, e_rev_E=0.0, gbar_Na=20.0,
-            e_rev_leak=-65.0, e_rev_I=-80, e_rev_K=-90.0, v_offset=-63,
-            v_init=None):
+            self, gbar_K=6.0, cm=0.2, e_rev_Na=50.0, tau_syn_E=0.2,
+            tau_syn_I=2.0, i_offset=0.0, g_leak=0.01, e_rev_E=0.0,
+            gbar_Na=20.0, e_rev_leak=-65.0, e_rev_I=-80, e_rev_K=-90.0,
+            v_offset=-63, v=-65.0, gsyn_exc=0.0, gsyn_inh=0.0):
         # pylint: disable=too-many-arguments, too-many-locals, unused-argument
         raise SpynnakerException(
             "This neuron model is currently not supported by the tool chain")
-
-    @staticmethod
-    def set_model_max_atoms_per_core(new_value):
-        """ ???
-        """

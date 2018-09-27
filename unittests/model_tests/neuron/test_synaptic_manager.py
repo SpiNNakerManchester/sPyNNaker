@@ -33,8 +33,6 @@ from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector, AllToAllConnector
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.synapse_types \
-    import AbstractSynapseType
 
 from unittests.mocks import MockSimulator
 
@@ -90,30 +88,6 @@ class SimpleApplicationVertex(ApplicationVertex):
         return ResourceContainer()
 
 
-class MockSynapseType(AbstractSynapseType):
-
-    def get_n_synapse_types(self):
-        return 2
-
-    def get_synapse_id_by_target(self, target):
-        return 0
-
-    def get_synapse_targets(self):
-        return [0, 1]
-
-    def get_n_synapse_type_parameters(self):
-        return 0
-
-    def get_synapse_type_parameters(self):
-        return []
-
-    def get_synapse_type_parameter_types(self):
-        return []
-
-    def get_n_cpu_cycles_per_neuron(self):
-        return 0
-
-
 class TestSynapticManager(unittest.TestCase):
 
     def test_retrieve_synaptic_block(self):
@@ -127,7 +101,7 @@ class TestSynapticManager(unittest.TestCase):
         key = 0
 
         synaptic_manager = SynapticManager(
-            synapse_type=None, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, False)]}),
@@ -181,7 +155,7 @@ class TestSynapticManager(unittest.TestCase):
             struct.pack("<IIIIIIII", 0, 1, 0, 3, 0, 1, 0, 4))
 
         synaptic_manager = SynapticManager(
-            synapse_type=None, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, True), (1, n_rows * 4, True)]}),
@@ -290,10 +264,8 @@ class TestSynapticManager(unittest.TestCase):
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
         spec.reserve_memory_region(synapse_region, all_syn_block_sz)
 
-        synapse_type = MockSynapseType()
-
         synaptic_manager = SynapticManager(
-            synapse_type=synapse_type, ring_buffer_sigma=5.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
