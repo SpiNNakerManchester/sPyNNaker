@@ -85,7 +85,7 @@ static input_t additional_input_get_input_value_as_current(
 
         additional_input->e_to_t_on_tau_m_H =
                   expk(
-                 -1.0k *
+                 -0.1k *
                   (expk(-14.59k - 0.086k * membrane_voltage)
                  + expk(-1.87k + 0.0701k * membrane_voltage)));
 
@@ -116,12 +116,12 @@ static input_t additional_input_get_input_value_as_current(
        }
 
        additional_input->e_to_t_on_tau_m_T = expk(
-          -1.0k /
+          -0.1k /
           (0.13k + 0.22k / (expk(-0.05988k * (membrane_voltage+132k))             // 1/16.7=0.05988023952
                              + expk(0.054945k * (membrane_voltage + 16.8k)))));    // 1/18.2=0.05494505494
 
        additional_input->e_to_t_on_tau_h_T = expk(
-           -1.0k /
+           -0.1k /
            (8.2k +
            (56.6k + 0.27k * expk((membrane_voltage + 115.2k) * 0.2k)) /            // 1/5.0=0.2
            (1.0k + expk((membrane_voltage + 86.0k) * 0.3125k))));                  // 1/3.2=0.3125
@@ -179,7 +179,9 @@ static input_t additional_input_get_input_value_as_current(
                              - additional_input->D_infinity)
                              * additional_input->e_to_t_on_tau_m_DK;
 
-        accum D_cube = (additional_input->D-0.05) * (additional_input->D-0.05) *  (additional_input->D-0.05);
+        accum D_cube = (additional_input->D)//-0.05)
+        		* (additional_input->D)//-0.05)
+				*  (additional_input->D);//-0.05);
          // the 0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way
          // the error is minimal. BUTVERIFY IF THIS IS STILL NEEDED.
 
