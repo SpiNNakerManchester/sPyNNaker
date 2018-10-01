@@ -189,10 +189,6 @@ static inline void _process_fixed_synapses(
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
             delay + time, combined_synapse_neuron_index,
             synapse_type_index_bits);
-//    io_printf("received a spike");
-	log_info("spike on target: %u",
-        		synapse_row_sparse_type(synaptic_word, synapse_index_bits, synapse_type_mask)
-				);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
