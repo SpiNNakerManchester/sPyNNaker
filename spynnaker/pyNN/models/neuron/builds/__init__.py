@@ -12,10 +12,12 @@ from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_comb_exp_2E2I import IFCurrCombExp2E2I
+from .if_cond_exp_2E2I import IFCondExp2E2I
 
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
-           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrCombExp2E2I"]
+           "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrCombExp2E2I",
+           "IFCondExp2E2I"]

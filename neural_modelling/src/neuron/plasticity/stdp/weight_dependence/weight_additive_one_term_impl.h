@@ -75,7 +75,7 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
         new_state.a2_minus, new_state.weight_region->a2_minus);
 
     // Apply all terms to initial weight
-    int32_t new_weight = new_state.initial_weight + scaled_a2_plus
+    int32_t new_weight = new_state.initial_weight - scaled_a2_plus
                          - scaled_a2_minus;
 
     // Clamp new weight

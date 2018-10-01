@@ -8,7 +8,7 @@ logger = logging.getLogger(__file__)
 
 class AllToAllConnector(AbstractConnector):
     """ Connects all cells in the presynaptic population to all cells in \
-        the postsynaptic population
+        the postsynaptic population.
     """
 
     __slots__ = [
@@ -16,13 +16,13 @@ class AllToAllConnector(AbstractConnector):
 
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
-
-        :param `bool` allow_self_connections:
-            if the connector is used to connect a
-            Population to itself, this flag determines whether a neuron is
-            allowed to connect to itself, or only to other neurons in the
+        :param allow_self_connections:
+            if the connector is used to connect a\
+            Population to itself, this flag determines whether a neuron is\
+            allowed to connect to itself, or only to other neurons in the\
             Population.
-    """
+        :type allow_self_connections: bool
+        """
         super(AllToAllConnector, self).__init__(safe, verbose)
         self._allow_self_connections = allow_self_connections
         self._weights = None
@@ -30,24 +30,22 @@ class AllToAllConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
+        if self._weights is not None:
+            logger.warning(
+                'Weights were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
+        if self._delays is not None:
+            logger.warning(
+                'Delays were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
-        """ Get a slice of the overall set of connections
+        """ Get a slice of the overall set of connections.
         """
         n_post_neurons = self._n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1

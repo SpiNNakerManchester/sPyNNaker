@@ -2,12 +2,14 @@ import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class OneToOneConnector(AbstractConnector):
-    """
-    Where the pre- and postsynaptic populations have the same size, connect\
-    cell i in the presynaptic pynn_population.py to cell i in the\
-    postsynaptic pynn_population.py for all i.
+    """ Where the pre- and postsynaptic populations have the same size,\
+        connect cell i in the presynaptic pynn_population.py to cell i in the\
+        postsynaptic pynn_population.py for all i.
     """
     __slots__ = ["_random_number_class"]
 
@@ -20,18 +22,16 @@ class OneToOneConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
+        if self._weights is not None:
+            logger.warning(
+                'Weights were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
+        if self._delays is not None:
+            logger.warning(
+                'Delays were already set in '+str(self)+', possibly in '
+                'another projection: currently this will overwrite the values '
+                'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)

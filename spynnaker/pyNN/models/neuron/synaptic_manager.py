@@ -675,7 +675,7 @@ class SynapticManager(object):
                 pre_vertex_slice, delayed_source_ids, delay_stages)
         elif delayed_source_ids.size != 0:
             raise Exception(
-                "Found delayed source ids but no delay "
+                "Found delayed source IDs but no delay "
                 "machine edge for {}".format(app_edge.label))
 
         if (app_edge, synapse_info) in self._pre_run_connection_holders:
@@ -989,7 +989,7 @@ class SynapticManager(object):
 
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-        # locate sdram address to where the synapse parameters are stored
+        # locate SDRAM address to where the synapse parameters are stored
         synapse_region_sdram_address = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             transceiver)

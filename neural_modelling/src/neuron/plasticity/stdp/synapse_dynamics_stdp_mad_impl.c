@@ -3,7 +3,6 @@
 
 // sPyNNaker neural modelling includes
 #include <neuron/synapses.h>
-#include "../synapse_dynamics.h"
 
 // Plasticity includes
 #include "maths.h"

@@ -55,6 +55,7 @@ typedef enum extra_provenance_data_region_entries{
     SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
+	PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -94,7 +95,7 @@ uint32_t count_rewires = 0;
 
 
 //! \brief Initialises the recording parts of the model
-//! \param[in] recording_address: the address in sdram where to store
+//! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(address_t recording_address){
@@ -114,6 +115,8 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
         spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
+    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+    		synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
 
@@ -219,7 +222,7 @@ static bool initialise(uint32_t *timer_period) {
 }
 
 //! \brief the function to call when resuming a simulation
-//! return None
+//! \return None
 void resume_callback() {
     recording_reset();
 
@@ -259,7 +262,7 @@ void timer_callback(uint timer_count, uint unused) {
 
         log_debug("Completed a run");
 
-        // rewrite neuron params to sdram for reading out if needed
+        // rewrite neuron params to SDRAM for reading out if needed
         address_t address = data_specification_get_data_address();
         neuron_store_neuron_parameters(
             data_specification_get_region(NEURON_PARAMS_REGION, address));
