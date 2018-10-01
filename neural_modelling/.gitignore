@@ -1,3 +1,5 @@
 /Debug
 /.cproject
 /.project
+*modified_src/
+*builds/

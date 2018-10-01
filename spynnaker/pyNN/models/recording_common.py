@@ -6,7 +6,6 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from collections import defaultdict
 import numpy
@@ -79,17 +78,15 @@ class RecordingCommon(object):
         self._write_to_files_indicators[variable] = to_file
 
         if variable == "gsyn_exc":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
+            if not self._population._vertex.conductance_based:
                 logger_utils.warn_once(
                     logger, "You are trying to record the excitatory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
         elif variable == "gsyn_inh":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
+            if not self._population._vertex.conductance_based:
                 logger_utils.warn_once(
-                    logger, "You are trying to record the inhibtatory "
+                    logger, "You are trying to record the inhibitory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
 
