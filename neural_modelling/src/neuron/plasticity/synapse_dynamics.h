@@ -33,6 +33,11 @@ void synapse_dynamics_print_plastic_synapses(
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
 
+//! \brief returns the number of ring buffer saturation events due to adding
+//! plastic weights.
+//! \return counter for saturation events or 0
+uint32_t synapse_dynamics_get_plastic_saturation_count();
+
 void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array);
 
 void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array);

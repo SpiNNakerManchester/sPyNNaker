@@ -373,6 +373,9 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
     return num_plastic_pre_synaptic_events;
 }
 
+uint32_t synapse_dynamics_get_plastic_saturation_count(){
+	return plastic_saturation_count;
+}
 
 void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_plasticity = neuron_array;
