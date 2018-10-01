@@ -1,17 +1,4 @@
-# If SPINN_DIRS is not defined, this is an error!
-ifndef SPINN_DIRS
-    $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
-endif
-# If NEURAL_MODELLING_DIRS is not defined, this is an error!
-ifndef NEURAL_MODELLING_DIRS
-    $(error NEURAL_MODELLING_DIRS is not set.  Please define NEURAL_MODELLING_DIRS (possibly by running "source setup" in the sPyNNaker folder))
-endif
-
-MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CHECK_PATH := $(NEURAL_MODELLING_DIRS)/src/common.mk
-ifneq ($(CHECK_PATH), $(MAKEFILE_PATH))
-    $(error Please check NEURAL_MODELLING_DIRS as based on that this file is at $(CHECK_PATH) when it is actually at $(MAKEFILE_PATH))
-endif
-
-include $(NEURAL_MODELLING_DIRS)/src/paths.mk
-include $(SPINN_DIRS)/make/FrontEndCommon.mk
+# THIS FILE WAS USED IN AN OLDER MAKE STYLE
+# Make now has to convert c files before building
+# SEE http://spinnakermanchester.github.io/spynnaker/5.0.0/Makefiles.html
+$(error inclusion of sPyNNaker/neural_modelling/src/common.mk)

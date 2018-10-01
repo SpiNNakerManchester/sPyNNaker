@@ -544,7 +544,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
             rewiring_dma_buffer.sdram_writeback_address,\
             rewiring_dma_buffer.row, DMA_WRITE,\
             rewiring_dma_buffer.n_bytes_transferred)) {\
-        log_error(msg);\
+        log_error("%s", msg);\
         }\
     } while (0)
 

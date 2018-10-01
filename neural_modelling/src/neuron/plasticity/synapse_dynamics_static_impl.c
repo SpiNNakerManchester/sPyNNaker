@@ -7,10 +7,11 @@ static additional_input_pointer_t additional_input_array_plasticity;
 static threshold_type_pointer_t threshold_type_array_plasticity;
 
 address_t synapse_dynamics_initialise(
-        address_t address, uint32_t n_neurons,
+        address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
     use(address);
     use(n_neurons);
+    use(n_synapse_types);
     use(ring_buffer_to_input_buffer_left_shifts);
     return address;
 }
@@ -55,7 +56,7 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
 }
 
 uint32_t synapse_dynamics_get_plastic_saturation_count(){
-	return 0;
+    return 0;
 }
 
 
