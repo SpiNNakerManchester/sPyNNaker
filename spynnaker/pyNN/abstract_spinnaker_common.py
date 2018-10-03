@@ -466,3 +466,18 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :return:
         """
         self._id_counter = new_value
+
+    def generate_bibtex(
+            self, top_module, doi_title, zenodo_access_token, tools_doi):
+        """ helper method for building bibtex from citation.cff's
+        
+        :param top_module: the top module to start aggregating the \
+        citation.cffs from
+        :param doi_title: the title of the doi
+        :param zenodo_access_token: the access token for zenodo
+        :param tools_doi: the doi of the tools 
+        :rtype: None 
+        """
+        AbstractSpinnakerBase._generate_bibtex(
+            self, top_module=top_module, doi_title=doi_title,
+            zenodo_access_token=zenodo_access_token, tools_doi=tools_doi)
