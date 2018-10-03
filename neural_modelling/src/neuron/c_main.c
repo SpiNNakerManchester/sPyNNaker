@@ -16,6 +16,7 @@
  */
 
 #include <common/in_spikes.h>
+#include "regions.h"
 #include "neuron.h"
 #include "synapses.h"
 #include "spike_processing.h"
@@ -36,19 +37,6 @@
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
        constant
 #endif
-
-//! human readable definitions of each region in SDRAM
-typedef enum regions_e{
-    SYSTEM_REGION,
-    NEURON_PARAMS_REGION,
-    SYNAPSE_PARAMS_REGION,
-    POPULATION_TABLE_REGION,
-    SYNAPTIC_MATRIX_REGION,
-    SYNAPSE_DYNAMICS_REGION,
-    RECORDING_REGION,
-    PROVENANCE_DATA_REGION,
-    PROFILER_REGION
-} regions_e;
 
 typedef enum extra_provenance_data_region_entries{
     NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
@@ -165,14 +153,15 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address;
+    address_t indirect_synapses_address = data_specification_get_region(
+        SYNAPTIC_MATRIX_REGION, address);
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            data_specification_get_region(DIRECT_MATRIX_REGION, address),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
-            &indirect_synapses_address, &direct_synapses_address)) {
+            &direct_synapses_address)) {
         return false;
     }
 
