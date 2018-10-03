@@ -47,8 +47,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
-            extra_load_algorithms=None, front_end_versions=None,
-            top_level_module=None):
+            extra_load_algorithms=None, front_end_versions=None):
         # pylint: disable=too-many-arguments, too-many-locals
 
         # add model binaries
@@ -98,8 +97,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             default_config_paths=[
                 os.path.join(os.path.dirname(__file__),
                              self.CONFIG_FILE_NAME)],
-            front_end_versions=versions,
-            top_level_module=top_level_module)
+            front_end_versions=versions)
 
         extra_mapping_inputs = dict()
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
