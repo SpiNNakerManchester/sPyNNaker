@@ -246,15 +246,15 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // Enter pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
         address_t address = data_specification_get_data_address();
         neuron_store_neuron_parameters(
             data_specification_get_region(NEURON_PARAMS_REGION, address));
-
-        // Enter pause and resume state to avoid another tick
-        simulation_handle_pause_resume(resume_callback);
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
@@ -271,6 +271,8 @@ void timer_callback(uint timer_count, uint unused) {
         time -= 1;
 
         log_debug("Rewire tries = %d", count_rewires);
+
+        simulation_ready_to_read();
 
         return;
     }
