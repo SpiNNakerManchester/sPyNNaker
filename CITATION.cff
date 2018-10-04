@@ -1,135 +1,133 @@
-cff-version: 1.0.3
-message: If you use this software, please cite it as below.
 authors:
-- family-names: Stokes
+- affiliation: University Of Manchester
+  email: alan.stokes-2@manchester.ac.uk
+  family-names: Stokes
   given-names: Alan
   orcid: https://orcid.org/0000-0002-6110-1484
-  affiliation: "University Of Manchester"
-  email: alan.stokes-2@manchester.ac.uk
   website: http://www.cs.man.ac.uk/~stokesa6/
-- family-names: Rowley
+- affiliation: University Of Manchester
+  email: Andrew.Rowley@manchester.ac.uk
+  family-names: Rowley
   given-names: Andrew
   orcid: https://orcid.org/0000-0002-2646-8520
-  affiliation: "University Of Manchester"
-  email: Andrew.Rowley@manchester.ac.uk
   website: https://www.researchgate.net/profile/Andrew_Rowley2
-- family-names: Gait
+- affiliation: University Of Manchester
+  email: Andrew.Gait@manchester.ac.uk
+  family-names: Gait
   given-names: Andrew
   orcid: http://orcid.org/0000-0001-9349-1096
-  affiliation: "University Of Manchester"
-  email: Andrew.Gait@manchester.ac.uk
   website: https://personalpages.manchester.ac.uk/staff/Andrew.Gait/
-- family-names: Stöckel
+- email: andreas.stoeckel@googlemail.com
+  family-names: Stöckel
   given-names: Andreas
-  email: andreas.stoeckel@googlemail.com
   website: http://compneuro.uwaterloo.ca/people/andreas-stoeckel.html
-- family-names: Brenninkmeijer
+- affiliation: University Of Manchester
+  email: christian.brenninkmeijer@manchester.ac.uk
+  family-names: Brenninkmeijer
   given-names: Christian Y.
   orcid: https://orcid.org/0000-0002-2937-7819
-  affiliation: "University Of Manchester"
-  email: christian.brenninkmeijer@manchester.ac.uk
   website: https://www.researchgate.net/profile/Christian_Brenninkmeijer
-- family-names: Fellows
+- affiliation: University Of Manchester
+  email: donal.k.fellows@manchester.ac.uk
+  family-names: Fellows
   given-names: Donal
   orcid: https://orcid.org/0000-0002-9091-5938
-  affiliation: "University Of Manchester"
-  email: donal.k.fellows@manchester.ac.uk
   website: http://www.cs.manchester.ac.uk/about-us/staff/profile/?ea=donal.k.fellows
-- family-names: Lester
+- affiliation: University Of Manchester
+  email: david.r.lester@manchester.ac.uk
+  family-names: Lester
   given-names: David
   orcid: https://orcid.org/0000-0002-7267-291X
-  affiliation: "University Of Manchester"
-  email: david.r.lester@manchester.ac.uk
   website: http://apt.cs.manchester.ac.uk/people/dlester/
-- family-names: Ceccotti
-  given-names: Arthur
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: arthur.ceccotti@student.manchester.ac.uk
+  family-names: Ceccotti
+  given-names: Arthur
   website: https://www.linkedin.com/in/arthur-ceccotti-07359483
-- family-names: Plana
+- affiliation: University Of Manchester
+  email: luis.plana@manchester.ac.uk
+  family-names: Plana
   given-names: Luis
   orcid: https://orcid.org/0000-0002-6113-3929
-  affiliation: "University Of Manchester"
-  email: luis.plana@manchester.ac.uk
   website: https://www.research.manchester.ac.uk/portal/luis.plana.html
-- family-names: Mikaitis
+- affiliation: University Of Manchester
+  email: mantas.mikaitis@manchester.ac.uk
+  family-names: Mikaitis
   given-names: Mantas
   orcid: https://orcid.org/0000-0001-8706-1436
-  affiliation: "University Of Manchester"
-  email: mantas.mikaitis@manchester.ac.uk
   website: http://apt.cs.manchester.ac.uk/people/mmikaitis/
-- family-names: Heathcote
-  given-names: Jonathan
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: jheathcote@cs.man.ac.uk
+  family-names: Heathcote
+  given-names: Jonathan
   website: http://apt.cs.manchester.ac.uk/people/jheathcote/
-- family-names: Mundy
-  given-names: Andrew
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: andrew.mundy@ieee.org
+  family-names: Mundy
+  given-names: Andrew
   website: https://www.linkedin.com/in/andrew-mundy-56422627/
-- family-names: Knight
-  given-names: James
-  affiliation: "University Of Sussex"
+- affiliation: University Of Sussex
   email: J.C.Knight@sussex.ac.uk
+  family-names: Knight
+  given-names: James
   website: http://www.sussex.ac.uk/profiles/415734
-- family-names: Rhodes
-  given-names: Oliver
-  affiliation:  "University Of Manchester"
+- affiliation: University Of Manchester
   email: oliver.rhodes@manchester.ac.uk
-  website: http://apt.cs.manchester.ac.uk/people/orhodes/
+  family-names: Rhodes
+  given-names: Oliver
   orcid: https://orcid.org/0000-0003-1728-2828
-- family-names: Bogdan
-  given-names: Petrut
-  affiliation: "University Of Manchester"
+  website: http://apt.cs.manchester.ac.uk/people/orhodes/
+- affiliation: University Of Manchester
   email: petrut.bogdan@manchester.ac.uk
-  website: https://personalpages.manchester.ac.uk/staff/petrut.bogdan/
+  family-names: Bogdan
+  given-names: Petrut
   orcid: https://orcid.org/0000-0001-5535-7865
-- family-names: Gafton
-  given-names: Paul
-  affiliation: "University Of Manchester"
+  website: https://personalpages.manchester.ac.uk/staff/petrut.bogdan/
+- affiliation: University Of Manchester
   email: paul.gafton@gmail.com
+  family-names: Gafton
+  given-names: Paul
   website: https://manchester.academia.edu/PaulGafton
-- family-names: Summerton
-  given-names: Sara
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: sara.summerton@student.manchester.ac.uk
+  family-names: Summerton
+  given-names: Sara
   website: https://www.linkedin.com/in/sara-summerton-67723637/
-- family-names: Davies
-  given-names: Sergio
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: sergio.davies@gmail.com
-  website: http://apt.cs.manchester.ac.uk/people/daviess/
+  family-names: Davies
+  given-names: Sergio
   orcid: https://orcid.org/0000-0001-5330-5527
-- family-names: Furber
-  given-names: Stephen
-  affiliation: "University Of Manchester"
+  website: http://apt.cs.manchester.ac.uk/people/daviess/
+- affiliation: University Of Manchester
   email: steve.furber@manchester.ac.uk
-  website: https://www.research.manchester.ac.uk/portal/steve.furber.html
+  family-names: Furber
+  given-names: Stephen
   orcid: https://orcid.org/0000-0002-6524-3367
-- family-names: Moy
-  given-names: Joanna
-  affiliation: "University Of Manchester"
+  website: https://www.research.manchester.ac.uk/portal/steve.furber.html
+- affiliation: University Of Manchester
   email: joanna.moy@manchester.ac.uk
+  family-names: Moy
+  given-names: Joanna
   website: http://apt.cs.manchester.ac.uk/people/jmoy/
-- family-names: Hopkins
-  given-names: Michael
-  affiliation: "University Of Manchester"
+- affiliation: University Of Manchester
   email: michael.hopkins@manchester.ac.uk
+  family-names: Hopkins
+  given-names: Michael
   website: http://apt.cs.manchester.ac.uk/people/mhopkins/
-
-title:
-  The common code for supporting the different PyNN Implementations for
-  executing on SpiNNaker machines.
-version:
-date-released:
-url: http://spinnakermanchester.github.io/
-repository: https://github.com/SpiNNakerManchester/sPyNNaker
+cff-version: 1.0.3
 contact:
-- name: SpiNNaker Software Team
-  address: University of Manchester, Oxford Road
+- address: University of Manchester, Oxford Road
   city: Manchester
-  post-code: M13 9PL
   country: GB
+  name: SpiNNaker Software Team
+  post-code: M13 9PL
+date-released:
 email: spinnakerusers@googlegroups.com
 identifier:
+message: If you use this software, please cite it as below.
+repository: https://github.com/SpiNNakerManchester/sPyNNaker
+title: The common code for supporting the different PyNN Implementations for executing
+  on SpiNNaker machines.
+url: http://spinnakermanchester.github.io/
+version:
