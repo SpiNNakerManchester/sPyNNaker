@@ -25,7 +25,7 @@ if os.environ.get('READTHEDOCS', None) != 'True':
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
 extensions = {".aplx", ".boot", ".cfg", ".json", ".sql", ".template", ".xml",
-              ".xsd"}
+              ".xsd", ".dict"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []

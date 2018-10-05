@@ -8,7 +8,8 @@ ifndef NEURAL_MODELLING_DIRS
 endif
 #Check NEURAL_MODELLING_DIRS
 MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-ifneq ($(NEURAL_MODELLING_DIRS)/makefiles/neural_support.mk, $(MAKEFILE_PATH))
+CHECK_PATH := $(NEURAL_MODELLING_DIRS)/makefiles/neural_support.mk
+ifneq ($(CHECK_PATH), $(MAKEFILE_PATH))
     $(error Please check NEURAL_MODELLING_DIRS as based on that this file is at $(CHECK_PATH) when it is actually at $(MAKEFILE_PATH))
 endif
 

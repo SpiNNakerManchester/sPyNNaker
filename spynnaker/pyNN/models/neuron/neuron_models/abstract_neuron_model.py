@@ -68,4 +68,4 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         # Assume that the global data doesn't change
         offset += (self.global_struct.get_size_in_whole_words() * 4)
         return super(AbstractNeuronModel, self).read_data(
-            self, data, offset, vertex_slice, parameters, state_variables)
+            data, offset, vertex_slice, parameters, state_variables)

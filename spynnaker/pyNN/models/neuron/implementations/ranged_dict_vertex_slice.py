@@ -17,6 +17,11 @@ class RangedDictVertexSlice(object):
         return _RangedListVertexSlice(
             self._ranged_dict[key], self._vertex_slice)
 
+    def __setitem__(self, key, value):
+        ranged_list_vertex_slice = _RangedListVertexSlice(
+            self._ranged_dict[key], self._vertex_slice)
+        ranged_list_vertex_slice.__setitem__(value)
+
 
 class _RangedListVertexSlice(object):
     """ A slice of ranged list to be used to update values
@@ -39,7 +44,7 @@ class _RangedListVertexSlice(object):
             # Go through and set the data in ranges
             start_index = 0
             for end_index in itertools.chain(
-                    changes, [self._vertex_slice.n_items]):
+                    changes, [self._vertex_slice.n_atoms]):
                 self._ranged_list.set_value_by_slice(
                     start_index, end_index, value[start_index])
                 start_index = end_index

@@ -135,8 +135,8 @@ class AbstractStandardNeuronComponent(object):
         :return: The offset after reading the data
         """
         values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
-        new_offset = offset + self.struct.get_size_in_whole_words(
-            vertex_slice.n_atoms)
+        new_offset = offset + (self.struct.get_size_in_whole_words(
+            vertex_slice.n_atoms) * 4)
         params = RangedDictVertexSlice(parameters, vertex_slice)
         variables = RangedDictVertexSlice(state_variables, vertex_slice)
         self.update_values(values, params, variables)
