@@ -9,71 +9,71 @@ import numpy
 
 EXC_A_RESPONSE = 'exc_a_response'
 EXC_CONST_A = 'exc_a_A'
-EXC_TAU_A = 'exc_tau_a'
+EXC_A_TAU = 'exc_a_tau'
 EXC_B_RESPONSE = 'exc_b_response'
 EXC_CONST_B = 'exc_b_B'
-EXC_TAU_B = 'exc_tau_b'
+EXC_B_TAU = 'exc_b_tau'
 EXC2_A_RESPONSE = 'exc2_a_response'
 EXC2_CONST_A = 'exc2_a_A'
-EXC2_TAU_A = 'exc2_tau_a'
+EXC2_A_TAU = 'exc2_a_tau'
 EXC2_B_RESPONSE = 'exc2_b_response'
 EXC2_CONST_B = 'exc2_b_B'
-EXC2_TAU_B = 'exc2_tau_b'
+EXC2_B_TAU = 'exc2_b_tau'
 INH_A_RESPONSE = 'inh_a_response'
 INH_CONST_A = 'inh_a_A'
-INH_TAU_A = 'inh_tau_a'
+INH_A_TAU = 'inh_a_tau'
 INH_B_RESPONSE = 'inh_b_response'
 INH_CONST_B = 'inh_b_B'
-INH_TAU_B = 'inh_tau_b'
+INH_B_TAU = 'inh_b_tau'
 INH2_A_RESPONSE = 'inh2_a_response'
 INH2_CONST_A = 'inh2_a_A'
-INH2_TAU_A = 'inh2_tau_a'
+INH2_A_TAU = 'inh2_a_tau'
 INH2_B_RESPONSE = 'inh2_b_response'
 INH2_CONST_B = 'inh2_b_B'
-INH2_TAU_B = 'inh2_tau_b'
+INH2_B_TAU = 'inh2_b_tau'
 
 UNITS = {
     EXC_CONST_A: "(Dimensionless)",
-    EXC_TAU_A: "ms",
+    EXC_A_TAU: "ms",
     EXC_CONST_B: "(Dimensionless)",
-    EXC_TAU_B: "ms",
+    EXC_B_TAU: "ms",
     EXC2_CONST_A: "(Dimensionless)",
-    EXC2_TAU_A: "ms",
+    EXC2_A_TAU: "ms",
     EXC2_CONST_B: "(Dimensionless)",
-    EXC2_TAU_B: "ms",
+    EXC2_B_TAU: "ms",
     INH_CONST_A: "(Dimensionless)",
-    INH_TAU_A: "ms",
+    INH_A_TAU: "ms",
     INH_CONST_B: "(Dimensionless)",
-    INH_TAU_B: "ms",
+    INH_B_TAU: "ms",
     INH2_CONST_A: "(Dimensionless)",
-    INH2_TAU_A: "ms",
+    INH2_A_TAU: "ms",
     INH2_CONST_B: "(Dimensionless)",
-    INH2_TAU_B: "ms"
+    INH2_B_TAU: "ms"
     }
 
-class SynapseTypeCombExp2E2I(abstractSynapseType):
+class SynapseTypeCombExp2E2I(AbstractSynapseType):
     slots = [
         '_exc_a_response'
         '_exc_a_A',
-        'exc_tau_a',
+        '_exc_a_tau',
         '_exc_B_response'
         '_exc_b_B',
         '_exc_tau_B',
         '_exc2_a_response'
         '_exc2_a_A',
-        '_exc2_tau_a',
+        '_exc2_a_tau',
         '_exc2_B_response'
         '_exc2_b_B',
         '_exc2_tau_B',
         '_inh_a_response'
         '_inh_a_A',
-        '_inh_tau_a',
+        '_inh_a_tau',
         '_inh_B_response'
         '_inh_b_B',
         '_inh_tau_B',
         '_inh2_a_response'
         '_inh2_a_A',
-        '_inh2_tau_a',
+        '_inh2_a_tau',
         '_inh2_B_response'
         '_inh2_b_B',
         '_inh2_tau_B'
@@ -108,7 +108,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
                 inh2_b_B,
                 inh2_b_tau):
 
-        super(SynapseTypeExponential2E2I, self).__init__([
+        super(SynapseTypeCombExp2E2I, self).__init__([
             DataType.S1615,  # exc_a_response
             DataType.S1615,  # exc_a
             DataType.U032,   # exc_a_decay
@@ -147,7 +147,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
             ])
 
 
-        # inhitatory
+        # excitatory
         self._exc_a_response = exc_a_response
         self._exc_a_A = exc_a_A
         self._exc_a_tau = exc_a_tau
@@ -175,7 +175,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
         self._inh_b_B = inh_b_B
         self._inh_b_tau = inh_b_tau
 
-        self.inh_a_A, self.inh_b_B = set_inhitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+        self.inh_a_A, self.inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
         # inhibitory 2
         self._inh2_a_response = inh2_a_response
@@ -185,7 +185,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
         self._inh2_b_B = inh2_b_B
         self._inh2_b_tau = inh2_b_tau
 
-        self.inh2_a_A, self.inh2_b_B = set_inhitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self.inh2_a_A, self.inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
 
 
@@ -195,21 +195,21 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[EXC_TAU_A] = self._exc_a_tau
+        parameters[EXC_A_TAU] = self._exc_a_tau
         parameters[EXC_CONST_A] = self._exc_a_A
-        parameters[EXC_TAU_B] = self._exc_b_tau
+        parameters[EXC_B_TAU] = self._exc_b_tau
         parameters[EXC_CONST_B] = self._exc_b_B
-        parameters[EXC2_TAU_A] = self._exc2_a_tau
+        parameters[EXC2_A_TAU] = self._exc2_a_tau
         parameters[EXC2_CONST_A] = self._exc2_a_A
-        parameters[EXC2_TAU_B] = self._exc2_b_tau
+        parameters[EXC2_B_TAU] = self._exc2_b_tau
         parameters[EXC2_CONST_B] = self._exc2_b_B
-        parameters[INH_TAU_A] = self._inh_a_tau
+        parameters[INH_A_TAU] = self._inh_a_tau
         parameters[INH_CONST_A] = self._inh_a_A
-        parameters[INH_TAU_B] = self._inh_b_tau
+        parameters[INH_B_TAU] = self._inh_b_tau
         parameters[INH_CONST_B] = self._inh_b_B
-        parameters[INH2_TAU_A] = self._inh2_a_tau
+        parameters[INH2_A_TAU] = self._inh2_a_tau
         parameters[INH2_CONST_A] = self._inh2_a_A
-        parameters[INH2_TAU_B] = self._inh2_b_tau
+        parameters[INH2_B_TAU] = self._inh2_b_tau
         parameters[INH2_CONST_B] = self._inh2_b_B
 
     @overrides(AbstractSynapseType.add_state_variables)
@@ -243,40 +243,40 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
         return [
             # excitatory
             state_variables[EXC_A_RESPONSE],
-            parameters[EXC_A_A],
-            parameters[EXC_TAU_A].apply_operation(decay),
-            parameters[EXC_TAU_A].apply_operation(init),
+            parameters[EXC_CONST_A],
+            parameters[EXC_A_TAU].apply_operation(decay),
+            parameters[EXC_A_TAU].apply_operation(init),
             state_variables[EXC_B_RESPONSE],
-            parameters[EXC_B_B],
-            parameters[EXC_TAU_B].apply_operation(decay),
-            parameters[EXC_TAU_B].apply_operation(init),
+            parameters[EXC_CONST_B],
+            parameters[EXC_B_TAU].apply_operation(decay),
+            parameters[EXC_B_TAU].apply_operation(init),
             # excitatory2
             state_variables[EXC_A_RESPONSE],
-            parameters[EXC2_A_A],
-            parameters[EXC2_TAU_A].apply_operation(decay),
-            parameters[EXC2_TAU_A].apply_operation(init),
+            parameters[EXC2_CONST_A],
+            parameters[EXC2_A_TAU].apply_operation(decay),
+            parameters[EXC2_A_TAU].apply_operation(init),
             state_variables[EXC2_B_RESPONSE],
-            parameters[EXC2_B_B],
-            parameters[EXC2_TAU_B].apply_operation(decay),
-            parameters[EXC2_TAU_B].apply_operation(init),
+            parameters[EXC2_CONST_B],
+            parameters[EXC2_B_TAU].apply_operation(decay),
+            parameters[EXC2_B_TAU].apply_operation(init),
             # Inhibitory
             state_variables[INH_A_RESPONSE],
-            parameters[INH_A_A],
-            parameters[INH_TAU_A].apply_operation(decay),
-            parameters[INH_TAU_A].apply_operation(init),
+            parameters[INH_CONST_A],
+            parameters[INH_A_TAU].apply_operation(decay),
+            parameters[INH_A_TAU].apply_operation(init),
             state_variables[INH_B_RESPONSE],
-            parameters[INH_B_B],
-            parameters[INH_TAU_B].apply_operation(decay),
-            parameters[INH_TAU_B].apply_operation(init),
+            parameters[INH_CONST_B],
+            parameters[INH_B_TAU].apply_operation(decay),
+            parameters[INH_B_TAU].apply_operation(init),
             # Inhibitory 2
             state_variables[INH2_A_RESPONSE],
-            parameters[INH2_A_A],
-            parameters[INH2_TAU_A].apply_operation(decay),
-            parameters[INH2_TAU_A].apply_operation(init),
+            parameters[INH2_CONST_A],
+            parameters[INH2_A_TAU].apply_operation(decay),
+            parameters[INH2_A_TAU].apply_operation(init),
             state_variables[INH2_B_RESPONSE],
-            parameters[INH2_B_B],
-            parameters[INH2_TAU_B].apply_operation(decay),
-            parameters[INH2_TAU_B].apply_operation(init)
+            parameters[INH2_CONST_B],
+            parameters[INH2_B_TAU].apply_operation(decay),
+            parameters[INH2_B_TAU].apply_operation(init)
             ]
 
     @overrides(AbstractSynapseType.update_values)
@@ -453,7 +453,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
     @inh_a_tau.setter
     def inh_a_tau(self, inh_a_tau):
         self._inh_a_tau = inh_a_tau
-        self.inh_a_A, self.inh_b_B = set_inhitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+        self.inh_a_A, self.inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
     @property
     def inh_b_response(self):
@@ -478,7 +478,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
     @inh_b_tau.setter
     def inh_b_tau(self, inh_b_tau):
         self._inh_b_tau = inh_b_tau
-        self.inh_a_A, self.inh_b_B = set_inhitatory_scalar(self._inh_a_tau, self._inh_b_tau)
+        self.inh_a_A, self.inh_b_B = set_excitatory_scalar(self._inh_a_tau, self._inh_b_tau)
 
     # inhibitory2
     @property
@@ -504,7 +504,7 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
     @inh2_a_tau.setter
     def inh2_a_tau(self, inh2_a_tau):
         self._inh2_a_tau = inh2_a_tau
-        self.inh2_a_A, self.inh2_b_B = set_inhitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self.inh2_a_A, self.inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
     @property
     def inh2_b_response(self):
@@ -529,25 +529,25 @@ class SynapseTypeCombExp2E2I(abstractSynapseType):
     @inh2_b_tau.setter
     def inh2_b_tau(self, inh2_b_tau):
         self._inh2_b_tau = inh2_b_tau
-        self.inh2_a_A, self.inh2_b_B = set_inhitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
+        self.inh2_a_A, self.inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
 
 
 
     ###########################################################
 
-def calc_rise_time(tau_a, tau_b, A=1, B=-1):
+def calc_rise_time(a_tau, b_tau, A=1, B=-1):
     try:
-        return numpy.log((A*tau_b) / (-B*tau_a)) * ( (tau_a*tau_b) / (tau_b - tau_a) )
+        return numpy.log((A*b_tau) / (-B*a_tau)) * ( (a_tau*b_tau) / (b_tau - a_tau) )
     except:
         "calculation failed: ensure A!=B and that they are of opposite sign"
 
-def calc_scalar_f(tau_a, tau_b):
-    t_rise = calc_rise_time(tau_a = tau_a, tau_b=tau_b)
-    return 1/(numpy.exp(-t_rise/tau_a) - numpy.exp(-t_rise/tau_b))
+def calc_scalar_f(a_tau, b_tau):
+    t_rise = calc_rise_time(a_tau = a_tau, b_tau=b_tau)
+    return 1/(numpy.exp(-t_rise/a_tau) - numpy.exp(-t_rise/b_tau))
 
 def set_excitatory_scalar(exc_a_tau, exc_b_tau):
-    sf = calc_scalar_f(tau_a = exc_a_tau, tau_b=exc_b_tau)
+    sf = calc_scalar_f(a_tau = exc_a_tau, b_tau=exc_b_tau)
     a_A = sf
     b_B = -sf
     return a_A, b_B

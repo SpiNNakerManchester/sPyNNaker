@@ -8,6 +8,7 @@ typedef uint16_t post_trace_t;
 typedef uint16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h>
+#include <neuron/threshold_types/threshold_type_static.h>
 
 #include "timing.h"
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
@@ -295,7 +296,7 @@ static inline update_state_t timing_apply_post_spike(
              } else { // syn_type excit 2 or inhib-1:
                       previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
                                                                syn_type, STDP_FIXED_POINT_ONE);
-             
+
              }
          }
       }

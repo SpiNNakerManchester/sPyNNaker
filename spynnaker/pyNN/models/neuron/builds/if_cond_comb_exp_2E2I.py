@@ -1,16 +1,11 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron.neuron_models\
-    .neuron_model_leaky_integrate_and_fire_v_hist \
+from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelLeakyIntegrateAndFireVHist
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp_2E2I\
-    import SynapseTypeCombExp2E2I
-from spynnaker.pyNN.models.neuron.input_types.input_type_current \
-    import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static \
-    import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance2E2I
+from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeCombExp2E2I
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-import numpy
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
@@ -59,28 +54,23 @@ default_parameters = {
 initialize_parameters = {'v_init': None}
 
 
-class IFCurrCombExp2E2I(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with 2 excitatory and 2 inhibitory \
-        synapses, each responding accodring to a combination of exponential \
-        functions: Ae^(-t/tau_a) + Be^(-t/tau_b)
+
+
+class IFCondCombExp2E2I(AbstractPyNNNeuronModelStandard):
+    """ Leaky integrate and fire neuron with an exponentially decaying \
+        conductance input.
     """
+
     @default_initial_values({"v", "v_hist",
                              "exc_a_response", "exc_b_response",
                              "exc2_a_response", "exc2_b_response",
                              "inh_a_response", "inh_b_response",
-                             "inh2_a_response", "inh2_b_response",
-                             })
-
+                             "inh2_a_response", "inh2_b_response"})
     def __init__(
-            self,
-            tau_m=default_parameters['tau_m'], cm=default_parameters['cm'],
-            v=initialize_parameters['v_init'],
-            v_rest=default_parameters['v_rest'],
-            v_reset=default_parameters['v_reset'],
-            v_thresh=default_parameters['v_thresh'],
-            v_hist=default_parameters['v_hist'],
-            tau_refrac=default_parameters['tau_refrac'],
-            i_offset=default_parameters['i_offset'],
+            self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
+            v_thresh=-50.0,  tau_refrac=0.1, v_hist=None,
+            i_offset=0.0, v=-65.0,
+            e_rev_E=0.0, e_rev_E2=5.0, e_rev_I=-70.0, e_rev_I2=-70.0,
 
             # excitatory
             exc_a_response=default_parameters['exc_a_response'],
@@ -112,13 +102,13 @@ class IFCurrCombExp2E2I(AbstractPyNNNeuronModelStandard):
             inh2_a_tau=default_parameters['inh2_a_tau'],
             inh2_b_response=default_parameters['inh2_b_response'],
             inh2_b_B=default_parameters['inh2_b_B'],
-            inh2_b_tau=default_parameters['inh2_b_tau']):
+            inh2_b_tau=default_parameters['inh2_b_tau']
 
+            ):
 
-        # Construct neuron/synapse objects
+        # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireVHist(
-            v, v_rest, tau_m, cm, i_offset,
-            v_reset, tau_refrac, v_hist)
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, v_hist)
 
         synapse_type = SynapseTypeCombExp2E2I(
                 # excitatory
@@ -151,13 +141,21 @@ class IFCurrCombExp2E2I(AbstractPyNNNeuronModelStandard):
                 inh2_a_tau,
                 inh2_b_response,
                 inh2_b_B,
-                inh2_b_tau)
+                inh2_b_tau
+            )
 
-        input_type = InputTypeCurrent()
+        input_type = InputTypeConductance2E2I(
+            e_rev_E,
+            e_rev_E2,
+            e_rev_I,
+            e_rev_I2
+            )
+
         threshold_type = ThresholdTypeStatic(v_thresh)
 
-        super(IFCurrCombExp2E2I, self).__init__(
-            model_name="IF_curr_comb_exp_2E2I", binary="IF_curr_comb_exp_2E2I.aplx",
+        super(IFCondCombExp2E2I, self).__init__(
+            model_name="IF_cond_comb_exp_2E2I", binary="IF_cond_comb_exp_2E2I.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)
+
 

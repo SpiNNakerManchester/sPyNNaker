@@ -41,7 +41,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            v_hist=None):
+            v_hist):
         super(NeuronModelLeakyIntegrateAndFireVHist, self).__init__(
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
@@ -120,6 +120,7 @@ class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
+        state_variables[V_HIST] = _v_hist
 
     @property
     def v_init(self):
