@@ -1,13 +1,11 @@
+from spinn_utilities.overrides import overrides
+from spinn_utilities.ranged.abstract_list import AbstractList
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
-    import get_exponential_decay_and_init
-
-from spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type import \
-    AbstractSynapseType
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_comb_exp\
-    import set_excitatory_scalar
-from data_specification.enums.data_type import DataType
-from enum import Enum
+from .abstract_synapse_type import AbstractSynapseType
+from data_specification.enums import DataType
+import numpy
 
 EXC_A_RESPONSE = 'exc_a_response'
 EXC_CONST_A = 'exc_a_A'
