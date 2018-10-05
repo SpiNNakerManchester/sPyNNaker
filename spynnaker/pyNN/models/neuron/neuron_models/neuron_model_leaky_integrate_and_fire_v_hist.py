@@ -1,85 +1,186 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.decorators import overrides
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from .neuron_model_leaky_integrate_and_fire import NeuronModelLeakyIntegrateAndFire
-from spynnaker.pyNN.utilities import utility_calls
-
+from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
 
 import numpy
-from enum import Enum
 
+V = "v"
+V_REST = "v_rest"
+TAU_M = "tau_m"
+CM = "cm"
+I_OFFSET = "i_offset"
+V_RESET = "v_reset"
+TAU_REFRAC = "tau_refrac"
+COUNT_REFRAC = "count_refrac"
 V_HIST = "v_hist"
 
-class _LIFVHist_TYPES(Enum):
-    V_HIST = (1, DataType.S1615)
-
-    def __new__(cls, value, data_type):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    V: 'mV',
+    V_REST: 'mV',
+    TAU_M: 'ms',
+    CM: 'nF',
+    I_OFFSET: 'nA',
+    V_RESET: 'mV',
+    TAU_REFRAC: 'ms',
+    V_HIST: "mV"
+}
 
 
-class NeuronModelLeakyIntegrateAndFireVHist(NeuronModelLeakyIntegrateAndFire):
+class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
+    __slots__ = [
+        "_v_init",
+        "_v_rest",
+        "_tau_m",
+        "_cm",
+        "_i_offset",
+        "_v_reset",
+        "_tau_refrac",
+        "_v_hist"
+        ]
 
     def __init__(
-            self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
-            tau_refrac, v_hist):
+            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
+            v_hist=None):
+        super(NeuronModelLeakyIntegrateAndFireVHist, self).__init__(
+            [DataType.S1615,   # v
+             DataType.S1615,   # v_rest
+             DataType.S1615,   # r_membrane (= tau_m / cm)
+             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
+             DataType.S1615,   # i_offset
+             DataType.INT32,   # count_refrac
+             DataType.S1615,   # v_reset
+             DataType.INT32,   # tau_refrac
+             DataType.S1615    # v_hist
+             ])
 
-        NeuronModelLeakyIntegrateAndFire.__init__(
-            self, n_neurons, v_init, v_rest, tau_m, cm, i_offset, v_reset,
-            tau_refrac)
+        if v_init is None:
+            v_init = v_rest
+        if v_hist is None: # initialise history V to initial V
+            v_hist = v_init
 
-#         self._v_hist = utility_calls.convert_param_to_numpy(
-#             v_hist, n_neurons)
-        self._data[V_HIST] = v_hist
-        self._my_units = {V_HIST: 'mV'}
+        self._v_init = v_init
+        self._v_rest = v_rest
+        self._tau_m = tau_m
+        self._cm = cm
+        self._i_offset = i_offset
+        self._v_reset = v_reset
+        self._tau_refrac = tau_refrac
+        self._v_hist = v_hist
+
+    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 100 * n_neurons
+
+    @overrides(AbstractNeuronModel.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[V_REST] = self._v_rest
+        parameters[TAU_M] = self._tau_m
+        parameters[CM] = self._cm
+        parameters[I_OFFSET] = self._i_offset
+        parameters[V_RESET] = self._v_reset
+        parameters[TAU_REFRAC] = self._tau_refrac
+
+    @overrides(AbstractNeuronModel.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[V] = self._v_init
+        state_variables[COUNT_REFRAC] = 0
+        state_variables[V_HIST] = self._v_hist
+
+    @overrides(AbstractNeuronModel.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractNeuronModel.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
+
+        # Add the rest of the data
+        return [state_variables[V], parameters[V_REST],
+                parameters[TAU_M] / parameters[CM],
+                parameters[TAU_M].apply_operation(
+                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                parameters[I_OFFSET], state_variables[COUNT_REFRAC],
+                parameters[V_RESET],
+                parameters[TAU_REFRAC].apply_operation(
+                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
+
+    @overrides(AbstractNeuronModel.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
+         _v_reset, _tau_refrac, _v_hist) = values
+
+        # Copy the changed data only
+        state_variables[V] = v
+        state_variables[COUNT_REFRAC] = count_refrac
+
+    @property
+    def v_init(self):
+        return self._v
+
+    @v_init.setter
+    def v_init(self, v_init):
+        self._v = v_init
+
+    @property
+    def v_rest(self):
+        return self._v_rest
+
+    @v_rest.setter
+    def v_rest(self, v_rest):
+        self._v_rest = v_rest
+
+    @property
+    def tau_m(self):
+        return self._tau_m
+
+    @tau_m.setter
+    def tau_m(self, tau_m):
+        self._tau_m = tau_m
+
+    @property
+    def cm(self):
+        return self._cm
+
+    @cm.setter
+    def cm(self, cm):
+        self._cm = cm
+
+    @property
+    def i_offset(self):
+        return self._i_offset
+
+    @i_offset.setter
+    def i_offset(self, i_offset):
+        self._i_offset = i_offset
+
+    @property
+    def v_reset(self):
+        return self._v_reset
+
+    @v_reset.setter
+    def v_reset(self, v_reset):
+        self._v_reset = v_reset
+
+    @property
+    def tau_refrac(self):
+        return self._tau_refrac
+
+    @tau_refrac.setter
+    def tau_refrac(self, tau_refrac):
+        self._tau_refrac = tau_refrac
 
     @property
     def v_hist(self):
-        return self._data[V_HIST]
+        return self._v_hist
 
     @v_hist.setter
     def v_hist(self, v_hist):
-        self._data.set_value(key=V_HIST, value=v_hist)
-
-    @overrides(NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters)
-    def get_n_neural_parameters(self):
-        return NeuronModelLeakyIntegrateAndFire.get_n_neural_parameters(self) + 1
-
-#     def _tau_refrac_timesteps(self, machine_time_step):
-#         return numpy.ceil(self._tau_refrac /
-#                           (machine_time_step / 1000.0))
-
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    def get_neural_parameters(self, machine_time_step):
-        params = NeuronModelLeakyIntegrateAndFire.get_neural_parameters(self)
-        params.extend([
-            # V history parameter (S1615)
-            NeuronParameter(
-                self._data[V_HIST],
-                _LIFVHist_TYPES.V_HIST.data_type),
-        ])
-        return params
-
-    @overrides(NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types)
-    def get_neural_parameter_types(self):
-        lif_types = NeuronModelLeakyIntegrateAndFire.get_neural_parameter_types(self)
-        lif_types.extend([item.data_type for item in _LIFVHist_TYPES])
-        return lif_types
-
-    def get_n_cpu_cycles_per_neuron(self):
-        # A guess - 20 for the reset procedure
-        return NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles_per_neuron(self) + 20
-
-    @overrides(NeuronModelLeakyIntegrateAndFire.get_units)
-    def get_units(self, variable):
-        if variable in self._my_units:
-            return self._my_units[variable]
-        else:
-            return NeuronModelLeakyIntegrateAndFire.get_units(variable)
+        self._v_hist = v_hist
