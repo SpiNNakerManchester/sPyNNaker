@@ -227,10 +227,13 @@ address_t synapse_dynamics_initialise(
     }
 
     uint32_t n_neurons_power_2 = n_neurons;
-    if (!is_power_of_2(n_neurons)) {
-        n_neurons_power_2 = next_power_of_2(n_neurons);
+    uint32_t log_n_neurons = 1;
+    if (n_neurons != 1) {
+    	if (!is_power_of_2(n_neurons)) {
+    		n_neurons_power_2 = next_power_of_2(n_neurons);
+    	}
+    	log_n_neurons = ilog_2(n_neurons_power_2);
     }
-    uint32_t log_n_neurons = ilog_2(n_neurons_power_2);
 
     uint32_t n_synapse_types_power_2 = n_synapse_types;
     if (!is_power_of_2(n_synapse_types)) {

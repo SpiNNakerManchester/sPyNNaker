@@ -463,19 +463,20 @@ class AbstractPopulationVertex(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "tags": "MemoryTags",
-        "n_machine_time_steps": "TotalMachineTimeSteps"
+        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "placements": "MemoryPlacements",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info", "tags",
-            "n_machine_time_steps"
+            "n_machine_time_steps", "placements",
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            tags, n_machine_time_steps):
+            tags, n_machine_time_steps, placements):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -528,7 +529,7 @@ class AbstractPopulationVertex(
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step)
+            weight_scale, machine_time_step, placements)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -862,3 +863,6 @@ class AbstractPopulationVertex(
 
     def __repr__(self):
         return self.__str__()
+
+    def gen_on_machine(self, vertex_slice):
+        return self._synapse_manager.gen_on_machine(vertex_slice)

@@ -1,6 +1,7 @@
 # utils imports
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.models.utility_models import synapse_expander
 
 # common front end imports
 from spinn_front_end_common.interface.abstract_spinnaker_base \
@@ -70,6 +71,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         extra_algorithm_xml_path.append(os.path.join(
             os.path.dirname(overridden_pacman_functions.__file__),
             "algorithms_metadata.xml"))
+        extra_algorithm_xml_path.append(os.path.join(
+            os.path.dirname(synapse_expander.__file__),
+            "synapse_expander.xml"))
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
@@ -106,6 +110,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        extra_load_algorithms.append("SynapseExpander")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):

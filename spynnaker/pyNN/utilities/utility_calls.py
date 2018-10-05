@@ -4,6 +4,7 @@ utility class containing simple helper methods
 import numpy
 import os
 import logging
+import math
 
 from spinn_utilities.safe_eval import SafeEval
 
@@ -164,13 +165,13 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 
 def get_probable_maximum_selected(
-        n_total_selections, n_selected, selection_prob, chance=(1.0 / 100.0)):
+        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
     """ Get the likely maximum number of items that will be selected from a\
-        set of n_selected from a total set of n_total_selections\
+        set of n_trials from a total set of n_total_trials\
         with a probability of selection of selection_prob
     """
-    prob = 1.0 - (chance / float(n_total_selections))
-    return binom.ppf(prob, n_selected, selection_prob)
+    prob = 1.0 - (chance / float(n_total_trials))
+    return binom.ppf(prob, n_trials, selection_prob)
 
 
 def get_probability_within_range(dist, lower, upper):
@@ -272,3 +273,13 @@ def check_sampling_interval(sampling_interval):
               "".format(sampling_interval, step * MAX_RATE)
         raise ConfigurationException(msg)
     return sampling_interval
+
+
+def get_n_bits(n_values):
+    """ Determine how many bits are required for the given number of values
+    """
+    if n_values == 0:
+        return 0
+    if n_values == 1:
+        return 1
+    return int(math.ceil(math.log(n_values, 2)))
