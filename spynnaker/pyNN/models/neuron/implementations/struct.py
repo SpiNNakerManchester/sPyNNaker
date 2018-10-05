@@ -114,7 +114,7 @@ class Struct(object):
         for i, data_type in enumerate(self.field_types):
 
             # Get the data to set for this item
-            values = numpy_data["f" + i]
+            values = numpy_data["f" + str(i)]
 
             items_to_return.append(values / float(data_type.scale))
 

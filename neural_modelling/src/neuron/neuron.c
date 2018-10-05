@@ -275,7 +275,7 @@ void neuron_store_neuron_parameters(address_t address){
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
-    next += n_words_for_n_neurons * (n_recorded_vars + 1);
+    next += (n_words_for_n_neurons + 2) * (n_recorded_vars + 1);
 
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(address, next, n_neurons);
