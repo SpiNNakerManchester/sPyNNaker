@@ -286,7 +286,7 @@ bool synapse_dynamics_process_plastic_synapses(
     if (plastic_synapse > 0)
     {
         // Get the synapse type from the first synapse in the row:
-        syn_type = synapse_row_sparse_type(*control_words, synapse_index_bits, synapse_type_mask);
+        syn_type = synapse_row_sparse_type(*control_words[1], synapse_index_bits, synapse_type_mask);
     }
 
     // Update pre-synaptic trace
