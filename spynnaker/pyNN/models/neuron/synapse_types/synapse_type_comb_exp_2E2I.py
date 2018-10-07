@@ -324,9 +324,6 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
     def get_synapse_targets(self):
         return "excitatory", "excitatory2", "inhibitory", "inhibitory2"
 
-
-
-
     #excitatory
     @property
     def exc_a_response(self):
@@ -531,14 +528,11 @@ class SynapseTypeCombExp2E2I(AbstractSynapseType):
         self._inh2_b_tau = inh2_b_tau
         self.inh2_a_A, self.inh2_b_B = set_excitatory_scalar(self._inh2_a_tau, self._inh2_b_tau)
 
-
-
-
     ###########################################################
 
 def calc_rise_time(a_tau, b_tau, A=1, B=-1):
     try:
-        return numpy.log((A*b_tau) / (-B*a_tau)) * ( (a_tau*b_tau) / (b_tau - a_tau) )
+        return numpy.log(float(A*b_tau) / float(-B*a_tau)) * ( float(a_tau*b_tau) / float(b_tau - a_tau) )
     except:
         "calculation failed: ensure A!=B and that they are of opposite sign"
 
