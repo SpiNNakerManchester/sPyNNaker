@@ -361,13 +361,21 @@ bool synapse_dynamics_process_plastic_synapses(
         
         if (STP==true){
           uint32_t accumulation = ring_buffers[ring_buffer_index] +
-                (current_stp_trace * synapse_structure_get_final_weight(
-                									final_state)) >> 11;
+                ((current_stp_trace * synapse_structure_get_final_weight(
+                									final_state)) >> 11);
         }else{
         accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
         }
 
+	    uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test){
+            accumulation = sat_test - 1;
+            plastic_saturation_count += 1;
+        }
+
+        ring_buffers[ring_buffer_index] = accumulation;
+	
         // Write back updated synaptic word to plastic region
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
             final_state);

@@ -22,7 +22,8 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_structural \
          IF_cond_exp_stdp_mad_pair_additive_structural \
-         IF_curr_exp_sEMD
+         IF_curr_exp_sEMD \
+         ht \
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
