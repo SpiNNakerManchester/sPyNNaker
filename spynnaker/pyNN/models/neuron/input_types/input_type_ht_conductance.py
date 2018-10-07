@@ -1,12 +1,7 @@
 from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-
 from .abstract_input_type import AbstractInputType
 
-from enum import Enum
 
 AMPA_REV_E = "ampa_rev_E"
 NMDA_REV_E = "nmda_rev_E"
@@ -14,114 +9,115 @@ GABA_A_REV_E = "gaba_a_rev_E"
 GABA_B_REV_E = "gaba_b_rev_E"
 
 
-class _CONDUCTANTCE_TYPES(Enum):
-    AMPA_REV_E = (1, DataType.S1615)
-    NMDA_REV_E = (2, DataType.S1615)
-    GABA_A_REV_E = (3, DataType.S1615)
-    GABA_B_REV_E = (4, DataType.S1615)
-
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    AMPA_REV_E: "mV",
+    NMDA_REV_E: "mV",
+    GABA_A_REV_E: "mV",
+    GABA_B_REV_E: "mV"
+}
 
 
-class InputTypeHTConductance(AbstractInputType, AbstractContainsUnits):
-    """ The conductance input type
-    """
-    __slots__ = [
-        "_data",
-        "_n_neurons",
-        "_units"]
+class InputTypeHTConductance(AbstractInputType):
 
-    def __init__(self,
-                 n_neurons,
-                 ampa_rev_E,
-                 nmda_rev_E,
-                 gaba_a_rev_E,
-                 gaba_b_rev_E
-                 ):
-        self._units = {
-            AMPA_REV_E: "mV",
-            NMDA_REV_E: "mV",
-            GABA_A_REV_E: "mV",
-            GABA_B_REV_E: "mV"
-        }
+    __slots__[
+        "ampa_rev_E",
+        "nmda_rev_E",
+        "gaba_a_rev_E",
+        "gaba_b_rev_E"
+        ]
 
-        self._n_neurons = n_neurons
-        self._data = SpynnakerRangeDictionary(size=n_neurons)
-        self._data[AMPA_REV_E] = ampa_rev_E
-        self._data[NMDA_REV_E] = nmda_rev_E
-        self._data[GABA_A_REV_E] = gaba_a_rev_E
-        self._data[GABA_B_REV_E] = gaba_b_rev_E
+    def __init__(self, ampa_rev_E, nmda_rev_E, gaba_a_rev_E, gaba_b_rev_E):
+        super(InputTypeConductance, self).__init__([
+            DataType.S1615,   # ampa_rev_E
+            DataType.S1615,   # nmda_rev_E
+            DataType.S1615,   # gaba_a_rev_E
+            DataType.S1615    # gaba_b_rev_E
+            ])
+        self._ampa_rev_E = ampa_rev_E
+        self._nmda_rev_E = nmda_rev_E
+        self._gaba_a_rev_E = gaba_a_rev_E
+        self._gaba_b_rev_E = gaba_b_rev_E
 
-    @property
-    def ampa_rev_E(self):
-        return self._data[AMPA_REV_E]
+    @overrides(AbstractInputType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 10 * n_neurons
 
-    @ampa_rev_E.setter
-    def ampa_rev_E(self, ampa_rev_E):
-        self._data.set_value(key=AMPA_REV_E, value=ampa_rev_E)
+    @overrides(AbstractInputType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[AMPA_REV_E] = self._ampa_rev_E
+        parameters[NMDA_REV_E] = self._ampa_rev_E
+        parameters[GABA_A_REV_E] = self._gaba_a_rev_E
+        parameters[GABA_B_REV_E] = self._gaba_b_rev_E
 
-    @property
-    def nmda_rev_E(self):
-        return self._data[NMDA_REV_E]
+    @overrides(AbstractInputType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        pass
 
-    @nmda_rev_E.setter
-    def nmda_rev_E(self, nmda_rev_E):
-        self._data.set_value(key=NMDA_REV_E, value=nmda_rev_E)
+    @overrides(AbstractInputType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
 
-    @property
-    def gaba_a_rev_E(self):
-        return self._data[GABA_A_REV_E]
+    @overrides(AbstractInputType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
 
-    @gaba_a_rev_E.setter
-    def gaba_a_rev_E(self, gaba_a_rev_E):
-        self._data.set_value(key=GABA_A_REV_E, value=gaba_a_rev_E)
+    @overrides(AbstractInputType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
 
-    @property
-    def gaba_b_rev_E(self):
-        return self._data[GABA_A_REV_E]
+        # Add the rest of the data
+        return [
+            parameters[AMPA_REV_E],
+            parameters[NMDA_REV_E],
+            parameters[GABA_A_REV_E],
+            parameters[GABA_B_REV_E]
+            ]
 
-    @gaba_b_rev_E.setter
-    def gaba_b_rev_E(self, gaba_b_rev_E):
-        self._data.set_value(key=GABA_A_REV_E, value=gaba_b_rev_E)
+    @overrides(AbstractInputType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
+        # Read the data
+        (_ampa_rev_E, _nmda_rev_E, gaba_a_rev_E, _gaba_b_rev_E) = values
+
+
+    @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
         return 1024.0
 
-    def get_n_input_type_parameters(self):
-        return 4
+    @property
+    def ampa_rev_E(self):
+        return self._ampa_rev_E
 
-    def get_input_type_parameters(self):
-        return [
-            NeuronParameter(
-                self._data[AMPA_REV_E],
-                _CONDUCTANTCE_TYPES.AMPA_REV_E.data_type),
-            NeuronParameter(
-                self._data[NMDA_REV_E],
-                _CONDUCTANTCE_TYPES.NMDA_REV_E.data_type),
-            NeuronParameter(
-                self._data[GABA_A_REV_E],
-                _CONDUCTANTCE_TYPES.GABA_A_REV_E.data_type),
-            NeuronParameter(
-                self._data[GABA_B_REV_E],
-                _CONDUCTANTCE_TYPES.GABA_B_REV_E.data_type)
-        ]
+    @ampa_rev_E.setter
+    def ampa_rev_E(self, ampa_rev_E):
+        self._ampa_rev_E = ampa_rev_E
 
-    def get_input_type_parameter_types(self):
-        return [item.data_type for item in _CONDUCTANTCE_TYPES]
+    @property
+    def nmda_rev_E(self):
+        return self._nmda_rev_E
 
-    def get_n_cpu_cycles_per_neuron(self, n_synapse_types):
-        return 10
+    @nmda_rev_E.setter
+    def nmda_rev_E(self, nmda_rev_E):
+        self._nmda_rev_E = nmda_rev_E
 
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]
+    @property
+    def gaba_a_rev_E(self):
+        return self._gaba_a_rev_E
+
+    @gaba_a_rev_E.setter
+    def gaba_a_rev_E(self, gaba_a_rev_E):
+        self._gaba_a_rev_E = gaba_a_rev_E
+
+    @property
+    def gaba_b_rev_E(self):
+        return self._gaba_b_rev_E
+
+    @gaba_b_rev_E.setter
+    def gaba_b_rev_E(self, gaba_b_rev_E):
+        self._gaba_b_rev_E = gaba_b_rev_E
+
+
+
+
+
+

@@ -1,3 +1,5 @@
+from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
+from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models \
     import NeuronModelHT
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeHTDynamic
@@ -5,106 +7,105 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeHT
 from spynnaker.pyNN.models.neuron.input_types import InputTypeHTConductance
 from spynnaker.pyNN.models.neuron.additional_inputs \
     import AdditionalInputHTIntrinsicCurrents
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+
 
 # global objects
 DEFAULT_MAX_ATOMS_PER_CORE = 255
-_apv_defs = AbstractPopulationVertex.non_pynn_default_parameters
+
+default_parameters = {
+
+    # #### Neuron model #####
+    'g_Na': 0.2,
+    'E_Na': 30.0,
+    'g_K': 1.85,
+    'E_K': -90.0,
+    'tau_m': 16,
+    'i_offset': 0.0,
+    'g_spike': 1.0,
+    'tau_spike': 1.75,
+    't_spike': 2.0,
+
+    # #### Threshold #####
+    'v_thresh': -50,
+    'v_thresh_resting': -50,
+    'v_thresh_tau': 2,
+    'v_thresh_Na_reversal': 30,
+
+    # ##### Synapse Model #####
+    # AMPA - excitatory
+    'exc_a_response': 0, 'exc_a_A': 1, 'exc_a_tau': 0.5,
+    'exc_b_response': 0, 'exc_b_B': -1, 'exc_b_tau': 2.4,
+    # NMDA - excitatory2
+    'exc2_a_response': 0, 'exc2_a_A': 1, 'exc2_a_tau': 4,
+    'exc2_b_response': 0, 'exc2_b_B': -1, 'exc2_b_tau': 40,
+    # GABA_A - inhibitory
+    'inh_a_response': 0, 'inh_a_A': 1, 'inh_a_tau': 1,
+    'inh_b_response': 0, 'inh_b_B': -1, 'inh_b_tau': 7,
+    # GABA_B - inhibitory2
+    'inh2_a_response': 0, 'inh2_a_A': 1, 'inh2_a_tau': 60,
+    'inh2_b_response': 0, 'inh2_b_B': -1, 'inh2_b_tau': 200,
+
+    # #### Input Type ####
+    'ampa_rev_E': 0,
+    'nmda_rev_E': 0,
+    'gaba_a_rev_E': -70,
+    'gaba_b_rev_E': -90,
+
+    # #### Additional Input ####
+    # Pacemaker (H)
+    'I_H':-0.2,
+    'g_H':2.0,
+    'E_H':-40.0,  # 40 in Synthesis code and 43.0 in Huguenard's paper.
+    'm_H':4.0,
+    'm_inf_H':5.0,
+    'e_to_t_on_tau_m_H':6.0,
+    # Calcium (T)
+    'I_T':0.02,
+    'g_T':11.0,
+    'E_T':120.0,  # 0.0 in synthesis but experimental value approx 120.0.
+    'm_T':13.0,
+    'm_inf_T':14.0,
+    'e_to_t_on_tau_m_T':15.0,
+    'h_T':16.0,
+    'h_inf_T':17.0,
+    'e_to_t_on_tau_h_T':18.0,
+    # Sodium (Na)
+    'I_NaP':19.0,
+    'g_NaP':20.0,
+    'E_NaP':30,  # 30.0 in Synthesis
+    'm_inf_NaP':23.0,
+    # Potassium (K)
+    'I_DK':28.0,
+    'g_DK':29.0,
+    'E_DK':-90.0,
+    'm_inf_DK':32.0,
+    'e_to_t_on_tau_m_DK':33.0,
+    'D':34.0,
+    'D_infinity':35.0,
+    # Voltage Clamp
+    'v_clamp': -75.0,
+    's_clamp': 3.0,
+    't_clamp': 1.0,
+    'dt':1.0
+    }
+
+initialize_parameters = {'v_init': -78.25}
 
 
-class HillTononiNeuron(AbstractPopulationVertex):
+class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
     """
         HT Neuron
     """
 
-    _model_based_max_atoms_per_core = DEFAULT_MAX_ATOMS_PER_CORE
-
-    default_parameters = {
-
-        # #### Neuron model #####
-        'g_Na': 0.2,
-        'E_Na': 30.0,
-        'g_K': 1.85,
-        'E_K': -90.0,
-        'tau_m': 16,
-        'i_offset': 0.0,
-        'g_spike': 1.0,
-        'tau_spike': 1.75,
-        't_spike': 2.0,
-
-        # #### Threshold #####
-        'v_thresh': -50,
-        'v_thresh_resting': -50,
-        'v_thresh_tau': 2,
-        'v_thresh_Na_reversal': 30,
-
-        # ##### Synapse Model #####
-        # AMPA - excitatory
-        'exc_a_response': 0, 'exc_a_A': 1, 'exc_a_tau': 0.5,
-        'exc_b_response': 0, 'exc_b_B': -1, 'exc_b_tau': 2.4,
-        # NMDA - excitatory2
-        'exc2_a_response': 0, 'exc2_a_A': 1, 'exc2_a_tau': 4,
-        'exc2_b_response': 0, 'exc2_b_B': -1, 'exc2_b_tau': 40,
-        # GABA_A - inhibitory
-        'inh_a_response': 0, 'inh_a_A': 1, 'inh_a_tau': 1,
-        'inh_b_response': 0, 'inh_b_B': -1, 'inh_b_tau': 7,
-        # GABA_B - inhibitory2
-        'inh2_a_response': 0, 'inh2_a_A': 1, 'inh2_a_tau': 60,
-        'inh2_b_response': 0, 'inh2_b_B': -1, 'inh2_b_tau': 200,
-
-        # #### Input Type ####
-        'ampa_rev_E': 0,
-        'nmda_rev_E': 0,
-        'gaba_a_rev_E': -70,
-        'gaba_b_rev_E': -90,
-
-        # #### Additional Input ####
-        # Pacemaker (H)
-        'I_H':-0.2,
-        'g_H':2.0,
-        'E_H':-40.0,  # 40 in Synthesis code and 43.0 in Huguenard's paper.
-        'm_H':4.0,
-        'm_inf_H':5.0,
-        'e_to_t_on_tau_m_H':6.0,
-        # Calcium (T)
-        'I_T':0.02,
-        'g_T':11.0,
-        'E_T':120.0,  # 0.0 in synthesis but experimental value approx 120.0.
-        'm_T':13.0,
-        'm_inf_T':14.0,
-        'e_to_t_on_tau_m_T':15.0,
-        'h_T':16.0,
-        'h_inf_T':17.0,
-        'e_to_t_on_tau_h_T':18.0,
-        # Sodium (Na)
-        'I_NaP':19.0,
-        'g_NaP':20.0,
-        'E_NaP':30,  # 30.0 in Synthesis
-        'm_inf_NaP':23.0,
-        # Potassium (K)
-        'I_DK':28.0,
-        'g_DK':29.0,
-        'E_DK':-90.0,
-        'm_inf_DK':32.0,
-        'e_to_t_on_tau_m_DK':33.0,
-        'D':34.0,
-        'D_infinity':35.0,
-        # Voltage Clamp
-        'v_clamp': -75.0,
-        's_clamp': 3.0,
-        't_clamp': 1.0,
-        'dt':1.0
-        }
-
-    initialize_parameters = {'v_init': -78.25}
+    @default_initial_values({"v", "v_thresh",
+                             "exc_a_response", "exc_b_response",
+                            "exc2_a_response", "exc2_b_response",
+                            "inh_a_response", "inh_b_response",
+                            "inh2_a_response", "inh2_b_response"
+                            "I_H ", "I_T", "I_NaP", "I_DK" })
 
     def __init__(
-            self, n_neurons,
-            spikes_per_second=_apv_defs['spikes_per_second'],
-            ring_buffer_sigma=_apv_defs['ring_buffer_sigma'],
-            incoming_spike_buffer_size=_apv_defs['incoming_spike_buffer_size'],
-            constraints=_apv_defs['constraints'],
-            label=_apv_defs['label'],
+            self,
 
             # #################################
             # #### neuron model parameters ####
@@ -214,7 +215,6 @@ class HillTononiNeuron(AbstractPopulationVertex):
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelHT(
-            n_neurons,
             v_init,
             g_Na,
             E_Na,
@@ -227,14 +227,12 @@ class HillTononiNeuron(AbstractPopulationVertex):
             i_offset)
 
         threshold_type = ThresholdTypeHTDynamic(
-            n_neurons,
             v_thresh,
             v_thresh_resting,
             v_thresh_tau,
             v_thresh_Na_reversal)
 
         synapse_type = SynapseTypeHT(
-            n_neurons,
             # AMPA - excitatory
             exc_a_response,
             exc_a_A,
@@ -266,14 +264,12 @@ class HillTononiNeuron(AbstractPopulationVertex):
             )
 
         input_type = InputTypeHTConductance(
-            n_neurons,
             ampa_rev_E,
             nmda_rev_E,
             gaba_a_rev_E,
             gaba_b_rev_E)
 
         additional_input = AdditionalInputHTIntrinsicCurrents(
-            n_neurons,
             # Pacemaker
             I_H,
             g_H,
@@ -312,38 +308,6 @@ class HillTononiNeuron(AbstractPopulationVertex):
             )
 
         super(HillTononiNeuron, self).__init__(
-            n_neurons=n_neurons, binary="ht.aplx", label=label,
-            max_atoms_per_core=HillTononiNeuron.
-                                        _model_based_max_atoms_per_core,
-            spikes_per_second=spikes_per_second,
-            ring_buffer_sigma=ring_buffer_sigma,
-            incoming_spike_buffer_size=incoming_spike_buffer_size,
-            model_name="ht", neuron_model=neuron_model,
-            input_type=input_type, synapse_type=synapse_type,
-            threshold_type=threshold_type,
-            additional_input=additional_input,
-            constraints=constraints)
-
-    @staticmethod
-    def set_model_max_atoms_per_core(new_value=DEFAULT_MAX_ATOMS_PER_CORE):
-        HillTononiNeuron._model_based_max_atoms_per_core = new_value
-
-    @staticmethod
-    def get_max_atoms_per_core():
-        return HillTononiNeuron._model_based_max_atoms_per_core
-
-    @property
-    def isyn_exc(self):
-        return self.synapse_type.initial_value_exc
-
-    @property
-    def isyn_inh(self):
-        return self.synapse_type.initial_value_inh
-
-    @isyn_exc.setter
-    def isyn_exc(self, new_value):
-        self.synapse_type.initial_value_exc = new_value
-
-    @isyn_inh.setter
-    def isyn_inh(self, new_value):
-        self.synapse_type.initial_value_inh = new_value
+            model_name="ht", binary="ht.aplx",
+            neuron_model=neuron_model, input_type=input_type,
+            synapse_type=synapse_type, threshold_type=threshold_type)
