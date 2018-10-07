@@ -19,102 +19,78 @@ class ArrayConnector(AbstractConnector):
             safe=True, callback=None, verbose=False):
         """
         :param array:
-            A (numpy) array of integers that specifies the connections
+            An explicit boolean matrix that specifies the connections
             between the pre- and post-populations
+            (see PyNN documentation)
         """
         super(ArrayConnector, self).__init__(safe, verbose)
         self._array = array
+        # we can get the total number of connections straight away
+        # from the boolean matrix
+        n_total_connections = 0
+        # array shape
+        dims = array.shape
+        for i in range(dims[0]):
+            for j in range(dims[1]):
+                if array[i, j] == 1:
+                    n_total_connections += 1
+
+        self._n_total_connections = n_total_connections
+        self._array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
-        n_connections_max = self._n_pre_neurons * self._n_post_neurons
-        return self._get_delay_maximum(
-            self._delays, n_connections_max)
-
-    @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_delay_variance(self._delays, None)
-
-    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
-        pre_neurons = self._array[0]
-        post_neurons = self._array[1]
-        self._pre_neurons_slice = numpy.empty(0, numpy.uint32)
-        self._post_neurons_slice = numpy.empty(0, numpy.uint32)
-        for i in range(pre_neurons.size):
-            if ((pre_neurons[i] >= pre_vertex_slice.lo_atom) and
-                    (pre_neurons[i] <= pre_vertex_slice.hi_atom) and
-                    (post_neurons[i] >= post_vertex_slice.lo_atom) and
-                    (post_neurons[i] <= post_vertex_slice.hi_atom)):
-                self._pre_neurons_slice = numpy.append(
-                    self._pre_neurons_slice, pre_neurons[i])
-                self._post_neurons_slice = numpy.append(
-                    self._post_neurons_slice, post_neurons[i])
-
-        n_connections = self._pre_neurons_slice.size
-        return n_connections
+        return self._get_delay_maximum(len(self._array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
+            self, post_vertex_slice, min_delay=None, max_delay=None):
+        n_connections = 0
+        post_lo = post_vertex_slice.lo_atom
+        post_hi = post_vertex_slice.hi_atom
+        for i in range(self._array_dims[0]):
+            for j in range(post_lo, post_hi+1):
+                if self._array[i, j] == 1:
+                    n_connections += 1
+
+        if min_delay is None and max_delay is None:
+            return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._n_total_connections, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
-
-    @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_mean(self._weights, None)
+    def get_n_connections_to_post_vertex_maximum(self):
+        return self._n_total_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
-
-    @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_variance(self._weights, None)
-
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
+    def get_weight_maximum(self):
+        return self._get_weight_maximum(self._n_total_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        n_connections = self._get_n_connections(pre_vertex_slice,
-                                                post_vertex_slice)
+        pre_neurons = []
+        post_neurons = []
+        n_connections = 0
+        pre_lo = pre_vertex_slice.lo_atom
+        pre_hi = pre_vertex_slice.hi_atom
+        post_lo = post_vertex_slice.lo_atom
+        post_hi = post_vertex_slice.hi_atom
+        for i in range(pre_lo, pre_hi+1):
+            for j in range(post_lo, post_hi+1):
+                if self._array[i, j] == 1:
+                    pre_neurons.append(i)
+                    post_neurons.append(j)
+                    n_connections += 1
 
         # Feed the arrays calculated above into the block structure
-        source = self._pre_neurons_slice
-        target = self._post_neurons_slice
-
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = source
-        block["target"] = target
+        block["source"] = pre_neurons
+        block["target"] = post_neurons
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
