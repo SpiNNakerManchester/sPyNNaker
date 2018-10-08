@@ -44,65 +44,130 @@ T_CLAMP = "t_clamp"
 # simulation. Maybe more efficient to get them from other parts of the software?
 DT = "dt"
 
-
-class _INTRINSIC_CURRENTS_TYPES(Enum):
-    # Pacemaker
-    I_H = (1, DataType.S1615)
-    g_H = (2, DataType.S1615)
-    E_H = (3, DataType.S1615)
-    m_H = (4, DataType.S1615)
-    m_inf_H = (5, DataType.S1615)
-    e_to_t_on_tau_m_H = (6, DataType.S1615)
-    # Calcium
-    I_T = (7, DataType.S1615)
-    g_T = (8, DataType.S1615)
-    E_T = (9, DataType.S1615)
-    m_T = (10, DataType.S1615)
-    m_inf_T = (11, DataType.S1615)
-    e_to_t_on_tau_m_T = (12, DataType.S1615)
-    h_T = (13, DataType.S1615)
-    h_inf_T = (14, DataType.S1615)
-    e_to_t_on_tau_h_T = (15, DataType.S1615)
-    # Sodium
-    I_NaP = (16, DataType.S1615)
-    g_NaP = (17, DataType.S1615)
-    E_NaP = (18, DataType.S1615)
-    m_inf_NaP = (19, DataType.S1615)
-    # Potassium
-    I_DK = (20, DataType.S1615)
-    g_DK = (21, DataType.S1615)
-    E_DK = (22, DataType.S1615)
-    m_inf_DK = (23, DataType.S1615)
-    e_to_t_on_tau_m_DK = (24, DataType.S1615)
-    D = (25, DataType.S1615)
-    D_infinity = (26, DataType.S1615)
+UNITS = {
+    # Pacemaker Current
+    I_H: "mA",
+    G_H: "uS",
+    E_H: "mV",
+    M_H: "",
+    M_INF_H: "",
+    E_TO_T_ON_TAU_M_H: "ms",
+    # Calcium Current
+    I_T: "mA",
+    G_T: "uS",
+    E_T: "mV",
+    M_T: "",
+    M_INF_T: "",
+    E_TO_T_ON_TAU_M_T: "ms",
+    H_T: "",
+    H_INF_T: "",
+    E_TO_T_ON_TAU_H_T: "ms",
+    # Sodium Current
+    I_NAP: "mA",
+    G_NAP: "uS",
+    E_NAP: "mV",
+    M_INF_NAP: "",
+    # Potassium Current
+    I_DK: "mA",
+    G_DK: "uS",
+    E_DK: "mV",
+    M_INF_DK: "",
+    E_TO_T_ON_TAU_M_DK: "ms",
+    D: "",
+    D_INFINITY: "",
     # Voltage Clamp
-    v_clamp = (27, DataType.S1615)
-    s_clamp = (28, DataType.UINT32)
-    t_clamp = (29, DataType.UINT32)
-    dt = (30, DataType.S1615)
+    V_CLAMP: "mV",
+    S_CLAMP: "mV",
+    T_CLAMP: "mV",
+    # simulation. Maybe more efficient to get them from other parts of the software?
+    DT: "ms"
+    }
 
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+# class _INTRINSIC_CURRENTS_TYPES(Enum):
+#     # Pacemaker
+#     I_H = (1, DataType.S1615)
+#     g_H = (2, DataType.S1615)
+#     E_H = (3, DataType.S1615)
+#     m_H = (4, DataType.S1615)
+#     m_inf_H = (5, DataType.S1615)
+#     e_to_t_on_tau_m_H = (6, DataType.S1615)
+#     # Calcium
+#     I_T = (7, DataType.S1615)
+#     g_T = (8, DataType.S1615)
+#     E_T = (9, DataType.S1615)
+#     m_T = (10, DataType.S1615)
+#     m_inf_T = (11, DataType.S1615)
+#     e_to_t_on_tau_m_T = (12, DataType.S1615)
+#     h_T = (13, DataType.S1615)
+#     h_inf_T = (14, DataType.S1615)
+#     e_to_t_on_tau_h_T = (15, DataType.S1615)
+#     # Sodium
+#     I_NaP = (16, DataType.S1615)
+#     g_NaP = (17, DataType.S1615)
+#     E_NaP = (18, DataType.S1615)
+#     m_inf_NaP = (19, DataType.S1615)
+#     # Potassium
+#     I_DK = (20, DataType.S1615)
+#     g_DK = (21, DataType.S1615)
+#     E_DK = (22, DataType.S1615)
+#     m_inf_DK = (23, DataType.S1615)
+#     e_to_t_on_tau_m_DK = (24, DataType.S1615)
+#     D = (25, DataType.S1615)
+#     D_infinity = (26, DataType.S1615)
+#     # Voltage Clamp
+#     v_clamp = (27, DataType.S1615)
+#     s_clamp = (28, DataType.UINT32)
+#     t_clamp = (29, DataType.UINT32)
+#     dt = (30, DataType.S1615)
+#
+#     def __new__(cls, value, data_type, doc=""):
+#         # pylint: disable=protected-access
+#         obj = object.__new__(cls)
+#         obj._value_ = value
+#         obj._data_type = data_type
+#         obj.__doc__ = doc
+#         return obj
+#
+#     @property
+#     def data_type(self):
+#         return self._data_type
 
 
 class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     __slots__ = [
-        "_data",
-        "_n_neurons"
+        "I_H",
+        "_g_H",
+        "_E_H",
+        "_m_H",
+        "_m_inf_H",
+        "_e_to_t_on_tau_m_H",
+        "_I_T",
+        "_g_T",
+        "_E_T",
+        "_m_T",
+        "_m_inf_T",
+        "_e_to_t_on_tau_m_T",
+        "_h_T",
+        "_h_inf_T",
+        "_e_to_t_on_tau_h_T",
+        "_I_NaP",
+        "_g_NaP",
+        "_E_NaP",
+        "_m_inf_NaP",
+        "_I_DK",
+        "_g_DK",
+        "_E_DK",
+        "_m_inf_DK",
+        "_e_to_t_on_tau_m_DK",
+        "_D",
+        "_D_infinity",
+        "_v_clamp",
+        "_s_clamp",
+        "_t_clamp",
+        "_dt"
         ]
 
     def __init__(self,
-                 n_neurons,
                  # Pacemaker
                  I_H,
                  g_H,
@@ -139,271 +204,363 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
                  # Other
                  dt
                  ):
-        self._n_neurons = n_neurons
-        self._data = SpynnakerRangeDictionary(size=n_neurons)
-        self._data['I_H'] = I_H
-        self._data['g_H'] = g_H
-        self._data['E_H'] = E_H
-        self._data['m_H'] = m_H
-        self._data['m_inf_H'] = m_inf_H
-        self._data['e_to_t_on_tau_m_H'] = e_to_t_on_tau_m_H
-        self._data['I_T'] = I_T
-        self._data['g_T'] = g_T
-        self._data['E_T'] = E_T
-        self._data['m_T'] = m_T
-        self._data['m_inf_T'] = m_inf_T
-        self._data['e_to_t_on_tau_m_T'] = e_to_t_on_tau_m_T
-        self._data['h_T'] = h_T
-        self._data['h_inf_T'] = h_inf_T
-        self._data['e_to_t_on_tau_h_T'] = e_to_t_on_tau_h_T
-        self._data['I_NaP'] = I_NaP
-        self._data['g_NaP'] = g_NaP
-        self._data['E_NaP'] = E_NaP
-        self._data['m_inf_NaP'] = m_inf_NaP
-        self._data['I_DK'] = I_DK
-        self._data['g_DK'] = g_DK
-        self._data['E_DK'] = E_DK
-        self._data['m_inf_DK'] = m_inf_DK
-        self._data['e_to_t_on_tau_m_DK'] = e_to_t_on_tau_m_DK
-        self._data['D'] = D
-        self._data['D_infinity'] = D_infinity
-        self._data['v_clamp'] = v_clamp
-        self._data['s_clamp'] = s_clamp
-        self._data['t_clamp'] = t_clamp
-        self._data['dt'] = dt
+
+        super(AdditionalInputHTIntrinsicCurrents, self).__init__(
+           [
+            DataType.S1615, #I_H = (1, )
+            DataType.S1615, #g_H = (2, )
+            DataType.S1615, #E_H = (3, )
+            DataType.S1615, #m_H = (4, )
+            DataType.S1615, #m_inf_H = (5, )
+            DataType.S1615, #e_to_t_on_tau_m_H = (6, )
+            # Calcium
+            DataType.S1615, #I_T = (7, )
+            DataType.S1615, #g_T = (8, )
+            DataType.S1615, #E_T = (9, )
+            DataType.S1615, #m_T = (10, )
+            DataType.S1615, #m_inf_T = (11, )
+            DataType.S1615, #e_to_t_on_tau_m_T = (12, )
+            DataType.S1615, #h_T = (13, )
+            DataType.S1615, #h_inf_T = (14, )
+            DataType.S1615, #e_to_t_on_tau_h_T = (15, )
+            # Sodium
+            DataType.S1615, #I_NaP = (16, )
+            DataType.S1615, #g_NaP = (17, )
+            DataType.S1615, #E_NaP = (18, )
+            DataType.S1615, #m_inf_NaP = (19, )
+            # Potassium
+            DataType.S1615, #I_DK = (20, )
+            DataType.S1615, #g_DK = (21, )
+            DataType.S1615, #E_DK = (22, )
+            DataType.S1615, #m_inf_DK = (23, )
+            DataType.S1615, #e_to_t_on_tau_m_DK = (24, )
+            DataType.S1615, #D = (25, )
+            DataType.S1615, #D_infinity = (26, )
+            # Voltage Clamp
+            DataType.S1615, #v_clamp = (27, )
+            DataType.UINT32, #s_clamp = (28, )
+            DataType.UINT32, #t_clamp = (29, )
+            DataType.S1615 #dt = (30, )
+            ])
+
+        self._I_H = I_H
+        self._g_H = g_H
+        self._E_H = E_H
+        self._m_H = m_H
+        self._m_inf_H = m_inf_H
+        self._e_to_t_on_tau_m_H = e_to_t_on_tau_m_H
+        self._I_T = I_T
+        self._g_T = g_T
+        self._E_T = E_T
+        self._m_T = m_T
+        self._m_inf_T = m_inf_T
+        self._e_to_t_on_tau_m_T = e_to_t_on_tau_m_T
+        self._h_T = h_T
+        self._h_inf_T = h_inf_T
+        self._e_to_t_on_tau_h_T = e_to_t_on_tau_h_T
+        self._I_NaP = I_NaP
+        self._g_NaP = g_NaP
+        self._E_NaP = E_NaP
+        self._m_inf_NaP = m_inf_NaP
+        self._I_DK = I_DK
+        self._g_DK = g_DK
+        self._E_DK = E_DK
+        self._m_inf_DK = m_inf_DK
+        self._e_to_t_on_tau_m_DK = e_to_t_on_tau_m_DK
+        self._D = D
+        self._D_infinity = D_infinity
+        self._v_clamp = v_clamp
+        self._s_clamp = s_clamp
+        self._t_clamp = t_clamp
+        self._dt = dt
+
+    @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 3 * n_neurons
+
+    @overrides(AbstractAdditionalInput.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[I_H] = self._I_H
+        parameters[G_H] = self._g_H
+        parameters[E_H] = self._E_H
+        parameters[M_H] = self._m_H
+        parameters[M_INF_H_H] = self._m_inf_H
+        parameters[E_TO_T_ON_TAU_M_H] = self._e_to_t_on_tau_m_H
+        parameters[I_T] = self._I_T
+        parameters[G_T] = self._g_T
+        parameters[E_T] = self._E_T
+        parameters[M_T] = self._m_T
+        parameters[M_INF_T] = self._m_inf_T
+        parameters[E_TO_T_ON_TAU_M_T] = self._e_to_t_on_tau_m_T
+        parameters[H_T] = self._h_T
+        parameters[H_INF_T] = self._h_inf_T
+        parameters[e_to_t_on_tau_h_T] = self._e_to_t_on_tau_h_T
+        parameters[I_NaP] = self._I_NaP
+        parameters[g_NaP] = self._g_NaP
+        parameters[E_NaP] = self._E_NaP
+        parameters[m_inf_NaP] = self._m_inf_NaP
+        parameters[I_DK] = self._I_DK
+        parameters[g_DK] = self._g_DK
+        parameters[E_DK] = self._E_DK
+        parameters[m_inf_DK] = self._m_inf_DK
+        parameters[e_to_t_on_tau_m_DK] = self._e_to_t_on_tau_m_DK
+        parameters[D] = self._D
+        parameters[D_infinity] = self._D_infinity
+        parameters[v_clamp] = self._v_clamp
+        parameters[s_clamp] = self._s_clamp
+        parameters[t_clamp] = self._t_clamp
+        parameters[dt] = self._dt
+
+
+
+
+        parameters[TAU_CA2] = self._tau_ca2
+        parameters[I_ALPHA] = self._i_alpha
+
+    @overrides(AbstractAdditionalInput.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[I_CA2] = self._i_ca2
+
+    @overrides(AbstractAdditionalInput.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractAdditionalInput.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+
+
+
+
 
     @property
     def I_H(self):
-        return self._data[I_H]
+        return self._I_H
     @ I_H.setter
     def I_H(self, new_I_H):
-        self._data.set_value(key=I_H, value=new_I_H)
+        self._I_H = new_I_H
 
     @property
     def g_H(self):
-        return self._data[G_H]
+        return self._g_H
     @ g_H.setter
     def g_H(self, new_g_H):
-        self._data.set_value(key=G_H, value=new_g_H)
+        self._g_H = new_g_H
 
     @property
     def E_H(self):
-        return self._data[E_H]
+        return self._E_H
     @ E_H.setter
     def E_H(self, new_E_H):
-        self._data.set_value(key=E_H, value=new_E_H)
+        self._E_H = new_E_H
 
     @property
     def m_H(self):
-        return self._data[M_H]
+        return self._m_H
     @ m_H.setter
     def m_H(self, new_m_H):
-        self._data.set_value(key=M_H, value=new_m_H)
+        self._m_H = new_m_H
 
     @property
     def m_inf_H(self):
-        return self._data[M_INF_H]
+        return self._m_inf_H
     @ m_inf_H.setter
     def m_inf_H(self, new_m_inf_H):
-        self._data.set_value(key=M_INF_H, value=new_m_inf_H)
+        self._m_inf_H = new_m_inf_H
 
     @property
     def e_to_t_on_tau_m_H(self):
-        return self._data[E_TO_T_ON_TAU_M_H]
+        return self._e_to_t_on_tau_m_H
     @ e_to_t_on_tau_m_H.setter
     def e_to_t_on_tau_m_H(self, new_e_to_t_on_tau_m_H):
-        self._data.set_value(key=E_TO_T_ON_TAU_M_H, value=new_e_to_t_on_tau_m_H)
+        self._e_to_t_on_tau_m_H = new_e_to_t_on_tau_m_H
 
     @property
     def I_T(self):
-        return self._data[I_T]
+        return self._I_T
     @ I_T.setter
     def I_T(self, new_I_T):
-        self._data.set_value(key=I_T, value=new_I_T)
+        self._I_T = new_I_T
 
     @property
     def g_T(self):
-        return self._data[G_T]
+        return self._g_T
     @ g_T.setter
     def g_T(self, new_g_T):
-        self._data.set_value(key=G_T, value=new_g_T)
+        self._g_T = new_g_T
 
     @property
     def E_T(self):
-        return self._data[E_T]
+        return self._E_T
     @ E_T.setter
     def E_T(self, new_E_T):
-        self._data.set_value(key=E_T, value=new_E_T)
+        self._E_T = new_E_T
 
     @property
     def m_T(self):
-        return self._data[M_T]
+        return self._m_T
     @ m_T.setter
     def m_T(self, new_m_T):
-        self._data.set_value(key=M_T, value=new_m_T)
+        self._m_T = new_m_T
 
     @property
     def m_inf_T(self):
-        return self._data[M_INF_T]
+        return self._m_inf_T
     @ m_inf_T.setter
     def m_inf_T(self, new_m_inf_T):
-        self._data.set_value(key=M_INF_T, value=new_m_inf_T)
+        self._m_inf_T = new_m_inf_T
 
     @property
     def e_to_t_on_tau_m_T(self):
-        return self._data[E_TO_T_ON_TAU_M_T]
-
+        return self._e_to_t_on_tau_m_T
     @ e_to_t_on_tau_m_T.setter
     def e_to_t_on_tau_m_T(self, new_e_to_t_on_tau_m_T):
-        self._data.set_value(key=E_TO_T_ON_TAU_M_T, value=new_e_to_t_on_tau_m_T)
+        self._e_to_t_on_tau_m_T = new_e_to_t_on_tau_m_T
 
     @property
     def h_T(self):
-        return self._data[H_T]
-
+        return self._h_T
     @ h_T.setter
     def h_T(self, new_h_T):
-        self._data.set_value(key=H_T, value=new_h_T)
+        self._h_T = new_h_T
 
     @property
     def h_inf_T(self):
-        return self._data[H_INF_T]
-
+        return self._h_inf_T
     @ h_inf_T.setter
     def h_inf_T(self, new_h_inf_T):
-        self._data.set_value(key=H_INF_T, value=new_h_inf_T)
+        self._h_inf_T = new_h_inf_T
 
     @property
     def e_to_t_on_tau_h_T(self):
-        return self._data[E_TO_T_ON_TAU_H_T]
-
+        return self._e_to_t_on_tau_h_T
     @ e_to_t_on_tau_h_T.setter
     def e_to_t_on_tau_h_T(self, new_e_to_t_on_tau_h_T):
-        self._data.set_value(key=E_TO_T_ON_TAU_H_T, value=new_e_to_t_on_tau_h_T)
+        self._e_to_t_on_tau_h_T = new_e_to_t_on_tau_h_T
 
     @property
     def I_NaP(self):
-        return self._data[I_NAP]
-
+        return self._I_NaP
     @ I_NaP.setter
     def I_NaP(self, new_I_NaP):
-        self._data.set_value(key=I_NAP, value=new_I_NaP)
+        self._I_NaP = new_I_NaP
 
     @property
     def g_NaP(self):
-        return self._data[G_NAP]
-
+        return self._g_NaP
     @ g_NaP.setter
     def g_NaP(self, new_g_NaP):
-        self._data.set_value(key=G_NAP, value=new_g_NaP)
+        self._g_NaP = new_g_NaP
 
     @property
     def E_NaP(self):
-        return self._data[E_NAP]
-
+        return self._E_NaP
     @E_NaP.setter
     def E_NaP(self, new_E_NaP):
-        self._data.set_value(key=E_NAP, value=new_E_NaP)
+        self._E_NaP = new_E_NaP
 
     @property
     def m_inf_NaP(self):
-        return self._data[M_INF_NAP]
-
+        return self._m_inf_NaP
     @ m_inf_NaP.setter
     def m_inf_NaP(self, new_m_inf_NaP):
-        self._data.set_value(key=M_INF_NAP, value=new_m_inf_NaP)
+        self._m_inf_NaP = new_m_inf_NaP
 
     @property
     def I_DK(self):
-        return self._data[I_DK]
-
+        return self._I_DK
     @ I_DK.setter
     def I_DK(self, new_I_DK):
-        self._data.set_value(key=I_DK, value=new_I_DK)
+        self._I_DK = new_I_DK
 
     @property
     def g_DK(self):
-        return self._data[G_DK]
-
+        return self._g_DK
     @ g_DK.setter
     def g_DK(self, new_g_DK):
-        self._data.set_value(key=G_DK, value=new_g_DK)
+        self._g_DK = new_g_DK
 
     @property
     def E_DK(self):
-        return self._data[E_DK]
-
+        return self._E_DK
     @ E_DK.setter
     def E_DK(self, new_E_DK):
-        self._data.set_value(key=E_DK, value=new_E_DK)
+        self._E_DK = new_E_DK
 
     @property
     def m_inf_DK(self):
-        return self._data[M_INF_DK]
-
+        return self._m_inf_DK
     @ m_inf_DK.setter
     def m_inf_DK(self, new_m_inf_DK):
-        self._data.set_value(key=M_INF_DK, value=new_m_inf_DK)
+        self._m_inf_DK = new_m_inf_DK
 
     @property
     def e_to_t_on_tau_m_DK(self):
-        return self._data[E_TO_T_ON_TAU_M_DK]
-
+        return self._e_to_t_on_tau_m_DK
     @ e_to_t_on_tau_m_DK.setter
     def e_to_t_on_tau_m_DK(self, new_e_to_t_on_tau_m_DK):
-        self._data.set_value(key=E_TO_T_ON_TAU_M_DK, value=new_e_to_t_on_tau_m_DK)
+        self._e_to_t_on_tau_m_DK = new_e_to_t_on_tau_m_DK
 
     @property
     def D(self):
-        return self._data[D]
-
+        return self._D
     @ D.setter
     def D(self, new_D):
-        self._data.set_value(key=D, value=new_D)
+        self._D = new_D
 
     @property
     def D_infinity(self):
-        return self._data[D_INFINITY]
-
+        return self._D_infinity
     @ D_infinity.setter
     def D_infinity(self, new_D_infinity):
-        self._data.set_value(key=D_INFINITY, value=new_D_infinity)
+        self._D_infinity = new_D_infinity
 
     @property
     def e_to_t_on_tau_h_DK(self):
-        return self._data[E_TO_T_ON_TAU_H_DK]
+        return self._e_to_t_on_tau_h_DK
+    @e_to_t_on_tau_h_DK.setter
+    def e_to_t_on_tau_h_DK(self, new_e_to_t_on_tau_h_DK):
+        self._e_to_t_on_tau_h_DK = new_e_to_t_on_tau_h_DK
 
     @property
     def v_clamp(self):
-        return self._data[V_CLAMP]
-
+        return self._v_clamp
     @ v_clamp.setter
     def v_clamp(self, new_v_clamp):
-        self._data.set_value(key=V_CLAMP, value=new_v_clamp)
+        self._v_clamp = new_v_clamp
 
     @property
     def s_clamp(self):
-        return self._data[S_CLAMP]
-
+        return self._s_clamp
     @ s_clamp.setter
     def s_clamp(self, new_s_clamp):
-        self._data.set_value(key=S_CLAMP, value=new_s_clamp)
+        self._s_clamp = new_s_clamp
 
     @property
     def t_clamp(self):
-        return self._data[T_CLAMP]
-
+        return self._t_clamp
     @ t_clamp.setter
     def t_clamp(self, new_t_clamp):
-        self._data.set_value(key=T_CLAMP, value=new_t_clamp)
+        self._t_clamp = new_t_clamp
 
     @property
     def dt(self):
-        return self._data[DT]
-
+        return self._dt
     @ dt.setter
     def dt(self, new_dt):
-        self._data.set_value(key=DT, value=new_dt)
+        self._dt = new_dt
+
+
+
+
+
+
+
+
+
+
 
     def get_n_parameters(self):
         return 30
