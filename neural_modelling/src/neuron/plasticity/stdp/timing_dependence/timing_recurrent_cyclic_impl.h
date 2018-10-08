@@ -237,8 +237,7 @@ static inline update_state_t timing_apply_post_spike(
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
-   uint32_t temp = mars_kiss64_seed(recurrentSeed);
-   uint32_t random = temp & ((STDP_FIXED_POINT_ONE>>2) - 1);
+   uint32_t random = 5 ;//mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
    uint16_t window_length;
    if (syn_type == 0)
       window_length = post_exp_dist_lookup_excit[random];
