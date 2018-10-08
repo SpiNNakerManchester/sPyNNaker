@@ -105,7 +105,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
     last_event_time = last_time;
 
     // Pick random number and use to draw from exponential distribution
-    uint32_t random = 4; //mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+    uint32_t random = mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
    if (syn_type == 0)
       window_length = pre_exp_dist_lookup_excit[random];
    else if (syn_type == 1)
