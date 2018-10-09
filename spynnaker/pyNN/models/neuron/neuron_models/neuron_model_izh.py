@@ -78,7 +78,7 @@ class NeuronModelIzh(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
-        return [machine_time_step/1000]
+        return [float(machine_time_step)/1000.0]
 
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
