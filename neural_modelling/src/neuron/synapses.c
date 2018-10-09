@@ -185,6 +185,21 @@ static inline void _process_fixed_synapses(
                 synaptic_word, synapse_type_index_mask);
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
+        // ***********************************
+        // For Cerebellum plasticity
+        uint32_t type = synapse_row_sparse_type(synaptic_word,
+        		synapse_index_bits, synapse_type_mask);
+
+        if (type == 0){
+        	index_t neuron_index = synapse_row_sparse_index(synaptic_word, synapse_index_mask);
+
+        	io_printf(IO_BUF, "\nSpike on type: %u at time: %u\n", type, time);
+        	synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+        }
+
+        // ***********************************
+
+
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
             delay + time, combined_synapse_neuron_index,

@@ -87,9 +87,12 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
-    // print_event_history(post_event_history);
-    // print_delayed_window_events(post_event_history, window_begin_time,
-    //		window_end_time, delay_dendritic);
+     print_event_history(post_event_history);
+     print_delayed_window_events(post_event_history, window_begin_time,
+    		window_end_time, delay_dendritic);
+
+
+    io_printf(IO_BUF, "\n    Looping over climbing fibre spikes:\n");
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
@@ -264,8 +267,9 @@ bool synapse_dynamics_process_plastic_synapses(
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
+    io_printf(IO_BUF, "\nAdding pre-synaptic event (Purkinje fibre spike) at time: %u\n", time);
     event_history->prev_time = time;
+
     event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
                                                      last_pre_trace);
 
