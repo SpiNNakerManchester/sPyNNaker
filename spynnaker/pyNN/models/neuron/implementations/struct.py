@@ -105,6 +105,9 @@ class Struct(object):
         :return:\
             a list of lists of data values, one list for each struct element
         """
+        if self.numpy_dtype.itemsize == 0:
+            return numpy.zeros(0, dtype=self.numpy_dtype)
+
         # Read in the data values
         numpy_data = numpy.frombuffer(
             data, offset=offset, dtype=self.numpy_dtype, count=array_size)
