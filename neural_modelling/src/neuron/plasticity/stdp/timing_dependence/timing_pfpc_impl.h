@@ -152,8 +152,12 @@ static inline update_state_t timing_apply_post_spike(
 //    // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
 //
-    io_printf(IO_BUF, "        delta t = %u\n", time_since_last_pre);
+    io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
 //
+
+    uint32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
+
+    io_printf(IO_BUF, "multiplier: %k\n", multiplier << 4);
 //    if (time_since_last_pre > 0) {
 //        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
 //            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));

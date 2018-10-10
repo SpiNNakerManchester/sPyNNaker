@@ -92,7 +92,7 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     int32_t new_weight = new_state.weight + new_state.a2_plus;
                          // - scaled_a2_minus;
 
-    io_printf(IO_BUF, "old weight: %u, new weight: %u\n", new_state.weight,  new_weight);
+    io_printf(IO_BUF, "        old weight: %u, new weight: %u\n", new_state.weight,  new_weight);
 
     // Clamp new weight
     new_weight = MIN(new_state.weight_region->max_weight,
