@@ -70,9 +70,9 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift,
         peak_time_data = int(peak_time * (1000.0 / machine_time_step) - lut_size/2  + 0.5)
         print "peak time data:", peak_time_data, "peak_time:", peak_time
 
-        if spec is not None:
-            spec.write_value(data=peak_time_data,
-                         data_type=DataType.INT32)
+#         if spec is not None:
+#             spec.write_value(data=peak_time_data,
+#                          data_type=DataType.INT32)
 
         # Calculate 1/tau in machine time steps
         inv_tau = (1.0 / float(tau)) #* (machine_time_step / 1000.0)
