@@ -150,7 +150,7 @@ static inline update_state_t timing_apply_post_spike(
 
 //
 //    // Get time of event relative to last pre-synaptic event
-//    uint32_t time_since_last_pre = time - last_pre_time;
+    uint32_t time_since_last_pre = time - last_pre_time;
 //
     io_printf(IO_BUF, "        delta t = %u\n", time_since_last_pre);
 //
