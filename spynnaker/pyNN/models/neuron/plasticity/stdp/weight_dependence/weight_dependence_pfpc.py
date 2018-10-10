@@ -62,10 +62,10 @@ class WeightDependencePFPC(
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * self._w_max * w)),
+                data=int(round(self._a_plus * w)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * self._w_max * w)),
+                data=int(round(self._a_minus * w)),
                 data_type=DataType.INT32)
 
     @property

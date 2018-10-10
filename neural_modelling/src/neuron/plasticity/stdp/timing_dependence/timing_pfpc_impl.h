@@ -106,21 +106,32 @@ static inline update_state_t timing_apply_pre_spike(
     // Here we will potentiate by the fixed amount alpha
     io_printf(IO_BUF, "    This is where we'll do potentiation\n");
 
+    return weight_one_term_apply_potentiation(previous_state, 0);
 
-    // Get time of event relative to last post-synaptic event
-    uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
 
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-                  time_since_last_post, decayed_o1);
 
-        // Apply depression to state (which is a weight_state)
-        return weight_one_term_apply_depression(previous_state, decayed_o1);
-    } else {
-        return previous_state;
-    }
+//
+//    // Get time of event relative to last post-synaptic event
+//    uint32_t time_since_last_post = time - last_post_time;
+//    if (time_since_last_post > 0) {
+//        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
+//            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+//
+//        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
+//                  time_since_last_post, decayed_o1);
+//
+//        // Apply depression to state (which is a weight_state)
+//        return weight_one_term_apply_depression(previous_state, decayed_o1);
+//
+//
+//
+//
+//
+//
+//
+//    } else {
+//        return previous_state;
+//    }
 }
 
 //---------------------------------------
@@ -132,27 +143,33 @@ static inline update_state_t timing_apply_post_spike(
     use(last_post_time);
     use(&last_post_trace);
 
-    // This is where we calculate the e^(-x) * sin(x)^20
 
 
+//    // This is where we calculate the e^(-x) * sin(x)^20
+//
+//
+//    weight_one_term_apply_depression(
+//            weight_state_t state, int32_t depression)
 
-    // Get time of event relative to last pre-synaptic event
-    uint32_t time_since_last_pre = time - last_pre_time;
 
-    io_printf(IO_BUF, "        delta t = %u\n", time_since_last_pre);
-
-    if (time_since_last_pre > 0) {
-        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
-
-        log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-                  time_since_last_pre, decayed_r1);
-
-        // Apply potentiation to state (which is a weight_state)
-        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
-    } else {
+//
+//    // Get time of event relative to last pre-synaptic event
+//    uint32_t time_since_last_pre = time - last_pre_time;
+//
+//    io_printf(IO_BUF, "        delta t = %u\n", time_since_last_pre);
+//
+//    if (time_since_last_pre > 0) {
+//        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
+//            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+//
+//        log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
+//                  time_since_last_pre, decayed_r1);
+//
+//        // Apply potentiation to state (which is a weight_state)
+//        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
+//    } else {
         return previous_state;
-    }
+    //}
 }
 
 #endif // _TIMING_CEREBELLUM_IMPL_H_

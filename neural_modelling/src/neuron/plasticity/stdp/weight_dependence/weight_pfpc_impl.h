@@ -22,6 +22,9 @@ typedef struct {
 typedef struct {
     int32_t weight;
 
+    int32_t a2_plus;
+    int32_t a2_minus;
+
     uint32_t weight_multiply_right_shift;
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
@@ -66,21 +69,36 @@ static inline weight_state_t weight_one_term_apply_depression(
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
-    // Calculate scale
-    // **NOTE** this calculation must be done at runtime-defined weight
-    // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-        state.weight_region->max_weight - state.weight,
-        state.weight_region->a2_plus, state.weight_multiply_right_shift);
 
-    // Multiply scale by potentiation and add
-    // **NOTE** using standard STDP fixed-point format handles format conversion
-    state.weight += STDP_FIXED_MUL_16X16(scale, potentiation);
+	// add fixed amount
+    state.a2_plus += state.weight_region->a2_plus;
+
     return state;
+
 }
 //---------------------------------------
 static inline weight_t weight_get_final(weight_state_t new_state) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
+
+    // first do Depression (as this would have happened first)
+
+
+//    // Now do potentiation (check against lower limit)
+//    int32_t scaled_a2_plus = STDP_FIXED_MUL_16X16(
+//        new_state.a2_plus, new_state.weight_region->a2_plus);
+
+
+    // Apply all terms to initial weight
+    int32_t new_weight = new_state.weight + new_state.a2_plus;
+                         // - scaled_a2_minus;
+
+    io_printf(IO_BUF, "old weight: %u, new weight: %u\n", new_state.weight,  new_weight);
+
+    // Clamp new weight
+    new_weight = MIN(new_state.weight_region->max_weight,
+                      new_weight);
+
+    new_state.weight = new_weight;
 
     return (weight_t) new_state.weight;
 }
