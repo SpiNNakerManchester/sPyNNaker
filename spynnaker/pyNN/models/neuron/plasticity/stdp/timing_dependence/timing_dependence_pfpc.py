@@ -74,6 +74,11 @@ class TimingDependencePFPC(AbstractTimingDependence):
             raise NotImplementedError(
                 "STDP LUT generation currently only supports 1ms timesteps")
 
+        #################
+        # Add new LUT generation here
+        #################
+
+
         # Write lookup tables
         self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
