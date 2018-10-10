@@ -13,8 +13,8 @@ uint32_t *weight_multiply_right_shift;
 uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
                             uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
-    log_debug("weight_initialise: starting");
-    log_debug("\tSTDP multiplicative weight dependence");
+    log_debug("weight_initialise: starting\n");
+    log_debug("\tSTDP multiplicative weight dependence\n");
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
@@ -45,7 +45,7 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
 //        log_debug(
         io_printf(IO_BUF,
             "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
-            " Weight multiply right shift:%u",
+            " Weight multiply right shift:%u\n",
             s, plasticity_weight_region_data[s].min_weight,
             plasticity_weight_region_data[s].max_weight,
             plasticity_weight_region_data[s].a2_plus,

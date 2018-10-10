@@ -97,7 +97,8 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift,
 #                 exp_float = 0.0
 #                 print "clamp @ value = ", value
 #             else:
-            exp_float = math.exp(-value) * math.sin(value)**sin_pwr # / max_value
+            exp_float = math.exp(-value) * math.sin(value)**sin_pwr / 0.213122689799
+
 
             # Convert to fixed-point and write to spec
             exp_fix = float_to_fixed(exp_float, fixed_point_one)
@@ -109,5 +110,6 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift,
                 spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
         if spec is None :
+            print max(out)
             plt.plot(t,out)
             plt.show()
