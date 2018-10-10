@@ -23,24 +23,20 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 // Exponential decay lookup parameters
 #define TAU_PLUS_TIME_SHIFT 0
-#define TAU_PLUS_SIZE 256
-
-#define TAU_MINUS_TIME_SHIFT 0
-#define TAU_MINUS_SIZE 256
+#define EXP_SIN_LUT_SIZE 256
 
 // Helper macros for looking up decays
-#define DECAY_LOOKUP_TAU_PLUS(time) \
+#define EXP_SIN_LOOKUP(time) \
     maths_lut_exponential_decay( \
-        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
-#define DECAY_LOOKUP_TAU_MINUS(time) \
-    maths_lut_exponential_decay( \
-        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
+        time, TAU_PLUS_TIME_SHIFT, EXP_SIN_LUT_SIZE, exp_sin_lookup)
+//#define DECAY_LOOKUP_TAU_MINUS(time) \
+//    maths_lut_exponential_decay( \
+//        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
 
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
-extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
+extern int16_t exp_sin_lookup[EXP_SIN_LUT_SIZE];
 
 //---------------------------------------
 // Timing dependence inline functions
