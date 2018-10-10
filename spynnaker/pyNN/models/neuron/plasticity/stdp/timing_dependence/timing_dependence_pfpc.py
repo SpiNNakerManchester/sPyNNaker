@@ -9,11 +9,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
 import logging
 logger = logging.getLogger(__name__)
 
-LOOKUP_TAU_PLUS_SIZE = 256
-LOOKUP_TAU_PLUS_SHIFT = 0
-LOOKUP_TAU_MINUS_SIZE = 256
-LOOKUP_TAU_MINUS_SHIFT = 0
-
+LUT_SIZE = 256
 
 class TimingDependencePFPC(AbstractTimingDependence):
     __slots__ = [
@@ -61,7 +57,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return 2 * LUT_SIZE #in bytes: 256 * 16 bit values
 
     @property
     def n_weight_terms(self):
@@ -80,12 +76,8 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
 
         # Write lookup tables
-        self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
-            LOOKUP_TAU_PLUS_SHIFT)
-        self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
-            LOOKUP_TAU_MINUS_SHIFT)
+        self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(spec,
+                time_constant=20, lut_size=LUT_SIZE, shift=0)
 
     @property
     def synaptic_structure(self):

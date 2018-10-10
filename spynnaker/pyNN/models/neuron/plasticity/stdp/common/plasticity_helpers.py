@@ -1,5 +1,7 @@
 import math
 import logging
+import matplotlib.pyplot as plt
+import numpy as np
 
 from data_specification.enums import DataType
 
@@ -9,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
-
 
 def float_to_fixed(value, fixed_point_one):
     return int(round(float(value) * float(fixed_point_one)))
@@ -55,3 +56,58 @@ def get_lut_provenance(
             " increasing the timestep".format(
                 param_name, rule_name, pre_population_label,
                 post_population_label, last_entry)))
+
+def write_pfpc_lut(spec, time_constant, lut_size, shift,
+                  fixed_point_one=STDP_FIXED_POINT_ONE):
+        peak_time = 100.0
+        tau = peak_time * 2/math.pi;
+        machine_time_step = 1.0
+
+        # This offset is the quasi-symmetry point
+        sin_pwr = 20
+
+# Write peak time in timesteps
+        peak_time_data = int(peak_time * (1000.0 / machine_time_step) - lut_size/2  + 0.5)
+        print "peak time data:", peak_time_data, "peak_time:", peak_time
+
+        if spec is not None:
+            spec.write_value(data=peak_time_data,
+                         data_type=DataType.INT32)
+
+        # Calculate 1/tau in machine time steps
+        inv_tau = (1.0 / float(tau)) #* (machine_time_step / 1000.0)
+
+        zero_offset = math.atan(-1./sin_pwr) # abscissae of the max point obtained by deriving the kernel and equal to zero
+        max_value = math.exp(-zero_offset)*math.sin(zero_offset)**sin_pwr
+
+        if spec is None :
+            print tau, inv_tau, zero_offset, max_value
+        # Generate LUT
+        #last_value = None
+
+        t = np.arange(0,lut_size)
+        out = []
+
+        for i in range(0,lut_size): # the sign needs to be checked and has to be consistent with the dt used in the synapse
+
+            # Multiply by time constant and calculate negative exponential
+            value = float(i) * inv_tau
+            # we want a single bump only, so we clip the arg at pi/2
+#             if (value) < 0:# math.pi*2:
+#                 exp_float = 0.0
+#                 print "clamp @ value = ", value
+#             else:
+            exp_float = math.exp(-value) * math.sin(value)**sin_pwr # / max_value
+
+            # Convert to fixed-point and write to spec
+            exp_fix = float_to_fixed(exp_float, fixed_point_one)
+
+            if spec is None :
+                out.append(exp_float)
+                print i, exp_float, exp_fix
+            else :
+                spec.write_value(data=exp_fix, data_type=DataType.INT16)
+
+        if spec is None :
+            plt.plot(t,out)
+            plt.show()
