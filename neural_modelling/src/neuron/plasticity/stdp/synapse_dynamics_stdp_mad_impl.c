@@ -55,10 +55,34 @@ uint32_t plastic_saturation_count = 0;
 //---------------------------------------
 // Structures
 //---------------------------------------
+//typedef struct {
+//    pre_trace_t prev_trace;
+//    uint32_t prev_time;
+//} pre_event_history_t;
+
+#define NUM_PF_SPIKES_TO_RECORD 16
+
 typedef struct {
-    pre_trace_t prev_trace;
-    uint32_t prev_time;
+    uint32_t num_recorded_pf_spikes_minus_one;
+    uint32_t pf_times[NUM_PF_SPIKES_TO_RECORD];
+    post_trace_t traces[NUM_PF_SPIKES_TO_RECORD];
 } pre_event_history_t;
+
+
+
+_print_pre_event_history(pre_event_history_t pre_eve_hist){
+
+	io_printf(IO_BUF, "\n\n************************\n\n");
+	io_printf(IO_BUF, "Number recorded spikes: %u\n", pre_eve_hist.num_recorded_pf_spikes_minus_one);
+	io_printf(IO_BUF, "Prev time: %u\n",
+			pre_eve_hist.pf_times[pre_eve_hist.num_recorded_pf_spikes_minus_one]);
+
+	for (int i =0; i < NUM_PF_SPIKES_TO_RECORD; i ++){
+		io_printf(IO_BUF, "    Entry %u: %u\n", i ,pre_eve_hist.pf_times[i]);
+	}
+
+}
+
 
 post_event_history_t *post_event_history;
 
@@ -68,9 +92,11 @@ post_event_history_t *post_event_history;
 static inline final_state_t _plasticity_update_synapse(
         uint32_t time,
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
-        const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
+        const pre_trace_t new_pre_trace,
+		uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_history,
+		const pre_event_history_t *pre_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -87,25 +113,59 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
-     print_event_history(post_event_history);
-     print_delayed_window_events(post_event_history, window_begin_time,
-    		window_end_time, delay_dendritic);
+
+    io_printf(IO_BUF, "    Printing CF history\n");
+    print_event_history(post_event_history);
+//     print_delayed_window_events(post_event_history, window_begin_time,
+//    		window_end_time, delay_dendritic);
 
 
     io_printf(IO_BUF, "\n    Looping over climbing fibre spikes:\n");
+
+    delay_dendritic = 0;
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
-        log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
+
+        uint32_t pf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
+
+
+        io_printf(IO_BUF, "        Applying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
-        // Apply spike to state
-        current_state = timing_apply_post_spike(
-            delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
-            last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state);
+//        // Get window of pf events based on cf spikes
+//        print_delayed_window_events(pre_event_history,
+//        		//(delayed_post_time-255)
+//        		pf_begin_time, delayed_post_time, delay_dendritic);
+        post_event_window_t pre_window = post_events_get_window_delayed(
+        		pre_event_history, pf_begin_time, delayed_post_time);
+
+
+        io_printf(IO_BUF, "        Looping over PF window\n",
+                      delayed_post_time);
+        while (pre_window.num_events > 0) {
+            const uint32_t delayed_pre_time = *pre_window.next_time
+                                               + delay_dendritic;
+
+            io_printf(IO_BUF, "            delta t = %u\n", delayed_post_time - delayed_pre_time);
+
+
+        	current_state = timing_apply_post_spike(
+        			delayed_post_time, *post_window.next_trace,
+					(delayed_post_time - delayed_pre_time),
+					last_pre_trace, post_window.prev_time, post_window.prev_trace,
+					current_state);
+
+
+
+            pre_window = post_events_next_delayed(pre_window, delayed_pre_time);
+
+
+        }
+//        	// Apply spike to state
+
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -263,15 +323,22 @@ bool synapse_dynamics_process_plastic_synapses(
         plastic_region_address);
 
     // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
+    const uint32_t last_pre_time = event_history->pf_times[event_history->num_recorded_pf_spikes_minus_one];
+
+    // no longer need to manage this trace
+    const pre_trace_t last_pre_trace = 0;
+
+
+    // add pre spike to struct capturing pre synaptic event history
+    // NOTE: this uses the post_event_history_t handling code
+    post_events_add(time, event_history, 0);
+
 
     // Update pre-synaptic trace
-    io_printf(IO_BUF, "\nAdding pre-synaptic event (Purkinje fibre spike) at time: %u\n", time);
-    event_history->prev_time = time;
+    io_printf(IO_BUF, "\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
 
-    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
+
+    timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -292,15 +359,18 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(
             control_word, synapse_type_index_mask);
 
+//        io_printf(IO_BUF, "PRINTING PRE EVENT HISTORY");
+//    	print_delayed_window_events(event_history, begin_time, time, delay_dendritic);
+
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
-            time, last_pre_time, last_pre_trace, event_history->prev_trace,
+            time, last_pre_time, last_pre_trace, last_pre_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index]);
+            &post_event_history[index], event_history);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(

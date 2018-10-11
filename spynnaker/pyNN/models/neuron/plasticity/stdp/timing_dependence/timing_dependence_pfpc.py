@@ -51,9 +51,8 @@ class TimingDependencePFPC(AbstractTimingDependence):
     @property
     def pre_trace_n_bytes(self):
 
-        # Pair rule requires no pre-synaptic trace when only the nearest
-        # Neighbours are considered and, a single 16-bit R1 trace
-        return 2
+        # Here we will record the last 16 spikes, these will be 32-bit quantities,
+        return (16 * 4) + (2 * 16) # 16 4-byte entries, plus one counter for the number of spikes
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
@@ -68,14 +67,9 @@ class TimingDependencePFPC(AbstractTimingDependence):
         # Check timestep is valid
         if machine_time_step != 1000:
             raise NotImplementedError(
-                "STDP LUT generation currently only supports 1ms timesteps")
+                "exp_sin LUT generation currently only supports 1ms timesteps")
 
-        #################
-        # Add new LUT generation here
-        #################
-
-
-        # Write lookup tables
+        # Write exp_sin lookup table
         self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(spec,
                 time_constant=20, time_probe=None, lut_size=LUT_SIZE, shift=0)
 

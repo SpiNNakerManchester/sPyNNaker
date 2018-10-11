@@ -73,20 +73,7 @@ static inline post_trace_t timing_add_post_spike(
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
 
-//    // Get time since last spike
-//    uint32_t delta_time = time - last_time;
-//
-//    // Decay previous r1 and r2 traces
-//    int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(
-//        last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
-//
-//    // Add energy caused by new spike to trace
-//    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
-//
-//    log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
-//
-//    // Return new pre-synaptic event with decayed trace values with energy
-//    // for new spike added
+
     return (pre_trace_t) 0; //new_r1_trace;
 }
 
@@ -149,7 +136,7 @@ static inline update_state_t timing_apply_post_spike(
 
 //
 //    // Get time of event relative to last pre-synaptic event
-    uint32_t time_since_last_pre = time - last_pre_time;
+    uint32_t time_since_last_pre = last_pre_time; //time - last_pre_time;
     io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
 
     if (time_since_last_pre < 255){

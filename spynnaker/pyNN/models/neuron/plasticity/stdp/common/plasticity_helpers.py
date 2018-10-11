@@ -68,7 +68,7 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift, time_probe,
 
 # Write peak time in timesteps
         peak_time_data = int(peak_time * (1000.0 / machine_time_step) - lut_size/2  + 0.5)
-        print "peak time data:", peak_time_data, "peak_time:", peak_time
+        #print "peak time data:", peak_time_data, "peak_time:", peak_time
 
 #         if spec is not None:
 #             spec.write_value(data=peak_time_data,
@@ -89,6 +89,7 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift, time_probe,
 #         t = np.arange(0,lut_size)
 #         out = []
 #         out_fixed = []
+        exp_list = []
         for i in range(0,lut_size): # the sign needs to be checked and has to be consistent with the dt used in the synapse
 
             # Multiply by time constant and calculate negative exponential
@@ -98,10 +99,11 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift, time_probe,
 #                 exp_float = 0.0
 #                 print "clamp @ value = ", value
 #             else:
-            exp_float = math.exp(-value) * math.sin(value)**sin_pwr / max_value
+            exp_float = math.exp(-value) * math.sin(value)**sin_pwr  / 0.213122689799 #max_value
 
             # Convert to fixed-point and write to spec
             exp_fix = float_to_fixed(exp_float, fixed_point_one)
+            exp_list.append(exp_float)
 
             if spec is None :
                 #out.append(exp_float)
@@ -111,7 +113,9 @@ def write_pfpc_lut(spec, time_constant, lut_size, shift, time_probe,
                 spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
 
+
 #         if spec is None :
 #             plt.plot(t,out)
 #             plt.show()
+
 
