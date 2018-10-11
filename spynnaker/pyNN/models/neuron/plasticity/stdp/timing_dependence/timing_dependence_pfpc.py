@@ -77,7 +77,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
         # Write lookup tables
         self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(spec,
-                time_constant=20, lut_size=LUT_SIZE, shift=0)
+                time_constant=20, time_probe=None, lut_size=LUT_SIZE, shift=0)
 
     @property
     def synaptic_structure(self):

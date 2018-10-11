@@ -57,7 +57,7 @@ def get_lut_provenance(
                 param_name, rule_name, pre_population_label,
                 post_population_label, last_entry)))
 
-def write_pfpc_lut(spec, time_constant, lut_size, shift,time_probe,
+def write_pfpc_lut(spec, time_constant, lut_size, shift, time_probe,
                   fixed_point_one=STDP_FIXED_POINT_ONE):
         peak_time = 100.0
         tau = peak_time * 2/math.pi;

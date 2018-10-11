@@ -52,18 +52,25 @@ static inline weight_state_t weight_get_initial(weight_t weight,
 
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_depression(
-        weight_state_t state, int32_t depression) {
+        weight_state_t state, int32_t depression_multiplier) {
+
+	io_printf(IO_BUF, "        Weight prior to depression: %u\n",state.weight);
 
     // Calculate scale
     // **NOTE** this calculation must be done at runtime-defined weight
     // fixed-point format
-    int32_t scale = maths_fixed_mul16(
-        state.weight - state.weight_region->min_weight,
-        state.weight_region->a2_minus, state.weight_multiply_right_shift);
+//    int32_t scale = maths_fixed_mul16(
+//        state.weight - state.weight_region->min_weight,
+////        state.weight_region->a2_minus,
+//		depression_multiplier,
+//		state.weight_multiply_right_shift);
 
     // Multiply scale by depression and subtract
     // **NOTE** using standard STDP fixed-point format handles format conversion
-    state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
+    state.weight -= STDP_FIXED_MUL_16X16(state.weight, depression_multiplier);
+
+    io_printf(IO_BUF, "        Weight after depression: %u\n",state.weight);
+
     return state;
 }
 //---------------------------------------

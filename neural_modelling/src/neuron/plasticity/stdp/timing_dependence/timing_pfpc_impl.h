@@ -144,20 +144,29 @@ static inline update_state_t timing_apply_post_spike(
 //    // This is where we lookup the value of e^(-x) * sin(x)^20
 //
 //
-//    weight_one_term_apply_depression(
-//            weight_state_t state, int32_t depression)
+
 
 
 //
 //    // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
-//
     io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
+
+    if (time_since_last_pre < 255){
+
+
+        uint32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
+
+        io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
+
+        return weight_one_term_apply_depression(previous_state, multiplier);
+
+
+    }
 //
+	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
+	io_printf(IO_BUF, "        out of LUT range - do nothing");
 
-    uint32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
-
-    io_printf(IO_BUF, "multiplier: %k\n", multiplier << 4);
 //    if (time_since_last_pre > 0) {
 //        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
 //            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
