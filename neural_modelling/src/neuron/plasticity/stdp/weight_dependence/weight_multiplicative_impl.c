@@ -42,8 +42,8 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         weight_multiply_right_shift[s] =
                 16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
 
-        log_info(
-            "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u",
+        io_printf(IO_BUF,
+            "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u\n",
             s,
             plasticity_weight_region_data[s].min_weight,
             plasticity_weight_region_data[s].max_weight,
