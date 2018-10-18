@@ -95,7 +95,7 @@ class NeuronModelIzh(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        _a, _b, _c, _d, v, u, _i_offset = values
+        _a, _b, _c, _d, v, u, _i_offset, _this_h = values
 
         # Copy the changed data only
         state_variables[V] = v
