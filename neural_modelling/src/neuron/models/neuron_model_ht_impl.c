@@ -30,6 +30,10 @@ static inline void _ht_closed_form(
 //
 //		TC = neuron->exp_TC_spike;
 
+		// *******************
+		// Should input_this_timestep also be multiplied by tau_spike here?
+		//
+
 	    neuron->V_membrane = (V_prev -
 	    		(neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV) * neuron->exp_TC_spike +
 				((neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV);
@@ -66,10 +70,10 @@ state_t neuron_model_state_update(
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
 		input_t external_bias, neuron_pointer_t neuron) {
 
-	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
-	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+//	io_printf(IO_BUF,"Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
+//	io_printf(IO_BUF,"Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
-	neuron_model_print_parameters(neuron);
+//	neuron_model_print_parameters(neuron);
 
 	REAL total_exc = 0;
 	REAL total_inh = 0;
@@ -106,28 +110,28 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
-    log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+    io_printf(IO_BUF,"V membrane    = %11.4k mv", neuron->V_membrane);
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    log_debug("V membrane        = %k mv", neuron->V_membrane);
-    log_debug("g_Na	            = %k microS", neuron->g_Na);
-    log_debug("E_Na              = %k mV", neuron->E_Na);
-    log_debug("g_K               = %k microS", neuron->g_K);
-    log_debug("E_K               = %k mV", neuron->E_K);
-    log_debug("exp(-ms/(RC))     = %k ", neuron->exp_TC);
-    log_debug("tau_m             = %k ms", neuron->tau_m);
-    log_debug("exp_TC_spike      = %k ", neuron->exp_TC_spike);
-    log_debug("tau_spike         = %k ms", neuron->tau_spike);
-    log_debug("I offset          = %k nA", neuron->I_offset);
-    log_debug("g_spike_var       = %k microS", neuron->g_spike_var);
-    log_debug("g_spike           = %k microS", neuron->g_spike);
-    log_debug("t_spike           = %k ms", neuron->t_spike);
-    log_debug("ref_counter       = %k ms", neuron->ref_counter);
-    log_debug("A                  = %k", neuron->A);
-    log_debug("B                  = %k", neuron->B);
-    log_debug("A_SPIKE            = %k", neuron->A_SPIKE);
-    log_debug("B_SPIKE            = %k", neuron->B_SPIKE);
-    log_debug("A_INV              = %k", neuron->A_INV);
-    log_debug("A_SPIKE_INV        = %k", neuron->A_SPIKE_INV);
+    io_printf(IO_BUF,"V membrane        = %k mv\n", neuron->V_membrane);
+    io_printf(IO_BUF,"g_Na	            = %k microS\n", neuron->g_Na);
+    io_printf(IO_BUF,"E_Na              = %k mV\n", neuron->E_Na);
+    io_printf(IO_BUF,"g_K               = %k microS\n", neuron->g_K);
+    io_printf(IO_BUF,"E_K               = %k mV\n", neuron->E_K);
+    io_printf(IO_BUF,"exp(-ms/(RC))     = %k \n", neuron->exp_TC);
+    io_printf(IO_BUF,"tau_m             = %k ms\n", neuron->tau_m);
+    io_printf(IO_BUF,"exp_TC_spike      = %k \n", neuron->exp_TC_spike);
+    io_printf(IO_BUF,"tau_spike         = %k ms\n", neuron->tau_spike);
+    io_printf(IO_BUF,"I offset          = %k nA\n", neuron->I_offset);
+    io_printf(IO_BUF,"g_spike_var       = %k microS\n", neuron->g_spike_var);
+    io_printf(IO_BUF,"g_spike           = %k microS\n", neuron->g_spike);
+    io_printf(IO_BUF,"t_spike           = %k ms\n", neuron->t_spike);
+    io_printf(IO_BUF,"ref_counter       = %k ms\n", neuron->ref_counter);
+    io_printf(IO_BUF,"A                  = %k\n", neuron->A);
+    io_printf(IO_BUF,"B                  = %k\n", neuron->B);
+    io_printf(IO_BUF,"A_SPIKE            = %k\n", neuron->A_SPIKE);
+    io_printf(IO_BUF,"B_SPIKE            = %k\n", neuron->B_SPIKE);
+    io_printf(IO_BUF,"A_INV              = %k\n", neuron->A_INV);
+    io_printf(IO_BUF,"A_SPIKE_INV        = %k\n", neuron->A_SPIKE_INV);
 }

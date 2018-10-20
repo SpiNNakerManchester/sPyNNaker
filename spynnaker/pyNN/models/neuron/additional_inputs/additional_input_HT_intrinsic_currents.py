@@ -1,3 +1,4 @@
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from data_specification.enums import DataType
@@ -135,7 +136,7 @@ UNITS = {
 
 class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     __slots__ = [
-        "I_H",
+        "_I_H",
         "_g_H",
         "_E_H",
         "_m_H",
@@ -277,17 +278,15 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
-        return 3 * n_neurons
+        return 300 * n_neurons
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
-        parameters[I_H] = self._I_H
         parameters[G_H] = self._g_H
         parameters[E_H] = self._E_H
         parameters[M_H] = self._m_H
-        parameters[M_INF_H_H] = self._m_inf_H
+        parameters[M_INF_H] = self._m_inf_H
         parameters[E_TO_T_ON_TAU_M_H] = self._e_to_t_on_tau_m_H
-        parameters[I_T] = self._I_T
         parameters[G_T] = self._g_T
         parameters[E_T] = self._E_T
         parameters[M_T] = self._m_T
@@ -295,32 +294,28 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         parameters[E_TO_T_ON_TAU_M_T] = self._e_to_t_on_tau_m_T
         parameters[H_T] = self._h_T
         parameters[H_INF_T] = self._h_inf_T
-        parameters[e_to_t_on_tau_h_T] = self._e_to_t_on_tau_h_T
-        parameters[I_NaP] = self._I_NaP
-        parameters[g_NaP] = self._g_NaP
-        parameters[E_NaP] = self._E_NaP
-        parameters[m_inf_NaP] = self._m_inf_NaP
-        parameters[I_DK] = self._I_DK
-        parameters[g_DK] = self._g_DK
+        parameters[E_TO_T_ON_TAU_H_T] = self._e_to_t_on_tau_h_T
+        parameters[G_NAP] = self._g_NaP
+        parameters[E_NAP] = self._E_NaP
+        parameters[M_INF_NAP] = self._m_inf_NaP
+        parameters[G_DK] = self._g_DK
         parameters[E_DK] = self._E_DK
-        parameters[m_inf_DK] = self._m_inf_DK
-        parameters[e_to_t_on_tau_m_DK] = self._e_to_t_on_tau_m_DK
+        parameters[M_INF_DK] = self._m_inf_DK
+        parameters[E_TO_T_ON_TAU_M_DK] = self._e_to_t_on_tau_m_DK
         parameters[D] = self._D
-        parameters[D_infinity] = self._D_infinity
-        parameters[v_clamp] = self._v_clamp
-        parameters[s_clamp] = self._s_clamp
-        parameters[t_clamp] = self._t_clamp
-        parameters[dt] = self._dt
+        parameters[D_INFINITY] = self._D_infinity
+        parameters[V_CLAMP] = self._v_clamp
+        parameters[S_CLAMP] = self._s_clamp
+        parameters[T_CLAMP] = self._t_clamp
+        parameters[DT] = self._dt
 
-
-
-
-        parameters[TAU_CA2] = self._tau_ca2
-        parameters[I_ALPHA] = self._i_alpha
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[I_CA2] = self._i_ca2
+        state_variables[I_H] = self._I_H
+        state_variables[I_T] = self._I_T
+        state_variables[I_NAP] = self._I_NaP
+        state_variables[I_DK] = self._I_DK
 
     @overrides(AbstractAdditionalInput.get_units)
     def get_units(self, variable):
@@ -330,9 +325,86 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def has_variable(self, variable):
         return variable in UNITS
 
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
+        # Add the rest of the data
+        return [
+                state_variables[I_H],
+                parameters[G_H],
+                parameters[E_H],
+                parameters[M_H],
+                parameters[M_INF_H],
+                parameters[E_TO_T_ON_TAU_M_H],
 
+                state_variables[I_T],
+                parameters[G_T],
+                parameters[E_T],
+                parameters[M_T],
+                parameters[M_INF_T],
+                parameters[E_TO_T_ON_TAU_M_T],
+                parameters[H_T],
+                parameters[H_INF_T],
+                parameters[E_TO_T_ON_TAU_H_T],
 
+                state_variables[I_NAP],
+                parameters[G_NAP],
+                parameters[E_NAP],
+                parameters[M_INF_NAP],
+
+                state_variables[I_DK],
+                parameters[G_DK],
+                parameters[E_DK],
+                parameters[M_INF_DK],
+                parameters[E_TO_T_ON_TAU_M_DK],
+                parameters[D],
+                parameters[D_INFINITY],
+
+                parameters[V_CLAMP],
+                parameters[S_CLAMP],
+                parameters[T_CLAMP],
+
+                ts
+                ]
+
+    @overrides(AbstractAdditionalInput.update_values)
+    def update_values(self, values, parameters, state_variables):
+        (_I_H,
+        _g_H,
+        _E_H,
+        _m_H,
+        _m_inf_H,
+        _e_to_t_on_tau_m_H,
+        _I_T,
+        _g_T,
+        _E_T,
+        _m_T,
+        _m_inf_T,
+        _e_to_t_on_tau_m_T,
+        _h_T,
+        _h_inf_T,
+        _e_to_t_on_tau_h_T,
+        _I_NaP,
+        _g_NaP,
+        _E_NaP,
+        _m_inf_NaP,
+        _I_DK,
+        _g_DK,
+        _E_DK,
+        _m_inf_DK,
+        _e_to_t_on_tau_m_DK,
+        _D,
+        _D_infinity,
+        _v_clamp,
+        _s_clamp,
+        _t_clamp,
+        _dt) = values
+#         # Read the data
+#         (_exp_tau_ca2, i_ca2, _i_alpha) = values
+#
+#         # Copy the changed data only
+#         state_variables[I_CA2] = i_ca
 
 
     @property
@@ -561,51 +633,51 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
 
 
 
-
-    def get_n_parameters(self):
-        return 30
-
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    def get_parameters(self, machine_time_step):
-        # pylint: disable=arguments-differ
-        return [NeuronParameter(self._data[I_H],_INTRINSIC_CURRENTS_TYPES.I_H.data_type),
-               NeuronParameter(self._data[G_H],_INTRINSIC_CURRENTS_TYPES.g_H.data_type),
-               NeuronParameter(self._data[E_H],_INTRINSIC_CURRENTS_TYPES.E_H.data_type),
-               NeuronParameter(self._data[M_H],_INTRINSIC_CURRENTS_TYPES.m_H.data_type),
-               NeuronParameter(self._data[M_INF_H],_INTRINSIC_CURRENTS_TYPES.m_inf_H.data_type),
-               NeuronParameter(self._data[E_TO_T_ON_TAU_M_H],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_H.data_type),
-               NeuronParameter(self._data[I_T],_INTRINSIC_CURRENTS_TYPES.I_T.data_type),
-               NeuronParameter(self._data[G_T],_INTRINSIC_CURRENTS_TYPES.g_T.data_type),
-               NeuronParameter(self._data[E_T],_INTRINSIC_CURRENTS_TYPES.E_T.data_type),
-               NeuronParameter(self._data[M_T],_INTRINSIC_CURRENTS_TYPES.m_T.data_type),
-               NeuronParameter(self._data[M_INF_T],_INTRINSIC_CURRENTS_TYPES.m_inf_T.data_type),
-               NeuronParameter(self._data[E_TO_T_ON_TAU_M_T],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_T.data_type),
-               NeuronParameter(self._data[H_T],_INTRINSIC_CURRENTS_TYPES.h_T.data_type),
-               NeuronParameter(self._data[H_INF_T],_INTRINSIC_CURRENTS_TYPES.h_inf_T.data_type),
-               NeuronParameter(self._data[E_TO_T_ON_TAU_H_T],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_h_T.data_type),
-               NeuronParameter(self._data[I_NAP],_INTRINSIC_CURRENTS_TYPES.I_NaP.data_type),
-               NeuronParameter(self._data[G_NAP],_INTRINSIC_CURRENTS_TYPES.g_NaP.data_type),
-               NeuronParameter(self._data[E_NAP],_INTRINSIC_CURRENTS_TYPES.E_NaP.data_type),
-               NeuronParameter(self._data[M_INF_NAP],_INTRINSIC_CURRENTS_TYPES.m_inf_NaP.data_type),
-               NeuronParameter(self._data[I_DK],_INTRINSIC_CURRENTS_TYPES.I_DK.data_type),
-               NeuronParameter(self._data[G_DK],_INTRINSIC_CURRENTS_TYPES.g_DK.data_type),
-               NeuronParameter(self._data[E_DK],_INTRINSIC_CURRENTS_TYPES.E_DK.data_type),
-               NeuronParameter(self._data[M_INF_DK],_INTRINSIC_CURRENTS_TYPES.m_inf_DK.data_type),
-               NeuronParameter(self._data[E_TO_T_ON_TAU_M_DK],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_DK.data_type),
-               NeuronParameter(self._data[D],_INTRINSIC_CURRENTS_TYPES.D.data_type),
-               NeuronParameter(self._data[D_INFINITY],_INTRINSIC_CURRENTS_TYPES.D_infinity.data_type),
-               NeuronParameter(self._data[V_CLAMP],_INTRINSIC_CURRENTS_TYPES.v_clamp.data_type),
-               NeuronParameter(self._data[S_CLAMP],_INTRINSIC_CURRENTS_TYPES.s_clamp.data_type),
-               NeuronParameter(self._data[T_CLAMP],_INTRINSIC_CURRENTS_TYPES.t_clamp.data_type),
-               NeuronParameter(self._data[DT],_INTRINSIC_CURRENTS_TYPES.dt.data_type)
-               ]
-
-    def get_parameter_types(self):
-        return [item.data_type for item in _INTRINSIC_CURRENTS_TYPES]
-
-    def set_parameters(self, parameters, vertex_slice):
-        pass
-
-    def get_n_cpu_cycles_per_neuron(self):
-        return 100
+#
+#     def get_n_parameters(self):
+#         return 30
+#
+#     @inject_items({"machine_time_step": "MachineTimeStep"})
+#     def get_parameters(self, machine_time_step):
+#         # pylint: disable=arguments-differ
+#         return [NeuronParameter(self._data[I_H],_INTRINSIC_CURRENTS_TYPES.I_H.data_type),
+#                NeuronParameter(self._data[G_H],_INTRINSIC_CURRENTS_TYPES.g_H.data_type),
+#                NeuronParameter(self._data[E_H],_INTRINSIC_CURRENTS_TYPES.E_H.data_type),
+#                NeuronParameter(self._data[M_H],_INTRINSIC_CURRENTS_TYPES.m_H.data_type),
+#                NeuronParameter(self._data[M_INF_H],_INTRINSIC_CURRENTS_TYPES.m_inf_H.data_type),
+#                NeuronParameter(self._data[E_TO_T_ON_TAU_M_H],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_H.data_type),
+#                NeuronParameter(self._data[I_T],_INTRINSIC_CURRENTS_TYPES.I_T.data_type),
+#                NeuronParameter(self._data[G_T],_INTRINSIC_CURRENTS_TYPES.g_T.data_type),
+#                NeuronParameter(self._data[E_T],_INTRINSIC_CURRENTS_TYPES.E_T.data_type),
+#                NeuronParameter(self._data[M_T],_INTRINSIC_CURRENTS_TYPES.m_T.data_type),
+#                NeuronParameter(self._data[M_INF_T],_INTRINSIC_CURRENTS_TYPES.m_inf_T.data_type),
+#                NeuronParameter(self._data[E_TO_T_ON_TAU_M_T],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_T.data_type),
+#                NeuronParameter(self._data[H_T],_INTRINSIC_CURRENTS_TYPES.h_T.data_type),
+#                NeuronParameter(self._data[H_INF_T],_INTRINSIC_CURRENTS_TYPES.h_inf_T.data_type),
+#                NeuronParameter(self._data[E_TO_T_ON_TAU_H_T],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_h_T.data_type),
+#                NeuronParameter(self._data[I_NAP],_INTRINSIC_CURRENTS_TYPES.I_NaP.data_type),
+#                NeuronParameter(self._data[G_NAP],_INTRINSIC_CURRENTS_TYPES.g_NaP.data_type),
+#                NeuronParameter(self._data[E_NAP],_INTRINSIC_CURRENTS_TYPES.E_NaP.data_type),
+#                NeuronParameter(self._data[M_INF_NAP],_INTRINSIC_CURRENTS_TYPES.m_inf_NaP.data_type),
+#                NeuronParameter(self._data[I_DK],_INTRINSIC_CURRENTS_TYPES.I_DK.data_type),
+#                NeuronParameter(self._data[G_DK],_INTRINSIC_CURRENTS_TYPES.g_DK.data_type),
+#                NeuronParameter(self._data[E_DK],_INTRINSIC_CURRENTS_TYPES.E_DK.data_type),
+#                NeuronParameter(self._data[M_INF_DK],_INTRINSIC_CURRENTS_TYPES.m_inf_DK.data_type),
+#                NeuronParameter(self._data[E_TO_T_ON_TAU_M_DK],_INTRINSIC_CURRENTS_TYPES.e_to_t_on_tau_m_DK.data_type),
+#                NeuronParameter(self._data[D],_INTRINSIC_CURRENTS_TYPES.D.data_type),
+#                NeuronParameter(self._data[D_INFINITY],_INTRINSIC_CURRENTS_TYPES.D_infinity.data_type),
+#                NeuronParameter(self._data[V_CLAMP],_INTRINSIC_CURRENTS_TYPES.v_clamp.data_type),
+#                NeuronParameter(self._data[S_CLAMP],_INTRINSIC_CURRENTS_TYPES.s_clamp.data_type),
+#                NeuronParameter(self._data[T_CLAMP],_INTRINSIC_CURRENTS_TYPES.t_clamp.data_type),
+#                NeuronParameter(self._data[DT],_INTRINSIC_CURRENTS_TYPES.dt.data_type)
+#                ]
+#
+#     def get_parameter_types(self):
+#         return [item.data_type for item in _INTRINSIC_CURRENTS_TYPES]
+#
+#     def set_parameters(self, parameters, vertex_slice):
+#         pass
+#
+#     def get_n_cpu_cycles_per_neuron(self):
+#         return 100
 

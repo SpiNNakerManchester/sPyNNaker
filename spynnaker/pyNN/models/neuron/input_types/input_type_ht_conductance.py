@@ -19,15 +19,15 @@ UNITS = {
 
 class InputTypeHTConductance(AbstractInputType):
 
-    __slots__[
-        "ampa_rev_E",
-        "nmda_rev_E",
-        "gaba_a_rev_E",
-        "gaba_b_rev_E"
+    __slots__=[
+        "_ampa_rev_E",
+        "_nmda_rev_E",
+        "_gaba_a_rev_E",
+        "_gaba_b_rev_E"
         ]
 
     def __init__(self, ampa_rev_E, nmda_rev_E, gaba_a_rev_E, gaba_b_rev_E):
-        super(InputTypeConductance, self).__init__([
+        super(InputTypeHTConductance, self).__init__([
             DataType.S1615,   # ampa_rev_E
             DataType.S1615,   # nmda_rev_E
             DataType.S1615,   # gaba_a_rev_E

@@ -3,6 +3,8 @@ from .abstract_threshold_type import AbstractThresholdType
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 
+import numpy
+
 V_THRESH = "v_thresh"
 V_THRESH_RESTING = "v_thresh_resting"
 V_THRESH_TAU = "v_thresh_tau"
@@ -26,16 +28,16 @@ class ThresholdTypeHTDynamic(AbstractThresholdType):
         "_v_thresh",
         "_v_thresh_resting",
         "_v_thresh_tau",
-        "_v_thresh_na_reversal"
+        "_v_thresh_Na_reversal"
         ]
 
     def __init__(self, v_thresh_init,
                  v_thresh_resting, v_thresh_tau, v_thresh_Na_reversal):
-        super(ThresholdTypeStatic, self).__init__([
+        super(ThresholdTypeHTDynamic, self).__init__([
             DataType.S1615,    # v_thresh
             DataType.S1615,    # v_thresh_resting
             DataType.S1615,    # v_thresh_tau
-            DataType.S1615,    # v_thresh_na_reversal
+            DataType.S1615,    # v_thresh_Na_reversal
             ])
 
         self._v_thresh = v_thresh_init
@@ -52,7 +54,7 @@ class ThresholdTypeHTDynamic(AbstractThresholdType):
     def add_parameters(self, parameters):
         parameters[V_THRESH_RESTING] = self._v_thresh_resting
         parameters[V_THRESH_TAU] = self._v_thresh_tau
-        parameters[V_THRESH_NA_REVERSAL] = self._v_thresh_na_reversal
+        parameters[V_THRESH_NA_REVERSAL] = self._v_thresh_Na_reversal
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -66,15 +68,16 @@ class ThresholdTypeHTDynamic(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractThresholdType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
 
         # Add the rest of the data
         return [
-            state_variabless[V_THRESH],
+            state_variables[V_THRESH],
             parameters[V_THRESH_RESTING],
             parameters[V_THRESH_TAU].apply_operation(decay),
             parameters[V_THRESH_NA_REVERSAL]

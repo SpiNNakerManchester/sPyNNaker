@@ -101,8 +101,8 @@ class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
                              "exc_a_response", "exc_b_response",
                             "exc2_a_response", "exc2_b_response",
                             "inh_a_response", "inh_b_response",
-                            "inh2_a_response", "inh2_b_response"
-                            "I_H ", "I_T", "I_NaP", "I_DK" })
+                            "inh2_a_response", "inh2_b_response",
+                            "I_H", "I_T", "I_NaP", "I_DK" })
 
     def __init__(
             self,
@@ -110,7 +110,7 @@ class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
             # #################################
             # #### neuron model parameters ####
             # #################################
-            v_init=initialize_parameters['v_init'],
+            v=initialize_parameters['v_init'],
             g_Na=default_parameters['g_Na'],
             E_Na=default_parameters['E_Na'],
             g_K=default_parameters['g_K'],
@@ -215,7 +215,7 @@ class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelHT(
-            v_init,
+            v,
             g_Na,
             E_Na,
             g_K,
@@ -310,4 +310,5 @@ class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
         super(HillTononiNeuron, self).__init__(
             model_name="ht", binary="ht.aplx",
             neuron_model=neuron_model, input_type=input_type,
-            synapse_type=synapse_type, threshold_type=threshold_type)
+            synapse_type=synapse_type, threshold_type=threshold_type,
+            additional_input_type=additional_input)

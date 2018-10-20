@@ -199,7 +199,7 @@ static input_t additional_input_get_input_value_as_current(
           PROFILER_EXIT | PROFILER_INTRINSIC_CURRENT);
 //------------------------------------------------------------------------
 
-     return additional_input->I_H + additional_input->I_T + additional_input->I_NaP + additional_input->I_DK;
+     return 0; // additional_input->I_H + additional_input->I_T + additional_input->I_NaP + additional_input->I_DK;
 }
 
 static void additional_input_has_spiked(

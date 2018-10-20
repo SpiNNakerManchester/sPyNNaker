@@ -7,7 +7,7 @@
 #include <neuron/models/neuron_model.h>
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
-#include <neuron/threshold_types/threshold_type.h>
+#include <neuron/threshold_types/threshold_type_ht_dynamic.h>
 #include <neuron/synapse_types/synapse_types.h>
 
 // Further includes
@@ -217,7 +217,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		threshold_type->threshold_value;
+//    		total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(

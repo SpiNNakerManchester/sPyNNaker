@@ -23,7 +23,7 @@ typedef struct threshold_type_t {
 } threshold_type_t;
 
 static inline void _print_threshold_type_params(threshold_type_t* threshold_type){
-	   log_debug("threshold_value: %k; \n"
+	   io_printf(IO_BUF, "threshold_value: %k; \n"
 	    		"threshold_resting: %k; \n"
 	    		"Thereshold_decay: %k; \n"
 	    		"Threshold_Na_reversal: %k. \n",
@@ -36,8 +36,8 @@ static inline void _print_threshold_type_params(threshold_type_t* threshold_type
 static inline bool threshold_type_is_above_threshold(state_t value,
                         threshold_type_pointer_t threshold_type) {
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DYNAMIC_THRESHOLD);
-    _print_threshold_type_params(threshold_type);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DYNAMIC_THRESHOLD);
+//    _print_threshold_type_params(threshold_type);
 
 	// If neuron has spiked
 	if (REAL_COMPARE(value, >=, threshold_type->threshold_value)) {
@@ -48,7 +48,7 @@ static inline bool threshold_type_is_above_threshold(state_t value,
 		// we can decay threshold value back to zero
 		threshold_type->threshold_value = threshold_type->threshold_Na_reversal;
 
-        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DYNAMIC_THRESHOLD);
+//        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DYNAMIC_THRESHOLD);
 
 		// Return true as neuron spiked
 		return true;
@@ -60,7 +60,7 @@ static inline bool threshold_type_is_above_threshold(state_t value,
 				threshold_type->threshold_decay
 				+ threshold_type->threshold_resting;
 
-        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DYNAMIC_THRESHOLD);
+//        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DYNAMIC_THRESHOLD);
 
 		// Return false 'has not spiked' to neuron.c
 		return false;
