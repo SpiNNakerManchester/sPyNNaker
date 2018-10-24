@@ -105,7 +105,7 @@ class NeuronRecorder(object):
                 continue
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
-            record_raw, missing_data = buffer_manager.get_data_by_vertex(
+            record_raw, missing_data = buffer_manager.get_data_by_placement(
                     placement, region)
             record_length = len(record_raw)
 
@@ -183,7 +183,7 @@ class NeuronRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
-            record_raw, data_missing = buffer_manager.get_data_by_vertex(
+            record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(

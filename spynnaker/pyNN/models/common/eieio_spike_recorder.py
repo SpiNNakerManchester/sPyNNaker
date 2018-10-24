@@ -61,7 +61,7 @@ class EIEIOSpikeRecorder(object):
 
             # Read the spikes
             raw_spike_data, data_missing = \
-                buffer_manager.get_data_by_vertex(placement, region)
+                buffer_manager.get_data_by_placement(placement, region)
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
