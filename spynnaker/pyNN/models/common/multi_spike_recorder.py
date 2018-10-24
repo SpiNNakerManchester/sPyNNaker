@@ -63,14 +63,14 @@ class MultiSpikeRecorder(object):
             vertex_slice = graph_mapper.get_slice(vertex)
 
             # Read the spikes from the buffer manager
-            neuron_param_region, data_missing = \
-                buffer_manager.get_data_for_vertex(placement, region)
+            neuron_param_data, data_missing = \
+                buffer_manager.get_data_by_vertex(placement, region)
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
                 int(math.ceil(vertex_slice.n_atoms / 32.0)),
-                neuron_param_region.read_all(), spike_ids, spike_times)
+                neuron_param_data, spike_ids, spike_times)
 
         if missing:
             logger.warning(

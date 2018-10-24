@@ -105,10 +105,8 @@ class NeuronRecorder(object):
                 continue
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_data = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, missing_data = buffer_manager.get_data_by_vertex(
                     placement, region)
-            record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
 
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
@@ -145,7 +143,7 @@ class NeuronRecorder(object):
                 # Add the slice fragment on axis 1 which is IDs/channel_index
                 data = numpy.append(data, fragment, axis=1)
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
         sampling_interval = self.get_neuron_sampling_interval(variable)
@@ -185,13 +183,11 @@ class NeuronRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, data_missing = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, data_missing = buffer_manager.get_data_by_vertex(
                     placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
-            record_raw = neuron_param_region_data_pointer.read_all()
             raw_data = (numpy.asarray(record_raw, dtype="uint8").
                         view(dtype="<i4")).reshape(
                 [-1, n_words_with_timestamp])
