@@ -2,7 +2,7 @@ from collections import defaultdict
 
 
 class ExtractedData(object):
-    """ data holder for all synaptic data being extracted in parallel.
+    """ Data holder for all synaptic data being extracted in parallel.
     @Chimp: play here to hearts content.
     """
 
@@ -10,7 +10,7 @@ class ExtractedData(object):
         self._data = defaultdict(dict)
 
     def get(self, projection, attribute):
-        """ allows getting data from a given projection and attribute
+        """ Allow getting data from a given projection and attribute
 
         :param projection: the projection data was extracted from
         :param attribute: the attribute to retrieve
@@ -22,7 +22,7 @@ class ExtractedData(object):
         return None
 
     def set(self, projection, attribute, data):
-        """ allows the addition of data from a projection and attribute.
+        """ Allow the addition of data from a projection and attribute.
 
         :param projection: the projection data was extracted from
         :param attribute: the attribute to store

@@ -31,9 +31,8 @@ typedef struct {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern plasticity_weight_region_data_t
-    plasticity_weight_region_data[SYNAPSE_TYPE_COUNT];
-extern uint32_t weight_multiply_right_shift[SYNAPSE_TYPE_COUNT];
+extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+extern uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Weight dependance functions

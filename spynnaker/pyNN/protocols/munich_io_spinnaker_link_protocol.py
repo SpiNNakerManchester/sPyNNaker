@@ -171,24 +171,24 @@ REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY = munich_key_i_d(5, 3)
 # set payload pins to high impedance
 SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY = munich_key_i_d(5, 4)
 
-# set laser params for pushbot
+# set laser params for PushBot
 PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 0)
 PUSH_BOT_LASER_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 0)
 PUSH_BOT_LASER_FREQUENCY = munich_key_i_d(37, 1)
 
-# set led params for pushbot
+# set led params for PushBot
 PUSH_BOT_LED_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 4)
 PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 4)
 PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 5)
 PUSH_BOT_LED_FREQUENCY = munich_key_i_d(37, 0)
 
-# set speaker params for pushbot
+# set speaker params for PushBot
 PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD = munich_key_i_d(3, 2)
 PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME = munich_key_i_d(4, 2)
 PUSH_BOT_SPEAKER_TONE_BEEP = munich_key_i_d(36, 0)
 PUSH_BOT_SPEAKER_TONE_MELODY = munich_key_i_d(36, 1)
 
-# pushbot motor control
+# PushBot motor control
 PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY = munich_key_i_d(32, 0)
 PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY = munich_key_i_d(32, 1)
 PUSH_BOT_MOTOR_0_LEAKY_VELOCITY = munich_key_i_d(32, 2)
@@ -260,7 +260,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
                ('FREE', 5)])
 
     # The instance of the protocol in use, to ensure that each vertex that is
-    # to send commands to the pushbot uses a different outgoing key; the top
+    # to send commands to the PushBot uses a different outgoing key; the top
     # part of the key is ignored, so this works out!
     protocol_instance = 0
 
@@ -272,7 +272,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
         :param mode: The mode of operation of the protocol
         :param instance_key: The optional instance key to use
-        :param uart_id: The id of the UART when needed
+        :param uart_id: The ID of the UART when needed
         """
         self._mode = mode
 
@@ -614,7 +614,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def _check_for_pushbot_mode(self):
         if self._mode is not self.MODES.PUSH_BOT:
             raise ConfigurationException(
-                "The mode you configured is not the pushbot, and so this "
+                "The mode you configured is not the PushBot, and so this "
                 "message is invalid for mode {}".format(self._mode))
 
     @property
@@ -800,7 +800,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def set_retina_transmission(
             self, retina_key=RetinaKey.NATIVE_128_X_128,
             retina_payload=None, time=None):
-        """ set the retina transmission key
+        """ Set the retina transmission key
 
         :param retina_key: the new key for the retina
         :param retina_payload: \
@@ -808,7 +808,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :type retina_payload: enum or None
         :param time: when to transmit this packet
         :return: the command to send
-        :rtype: MultiCastCommand
+        :rtype: \
+            :py:class:`spinn_front_end_common.utility_models.multi_cast_command.MultiCastCommand`
         """
 
         if retina_key == RetinaKey.FIXED_KEY and retina_payload is None:

@@ -74,7 +74,7 @@ class EIEIOSpikeRecorder(object):
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}", label, region, missing_str)
         if not results:
-            return []
+            return numpy.empty(shape=(0, 2))
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 

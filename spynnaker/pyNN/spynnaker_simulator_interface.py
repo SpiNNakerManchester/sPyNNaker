@@ -17,7 +17,7 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     def get_distribution_to_stats(self):
         pass
 
-    # Implemented in FEC but only used by spynakker
+    # Implemented in FEC but only used by sPyNNaker
     @abstractmethod
     def get_current_time(self):
         pass
