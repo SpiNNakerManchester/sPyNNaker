@@ -104,7 +104,7 @@ typedef struct {
     uint32_t current_time;
     // what is the current control word
     int16_t current_controls;
-    // what are the global pre- and post-synaptic neuron ids
+    // what are the global pre- and post-synaptic neuron IDs
     uint32_t global_pre_syn_id, global_post_syn_id;
     // does the post to pre table have contain a connection for the selected
     // slot
@@ -398,7 +398,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
             &rewiring_data.pre_pop_info_table.subpop_info[i];
 
             // Loop over all subpopulations and check if the KEY matches
-            // (with neuron id masked out)
+            // (with neuron ID masked out)
             for (int subpop_index = 0;
                 subpop_index < preapppop_info->no_pre_vertices;
                 subpop_index++) {
@@ -430,7 +430,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     }
     pre_sub_pop = i;
 
-    // Select a presynaptic neuron id
+    // Select a presynaptic neuron ID
     choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
         preapppop_info->key_atom_info[pre_sub_pop].n_atoms;
 
@@ -461,7 +461,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
 
     // Compute distances
     // To do this I need to take the DIV and MOD of the
-    // postsyn neuron id, of the presyn neuron id
+    // postsyn neuron ID, of the presyn neuron ID
     // Compute the distance of these 2 measures
     int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
     // Pre computation requires querying the table with global information
@@ -512,13 +512,13 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
 }
 
 //! \brief This function is a rewiring DMA callback
-//! \param[in] dma_id: the id of the dma
-//! \param[in] dma_tag: the dma tag, i.e. the tag used for reading row for rew.
+//! \param[in] dma_id: the ID of the DMA
+//! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
 void synaptic_row_restructure(uint dma_id, uint dma_tag)
 {
     // the synaptic row is in rewiring_dma_buffer, while
-    // the selected pre and postsynaptic ids are in current_state
+    // the selected pre- and postsynaptic IDs are in current_state
     use(dma_id);
     use(dma_tag);
 
@@ -544,7 +544,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
             rewiring_dma_buffer.sdram_writeback_address,\
             rewiring_dma_buffer.row, DMA_WRITE,\
             rewiring_dma_buffer.n_bytes_transferred)) {\
-        log_error(msg);\
+        log_error("%s", msg);\
         }\
     } while (0)
 

@@ -60,8 +60,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
         my_repeat_reg = 4
         spec.set_register_value(register_id=my_repeat_reg,
                                 data=MASTER_POPULATION_ENTRIES)
-        spec.write_repeat_value(data=0, repeats_register=my_repeat_reg,
-                                data_type=DataType.UINT16)
+        spec.write_repeated_value(data=0, repeats_register=my_repeat_reg,
+                                  data_type=DataType.UINT16)
 
         spec.comment("\nWriting Row Length Translation Table:\n")
         for entry in ROW_LEN_TABLE_ENTRIES:
@@ -135,7 +135,8 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
     def _get_table_address_from_coords(self, x, y, p):
         return (p + (18 * y) + (18 * 8 * x)) * 2
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
+               extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
@@ -143,6 +144,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
             created synaptic block.
 
         An entry in the table is a 16-bit value, with the following structure:
+
         * Bits [2:0]  Row length information. This value (from 0->7) indicates\
             the maximum number of synapses in this block. It is translated in\
             the row length translation table by the executing code each time\
@@ -152,11 +154,17 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
             by shifting left by 7 bits then adding the start address of the\
             memory region.
 
-        :param spec:
-        :param block_start_addr:
-        :param row_length:
-        :param key_and_mask:
-        :param master_pop_table_region:
+        :param spec: the data specification to write the master pop entry to
+        :param block_start_addr: the start address of the row in the region
+        :param row_length: the row length of this entry
+        :param key_and_mask: a key_and_mask object used as part of describing\
+            an edge that will require being received to be stored in the\
+            master pop table; the whole edge will become multiple calls to\
+            this function
+        :type key_and_mask: \
+            :py:class:`pacman.model.routing_info.BaseKeyAndMask`
+        :param master_pop_table_region: \
+            The region to which the master pop table is being stored
         :param is_single: True if this is a single synapse, False otherwise
         """
         # pylint: disable=too-many-arguments, arguments-differ
@@ -197,6 +205,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
+        # Nothing to do here
         pass
 
     @overrides(AbstractMasterPopTableFactory.get_edge_constraints)

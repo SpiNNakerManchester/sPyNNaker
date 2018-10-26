@@ -70,21 +70,16 @@ class ExternalFPGARetinaDevice(
     DOWN_POLARITY = "DOWN"
     MERGED_POLARITY = "MERGED"
 
-    default_parameters = {
-        'board_address': None, 'label': "ExternalFPGARetinaDevice"}
-
     def __init__(
             self, mode, retina_key, spinnaker_link_id, polarity,
-            label=default_parameters['label'], n_neurons=None,
-            board_address=default_parameters['board_address']):
+            label=None, board_address=None):
         """
         :param mode: The retina "mode"
         :param retina_key: The value of the top 16-bits of the key
         :param spinnaker_link_id: \
-            The spinnaker link to which the retina is connected
+            The SpiNNaker link to which the retina is connected
         :param polarity: The "polarity" of the retina data
         :param label:
-        :param n_neurons: The number of neurons in the population
         :param board_address:
         """
         # pylint: disable=too-many-arguments
@@ -97,10 +92,6 @@ class ExternalFPGARetinaDevice(
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
         self._fixed_mask = self._get_mask(mode)
 
-        if fixed_n_neurons != n_neurons and n_neurons is not None:
-            logger.warning("The specified number of neurons for the FPGA "
-                           "retina device has been ignored {} will be used "
-                           "instead", fixed_n_neurons)
         super(ExternalFPGARetinaDevice, self).__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             label=label, max_atoms_per_core=fixed_n_neurons,
