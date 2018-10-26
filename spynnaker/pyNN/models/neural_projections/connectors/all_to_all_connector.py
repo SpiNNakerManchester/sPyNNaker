@@ -45,7 +45,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                 n_post_neurons)]
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self):
         return self._get_delay_maximum(
             self._n_pre_neurons * self._n_post_neurons)
 

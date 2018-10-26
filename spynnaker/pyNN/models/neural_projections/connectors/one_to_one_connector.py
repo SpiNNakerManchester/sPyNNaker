@@ -23,7 +23,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self):
         return self._get_delay_maximum(
             max((self._n_pre_neurons, self._n_post_neurons)))
 

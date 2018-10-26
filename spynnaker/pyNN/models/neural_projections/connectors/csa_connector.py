@@ -89,7 +89,7 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         n_connections, pair_list = self._get_n_connections(
@@ -109,10 +109,8 @@ class CSAConnector(AbstractConnector):
         # source and target are the pre_neurons and post_neurons in pair_list
         block["source"] = [x[0] for x in pair_list]
         block["target"] = [x[1] for x in pair_list]
-        block["weight"] = self._generate_weights(
-            self._weights, n_connections, None)
-        block["delay"] = self._generate_delays(
-            self._delays, n_connections, None)
+        block["weight"] = self._generate_weights(weights, n_connections, None)
+        block["delay"] = self._generate_delays(delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
 

@@ -136,7 +136,7 @@ class AbstractConnector(object):
             type(self._delays)))
 
     @abstractmethod
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
         """

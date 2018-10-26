@@ -40,7 +40,8 @@ class FromListConnector(AbstractConnector):
         self._converted_weights_and_delays = False
 
     @overrides(AbstractConnector.set_weights_and_delays)
-    def set_weights_and_delays(self, weights, delays):
+    def set_weights_and_delays(self, weights, delays, allow_lists):
+        self._check_parameter(weights, delays, allow_lists)
         # set the data if not already set (supports none overriding via
         # synapse data)
         weight = convert_param_to_numpy(weights, len(self._conn_list))
@@ -65,8 +66,8 @@ class FromListConnector(AbstractConnector):
             self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
-        return numpy.max(delays)  # self._conn_list["delay"])
+    def get_delay_maximum(self):
+        return numpy.max(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self):
