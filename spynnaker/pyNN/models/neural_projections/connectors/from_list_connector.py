@@ -41,7 +41,7 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays, allow_lists):
-        self._check_parameter(weights, delays, allow_lists)
+        self._check_parameters(weights, delays, allow_lists)
         # set the data if not already set (supports none overriding via
         # synapse data)
         weight = convert_param_to_numpy(weights, len(self._conn_list))
@@ -84,8 +84,8 @@ class FromListConnector(AbstractConnector):
         else:
             mask = ((self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                     (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
-                    (delays >= min_delay) &
-                    (delays <= max_delay))
+                    (self._conn_list["delay"] >= min_delay) &
+                    (self._conn_list["delay"] <= max_delay))
         sources = self._conn_list["source"][mask]
         if sources.size == 0:
             return 0
