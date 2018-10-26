@@ -67,7 +67,7 @@ class AbstractConnector(object):
         """
         self._space = space
 
-    def set_weights_and_delays(self, weights, delays, allow_lists):
+    def set_weights_and_delays(self, weights, delays):
         """ Set the weights and delays as needed.
 
         :param weights:
@@ -115,28 +115,29 @@ class AbstractConnector(object):
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
-    def _get_delay_maximum(self, n_connections):
+    @staticmethod
+    def _get_delay_maximum(delays, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
         """
-        if get_simulator().is_a_pynn_random(self._delays):
+        if get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
-                self._delays, n_connections)
-            high = utility_calls.high(self._delays)
+                delays, n_connections)
+            high = utility_calls.high(delays)
             if high is None:
                 return max_estimated_delay
 
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
-        elif numpy.isscalar(self._delays):
-            return self._delays
-        elif hasattr(self._delays, "__getitem__"):
-            return numpy.max(self._delays)
+        elif numpy.isscalar(delays):
+            return delays
+        elif hasattr(delays, "__getitem__"):
+            return numpy.max(delays)
         raise Exception("Unrecognised delay format: {:s}".format(
-            type(self._delays)))
+            type(delays)))
 
     @abstractmethod
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
         """

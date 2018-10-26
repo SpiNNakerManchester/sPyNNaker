@@ -39,8 +39,8 @@ class ArrayConnector(AbstractConnector):
         self._array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(len(self._array))
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, len(self._array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

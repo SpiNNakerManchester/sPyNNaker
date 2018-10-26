@@ -68,9 +68,9 @@ class FixedNumberPostConnector(AbstractConnector):
                 "and n = n_post_neurons")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         n_connections = self._n_pre_neurons * self._n_post
-        return self._get_delay_maximum(n_connections)
+        return self._get_delay_maximum(delays, n_connections)
 
     def _get_post_neurons(self):
         # If we haven't set the array up yet, do it now

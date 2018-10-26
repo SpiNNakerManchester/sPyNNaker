@@ -50,8 +50,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         """
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._num_synapses)
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, self._num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self._synapses_per_edge is None or

@@ -44,11 +44,11 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
                 "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
             self._n_pre_neurons * self._n_post_neurons, self._p_connect)
-        return self._get_delay_maximum(n_connections)
+        return self._get_delay_maximum(delays, n_connections)
 
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(

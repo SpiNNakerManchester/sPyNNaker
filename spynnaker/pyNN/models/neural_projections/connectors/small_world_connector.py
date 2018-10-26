@@ -33,8 +33,8 @@ class SmallWorldConnector(AbstractConnector):
         self._n_connections = numpy.sum(self._mask)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._n_connections)
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, self._n_connections)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         return numpy.sum(

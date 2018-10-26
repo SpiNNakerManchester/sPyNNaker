@@ -39,9 +39,54 @@ class FromListConnector(AbstractConnector):
         self._conn_list = conn_list
         self._converted_weights_and_delays = False
 
+    @staticmethod
+    def _split_conn_list(conn_list, column_names):
+        """ Separate the connection list into the blocks needed.
+        :param conn_list: the original connection list
+        :param column_names: the column names if exist
+        :return: source dest list, weights list, delays list, extra list
+        """
+
+        # weights and delay index
+        weight_index = None
+        delay_index = None
+
+        # conn lists
+        weights = None
+        delays = None
+
+        # locate weights and delay index in the listings
+        if "weight" in column_names:
+            weight_index = column_names.index("weight")
+        if "delay" in column_names:
+            delay_index = column_names.index("delay")
+        element_index = list(range(2, len(column_names)))
+
+        # figure out where other stuff is
+        conn_list = numpy.array(conn_list)
+        source_destination_conn_list = conn_list[:, [0, 1]]
+
+        if weight_index is not None:
+            element_index.remove(weight_index)
+            weights = conn_list[:, weight_index]
+        if delay_index is not None:
+            element_index.remove(delay_index)
+            delays = conn_list[:, delay_index]
+
+        # build other data element conn list (with source and destination)
+        other_conn_list = None
+        other_element_column_names = list()
+        for element in element_index:
+            other_element_column_names.append(column_names[element])
+        if element_index:
+            other_conn_list = conn_list[:, element_index]
+            other_conn_list.dtype.names = other_element_column_names
+
+        # hand over split data
+        return source_destination_conn_list, weights, delays, other_conn_list
+
     @overrides(AbstractConnector.set_weights_and_delays)
-    def set_weights_and_delays(self, weights, delays, allow_lists):
-        self._check_parameters(weights, delays, allow_lists)
+    def set_weights_and_delays(self, weights, delays):
         # set the data if not already set (supports none overriding via
         # synapse data)
         weight = convert_param_to_numpy(weights, len(self._conn_list))
@@ -66,8 +111,8 @@ class FromListConnector(AbstractConnector):
             self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return numpy.max(self._conn_list["delay"])
+    def get_delay_maximum(self, delays):
+        return numpy.max(delays)  # self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self):
