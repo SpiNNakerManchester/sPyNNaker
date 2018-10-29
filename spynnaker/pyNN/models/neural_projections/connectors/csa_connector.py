@@ -70,12 +70,12 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         n_connections_max = post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons, n_connections_max,
-            min_delay, max_delay)
+            delays, self._n_pre_neurons * self._n_post_neurons,
+            n_connections_max, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -83,9 +83,9 @@ class CSAConnector(AbstractConnector):
         return n_connections_max
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         n_connections_max = self._n_pre_neurons * self._n_post_neurons
-        return self._get_weight_maximum(n_connections_max)
+        return self._get_weight_maximum(weights, n_connections_max)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

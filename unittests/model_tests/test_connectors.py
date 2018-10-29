@@ -98,10 +98,10 @@ def test_connectors(
         pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
 
-        max_delay = connector.get_delay_maximum()
-        max_weight = connector.get_weight_maximum()
+        max_delay = connector.get_delay_maximum(delay)
+        max_weight = connector.get_weight_maximum(weight)
         max_row_length = connector.get_n_connections_from_pre_vertex_maximum(
-            post_vertex_slice)
+            delay, post_vertex_slice)
         max_col_length = connector.get_n_connections_to_post_vertex_maximum()
         synaptic_block = connector.create_synaptic_block(
             weight, delay, pre_slices, pre_slice_index, post_slices,

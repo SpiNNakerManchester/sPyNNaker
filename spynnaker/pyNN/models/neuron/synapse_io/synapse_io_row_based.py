@@ -77,14 +77,14 @@ class SynapseIORowBased(AbstractSynapseIO):
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                post_vertex_slice, 0, max_delay_supported)
+                delays, post_vertex_slice, 0, max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
         if n_delay_stages > 0:
             max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    post_vertex_slice,
+                    delays, post_vertex_slice,
                     min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes

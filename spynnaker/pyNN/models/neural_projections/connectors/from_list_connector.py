@@ -115,12 +115,12 @@ class FromListConnector(AbstractConnector):
         return numpy.max(delays)  # self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self):
+    def get_delay_variance(self, delays):
         return numpy.var(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         mask = None
         if min_delay is None or max_delay is None:
@@ -142,16 +142,16 @@ class FromListConnector(AbstractConnector):
         return numpy.max(numpy.bincount(self._conn_list["target"]))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self):
+    def get_weight_mean(self, weights):
         return numpy.mean(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
         return numpy.amax(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self):
+    def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
         return numpy.var(numpy.abs(self._conn_list["weight"]))
 

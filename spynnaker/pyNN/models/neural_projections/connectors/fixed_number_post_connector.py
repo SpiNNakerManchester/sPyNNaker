@@ -134,7 +134,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         prob_in_slice = (
             post_vertex_slice.n_atoms / float(self._n_post_neurons))
@@ -146,8 +146,8 @@ class FixedNumberPostConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_post_neurons * self._n_pre_neurons, n_connections,
-            min_delay, max_delay)
+            delays, self._n_post_neurons * self._n_pre_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -160,9 +160,9 @@ class FixedNumberPostConnector(AbstractConnector):
         return int(math.ceil(n_connections))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         n_connections = self._n_pre_neurons * self._n_post
-        return self._get_weight_maximum(n_connections)
+        return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

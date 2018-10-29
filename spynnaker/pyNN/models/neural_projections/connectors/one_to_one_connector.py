@@ -29,20 +29,20 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         if min_delay is None or max_delay is None:
             return 1
 
-        if numpy.isscalar(self._delays):
-            if self._delays >= min_delay and self._delays <= max_delay:
+        if numpy.isscalar(delays):
+            if delays >= min_delay and delays <= max_delay:
                 return 1
             return 0
-        if isinstance(self._delays, self._random_number_class):
+        if isinstance(delays, self._random_number_class):
             return 1
 
-        slice_min_delay = min(self._delays)
-        slice_max_delay = max(self._delays)
+        slice_min_delay = min(delays)
+        slice_max_delay = max(delays)
         if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
             return 1
         return 0
@@ -52,8 +52,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return 1
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
-        return self._get_weight_maximum(
+    def get_weight_maximum(self, weights):
+        return self._get_weight_maximum(weights,
             max((self._n_pre_neurons, self._n_post_neurons)))
 
     @overrides(AbstractConnector.create_synaptic_block)

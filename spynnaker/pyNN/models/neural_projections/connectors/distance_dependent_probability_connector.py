@@ -82,7 +82,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         max_prob = numpy.amax(
             self._probs[0:self._n_pre_neurons, post_vertex_slice.as_slice])
@@ -94,7 +94,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons,
+            delays, self._n_pre_neurons * self._n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -105,7 +105,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             numpy.amax(self._probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
         return utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
