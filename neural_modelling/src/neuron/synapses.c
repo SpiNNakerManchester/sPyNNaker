@@ -40,6 +40,12 @@ static uint32_t synapse_type_mask;
 
 /* PRIVATE FUNCTIONS */
 
+#if LOG_LEVEL >= LOG_DEBUG
+static const char *_get_type_char(uint32_t synapse_type) {
+	return neuron_get_synapse_type_char(synapse_type);
+}
+#endif // LOG_LEVEL >= LOG_DEBUG
+
 static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
@@ -71,7 +77,7 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
         log_debug(
             "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
             synapse_row_sparse_delay(synapse, synapse_type_index_bits),
-            synapse_types_get_type_char(synapse_type),
+            _get_type_char(synapse_type),
             synapse_row_sparse_index(synapse, synapse_index_mask),
             SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
@@ -98,7 +104,7 @@ static inline void _print_ring_buffers(uint32_t time) {
     io_printf(IO_BUF, "----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
-            const char *type_string = synapse_types_get_type_char(t);
+            const char *type_string = _get_type_char(t);
             bool empty = true;
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                 empty = empty && (ring_buffers[
@@ -128,34 +134,36 @@ static inline void _print_ring_buffers(uint32_t time) {
 static inline void _print_inputs() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
-
-    bool empty = true;
-    for (index_t i = 0; i < n_neurons; i++) {
-        empty = empty
-                && (bitsk(synapse_types_get_excitatory_input(
-                        &(neuron_synapse_shaping_params[i]))
-                    - synapse_types_get_inhibitory_input(
-                        &(neuron_synapse_shaping_params[i]))) == 0);
-    }
-
-    if (!empty) {
-        log_debug("-------------------------------------\n");
-
-        for (index_t i = 0; i < n_neurons; i++) {
-            input_t input =
-                synapse_types_get_excitatory_input(
-                    &(neuron_synapse_shaping_params[i]))
-                - synapse_types_get_inhibitory_input(
-                    &(neuron_synapse_shaping_params[i]));
-            if (bitsk(input) != 0) {
-                log_debug("%3u: %12.6k (= ", i, input);
-                synapse_types_print_input(
-                    &(neuron_synapse_shaping_params[i]));
-                log_debug(")\n");
-            }
-        }
-        log_debug("-------------------------------------\n");
-    }
+    // neuron_synapse_shaping_params have moved to implementation...
+    neuron_print_inputs();
+//
+//    bool empty = true;
+//    for (index_t i = 0; i < n_neurons; i++) {
+//        empty = empty
+//                && (bitsk(synapse_types_get_excitatory_input(
+//                        &(neuron_synapse_shaping_params[i]))
+//                    - synapse_types_get_inhibitory_input(
+//                        &(neuron_synapse_shaping_params[i]))) == 0);
+//    }
+//
+//    if (!empty) {
+//        log_debug("-------------------------------------\n");
+//
+//        for (index_t i = 0; i < n_neurons; i++) {
+//            input_t input =
+//                synapse_types_get_excitatory_input(
+//                    &(neuron_synapse_shaping_params[i]))
+//                - synapse_types_get_inhibitory_input(
+//                    &(neuron_synapse_shaping_params[i]));
+//            if (bitsk(input) != 0) {
+//                log_debug("%3u: %12.6k (= ", i, input);
+//                synapse_types_print_input(
+//                    &(neuron_synapse_shaping_params[i]));
+//                log_debug(")\n");
+//            }
+//        }
+//        log_debug("-------------------------------------\n");
+//    }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -213,11 +221,14 @@ static inline void _print_synapse_parameters() {
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
 #if LOG_LEVEL >= LOG_DEBUG
-    log_debug("-------------------------------------\n");
-    for (index_t n = 0; n < n_neurons; n++) {
-        synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
-    }
-    log_debug("-------------------------------------\n");
+	// again neuron_synapse_shaping_params has moved to implementation
+	neuron_print_synapse_parameters();
+
+//    log_debug("-------------------------------------\n");
+//    for (index_t n = 0; n < n_neurons; n++) {
+//        synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
+//    }
+//    log_debug("-------------------------------------\n");
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 

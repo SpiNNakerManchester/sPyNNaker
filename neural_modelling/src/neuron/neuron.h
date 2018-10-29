@@ -62,5 +62,12 @@ void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_print_inputs();
+
+void neuron_print_synapse_parameters();
+
+const char *neuron_get_synapse_type_char(uint32_t synapse_type);
+#endif
 
 #endif // _NEURON_H_
