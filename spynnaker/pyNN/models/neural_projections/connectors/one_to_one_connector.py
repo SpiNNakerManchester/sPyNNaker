@@ -24,8 +24,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
-        return self._get_delay_maximum(delays,
-            max((self._n_pre_neurons, self._n_post_neurons)))
+        return self._get_delay_maximum(
+            delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -53,8 +53,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
-        return self._get_weight_maximum(weights,
-            max((self._n_pre_neurons, self._n_post_neurons)))
+        return self._get_weight_maximum(
+            weights, max((self._n_pre_neurons, self._n_post_neurons)))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
