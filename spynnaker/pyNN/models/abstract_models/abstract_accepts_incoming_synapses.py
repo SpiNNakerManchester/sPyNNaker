@@ -11,11 +11,12 @@ class AbstractAcceptsIncomingSynapses(object):
     __slots__ = ()
 
     @abstractproperty
-    def synapse_type(self):
-        """ The synapse type of the vertex.
+    def get_synapse_id_by_target(self, target):
+        """ Get the ID of a synapse given the name.
 
-        :rtype:\
-            :py:class:`spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType`
+        :param target: The name of the synapse
+        :type target: str
+        :rtype: int
         """
 
     @abstractmethod
