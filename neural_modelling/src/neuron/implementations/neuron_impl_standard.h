@@ -215,8 +215,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         total_inh += inh_input_values[i];
     }
 
+    // hacked to enable recording of intrinsic currents
+    external_bias = additional_input_get_input_value_as_current(
+        additional_input, voltage);
+
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    		external_bias;
+//    		total_exc;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
     		threshold_type->threshold_value;
 //    		total_inh;
@@ -227,8 +233,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_type_convert_inhibitory_input_to_current(
             inh_input_values, input_type, voltage);
 
-    external_bias += additional_input_get_input_value_as_current(
-        additional_input, voltage);
+//    external_bias += additional_input_get_input_value_as_current(
+//        additional_input, voltage);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(

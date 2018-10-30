@@ -136,6 +136,7 @@ UNITS = {
 
 class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     __slots__ = [
+        "_v_init",
         "_I_H",
         "_g_H",
         "_E_H",
@@ -244,32 +245,52 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
             DataType.S1615 #dt = (30, )
             ])
 
+        self._v_init = -69.9
+
         self._I_H = I_H
         self._g_H = g_H
         self._E_H = E_H
-        self._m_H = m_H
-        self._m_inf_H = m_inf_H
-        self._e_to_t_on_tau_m_H = e_to_t_on_tau_m_H
+        self._m_inf_H = 1 / (1 + numpy.exp((self._v_init +75) / 5.5) )      #m_inf_H
+        self._m_H = self._m_inf_H # initialise to m_inf_h
+        self._e_to_t_on_tau_m_H = \
+            numpy.exp(-0.1 * # this is dt - needs substituing for variable
+                      (numpy.exp(-14.59 - 0.086 * self._v_init) +
+                             numpy.exp(-1.87 + 0.0701 * self._v_init)))
+
+
         self._I_T = I_T
         self._g_T = g_T
         self._E_T = E_T
-        self._m_T = m_T
-        self._m_inf_T = m_inf_T
-        self._e_to_t_on_tau_m_T = e_to_t_on_tau_m_T
-        self._h_T = h_T
-        self._h_inf_T = h_inf_T
-        self._e_to_t_on_tau_h_T = e_to_t_on_tau_h_T
+        self._m_inf_T = 1 / (1 + numpy.exp(-(self._v_init + 59) * 0.16129)) #m_inf_T
+        self._m_T = self._m_inf_T # initialise to m_inf_T
+        self._e_to_t_on_tau_m_T = numpy.exp(
+          -0.1 / (# this is dt
+                  0.13 + (0.22 / numpy.exp(-0.05988 * (self._v_init + 132))             #// 1/16.7=0.05988023952
+                             + numpy.exp(0.054945 * (self._v_init + 16.8)))))
+        self._h_inf_T = 1 / (1 + numpy.exp((self._v_init + 83.0) * 0.25)) # h_inf_T
+        self._h_T = self._h_inf_T
+        self._e_to_t_on_tau_h_T = numpy.exp(
+           -0.1 / ( # This is dt - substitute for variable
+                    8.2 +
+                    (56.6 + 0.27 * numpy.exp((self._v_init + 115.2) * 0.2)) /            #// 1/5.0=0.2
+                    (1.0 + numpy.exp((self._v_init + 86.0) * 0.3125))))
+
+
         self._I_NaP = I_NaP
         self._g_NaP = g_NaP
         self._E_NaP = E_NaP
-        self._m_inf_NaP = m_inf_NaP
+        self._m_inf_NaP = 1 / (1 + numpy.exp(-(self._v_init + 55.7) * 0.12987))
+
         self._I_DK = I_DK
         self._g_DK = g_DK
         self._E_DK = E_DK
-        self._m_inf_DK = m_inf_DK
-        self._e_to_t_on_tau_m_DK = e_to_t_on_tau_m_DK
-        self._D = D
-        self._D_infinity = D_infinity
+
+
+        self._e_to_t_on_tau_m_DK = numpy.exp(-0.1/1250)
+        self._D_infinity = 0.001 + ((1250.0 * 0.025)
+                                       / (1.0 + numpy.exp(-(self._v_init - -10.0) * 0.2)))
+        self._D = self._D_infinity
+        self._m_inf_DK = 1 / (1 + (0.25 / self._D)**3)
         self._v_clamp = v_clamp
         self._s_clamp = s_clamp
         self._t_clamp = t_clamp

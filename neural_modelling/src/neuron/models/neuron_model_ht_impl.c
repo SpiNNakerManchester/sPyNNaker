@@ -35,8 +35,8 @@ static inline void _ht_closed_form(
 		//
 
 	    neuron->V_membrane = (V_prev -
-	    		(neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV) * neuron->exp_TC_spike +
-				((neuron->B_SPIKE + input_this_timestep) * neuron->A_SPIKE_INV);
+	    		(neuron->B_SPIKE + (input_this_timestep* neuron->tau_spike)) * neuron->A_SPIKE_INV) * neuron->exp_TC_spike +
+				((neuron->B_SPIKE + (input_this_timestep* neuron->tau_spike)) * neuron->A_SPIKE_INV);
 
 		neuron->ref_counter--;
 

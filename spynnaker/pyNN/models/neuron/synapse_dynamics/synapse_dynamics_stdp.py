@@ -236,8 +236,10 @@ class SynapseDynamicsSTDP(
             # Pad the data
             plastic_plastic_row_data = self._pad_row(
                 plastic_plastic_row_data, n_half_words * 2)
-        plastic_headers = numpy.zeros(
-            (n_rows, self._n_header_bytes), dtype="uint8")
+
+        plastic_headers = self._timing_dependence.initialise_row_headers(
+            n_rows, self._n_header_bytes)
+
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))

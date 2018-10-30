@@ -53,35 +53,35 @@ default_parameters = {
 
     # #### Additional Input ####
     # Pacemaker (H)
-    'I_H':-0.2,
+    'I_H':0.0,
     'g_H':2.0,
     'E_H':-40.0,  # 40 in Synthesis code and 43.0 in Huguenard's paper.
-    'm_H':4.0,
-    'm_inf_H':5.0,
-    'e_to_t_on_tau_m_H':6.0,
+    'm_H':4.0,  # should be calculated according to initial m_inf
+    'm_inf_H':5.0,  # should be calculated according to initial V
+    'e_to_t_on_tau_m_H':6.0,  # should be calculated according to initial V
     # Calcium (T)
-    'I_T':0.02,
+    'I_T':0.0,
     'g_T':11.0,
     'E_T':120.0,  # 0.0 in synthesis but experimental value approx 120.0.
     'm_T':13.0,
-    'm_inf_T':14.0,
-    'e_to_t_on_tau_m_T':15.0,
+    'm_inf_T':14.0, # should be calculated according to initial m_inf
+    'e_to_t_on_tau_m_T':15.0,  # should be calculated according to initial V
     'h_T':16.0,
     'h_inf_T':17.0,
-    'e_to_t_on_tau_h_T':18.0,
+    'e_to_t_on_tau_h_T':18.0,  # should be calculated according to initial V
     # Sodium (Na)
-    'I_NaP':19.0,
-    'g_NaP':20.0,
+    'I_NaP':0.0,
+    'g_NaP':0.5,
     'E_NaP':30,  # 30.0 in Synthesis
-    'm_inf_NaP':23.0,
+    'm_inf_NaP':0.0,  # should be calculated according to initial V
     # Potassium (K)
-    'I_DK':28.0,
-    'g_DK':29.0,
+    'I_DK':0.0,
+    'g_DK':0.5,
     'E_DK':-90.0,
-    'm_inf_DK':32.0,
-    'e_to_t_on_tau_m_DK':33.0,
-    'D':34.0,
-    'D_infinity':35.0,
+    'm_inf_DK':0.0,  # should be calculated according to initial V
+    'e_to_t_on_tau_m_DK': 1250,  # should be calculated according to initial V
+    'D':0.0,  # should be calculated according to initial V
+    'D_infinity':0.0, # should be calculated according to initial V
     # Voltage Clamp
     'v_clamp': -75.0,
     's_clamp': 3.0,
@@ -89,7 +89,7 @@ default_parameters = {
     'dt':1.0
     }
 
-initialize_parameters = {'v_init': -78.25}
+initialize_parameters = {'v_init': -69.9}
 
 
 class HillTononiNeuron(AbstractPyNNNeuronModelStandard):

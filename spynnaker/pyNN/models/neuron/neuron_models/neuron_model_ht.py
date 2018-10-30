@@ -234,7 +234,8 @@ class NeuronModelHT(AbstractNeuronModel):
 
         # Add lambda functions here to enable heterogeneous parameter setting
         tsfloat = float(ts) / 1000.0
-        decay_tau = lambda x: numpy.exp(-tsfloat / x)
+        convert_to_machine_timesteps = lambda x: int(x*1000/ts)
+        decay_tau = lambda x: numpy.exp(-tsfloat * x)
 
         return [
             state_variables[V],
@@ -242,13 +243,13 @@ class NeuronModelHT(AbstractNeuronModel):
             parameters[E_NA],
             parameters[G_K],
             parameters[E_K],
-            parameters[TAU_M].apply_operation(decay_tau),
+            parameters[EXPONENT].apply_operation(decay_tau),
             parameters[TAU_M],
-            parameters[TAU_SPIKE].apply_operation(decay_tau),
+            parameters[EXPONENT_SPIKE].apply_operation(decay_tau),
             parameters[TAU_SPIKE],
             parameters[G_SPIKE_VAR],
             parameters[G_SPIKE],
-            parameters[T_SPIKE],
+            parameters[T_SPIKE].apply_operation(convert_to_machine_timesteps),
             parameters[I_OFFSET],
             state_variables[REF_COUNTER],
             parameters[A],
@@ -270,7 +271,7 @@ class NeuronModelHT(AbstractNeuronModel):
 
         state_variables[V] = v
         state_variables[REF_COUNTER] = ref_counter
-        state_variables[G_SPIKE_VAR] = g_spike_var
+#         state_variables[G_SPIKE_VAR] = g_spike_var
 
 
     @property
