@@ -215,6 +215,12 @@ class AbstractPopulationVertex(
             self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
             self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
+
+        sf = 1.5
+
+        for i in range(len(recording_sizes)):
+            recording_sizes[i] = recording_sizes[i] * sf
+
         container.extend(recording_utilities.get_recording_resources(
             recording_sizes, self._receive_buffer_host,
             self._receive_buffer_port))
