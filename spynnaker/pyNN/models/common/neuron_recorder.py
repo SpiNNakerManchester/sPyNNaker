@@ -114,9 +114,12 @@ class NeuronRecorder(object):
 
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
-            # Converts bytes to ints and make a matrix
-            record = (numpy.asarray(record_raw, dtype="uint8").
-                      view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            if record_length > 0:
+                # Converts bytes to ints and make a matrix
+                record = (numpy.asarray(record_raw, dtype="uint8").
+                          view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            else:
+                record = numpy.empty((0, n_neurons))
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
@@ -188,9 +191,12 @@ class NeuronRecorder(object):
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
-            raw_data = (numpy.asarray(record_raw, dtype="uint8").
-                        view(dtype="<i4")).reshape(
-                [-1, n_words_with_timestamp])
+            if len(record_raw) > 0:
+                raw_data = (numpy.asarray(record_raw, dtype="uint8").
+                            view(dtype="<i4")).reshape(
+                    [-1, n_words_with_timestamp])
+            else:
+                raw_data = record_raw
             if len(raw_data) > 0:
                 record_time = raw_data[:, 0] * float(ms_per_tick)
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
