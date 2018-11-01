@@ -13,6 +13,10 @@ class DelayedApplicationEdge(ApplicationEdge):
             pre_vertex, post_vertex, label=label)
         self._synapse_information = [synapse_information]
 
+    @property
+    def synapse_information(self):
+        return self._synapse_information
+
     def add_synapse_information(self, synapse_information):
         self._synapse_information.append(synapse_information)
 
