@@ -3,6 +3,8 @@
 
 #include "additional_input.h"
 
+#define TIMESTEP 0.100006103515625k
+
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 
@@ -105,12 +107,6 @@ static inline void _print_additional_input_params(additional_input_t* additional
                        additional_input->dt);
 }
 
-
-
-
-
-
-
 static input_t additional_input_get_input_value_as_current(
         additional_input_pointer_t additional_input,
         state_t membrane_voltage) {
@@ -140,9 +136,9 @@ static input_t additional_input_get_input_value_as_current(
 
         additional_input->e_to_t_on_tau_m_H =
                   expk(
-                 -0.1k * // this should use a variable to access the simulation timestep so we can readily change it from Python
-                  (expk(-14.59k - 0.086k * membrane_voltage)
-                 + expk(-1.87k + 0.0701k * membrane_voltage)));
+                 -TIMESTEP * // this should use a variable to access the simulation timestep so we can readily change it from Python
+                  (expk(-14.589996337890625k - 0.08599853515625k * membrane_voltage)
+                 + expk(-1.8699951171875k + 0.070098876953125k * membrane_voltage)));
 
         // Update m
         additional_input->m_H = additional_input->m_inf_H +
@@ -162,12 +158,12 @@ static input_t additional_input_get_input_value_as_current(
 
        // Update m
        additional_input->m_inf_T = 1k
-       / (1k + expk(-(membrane_voltage+59k) * 0.16129k)); //1/6.2=0.161290322
+       / (1k + expk(-(membrane_voltage+59k) * 0.161285400390625k)); //1/6.2=0.161290322
 
        additional_input->e_to_t_on_tau_m_T = expk(
-          -0.1k /
-          (0.13k + 0.22k / (expk(-0.05988k * (membrane_voltage+132k))             // 1/16.7=0.05988023952
-                             + expk(0.054945k * (membrane_voltage + 16.8k)))));    // 1/18.2=0.05494505494
+          -TIMESTEP /
+          (0.1300048828125k + 0.220001220703125k / (expk(-0.05987548828125k * (membrane_voltage+132k))             // 1/16.7=0.05988023952
+                             + expk(0.054931640625k * (membrane_voltage + 16.79998779296875k)))));    // 1/18.2=0.05494505494
 
        additional_input->m_T = additional_input->m_inf_T +
                (additional_input->m_T - additional_input->m_inf_T) *
@@ -178,9 +174,9 @@ static input_t additional_input_get_input_value_as_current(
     		   	   / (1k + expk((membrane_voltage + 83.0k)*0.25k)); //1/4=0.25
 
        additional_input->e_to_t_on_tau_h_T = expk(
-           -0.1k /
-           (8.2k +
-           (56.6k + 0.27k * expk((membrane_voltage + 115.2k) * 0.2k)) /            // 1/5.0=0.2
+           -TIMESTEP /
+           (8.20001220703125k +
+           (56.600006103515625k + 0.269989013671875k * expk((membrane_voltage + 115.20001220703125k) * 0.20001220703125k)) / // 1/5.0=0.2
            (1.0k + expk((membrane_voltage + 86.0k) * 0.3125k))));                  // 1/3.2=0.3125
 
        additional_input->h_T = additional_input->h_inf_T +
@@ -200,7 +196,7 @@ static input_t additional_input_get_input_value_as_current(
 //        additional_input->g_NaP = 0.5k;
 
         additional_input->m_inf_NaP = 1k / (1k
-                                  + expk(-(membrane_voltage+55.7k)*0.12987k)); // 1/7.7 = 0.129870129
+                                  + expk(-(membrane_voltage+55.70001220703125k)*0.1298828125k)); // 1/7.7 = 0.129870129
 
         // h (inactivation) is 1 and constant, so we will just ignore it.
         additional_input->I_NaP =
@@ -212,8 +208,8 @@ static input_t additional_input_get_input_value_as_current(
 
 //--////-//------------------------------------------------------------------------
 
-        additional_input->D_influx = 0.001k + 1250.0k * 0.025k
-                                       / (1.0k + expk(-(membrane_voltage - -10.0k) * 0.2k)); //1/5 = 0.2
+        additional_input->D_influx = 0.001007080078125k + 1250.0k * 0.024993896484375k
+                                       / (1.0k + expk(-(membrane_voltage - -10.0k) * 0.20001220703125k)); //1/5 = 0.2
 
 
         // Update D (Same form as LIF dV/dt solution)
