@@ -7,6 +7,9 @@
 plasticity_weight_region_data_t *plasticity_weight_region_data;
 uint32_t *weight_multiply_right_shift;
 
+
+uint16_t glob_shift = 10;
+uint16_t no_shift = 15;
 //---------------------------------------
 // Functions
 //---------------------------------------
@@ -42,13 +45,16 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         weight_multiply_right_shift[s] =
                 16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
 
+        uint16_t this_syn_shift = no_shift - glob_shift - weight_multiply_right_shift[s];
+
         io_printf(IO_BUF,
-            "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u\n",
+//            "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u\n",
+            "\tType %u: MinW:%k, MaxWe:%k +:%k -:%k shft:%u\n",
             s,
-            plasticity_weight_region_data[s].min_weight,
-            plasticity_weight_region_data[s].max_weight,
-            plasticity_weight_region_data[s].a2_plus,
-            plasticity_weight_region_data[s].a2_minus,
+            plasticity_weight_region_data[s].min_weight << this_syn_shift,
+            plasticity_weight_region_data[s].max_weight << this_syn_shift,
+            plasticity_weight_region_data[s].a2_plus << this_syn_shift,
+            plasticity_weight_region_data[s].a2_minus << this_syn_shift,
             weight_multiply_right_shift[s]);
     }
 

@@ -321,7 +321,7 @@ bool synapse_dynamics_process_plastic_synapses(
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
 
         // for integration test
-        log_info("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
+        log_debug("time: %u, neuron index: %u, threshold_value: %k, membrane voltage:, %k",
         		time, index, post_synaptic_threshold->threshold_value,
 				post_synaptic_neuron->V_membrane);
 
