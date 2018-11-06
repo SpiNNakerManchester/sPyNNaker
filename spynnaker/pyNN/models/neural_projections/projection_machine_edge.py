@@ -33,6 +33,8 @@ class ProjectionMachineEdge(
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         # Filter one-to-one connections that are out of range
+        # Note: there may be other connectors stored on the same edge!
+        count_synapse_info = 0
         for synapse_info in self._synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
@@ -40,8 +42,12 @@ class ProjectionMachineEdge(
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
-                    return True
-        return False
+                    count_synapse_info += 1
+
+        if (count_synapse_info==len(self._synapse_information)):
+            return True
+        else:
+            return False
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
