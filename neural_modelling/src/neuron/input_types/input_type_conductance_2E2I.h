@@ -15,6 +15,8 @@
 
 #include "input_type.h"
 
+uint32_t global_weight_scale = 10;
+
 typedef struct input_type_t {
 	// Reversal potentials
 	REAL exc_rev_E[NUM_EXCITATORY_RECEPTORS]; // {excitatory, excitatory2}
@@ -26,7 +28,7 @@ static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
     for (int i=0; i< num_receptors; i++){
-    	value[i] = value[i] >> 10;
+    	value[i] = value[i] >> global_weight_scale;
     }
     return &value[0];
 }

@@ -8,7 +8,7 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 uint32_t *weight_multiply_right_shift;
 
 
-uint16_t glob_shift = 10;
+extern uint16_t glob_shift = 10;
 uint16_t no_shift = 15;
 //---------------------------------------
 // Functions
@@ -24,12 +24,14 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
     int32_t *plasticity_word = (int32_t*) address;
     plasticity_weight_region_data = (plasticity_weight_region_data_t *)
         spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
+
     if (plasticity_weight_region_data == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
     weight_multiply_right_shift = (uint32_t *)
         spin1_malloc(sizeof(uint32_t) * n_synapse_types);
+
     if (weight_multiply_right_shift == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
@@ -49,13 +51,14 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
 
         io_printf(IO_BUF,
 //            "\tType %u: MinW:%d, MaxWe:%d +:%d -:%d shft:%u\n",
-            "\tType %u: MinW:%k, MaxWe:%k +:%k -:%k shft:%u\n",
+            "\tType %u: MinW:%k, MaxWe:%k +:%k -:%k shft:%u, l_shft: %u\n",
             s,
             plasticity_weight_region_data[s].min_weight << this_syn_shift,
             plasticity_weight_region_data[s].max_weight << this_syn_shift,
             plasticity_weight_region_data[s].a2_plus << this_syn_shift,
             plasticity_weight_region_data[s].a2_minus << this_syn_shift,
-            weight_multiply_right_shift[s]);
+            weight_multiply_right_shift[s],
+			ring_buffer_to_input_buffer_left_shifts[s]);
     }
 
     log_info("weight_initialise: completed successfully");
