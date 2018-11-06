@@ -44,7 +44,7 @@ class ProjectionMachineEdge(
                 if pre_hi < post_lo or pre_lo > post_hi:
                     count_synapse_info += 1
 
-        if (count_synapse_info==len(self._synapse_information)):
+        if (count_synapse_info == len(self._synapse_information)):
             return True
         else:
             return False
