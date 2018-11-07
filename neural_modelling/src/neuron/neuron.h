@@ -32,8 +32,9 @@
 //! \return boolean which is True is the translation was successful
 //!         otherwise False
 bool neuron_initialise(
-    address_t address, uint32_t recording_flags, uint32_t *n_neurons_value,
-    uint32_t *incoming_spike_buffer_size, uint32_t *random_backoff);
+    address_t address, uint32_t *n_neurons_value,
+	uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
+	uint32_t *random_backoff);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

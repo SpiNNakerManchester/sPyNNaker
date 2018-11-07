@@ -150,7 +150,7 @@ static bool initialise() {
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, address),
-            recording_flags, &n_neurons, &incoming_spike_buffer_size,
+            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &random_backoff)) {
         return false;
     }

@@ -161,7 +161,7 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
-        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size)
+        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
     	uint32_t *random_backoff) {
     log_debug("neuron_initialise: starting");
 
