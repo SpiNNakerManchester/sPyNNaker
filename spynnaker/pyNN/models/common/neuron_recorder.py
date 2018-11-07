@@ -133,10 +133,13 @@ class NeuronRecorder(object):
                     time = i * sampling_rate
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
-                    if len(local_indexes[0]) > 0:
-                        # Set row to data for that timestep
+                    if len(local_indexes[0]) == 1:
                         fragment[i] = (record[local_indexes[0], 1:] /
                                        float(DataType.S1615.scale))
+                    elif len(local_indexes[0]) > 1:
+                        logger.warning(
+                            "Population {} on multiple recorded data for "
+                            "time {}".format(label, time))
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
