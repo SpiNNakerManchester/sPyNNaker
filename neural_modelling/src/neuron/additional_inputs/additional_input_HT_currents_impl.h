@@ -2,8 +2,11 @@
 #define _ADDITIONAL_INPUT_ALL_CURRENTS_
 
 #include "additional_input.h"
+#include "sqrt.h"
 
 #define TIMESTEP 0.100006103515625k
+#define NUM_CURRENTS 4
+input_t currents[NUM_CURRENTS];
 
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
@@ -107,7 +110,7 @@ static inline void _print_additional_input_params(additional_input_t* additional
                        additional_input->dt);
 }
 
-static input_t additional_input_get_input_value_as_current(
+static input_t* additional_input_get_input_value_as_current(
         additional_input_pointer_t additional_input,
         state_t membrane_voltage) {
 
@@ -153,6 +156,7 @@ static input_t additional_input_get_input_value_as_current(
                 additional_input->m_H *
                 (membrane_voltage - additional_input->E_H);
 
+        currents[0] = additional_input->I_H;
 //------------------------------------------------------------------------
        // Calcium Current.
 
@@ -191,6 +195,8 @@ static input_t additional_input_get_input_value_as_current(
                 additional_input->h_T *
                (membrane_voltage - additional_input->E_T);
 
+       currents[1] = additional_input->I_T;
+
 //--////-//------------------------------------------------------------------------
         // Sodium Current.
 //        additional_input->g_NaP = 0.5k;
@@ -206,6 +212,7 @@ static input_t additional_input_get_input_value_as_current(
                  additional_input->m_inf_NaP *
                 (membrane_voltage - additional_input->E_NaP);
 
+        currents[2] = additional_input->I_NaP;
 //--////-//------------------------------------------------------------------------
 
         additional_input->D_influx = 0.001007080078125k + 1250.0k * 0.024993896484375k
@@ -218,19 +225,32 @@ static input_t additional_input_get_input_value_as_current(
                              - additional_input->D_influx)
                              * additional_input->e_to_t_on_tau_m_DK;
 
-        accum D_cube = (additional_input->D)//-0.05)
-        		* (additional_input->D)//-0.05)
-				*  (additional_input->D);//-0.05);
-         // the 0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way
+        accum D_cube = ((additional_input->D)
+        		* (additional_input->D)
+        		* (additional_input->D)
+        		);
+         // the -0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way
          // the error is minimal. BUTVERIFY IF THIS IS STILL NEEDED.
 
-        additional_input->m_inf_DK = 1k / (1k + (0.0078125k /  // 0.25^3.5 = 0.0078125
-                                  (0.00001 + D_cube  // the 0.00001 factor was added to avoid divergence of the type 1/0.
-                                  )));              // TODO: Actual exponent is D^3.5.
+//        additional_input->m_inf_DK = 1k / (1k +
+//        						  (0.015625k /
+////        		 	 	 	 	  (0.0078125k /  // 0.25^3.5 = 0.0078125
+//                                  (0.0001
+////                                  (0.000030517578125k
+//                                		  + D_cube  // the 0.00001 factor was added to avoid divergence of the type 1/0.
+//                                  )));              // TODO: Actual exponent is D^3.5.
+//
+        additional_input->m_inf_DK = D_cube / (D_cube +
+        		0.015625k);   // 0.25^3 = 0.015625k
+//        		0.0078125k);  // 0.25^3.5 = 0.0078125
+//        		0.00390625k); // 0.25^4 = 0.00390625k
+
 
         additional_input->I_DK = - additional_input->g_DK
                                  * additional_input->m_inf_DK
                                  * (membrane_voltage - additional_input->E_DK);
+
+        currents[3] = additional_input->I_DK;
 
         //    _print_additional_input_params(additional_input);
 //------------------------------------------------------------------------
@@ -238,11 +258,11 @@ static input_t additional_input_get_input_value_as_current(
           PROFILER_EXIT | PROFILER_INTRINSIC_CURRENT);
 //------------------------------------------------------------------------
 
-     return
-    		 additional_input->I_H +
-    		 additional_input->I_T +
-			 additional_input->I_NaP +
-			 additional_input->I_DK;
+     return   &currents[0];
+//    		 additional_input->I_H +
+//    		 additional_input->I_T +
+//			 additional_input->I_NaP +
+//			 additional_input->I_DK;
 }
 
 static void additional_input_has_spiked(

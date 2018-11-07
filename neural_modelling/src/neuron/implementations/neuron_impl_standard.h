@@ -32,6 +32,12 @@
        shaping include
 #endif
 
+#ifndef NUM_CURRENTS
+#define NUM_CURRENTS 1
+#error NUM_CURRENTS should already have been defined
+#endif
+
+
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
@@ -216,15 +222,22 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
 
     // hacked to enable recording of intrinsic currents
-    external_bias = additional_input_get_input_value_as_current(
+    input_t* currents = additional_input_get_input_value_as_current(
+//    external_bias = additional_input_get_input_value_as_current(
         additional_input, voltage);
+
+    external_bias = 0;
+    for (int i = 0; i<NUM_CURRENTS; i++){
+    	external_bias += currents[i];
+    }
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		external_bias;
+    		currents[2];
 //    		total_exc;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		threshold_type->threshold_value;
+    		currents[3];
+//    		threshold_type->threshold_value;
 //    		total_inh;
 
     // Call functions to convert exc_input and inh_input to current

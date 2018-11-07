@@ -12,7 +12,7 @@ typedef struct additional_input_t* additional_input_pointer_t;
 //!     parameters
 //! \param[in] membrane_voltage The membrane voltage of the neuron
 //! \return The value of the input after scaling
-static input_t additional_input_get_input_value_as_current(
+static input_t* additional_input_get_input_value_as_current(
     additional_input_pointer_t additional_input,
     state_t membrane_voltage);
 
