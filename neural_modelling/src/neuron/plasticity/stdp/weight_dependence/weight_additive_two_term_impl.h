@@ -37,8 +37,7 @@ typedef struct weight_state_t {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern plasticity_weight_region_data_t
-    plasticity_weight_region_data[SYNAPSE_TYPE_COUNT];
+extern plasticity_weight_region_data_t *plasticity_weight_region_data;
 
 //---------------------------------------
 // STDP weight dependance functions

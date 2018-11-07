@@ -1,123 +1,107 @@
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential \
-    import get_exponential_decay_and_init
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 from .abstract_synapse_type import AbstractSynapseType
 from data_specification.enums import DataType
-
-from enum import Enum
+import numpy
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
 TAU_SYN_I = 'tau_syn_I'
-GSYN_EXC = 'gsyn_exc'
-GSYN_INH = 'gsyn_inh'
-INITIAL_INPUT_EXC = "initial_input_exc"
-INITIAL_INPUT_EXC2 = "initial_input_exc2"
-INITIAL_INPUT_INH = "initial_input_inh"
+ISYN_EXC = "isyn_exc"
+ISYN_EXC2 = "isyn_exc2"
+ISYN_INH = "isyn_inh"
+
+UNITS = {
+    TAU_SYN_E: "mV",
+    TAU_SYN_E2: "mV",
+    TAU_SYN_I: 'mV',
+    ISYN_EXC: "",
+    ISYN_EXC2: "",
+    ISYN_INH: "",
+}
 
 
-class _DUAL_EXP_TYPES(Enum):
-
-    E_DECAY = (1, DataType.UINT32)
-    E_INIT = (2, DataType.UINT32)
-    E2_DECAY = (3, DataType.UINT32)
-    E2_INIT = (4, DataType.UINT32)
-    I_DECAY = (5, DataType.UINT32)
-    I_INIT = (6, DataType.UINT32)
-    INITIAL_EXC = (7, DataType.S1615)
-    INITIAL_EXC2 = (8, DataType.S1615)
-    INITIAL_INH = (9, DataType.S1615)
-
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
-
-
-class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
+class SynapseTypeDualExponential(AbstractSynapseType):
     __slots__ = [
-        "_data",
-        "_n_neurons",
-        "_units"]
+        "_tau_syn_E",
+        "_tau_syn_E2",
+        "_tau_syn_I",
+        "_isyn_exc",
+        "_isyn_exc2",
+        "_isyn_inh"]
 
-    def __init__(self, n_neurons, tau_syn_E, tau_syn_E2,
-                 tau_syn_I, initial_input_exc, initial_input_exc2,
-                 initial_input_inh):
-        # pylint: disable=too-many-arguments
-        self._units = {
-            TAU_SYN_E: "mV",
-            TAU_SYN_E2: "mV",
-            TAU_SYN_I: 'mV',
-            GSYN_EXC: "uS",
-            GSYN_INH: "uS"}
+    def __init__(
+            self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
+            isyn_inh):
+        super(SynapseTypeDualExponential, self).__init__(
+            [DataType.U032,    # decay_E
+             DataType.U032,    # init_E
+             DataType.U032,    # decay_E2
+             DataType.U032,    # init_E2
+             DataType.U032,    # decay_I
+             DataType.U032,    # init_I
+             DataType.S1615,   # isyn_exc
+             DataType.S1615,   # isyn_exc2
+             DataType.S1615])  # isyn_inh
+        self._tau_syn_E = tau_syn_E
+        self._tau_syn_E2 = tau_syn_E2
+        self._tau_syn_I = tau_syn_I
+        self._isyn_exc = isyn_exc
+        self._isyn_exc2 = isyn_exc2
+        self._isyn_inh = isyn_inh
 
-        self._n_neurons = n_neurons
-        self._data = SpynnakerRangeDictionary(size=n_neurons)
-        self._data[TAU_SYN_E] = tau_syn_E
-        self._data[TAU_SYN_E2] = tau_syn_E2
-        self._data[TAU_SYN_I] = tau_syn_I
-        self._data[INITIAL_INPUT_EXC] = initial_input_exc
-        self._data[INITIAL_INPUT_EXC2] = initial_input_exc2
-        self._data[INITIAL_INPUT_INH] = initial_input_inh
+    @overrides(AbstractSynapseType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        return 100 * n_neurons
 
-    @property
-    def tau_syn_E(self):
-        return self._data[TAU_SYN_E]
+    @overrides(AbstractSynapseType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[TAU_SYN_E] = self._tau_syn_E
+        parameters[TAU_SYN_E2] = self._tau_syn_E2
+        parameters[TAU_SYN_I] = self._tau_syn_I
 
-    @tau_syn_E.setter
-    def tau_syn_E(self, tau_syn_E):
-        self._data.set_value(key=TAU_SYN_E, _value=tau_syn_E)
+    @overrides(AbstractSynapseType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[ISYN_EXC] = self._isyn_exc
+        state_variables[ISYN_EXC2] = self._isyn_exc2
+        state_variables[ISYN_INH] = self._isyn_inh
 
-    @property
-    def tau_syn_E2(self):
-        return self._data[TAU_SYN_E2]
+    @overrides(AbstractSynapseType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
 
-    @tau_syn_E2.setter
-    def tau_syn_E2(self, tau_syn_E2):
-        self._data.set_value(key=TAU_SYN_E2, value=tau_syn_E2)
+    @overrides(AbstractSynapseType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
 
-    @property
-    def tau_syn_I(self):
-        return self._data[TAU_SYN_I]
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
-    @tau_syn_I.setter
-    def tau_syn_I(self, tau_syn_I):
-        self._data.set_value(key=TAU_SYN_I, value=tau_syn_I)
+        tsfloat = float(ts) / 1000.0
+        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
+        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
 
-    @property
-    def isyn_exc(self):
-        return self._data[INITIAL_INPUT_EXC]
+        # Add the rest of the data
+        return [parameters[TAU_SYN_E].apply_operation(decay),
+                parameters[TAU_SYN_E].apply_operation(init),
+                parameters[TAU_SYN_E2].apply_operation(decay),
+                parameters[TAU_SYN_E2].apply_operation(init),
+                parameters[TAU_SYN_I].apply_operation(decay),
+                parameters[TAU_SYN_I].apply_operation(init),
+                state_variables[ISYN_EXC], state_variables[ISYN_EXC2],
+                state_variables[ISYN_INH]]
 
-    @isyn_exc.setter
-    def isyn_exc(self, new_value):
-        self._data.set_value(key=INITIAL_INPUT_EXC, value=new_value)
+    @overrides(AbstractSynapseType.update_values)
+    def update_values(self, values, parameters, state_variables):
 
-    @property
-    def isyn_inh(self):
-        return self._data[INITIAL_INPUT_INH]
+        # Read the data
+        (_decay_E, _init_E, _decay_E2, _init_E2, _decay_I, _init_I,
+         isyn_exc, isyn_exc2, isyn_inh) = values
 
-    @isyn_inh.setter
-    def isyn_inh(self, new_value):
-        self._data.set_value(key=INITIAL_INPUT_INH, value=new_value)
-
-    @property
-    def isyn_exc2(self):
-        return self._data[INITIAL_INPUT_EXC2]
-
-    @isyn_exc2.setter
-    def isyn_exc2(self, new_value):
-        self._data.set_value(key=INITIAL_INPUT_EXC2, value=new_value)
+        state_variables[ISYN_EXC] = isyn_exc
+        state_variables[ISYN_EXC2] = isyn_exc2
+        state_variables[ISYN_INH] = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
@@ -137,48 +121,50 @@ class SynapseTypeDualExponential(AbstractSynapseType, AbstractContainsUnits):
     def get_synapse_targets(self):
         return "excitatory", "excitatory2", "inhibitory"
 
-    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
-    def get_n_synapse_type_parameters(self):
-        return 9
+    @property
+    def tau_syn_E(self):
+        return self._tau_syn_E
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    def get_synapse_type_parameters(self, machine_time_step):
-        # pylint: disable=arguments-differ
-        e_decay, e_init = get_exponential_decay_and_init(
-            self._data[TAU_SYN_E], machine_time_step)
-        e_decay2, e_init2 = get_exponential_decay_and_init(
-            self._data[TAU_SYN_E2], machine_time_step)
-        i_decay, i_init = get_exponential_decay_and_init(
-            self._data[TAU_SYN_I], machine_time_step)
+    @tau_syn_E.setter
+    def tau_syn_E(self, tau_syn_E):
+        self._tau_syn_E = tau_syn_E
 
-        return [
-            NeuronParameter(e_decay, _DUAL_EXP_TYPES.E_DECAY.data_type),
-            NeuronParameter(e_init, _DUAL_EXP_TYPES.E_INIT.data_type),
-            NeuronParameter(e_decay2, _DUAL_EXP_TYPES.E2_DECAY.data_type),
-            NeuronParameter(e_init2, _DUAL_EXP_TYPES.E2_INIT.data_type),
-            NeuronParameter(i_decay, _DUAL_EXP_TYPES.I_DECAY.data_type),
-            NeuronParameter(i_init, _DUAL_EXP_TYPES.I_INIT.data_type),
-            NeuronParameter(
-                self._data[INITIAL_INPUT_EXC],
-                _DUAL_EXP_TYPES.INITIAL_EXC.data_type),
-            NeuronParameter(
-                self._data[INITIAL_INPUT_EXC2],
-                _DUAL_EXP_TYPES.INITIAL_EXC2.data_type),
-            NeuronParameter(
-                self._data[INITIAL_INPUT_INH],
-                _DUAL_EXP_TYPES.INITIAL_INH.data_type)
-        ]
+    @property
+    def tau_syn_E2(self):
+        return self._tau_syn_E2
 
-    @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
-    def get_synapse_type_parameter_types(self):
-        return [item.data_type for item in _DUAL_EXP_TYPES]
+    @tau_syn_E2.setter
+    def tau_syn_E2(self, tau_syn_E2):
+        self._tau_syn_E2 = tau_syn_E2
 
-    @overrides(AbstractSynapseType.get_n_cpu_cycles_per_neuron)
-    def get_n_cpu_cycles_per_neuron(self):
+    @property
+    def tau_syn_I(self):
+        return self._tau_syn_I
 
-        # A guess
-        return 100
+    @tau_syn_I.setter
+    def tau_syn_I(self, tau_syn_I):
+        self._tau_syn_I = tau_syn_I
 
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]
+    @property
+    def isyn_exc(self):
+        return self._isyn_exc
+
+    @isyn_exc.setter
+    def isyn_exc(self, isyn_exc):
+        self._isyn_exc = isyn_exc
+
+    @property
+    def isyn_inh(self):
+        return self._isyn_inh
+
+    @isyn_inh.setter
+    def isyn_inh(self, isyn_inh):
+        self._isyn_inh = isyn_inh
+
+    @property
+    def isyn_exc2(self):
+        return self._isyn_exc2
+
+    @isyn_exc2.setter
+    def isyn_exc2(self, isyn_exc2):
+        self._isyn_exc2 = isyn_exc2

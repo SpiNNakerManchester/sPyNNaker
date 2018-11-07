@@ -39,7 +39,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls
+  - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
 
 before_script:
@@ -64,7 +64,7 @@ script:
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
   - make -C neural_modelling
-  - support/run-vera.sh neural_modelling
+  - support/run-vera.sh neural_modelling/src
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json

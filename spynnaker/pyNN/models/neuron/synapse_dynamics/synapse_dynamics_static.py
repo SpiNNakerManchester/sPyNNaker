@@ -1,17 +1,19 @@
 import numpy
-import math
 
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    MatrixGeneratorID
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
-        AbstractChangableAfterRun):
+        AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????
         "_change_requires_mapping",
@@ -56,9 +58,9 @@ class SynapseDynamicsStatic(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
-        n_neuron_id_bits = int(
-            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
 
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
@@ -67,7 +69,8 @@ class SynapseDynamicsStatic(
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
-            ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
+            ((connections["target"] - post_vertex_slice.lo_atom) &
+             neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
@@ -107,15 +110,16 @@ class SynapseDynamicsStatic(
     def read_static_synaptic_data(
             self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
 
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
-        n_neuron_id_bits = int(
-            math.ceil(math.log(post_vertex_slice.n_atoms, 2)))
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
-        connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
+        connections["target"] = (
+            (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (n_neuron_id_bits +
                                          n_synapse_type_bits)) & 0xF
@@ -168,3 +172,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):
         return n_words
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_matrix_id)
+    def gen_matrix_id(self):
+        return MatrixGeneratorID.STATIC_MATRIX.value
