@@ -35,7 +35,7 @@ class AbstractMasterPopTableFactory(object):
     @abstractmethod
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False):
+            master_pop_table_region, is_single=False,conn_matrix=False):
         """ Update a data specification with a master pop entry in some form
 
         :param spec: the data specification to write the master pop entry to

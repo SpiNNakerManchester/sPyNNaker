@@ -163,7 +163,7 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number of failed pop table searches"),
             n_ghost_searches,
-            report=n_ghost_searches >= 0,
+            report=n_ghost_searches > 0,
             message=(
                 "The number of failed population table searches for {} on {},"
                 " {}, {} was {}. If this number is large relative to the "

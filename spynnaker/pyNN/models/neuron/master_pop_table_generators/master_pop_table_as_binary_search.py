@@ -33,6 +33,7 @@ class _MasterPopEntry(object):
     MASTER_POP_ENTRY_SIZE_WORDS = 3
     ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
+    CONN_LOOKUP_SIZE_BYTES = 1
 
     def __init__(self, routing_key, mask):
         self._routing_key = routing_key
@@ -72,7 +73,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     __slots__ = [
         "_entries",
         "_n_addresses",
-        "_n_single_entries"]
+        "_n_single_entries",
+        "_conn_lookup"]
 
     # Switched ordering of count and start as numpy will switch them back
     # when asked for view("<4")
@@ -80,6 +82,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         ("key", "<u4"), ("mask", "<u4"), ("start", "<u2"), ("count", "<u2")]
 
     ADDRESS_LIST_DTYPE = "<u4"
+    CONN_LOOKUP_DTYPE = "<u1"
 
     # top bit of the 32 bit number
     SINGLE_BIT_FLAG_BIT = 0x80000000
@@ -92,6 +95,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries = None
         self._n_addresses = 0
         self._n_single_entries = None
+        self._conn_lookup = None
 
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
@@ -133,7 +137,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         return (
             (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8)
+            8 + (n_entries * 255 * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
 
     def get_exact_master_population_table_size(
             self, vertex, machine_graph, graph_mapper):
@@ -153,7 +157,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         return (
             (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8)
+            8 + (n_entries * 255 * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
 
     def get_allowed_row_length(self, row_length):
         """
@@ -190,12 +194,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries = dict()
         self._n_addresses = 0
         self._n_single_entries = 0
+        self._conn_lookup = numpy.zeros(0,dtype=bool)
 
     @overrides(AbstractMasterPopTableFactory.update_master_population_table,
                extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False):
+            master_pop_table_region, is_single=False,conn_matrix=False):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
@@ -219,6 +224,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
+        lookup_entry = numpy.sum(conn_matrix,axis=0,dtype=bool)
+        self._conn_lookup = numpy.append(self._conn_lookup,lookup_entry)
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
@@ -246,6 +253,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # Write the arrays
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
+
+        spec.write_array(self._conn_lookup.view("<u1"))
 
         self._entries.clear()
         del self._entries

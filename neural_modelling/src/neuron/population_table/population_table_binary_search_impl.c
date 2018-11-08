@@ -1,6 +1,9 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include "profile_tags.h"
+#include <profiler.h>
+
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -16,6 +19,8 @@ static uint32_t master_population_table_length;
 static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
 static address_t direct_rows_base_address;
+
+static bool *connectivity_lookup;
 
 static uint32_t ghost_pop_table_searches = 0;
 
@@ -94,7 +99,8 @@ bool population_table_initialise(
     uint32_t n_master_pop_bytes =
         master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    log_debug("pop table size is %d\n", n_master_pop_bytes);
+//    log_debug("pop table size is %d\n", n_master_pop_bytes);
+    io_printf(IO_BUF,"pop table length is %d\n", master_population_table_length);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0){
@@ -120,6 +126,18 @@ bool population_table_initialise(
         }
     }
 
+    //TODO: add in reading of connectivity list here
+    uint32_t connectivity_lookup_length = (uint32_t)255*master_population_table_length;
+    uint32_t connectivity_lookup_nbytes = sizeof(bool)*connectivity_lookup_length;
+    io_printf(IO_BUF,"conn_lookup_n_bytes: %u\n", connectivity_lookup_nbytes);
+    io_printf(IO_BUF,"conn_lookup_n: %u\n", connectivity_lookup_length);
+    connectivity_lookup = (bool*)spin1_malloc(connectivity_lookup_nbytes);
+/*    for (uint i=0;i<connectivity_lookup_length;i++){
+
+        connectivity_lookup[i]=0;
+
+    }*/
+
     log_debug(
         "pop table size: %u (%u bytes)", master_population_table_length,
         n_master_pop_bytes);
@@ -133,6 +151,10 @@ bool population_table_initialise(
     spin1_memcpy(
         address_list, &(table_address[2 + n_master_pop_words]),
         n_address_list_bytes);
+
+    spin1_memcpy(
+    connectivity_lookup, &(table_address[2 + n_master_pop_words+address_list_length]),
+    connectivity_lookup_nbytes);
 
     // Store the base address
     log_info(
@@ -148,6 +170,12 @@ bool population_table_initialise(
 
     _print_master_population_table();
     return true;
+}
+
+bool check_for_connectivity(uint32_t neuron_id,master_population_table_entry mp_entry){
+    uint32_t connectivity_lookup_index = neuron_id + mp_entry.count*(uint32_t)255;
+
+    return connectivity_lookup[connectivity_lookup_index];
 }
 
 bool population_table_get_first_address(
@@ -167,6 +195,8 @@ bool population_table_get_first_address(
             }
 
             last_neuron_id = _get_neuron_id(entry, spike);
+            if(!check_for_connectivity(last_neuron_id,entry))return false;
+
             next_item = entry.start;
             items_to_go = entry.count;
 
@@ -174,8 +204,13 @@ bool population_table_get_first_address(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
                 spike, imid, next_item, items_to_go);
 
-            return population_table_get_next_address(
+            bool get_next = population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
+            if(!get_next)ghost_pop_table_searches ++;
+            return get_next;
+
+//            return population_table_get_next_address(
+//                row_address, n_bytes_to_transfer);
         } else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
@@ -187,8 +222,8 @@ bool population_table_get_first_address(
         }
     }
 
-    ghost_pop_table_searches ++;
-    log_info("Ghost searches: %u", ghost_pop_table_searches);
+//    ghost_pop_table_searches ++;//redefined "ghost spike" as from a connected MV but not actually connected to any of the neurons on this core
+    io_printf (IO_BUF,"Ghost searches: %u\n", ghost_pop_table_searches);
     log_debug(
         "spike %u (= %x): population not found in master population table",
         spike, spike);
@@ -202,6 +237,7 @@ bool population_table_get_next_address(
     if (items_to_go <= 0) {
         return false;
     }
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     bool is_valid = false;
     do {
@@ -241,7 +277,7 @@ bool population_table_get_next_address(
         next_item += 1;
         items_to_go -= 1;
     } while (!is_valid && (items_to_go > 0));
-
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
     return is_valid;
 }
 

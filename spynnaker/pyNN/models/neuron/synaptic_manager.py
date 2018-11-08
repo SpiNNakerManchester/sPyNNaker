@@ -871,9 +871,10 @@ class SynapticManager(object):
                 spec, synaptic_matrix_region, block_addr)
             spec.switch_write_focus(synaptic_matrix_region)
             spec.write_array(row_data)
+
             self._poptable_type.update_master_population_table(
                 spec, block_addr, row_length,
-                rinfo.first_key_and_mask, master_pop_table_region)
+                rinfo.first_key_and_mask, master_pop_table_region,is_single=False,conn_matrix=connector._conn_matrix[pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom,post_vertex_slice.lo_atom:post_vertex_slice.hi_atom])
             block_addr += len(row_data) * 4
         return block_addr, single_addr
 

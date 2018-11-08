@@ -38,7 +38,6 @@ class GraphEdgeFilter(object):
             "Filtering edges")
 
         # add the vertices directly, as they wont be pruned.
-        vertex=
         for vertex in progress.over(machine_graph.vertices, False):
             self._add_vertex_to_new_graph(
                 vertex, graph_mapper, new_machine_graph, new_graph_mapper)
@@ -59,6 +58,7 @@ class GraphEdgeFilter(object):
                     new_graph_mapper)
 
         # returned the pruned graph and graph_mapper
+        # print "prune_count:{} no_prune_count:{}".format(prune_count,no_prune_count)
         print "prune_count:{} no_prune_count:{}".format(prune_count,no_prune_count)
         return new_machine_graph, new_graph_mapper
 

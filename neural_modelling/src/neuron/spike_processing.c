@@ -5,7 +5,8 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
-
+#include <profiler.h>
+#include "profile_tags.h"
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
 
@@ -91,6 +92,7 @@ void _setup_synaptic_dma_read() {
                 setup_done = true;
             }
         }
+//        profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
         // If there's more incoming spikes
         cpsr = spin1_int_disable();
@@ -126,6 +128,7 @@ void _setup_synaptic_dma_read() {
         dma_busy = false;
     }
     spin1_mode_restore(cpsr);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
