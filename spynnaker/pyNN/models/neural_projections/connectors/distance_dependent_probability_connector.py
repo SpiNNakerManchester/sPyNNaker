@@ -1,18 +1,17 @@
-from spynnaker.pyNN.utilities import utility_calls
-from .abstract_connector import AbstractConnector
+import logging
+import math
+import numpy
+from numpy import (
+    arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
+    hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
+    minimum, e, pi)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-import logging
-import numpy
-import math
-
-# support for arbitrary expression for the distance dependence
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
-from numpy import log, log10, modf, power, sin, sinh, sqrt
-from numpy import tan, tanh, maximum, minimum, e, pi
+from spynnaker.pyNN.utilities import utility_calls
+from .abstract_connector import AbstractConnector
 
 logger = logging.getLogger(__name__)
+# support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
                            log, log10, modf, power, sin, sinh, sqrt, tan, tanh,

@@ -1,10 +1,9 @@
 from __future__ import division
-import struct
 import logging
+import struct
 import numpy
-
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
 from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)

@@ -1,8 +1,8 @@
-from spinn_utilities.overrides import overrides
 import numpy
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations.struct import Struct
-from spynnaker.pyNN.models.neuron.implementations \
-    import AbstractStandardNeuronComponent
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 
 class AbstractNeuronModel(AbstractStandardNeuronComponent):

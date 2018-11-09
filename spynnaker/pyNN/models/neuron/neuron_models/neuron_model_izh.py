@@ -1,7 +1,7 @@
 from spinn_utilities.overrides import overrides
-from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
+from .abstract_neuron_model import AbstractNeuronModel
 
 A = 'a'
 B = 'b'

@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spynnaker.pyNN.utilities import constants
 from .spike_source_array_vertex import SpikeSourceArrayVertex
 

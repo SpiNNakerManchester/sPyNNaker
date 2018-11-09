@@ -1,8 +1,7 @@
 from enum import Enum
+import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-import logging
 
 logger = logging.getLogger(__name__)
 

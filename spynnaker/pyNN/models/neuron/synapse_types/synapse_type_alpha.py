@@ -1,8 +1,8 @@
+import numpy
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
-from data_specification.enums import DataType
-import numpy
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"
