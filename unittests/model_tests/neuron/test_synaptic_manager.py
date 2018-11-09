@@ -1,39 +1,28 @@
-import unittest
-import struct
 import os
+import struct
 import tempfile
-
+import unittest
 import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.overrides import overrides
-
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph
-from pacman.model.routing_info import RoutingInfo
-from pacman.model.routing_info import PartitionRoutingInfo
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.routing_info import (
+    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
-
-from data_specification \
-    import DataSpecificationGenerator, DataSpecificationExecutor
-
 from spinn_storage_handlers import FileDataWriter, FileDataReader
-
+from data_specification import (
+    DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, ProjectionMachineEdge
-from spynnaker.pyNN.models.neural_projections \
-    import SynapseInformation
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import OneToOneConnector, AllToAllConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic
-
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector, AllToAllConnector)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic)
 from unittests.mocks import MockSimulator
 
 

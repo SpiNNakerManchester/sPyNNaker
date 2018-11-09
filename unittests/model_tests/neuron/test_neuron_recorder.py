@@ -1,8 +1,8 @@
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+from spynnaker.pyNN.utilities.spynnaker_failed_state import (
+    SpynnakerFailedState)
 
 
 class MockSimulator(object):

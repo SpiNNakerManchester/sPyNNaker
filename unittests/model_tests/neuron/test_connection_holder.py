@@ -1,10 +1,9 @@
-import numpy
 import math
 import pytest
-
+import numpy
 from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamics)
 
 
 @pytest.fixture(

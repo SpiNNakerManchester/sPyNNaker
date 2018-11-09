@@ -1,16 +1,14 @@
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import _Range_Iterator, _Get_Iterator, _SingleValue_Iterator
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from data_specification.enums import DataType
-from data_specification import DataSpecificationGenerator
-from spinn_storage_handlers.file_data_writer import FileDataWriter
-
-from unittests.mocks import MockSimulator
-
 import os
 import struct
+from unittests.mocks import MockSimulator
 from six.moves import xrange
+from spinn_storage_handlers.file_data_writer import FileDataWriter
+from data_specification.enums import DataType
+from data_specification import DataSpecificationGenerator
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.models.neural_properties.neural_parameter import (
+    _Range_Iterator, _Get_Iterator, _SingleValue_Iterator)
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
 
 
 def _iterate_parameter_values(iterator, data_type):
