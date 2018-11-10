@@ -78,7 +78,7 @@ class NeuronModelIzh(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
-        return [machine_time_step/1000]
+        return [float(machine_time_step)/1000.0]
 
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
@@ -95,7 +95,7 @@ class NeuronModelIzh(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
-        _a, _b, _c, _d, v, u, _i_offset = values
+        _a, _b, _c, _d, v, u, _i_offset, _this_h = values
 
         # Copy the changed data only
         state_variables[V] = v
