@@ -10,8 +10,8 @@ from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractRewritesDataSpecification,
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary)
+    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
