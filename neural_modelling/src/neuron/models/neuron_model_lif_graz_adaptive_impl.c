@@ -1,5 +1,5 @@
 #include "neuron_model_lif_graz_adaptive_impl.h"
-#include "../threshold_types/threshold_type_adaptive.h"
+//#include "../threshold_types/threshold_type_adaptive.h"
 #include <debug.h>
 
 // simple Leaky I&F ODE
@@ -27,8 +27,8 @@ state_t neuron_model_state_update(
 		input_t external_bias, neuron_pointer_t neuron,
 		input_t B_t) {
 
-	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
-	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+//	io_printf(IO_BUF, "Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
+//	io_printf(IO_BUF, "Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
 
 	REAL total_exc = 0;
@@ -75,17 +75,17 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
-    log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+    io_printf(IO_BUF,"V membrane    = %11.4k mv", neuron->V_membrane);
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    log_debug("V reset       = %11.4k mv", neuron->V_reset);
-    log_debug("V rest        = %11.4k mv", neuron->V_rest);
+    io_printf(IO_BUF,"V reset       = %11.4k mv", neuron->V_reset);
+    io_printf(IO_BUF,"V rest        = %11.4k mv", neuron->V_rest);
 
-    log_debug("I offset      = %11.4k nA", neuron->I_offset);
-    log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
+    io_printf(IO_BUF,"I offset      = %11.4k nA", neuron->I_offset);
+    io_printf(IO_BUF,"R membrane    = %11.4k Mohm", neuron->R_membrane);
 
-    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+    io_printf(IO_BUF,"exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
 
-    log_debug("T refract     = %u timesteps", neuron->T_refract);
+    io_printf(IO_BUF,"T refract     = %u timesteps", neuron->T_refract);
 }

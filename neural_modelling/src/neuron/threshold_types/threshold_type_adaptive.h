@@ -18,7 +18,7 @@ typedef struct threshold_type_t {
 
 
 static void _print_threshold_params(threshold_type_pointer_t threshold_type){
-	log_info("B: %k, "
+	io_printf(IO_BUF, "B: %k, "
 			"b: %k, "
 			"b_0: %k, "
 			"e_to_dt_on_tau_a: %u, "
@@ -38,6 +38,8 @@ static inline bool threshold_type_is_above_threshold(state_t value,
                         threshold_type_pointer_t threshold_type) {
 
 	// Not used
+	use(value);
+	use(threshold_type);
 
     return false;
 }

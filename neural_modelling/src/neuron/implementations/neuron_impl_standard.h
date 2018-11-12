@@ -232,7 +232,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            external_bias, neuron, -50k);
 
     // determine if a spike should occur
     bool spike = threshold_type_is_above_threshold(result, threshold_type);
