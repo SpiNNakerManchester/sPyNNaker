@@ -614,7 +614,10 @@ class SynapticManager(object):
                             dynamics.generate_on_machine and
                             not self.__is_direct(
                                 single_addr, connector, pre_vertex_slice,
-                                post_vertex_slice, app_edge)):
+                                post_vertex_slice, app_edge) and
+                            not isinstance(
+                                self.synapse_dynamics,
+                                AbstractSynapseDynamicsStructural)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_idx, app_edge, rinfo))
