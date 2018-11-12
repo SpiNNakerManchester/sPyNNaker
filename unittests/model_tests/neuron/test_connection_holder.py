@@ -1,7 +1,7 @@
 import math
 import pytest
 import numpy
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
+from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 

@@ -1,17 +1,16 @@
 import pytest
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, SynapseInformation)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic, SynapseDynamicsSTDP)
 from spynnaker.pyNN.models.neuron.master_pop_table_generators import (
     MasterPopTableAsBinarySearch)
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
     WeightDependenceAdditive)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     TimingDependenceSpikePair)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neural_projections.synapse_information import (
-    SynapseInformation)
 
 
 @pytest.mark.parametrize(

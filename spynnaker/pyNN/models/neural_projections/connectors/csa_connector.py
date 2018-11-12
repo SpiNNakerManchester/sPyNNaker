@@ -1,6 +1,6 @@
 import logging
-import numpy
 import csa
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 

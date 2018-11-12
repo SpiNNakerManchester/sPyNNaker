@@ -4,9 +4,8 @@ from pacman.model.graphs.machine import MachineEdge
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
-    import (
-        OneToOneConnector)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractWeightUpdatable, AbstractFilterableEdge)
 

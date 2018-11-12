@@ -27,12 +27,10 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, MultiSpikeRecorder)
+    AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants, utility_calls
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
-from spynnaker.pyNN.models.common.simple_population_settable import (
-    SimplePopulationSettable)
 from spynnaker.pyNN.models.neuron.implementations import Struct
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
