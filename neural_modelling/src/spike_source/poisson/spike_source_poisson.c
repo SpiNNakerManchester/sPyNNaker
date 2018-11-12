@@ -543,14 +543,14 @@ void timer_callback(uint timer_count, uint unused) {
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
+        // go into pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
         // rewrite poisson params to SDRAM for reading out if needed
         if (!store_poisson_parameters()){
             log_error("Failed to write poisson parameters to SDRAM");
             rt_error(RTE_SWERR);
         }
-
-        // go into pause and resume state to avoid another tick
-        simulation_handle_pause_resume(resume_callback);
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
@@ -561,6 +561,7 @@ void timer_callback(uint timer_count, uint unused) {
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time -= 1;
+        simulation_ready_to_read();
         return;
     }
 

@@ -42,19 +42,15 @@ bool out_spikes_initialize(size_t max_spike_sources) {
     return true;
 }
 
-//! \brief flush the recorded spikes - must be called to do the actual
-//!        recording
-//! \param[in] channel The channel to record to
-//! \param[in] time The time at which the recording is being made
 bool out_spikes_record(
-        uint8_t channel, uint32_t time,
+        uint8_t channel, uint32_t time, uint32_t n_words,
         recording_complete_callback_t callback) {
     if (out_spikes_is_empty()) {
         return false;
     } else {
         spikes->time = time;
         recording_record_and_notify(
-            channel, spikes, (out_spikes_size + 1) * sizeof(uint32_t),
+            channel, spikes, (n_words + 1) * sizeof(uint32_t),
             callback);
         return true;
     }
@@ -92,7 +88,7 @@ void out_spike_info_print(){
     index_t i; //!< For indexing through the bit field
 
     for (i = 0; i < out_spikes_size; i++) {
-    	log_debug("%08x\n", out_spikes[i]);
+        log_debug("%08x\n", out_spikes[i]);
     }
     log_debug("-----------\n");
 }

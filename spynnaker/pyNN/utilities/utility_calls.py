@@ -4,13 +4,14 @@ utility class containing simple helper methods
 import numpy
 import os
 import logging
-import struct
+import math
 
 from spinn_utilities.safe_eval import SafeEval
 
 from scipy.stats import binom
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from decimal import Decimal
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -59,109 +60,16 @@ def convert_param_to_numpy(param, no_atoms):
     return numpy.array(param, dtype="float")
 
 
-def write_parameters_per_neuron(spec, vertex_slice, parameters,
-                                slice_paramaters=False):
+def convert_to(value, data_type):
+    """ Convert a value to a given data type
+
+    :param value: The value to convert
+    :param data_type: The data type to convert to
+    :return: The converted data as a numpy data type
     """
-    Writes the parameters neurons by neuron
-
-    :param spec: The data specification to write to
-    :param vertex_slice: The vertex currently being writen
-    :param parameters: The parameters currently being written
-    :param slice_paramaters: Flag to indicate if the parameters are only for\
-        this slice.
-
-        The default False say that the parameters are for full\
-        lists across all slices. So that parameter[x] will be for the neuron\
-        x where x is the ID which may or may nor be in the slice.
-
-        If True the parameter list will only contain values for this slice.\
-        So that parameter[x] is the x'th neuron in the slice.\
-        i.e., the neuron with the ID x + vertex_slice.lo_atom
-    """
-    if len(parameters) == 0:
-        return
-
-    # Get an iterator per parameter
-    iterators = []
-    for param in parameters:
-        if slice_paramaters:
-            iterators.append(param.iterator_by_slice(
-                0, vertex_slice.n_atoms, spec))
-        else:
-            iterators.append(param.iterator_by_slice(
-                vertex_slice.lo_atom, vertex_slice.hi_atom + 1, spec))
-
-    # Iterate through the iterators until a StopIteration is generated
-    while True:
-        try:
-            for iterator in iterators:
-                (cmd_word_list, cmd_string) = next(iterator)
-                spec.write_command_to_files(cmd_word_list, cmd_string)
-        except StopIteration:
-            return
-
-
-def translate_parameters(types, byte_array, offset, n_elements):
-    """ Translate an array of data into a set of parameters
-
-    :param types: the DataType of each of the parameters to translate
-    :param byte_array: the byte array to read parameters out of
-    :param offset: where in the byte array to start reading from
-    :param n_elements: the number of repeated elements to read
-    :return: An array of arrays of parameter values, and the new offset
-    """
-
-    # If there are no parameters, return an empty list
-    if not types:
-        return numpy.zeros((0, 0), dtype="float"), offset
-
-    # Get the single-struct format
-    struct_data_format = ""
-    for param_type in types:
-        struct_data_format += param_type.struct_encoding
-
-    # Get the struct-array format, consisting of repeating the struct
-    struct_array_format = "<" + (struct_data_format * n_elements)
-
-    # unpack the params from the byte array
-    translated_parameters = numpy.asarray(
-        struct.unpack_from(struct_array_format, byte_array, offset),
-        dtype="float")
-
-    # scale values with required scaling factor
-    scales = numpy.tile(
-        [float(param_type.scale) for param_type in types], n_elements)
-    scaled_parameters = translated_parameters / scales
-
-    # sort the parameters into arrays of values, one array per parameter
-    sorted_parameters = scaled_parameters.reshape(
-        (n_elements, len(types))).swapaxes(0, 1)
-
-    # Get the size of the parameters read
-    parameter_size = sum(param_type.size for param_type in types)
-
-    return sorted_parameters, offset + (parameter_size * n_elements)
-
-
-def get_parameters_size_in_bytes(parameters):
-    """ Get the total size of a list of parameters in bytes
-
-    :param parameters: the parameters to compute the total size of
-    :return: size of all the parameters in bytes
-    :rtype: int
-    """
-    return sum(param.get_dataspec_datatype().size for param in parameters)
-
-
-def set_slice_values(arrays, values, vertex_slice):
-    """ Set a vertex slice of atoms in a set of arrays to the given values
-
-    :param array: The array of arrays to set the values in
-    :param value: The array of arrays of values to set
-    :param vertex_slice: The slice of parameters to set
-    """
-    for i, array in enumerate(arrays):
-        array[vertex_slice.as_slice] = values[i]
+    return numpy.round(
+        float(Decimal(str(value)) * data_type.scale)).astype(
+            numpy.dtype(data_type.struct_encoding))
 
 
 def read_in_data_from_file(
@@ -257,13 +165,13 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 
 def get_probable_maximum_selected(
-        n_total_selections, n_selected, selection_prob, chance=(1.0 / 100.0)):
+        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
     """ Get the likely maximum number of items that will be selected from a\
-        set of n_selected from a total set of n_total_selections\
+        set of n_trials from a total set of n_total_trials\
         with a probability of selection of selection_prob
     """
-    prob = 1.0 - (chance / float(n_total_selections))
-    return binom.ppf(prob, n_selected, selection_prob)
+    prob = 1.0 - (chance / float(n_total_trials))
+    return binom.ppf(prob, n_trials, selection_prob)
 
 
 def get_probability_within_range(dist, lower, upper):
@@ -320,7 +228,7 @@ def get_variance(dist):
 
 
 def high(dist):
-    """ Gets the high or max boundry value for this distribution
+    """ Gets the high or max boundary value for this distribution
 
     Could return None
     """
@@ -330,7 +238,7 @@ def high(dist):
 
 
 def low(dist):
-    """ Gets the high or min boundry value for this distribution
+    """ Gets the high or min boundary value for this distribution
 
     Could return None
     """
@@ -365,3 +273,13 @@ def check_sampling_interval(sampling_interval):
               "".format(sampling_interval, step * MAX_RATE)
         raise ConfigurationException(msg)
     return sampling_interval
+
+
+def get_n_bits(n_values):
+    """ Determine how many bits are required for the given number of values
+    """
+    if n_values == 0:
+        return 0
+    if n_values == 1:
+        return 1
+    return int(math.ceil(math.log(n_values, 2)))
