@@ -228,6 +228,7 @@ static input_t* additional_input_get_input_value_as_current(
         accum D_cube = ((additional_input->D)
         		* (additional_input->D)
         		* (additional_input->D)
+//        		* (additional_input->D)
         		);
          // the -0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way
          // the error is minimal. BUTVERIFY IF THIS IS STILL NEEDED.

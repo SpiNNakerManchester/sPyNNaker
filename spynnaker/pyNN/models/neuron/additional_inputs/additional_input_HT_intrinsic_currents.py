@@ -362,25 +362,25 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
                 state_variables[I_T],
                 parameters[G_T],
                 parameters[E_T],
-                parameters[M_T],
-                parameters[M_INF_T],
-                parameters[E_TO_T_ON_TAU_M_T],
-                parameters[H_T],
-                parameters[H_INF_T],
-                parameters[E_TO_T_ON_TAU_H_T],
+                parameters[M_T], # state variable
+                parameters[M_INF_T], # state variable
+                parameters[E_TO_T_ON_TAU_M_T], # state variable
+                parameters[H_T], # state variable
+                parameters[H_INF_T], # state variable
+                parameters[E_TO_T_ON_TAU_H_T], # state variable
 
                 state_variables[I_NAP],
                 parameters[G_NAP],
                 parameters[E_NAP],
-                parameters[M_INF_NAP],
+                parameters[M_INF_NAP], # state variable
 
                 state_variables[I_DK],
                 parameters[G_DK],
                 parameters[E_DK],
-                parameters[M_INF_DK],
-                parameters[E_TO_T_ON_TAU_M_DK],
-                parameters[D],
-                parameters[D_INFINITY],
+                parameters[M_INF_DK], # state variable
+                parameters[E_TO_T_ON_TAU_M_DK], # state variable
+                parameters[D], # state variable
+                parameters[D_INFINITY], # state variable
 
                 parameters[V_CLAMP],
                 parameters[S_CLAMP],
@@ -421,12 +421,14 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         _s_clamp,
         _t_clamp,
         _dt) = values
-#         # Read the data
-#         (_exp_tau_ca2, i_ca2, _i_alpha) = values
-#
-#         # Copy the changed data only
-#         state_variables[I_CA2] = i_ca
 
+        state_variables[I_H] = _I_H
+        state_variables[I_T] = _I_T
+        state_variables[I_DK] = _I_DK
+        state_variables[I_NAP] = _I_NaP
+
+        # Need to add additional state variables for m and h, D_cube, etc,
+        # such that state is maintained across restarts
 
     @property
     def I_H(self):
