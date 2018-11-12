@@ -84,7 +84,6 @@ class SpikeSourcePoissonVertex(
     """ A Poisson Spike source object
     """
 
-    _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
     SPIKE_RECORDING_REGION_ID = 0
 
