@@ -33,7 +33,6 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
         """
-
         :param `string` index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,
@@ -62,73 +61,42 @@ class IndexBasedProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         self._update_probs_from_index_expression()
-        return self._get_delay_maximum(
-            self._delays, utility_calls.get_probable_maximum_selected(
-                self._n_pre_neurons * self._n_post_neurons,
-                self._n_pre_neurons * self._n_post_neurons,
-                numpy.amax(self._probs)))
-
-    @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_delay_variance(self._delays, None)
-
-    def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
-        self._update_probs_from_index_expression()
-        max_prob = numpy.amax(
-            self._probs[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
-        return utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons, out_of,
-            max_prob)
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre_neurons * self._n_post_neurons,
+            numpy.amax(self._probs))
+        return self._get_delay_maximum(n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        n_connections = self._get_n_connections(
-            post_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
+            self, post_vertex_slice, min_delay=None, max_delay=None):
+        self._update_probs_from_index_expression()
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            post_vertex_slice.n_atoms, numpy.amax(self._probs))
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._n_pre_neurons * self._n_post_neurons, n_connections,
+            min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_n_connections(
-            pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
-
-    @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_mean(self._weights, None)
+    def get_n_connections_to_post_vertex_maximum(self):
+        self._update_probs_from_index_expression()
+        return utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre_neurons, numpy.amax(self._probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
-            pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
-
-    @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        return self._get_weight_variance(self._weights, None)
-
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
+    def get_weight_maximum(self):
+        self._update_probs_from_index_expression()
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre_neurons * self._n_post_neurons,
+            numpy.amax(self._probs))
+        return self._get_weight_maximum(n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

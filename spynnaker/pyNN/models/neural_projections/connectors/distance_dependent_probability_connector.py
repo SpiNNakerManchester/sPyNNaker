@@ -32,20 +32,24 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, d_expression, allow_self_connections=True, safe=True,
             verbose=False, n_connections=None):
         """
-        :param `string` d_expression:\
+        :param d_expression:\
             the right-hand side of a valid python expression for\
             probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
             that can be parsed by eval(), that computes the distance\
-            dependent distribution
-        :param `bool` allow_self_connections:\
+            dependent distribution.
+        :type d_expression: str
+        :param allow_self_connections:\
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :param `pyNN.Space` space:\
+        :type d_expression: bool
+        :param space:\
             a Space object, needed if you wish to specify distance-dependent\
-            weights or delays
-        :param `int` n_connections:\
+            weights or delays.
+        :type space: pyNN.Space
+        :param n_connections:\
             The number of efferent synaptic connections per neuron.
+        :type n_connections: int or None
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
@@ -71,77 +75,42 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
         return self._get_delay_maximum(
-            self._delays, utility_calls.get_probable_maximum_selected(
+            utility_calls.get_probable_maximum_selected(
                 self._n_pre_neurons * self._n_post_neurons,
                 self._n_pre_neurons * self._n_post_neurons,
                 numpy.amax(self._probs)))
 
-    @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        return self._get_delay_variance(self._delays, None)
-
-    def _get_n_connections(self, out_of, pre_vertex_slice, post_vertex_slice):
-        max_prob = numpy.amax(
-            self._probs[pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
-        return utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons, out_of,
-            max_prob)
-
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
+            self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = self._get_n_connections(
-            post_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
+        max_prob = numpy.amax(
+            self._probs[0:self._n_pre_neurons, post_vertex_slice.as_slice])
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons, self._n_pre_neurons,
+            max_prob)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections, None, min_delay, max_delay)
+            self._n_pre_neurons * self._n_post_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return self._get_n_connections(
-            pre_vertex_slice.n_atoms, pre_vertex_slice, post_vertex_slice)
-
-    @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        return self._get_weight_mean(self._weights, None)
+        return utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons, self._n_post_neurons,
+            numpy.amax(self._probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        n_connections = self._get_n_connections(
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms,
-            pre_vertex_slice, post_vertex_slice)
-        return self._get_weight_maximum(
-            self._weights, n_connections, None)
-
-    @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        return self._get_weight_variance(self._weights, None)
-
-    @overrides(AbstractConnector.generate_on_machine)
-    def generate_on_machine(self):
-        return False
+        return utility_calls.get_probable_maximum_selected(
+            self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre_neurons * self._n_post_neurons,
+            numpy.amax(self._probs))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

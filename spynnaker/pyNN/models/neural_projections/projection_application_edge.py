@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectionApplicationEdge(ApplicationEdge):
-    """ An edge which terminates on an AbstractPopulationVertex
+    """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
         "_delay_edge",

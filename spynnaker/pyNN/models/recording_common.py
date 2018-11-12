@@ -6,7 +6,6 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from collections import defaultdict
 import numpy
@@ -18,6 +17,8 @@ logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RecordingCommon(object):
+    """ Object to hold recording behaviour.
+    """
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = [
     #     "_indices_to_record",
@@ -25,8 +26,7 @@ class RecordingCommon(object):
     #     "_write_to_files_indicators"]
 
     def __init__(self, population):
-        """ object to hold recording behaviour
-
+        """
         :param population: the population to record for
         """
 
@@ -46,13 +46,13 @@ class RecordingCommon(object):
 
     def _record(self, variable, sampling_interval=None, to_file=None,
                 indexes=None):
-        """ tells the vertex to record data
+        """ Tell the vertex to record data.
 
-        :param variable: the variable to record, valued variables to record
-        are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param variable: the variable to record, valued variables to record\
+            are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all
-        :return:  None
+        :return: None
         """
 
         get_simulator().verify_not_running()
@@ -78,29 +78,27 @@ class RecordingCommon(object):
         self._write_to_files_indicators[variable] = to_file
 
         if variable == "gsyn_exc":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
+            if not self._population._vertex.conductance_based:
                 logger_utils.warn_once(
                     logger, "You are trying to record the excitatory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
         elif variable == "gsyn_inh":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
+            if not self._population._vertex.conductance_based:
                 logger_utils.warn_once(
-                    logger, "You are trying to record the inhibtatory "
+                    logger, "You are trying to record the inhibitory "
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
 
     def _set_v_recording(self):
-        """ Sets the parameters etc that are used by the voltage recording
+        """ Set the parameters etc that are used by the voltage recording.
 
         :return: None
         """
         self._population._vertex.set_recording("v")
 
     def _set_spikes_recording(self, sampling_interval, indexes=None):
-        """ sets the parameters etc that are used by the spikes recording
+        """ Set the parameters, etc., that are used by the spikes recording.
 
         :return: None
         """
@@ -133,8 +131,8 @@ class RecordingCommon(object):
         return self.pynn7_format(data, ids, sampling_interval)
 
     def _get_recorded_matrix(self, variable):
-        """ method that contains all the safety checks and gets the recorded
-            data from the vertex in matrix format
+        """ Perform safety checks and get the recorded data from the vertex\
+            in matrix format.
 
         :param variable: the variable name to read. supported variable names
             are :'gsyn_exc', 'gsyn_inh', 'v'
@@ -189,7 +187,7 @@ class RecordingCommon(object):
         return (data, indexes, sampling_interval)
 
     def _get_spikes(self):
-        """ How to get spikes from a vertex
+        """ How to get spikes from a vertex.
 
         :return: the spikes from a vertex
         """
@@ -222,7 +220,7 @@ class RecordingCommon(object):
             sim.machine_time_step)
 
     def _turn_off_all_recording(self, indexes=None):
-        """ Turns off recording, is used by a pop saying .record()
+        """ Turns off recording, is used by a pop saying `.record()`
 
         :rtype: None
         """
