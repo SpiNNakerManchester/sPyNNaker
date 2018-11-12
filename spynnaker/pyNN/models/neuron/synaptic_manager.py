@@ -16,7 +16,6 @@ from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 # front-end common
 from spinn_front_end_common.utilities.helpful_functions \
     import locate_memory_region_for_placement
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 # dsg
 from data_specification.enums import DataType
@@ -36,8 +35,7 @@ from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex \
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants \
     import POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT
-from spynnaker.pyNN.utilities.utility_calls \
-    import get_maximum_probable_value, get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 
@@ -461,13 +459,7 @@ class SynapticManager(object):
                     spikes_per_second = self._spikes_per_second
                     if isinstance(app_edge.pre_vertex,
                                   SpikeSourcePoissonVertex):
-                        spikes_per_second = app_edge.pre_vertex.rate
-                        if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = max(spikes_per_second)
-                        elif get_simulator().is_a_pynn_random(
-                                spikes_per_second):
-                            spikes_per_second = get_maximum_probable_value(
-                                spikes_per_second, app_edge.pre_vertex.n_atoms)
+                        spikes_per_second = app_edge.pre_vertex.max_rate
                         prob = 1.0 - (
                             (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
                         spikes_per_tick = spikes_per_second / steps_per_second

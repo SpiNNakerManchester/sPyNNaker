@@ -32,5 +32,5 @@ class SpikeSourcePoisson(AbstractPyNNModel):
     def create_vertex(self, n_neurons, label, constraints, seed):
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
-            n_neurons, constraints, label, self._rate, self._start,
-            self._duration, seed, max_atoms, self)
+            n_neurons, constraints, label, seed, max_atoms, self,
+            rate=self._rate, start=self._start, duration=self._duration)
