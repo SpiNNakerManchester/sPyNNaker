@@ -7,7 +7,7 @@ from collections import defaultdict
 from spinn_utilities.overrides import overrides
 
 from spinn_front_end_common.utilities.constants import \
-    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT
+    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES
 
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
@@ -194,7 +194,7 @@ class DelayExtensionVertex(
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
-            size=SYSTEM_BYTES_REQUIREMENT,
+            size=SIMULATION_N_BYTES,
             label='setup')
 
         spec.reserve_memory_region(

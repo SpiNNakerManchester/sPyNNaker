@@ -20,7 +20,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.abstract_models \
     import AbstractVertexWithEdgeToDependentVertices
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
+from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT,\
+    SIMULATION_N_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 
@@ -171,7 +172,7 @@ class MunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            self.SYSTEM_REGION, SYSTEM_BYTES_REQUIREMENT, label='setup')
+            self.SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
             self.PARAMS_REGION, self.PARAMS_SIZE, label='params')

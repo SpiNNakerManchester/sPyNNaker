@@ -25,7 +25,8 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.interface.buffer_management \
     import recording_utilities
 from spinn_front_end_common.utilities.constants \
-    import SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE
+    import SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE,\
+    SIMULATION_N_BYTES
 from spinn_front_end_common.abstract_models \
     import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models.impl\
@@ -59,9 +60,9 @@ logger = logging.getLogger(__name__)
 # uint32_t n_spike_sources; mars_kiss64_seed_t (uint[4]) spike_source_seed;
 PARAMS_BASE_WORDS = 14
 
-# start_scaled, end_scaled, is_fast_source, exp_minus_lambda, isi_val,
-# time_to_spike
-PARAMS_WORDS_PER_NEURON = 6
+# start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,
+# isi_val, time_to_spike
+PARAMS_WORDS_PER_NEURON = 7
 
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
@@ -393,7 +394,7 @@ class SpikeSourcePoissonVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=_REGIONS.SYSTEM_REGION.value,
-            size=SYSTEM_BYTES_REQUIREMENT,
+            size=SIMULATION_N_BYTES,
             label='setup')
 
         # reserve poisson parameters and rates DSG region
@@ -631,7 +632,7 @@ class SpikeSourcePoissonVertex(
         """
         poisson_params_sz = self.get_rates_bytes(vertex_slice)
         total_size = (
-            SYSTEM_BYTES_REQUIREMENT + PARAMS_BASE_WORDS +
+            SYSTEM_BYTES_REQUIREMENT + (PARAMS_BASE_WORDS * 4) +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz)
         total_size += self._get_number_of_mallocs_used_by_dsg() * \

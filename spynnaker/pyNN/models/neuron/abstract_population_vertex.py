@@ -334,7 +334,7 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            size=common_constants.SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
