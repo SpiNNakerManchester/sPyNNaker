@@ -45,7 +45,7 @@ class DelayExtensionMachineVertex(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return 6
+        return len(self.EXTRA_PROVENANCE_DATA_ENTRIES)
 
     @property
     @overrides(MachineVertex.resources_required)

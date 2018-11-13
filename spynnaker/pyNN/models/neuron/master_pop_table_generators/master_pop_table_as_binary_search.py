@@ -1,9 +1,5 @@
-
-# spynnaker imports
-import struct
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
-from pacman.model.graphs.application import ApplicationVertex
 from spinn_utilities.overrides import overrides
+from pacman.utilities.utility_calls import get_max_atoms_per_core
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
@@ -14,8 +10,8 @@ from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 # general imports
 import logging
 import numpy
-import sys
 import math
+import struct
 
 logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
@@ -112,15 +108,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxsize
                 edge_pre_vertex = in_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, ApplicationVertex) and
-                        isinstance(
-                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
-
-                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = in_edge.pre_vertex.n_atoms
+                max_atoms = get_max_atoms_per_core(edge_pre_vertex)
 
                 # Get the number of likely vertices
                 n_edge_vertices = int(math.ceil(
@@ -142,14 +131,15 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = len(in_edges)
+        n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
+                n_vertices += 1
                 n_entries += len(edge.synapse_information)
 
-        # Multiply by 2 to get an upper bound
+        # Multiply by 2 to get an upper bound as could be delays as well
         return (
             (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +

@@ -98,6 +98,12 @@ static spike_source_t *poisson_parameters = NULL;
 //! global variable which contains all the data for neuron future rates
 static spike_source_t **future_parameters = NULL;
 
+//! global variable which indicates which parameters are next
+static uint32_t *next_parameters_index = NULL;
+
+//! global variable that indicates that a rate has been changed manually
+static bool *rate_changed = NULL;
+
 //! The number of clock ticks between sending each spike
 static uint32_t time_between_spikes;
 
@@ -202,6 +208,7 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id >= global_parameters.first_source_id) &&
             ((id - global_parameters.first_source_id) <
              global_parameters.n_spike_sources)) {
+        rate_changed[id] = true;
         uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         if (rate > global_parameters.slow_rate_per_tick_cutoff) {
@@ -258,9 +265,15 @@ bool read_global_parameters(address_t address) {
 
 static void read_next_rates(uint32_t index) {
     log_info("Reading next data for source %d at time %d", index, time);
-    spin1_memcpy(&poisson_parameters[index], future_parameters[index],
+    if (next_parameters_index[index] > 0 && rate_changed[index]) {
+        spin1_memcpy(&future_parameters[next_parameters_index[index] - 1],
+            &poisson_parameters[index], sizeof(spike_source_t));
+    }
+    rate_changed[index] = false;
+    spin1_memcpy(&poisson_parameters[index],
+        future_parameters[next_parameters_index[index]],
         sizeof(spike_source_t));
-    future_parameters[index] = &(future_parameters[index][1]);
+    next_parameters_index[index] += 1;
     if (!poisson_parameters[index].is_fast_source) {
         poisson_parameters[index].time_to_spike_ticks =
             slow_spike_source_get_time_to_spike(
@@ -275,6 +288,7 @@ static void read_next_rates(uint32_t index) {
 //! \return a boolean which is True if the rates were read successfully or
 //!         False otherwise
 static bool read_rates(address_t address) {
+    log_info("Reading rates from 0x%08x", address);
 
     // Allocate DTCM for array of spike sources and copy block of data
     if (global_parameters.n_spike_sources > 0) {
@@ -290,6 +304,24 @@ static bool read_rates(address_t address) {
         if (poisson_parameters == NULL) {
             log_error("Failed to allocate poisson_parameters");
             return false;
+        }
+
+        if (next_parameters_index == NULL) {
+            next_parameters_index = (uint32_t *) spin1_malloc(
+                global_parameters.n_spike_sources * sizeof(uint32_t));
+            if (next_parameters_index == NULL) {
+                log_error("Failed to allocate next_parameters_index");
+                return false;
+            }
+        }
+
+        if (rate_changed == NULL) {
+            rate_changed = (bool *) spin1_malloc(
+                global_parameters.n_spike_sources * sizeof(bool));
+            if (rate_changed == NULL) {
+                log_error("Failed to allocate rate_changed");
+                return false;
+            }
         }
 
         if (future_parameters == NULL) {
@@ -311,8 +343,11 @@ static bool read_rates(address_t address) {
             pos += (sizeof(spike_source_t) >> 2) * n_items;
 
             // Skip over the rates until the current time step
-            while (future_parameters[i]->next_ticks < time) {
-                future_parameters[i] = &(future_parameters[i][1]);
+            rate_changed[i] = false;
+            next_parameters_index[i] = 0;
+            while (future_parameters[next_parameters_index[i]]->next_ticks
+                    < time) {
+                next_parameters_index[i] += 1;
             }
 
             // Deal with the current rates
@@ -431,19 +466,19 @@ bool store_poisson_parameters() {
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
-    address = data_specification_get_region(POISSON_PARAMS, address);
 
     // Copy the global_parameters back to SDRAM
-    spin1_memcpy(address, &global_parameters, sizeof(global_parameters));
+    address_t params_address = data_specification_get_region(
+        POISSON_PARAMS, address);
+    spin1_memcpy(params_address, &global_parameters, sizeof(global_parameters));
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
-    if (global_parameters.n_spike_sources > 0) {
-        uint32_t spikes_offset =
-            sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
-        spin1_memcpy(
-            &address[spikes_offset], poisson_parameters,
-            global_parameters.n_spike_sources * sizeof(spike_source_t));
+    for (uint32_t i = 0; i < global_parameters.n_spike_sources; i++) {
+        if (next_parameters_index[i] > 0 && rate_changed[i]) {
+            spin1_memcpy(&future_parameters[next_parameters_index[i] - 1],
+                &poisson_parameters[i], sizeof(spike_source_t));
+        }
     }
 
     log_info("stored_parameters : completed successfully");

@@ -74,6 +74,7 @@ _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 _PoissonStruct = Struct([
     DataType.UINT32,  # Start Scaled
     DataType.UINT32,  # End Scaled
+    DataType.UINT32,  # Next Scaled
     DataType.UINT32,  # is_fast_source
     DataType.U032,    # exp^(-rate)
     DataType.S1615,   # inter-spike-interval
@@ -272,6 +273,22 @@ class SpikeSourcePoissonVertex(
             self._max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self._max_rate = 0
+
+    @property
+    def rate(self):
+        return self._data["rates"]
+
+    @rate.setter
+    def rate(self, rate):
+
+        # Normalise parameter
+        if hasattr(rate, "__len__"):
+            # Single rate per neuron for whole simulation
+            self._data["rates"].set_value([numpy.array([r]) for r in rate])
+        else:
+            # Single rate for all neurons for whole simulation
+            self._data["rates"].set_value(
+                numpy.array([rate]), use_list_as_value=True)
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -721,10 +738,10 @@ class SpikeSourcePoissonVertex(
         # For each atom, read the number of rates and the rate parameters
         offset = 0
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            n_values = struct.unpack_from("<I", byte_array, offset)
+            n_values = struct.unpack_from("<I", byte_array, offset)[0]
             offset += 4
 
-            (_start, _end, is_fast_source, exp_minus_lambda, isi,
+            (_start, _end, _next, is_fast_source, exp_minus_lambda, isi,
              time_to_next_spike) = _PoissonStruct.read_data(
                  byte_array, offset, n_values)
             offset += _PoissonStruct.get_size_in_whole_words(n_values) * 4
@@ -739,13 +756,15 @@ class SpikeSourcePoissonVertex(
             spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 
             # Convert spikes per tick to rates
-            self._data["rates"][i] = (
+            self._data["rates"].set_value_by_id(
+                i,
                 spikes_per_tick *
                 (MICROSECONDS_PER_SECOND / float(self._machine_time_step)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
-            self._data["time_to_spike"][i] = time_to_next_spike
+            self._data["time_to_spike"].set_value_by_id(
+                i, time_to_next_spike)
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",

@@ -1,17 +1,15 @@
 import math
 import scipy.stats  # @UnresolvedImport
 import struct
-import sys
 from collections import defaultdict
 from scipy import special  # @UnresolvedImport
 import numpy
 
-# PACMAN imports
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
-
 # spinn utilities
 from spinn_utilities.helpful_functions import get_valid_components
-from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
+
+# pacman
+from pacman.utilities.utility_calls import get_max_atoms_per_core
 
 # front-end common
 from spinn_front_end_common.utilities.helpful_functions \
@@ -21,6 +19,7 @@ from spinn_front_end_common.utilities.helpful_functions \
 from data_specification.enums import DataType
 
 # spynnaker
+from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector, AbstractGenerateConnectorOnMachine
@@ -220,6 +219,7 @@ class SynapticManager(object):
         """ Get the size of the synaptic blocks in bytes
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
+        direct_size = 4
 
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
@@ -236,8 +236,14 @@ class SynapticManager(object):
                     memory_size += (
                         max_row_info.delayed_max_bytes * n_atoms *
                         in_edge.n_delay_stages)
+                    if max_row_info.undelayed_max_n_synapses == 1:
+                        direct_size += n_atoms * 4
+                    if max_row_info.delayed_max_n_synapses == 1:
+                        direct_size += n_atoms * 4 * in_edge.n_delay_stages
 
-        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+        if direct_size > self._one_to_one_connection_dtcm_max_bytes:
+            direct_size = self._one_to_one_connection_dtcm_max_bytes
+        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE), direct_size
 
     def _get_size_of_generator_information(self, in_edges):
         """ Get the size of the synaptic expander parameters
@@ -249,13 +255,8 @@ class SynapticManager(object):
                 for synapse_info in in_edge.synapse_information:
 
                     # Get the number of likely vertices
-                    max_atoms = sys.maxsize
                     edge_pre_vertex = in_edge.pre_vertex
-                    if (isinstance(
-                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
-                        max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                    if in_edge.pre_vertex.n_atoms < max_atoms:
-                        max_atoms = in_edge.pre_vertex.n_atoms
+                    max_atoms = get_max_atoms_per_core(edge_pre_vertex)
                     n_edge_vertices = int(math.ceil(
                         float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
 
@@ -303,8 +304,8 @@ class SynapticManager(object):
             self._get_synapse_params_size() +
             self._get_synapse_dynamics_parameter_size(vertex_slice,
                                                       in_edges=in_edges) +
-            self._get_synaptic_blocks_size(
-                vertex_slice, in_edges, machine_time_step) +
+            sum(self._get_synaptic_blocks_size(
+                vertex_slice, in_edges, machine_time_step)) +
             self._poptable_type.get_master_population_table_size(
                 vertex_slice, in_edges) +
             self._get_size_of_generator_information(in_edges))
@@ -906,7 +907,7 @@ class SynapticManager(object):
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
         all_syn_block_sz = self._get_synaptic_blocks_size(
-            post_vertex_slice, in_edges, machine_time_step)
+            post_vertex_slice, in_edges, machine_time_step)[0]
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
             all_syn_block_sz, graph_mapper)
