@@ -102,7 +102,8 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.max(numpy.bincount(self._conn_list["target"]))
+        return numpy.max(
+            numpy.bincount(self._conn_list["target"].view('int32')))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self):
