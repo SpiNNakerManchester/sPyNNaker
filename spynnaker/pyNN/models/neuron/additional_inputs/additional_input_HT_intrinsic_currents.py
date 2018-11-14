@@ -309,7 +309,6 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
 
         parameters[G_T] = self._g_T
         parameters[E_T] = self._E_T
-
         parameters[G_NAP] = self._g_NaP
         parameters[E_NAP] = self._E_NaP
 
@@ -453,7 +452,6 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         state_variables[D_INFINITY] = _D_infinity
 
 
-
         state_variables[I_H] = _I_H
         state_variables[I_T] = _I_T
         state_variables[I_DK] = _I_DK
@@ -462,12 +460,12 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         # Need to add additional state variables for m and h, D_cube, etc,
         # such that state is maintained across restarts
 
-    @property
-    def I_H(self):
-        return self._I_H
-    @ I_H.setter
-    def I_H(self, new_I_H):
-        self._I_H = new_I_H
+#     @property
+#     def I_H(self):
+#         return self._I_H
+#     @ I_H.setter
+#     def I_H(self, new_I_H):
+#         self._I_H = new_I_H
 
     @property
     def g_H(self):
@@ -483,33 +481,33 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def E_H(self, new_E_H):
         self._E_H = new_E_H
 
-    @property
-    def m_H(self):
-        return self._m_H
-    @ m_H.setter
-    def m_H(self, new_m_H):
-        self._m_H = new_m_H
+#     @property
+#     def m_H(self):
+#         return self._m_H
+#     @ m_H.setter
+#     def m_H(self, new_m_H):
+#         self._m_H = new_m_H
+#
+#     @property
+#     def m_inf_H(self):
+#         return self._m_inf_H
+#     @ m_inf_H.setter
+#     def m_inf_H(self, new_m_inf_H):
+#         self._m_inf_H = new_m_inf_H
+#
+#     @property
+#     def e_to_t_on_tau_m_H(self):
+#         return self._e_to_t_on_tau_m_H
+#     @ e_to_t_on_tau_m_H.setter
+#     def e_to_t_on_tau_m_H(self, new_e_to_t_on_tau_m_H):
+#         self._e_to_t_on_tau_m_H = new_e_to_t_on_tau_m_H
 
-    @property
-    def m_inf_H(self):
-        return self._m_inf_H
-    @ m_inf_H.setter
-    def m_inf_H(self, new_m_inf_H):
-        self._m_inf_H = new_m_inf_H
-
-    @property
-    def e_to_t_on_tau_m_H(self):
-        return self._e_to_t_on_tau_m_H
-    @ e_to_t_on_tau_m_H.setter
-    def e_to_t_on_tau_m_H(self, new_e_to_t_on_tau_m_H):
-        self._e_to_t_on_tau_m_H = new_e_to_t_on_tau_m_H
-
-    @property
-    def I_T(self):
-        return self._I_T
-    @ I_T.setter
-    def I_T(self, new_I_T):
-        self._I_T = new_I_T
+#     @property
+#     def I_T(self):
+#         return self._I_T
+#     @ I_T.setter
+#     def I_T(self, new_I_T):
+#         self._I_T = new_I_T
 
     @property
     def g_T(self):
@@ -525,54 +523,54 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def E_T(self, new_E_T):
         self._E_T = new_E_T
 
-    @property
-    def m_T(self):
-        return self._m_T
-    @ m_T.setter
-    def m_T(self, new_m_T):
-        self._m_T = new_m_T
+#     @property
+#     def m_T(self):
+#         return self._m_T
+#     @ m_T.setter
+#     def m_T(self, new_m_T):
+#         self._m_T = new_m_T
+#
+#     @property
+#     def m_inf_T(self):
+#         return self._m_inf_T
+#     @ m_inf_T.setter
+#     def m_inf_T(self, new_m_inf_T):
+#         self._m_inf_T = new_m_inf_T
+#
+#     @property
+#     def e_to_t_on_tau_m_T(self):
+#         return self._e_to_t_on_tau_m_T
+#     @ e_to_t_on_tau_m_T.setter
+#     def e_to_t_on_tau_m_T(self, new_e_to_t_on_tau_m_T):
+#         self._e_to_t_on_tau_m_T = new_e_to_t_on_tau_m_T
+#
+#     @property
+#     def h_T(self):
+#         return self._h_T
+#     @ h_T.setter
+#     def h_T(self, new_h_T):
+#         self._h_T = new_h_T
+#
+#     @property
+#     def h_inf_T(self):
+#         return self._h_inf_T
+#     @ h_inf_T.setter
+#     def h_inf_T(self, new_h_inf_T):
+#         self._h_inf_T = new_h_inf_T
+#
+#     @property
+#     def e_to_t_on_tau_h_T(self):
+#         return self._e_to_t_on_tau_h_T
+#     @ e_to_t_on_tau_h_T.setter
+#     def e_to_t_on_tau_h_T(self, new_e_to_t_on_tau_h_T):
+#         self._e_to_t_on_tau_h_T = new_e_to_t_on_tau_h_T
 
-    @property
-    def m_inf_T(self):
-        return self._m_inf_T
-    @ m_inf_T.setter
-    def m_inf_T(self, new_m_inf_T):
-        self._m_inf_T = new_m_inf_T
-
-    @property
-    def e_to_t_on_tau_m_T(self):
-        return self._e_to_t_on_tau_m_T
-    @ e_to_t_on_tau_m_T.setter
-    def e_to_t_on_tau_m_T(self, new_e_to_t_on_tau_m_T):
-        self._e_to_t_on_tau_m_T = new_e_to_t_on_tau_m_T
-
-    @property
-    def h_T(self):
-        return self._h_T
-    @ h_T.setter
-    def h_T(self, new_h_T):
-        self._h_T = new_h_T
-
-    @property
-    def h_inf_T(self):
-        return self._h_inf_T
-    @ h_inf_T.setter
-    def h_inf_T(self, new_h_inf_T):
-        self._h_inf_T = new_h_inf_T
-
-    @property
-    def e_to_t_on_tau_h_T(self):
-        return self._e_to_t_on_tau_h_T
-    @ e_to_t_on_tau_h_T.setter
-    def e_to_t_on_tau_h_T(self, new_e_to_t_on_tau_h_T):
-        self._e_to_t_on_tau_h_T = new_e_to_t_on_tau_h_T
-
-    @property
-    def I_NaP(self):
-        return self._I_NaP
-    @ I_NaP.setter
-    def I_NaP(self, new_I_NaP):
-        self._I_NaP = new_I_NaP
+#     @property
+#     def I_NaP(self):
+#         return self._I_NaP
+#     @ I_NaP.setter
+#     def I_NaP(self, new_I_NaP):
+#         self._I_NaP = new_I_NaP
 
     @property
     def g_NaP(self):
@@ -588,19 +586,19 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def E_NaP(self, new_E_NaP):
         self._E_NaP = new_E_NaP
 
-    @property
-    def m_inf_NaP(self):
-        return self._m_inf_NaP
-    @ m_inf_NaP.setter
-    def m_inf_NaP(self, new_m_inf_NaP):
-        self._m_inf_NaP = new_m_inf_NaP
+#     @property
+#     def m_inf_NaP(self):
+#         return self._m_inf_NaP
+#     @ m_inf_NaP.setter
+#     def m_inf_NaP(self, new_m_inf_NaP):
+#         self._m_inf_NaP = new_m_inf_NaP
 
-    @property
-    def I_DK(self):
-        return self._I_DK
-    @ I_DK.setter
-    def I_DK(self, new_I_DK):
-        self._I_DK = new_I_DK
+#     @property
+#     def I_DK(self):
+#         return self._I_DK
+#     @ I_DK.setter
+#     def I_DK(self, new_I_DK):
+#         self._I_DK = new_I_DK
 
     @property
     def g_DK(self):
@@ -616,40 +614,40 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def E_DK(self, new_E_DK):
         self._E_DK = new_E_DK
 
-    @property
-    def m_inf_DK(self):
-        return self._m_inf_DK
-    @ m_inf_DK.setter
-    def m_inf_DK(self, new_m_inf_DK):
-        self._m_inf_DK = new_m_inf_DK
+#     @property
+#     def m_inf_DK(self):
+#         return self._m_inf_DK
+#     @ m_inf_DK.setter
+#     def m_inf_DK(self, new_m_inf_DK):
+#         self._m_inf_DK = new_m_inf_DK
+#
+#     @property
+#     def e_to_t_on_tau_m_DK(self):
+#         return self._e_to_t_on_tau_m_DK
+#     @ e_to_t_on_tau_m_DK.setter
+#     def e_to_t_on_tau_m_DK(self, new_e_to_t_on_tau_m_DK):
+#         self._e_to_t_on_tau_m_DK = new_e_to_t_on_tau_m_DK
 
-    @property
-    def e_to_t_on_tau_m_DK(self):
-        return self._e_to_t_on_tau_m_DK
-    @ e_to_t_on_tau_m_DK.setter
-    def e_to_t_on_tau_m_DK(self, new_e_to_t_on_tau_m_DK):
-        self._e_to_t_on_tau_m_DK = new_e_to_t_on_tau_m_DK
-
-    @property
-    def D(self):
-        return self._D
-    @ D.setter
-    def D(self, new_D):
-        self._D = new_D
-
-    @property
-    def D_infinity(self):
-        return self._D_infinity
-    @ D_infinity.setter
-    def D_infinity(self, new_D_infinity):
-        self._D_infinity = new_D_infinity
-
-    @property
-    def e_to_t_on_tau_h_DK(self):
-        return self._e_to_t_on_tau_h_DK
-    @e_to_t_on_tau_h_DK.setter
-    def e_to_t_on_tau_h_DK(self, new_e_to_t_on_tau_h_DK):
-        self._e_to_t_on_tau_h_DK = new_e_to_t_on_tau_h_DK
+#     @property
+#     def D(self):
+#         return self._D
+#     @ D.setter
+#     def D(self, new_D):
+#         self._D = new_D
+#
+#     @property
+#     def D_infinity(self):
+#         return self._D_infinity
+#     @ D_infinity.setter
+#     def D_infinity(self, new_D_infinity):
+#         self._D_infinity = new_D_infinity
+#
+#     @property
+#     def e_to_t_on_tau_h_DK(self):
+#         return self._e_to_t_on_tau_h_DK
+#     @e_to_t_on_tau_h_DK.setter
+#     def e_to_t_on_tau_h_DK(self, new_e_to_t_on_tau_h_DK):
+#         self._e_to_t_on_tau_h_DK = new_e_to_t_on_tau_h_DK
 
     @property
     def v_clamp(self):

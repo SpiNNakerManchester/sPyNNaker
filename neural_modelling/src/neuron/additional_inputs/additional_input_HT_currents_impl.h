@@ -2,7 +2,7 @@
 #define _ADDITIONAL_INPUT_ALL_CURRENTS_
 
 #include "additional_input.h"
-#include "sqrt.h"
+#include "math.h"
 
 #define TIMESTEP 0.100006103515625k
 #define NUM_CURRENTS 4
@@ -228,6 +228,7 @@ static input_t* additional_input_get_input_value_as_current(
         accum D_cube = ((additional_input->D)
         		* (additional_input->D)
         		* (additional_input->D)
+//				* sqrt(additional_input->D)
 //        		* (additional_input->D)
         		);
          // the -0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way

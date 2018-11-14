@@ -102,7 +102,11 @@ class HillTononiNeuron(AbstractPyNNNeuronModelStandard):
                             "exc2_a_response", "exc2_b_response",
                             "inh_a_response", "inh_b_response",
                             "inh2_a_response", "inh2_b_response",
-                            "I_H", "I_T", "I_NaP", "I_DK" })
+                            "I_H", 'm_H', 'm_inf_H', 'e_to_t_on_tau_m_H',
+                            "I_T", 'm_T', 'm_inf_T', 'e_to_t_on_tau_m_T', 'h_T', 'h_inf_T', 'e_to_t_on_tau_h_T',
+                            "I_NaP", 'm_inf_NaP',
+                            "I_DK", 'm_inf_DK', 'e_to_t_on_tau_m_DK', 'D', 'D_infinity'
+                            })
 
     def __init__(
             self,
