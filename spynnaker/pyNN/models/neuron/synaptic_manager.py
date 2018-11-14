@@ -698,6 +698,7 @@ class SynapticManager(object):
         if max_row_info.undelayed_max_n_synapses:
             synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(block_addr)
+	    print "update table called from gen on chip"
             self._poptable_type.update_master_population_table(
                 spec, synaptic_matrix_offset,
                 max_row_info.undelayed_max_words,
@@ -709,6 +710,7 @@ class SynapticManager(object):
             # The synaptic matrix offset is in words for the generator
             synaptic_matrix_offset = synaptic_matrix_offset // 4
         elif rinfo is not None:
+	    print "update table called from gen on chip"
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
 
@@ -729,6 +731,7 @@ class SynapticManager(object):
             delayed_synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(
                     block_addr)
+	    print "update table called from gen on chip"
             self._poptable_type.update_master_population_table(
                 spec, delayed_synaptic_matrix_offset,
                 max_row_info.delayed_max_words,
@@ -742,6 +745,7 @@ class SynapticManager(object):
             delayed_synaptic_matrix_offset = \
                 delayed_synaptic_matrix_offset // 4
         elif delay_rinfo is not None:
+	    print "update table called from gen on chip"
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
                 master_pop_table_region)
@@ -806,6 +810,7 @@ class SynapticManager(object):
                 single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif rinfo is not None:
+	    print "update table called from write block"
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
         del row_data
@@ -827,6 +832,7 @@ class SynapticManager(object):
                 delay_rinfo, single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif delay_rinfo is not None:
+	    print "update table called from write block"
             self._poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
                 master_pop_table_region)
@@ -862,19 +868,24 @@ class SynapticManager(object):
                 app_edge):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             single_synapses.append(single_rows)
+	    print "update table called from write row is single"
             self._poptable_type.update_master_population_table(
                 spec, single_addr, 1, rinfo.first_key_and_mask,
                 master_pop_table_region, is_single=True)
             single_addr += len(single_rows) * 4
         else:
+	    diff = pre_vertex_slice.hi_atom - pre_vertex_slice.lo_atom
+	    if diff < 100:
+		print "diff={}".format(diff)
+
             block_addr = self._write_padding(
                 spec, synaptic_matrix_region, block_addr)
             spec.switch_write_focus(synaptic_matrix_region)
             spec.write_array(row_data)
-
+	    #print "update table called from write row"
             self._poptable_type.update_master_population_table(
                 spec, block_addr, row_length,
-                rinfo.first_key_and_mask, master_pop_table_region,is_single=False,conn_matrix=connector._conn_matrix[pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom,post_vertex_slice.lo_atom:post_vertex_slice.hi_atom])
+                rinfo.first_key_and_mask, master_pop_table_region,is_single=False,conn_matrix=connector._conn_matrix[pre_vertex_slice.lo_atom:pre_vertex_slice.hi_atom+1,post_vertex_slice.lo_atom:post_vertex_slice.hi_atom+1])
             block_addr += len(row_data) * 4
         return block_addr, single_addr
 

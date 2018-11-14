@@ -110,7 +110,8 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[GHOST_POP_TABLE_SEARCHES]=
     	spike_processing_get_ghost_pop_table_searches();
     io_printf (IO_BUF, "n_ghost_input_spikes=%d\n",spike_processing_get_ghost_pop_table_searches());
-
+    io_printf (IO_BUF, "empty row count = %d\n",synapses_get_empty_row_count());
+//    population_table_print_connectivity_lookup();
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -276,7 +277,6 @@ void timer_callback(uint timer_count, uint unused) {
         time -= 1;
 
         log_debug("Rewire tries = %d", count_rewires);
-
         simulation_ready_to_read();
 
         return;

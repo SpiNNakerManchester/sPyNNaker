@@ -27,23 +27,27 @@ class _MasterPopEntry(object):
     __slots__ = [
         "_addresses_and_row_lengths",
         "_mask",
-        "_routing_key"]
+        "_routing_key",
+	"_conn_lookup"]
 
     MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
     ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
-    CONN_LOOKUP_SIZE_BYTES = 1
+    CONN_LOOKUP_SIZE_BYTES = 4#1#
 
     def __init__(self, routing_key, mask):
         self._routing_key = routing_key
         self._mask = mask
         self._addresses_and_row_lengths = list()
+	self._conn_lookup = None
+
 
     def append(self, address, row_length, is_single):
         self._addresses_and_row_lengths.append(
             (address, row_length, is_single))
-
+    def set_conn_lookup(self,conn_lookup):
+	self._conn_lookup = conn_lookup
     @property
     def routing_key(self):
         """
@@ -74,7 +78,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         "_entries",
         "_n_addresses",
         "_n_single_entries",
-        "_conn_lookup"]
+        "_conn_lookup",
+        "_n_conn_lookup_words_per_entry"]
 
     # Switched ordering of count and start as numpy will switch them back
     # when asked for view("<4")
@@ -82,7 +87,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         ("key", "<u4"), ("mask", "<u4"), ("start", "<u2"), ("count", "<u2")]
 
     ADDRESS_LIST_DTYPE = "<u4"
-    CONN_LOOKUP_DTYPE = "<u1"
+    CONN_LOOKUP_DTYPE = "<u4"#"<u1"
+    N_ATOMS_PER_CORE = 255#128
 
     # top bit of the 32 bit number
     SINGLE_BIT_FLAG_BIT = 0x80000000
@@ -96,6 +102,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_addresses = 0
         self._n_single_entries = None
         self._conn_lookup = None
+        self._n_conn_lookup_words_per_entry = int(numpy.ceil(self.N_ATOMS_PER_CORE / 32.))
+
 
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
@@ -137,7 +145,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         return (
             (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8 + (n_entries * 255 * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
+            8)
 
     def get_exact_master_population_table_size(
             self, vertex, machine_graph, graph_mapper):
@@ -157,7 +165,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         return (
             (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8 + (n_entries * 255 * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
+            # 8 + (2*n_entries * self.N_ATOMS_PER_CORE * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
+            8 + (2*n_entries * self._n_conn_lookup_words_per_entry * _MasterPopEntry.CONN_LOOKUP_SIZE_BYTES))
 
     def get_allowed_row_length(self, row_length):
         """
@@ -194,13 +203,14 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries = dict()
         self._n_addresses = 0
         self._n_single_entries = 0
-        self._conn_lookup = numpy.zeros(0,dtype=bool)
+        # self._conn_lookup = numpy.zeros(0,dtype=bool)
+        self._conn_lookup = numpy.zeros(0,dtype="uint32")
 
     @overrides(AbstractMasterPopTableFactory.update_master_population_table,
                extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False,conn_matrix=False):
+            master_pop_table_region, is_single=False,conn_matrix=None):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
@@ -224,14 +234,21 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
-        lookup_entry = numpy.sum(conn_matrix,axis=0,dtype=bool)
-        self._conn_lookup = numpy.append(self._conn_lookup,lookup_entry)
+	if conn_matrix is not None:
+        	lookup_entry = numpy.sum(conn_matrix,axis=1,dtype=bool)
+		if len(lookup_entry) < self.N_ATOMS_PER_CORE:
+	    	    print "lookup entry len:{}".format(len(lookup_entry))
+	    	    lookup_entry = numpy.append(lookup_entry,numpy.zeros(self.N_ATOMS_PER_CORE-len(lookup_entry),dtype=bool))
+		self._entries[key_and_mask.key].set_conn_lookup(lookup_entry)
+	else:
+	    self._entries[key_and_mask.key].set_conn_lookup(numpy.ones(self.N_ATOMS_PER_CORE,dtype=bool))
+	#self._conn_lookup = numpy.append(self._conn_lookup,lookup_entry)
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
         spec.switch_write_focus(region=master_pop_table_region)
 
-        # sort entries by key
+        # sort entries by key - This will screw up the matching of the conn lookup to each entry!
         entries = sorted(
             self._entries.values(),
             key=lambda entry: entry.routing_key)
@@ -249,12 +266,30 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         for i, entry in enumerate(entries):
             start += self._make_pop_table_entry(
                 entry, i, start, pop_table, address_list)
+            bitfield_conn_lookup = numpy.zeros(self._n_conn_lookup_words_per_entry,dtype="uint32")
+            for step,j in enumerate(range(0,self.N_ATOMS_PER_CORE,32)):
+                lookup_bools = entry._conn_lookup[j:j+32]
+                indices = numpy.nonzero(lookup_bools)[0]
+                for idx in indices:
+                    bitfield_conn_lookup[step]|= 1<<(31-idx)
+
+            # self._conn_lookup = numpy.append(self._conn_lookup,entry._conn_lookup)
+            self._conn_lookup = numpy.append(self._conn_lookup,bitfield_conn_lookup.flatten())
 
         # Write the arrays
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
-
-        spec.write_array(self._conn_lookup.view("<u1"))
+	#bool_byte_array = self._conn_lookup.view(self.CONN_LOOKUP_DTYPE)
+    #TODO: rewrite this stuff for bitfield imp
+	print "n_entries ={}".format(n_entries)
+	print "conn_lookup size:{}, dtype={}".format(self._conn_lookup.size,self._conn_lookup.dtype)
+	# bool_array_len = self._conn_lookup.size
+	# accepted_length = int(4 * numpy.ceil(bool_array_len/4.))
+	# extra_bytes = accepted_length - bool_array_len
+	# self._conn_lookup = numpy.append(self._conn_lookup,numpy.zeros(extra_bytes,dtype=bool))
+	bool_byte_array = self._conn_lookup.view("uint32")
+	print "bool byte array size:{}".format(bool_byte_array.size)
+        spec.write_array(bool_byte_array)
 
         self._entries.clear()
         del self._entries
