@@ -10,6 +10,7 @@
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_adaptive.h>
 
+
 // Further includes
 #include <common/out_spikes.h>
 #include <recording.h>
