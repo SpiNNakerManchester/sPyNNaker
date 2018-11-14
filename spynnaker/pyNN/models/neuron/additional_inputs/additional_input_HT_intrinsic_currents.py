@@ -305,26 +305,17 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
     def add_parameters(self, parameters):
         parameters[G_H] = self._g_H
         parameters[E_H] = self._E_H
-        parameters[M_H] = self._m_H
-        parameters[M_INF_H] = self._m_inf_H
-        parameters[E_TO_T_ON_TAU_M_H] = self._e_to_t_on_tau_m_H
+
+
         parameters[G_T] = self._g_T
         parameters[E_T] = self._E_T
-        parameters[M_T] = self._m_T
-        parameters[M_INF_T] = self._m_inf_T
-        parameters[E_TO_T_ON_TAU_M_T] = self._e_to_t_on_tau_m_T
-        parameters[H_T] = self._h_T
-        parameters[H_INF_T] = self._h_inf_T
-        parameters[E_TO_T_ON_TAU_H_T] = self._e_to_t_on_tau_h_T
+
         parameters[G_NAP] = self._g_NaP
         parameters[E_NAP] = self._E_NaP
-        parameters[M_INF_NAP] = self._m_inf_NaP
+
         parameters[G_DK] = self._g_DK
         parameters[E_DK] = self._E_DK
-        parameters[M_INF_DK] = self._m_inf_DK
-        parameters[E_TO_T_ON_TAU_M_DK] = self._e_to_t_on_tau_m_DK
-        parameters[D] = self._D
-        parameters[D_INFINITY] = self._D_infinity
+
         parameters[V_CLAMP] = self._v_clamp
         parameters[S_CLAMP] = self._s_clamp
         parameters[T_CLAMP] = self._t_clamp
@@ -333,6 +324,25 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
+
+        state_variables[M_H] = self._m_H
+        state_variables[M_INF_H] = self._m_inf_H
+        state_variables[E_TO_T_ON_TAU_M_H] = self._e_to_t_on_tau_m_H
+
+        state_variables[M_T] = self._m_T
+        state_variables[M_INF_T] = self._m_inf_T
+        state_variables[E_TO_T_ON_TAU_M_T] = self._e_to_t_on_tau_m_T
+        state_variables[H_T] = self._h_T
+        state_variables[H_INF_T] = self._h_inf_T
+        state_variables[E_TO_T_ON_TAU_H_T] = self._e_to_t_on_tau_h_T
+
+        state_variables[M_INF_NAP] = self._m_inf_NaP
+
+        state_variables[M_INF_DK] = self._m_inf_DK
+        state_variables[E_TO_T_ON_TAU_M_DK] = self._e_to_t_on_tau_m_DK
+        state_variables[D] = self._D
+        state_variables[D_INFINITY] = self._D_infinity
+
         state_variables[I_H] = self._I_H
         state_variables[I_T] = self._I_T
         state_variables[I_NAP] = self._I_NaP
@@ -355,32 +365,32 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
                 state_variables[I_H],
                 parameters[G_H],
                 parameters[E_H],
-                parameters[M_H],
-                parameters[M_INF_H],
-                parameters[E_TO_T_ON_TAU_M_H],
+                state_variables[M_H],
+                state_variables[M_INF_H],
+                state_variables[E_TO_T_ON_TAU_M_H],
 
                 state_variables[I_T],
                 parameters[G_T],
                 parameters[E_T],
-                parameters[M_T], # state variable
-                parameters[M_INF_T], # state variable
-                parameters[E_TO_T_ON_TAU_M_T], # state variable
-                parameters[H_T], # state variable
-                parameters[H_INF_T], # state variable
-                parameters[E_TO_T_ON_TAU_H_T], # state variable
+                state_variables[M_T], # state variable
+                state_variables[M_INF_T], # state variable
+                state_variables[E_TO_T_ON_TAU_M_T], # state variable
+                state_variables[H_T], # state variable
+                state_variables[H_INF_T], # state variable
+                state_variables[E_TO_T_ON_TAU_H_T], # state variable
 
                 state_variables[I_NAP],
                 parameters[G_NAP],
                 parameters[E_NAP],
-                parameters[M_INF_NAP], # state variable
+                state_variables[M_INF_NAP], # state variable
 
                 state_variables[I_DK],
                 parameters[G_DK],
                 parameters[E_DK],
-                parameters[M_INF_DK], # state variable
-                parameters[E_TO_T_ON_TAU_M_DK], # state variable
-                parameters[D], # state variable
-                parameters[D_INFINITY], # state variable
+                state_variables[M_INF_DK], # state variable
+                state_variables[E_TO_T_ON_TAU_M_DK], # state variable
+                state_variables[D], # state variable
+                state_variables[D_INFINITY], # state variable
 
                 parameters[V_CLAMP],
                 parameters[S_CLAMP],
@@ -421,6 +431,28 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         _s_clamp,
         _t_clamp,
         _dt) = values
+
+
+
+        state_variables[M_H] = _m_H
+        state_variables[M_INF_H] = _m_inf_H
+        state_variables[E_TO_T_ON_TAU_M_H] = _e_to_t_on_tau_m_H
+
+        state_variables[M_T] = _m_T
+        state_variables[M_INF_T] = _m_inf_T
+        state_variables[E_TO_T_ON_TAU_M_T] = _e_to_t_on_tau_m_T
+        state_variables[H_T] = _h_T
+        state_variables[H_INF_T] = _h_inf_T
+        state_variables[E_TO_T_ON_TAU_H_T] = _e_to_t_on_tau_h_T
+
+        state_variables[M_INF_NAP] = _m_inf_NaP
+
+        state_variables[M_INF_DK] = _m_inf_DK
+        state_variables[E_TO_T_ON_TAU_M_DK] = _e_to_t_on_tau_m_DK
+        state_variables[D] = _D
+        state_variables[D_INFINITY] = _D_infinity
+
+
 
         state_variables[I_H] = _I_H
         state_variables[I_T] = _I_T
