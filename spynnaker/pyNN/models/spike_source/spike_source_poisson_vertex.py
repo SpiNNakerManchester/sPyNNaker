@@ -291,6 +291,26 @@ class SpikeSourcePoissonVertex(
                 numpy.array([rate]), use_list_as_value=True)
 
     @property
+    def start(self):
+        return self._data["starts"]
+
+    @property
+    def duration(self):
+        return self._data["durations"]
+
+    @property
+    def rates(self):
+        return self._data["rates"]
+
+    @property
+    def starts(self):
+        return self._data["starts"]
+
+    @property
+    def durations(self):
+        return self._data["durations"]
+
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         return self._change_requires_mapping

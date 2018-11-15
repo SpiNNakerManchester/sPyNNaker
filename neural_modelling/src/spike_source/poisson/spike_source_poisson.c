@@ -264,14 +264,18 @@ bool read_global_parameters(address_t address) {
 }
 
 static void read_next_rates(uint32_t index) {
-    log_info("Reading next data for source %d at time %d", index, time);
+    log_debug(
+        "Reading next data for source %d at time %d of %d bytes from 0x%08x",
+        index, time, sizeof(spike_source_t),
+        &future_parameters[index][next_parameters_index[index]]);
     if (next_parameters_index[index] > 0 && rate_changed[index]) {
-        spin1_memcpy(&future_parameters[next_parameters_index[index] - 1],
+        spin1_memcpy(
+            &future_parameters[index][next_parameters_index[index] - 1],
             &poisson_parameters[index], sizeof(spike_source_t));
     }
     rate_changed[index] = false;
     spin1_memcpy(&poisson_parameters[index],
-        future_parameters[next_parameters_index[index]],
+        &future_parameters[index][next_parameters_index[index]],
         sizeof(spike_source_t));
     next_parameters_index[index] += 1;
     if (!poisson_parameters[index].is_fast_source) {
@@ -279,7 +283,7 @@ static void read_next_rates(uint32_t index) {
             slow_spike_source_get_time_to_spike(
                 poisson_parameters[index].mean_isi_ticks);
     }
-    print_spike_source(index);
+    // print_spike_source(index);
 }
 
 //! \brief method for reading the rates of the Poisson
