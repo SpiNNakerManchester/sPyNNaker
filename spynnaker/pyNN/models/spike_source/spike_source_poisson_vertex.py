@@ -294,9 +294,32 @@ class SpikeSourcePoissonVertex(
     def start(self):
         return self._data["starts"]
 
+    @start.setter
+    def start(self, start):
+        # Normalise parameter
+        if hasattr(start, "__len__"):
+            # Single start per neuron for whole simulation
+            self._data["starts"].set_value([numpy.array([s]) for s in start])
+        else:
+            # Single start for all neurons for whole simulation
+            self._data["starts"].set_value(
+                numpy.array([start]), use_list_as_value=True)
+
     @property
     def duration(self):
         return self._data["durations"]
+
+    @duration.setter
+    def duration(self, duration):
+        # Normalise parameter
+        if hasattr(duration, "__len__"):
+            # Single duration per neuron for whole simulation
+            self._data["durations"].set_value(
+                [numpy.array([d]) for d in duration])
+        else:
+            # Single duration for all neurons for whole simulation
+            self._data["durations"].set_value(
+                numpy.array([duration]), use_list_as_value=True)
 
     @property
     def rates(self):
