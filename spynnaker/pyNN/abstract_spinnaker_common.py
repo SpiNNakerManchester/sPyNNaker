@@ -21,6 +21,7 @@ from spynnaker import __version__ as version
 
 # general imports
 from six import add_metaclass
+from collections import defaultdict
 import logging
 import math
 import os
@@ -303,13 +304,32 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator()
 
+    def _write_report(self):
+        incoming_projections = defaultdict(list)
+        outgoing_projections = defaultdict(list)
+        for projection in self._projections:
+            incoming_projections[projection.post_population].append(projection)
+            outgoing_projections[projection.pre_population].append(projection)
+        filename = os.path.join(
+            self._report_default_directory, "pynn_network.txt")
+        with open(filename, "w") as f:
+            f.write("*** Populations:\n")
+            for population in self._populations:
+                f.write("Population {}, Model {}".format(
+                    population.label, population.cell_type))
+                f.write("Outgoing Projections:")
+                for projection in outgoing_projections[population]:
+                    f.write("    Projection from {}, connector {}".format(
+                        projection.pre_population.label, projection.connector))
+
     def run(self, run_time):
         """ Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         """
-        # pylint: disable=protected-access
+        self._write_report()
 
+        # pylint: disable=protected-access
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:

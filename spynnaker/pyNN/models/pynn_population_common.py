@@ -52,8 +52,18 @@ class PyNNPopulationCommon(object):
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
-        self._label = label
         size = self._roundsize(size)
+
+        self._label = label
+        if self._label is None:
+            if isinstance(model, ApplicationVertex):
+                self._label = model.label
+            if self._label is None:
+                self._label = "Population {}".format(
+                    globals_variables.get_simulator()
+                    .none_labelled_vertex_count)
+                globals_variables.get_simulator()\
+                    .increment_none_labelled_vertex_count()
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -64,7 +74,7 @@ class PyNNPopulationCommon(object):
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
             self._vertex = model.create_vertex(
-                size, label, constraints, **population_parameters)
+                size, self._label, constraints, **population_parameters)
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):
@@ -78,8 +88,6 @@ class PyNNPopulationCommon(object):
             elif size != self._vertex.n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
-            if label is None:
-                self._label = self._vertex.label
             if constraints is not None:
                 self._vertex.add_constraints(constraints)
 
@@ -88,10 +96,6 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "Model must be either an AbstractPyNNModel or an"
                 " ApplicationVertex")
-
-        if self._label is None:
-            self._label = "Population {}".format(
-                globals_variables.get_simulator().none_labelled_vertex_count)
 
         # Introspect properties of the vertex
         self._vertex_population_settable = \

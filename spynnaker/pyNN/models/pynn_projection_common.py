@@ -1,6 +1,7 @@
 from pacman.model.constraints.partitioner_constraints \
     import SameAtomsAsVertexConstraint
-from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities import helpful_functions,\
+    globals_variables
 
 from spynnaker.pyNN.models.abstract_models \
     import AbstractAcceptsIncomingSynapses
@@ -46,7 +47,12 @@ class PyNNProjectionCommon(object):
         self._host_based_synapse_list = None
         self._has_retrieved_synaptic_list_from_machine = False
         self._requires_mapping = True
-        self._label = None
+        self._label = label
+        if self._label is None:
+            self._label = "Edge {}".format(
+                globals_variables.get_simulator().none_labelled_edge_count)
+            globals_variables.get_simulator().\
+                increment_none_labelled_edge_count()
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
