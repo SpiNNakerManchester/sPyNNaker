@@ -308,19 +308,31 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         incoming_projections = defaultdict(list)
         outgoing_projections = defaultdict(list)
         for projection in self._projections:
-            incoming_projections[projection.post_population].append(projection)
-            outgoing_projections[projection.pre_population].append(projection)
+            connector = projection._synapse_information.connector
+            incoming_projections[connector._post_population].append(projection)
+            outgoing_projections[connector._pre_population].append(projection)
         filename = os.path.join(
             self._report_default_directory, "pynn_network.txt")
         with open(filename, "w") as f:
             f.write("*** Populations:\n")
             for population in self._populations:
-                f.write("Population {}, Model {}".format(
-                    population.label, population.cell_type))
-                f.write("Outgoing Projections:")
-                for projection in outgoing_projections[population]:
-                    f.write("    Projection from {}, connector {}".format(
-                        projection.pre_population.label, projection.connector))
+                f.write("Population {}, Model {}\n".format(
+                    population.label, population.celltype))
+                outgoing = outgoing_projections[population]
+                f.write("    {} Outgoing Projections:\n".format(len(outgoing)))
+                for projection in outgoing:
+                    connector = projection._synapse_information.connector
+                    post = connector._post_population
+                    f.write("        Projection to {}, connector {}\n".format(
+                        post.label, str(connector)))
+                incoming = incoming_projections[population]
+                f.write("    {} Incoming Projections:\n".format(len(incoming)))
+                for projection in incoming:
+                    connector = projection._synapse_information.connector
+                    pre = connector._pre_population
+                    f.write("        Projection from {}, connector {}\n"
+                            .format(pre.label, str(connector)))
+                f.write("\n")
 
     def run(self, run_time):
         """ Run the model created.
