@@ -164,10 +164,10 @@ bool population_table_initialise(
     spin1_memcpy(
         address_list, &(table_address[2 + n_master_pop_words]),
         n_address_list_bytes);
-
-    /*spin1_memcpy(
+    //copy the connectivity lookup
+    spin1_memcpy(
     connectivity_lookup, &(table_address[2 + n_master_pop_words+n_address_list_words]),
-    connectivity_lookup_nbytes);*/
+    connectivity_lookup_nbytes);
 
     population_table_print_connectivity_lookup();
 
@@ -223,7 +223,6 @@ bool population_table_get_first_address(
             last_neuron_info.w_index = last_neuron_id/32;
             last_neuron_info.id_shift = 31-(last_neuron_id%32);
 	        if((connectivity_lookup[(imid*8)+last_neuron_info.w_index] & (uint32_t)1 << last_neuron_info.id_shift) == 0)return false;
-
             next_item = entry.start;
             items_to_go = entry.count;
 
@@ -265,7 +264,7 @@ bool population_table_get_next_address(
         return false;
     }
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     bool is_valid = false;
     do {
@@ -307,7 +306,7 @@ bool population_table_get_next_address(
         next_item += 1;
         items_to_go -= 1;
     } while (!is_valid && (items_to_go > 0));
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
     return is_valid;
 }
 

@@ -173,7 +173,7 @@ static inline void _process_fixed_synapses(
         fixed_region_address);
     if (fixed_synapse==0){
         empty_row_count++;
-        population_table_remove_connectivity_lookup_entry();
+//        population_table_remove_connectivity_lookup_entry();
     }
     num_fixed_pre_synaptic_events += fixed_synapse;
 

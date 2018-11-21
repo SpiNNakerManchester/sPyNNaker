@@ -36,12 +36,14 @@ static uint32_t single_fixed_synapse[4];
 
 uint32_t number_of_rewires=0;
 bool any_spike = false;
+static uint32_t dma_complete_count=0;
+static uint32_t spike_processing_count=0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
-
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_DMA_READ);
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
@@ -65,6 +67,7 @@ static inline void _do_direct_row(address_t row_address) {
 }
 
 void _setup_synaptic_dma_read() {
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_INCOMING_SPIKE);
 
     // Set up to store the DMA location and size to read
     address_t row_address;
@@ -92,7 +95,6 @@ void _setup_synaptic_dma_read() {
                 setup_done = true;
             }
         }
-//        profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
         // If there's more incoming spikes
         cpsr = spin1_int_disable();
@@ -128,7 +130,8 @@ void _setup_synaptic_dma_read() {
         dma_busy = false;
     }
     spin1_mode_restore(cpsr);
-//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_INCOMING_SPIKE);
+    spike_processing_count++;
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
@@ -189,6 +192,7 @@ void _user_event_callback(uint unused0, uint unused1) {
 // Called when a DMA completes
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
+    dma_complete_count++;
 
     log_debug("DMA transfer complete with tag %u", tag);
 
@@ -225,7 +229,7 @@ void _dma_complete_callback(uint unused, uint tag) {
             rt_error(RTE_SWERR);
         }
     } while (subsequent_spikes);
-
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_DMA_READ);
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
 }
@@ -287,6 +291,14 @@ uint32_t spike_processing_get_buffer_overflows() {
 
 uint32_t spike_processing_get_ghost_pop_table_searches(){
 	return population_table_get_ghost_pop_table_searches();
+}
+
+uint32_t spike_processing_get_dma_complete_count(){
+    return dma_complete_count;
+}
+
+uint32_t spike_processing_get_spike_processing_count(){
+    return spike_processing_count;
 }
 
 //! \brief get the address of the circular buffer used for buffering received

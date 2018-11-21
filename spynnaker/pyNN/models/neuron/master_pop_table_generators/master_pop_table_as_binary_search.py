@@ -280,7 +280,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
 	#bool_byte_array = self._conn_lookup.view(self.CONN_LOOKUP_DTYPE)
-    #TODO: rewrite this stuff for bitfield imp
 	print "n_entries ={}".format(n_entries)
 	print "conn_lookup size:{}, dtype={}".format(self._conn_lookup.size,self._conn_lookup.dtype)
 	# bool_array_len = self._conn_lookup.size

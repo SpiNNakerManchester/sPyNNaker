@@ -111,7 +111,9 @@ void c_main_store_provenance_data(address_t provenance_region){
     	spike_processing_get_ghost_pop_table_searches();
     io_printf (IO_BUF, "n_ghost_input_spikes=%d\n",spike_processing_get_ghost_pop_table_searches());
     io_printf (IO_BUF, "empty row count = %d\n",synapses_get_empty_row_count());
-//    population_table_print_connectivity_lookup();
+    io_printf (IO_BUF, "dma_complete_count=%d\n",spike_processing_get_dma_complete_count());
+    io_printf (IO_BUF, "spike_processing_count=%d\n",spike_processing_get_spike_processing_count());
+    population_table_print_connectivity_lookup();
 }
 
 //! \brief Initialises the model by reading in the regions and checking
