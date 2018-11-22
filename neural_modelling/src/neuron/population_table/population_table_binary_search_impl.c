@@ -217,7 +217,7 @@ bool population_table_get_first_address(
                     "table but count is 0");
             }
 
-//	        if(connectivity_lookup[last_neuron_id+(imid*n_pre_neurons)]==0)return false;
+	        if(connectivity_lookup[last_neuron_id+(imid*n_pre_neurons)]==0)return false;
             last_neuron_id = _get_neuron_id(entry, spike);
             last_neuron_info.e_index = imid;
             last_neuron_info.w_index = last_neuron_id/32;
