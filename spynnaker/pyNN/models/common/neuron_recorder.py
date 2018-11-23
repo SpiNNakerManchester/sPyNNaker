@@ -388,10 +388,7 @@ class NeuronRecorder(object):
         if n_neurons == 0:
             return 0
         if variable == SPIKES:
-            if n_neurons < vertex_slice.n_atoms:
-                # Indexing is used rather than gating to determine recording
-                # Non recoding neurons write to an extra slot
-                n_neurons += 1
+            # Overflow can be ignored as it is not save if in an extra word
             out_spike_words = int(math.ceil(n_neurons / 32.0))
             out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
