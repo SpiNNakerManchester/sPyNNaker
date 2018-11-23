@@ -176,9 +176,6 @@ class NeuronRecorder(object):
                     for index in self._indexes[SPIKES])
                 if neurons_recording == 0:
                     continue
-                if neurons_recording < vertex_slice.n_atoms:
-                    # For spikes the overflow position is also returned
-                    neurons_recording += 1
             # Read the spikes
             n_words = int(math.ceil(neurons_recording / 32.0))
             n_bytes = n_words * self.N_BYTES_PER_WORD
