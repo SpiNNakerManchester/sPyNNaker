@@ -300,7 +300,7 @@ class PyNNProjectionCommon(object):
                 receiver = helpful_functions.locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
-                    extra_monitor_cores_to_ethernet_connection_map=receivers)
+                    packet_gather_cores_to_ethernet_connection_map=receivers)
                 sender_extra_monitor_core = extra_monitor_placements[
                     placement.x, placement.y]
                 sender_monitor_place = ctl.placements.get_placement_of_vertex(
