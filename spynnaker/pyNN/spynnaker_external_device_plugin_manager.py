@@ -121,7 +121,7 @@ class SpynnakerExternalDevicePluginManager(object):
         if port is None:
             port = config.getint("Recording", "live_spike_port")
         if host is None:
-            host = config.get("Recording", "live_spike_host")
+            host = str(config.get("Recording", "live_spike_host"))
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
