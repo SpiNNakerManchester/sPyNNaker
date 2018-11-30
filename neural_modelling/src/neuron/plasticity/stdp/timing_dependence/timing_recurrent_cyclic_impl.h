@@ -328,19 +328,19 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
 
    uint16_t shift_to_print = 15 - state.weight_multiply_right_shift - global_weight_scale;
 
-   io_printf(IO_BUF, "    Fixed Initial weight: %k, max_weight: %k\n",
-		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
-   io_printf(IO_BUF, "    Int   Initial weight: %u, max_weight: %u\n",
-		   state.weight, state.weight_region->max_weight);
+   //io_printf(IO_BUF, "    Fixed Initial weight: %k, max_weight: %k\n",
+//		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
+ //  io_printf(IO_BUF, "    Int   Initial weight: %u, max_weight: %u\n",
+//		   state.weight, state.weight_region->max_weight);
 
    int32_t scale = maths_fixed_mul16(
                    state.weight_region->max_weight - state.weight,
                    state.weight_region->a2_plus, (state.weight_multiply_right_shift + global_weight_scale));
 
-   io_printf(IO_BUF, "        A+: %u", state.weight_region->a2_plus);
-   io_printf(IO_BUF, "        shift: %u \n", state.weight_multiply_right_shift);
+   //io_printf(IO_BUF, "        A+: %u", state.weight_region->a2_plus);
+   //io_printf(IO_BUF, "        shift: %u \n", state.weight_multiply_right_shift);
 
-   io_printf(IO_BUF, "        scale: %u, potentiation: %k \n", scale , potentiation << 4);
+   //io_printf(IO_BUF, "        scale: %u, potentiation: %k \n", scale , potentiation << 4);
 
 //   // Multiply scale by potentiation and add
 //   // **NOTE** using standard STDP fixed-point format handles format conversion
@@ -349,10 +349,10 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
 //   if (state.weight > state.weight_region->max_weight)
 //      state.weight = state.weight_region->max_weight;
 
-   io_printf(IO_BUF, "    Fixed Updated weight: %k, max weight: %k\n",
-		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
-   io_printf(IO_BUF, "    Int   Updated weight: %u, max weight: %u\n",
-		   state.weight, state.weight_region->max_weight);
+   //io_printf(IO_BUF, "    Fixed Updated weight: %k, max weight: %k\n",
+//		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
+   //io_printf(IO_BUF, "    Int   Updated weight: %u, max weight: %u\n",
+//		   state.weight, state.weight_region->max_weight);
    return state;
 }
 

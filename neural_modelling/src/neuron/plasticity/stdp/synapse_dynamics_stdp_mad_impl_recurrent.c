@@ -91,8 +91,8 @@ static inline final_state_t _plasticity_update_synapse(
 
     // Get the post-synaptic window of events to be processed
     const uint32_t window_begin_time = (delayed_last_pre_time >=
-        delay_dendritic) ? (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
+        delay_dendritic) ? (delayed_last_pre_time ) : 0;
+    const uint32_t window_end_time = time + delay_axonal ;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
