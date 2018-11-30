@@ -105,18 +105,27 @@ class Struct(object):
         :return:\
             a list of lists of data values, one list for each struct element
         """
-        # Read in the data values
-        numpy_data = numpy.frombuffer(
-            data, offset=offset, dtype=self.numpy_dtype, count=array_size)
-
-        # Go through the things to be set
+        # Prepare items to return
         items_to_return = list()
-        for i, data_type in enumerate(self.field_types):
 
-            # Get the data to set for this item
-            values = numpy_data["f" + i]
+        # It could be possible that a component has no parameters
+        # (for example, InputTypeCurrent): this needs to be dealt with,
+        # as numpy.frombuffer does not like an empty type
+        if len(self.numpy_dtype) == 0:
+            return items_to_return
+        else:
+            # Read in the data values
+            numpy_data = numpy.frombuffer(
+                data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-            items_to_return.append(values / float(data_type.scale))
+            # Go through the things to be set
+            items_to_return = list()
+            for i, data_type in enumerate(self.field_types):
 
-        # Return values read
-        return items_to_return
+                # Get the data to set for this item
+                values = numpy_data["f" + str(i)]
+
+                items_to_return.append(values / float(data_type.scale))
+
+            # Return values read
+            return items_to_return
