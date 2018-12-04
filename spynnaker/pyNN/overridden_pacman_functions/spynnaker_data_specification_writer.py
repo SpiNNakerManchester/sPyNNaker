@@ -31,4 +31,4 @@ class SpynnakerDataSpecificationWriter(
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,
-            machine, graph_mapper, placement_order)
+            app_data_runtime_folder, machine, graph_mapper, placement_order)
