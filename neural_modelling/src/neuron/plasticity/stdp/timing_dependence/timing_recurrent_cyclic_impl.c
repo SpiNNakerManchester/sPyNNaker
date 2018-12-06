@@ -1,5 +1,5 @@
 #include "random.h"
-#include <string.h>
+//#include <string.h>
 #include "timing_recurrent_cyclic_impl.h"
 
 //---------------------------------------

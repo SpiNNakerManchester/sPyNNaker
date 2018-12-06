@@ -238,7 +238,7 @@ static inline void post_events_add_inc_v(uint32_t time, post_event_history_t *ev
 
 static inline print_event_history(post_event_history_t *events){
 	for (int i = 0; i <= events->count_minus_one; i++){
-		log_info("Post Spike Number: %u, Time: %u, Trace: %u, mem_V: %k",
+		io_printf(IO_BUF, "Post Spike Number: %u, Time: %u, Trace: %u, mem_V: %k",
 				i,
 				events->times[i],
 				events->traces[i],
@@ -255,7 +255,7 @@ static inline print_delayed_window_events(post_event_history_t *post_event_histo
     while (post_window.num_events > 0) {
     	const uint32_t delayed_post_time = *post_window.next_time
     	                                           + delay_dendritic;
-    	log_info("Spike: %u, Time: %u, Trace: %u, Mem_V: %k",
+    	io_printf(IO_BUF, "Spike: %u, Time: %u, Trace: %u, Mem_V: %k",
     			post_window.num_events, delayed_post_time,
 				*post_window.next_trace, *post_window.next_post_synaptic_v);
 

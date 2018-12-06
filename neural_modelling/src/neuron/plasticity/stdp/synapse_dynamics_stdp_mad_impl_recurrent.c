@@ -11,7 +11,7 @@
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
-#include <string.h>
+//#include <string.h>
 #include <debug.h>
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
