@@ -159,7 +159,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 void _multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     any_spike = true;
-    log_info("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
@@ -191,7 +191,7 @@ void _user_event_callback(uint unused0, uint unused1) {
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
-    log_info("DMA transfer complete at time %u with tag %u", time, tag);
+    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
