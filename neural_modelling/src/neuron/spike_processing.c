@@ -60,7 +60,6 @@ static inline void _do_dma_read(
 
 static inline void _do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
-    log_info("Processing direct row at time %u", time);
     synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
