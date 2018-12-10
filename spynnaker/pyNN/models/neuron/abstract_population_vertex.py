@@ -1,3 +1,4 @@
+from data_specification import utility_calls
 from spinn_utilities.overrides import overrides
 
 # pacman imports
@@ -44,6 +45,7 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 
@@ -77,6 +79,7 @@ class AbstractPopulationVertex(
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
+
     __slots__ = [
         "_buffer_size_before_receive",
         "_change_requires_mapping",
@@ -745,6 +748,20 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
         self._synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
+
+    @overrides(AbstractAcceptsIncomingSynapses.synaptic_matrix_base_address)
+    def synaptic_matrix_base_address(self, transceiver, placement):
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        return utility_calls.get_region_base_address_offset(
+            regions_base_address, POPULATION_BASED_REGIONS.POPULATION_TABLE)
+
+    @overrides(AbstractAcceptsIncomingSynapses.master_pop_table_base_address)
+    def master_pop_table_base_address(self, transceiver, placement):
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        return utility_calls.get_region_base_address_offset(
+            regions_base_address, POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(

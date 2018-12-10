@@ -111,6 +111,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if extra_load_algorithms is None:
             extra_load_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
+        extra_load_algorithms.append("SpynnakerAtomBasedRoutingDataGenerator")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):

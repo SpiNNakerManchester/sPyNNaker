@@ -52,3 +52,13 @@ class AbstractAcceptsIncomingSynapses(object):
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    @abstractmethod
+    def master_pop_table_base_address(self, transceiver, placement):
+        """ returns the sdram address for the master pop table data
+        """
+
+    @abstractmethod
+    def synaptic_matrix_base_address(self, transceiver, placement):
+        """ returns the sdram address for the synaptic matrix table data
+        """
