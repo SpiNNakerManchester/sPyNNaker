@@ -24,7 +24,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False):
+            safe=True, verbose=False, rng=None):
         """
         :param n: \
             number of random post-synaptic neurons connected to pre-neurons.
@@ -43,7 +43,7 @@ class FixedNumberPostConnector(AbstractConnector):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose, rng)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
         self._with_replacement = with_replacement
@@ -104,11 +104,11 @@ class FixedNumberPostConnector(AbstractConnector):
                              numpy.arange(m + 1, self._n_post_neurons)])
 
                         # Now use this list in the random choice
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             no_self_post_neurons, self._n_post,
                             self._with_replacement)
                     else:
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             self._n_post_neurons, self._n_post,
                             self._with_replacement)
 

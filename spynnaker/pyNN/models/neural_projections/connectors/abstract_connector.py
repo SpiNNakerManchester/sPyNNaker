@@ -43,7 +43,7 @@ class AbstractConnector(object):
         "_verbose",
         "_weights"]
 
-    def __init__(self, safe=True, verbose=False):
+    def __init__(self, safe=True, verbose=False, rng=None):
         self._safe = safe
         self._space = None
         self._verbose = verbose
@@ -52,7 +52,7 @@ class AbstractConnector(object):
         self._post_population = None
         self._n_pre_neurons = None
         self._n_post_neurons = None
-        self._rng = None
+        self._rng = rng
 
         self._n_clipped_delays = 0
         self._min_delay = 0
@@ -103,7 +103,8 @@ class AbstractConnector(object):
         self._post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
-        self._rng = rng
+        if self._rng is None and rng is not None:
+            self._rng = rng
         if self._rng is None:
             self._rng = get_simulator().get_pynn_NumpyRNG()
         self._min_delay = machine_time_step / 1000.0
