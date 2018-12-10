@@ -97,7 +97,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Exponentially decayed probability LUT for feed-forward formations
         "_ff_distance_probabilities",
         # Exponentially decayed probability LUT for lateral formations
-        "_lat_distance_probabilities"]
+        "_lat_distance_probabilities",
+        # The RNG used with the seed that is passed in
+        "_rng"
+    ]
 
     default_parameters = {
         'stdp_model': None, 'f_rew': 10 ** 4, 'weight': 0, 'delay': 1,
@@ -149,10 +152,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         self._weight_dynamics = stdp_model
 
-        # Generate a seed for the RNG on chip that should be the same for all
-        # of the cores that have my learning rule
-        _rng = np.random.RandomState(seed)
-        self._seeds = [_rng.randint(0x7FFFFFFF) for _ in range(4)]
+        self._rng = np.random.RandomState(seed)
+        self._seeds = {}
 
         # Addition information -- used for SDRAM usage
         self._actual_sdram_usage = {}
@@ -217,7 +218,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param sigma: spread
         :type sigma: float
         :return: distance-dependent probabilities
-        :rtype: np.ndarray of floats
+        :rtype: numpy.ndarray(float)
         """
         euclidian_distances = np.ones(self._grid ** 2) * np.nan
         for row in range(euclidian_distances.shape[0]):
@@ -295,23 +296,23 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type weight_scales: list(float)
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: None
         :rtype: None
         """
@@ -338,10 +339,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type spec: spec
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param weight_scales: scaling the weights
         :type weight_scales: list(float)
         :param machine_time_step: the duration of a machine time step (ms)
@@ -360,6 +361,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(
                 data=int((self._p_rew * 10 ** 6) / float(machine_time_step)))
 
+        # Generate a seed for the RNG on chip that is the same for all
+        # of the cores that have perform structural updates.
+        # NOTE: it should be different between application vertices
+        if app_vertex not in self._seeds.keys():
+            self._seeds[app_vertex] = [self._rng.randint(0x7FFFFFFF) for _ in range(4)]
         # scale the excitatory weight appropriately
         spec.write_value(
             data=int(round(self._initial_weight * weight_scales[0])))
@@ -393,7 +399,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         # write the random seed (4 words), generated randomly,
         # but the same for all postsynaptic vertices!
-        for seed in self._seeds:
+        for seed in self._seeds[app_vertex]:
             spec.write_value(data=seed)
 
         # write local seed (4 words), generated randomly!
@@ -407,23 +413,23 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: pop info, routing key for current vertex, number of pre pops
         :rtype: tuple
         """
@@ -509,29 +515,28 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type spec: spec
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: None
         :rtype: None
         """
         # Compute all the auxiliary stuff
-        pop_to_subpop_info, projection_types, \
-        current_key, no_prepops = \
+        pop_to_subpop_info, projection_types, current_key, no_prepops = \
             self.__compute_aux(
                 application_graph, machine_graph, app_vertex, machine_vertex,
                 graph_mapper, routing_info)
@@ -555,8 +560,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             # otherwise the connections if lat
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
-            # Write connection type
 
+            # Write connection type
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
 
             spec.write_value(

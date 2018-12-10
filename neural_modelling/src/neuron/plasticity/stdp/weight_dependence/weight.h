@@ -16,19 +16,20 @@
 #ifndef _WEIGHT_H_
 #define _WEIGHT_H_
 
-#include "../../../../common/neuron-typedefs.h"
-#include "../../../synapse_row.h"
+#include <common/neuron-typedefs.h>
+#include <neuron/synapse_row.h>
 
 /*! \brief initialised the weight aspect of a STDP rule.
  * \param[in] address: the absolute address in SRAM where the weight parameters
  *  are stored.
+ * \param[in] n_synapse_types: The number of synapse types
  * \param[in] ring_buffer_to_input_buffer_left_shifts: how much a value needs
  * to be shifted in the left direction to support comprises with fixed point
  * arithmetic
  * \return address_t: returns the end of the weight region as an absolute
  * SDRAM memory address.
  */
-address_t weight_initialise(address_t address,
+address_t weight_initialise(address_t address, uint32_t n_synapse_types,
                             uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 /*!

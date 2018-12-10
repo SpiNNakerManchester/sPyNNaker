@@ -1,17 +1,19 @@
 import numpy
-import math
 
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
+from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
+    MatrixGeneratorID
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 class SynapseDynamicsStatic(
-        AbstractStaticSynapseDynamics, AbstractPopulationSettable,
-        AbstractChangableAfterRun):
+        AbstractStaticSynapseDynamics, AbstractSettable,
+        AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????
         "_change_requires_mapping",
@@ -40,6 +42,7 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSynapseDynamics.write_parameters)
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
+        # Nothing to do here
         pass
 
     @overrides(
@@ -55,15 +58,19 @@ class SynapseDynamicsStatic(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
 
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
             ((connections["delay"].astype("uint32") & 0xF) <<
-             (8 + n_synapse_type_bits)) |
-            (connections["synapse_type"].astype("uint32") << 8) |
-            ((connections["target"] - post_vertex_slice.lo_atom) & 0xFF))
+             (n_neuron_id_bits + n_synapse_type_bits)) |
+            (connections["synapse_type"].astype(
+                "uint32") << n_neuron_id_bits) |
+            ((connections["target"] - post_vertex_slice.lo_atom) &
+             neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
@@ -102,14 +109,20 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.read_static_synaptic_data)
     def read_static_synaptic_data(
             self, post_vertex_slice, n_synapse_types, ff_size, ff_data):
-        n_synapse_type_bits = int(math.ceil(math.log(n_synapse_types, 2)))
+
+        n_synapse_type_bits = get_n_bits(n_synapse_types)
+        n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
+        neuron_id_mask = (1 << n_neuron_id_bits) - 1
+
         data = numpy.concatenate(ff_data)
         connections = numpy.zeros(data.size, dtype=self.NUMPY_CONNECTORS_DTYPE)
         connections["source"] = numpy.concatenate(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
-        connections["target"] = (data & 0xFF) + post_vertex_slice.lo_atom
+        connections["target"] = (
+            (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
-        connections["delay"] = (data >> (8 + n_synapse_type_bits)) & 0xF
+        connections["delay"] = (data >> (n_neuron_id_bits +
+                                         n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
 
         return connections
@@ -130,7 +143,7 @@ class SynapseDynamicsStatic(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractPopulationSettable.get_value)
+    @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -139,7 +152,7 @@ class SynapseDynamicsStatic(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractPopulationSettable.set_value)
+    @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 
@@ -159,3 +172,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_max_synapses)
     def get_max_synapses(self, n_words):
         return n_words
+
+    @property
+    @overrides(AbstractGenerateOnMachine.gen_matrix_id)
+    def gen_matrix_id(self):
+        return MatrixGeneratorID.STATIC_MATRIX.value

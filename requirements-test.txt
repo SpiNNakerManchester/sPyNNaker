@@ -1,6 +1,6 @@
 -r requirements.txt
 flake8
-pytest>=2.8
+pytest>=3.6
 pytest-cov
 pytest-timeout
 sphinx==1.5.3

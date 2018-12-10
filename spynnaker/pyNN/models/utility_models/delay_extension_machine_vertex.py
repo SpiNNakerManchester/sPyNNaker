@@ -19,7 +19,8 @@ class DelayExtensionMachineVertex(
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
-               ('PROVENANCE_REGION', 2)])
+               ('PROVENANCE_REGION', 2),
+               ('EXPANDER_REGION', 3)])
 
     EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
         value="EXTRA_PROVENANCE_DATA_ENTRIES",
@@ -44,7 +45,7 @@ class DelayExtensionMachineVertex(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return 6
+        return len(self.EXTRA_PROVENANCE_DATA_ENTRIES)
 
     @property
     @overrides(MachineVertex.resources_required)

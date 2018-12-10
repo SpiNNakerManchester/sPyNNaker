@@ -20,8 +20,10 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.abstract_models \
     import AbstractVertexWithEdgeToDependentVertices
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
+from spinn_front_end_common.utilities.constants import \
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.defaults import defaults
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +40,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
             board_address=board_address)
 
 
+@defaults
 class MunichMotorDevice(
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
         AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
@@ -60,29 +63,11 @@ class MunichMotorDevice(
 
     PARAMS_SIZE = 7 * 4
 
-    default_parameters = {
-        'speed': 30, 'sample_time': 4096, 'update_time': 512, 'delay_time': 5,
-        'delta_threshold': 23, 'continue_if_not_different': True,
-        'label': "RobotMotorControl", 'board_address': None}
-
     def __init__(
-            self, n_neurons, spinnaker_link_id,
-            board_address=default_parameters['board_address'],
-            speed=default_parameters['speed'],
-            sample_time=default_parameters['sample_time'],
-            update_time=default_parameters['update_time'],
-            delay_time=default_parameters['delay_time'],
-            delta_threshold=default_parameters['delta_threshold'],
-            continue_if_not_different=default_parameters[
-                'continue_if_not_different'],
-            label=default_parameters['label']):
-        """
-        """
+            self, spinnaker_link_id, board_address=None, speed=30,
+            sample_time=4096, update_time=512, delay_time=5,
+            delta_threshold=23, continue_if_not_different=True, label=None):
         # pylint: disable=too-many-arguments
-        if n_neurons != 6:
-            logger.warning(
-                "The specified number of neurons for the munich motor"
-                " device has been ignored; 6 will be used instead")
 
         super(MunichMotorDevice, self).__init__(label)
 
@@ -187,7 +172,7 @@ class MunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            self.SYSTEM_REGION, SYSTEM_BYTES_REQUIREMENT, label='setup')
+            self.SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
             self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
