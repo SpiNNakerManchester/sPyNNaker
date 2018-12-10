@@ -1,9 +1,19 @@
+from spinn_front_end_common.interface.interface_functions import \
+    ChipIOBufExtractor
+from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
+
 from spinn_utilities.progress_bar import ProgressBar
+
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+
 from spynnaker.pyNN.models.abstract_models import \
     AbstractAcceptsIncomingSynapses
+
 import struct
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SpynnakerAtomBasedRoutingDataGenerator(object):
@@ -13,6 +23,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     __slots__ = ()
 
     _SDRAM_TAG = 2
+    _SUCCESS = 0
+    _USER_2_BYTES = 4
     _N_BYTES_PER_REGION_ELEMENT = 8
     _ONE_WORDS = struct.Struct("<I")
     _TWO_WORDS = struct.Struct("<II")
@@ -21,8 +33,17 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, machine, transceiver, graph_mapper):
-
-        # pylint: disable=too-many-arguments
+        """
+        
+        :param placements: 
+        :param app_graph: 
+        :param executable_finder: 
+        :param provenance_file_path: 
+        :param machine: 
+        :param transceiver: 
+        :param graph_mapper: 
+        :return: 
+        """
 
         # progress bar
         progress = ProgressBar(
@@ -52,9 +73,9 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         
         :param app_graph: app graph
         :param graph_mapper: graph mapper between app graph and machine graph
-        :param transceiver: spinnman instance
+        :param transceiver: SpiNNMan instance
         :param placements: placements
-        :param machine: spinnMachine instance
+        :param machine: SpiNNMachine instance
         :param progress: progress bar
         :param executable_finder: where to find the executable
         :return: data and expander cores
@@ -163,3 +184,58 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         transceiver.stop_application(bit_field_app_id)
         transceiver.app_id_tracker.free_id(bit_field_app_id)
 
+    def _check_for_success(
+            self, executable_targets, transceiver, provenance_file_path,
+            compressor_app_id):
+        """ Goes through the cores checking for cores that have failed to\
+            expand the bitfield to the core
+        
+        :param executable_targets: cores to load bitfield on
+        :param transceiver: SpiNNMan instance
+        :param provenance_file_path: path to provenance folder
+        :param compressor_app_id: the app id for the compressor c code
+        :rtype: None 
+        """
+
+        for core_subset in executable_targets.all_core_subsets:
+            x = core_subset.x
+            y = core_subset.y
+            for p in core_subset.processor_ids:
+                # Read the result from USER0 register
+                user_2_base_address = \
+                    transceiver.get_user_2_register_address_from_core(p)
+                result = struct.unpack(
+                    "<I", transceiver.read_memory(
+                        x, y, user_2_base_address, self._USER_2_BYTES))[0]
+
+                # The result is 0 if success, otherwise failure
+                if result != self._SUCCESS:
+                    self._handle_failure(
+                        executable_targets, transceiver, provenance_file_path,
+                        compressor_app_id)
+
+                    raise SpinnFrontEndException(
+                        "The bit field expander on {}, {} failed to complete"
+                        .format(x, y))
+
+    @staticmethod
+    def _handle_failure(
+            executable_targets, transceiver, provenance_file_path,
+            compressor_app_id):
+        """
+        :param executable_targets: cores which are running the bitfield expander
+        :param transceiver: SpiNNMan instance
+        :param provenance_file_path: provenance file path
+        :rtype: None
+        """
+        logger.info("bit field expander has failed")
+        iobuf_extractor = ChipIOBufExtractor()
+        io_errors, io_warnings = iobuf_extractor(
+            transceiver, executable_targets,
+            provenance_file_path)
+        for warning in io_warnings:
+            logger.warning(warning)
+        for error in io_errors:
+            logger.error(error)
+        transceiver.stop_application(compressor_app_id)
+        transceiver.app_id_tracker.free_id(compressor_app_id)
