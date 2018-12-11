@@ -41,7 +41,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     _ONE_WORDS = struct.Struct("<I")
     _THREE_WORDS = struct.Struct("<III")
 
-    #binary name
+    # binary name
     _BIT_FIELD_EXPANDER_APLX = "synapse_expander.aplx"
 
     def __call__(
@@ -183,13 +183,13 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             self, executable_cores, bit_field_app_id, transceiver,
             provenance_file_path):
         """ executes the app
-        
+
         :param executable_cores: the cores to run the bit field expander on
         :param bit_field_app_id: the appid for the bit field expander
         :param transceiver: the SpiNNMan instance
-        :param provenance_file_path: the path for where provenance data is\ 
+        :param provenance_file_path: the path for where provenance data is\
         stored
-        :rtype: None 
+        :rtype: None
         """
 
         # load the bitfield expander executable
@@ -255,8 +255,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     def _handle_failure(
             executable_targets, transceiver, provenance_file_path,
             compressor_app_id):
-        """handles the state where some cores have failed. 
-        
+        """handles the state where some cores have failed.
+
         :param executable_targets: cores which are running the bitfield \
         expander
         :param transceiver: SpiNNMan instance
