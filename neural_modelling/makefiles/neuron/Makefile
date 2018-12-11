@@ -1,10 +1,12 @@
-MODELS = IF_curr_exp \
+MODELS = IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
+         IF_cond_exp_cerebellum_stdp_mad_mfvn_mfvn \
+		 IF_curr_exp \
          IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
          IF_curr_exp_stdp_mad_pair_additive \
-         IF_curr_exp_stdp_mad_pair_multiplicative \
+         #IF_curr_exp_stdp_mad_pair_multiplicative \
          IF_cond_exp_stdp_mad_pair_additive \
          external_device_lif_control \
          IF_curr_exp_stdp_mad_recurrent_pre_stochastic_multiplicative \
@@ -22,7 +24,7 @@ MODELS = IF_curr_exp \
          IF_curr_exp_structural \
          IF_cond_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_sEMD \
-         #IF_cond_exp_stoc 
+         #IF_cond_exp_stoc
          
 
 all:

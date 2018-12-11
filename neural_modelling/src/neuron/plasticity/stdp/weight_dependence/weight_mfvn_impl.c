@@ -13,8 +13,8 @@ uint32_t *weight_multiply_right_shift;
 uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
                             uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
-	io_printf(IO_BUF, "PFPC weight_initialise: starting\n");
-	io_printf(IO_BUF, "\tSTDP multiplicative weight dependence\n");
+    io_printf(IO_BUF, "mfvn weight_initialise: starting\n");
+    io_printf(IO_BUF, "\tSTDP mfvn  weight dependence\n");
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
@@ -27,6 +27,7 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
     weight_multiply_right_shift = (uint32_t *)
         spin1_malloc(sizeof(uint32_t) * n_synapse_types);
 
@@ -45,7 +46,6 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         weight_multiply_right_shift[s] =
                 16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
 
-
         io_printf(IO_BUF,
             "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
             " Weight multiply right shift:%u\n",
@@ -56,7 +56,7 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
             weight_multiply_right_shift[s]);
     }
 
-    io_printf(IO_BUF, "PFPC weight_initialise: completed successfully");
+    io_printf(IO_BUF, "mfvn weight initialisation: completed successfully");
 
     // Return end address of region
     return (address_t) plasticity_word;

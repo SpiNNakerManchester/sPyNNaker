@@ -7,10 +7,11 @@ from .timing_dependence_spike_nearest_pair \
     import TimingDependenceSpikeNearestPair
 from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
 from .timing_dependence_pfpc import TimingDependencePFPC
+from .timing_dependence_mfvn import TimingDependenceMFVN
 
 __all__ = [
     "AbstractTimingDependence", "TimingDependenceSpikePair",
     "TimingDependencePfisterSpikeTriplet", "TimingDependenceRecurrent",
     "TimingDependenceSpikeNearestPair", "TimingDependenceVogels2011",
-    "TimingDependencePFPC"
-]
+    "TimingDependencePFPC", "TimingDependenceMFVN"
+    ]

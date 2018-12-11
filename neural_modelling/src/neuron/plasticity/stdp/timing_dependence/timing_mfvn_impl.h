@@ -1,5 +1,5 @@
-#ifndef _TIMING_PFPC_IMPL_H_
-#define _TIMING_PFPC_IMPL_H_
+#ifndef _TIMING_MFVN_IMPL_H_
+#define _TIMING_MFVN_IMPL_H_
 
 //---------------------------------------
 // Typedefines
@@ -168,4 +168,4 @@ static inline update_state_t timing_apply_post_spike(
     //}
 }
 
-#endif // _TIMING_PFPC_IMPL_H_
+#endif // _TIMING_MFVN_IMPL_H_
