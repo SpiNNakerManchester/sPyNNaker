@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 LUT_SIZE = 256
 
-class TimingDependencePFPC(AbstractTimingDependence):
+class TimingDependenceMFVN(AbstractTimingDependence):
     __slots__ = [
         "_synapse_structure",
         "_tau_minus",
@@ -39,14 +39,14 @@ class TimingDependencePFPC(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
-        if not isinstance(timing_dependence, TimingDependencePFPC):
+        if not isinstance(timing_dependence, TimingDependenceMFVN):
             return False
         return (self.tau_plus == timing_dependence.tau_plus and
                 self.tau_minus == timing_dependence.tau_minus)
 
     @property
     def vertex_executable_suffix(self):
-        return "pfpc"
+        return "mfvn"
 
     @property
     def pre_trace_n_bytes(self):
@@ -70,7 +70,7 @@ class TimingDependencePFPC(AbstractTimingDependence):
                 "exp_sin LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(spec,
+        self._tau_plus_last_entry = plasticity_helpers.write_mfvn_lut(spec,
                 time_constant=20, time_probe=None, lut_size=LUT_SIZE, shift=0)
 
     @property
@@ -81,10 +81,10 @@ class TimingDependencePFPC(AbstractTimingDependence):
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label, "PFPCRule",
+            pre_population_label, post_population_label, "MFVNRule",
             "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
         prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label, "PFPCRule",
+            pre_population_label, post_population_label, "MFVNRule",
             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
         return prov_data
 
