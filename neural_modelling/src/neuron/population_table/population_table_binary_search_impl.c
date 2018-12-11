@@ -1,6 +1,9 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include "profile_tags.h"
+#include <profiler.h>
+
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -17,9 +20,18 @@ static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
 static address_t direct_rows_base_address;
 
+//static bool *connectivity_lookup;
+static uint32_t *connectivity_lookup;
+static uint32_t connectivity_lookup_length;
+
+static uint32_t ghost_pop_table_searches = 0;
+
 static uint32_t last_neuron_id = 0;
+static last_neuron_info_t last_neuron_info;
+
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
+static uint32_t n_pre_neurons = 255;//128;
 
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
 
@@ -92,14 +104,15 @@ bool population_table_initialise(
     uint32_t n_master_pop_bytes =
         master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    log_debug("pop table size is %d\n", n_master_pop_bytes);
+//    log_debug("pop table size is %d\n", n_master_pop_bytes);
+    io_printf(IO_BUF,"pop table length is %d\n", master_population_table_length);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0){
         master_population_table = (master_population_table_entry *)
             spin1_malloc(n_master_pop_bytes);
         if (master_population_table == NULL) {
-            log_error("Could not allocate master population table");
+            io_printf(IO_BUF,"Could not allocate master population table");
             return false;
         }
     }
@@ -107,15 +120,35 @@ bool population_table_initialise(
     uint32_t address_list_length = table_address[1];
     uint32_t n_address_list_bytes =
         address_list_length * sizeof(address_and_row_length);
+    uint32_t n_address_list_words = n_address_list_bytes >> 2;
 
     // only try to malloc if there's stuff to malloc.
     if (n_address_list_bytes != 0){
         address_list = (address_and_row_length *)
             spin1_malloc(n_address_list_bytes);
         if (address_list == NULL) {
-            log_error("Could not allocate master population address list");
+            io_printf(IO_BUF,"Could not allocate master population address list\n");
             return false;
         }
+    }
+
+    //reading of connectivity list
+//    uint32_t connectivity_lookup_length = (uint32_t)n_pre_neurons*master_population_table_length;
+    connectivity_lookup_length = (uint32_t)8*master_population_table_length;
+//    uint32_t connectivity_lookup_nbytes = sizeof(bool)*connectivity_lookup_length;
+    uint32_t connectivity_lookup_nbytes = sizeof(uint32_t)*connectivity_lookup_length;
+    //uint32_t connectivity_lookup_nbytes = sizeof(uint32_t)*connectivity_lookup_length;
+    io_printf(IO_BUF,"conn_lookup_n_bytes: %u\n", connectivity_lookup_nbytes);
+    io_printf(IO_BUF,"conn_lookup_n: %u\n", connectivity_lookup_length);
+//    connectivity_lookup = (bool*)spin1_malloc(connectivity_lookup_nbytes);
+    connectivity_lookup = (uint32_t*)spin1_malloc(connectivity_lookup_nbytes);
+    if (connectivity_lookup == NULL){
+	io_printf(IO_BUF,"could not allocate conn lookup\n");
+	return false;
+    }
+    for (uint i=0;i<connectivity_lookup_length;i++){
+//        connectivity_lookup[i]=1;
+        connectivity_lookup[i]=0xFFFFFFFF;
     }
 
     log_debug(
@@ -131,6 +164,12 @@ bool population_table_initialise(
     spin1_memcpy(
         address_list, &(table_address[2 + n_master_pop_words]),
         n_address_list_bytes);
+    //copy the connectivity lookup
+    spin1_memcpy(
+    connectivity_lookup, &(table_address[2 + n_master_pop_words+n_address_list_words]),
+    connectivity_lookup_nbytes);
+
+    population_table_print_connectivity_lookup();
 
     // Store the base address
     log_info(
@@ -148,14 +187,28 @@ bool population_table_initialise(
     return true;
 }
 
+/*
+
+bool check_for_connectivity(uint32_t neuron_id,int mp_index){
+    //uint32_t connectivity_lookup_index = neuron_id + mp_entry.start*(uint32_t)255;
+    uint32_t connectivity_lookup_index = neuron_id + mp_index*(uint32_t)n_pre_neurons;
+    //io_printf(IO_BUF,"%u, ",connectivity_lookup_index);
+
+    return connectivity_lookup[connectivity_lookup_index];
+}
+*/
+
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
+    uint32_t word_index;
+    uint32_t id_shift;
+
 
     while (imin < imax) {
 
-        int imid = (imax + imin) >> 1;
+        int imid = (imax + imin) >> 1;//todo: why is this signed?
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
             if (entry.count == 0) {
@@ -164,7 +217,12 @@ bool population_table_get_first_address(
                     "table but count is 0");
             }
 
+	        if(connectivity_lookup[last_neuron_id+(imid*n_pre_neurons)]==0)return false;
             last_neuron_id = _get_neuron_id(entry, spike);
+            last_neuron_info.e_index = imid;
+            last_neuron_info.w_index = last_neuron_id/32;
+            last_neuron_info.id_shift = 31-(last_neuron_id%32);
+	        if((connectivity_lookup[(imid*8)+last_neuron_info.w_index] & (uint32_t)1 << last_neuron_info.id_shift) == 0)return false;
             next_item = entry.start;
             items_to_go = entry.count;
 
@@ -172,8 +230,13 @@ bool population_table_get_first_address(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
                 spike, imid, next_item, items_to_go);
 
-            return population_table_get_next_address(
+            bool get_next = population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
+            if(!get_next)ghost_pop_table_searches ++;
+            return get_next;
+
+//            return population_table_get_next_address(
+//                row_address, n_bytes_to_transfer);
         } else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
@@ -184,6 +247,9 @@ bool population_table_get_first_address(
             imax = imid;
         }
     }
+
+//    ghost_pop_table_searches ++;//redefined "ghost spike" as from a connected MV but not actually connected to any of the neurons on this core
+    io_printf (IO_BUF,"Ghost searches: %u\n", ghost_pop_table_searches);
     log_debug(
         "spike %u (= %x): population not found in master population table",
         spike, spike);
@@ -197,6 +263,8 @@ bool population_table_get_next_address(
     if (items_to_go <= 0) {
         return false;
     }
+
+//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     bool is_valid = false;
     do {
@@ -224,6 +292,8 @@ bool population_table_get_next_address(
 
                 *row_address = (address_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
+
+
                 log_debug(
                     "neuron_id = %u, block_address = 0x%.8x,"
                     "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
@@ -236,6 +306,22 @@ bool population_table_get_next_address(
         next_item += 1;
         items_to_go -= 1;
     } while (!is_valid && (items_to_go > 0));
-
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
     return is_valid;
+}
+
+uint32_t population_table_get_ghost_pop_table_searches(){
+	return ghost_pop_table_searches;
+}
+
+void population_table_remove_connectivity_lookup_entry(void){
+    connectivity_lookup[(last_neuron_info.e_index*8)+last_neuron_info.w_index] &= ~((uint32_t)1 << last_neuron_info.id_shift);
+}
+
+void population_table_print_connectivity_lookup(void){
+    for (uint i=0;i<connectivity_lookup_length;i++){
+//        io_printf(IO_BUF,"%u",connectivity_lookup[i]);
+        io_printf(IO_BUF,"0x%x",connectivity_lookup[i]);
+    }
+    io_printf(IO_BUF,"\n");
 }

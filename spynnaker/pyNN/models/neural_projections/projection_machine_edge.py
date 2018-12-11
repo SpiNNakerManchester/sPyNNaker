@@ -5,6 +5,8 @@ from spinn_front_end_common.interface.provenance \
     import AbstractProvidesLocalProvenanceData
 from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
     import OneToOneConnector
+from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
+    import FromListConnector
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
@@ -32,6 +34,7 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
+        import numpy as np
         # Filter one-to-one connections that are out of range
         for synapse_info in self._synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
@@ -41,6 +44,21 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     return True
+            elif isinstance(synapse_info.connector,FromListConnector):
+                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                #run through connection list and return false if we find any connections between the pre and post vertices
+                try:
+                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi,post_lo:post_hi].max()>0:
+                        return False
+                except ValueError:
+                    print "Value error"
+                # for (pre,post,w,d) in synapse_info.connector.conn_list:
+                #     if (pre >= pre_lo and pre<=pre_hi) and (post>=post_lo and post<=post_hi):
+                #         return False
+                return True
         return False
 
     @overrides(AbstractWeightUpdatable.update_weight)

@@ -139,7 +139,7 @@ class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
                extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False):
+            master_pop_table_region, is_single=False,conn_matrix=False):
         """ Writes an entry in the Master Population Table for the newly\
             created synaptic block.
 

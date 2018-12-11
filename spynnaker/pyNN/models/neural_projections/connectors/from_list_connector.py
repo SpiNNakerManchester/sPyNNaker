@@ -38,6 +38,7 @@ class FromListConnector(AbstractConnector):
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
         self._conn_list = conn_list
+        self._conn_matrix = None
 
         # supports setting these at different times
         self._weights = None
@@ -58,6 +59,15 @@ class FromListConnector(AbstractConnector):
         # if got data, build connlist with correct dtypes
         if (self._weights is not None and self._delays is not None and not
                 self._converted_weights_and_delays):
+            try:
+                self._conn_matrix = numpy.zeros(
+                    (int(self._conn_list[:, 0].max() + 1), int(self._conn_list[:, 1].max() + 1)), dtype=bool)
+            except IndexError:
+                print "too many indices for array"
+
+            for [pre, post] in self._conn_list:
+                self._conn_matrix[int(pre)][int(post)] = 1
+
             # add weights and delays to the conn list
             temp_conn_list = numpy.dstack(
                 (self._conn_list[:, 0], self._conn_list[:, 1],
@@ -72,6 +82,7 @@ class FromListConnector(AbstractConnector):
             self._conn_list = numpy.asarray(self._conn_list,
                                             dtype=self.CONN_LIST_DTYPE)
             self._converted_weights_and_delays = True
+
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):

@@ -80,7 +80,7 @@ uint32_t synapses_get_saturation_count();
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events();
 
-
+uint32_t synapses_get_empty_row_count(void);
 //------------------------------------------------------------------------------
 // Synaptic rewiring functions
 //------------------------------------------------------------------------------

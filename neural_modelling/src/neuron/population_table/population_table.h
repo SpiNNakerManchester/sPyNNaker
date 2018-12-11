@@ -32,4 +32,10 @@ bool population_table_get_first_address(
 bool population_table_get_next_address(
     address_t* row_address, size_t* n_bytes_to_transfer);
 
+//bool check_for_connectivity(uint32_t neuron_id,master_population_table_entry mp_entry);
+
+uint32_t population_table_get_ghost_pop_table_searches(void);
+void population_table_remove_connectivity_lookup_entry(void);
+void population_table_print_connectivity_lookup(void);
+
 #endif // _POPULATION_TABLE_H_
