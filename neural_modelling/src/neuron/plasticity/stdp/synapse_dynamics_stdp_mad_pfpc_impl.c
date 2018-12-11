@@ -132,7 +132,7 @@ static inline final_state_t _plasticity_update_synapse(
         uint32_t pf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
 
 
-        io_printf(IO_BUF, "        Applying post-synaptic event at delayed time:%u\n",
+        io_printf(IO_BUF, "      Applying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
 //        // Get window of pf events based on cf spikes
@@ -143,14 +143,18 @@ static inline final_state_t _plasticity_update_synapse(
         		pre_event_history, pf_begin_time, delayed_post_time);
 
 
-        io_printf(IO_BUF, "        Looping over PF window\n",
+        io_printf(IO_BUF, "        Looping over PF window for this CF spike\n",
                       delayed_post_time);
         while (pre_window.num_events > 0) {
+
             const uint32_t delayed_pre_time = *pre_window.next_time
                                                + delay_dendritic;
+            io_printf(IO_BUF, "        PF Spike: %u \n", delayed_pre_time);
 
-            io_printf(IO_BUF, "            delta t = %u\n", delayed_post_time - delayed_pre_time);
-
+            io_printf(IO_BUF, "            delta t = %u (delayed PF = %u, delayed CF = %u)\n",
+            		delayed_post_time - delayed_pre_time,
+					delayed_pre_time,
+					delayed_post_time);
 
         	current_state = timing_apply_post_spike(
         			delayed_post_time, *post_window.next_trace,
@@ -158,14 +162,9 @@ static inline final_state_t _plasticity_update_synapse(
 					last_pre_trace, post_window.prev_time, post_window.prev_trace,
 					current_state);
 
-
-
             pre_window = post_events_next_delayed(pre_window, delayed_pre_time);
 
-
         }
-//        	// Apply spike to state
-
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);

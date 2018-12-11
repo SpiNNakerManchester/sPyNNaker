@@ -49,7 +49,7 @@ static inline post_trace_t timing_get_initial_post_trace() {
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
 
-	io_printf(IO_BUF, "Adding pre spike to event history (from climbing fibre)\n");
+	io_printf(IO_BUF, "Adding climbing fibre spike to post-event history (stored on neuron\n");
 
 //    // Get time since last spike
 //    uint32_t delta_time = time - last_time;
@@ -128,16 +128,11 @@ static inline update_state_t timing_apply_post_spike(
 
 
 
-//    // This is where we lookup the value of e^(-x) * sin(x)^20
-//
-//
+    // This is where we lookup the value of e^(-x) * sin(x)^20
 
-
-
-//
-//    // Get time of event relative to last pre-synaptic event
+    // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = last_pre_time; //time - last_pre_time;
-    io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
+    io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
 
     if (time_since_last_pre < 255){
 
@@ -151,8 +146,8 @@ static inline update_state_t timing_apply_post_spike(
 
     }
 //
-	io_printf(IO_BUF, "        delta t = %u,    ", time_since_last_pre);
-	io_printf(IO_BUF, "        out of LUT range - do nothing");
+	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+	io_printf(IO_BUF, "        out of LUT range (do nothing)");
 
 //    if (time_since_last_pre > 0) {
 //        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(

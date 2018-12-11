@@ -60,12 +60,12 @@ uint32_t plastic_saturation_count = 0;
 //    uint32_t prev_time;
 //} pre_event_history_t;
 
-#define NUM_PF_SPIKES_TO_RECORD 16
+#define NUM_MF_SPIKES_TO_RECORD 16
 
 typedef struct {
-    uint32_t num_recorded_pf_spikes_minus_one;
-    uint32_t pf_times[NUM_PF_SPIKES_TO_RECORD];
-    post_trace_t traces[NUM_PF_SPIKES_TO_RECORD];
+    uint32_t num_recorded_mf_spikes_minus_one;
+    uint32_t mf_times[NUM_MF_SPIKES_TO_RECORD];
+    post_trace_t traces[NUM_MF_SPIKES_TO_RECORD];
 } pre_event_history_t;
 
 
@@ -73,16 +73,14 @@ typedef struct {
 _print_pre_event_history(pre_event_history_t pre_eve_hist){
 
 	io_printf(IO_BUF, "\n\n************************\n\n");
-	io_printf(IO_BUF, "Number recorded spikes: %u\n", pre_eve_hist.num_recorded_pf_spikes_minus_one);
+	io_printf(IO_BUF, "Number recorded MF spikes: %u\n", pre_eve_hist.num_recorded_mf_spikes_minus_one);
 	io_printf(IO_BUF, "Prev time: %u\n",
-			pre_eve_hist.pf_times[pre_eve_hist.num_recorded_pf_spikes_minus_one]);
+			pre_eve_hist.mf_times[pre_eve_hist.num_recorded_mf_spikes_minus_one]);
 
-	for (int i =0; i < NUM_PF_SPIKES_TO_RECORD; i ++){
-		io_printf(IO_BUF, "    Entry %u: %u\n", i ,pre_eve_hist.pf_times[i]);
+	for (int i =0; i < NUM_MF_SPIKES_TO_RECORD; i ++){
+		io_printf(IO_BUF, "    Entry %u: %u\n", i ,pre_eve_hist.mf_times[i]);
 	}
-
 }
-
 
 post_event_history_t *post_event_history;
 
@@ -114,13 +112,13 @@ static inline final_state_t _plasticity_update_synapse(
         post_window.num_events);
 
 
-    io_printf(IO_BUF, "    Printing CF history\n");
+    io_printf(IO_BUF, "    Printing PC history\n");
     print_event_history(post_event_history);
 //     print_delayed_window_events(post_event_history, window_begin_time,
 //    		window_end_time, delay_dendritic);
 
 
-    io_printf(IO_BUF, "\n    Looping over climbing fibre spikes:\n");
+    io_printf(IO_BUF, "\n    Looping over PC spikes:\n");
 
     delay_dendritic = 0;
 
@@ -129,28 +127,28 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
 
-        uint32_t pf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
+        uint32_t mf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
 
 
-        io_printf(IO_BUF, "        Applying post-synaptic event at delayed time:%u\n",
+        io_printf(IO_BUF, "      Applying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
-//        // Get window of pf events based on cf spikes
-//        print_delayed_window_events(pre_event_history,
-//        		//(delayed_post_time-255)
-//        		pf_begin_time, delayed_post_time, delay_dendritic);
         post_event_window_t pre_window = post_events_get_window_delayed(
-        		pre_event_history, pf_begin_time, delayed_post_time);
+        		pre_event_history, mf_begin_time, delayed_post_time);
 
 
-        io_printf(IO_BUF, "        Looping over PF window\n",
+        io_printf(IO_BUF, "        Looping over MF window for this PC spike\n",
                       delayed_post_time);
         while (pre_window.num_events > 0) {
+
             const uint32_t delayed_pre_time = *pre_window.next_time
                                                + delay_dendritic;
+            io_printf(IO_BUF, "        MF Spike: %u \n", delayed_pre_time);
 
-            io_printf(IO_BUF, "            delta t = %u\n", delayed_post_time - delayed_pre_time);
-
+            io_printf(IO_BUF, "            delta t = %u (delayed MF = %u, delayed PC = %u)\n",
+            		delayed_post_time - delayed_pre_time,
+					delayed_pre_time,
+					delayed_post_time);
 
         	current_state = timing_apply_post_spike(
         			delayed_post_time, *post_window.next_trace,
@@ -158,14 +156,9 @@ static inline final_state_t _plasticity_update_synapse(
 					last_pre_trace, post_window.prev_time, post_window.prev_trace,
 					current_state);
 
-
-
             pre_window = post_events_next_delayed(pre_window, delayed_pre_time);
 
-
         }
-//        	// Apply spike to state
-
 
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
@@ -323,7 +316,8 @@ bool synapse_dynamics_process_plastic_synapses(
         plastic_region_address);
 
     // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->pf_times[event_history->num_recorded_pf_spikes_minus_one];
+    const uint32_t last_pre_time =
+    		event_history->mf_times[event_history->num_recorded_mf_spikes_minus_one];
 
     // no longer need to manage this trace
     const pre_trace_t last_pre_trace = 0;
@@ -335,7 +329,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
 
     // Update pre-synaptic trace
-    io_printf(IO_BUF, "\nAdding pre-synaptic event (parallel fibre spike) at time: %u\n\n", time);
+    io_printf(IO_BUF,
+    		"\nAdding pre-synaptic event (mossy fibre spike) at time: %u\n\n", time);
 
 
     timing_add_pre_spike(time, last_pre_time, last_pre_trace);
@@ -401,7 +396,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
-    log_debug("Adding post-synaptic event to trace at time:%u", time);
+    log_debug("Adding post-synaptic event (PC spike)to history at time:%u", time);
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
