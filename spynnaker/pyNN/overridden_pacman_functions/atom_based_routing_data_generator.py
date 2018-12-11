@@ -7,11 +7,14 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 
-from spynnaker.pyNN.models.abstract_models import \
-    AbstractAcceptsIncomingSynapses
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_uses_population_table_and_synapses import \
+    AbstractUsesPopulationTableAndSynapses
 
 import struct
 import logging
+
+from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
 
@@ -22,12 +25,23 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     __slots__ = ()
 
+    # the sdram tag being used here
     _SDRAM_TAG = 2
+
+    # flag which states that the binary finished cleanly.
     _SUCCESS = 0
+
+    # the number of bytes needed to read the user2 register
     _USER_2_BYTES = 4
-    _N_BYTES_PER_REGION_ELEMENT = 8
+
+    # master pop, synaptic matrix, bitfield base addresses
+    _N_ELEMENTS_PER_REGION_ELEMENT = 3
+
+    # structs for performance requirements.
     _ONE_WORDS = struct.Struct("<I")
-    _TWO_WORDS = struct.Struct("<II")
+    _THREE_WORDS = struct.Struct("<III")
+
+    #binary name
     _BIT_FIELD_EXPANDER_APLX = "synapse_expander.aplx"
 
     def __call__(
@@ -66,6 +80,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path)
 
+        # update progress bar
         progress.end()
 
     def _calculate_core_data(
@@ -95,7 +110,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
-            if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
+            if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
                 for machine_vertex in machine_verts:
                     # locate the 2 data region base addresses
@@ -106,6 +121,9 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                             transceiver, placement)
                     master_pop_table_base_address = \
                         machine_vertex.master_pop_table_base_address(
+                            transceiver, placement)
+                    bit_field_base_address = \
+                        machine_vertex.bit_field_base_address(
                             transceiver, placement)
 
                     # check if the chip being considered already.
@@ -119,7 +137,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                     # add the extra data
                     data_address[(placement.x, placement.y)].append(
                         (master_pop_table_base_address,
-                         synaptic_matrix_base_address))
+                         synaptic_matrix_base_address,
+                         bit_field_base_address))
 
         return data_address, expander_cores
 
@@ -137,7 +156,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             regions = data_address[(chip_x, chip_y)]
             base_address = transceiver.malloc_sdram(
                 chip_x, chip_y,
-                len(regions) * self._N_BYTES_PER_REGION_ELEMENT,
+                (len(regions) * self._N_ELEMENTS_PER_REGION_ELEMENT *
+                 constants.WORD_TO_BYTE_MULTIPLIER),
                 bit_field_generator_app_id, self._SDRAM_TAG)
             transceiver.write_memory(
                 chip_x, chip_y, base_address, self._generate_data(regions))
@@ -152,14 +172,25 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         """
         data = b''
         data += self._ONE_WORDS.pack(len(regions))
-        for (master_pop_base_address, synaptic_matrix_base_address) in regions:
-            data += self._TWO_WORDS.pack(master_pop_base_address,
-                                         synaptic_matrix_base_address)
+        for (master_pop_base_address, synaptic_matrix_base_address,
+             bit_field_base_address) in regions:
+            data += self._THREE_WORDS.pack(
+                master_pop_base_address, synaptic_matrix_base_address,
+                bit_field_base_address)
         return bytearray(data)
 
     def _run_app(
             self, executable_cores, bit_field_app_id, transceiver,
             provenance_file_path):
+        """ executes the app
+        
+        :param executable_cores: the cores to run the bit field expander on
+        :param bit_field_app_id: the appid for the bit field expander
+        :param transceiver: the SpiNNMan instance
+        :param provenance_file_path: the path for where provenance data is\ 
+        stored
+        :rtype: None 
+        """
 
         # load the bitfield expander executable
         transceiver.execute_application(executable_cores, bit_field_app_id)
@@ -224,7 +255,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     def _handle_failure(
             executable_targets, transceiver, provenance_file_path,
             compressor_app_id):
-        """
+        """handles the state where some cores have failed. 
+        
         :param executable_targets: cores which are running the bitfield \
         expander
         :param transceiver: SpiNNMan instance

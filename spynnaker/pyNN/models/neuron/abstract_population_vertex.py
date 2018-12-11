@@ -129,9 +129,6 @@ class AbstractPopulationVertex(
     # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
     BIT_IN_A_WORD = 32
 
-    # conversion from words to bytes (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
-    WORD_TO_BYTE_MULTIPLIER = 4
-
     _n_vertices = 0
 
     def __init__(
@@ -377,7 +374,7 @@ class AbstractPopulationVertex(
                 sdram += (
                     (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + (
                         n_words_for_atoms * n_machine_vertices)) *
-                    self.WORD_TO_BYTE_MULTIPLIER)
+                    constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
     def _exact_sdram_for_bit_field_region(self, machine_graph, graph_mapper):
@@ -390,7 +387,7 @@ class AbstractPopulationVertex(
         :return: sdram in bytes
         """
         sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
-                 self.WORD_TO_BYTE_MULTIPLIER)
+                 constants.WORD_TO_BYTE_MULTIPLIER)
         for incoming_edge in machine_graph.get_edges_ending_at_vertex(self):
             atoms_of_source_vertex = \
                 graph_mapper.get_slice(incoming_edge.pre_vertex)
@@ -399,7 +396,7 @@ class AbstractPopulationVertex(
 
             sdram += (
                 (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-                self.WORD_TO_BYTE_MULTIPLIER)
+                constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
     def _get_number_of_mallocs_used_by_dsg(self):
