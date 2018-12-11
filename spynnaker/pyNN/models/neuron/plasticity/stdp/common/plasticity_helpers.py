@@ -113,64 +113,55 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
             plt.show()
 
 
-def write_mfvn_lut(spec, time_constant, lut_size, shift, time_probe,
+def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                   fixed_point_one=STDP_FIXED_POINT_ONE):
-        peak_time = 100.0
-        tau = peak_time * 2/math.pi;
+
+        # Add this to function arguments in the future
         machine_time_step = 1.0
+        cos_pwr = 2
 
-        # This offset is the quasi-symmetry point
-        sin_pwr = 20
+        # Calculate required time constant
+        inv_sigma = (1.0 / float(sigma)) #* (machine_time_step / 1000.0)
+        peak_time = 0
 
-# Write peak time in timesteps
-        peak_time_data = int(peak_time * (1000.0 / machine_time_step) - lut_size/2  + 0.5)
-        #print "peak time data:", peak_time_data, "peak_time:", peak_time
-
-#         if spec is not None:
-#             spec.write_value(data=peak_time_data,
-#                          data_type=DataType.INT32)
-
-        # Calculate 1/tau in machine time steps
-        inv_tau = (1.0 / float(tau)) #* (machine_time_step / 1000.0)
-
-        zero_offset = math.atan(-1./sin_pwr) # abscissae of the max point obtained by deriving the kernel and equal to zero
-        max_value = math.exp(-math.pi/2)*math.sin(-math.pi/2)**sin_pwr
-
-        if spec is None :
-            print tau, inv_tau, zero_offset, max_value
+         # evaluate peak value of kernel to normalise LUT
+        kernel_peak_value = (math.exp(-abs(peak_time * inv_sigma * beta)) *
+              math.cos(peak_time*inv_sigma)**cos_pwr)
 
         # Generate LUT
-        #last_value = None
+        out_float = []
+        out_fixed = []
+        plot_times = []
 
-#         t = np.arange(0,lut_size)
-#         out = []
-#         out_fixed = []
-        exp_list = []
-        for i in range(0,lut_size): # the sign needs to be checked and has to be consistent with the dt used in the synapse
+        for i in range(0, lut_size): # note that i corresponds to 1 timestep!!!!!!
 
-            # Multiply by time constant and calculate negative exponential
-            value = float(i) * inv_tau
-            # we want a single bump only, so we clip the arg at pi/2
-#             if (value) < 0:# math.pi*2:
-#                 exp_float = 0.0
-#                 print "clamp @ value = ", value
-#             else:
-            exp_float = math.exp(-value) * math.sin(value)**sin_pwr  / 0.213122689799 #max_value
+            # Multiply by inverse of time constant
+            value = float(i) * inv_sigma
 
-            # Convert to fixed-point and write to spec
+            # Only take first peak from kernel
+            if (value > math.pi/2):
+                exp_float = 0
+            else:
+                # Evaluate kernel
+                exp_float = math.exp(-abs(value * beta)) * math.cos(value)**cos_pwr / kernel_peak_value
+
+            # Convert to fixed-point
             exp_fix = float_to_fixed(exp_float, fixed_point_one)
-            exp_list.append(exp_float)
 
-            if spec is None :
-                #out.append(exp_float)
+            if spec is None: # in testing mode so print
+                out_float.append(exp_float)
+                out_fixed.append(exp_fix)
+                plot_times.append(i)
                 if i == time_probe:
-                    print "dt = ", time_probe, "weight update = ", exp_float, "fixed = ", exp_fix
-            else :
+                    print "dt = {}, kernel value = {} (fixed-point = {})".format(
+                        time_probe, exp_float, exp_fix)
+
+            else: # at runtime, so write to spec
                 spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
-
-
-#         if spec is None :
-#             plt.plot(t,out)
-#             plt.show()
-
+        if spec is None:
+            print "peak: time {}, value {}".format(peak_time, kernel_peak_value)
+            plt.plot(plot_times,out_float, label='float')
+            # plt.plot(t,out_fixed, label='fixed')
+            plt.legend()
+            plt.show()
