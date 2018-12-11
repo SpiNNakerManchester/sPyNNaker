@@ -124,8 +124,6 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_dma_complete_count();
     provenance_region[SPIKE_PROGRESSING_COUNT] =
         spike_processing_get_spike_processing_count();
-
-    population_table_print_connectivity_lookup();
     log_debug("finished other provenance data");
 }
 
@@ -158,7 +156,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
 
         // alloc sdram into right region
         connectivity_lookup[position_in_array] = spin1_malloc(
-            sizeof(uint32_t) * n_words_for_bit_field)
+            sizeof(uint32_t) * n_words_for_bit_field);
         if (connectivity_lookup[position_in_array] == NULL){
             log_warning(
                 "could not initialise bit field for key %d, packets with"

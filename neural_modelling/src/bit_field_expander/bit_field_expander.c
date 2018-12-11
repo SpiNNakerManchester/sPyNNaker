@@ -4,10 +4,28 @@
 #include <data_specification.h>
 #include <debug.h>
 
+address_t row_address;
+
+bool initialise_master_pop_tables(){
+    if (!population_table_initialise(
+            data_specification_get_region(POPULATION_TABLE_REGION, address),
+            indirect_synapses_address, direct_synapses_address,
+            &row_max_n_words)) {
+        return false;
+    }
+}
 
 
 void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
+
+    log_info("starting the bit field expander");
+
+    read_in_addresses();
+
+    initialise_master_pop_table();
+
+
 
     // Register each of the components
     register_matrix_generators();
@@ -15,7 +33,7 @@ void c_main(void) {
     register_param_generators();
 
     // Get the addresses of the regions
-    log_info("Starting To Build Connectors");
+    log_info("Starting To Build bit fields");
     address_t core_address = data_specification_get_data_address();
     address_t params_address = data_specification_get_region(
         CONNECTOR_BUILDER_REGION, core_address);

@@ -2,8 +2,13 @@
 #include <neuron/synapse_row.h>
 #include <debug.h>
 
+// bits in a word
 #define BITS_PER_WORD 32
-#define TOP_BIT_IN_WORD 32
+
+// the highest bit within the word
+#define TOP_BIT_IN_WORD 31
+
+// the flag for when a spike isnt in the master pop table (so shouldnt happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
 
@@ -22,11 +27,19 @@ static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
 static address_t direct_rows_base_address;
 
+//! \brief the number of times a DMA resulted in 0 entries
 static uint32_t ghost_pop_table_searches = 0;
+
+//! \brief the number of times packet isnt in the master pop table at all!
 static uint32_t invalid_master_pop_hits = 0;
 
+//! \brief the last neuron id for the key
 static uint32_t last_neuron_id = 0;
+
+//! the index for the next time
 static uint16_t next_item = 0;
+
+//! \brief how many items are left to go
 static uint16_t items_to_go = 0;
 uint32_t* connectivity_bit_field;
 
@@ -94,7 +107,8 @@ bool population_table_initialise(
     log_debug("population_table_initialise: starting");
 
     master_population_table_length = table_address[0];
-    log_debug("master pop table length is %d\n", master_population_table_length);
+    log_debug("master pop table length is %d\n",
+              master_population_table_length);
     log_debug(
         "master pop table entry size is %d\n",
         sizeof(master_population_table_entry));
@@ -162,10 +176,10 @@ bool population_table_get_first_address(
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
-    // locate the posiiton in the binary search / array
+    // locate the position in the binary search / array
     int position = population_table_position_in_the_master_pop_array(spike);
 
-    // check we dont have a complete miss
+    // check we don't have a complete miss
     if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
@@ -178,7 +192,7 @@ bool population_table_get_first_address(
             last_neuron_id = _get_neuron_id(entry, spike);
 
             // check bitfield to see if its in need of a DMA, or a ghost search
-            if((connectivity_bit_field[imid][last_neuron_id/BITS_PER_WORD] &
+            if ((connectivity_bit_field[imid][last_neuron_id/BITS_PER_WORD] &
                     (uint32_t) 1 << TOP_BIT_IN_WORD - (
                         last_neuron_id % BITS_PER_WORD)) == 0){
 	            return false;
@@ -195,7 +209,7 @@ bool population_table_get_first_address(
                 row_address, n_bytes_to_transfer);
 
             // tracks surplus dmas
-            if(!get_next){
+            if (!get_next){
                 ghost_pop_table_searches ++;
             }
             return get_next;
