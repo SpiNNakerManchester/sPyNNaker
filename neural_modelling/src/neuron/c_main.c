@@ -44,7 +44,11 @@ typedef enum extra_provenance_data_region_entries{
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
     PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
-	GHOST_POP_TABLE_SEARCHES = 5
+	GHOST_POP_TABLE_SEARCHES = 5,
+	FAILED_TO_READ_BIT_FIELDS = 6,
+	EMPTY_ROW_READS = 7,
+	DMA_COMPLETES = 8,
+	SPIKE_PROGRESSING_COUNT = 9
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -79,8 +83,14 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
+int32_t* connectivity_lookup;
+
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
+
+//! the number of bit fields which were not able to be read in due to DTCM
+//! limits
+uint32_t failed_bit_field_reads = 0;
 
 
 //! \brief Initialises the recording parts of the model
@@ -105,15 +115,74 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-            synapse_dynamics_get_plastic_saturation_count();
-    log_debug("finished other provenance data");
-    provenance_region[GHOST_POP_TABLE_SEARCHES]=
+        synapse_dynamics_get_plastic_saturation_count();
+    provenance_region[GHOST_POP_TABLE_SEARCHES] =
     	spike_processing_get_ghost_pop_table_searches();
-    io_printf (IO_BUF, "n_ghost_input_spikes=%d\n",spike_processing_get_ghost_pop_table_searches());
-    io_printf (IO_BUF, "empty row count = %d\n",synapses_get_empty_row_count());
-    io_printf (IO_BUF, "dma_complete_count=%d\n",spike_processing_get_dma_complete_count());
-    io_printf (IO_BUF, "spike_processing_count=%d\n",spike_processing_get_spike_processing_count());
+    provenance_region[FAILED_TO_READ_BIT_FIELDS] = failed_bit_field_reads;
+    provenance_region[EMPTY_ROW_READS] = synapses_get_empty_row_count();
+    provenance_region[DMA_COMPLETES] =
+        spike_processing_get_dma_complete_count();
+    provenance_region[SPIKE_PROGRESSING_COUNT] =
+        spike_processing_get_spike_processing_count();
+
     population_table_print_connectivity_lookup();
+    log_debug("finished other provenance data");
+}
+
+static bool bit_field_filter_initialise(address_t bitfield_region){
+
+    uint32_t position = 0;
+    uint32_t n_bit_fields = bitfield_region[position];
+
+    // try allocating dtcm for starting array for bitfields
+    connectivity_lookup = spin1_malloc(sizeof(uint32_t*) * n_bit_fields);
+    if (connectivity_lookup == NULL){
+        log_warning("couldn't  initialise basic bit field holder. Will end up "
+                    "doing possibly more DMA's during the execution than "
+                    "required");
+        return true;
+    }
+    position += 1;
+
+    // try allocating dtcm for each bit field
+    for (uint32_t cur_bit_field = 0; cur_bit_field < n_bit_fields;
+            cur_bit_field++){
+        // get the key associated with this bitfield
+        uint32_t key = bitfield_region[position];
+        uint32_t n_words_for_bit_field = bitfield_region[position + 1];
+        position += 2;
+
+        // locate the position in the array to match the master pop element.
+        int position_in_array =
+            population_table_position_in_the_master_pop_array(key);
+
+        // alloc sdram into right region
+        connectivity_lookup[position_in_array] = spin1_malloc(
+            sizeof(uint32_t) * n_words_for_bit_field)
+        if (connectivity_lookup[position_in_array] == NULL){
+            log_warning(
+                "could not initialise bit field for key %d, packets with"
+                " that key will use a DMA to check if the packet targets "
+                "anything within this core. Potentially slowing down the "
+                "execution of neurons on this core.");
+            failed_bit_field_reads ++;
+        } else{  // read in bit field into correct location
+
+            spin1_memcpy(connectivity_lookup[position_in_array],
+                         &bitfield_region[position],
+                         sizeof(uint32_t) * n_words_for_bit_field);
+
+            // print out the bit field for debug purposes
+            log_debug("bit field for key %d is :", key);
+            for (uint32_t bit_field_word_index = 0;
+                    bit_field_word_index < n_words_for_bit_field;
+                    bit_field_word_index++){
+                log_debug("0x%x", connectivity_lookup[position_in_array]
+                                                     [bit_field_word_index]);
+            }
+        }
+        position += n_words_for_bit_field;
+    }
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -211,6 +280,12 @@ static bool initialise(uint32_t *timer_period) {
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
 
+    log_info("initialising the bit field region");
+    if (!bit_field_filter_initialise(
+            data_specification_get_region(BIT_FIELD_FILTER_REGION, address))){
+        return false;
+    }
+
     log_debug("Initialise: finished");
     return true;
 }
@@ -239,7 +314,7 @@ void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
 
-//    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
     last_rewiring_time++;
@@ -264,7 +339,7 @@ void timer_callback(uint timer_count, uint unused) {
         neuron_store_neuron_parameters(
             data_specification_get_region(NEURON_PARAMS_REGION, address));
 
-//        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
@@ -279,6 +354,7 @@ void timer_callback(uint timer_count, uint unused) {
         time -= 1;
 
         log_debug("Rewire tries = %d", count_rewires);
+
         simulation_ready_to_read();
 
         return;
@@ -322,7 +398,7 @@ void timer_callback(uint timer_count, uint unused) {
         recording_do_timestep_update(time);
     }
 
-//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 //! \brief The entry point for this model.

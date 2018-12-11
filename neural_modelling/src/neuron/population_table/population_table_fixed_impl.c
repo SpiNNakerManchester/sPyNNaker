@@ -9,6 +9,8 @@ static uint16_t master_population_table[MASTER_POPULATION_MAX];
 static address_t synaptic_rows_base_address;
 static uint32_t row_size_table[ROW_SIZE_TABLE_MAX];
 uint32_t ghost_pop_table_searches = 0;
+static uint32_t invalid_master_pop_hits = 0;
+uint32_t* connectivity_bit_field;
 
 static inline void _print_master_population_table() {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -183,6 +185,27 @@ bool population_table_get_next_address(
     return false;
 }
 
+//! \brief generates how many dma's were pointless
+//! \return uint of how many were done
 uint32_t population_table_get_ghost_pop_table_searches(){
 	return ghost_pop_table_searches;
+}
+
+//! \brief get the position in the master pop table
+//! \param[in] spike: The spike received
+//! \return the position in the master pop table
+int population_table_position_in_the_master_pop_array(spike_t spike){
+    return _get_table_index(_key_x(spike), _key_y(spike), _key_p(spike));
+}
+
+//! \brief sets the connectivity lookup element
+//! \param[in] connectivity_lookup: the connectivity lookup
+void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup){
+    connectivity_bit_field = connectivity_lookup;
+}
+
+//! \brief get the number of master pop table key misses
+//! \return the number of master pop table key misses
+uint32_t population_table_get_invalid_master_pop_hits(){
+    return invalid_master_pop_hits;
 }

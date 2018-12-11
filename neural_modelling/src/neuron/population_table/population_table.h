@@ -24,6 +24,11 @@ bool population_table_initialise(
 bool population_table_get_first_address(
     spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
+//! \brief get the position in the master pop table
+//! \param[in] spike: The spike received
+//! \return the position in the master pop table
+int population_table_position_in_the_master_pop_array(spike_t spike);
+
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
 //! \param[out] row_address Updated with the address of the row
@@ -32,10 +37,16 @@ bool population_table_get_first_address(
 bool population_table_get_next_address(
     address_t* row_address, size_t* n_bytes_to_transfer);
 
-//bool check_for_connectivity(uint32_t neuron_id,master_population_table_entry mp_entry);
-
+//! \brief generates how many dma's were pointless
+//! \return uint of how many were done
 uint32_t population_table_get_ghost_pop_table_searches(void);
-void population_table_remove_connectivity_lookup_entry(void);
-void population_table_print_connectivity_lookup(void);
+
+//! \brief sets the connectivity lookup element
+//! \param[in] connectivity_lookup: the connectivity lookup
+void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup);
+
+//! \brief get the number of master pop table key misses
+//! \return the number of master pop table key misses
+uint32_t population_table_get_invalid_master_pop_hits();
 
 #endif // _POPULATION_TABLE_H_

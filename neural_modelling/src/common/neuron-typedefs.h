@@ -94,10 +94,4 @@ typedef struct timed_state_t {
     state_t states[];
 } timed_state_t;
 
-typedef struct{
-    uint32_t e_index;
-    uint32_t w_index;
-    uint32_t id_shift;
-}last_neuron_info_t;
-
 #endif /* __NEURON_TYPEDEFS_H__ */

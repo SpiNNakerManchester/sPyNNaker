@@ -1,4 +1,9 @@
+import sys
+
+import math
+
 from data_specification import utility_calls
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from spinn_utilities.overrides import overrides
 
 # pacman imports
@@ -32,6 +37,7 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
@@ -111,6 +117,17 @@ class AbstractPopulationVertex(
 
     # 8 elements before the start of global parameters
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+
+    # number of elements
+    ELEMENTS_USED_IN_EACH_BIT_FIELD = 2  # n words, key
+
+    ELEMENTS_USED_IN_BIT_FIELD_HEADER = 1  # n bitfields
+
+    # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
+    BIT_IN_A_WORD = 32
+
+    # conversion from words to bytes (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
+    WORD_TO_BYTE_MULTIPLIER = 4
 
     _n_vertices = 0
 
@@ -319,9 +336,66 @@ class AbstractPopulationVertex(
             (self._get_number_of_mallocs_used_by_dsg() *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
             profile_utils.get_profile_region_size(
-                self._n_profile_samples))
+                self._n_profile_samples) +
+            self._get_estimated_sdram_for_bit_field_region(
+                graph.get_edges_ending_at_vertex(self)))
 
         return sdram_requirement
+
+    def _get_estimated_sdram_for_bit_field_region(self, incoming_edges):
+        """ estimates the sdram for the bit field region
+        :param incoming_edges: the application edges entering this vertex
+        :rtype: int
+        :return: the estimated number of bytes used by the bit field region
+        """
+        sdram = 0
+        for incoming_edge in incoming_edges:
+            if isinstance(incoming_edge, ProjectionApplicationEdge):
+                max_atoms = sys.maxsize
+                edge_pre_vertex = incoming_edge.pre_vertex
+                if (isinstance(edge_pre_vertex, ApplicationVertex) and
+                        isinstance(
+                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+                    max_atoms = \
+                        incoming_edge.pre_vertex.get_max_atoms_per_core()
+                if incoming_edge.pre_vertex.n_atoms < max_atoms:
+                    max_atoms = incoming_edge.pre_vertex.n_atoms
+
+                # Get the number of likely vertices
+                n_machine_vertices = int(math.ceil(
+                    float(incoming_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                n_atoms_per_machine_vertex = int(math.ceil(
+                    float(incoming_edge.pre_vertex.n_atoms) /
+                    n_machine_vertices))
+                n_words_for_atoms = int(math.ceil(
+                    n_atoms_per_machine_vertex / self.BIT_IN_A_WORD))
+                sdram += (
+                    (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + (
+                        n_words_for_atoms * n_machine_vertices)) *
+                    self.WORD_TO_BYTE_MULTIPLIER)
+        return sdram
+
+    def _exact_sdram_for_bit_field_region(self, machine_graph, graph_mapper):
+        """ calculates the correct sdram for the bitfield region based off the 
+        machine graph and graph mapper
+        
+        :param machine_graph: machine graph
+        :param graph_mapper: graph mapping between app and machine graphs. \
+                             Used to locate atom slices. 
+        :return: sdram in bytes
+        """
+        sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
+                 self.WORD_TO_BYTE_MULTIPLIER)
+        for incoming_edge in machine_graph.get_edges_ending_at_vertex(self):
+            atoms_of_source_vertex = \
+                graph_mapper.get_slice(incoming_edge.pre_vertex)
+            n_words_for_atoms = int(math.ceil(
+                atoms_of_source_vertex / self.BIT_IN_A_WORD))
+
+            sdram += (
+                (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
+                self.WORD_TO_BYTE_MULTIPLIER)
+        return sdram
 
     def _get_number_of_mallocs_used_by_dsg(self):
         extra_mallocs = len(self._neuron_recorder.recording_variables)
@@ -330,7 +404,17 @@ class AbstractPopulationVertex(
             self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
             extra_mallocs)
 
-    def _reserve_memory_regions(self, spec, vertex_slice, vertex):
+    def _reserve_memory_regions(
+            self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
+        """ reserves the dsg memory regions
+        
+        :param spec: the data spec object
+        :param vertex_slice: this vertex atom slice
+        :param vertex: this vertex
+        :param machine_graph: machine graph
+        :param graph_mapper: the graph mapper
+        :rtype: None 
+        """
 
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -350,6 +434,13 @@ class AbstractPopulationVertex(
         profile_utils.reserve_profile_region(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
+
+        # reserve bit field region
+        spec.reserve_memory_region(
+            region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            size=self._exact_sdram_for_bit_field_region(
+                machine_graph, graph_mapper),
+            label="bit_field region")
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -488,7 +579,8 @@ class AbstractPopulationVertex(
         vertex_slice = graph_mapper.get_slice(vertex)
 
         # Reserve memory regions
-        self._reserve_memory_regions(spec, vertex_slice, vertex)
+        self._reserve_memory_regions(
+            spec, vertex_slice, vertex, machine_graph, graph_mapper)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff

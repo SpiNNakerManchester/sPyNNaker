@@ -12,4 +12,5 @@ typedef enum regions_e {
     PROFILER_REGION,          // 8
     CONNECTOR_BUILDER_REGION, // 9
     DIRECT_MATRIX_REGION      // 10
+    BIT_FIELD_FILTER_REGION   // 11
 } regions_e;

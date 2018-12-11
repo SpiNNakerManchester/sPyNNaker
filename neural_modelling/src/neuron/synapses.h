@@ -80,6 +80,8 @@ uint32_t synapses_get_saturation_count();
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events();
 
+//! \brief returns the number of DMA retrieved rows which were empty.
+//! \return the number of DMA retrieved rows which were empty.
 uint32_t synapses_get_empty_row_count(void);
 //------------------------------------------------------------------------------
 // Synaptic rewiring functions

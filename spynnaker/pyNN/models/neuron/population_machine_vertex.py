@@ -43,7 +43,11 @@ class PopulationMachineVertex(
                ("BUFFER_OVERFLOW_COUNT", 2),
                ("CURRENT_TIMER_TIC", 3),
                ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4),
-               ("GHOST_POP_TABLE_SEARCHES", 5)])
+               ("GHOST_POP_TABLE_SEARCHES", 5),
+               ("FAILED_TO_READ_BIT_FIELDS", 6),
+               ("EMPTY_ROW_READS", 7),
+               ("DMA_COMPLETES", 8),
+               ("SPIKE_PROGRESSING_COUNT", 9)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -51,6 +55,9 @@ class PopulationMachineVertex(
         2: "INCOMING_SPIKE",
         3: "PROCESS_FIXED_SYNAPSES",
         4: "PROCESS_PLASTIC_SYNAPSES"}
+
+    # x words needed for a bitfield covering 256 atoms
+    WORDS_TO_COVER_256_ATOMS = 8
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -118,6 +125,14 @@ class PopulationMachineVertex(
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
         n_ghost_searches = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.GHOST_POP_TABLE_SEARCHES.value]
+        failed_to_read_bit_fields = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.FAILED_TO_READ_BIT_FIELDS.value]
+        empty_row_reads = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.EMPTY_ROW_READS.value]
+        dma_completes = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.DMA_COMPLETES.value]
+        spike_processing_count = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.SPIKE_PROGRESSING_COUNT.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -168,8 +183,34 @@ class PopulationMachineVertex(
                 "The number of failed population table searches for {} on {},"
                 " {}, {} was {}. If this number is large relative to the "
                 "predicted incoming spike rate, try increasing source and "
-                "target neruons per core".format(
+                "target neurons per core".format(
                     label, x, y, p, n_ghost_searches))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "N bit fields not able to be read into DTCM"),
+            failed_to_read_bit_fields, report=failed_to_read_bit_fields > 0,
+            message=(
+                "The filter for stopping redundant DMA's couldn't be fully "
+                "filled in, it failed to read {} entries, which means it "
+                "required a max of {} extra bytes of DTCM (assuming cores "
+                "have at max 255 neurons. Try reducing neurons per core, or "
+                "size of buffers, or neuron params per neuron etc.".format(
+                    failed_to_read_bit_fields,
+                    failed_to_read_bit_fields *
+                    self.WORDS_TO_COVER_256_ATOMS))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "N rows read that were empty"),
+            empty_row_reads, report=empty_row_reads > 0,
+            message=(
+                "During DMA reads for synaptic matrix, read {} rows which were"
+                " empty. This meant surplus DMA's which would have slowed down"
+                " the running of the neurons. Try increasing source and target"
+                " neurons per core".format(empty_row_reads))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "DMA's that were completed"), dma_completes))
+        provenance_items.provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "how many spikes were processed"),
+            spike_processing_count))
+
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)

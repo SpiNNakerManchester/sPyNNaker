@@ -15,10 +15,16 @@ void spike_processing_finish_write(uint32_t process_id);
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows();
 
-// Return the number of failed pop table searches
+//! \brief returns the number of ghost searches occurred
+//! \return the number of times a ghost search occurred.
 uint32_t spike_processing_get_ghost_pop_table_searches();
 
+//! \brief returns the number of DMA's that were completed
+//! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count();
+
+//! \brief returns the number of spikes that were processed
+//! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count();
 
 //! DMA buffer structure combines the row read from SDRAM with
