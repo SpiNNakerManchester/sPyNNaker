@@ -33,16 +33,17 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, machine, transceiver, graph_mapper):
-        """
-        
-        :param placements: 
-        :param app_graph: 
-        :param executable_finder: 
-        :param provenance_file_path: 
-        :param machine: 
-        :param transceiver: 
-        :param graph_mapper: 
-        :return: 
+        """ loads and runs the bit field generator on chip
+
+        :param placements: placements
+        :param app_graph: the app graph
+        :param executable_finder: the executable finder
+        :param provenance_file_path: the path to where provenance data items\
+                                     is written
+        :param machine: the SpiNNMachine instance
+        :param transceiver: the SpiNNMan instance
+        :param graph_mapper: mapper between application an machine graphs.
+        :rtype: None
         """
 
         # progress bar
@@ -62,7 +63,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
         # run app
         self._run_app(
-            expander_cores, bit_field_app_id, transceiver, provenance_file_path)
+            expander_cores, bit_field_app_id, transceiver,
+            provenance_file_path)
 
         progress.end()
 
@@ -70,7 +72,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             self, app_graph, graph_mapper, transceiver, placements, machine,
             progress, executable_finder):
         """ gets the data needed for the bit field expander for the machine
-        
+
         :param app_graph: app graph
         :param graph_mapper: graph mapper between app graph and machine graph
         :param transceiver: SpiNNMan instance
@@ -111,9 +113,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                         data_address[(placement.x, placement.y)] = list()
                         expander_cores.add_processor(
                             bit_field_expander_path, placement.x, placement.y,
-                            machine.get_chip_at(
-                                placement.x,
-                                placement.y).get_first_none_monitor_processor())
+                            machine.get_chip_at(placement.x, placement.y).
+                            get_first_none_monitor_processor())
 
                     # add the extra data
                     data_address[(placement.x, placement.y)].append(
@@ -124,10 +125,10 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _allocate_sdram_and_fill_in(self, data_address, transceiver):
         """ loads the app data for the bitfield generation
-        
+
         :param data_address: the data base addresses for the cores in question
-        :param transceiver: spinnman
-        :return: the bitfield app id 
+        :param transceiver: SpiNNMan instance
+        :return: the bitfield app id
         """
 
         # new app id for the bitfield expander
@@ -135,7 +136,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         for (chip_x, chip_y) in data_address.keys():
             regions = data_address[(chip_x, chip_y)]
             base_address = transceiver.malloc_sdram(
-                chip_x, chip_y, len(regions) * self._N_BYTES_PER_REGION_ELEMENT,
+                chip_x, chip_y,
+                len(regions) * self._N_BYTES_PER_REGION_ELEMENT,
                 bit_field_generator_app_id, self._SDRAM_TAG)
             transceiver.write_memory(
                 chip_x, chip_y, base_address, self._generate_data(regions))
@@ -143,7 +145,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _generate_data(self, regions):
         """ generates the chips worth of data for regions to bitfield
-        
+
         :param regions: list of tuples of master pop, synaptic matrix
         :return: data in byte array format for a given chip's bit field \
                  generator
@@ -189,12 +191,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             compressor_app_id):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
-        
+
         :param executable_targets: cores to load bitfield on
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: path to provenance folder
         :param compressor_app_id: the app id for the compressor c code
-        :rtype: None 
+        :rtype: None
         """
 
         for core_subset in executable_targets.all_core_subsets:
@@ -223,7 +225,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             executable_targets, transceiver, provenance_file_path,
             compressor_app_id):
         """
-        :param executable_targets: cores which are running the bitfield expander
+        :param executable_targets: cores which are running the bitfield \
+        expander
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: provenance file path
         :rtype: None

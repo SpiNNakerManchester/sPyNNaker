@@ -186,7 +186,8 @@ class PopulationMachineVertex(
                 "target neurons per core".format(
                     label, x, y, p, n_ghost_searches))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "N bit fields not able to be read into DTCM"),
+            self._add_name(names,
+                           "N bit fields not able to be read into DTCM"),
             failed_to_read_bit_fields, report=failed_to_read_bit_fields > 0,
             message=(
                 "The filter for stopping redundant DMA's couldn't be fully "

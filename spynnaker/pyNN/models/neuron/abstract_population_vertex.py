@@ -139,7 +139,8 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
-        ApplicationVertex.__init__(self, label, constraints, max_atoms_per_core)
+        ApplicationVertex.__init__(
+            self, label, constraints, max_atoms_per_core)
         AbstractUsesPopulationTableAndSynapses.__init__(self)
 
         self._n_atoms = n_neurons
@@ -366,7 +367,8 @@ class AbstractPopulationVertex(
 
                 # Get the number of likely vertices
                 n_machine_vertices = int(math.ceil(
-                    float(incoming_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                    float(incoming_edge.pre_vertex.n_atoms) /
+                    float(max_atoms)))
                 n_atoms_per_machine_vertex = int(math.ceil(
                     float(incoming_edge.pre_vertex.n_atoms) /
                     n_machine_vertices))
@@ -379,12 +381,12 @@ class AbstractPopulationVertex(
         return sdram
 
     def _exact_sdram_for_bit_field_region(self, machine_graph, graph_mapper):
-        """ calculates the correct sdram for the bitfield region based off the 
-        machine graph and graph mapper
-        
+        """ calculates the correct sdram for the bitfield region based off \
+            the machine graph and graph mapper
+
         :param machine_graph: machine graph
-        :param graph_mapper: graph mapping between app and machine graphs. \
-                             Used to locate atom slices. 
+        :param graph_mapper: graph mapping between app and machine graphs.\
+                             Used to locate atom slices.
         :return: sdram in bytes
         """
         sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
@@ -410,13 +412,13 @@ class AbstractPopulationVertex(
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
         """ reserves the dsg memory regions
-        
+
         :param spec: the data spec object
         :param vertex_slice: this vertex atom slice
         :param vertex: this vertex
         :param machine_graph: machine graph
         :param graph_mapper: the graph mapper
-        :rtype: None 
+        :rtype: None
         """
 
         spec.comment("\nReserving memory space for data regions:\n\n")
