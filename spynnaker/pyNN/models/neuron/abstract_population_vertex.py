@@ -37,6 +37,9 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_uses_population_table_and_synapses import \
+    AbstractUsesPopulationTableAndSynapses
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -46,7 +49,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
+    import AbstractPopulationInitializable
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
@@ -82,7 +85,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
+        AbstractUsesPopulationTableAndSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -136,8 +139,8 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
-        super(AbstractPopulationVertex, self).__init__(
-            label, constraints, max_atoms_per_core)
+        ApplicationVertex.__init__(self, label, constraints, max_atoms_per_core)
+        AbstractUsesPopulationTableAndSynapses.__init__(self)
 
         self._n_atoms = n_neurons
 
@@ -841,21 +844,35 @@ class AbstractPopulationVertex(
         self._synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 
-    @overrides(AbstractAcceptsIncomingSynapses.synaptic_matrix_base_address)
+    @overrides(
+        AbstractUsesPopulationTableAndSynapses.synaptic_matrix_base_address)
     def synaptic_matrix_base_address(self, transceiver, placement):
         regions_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
         return utility_calls.get_region_base_address_offset(
-            regions_base_address, POPULATION_BASED_REGIONS.POPULATION_TABLE)
+            regions_base_address,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
 
-    @overrides(AbstractAcceptsIncomingSynapses.master_pop_table_base_address)
+    @overrides(
+        AbstractUsesPopulationTableAndSynapses.master_pop_table_base_address)
     def master_pop_table_base_address(self, transceiver, placement):
         regions_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
         return utility_calls.get_region_base_address_offset(
-            regions_base_address, POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX)
+            regions_base_address,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
-    @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
+    @overrides(
+        AbstractUsesPopulationTableAndSynapses.bit_field_base_address)
+    def bit_field_base_address(self, transceiver, placement):
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        return utility_calls.get_region_base_address_offset(
+            regions_base_address,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
+
+    @overrides(
+        AbstractUsesPopulationTableAndSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
