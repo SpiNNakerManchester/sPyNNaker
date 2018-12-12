@@ -49,4 +49,22 @@ void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup);
 //! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits();
 
+//! \brief clears the dtcm allocated by the population table.
+//! \return bool that says if the clearing was successful or not.
+bool population_table_shut_down();
+
+//! \brief length of master pop table
+//! \return length of the master pop table
+uint32_t population_table_length();
+
+//! \brief gets the spike associated at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the spike
+spike_t population_table_get_spike_for_index(uint32_t index);
+
+//! \brief get the mask for the entry at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the mask associated with this entry
+uint32_t population_table_get_mask_for_entry(uint32_t index);
+
 #endif // _POPULATION_TABLE_H_

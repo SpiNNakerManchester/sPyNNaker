@@ -133,11 +133,11 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
     uint32_t n_bit_fields = bitfield_region[position];
 
     // try allocating dtcm for starting array for bitfields
-    connectivity_lookup = spin1_malloc(sizeof(uint32_t*) * n_bit_fields);
+    connectivity_lookup = spin1_malloc(sizeof(*bit_field_t) * n_bit_fields);
     if (connectivity_lookup == NULL){
-        log_warning("couldn't  initialise basic bit field holder. Will end up "
-                    "doing possibly more DMA's during the execution than "
-                    "required");
+        log_warning(
+            "couldn't  initialise basic bit field holder. Will end up doing "
+            "possibly more DMA's during the execution than required");
         return true;
     }
     position += 1;
@@ -156,7 +156,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
 
         // alloc sdram into right region
         connectivity_lookup[position_in_array] = spin1_malloc(
-            sizeof(uint32_t) * n_words_for_bit_field);
+            sizeof(bit_field_t) * n_words_for_bit_field);
         if (connectivity_lookup[position_in_array] == NULL){
             log_warning(
                 "could not initialise bit field for key %d, packets with"
@@ -166,17 +166,19 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
             failed_bit_field_reads ++;
         } else{  // read in bit field into correct location
 
-            spin1_memcpy(connectivity_lookup[position_in_array],
-                         &bitfield_region[position],
-                         sizeof(uint32_t) * n_words_for_bit_field);
+            // read in the bits for the bitfield (think this avoids a for loop)
+            spin1_memcpy(
+                connectivity_lookup[position_in_array],
+                &bitfield_region[position],
+                sizeof(uint32_t) * n_words_for_bit_field);
 
             // print out the bit field for debug purposes
             log_debug("bit field for key %d is :", key);
             for (uint32_t bit_field_word_index = 0;
                     bit_field_word_index < n_words_for_bit_field;
                     bit_field_word_index++){
-                log_debug("0x%x", connectivity_lookup[position_in_array]
-                                                     [bit_field_word_index]);
+                log_debug("%x", connectivity_lookup[position_in_array]
+                                                   [bit_field_word_index]);
             }
         }
         position += n_words_for_bit_field;

@@ -871,6 +871,24 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
     @overrides(
+        AbstractUsesPopulationTableAndSynapses.synapse_params_base_address)
+    def synapse_params_base_address(self, transceiver, placement):
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        return utility_calls.get_region_base_address_offset(
+            regions_base_address,
+            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+
+    @overrides(
+        AbstractUsesPopulationTableAndSynapses.direct_matrix_base_address)
+    def direct_matrix_base_address(self, transceiver, placement):
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        return utility_calls.get_region_base_address_offset(
+            regions_base_address,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
+
+    @overrides(
         AbstractUsesPopulationTableAndSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,

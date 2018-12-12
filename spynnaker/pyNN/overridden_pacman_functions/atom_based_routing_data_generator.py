@@ -35,11 +35,11 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     _USER_2_BYTES = 4
 
     # master pop, synaptic matrix, bitfield base addresses
-    _N_ELEMENTS_PER_REGION_ELEMENT = 3
+    _N_ELEMENTS_PER_REGION_ELEMENT = 5
 
     # structs for performance requirements.
     _ONE_WORDS = struct.Struct("<I")
-    _THREE_WORDS = struct.Struct("<III")
+    _FIVE_WORDS = struct.Struct("<IIIII")
 
     # binary name
     _BIT_FIELD_EXPANDER_APLX = "synapse_expander.aplx"
@@ -113,18 +113,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
                 for machine_vertex in machine_verts:
-                    # locate the 2 data region base addresses
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
-                    synaptic_matrix_base_address = \
-                        machine_vertex.synaptic_matrix_base_address(
-                            transceiver, placement)
-                    master_pop_table_base_address = \
-                        machine_vertex.master_pop_table_base_address(
-                            transceiver, placement)
-                    bit_field_base_address = \
-                        machine_vertex.bit_field_base_address(
-                            transceiver, placement)
 
                     # check if the chip being considered already.
                     if (placement.x, placement.y) not in data_address:
@@ -136,9 +126,16 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
                     # add the extra data
                     data_address[(placement.x, placement.y)].append(
-                        (master_pop_table_base_address,
-                         synaptic_matrix_base_address,
-                         bit_field_base_address))
+                        (machine_vertex.master_pop_table_base_address(
+                            transceiver, placement),
+                         machine_vertex.synaptic_matrix_base_address(
+                             transceiver, placement),
+                         machine_vertex.bit_field_base_address(
+                             transceiver, placement),
+                         machine_vertex.synapse_params_base_address(
+                             transceiver, placement),
+                         machine_vertex.direct_matrix_base_address(
+                            transceiver, placement)))
 
         return data_address, expander_cores
 
@@ -173,10 +170,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         data = b''
         data += self._ONE_WORDS.pack(len(regions))
         for (master_pop_base_address, synaptic_matrix_base_address,
-             bit_field_base_address) in regions:
-            data += self._THREE_WORDS.pack(
+             bit_field_base_address, synapse_params_base_address,
+             direct_matrix_base_address) in regions:
+            data += self._FIVE_WORDS.pack(
                 master_pop_base_address, synaptic_matrix_base_address,
-                bit_field_base_address)
+                bit_field_base_address, synapse_params_base_address,
+                direct_matrix_base_address)
         return bytearray(data)
 
     def _run_app(

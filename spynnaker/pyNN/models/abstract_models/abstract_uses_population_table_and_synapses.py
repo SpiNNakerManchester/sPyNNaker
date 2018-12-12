@@ -25,3 +25,13 @@ class AbstractUsesPopulationTableAndSynapses(AbstractAcceptsIncomingSynapses):
     def bit_field_base_address(self, transceiver, placement):
         """ returns the sdram address for the synaptic matrix table data
         """
+
+    @abstractmethod
+    def synapse_params_base_address(self, transceiver, placement):
+        """ returns the sdram address for the synapse params data
+        """
+
+    @abstractmethod
+    def direct_matrix_base_address(self, transceiver, placement):
+        """ returns the sdram address for the direct matrix
+        """

@@ -121,6 +121,12 @@ static inline key_t _key_n(key_t k) {
     return k & 0x7FF;
 }
 
+//! helpful method for converting a index to a key
+static inline key_t _key_from_index(uint32_t index){
+    // TODO SOMEONE WITH BRAINS NEEDS TO SORT THIS
+    rt_error(RTE_ABORT);
+}
+
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
@@ -208,4 +214,30 @@ void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup){
 //! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits(){
     return invalid_master_pop_hits;
+}
+
+//! \brief clears the dtcm allocated by the population table.
+//! \return bool that says if the clearing was successful or not.
+bool population_table_shut_down(){
+    return true;
+}
+
+//! \brief length of master pop table
+//! \return length of the master pop table
+uint32_t population_table_length(){
+    return MASTER_POPULATION_MAX;
+}
+
+//! \brief gets the spike associated at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the spike
+spike_t population_table_get_spike_for_index(uint32_t index){
+    return (spike_t) _key_from_index(index);
+}
+
+//! \brief get the mask for the entry at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the mask associated with this entry
+uint32_t population_table_get_mask_for_entry(uint32_t index){
+    return 0x7FF;
 }

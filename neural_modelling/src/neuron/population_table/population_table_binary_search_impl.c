@@ -1,6 +1,7 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <bit_field.h>
 
 // bits in a word
 #define BITS_PER_WORD 32
@@ -41,6 +42,8 @@ static uint16_t next_item = 0;
 
 //! \brief how many items are left to go
 static uint16_t items_to_go = 0;
+
+//! \brief pointer for the bitfield map
 uint32_t* connectivity_bit_field;
 
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
@@ -52,8 +55,8 @@ static inline uint32_t _get_direct_address(address_and_row_length entry) {
 static inline uint32_t _get_address(address_and_row_length entry) {
 
     // The address is in words and is the top 23-bits but 1, so this down
-    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift by 4
-    // with the given mask 0x7FFFFF00 to fully remove the row length
+    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift
+    // by 4 with the given mask 0x7FFFFF00 to fully remove the row length
     // NOTE: The mask can be removed given the machine spec says it
     // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
     return (entry & 0x7FFFFF00) >> 4;
@@ -173,47 +176,50 @@ bool population_table_initialise(
 
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
-    uint32_t imin = 0;
-    uint32_t imax = master_population_table_length;
 
     // locate the position in the binary search / array
     int position = population_table_position_in_the_master_pop_array(spike);
 
     // check we don't have a complete miss
     if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
-        master_population_table_entry entry = master_population_table[imid];
-        if ((spike & entry.mask) == entry.key) {
-            if (entry.count == 0) {
-                log_debug(
-                    "spike %u (= %x): population found in master population"
-                    "table but count is 0");
-            }
-
-            last_neuron_id = _get_neuron_id(entry, spike);
-
-            // check bitfield to see if its in need of a DMA, or a ghost search
-            if ((connectivity_bit_field[imid][last_neuron_id/BITS_PER_WORD] &
-                    (uint32_t) 1 << TOP_BIT_IN_WORD - (
-                        last_neuron_id % BITS_PER_WORD)) == 0){
-	            return false;
-	        }
-
-            next_item = entry.start;
-            items_to_go = entry.count;
-
+        master_population_table_entry entry = master_population_table[position];
+        if (entry.count == 0) {
             log_debug(
-                "spike = %08x, entry_index = %u, start = %u, count = %u",
-                spike, imid, next_item, items_to_go);
-
-            bool get_next = population_table_get_next_address(
-                row_address, n_bytes_to_transfer);
-
-            // tracks surplus dmas
-            if (!get_next){
-                ghost_pop_table_searches ++;
-            }
-            return get_next;
+                "spike %u (= %x): population found in master population"
+                "table but count is 0");
         }
+
+        last_neuron_id = _get_neuron_id(entry, spike);
+
+        // check we have a entry in the bit field for this (possible not to due
+        // to dtcm limitations or router table compression). If not, go to
+        // DMA check.
+        if (&connectivity_bit_field[position] != 0){
+
+            // check that the bit flagged for this neuron id does hit a
+            // neuron here. If not return false and avoid the DMA check.
+            if (!bit_field_test(connectivity_bit_field[position],
+                                last_neuron_id){
+                return false;
+            }
+        }
+
+        // going to do a DMA to read the matrix and see if there's a hit.
+        next_item = entry.start;
+        items_to_go = entry.count;
+
+        log_debug(
+            "spike = %08x, entry_index = %u, start = %u, count = %u",
+            spike, position, next_item, items_to_go);
+
+        bool get_next = population_table_get_next_address(
+            row_address, n_bytes_to_transfer);
+
+        // tracks surplus dmas
+        if (!get_next){
+            ghost_pop_table_searches ++;
+        }
+        return get_next;
     }
     else{
         invalid_master_pop_hits ++;
@@ -320,4 +326,37 @@ uint32_t population_table_get_invalid_master_pop_hits(){
 //! \param[in] connectivity_lookup: the connectivity lookup
 void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup){
     connectivity_bit_field = connectivity_lookup;
+}
+
+//! \brief clears the dtcm allocated by the population table.
+//! \return bool that says if the clearing was successful or not.
+bool population_table_shut_down(){
+    sark_free(address_list);
+    sark_free(master_population_table);
+    ghost_pop_table_searches = 0;
+    invalid_master_pop_hits = 0;
+    last_neuron_id = 0;
+    next_item = 0;
+    items_to_go = 0;
+    return true;
+}
+
+//! \brief length of master pop table
+//! \return length of the master pop table
+uint32_t population_table_length(){
+    return master_population_table_length;
+}
+
+//! \brief gets the spike associated at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the spike
+spike_t population_table_get_spike_for_index(uint32_t index){
+    return master_population_table[index].key;
+}
+
+//! \brief get the mask for the entry at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the mask associated with this entry
+uint32_t population_table_get_mask_for_entry(uint32_t index){
+    return master_population_table[index].mask;
 }
