@@ -17,11 +17,14 @@ class TimingDependencePFPC(AbstractTimingDependence):
         "_tau_minus",
         "_tau_minus_last_entry",
         "_tau_plus",
-        "_tau_plus_last_entry"]
+        "_tau_plus_last_entry",
+        "_t_peak"]
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0,
+                 t_peak=100):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
+        self._t_peak = t_peak
 
         self._synapse_structure = SynapseStructureWeightOnly()
 
@@ -36,6 +39,10 @@ class TimingDependencePFPC(AbstractTimingDependence):
     @property
     def tau_minus(self):
         return self._tau_minus
+
+    @property
+    def t_peak(self):
+        return self._t_peak
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
@@ -70,8 +77,12 @@ class TimingDependencePFPC(AbstractTimingDependence):
                 "exp_sin LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(spec,
-                peak_time=100, time_probe=None, lut_size=LUT_SIZE, shift=0)
+        self._tau_plus_last_entry = plasticity_helpers.write_pfpc_lut(
+            spec,
+            peak_time=self._t_peak,
+            time_probe=None,
+            lut_size=LUT_SIZE,
+            shift=0)
 
     @property
     def synaptic_structure(self):

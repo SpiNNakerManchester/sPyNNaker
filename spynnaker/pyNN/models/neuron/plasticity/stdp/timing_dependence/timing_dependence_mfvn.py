@@ -17,13 +17,19 @@ class TimingDependenceMFVN(AbstractTimingDependence):
         "_tau_minus",
         "_tau_minus_last_entry",
         "_tau_plus",
-        "_tau_plus_last_entry"]
+        "_tau_plus_last_entry",
+        "_beta",
+        "_sigma"
+        ]
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, beta=10, sigma=200):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 
         self._synapse_structure = SynapseStructureWeightOnly()
+
+        self._beta = beta
+        self._sigma = sigma
 
         # provenance data
         self._tau_plus_last_entry = None
@@ -36,6 +42,14 @@ class TimingDependenceMFVN(AbstractTimingDependence):
     @property
     def tau_minus(self):
         return self._tau_minus
+
+    @property
+    def beta(self):
+        return self._beta
+
+    @property
+    def sigma(self):
+        return self._sigma
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
@@ -67,11 +81,16 @@ class TimingDependenceMFVN(AbstractTimingDependence):
         # Check timestep is valid
         if machine_time_step != 1000:
             raise NotImplementedError(
-                "exp_sin LUT generation currently only supports 1ms timesteps")
+                "exp cos LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        self._tau_plus_last_entry = plasticity_helpers.write_mfvn_lut(spec,
-                sigma=200, beta=10, time_probe=None, lut_size=LUT_SIZE, shift=0)
+        self._tau_plus_last_entry = plasticity_helpers.write_mfvn_lut(
+            spec,
+            sigma=self._sigma,
+            beta=self._beta,
+            time_probe=None,
+            lut_size=LUT_SIZE,
+            shift=0)
 
     @property
     def synaptic_structure(self):
@@ -90,4 +109,4 @@ class TimingDependenceMFVN(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['tau_plus', 'tau_minus']
+        return ['tau_plus', 'tau_minus', 'beta', 'sigma']
