@@ -65,7 +65,7 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
         sin_pwr = 20
 
         # Calculate required time constant
-        time_constant = 1/(math.atan(sin_pwr)/peak_time)
+        time_constant = peak_time/math.atan(sin_pwr)
         inv_tau = (1.0 / float(time_constant)) #* (machine_time_step / 1000.0)
 
 #         # caluclate time of peak (from differentiating kernel and setting to zero)
