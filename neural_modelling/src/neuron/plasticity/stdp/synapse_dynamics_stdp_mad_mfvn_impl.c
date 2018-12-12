@@ -117,7 +117,7 @@ static inline final_state_t _plasticity_update_synapse(
 //     print_delayed_window_events(post_event_history, window_begin_time,
 //    		window_end_time, delay_dendritic);
 
-
+	io_printf(IO_BUF, "\n############ Phase 1 #############\n");
     io_printf(IO_BUF, "\n    Looping over PC spikes:\n");
 
     delay_dendritic = 0;
@@ -130,15 +130,13 @@ static inline final_state_t _plasticity_update_synapse(
         uint32_t mf_begin_time = (delayed_post_time < 255) ? 0 : (delayed_post_time - 255);
 
 
-        io_printf(IO_BUF, "      Applying post-synaptic event at delayed time:%u\n",
-              delayed_post_time);
-
         post_event_window_t pre_window = post_events_get_window_delayed(
         		pre_event_history, mf_begin_time, delayed_post_time);
 
 
-        io_printf(IO_BUF, "        Looping over MF window for this PC spike\n",
+        io_printf(IO_BUF, "    Looping over MF window for this PC spike: %u \n",
                       delayed_post_time);
+
         while (pre_window.num_events > 0) {
 
             const uint32_t delayed_pre_time = *pre_window.next_time
@@ -160,9 +158,41 @@ static inline final_state_t _plasticity_update_synapse(
 
         }
 
+
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
+
+    // **************
+    // Now look forward to current MF spike from each PC spike.
+    const uint32_t fwd_window_begin_time = ((time-delay_dendritic) < 255) ?
+    		0 : ((time-delay_dendritic) - 255);
+
+    post_event_window_t fwd_post_window = post_events_get_window_delayed(
+                post_event_history, fwd_window_begin_time, window_end_time);
+
+	io_printf(IO_BUF, "\n############ Phase 2 #############\n");
+    io_printf(IO_BUF,
+    		"    Looping over all PC spikes and comparing to latest MF spike at: %u\n",
+			time+delay_dendritic);
+
+    while (fwd_post_window.num_events > 0) {
+    	const uint32_t delayed_mf_time = *fwd_post_window.next_time + delay_dendritic;
+    	io_printf(IO_BUF, "        PC spike: %u, dt: %u\n",
+    			delayed_mf_time,
+				(time+delay_dendritic - delayed_mf_time)
+				);
+
+    	current_state = timing_apply_post_spike(
+    			delayed_mf_time, *fwd_post_window.next_trace,
+				(time+delay_dendritic - delayed_mf_time),
+				last_pre_trace, fwd_post_window.prev_time, fwd_post_window.prev_trace, // these variables aren't used
+				current_state);
+
+    	fwd_post_window = post_events_next_delayed(fwd_post_window, delayed_mf_time);
+    }
+
+    // **************
 
     const uint32_t delayed_pre_time = time + delay_axonal;
     log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
@@ -300,6 +330,8 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
+	io_printf(IO_BUF, "\n############ New Plasticity Update #############\n");
+
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = _plastic_synapses(
@@ -391,6 +423,8 @@ bool synapse_dynamics_process_plastic_synapses(
         *plastic_words++ = synapse_structure_get_final_synaptic_word(
             final_state);
     }
+
+	io_printf(IO_BUF, "\n############ Completed Plasticity Update #############\n");
     return true;
 }
 

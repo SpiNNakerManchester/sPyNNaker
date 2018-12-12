@@ -54,8 +54,8 @@ static inline weight_state_t weight_get_initial(weight_t weight,
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression_multiplier) {
 
-	io_printf(IO_BUF, "\n    Do Depression\n");
-	io_printf(IO_BUF, "        Weight prior to depression: %u\n",state.weight);
+	io_printf(IO_BUF, "\n      Do Depression\n");
+	io_printf(IO_BUF, "          Weight prior to depression: %u\n",state.weight);
 
     // Calculate scale
     // **NOTE** this calculation must be done at runtime-defined weight
@@ -70,7 +70,7 @@ static inline weight_state_t weight_one_term_apply_depression(
     // **NOTE** using standard STDP fixed-point format handles format conversion
     state.weight -= STDP_FIXED_MUL_16X16(state.weight, depression_multiplier);
 
-    io_printf(IO_BUF, "        Weight after depression: %u\n\n",state.weight);
+    io_printf(IO_BUF, "          Weight after depression: %u\n\n",state.weight);
 
     return state;
 }
@@ -79,6 +79,10 @@ static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
 
 	// add fixed amount
+	io_printf(IO_BUF, "        Adding fixed coontribution: %k (int %u)\n",
+			state.weight_region->a2_plus << 4,
+			state.weight_region->a2_plus);
+
     state.a2_plus += state.weight_region->a2_plus;
 
     return state;
@@ -100,11 +104,12 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     int32_t new_weight = new_state.weight + new_state.a2_plus;
                          // - scaled_a2_minus;
 
-    io_printf(IO_BUF, "        old weight: %u, new weight: %u\n", new_state.weight,  new_weight);
 
     // Clamp new weight
     new_weight = MIN(new_state.weight_region->max_weight,
                       new_weight);
+
+    io_printf(IO_BUF, "    old weight: %u, new weight: %u\n", new_state.weight,  new_weight);
 
     new_state.weight = new_weight;
 

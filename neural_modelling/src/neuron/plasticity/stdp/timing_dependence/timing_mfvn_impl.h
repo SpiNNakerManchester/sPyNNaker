@@ -87,7 +87,8 @@ static inline update_state_t timing_apply_pre_spike(
     use(&last_pre_trace);
 
     // Here we will potentiate by the fixed amount alpha
-    io_printf(IO_BUF, "    This is where we'll do potentiation\n");
+	io_printf(IO_BUF, "\n############ Phase 3 #############");
+    io_printf(IO_BUF, "\n    Now do potentiation\n");
 
     return weight_one_term_apply_potentiation(previous_state, 0);
 

@@ -71,7 +71,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
 
         # Write exp_sin lookup table
         self._tau_plus_last_entry = plasticity_helpers.write_mfvn_lut(spec,
-                time_constant=20, time_probe=None, lut_size=LUT_SIZE, shift=0)
+                sigma=200, beta=10, time_probe=None, lut_size=LUT_SIZE, shift=0)
 
     @property
     def synaptic_structure(self):
