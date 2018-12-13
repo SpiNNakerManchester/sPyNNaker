@@ -41,19 +41,24 @@ class GraphEdgeFilter(object):
         for vertex in progress.over(machine_graph.vertices, False):
             self._add_vertex_to_new_graph(
                 vertex, graph_mapper, new_machine_graph, new_graph_mapper)
+        prune_count = 0
+        no_prune_count = 0
 
         # start checking edges to decide which ones need pruning....
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge, graph_mapper):
                     logger.debug("this edge was pruned %s", edge)
+                    prune_count+=1
                     continue
                 logger.debug("this edge was not pruned %s", edge)
+                no_prune_count+=1
                 self._add_edge_to_new_graph(
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
         # returned the pruned graph and graph_mapper
+        print "prune_count:{} no_prune_count:{}".format(prune_count,no_prune_count)
         return new_machine_graph, new_graph_mapper
 
     @staticmethod

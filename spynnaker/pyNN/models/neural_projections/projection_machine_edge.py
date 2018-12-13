@@ -55,9 +55,7 @@ class ProjectionMachineEdge(
                         return False
                 except ValueError:
                     print "Value error"
-                # for (pre,post,w,d) in synapse_info.connector.conn_list:
-                #     if (pre >= pre_lo and pre<=pre_hi) and (post>=post_lo and post<=post_hi):
-                #         return False
+
                 return True
         return False
 
