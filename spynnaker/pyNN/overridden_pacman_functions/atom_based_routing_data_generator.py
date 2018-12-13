@@ -42,7 +42,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     _FIVE_WORDS = struct.Struct("<IIIII")
 
     # binary name
-    _BIT_FIELD_EXPANDER_APLX = "synapse_expander.aplx"
+    _BIT_FIELD_EXPANDER_APLX = "bit_field_expander.aplx"
 
     def __call__(
             self, placements, app_graph, executable_finder,
@@ -78,7 +78,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         # run app
         self._run_app(
             expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path)
+            provenance_file_path, executable_finder)
 
         # update progress bar
         progress.end()
@@ -122,19 +122,19 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                         expander_cores.add_processor(
                             bit_field_expander_path, placement.x, placement.y,
                             machine.get_chip_at(placement.x, placement.y).
-                            get_first_none_monitor_processor())
+                            get_first_none_monitor_processor().processor_id)
 
                     # add the extra data
                     data_address[(placement.x, placement.y)].append(
-                        (machine_vertex.master_pop_table_base_address(
+                        (app_vertex.master_pop_table_base_address(
                             transceiver, placement),
-                         machine_vertex.synaptic_matrix_base_address(
+                         app_vertex.synaptic_matrix_base_address(
                              transceiver, placement),
-                         machine_vertex.bit_field_base_address(
+                         app_vertex.bit_field_base_address(
                              transceiver, placement),
-                         machine_vertex.synapse_params_base_address(
+                         app_vertex.synapse_params_base_address(
                              transceiver, placement),
-                         machine_vertex.direct_matrix_base_address(
+                         app_vertex.direct_matrix_base_address(
                             transceiver, placement)))
 
         return data_address, expander_cores
@@ -180,7 +180,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _run_app(
             self, executable_cores, bit_field_app_id, transceiver,
-            provenance_file_path):
+            provenance_file_path, executable_finder):
         """ executes the app
 
         :param executable_cores: the cores to run the bit field expander on
@@ -188,6 +188,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param transceiver: the SpiNNMan instance
         :param provenance_file_path: the path for where provenance data is\
         stored
+        :param executable_finder: finder for executable paths
         :rtype: None
         """
 
@@ -205,12 +206,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             if not succeeded:
                 self._handle_failure(
                     executable_cores, transceiver, provenance_file_path,
-                    bit_field_app_id)
+                    bit_field_app_id, executable_finder)
 
         # Check if any cores have not completed successfully
         self._check_for_success(
-            executable_cores, transceiver,
-            provenance_file_path, bit_field_app_id)
+            executable_cores, transceiver, provenance_file_path,
+            bit_field_app_id, executable_finder)
 
         # stop anything that's associated with the compressor binary
         transceiver.stop_application(bit_field_app_id)
@@ -218,7 +219,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id):
+            compressor_app_id, executable_finder):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
@@ -226,6 +227,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: path to provenance folder
         :param compressor_app_id: the app id for the compressor c code
+        :param executable_finder: exeuctable path finder
         :rtype: None
         """
 
@@ -244,7 +246,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                 if result != self._SUCCESS:
                     self._handle_failure(
                         executable_targets, transceiver, provenance_file_path,
-                        compressor_app_id)
+                        compressor_app_id, executable_finder)
 
                     raise SpinnFrontEndException(
                         "The bit field expander on {}, {} failed to complete"
@@ -253,19 +255,20 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     @staticmethod
     def _handle_failure(
             executable_targets, transceiver, provenance_file_path,
-            compressor_app_id):
+            compressor_app_id, executable_finder):
         """handles the state where some cores have failed.
 
         :param executable_targets: cores which are running the bitfield \
         expander
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: provenance file path
+        :param executable_finder: executable finder
         :rtype: None
         """
         logger.info("bit field expander has failed")
         iobuf_extractor = ChipIOBufExtractor()
         io_errors, io_warnings = iobuf_extractor(
-            transceiver, executable_targets,
+            transceiver, executable_targets, executable_finder,
             provenance_file_path)
         for warning in io_warnings:
             logger.warning(warning)
