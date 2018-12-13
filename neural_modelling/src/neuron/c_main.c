@@ -24,6 +24,7 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
+#include "direct_synapses.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -232,15 +233,18 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, address);
-    address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
             n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+
+    // set up direct synapses
+    address_t direct_synapses_address;
+    if (!direct_synapses_initialise(
+            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            &direct_synapses_address)){
         return false;
     }
 
@@ -248,8 +252,8 @@ static bool initialise(uint32_t *timer_period) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
-            indirect_synapses_address, direct_synapses_address,
-            &row_max_n_words)) {
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics

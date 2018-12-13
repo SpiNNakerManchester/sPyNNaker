@@ -52,11 +52,17 @@ static inline void synapses_print_weight(
     }
 }
 
+//! \brief inits the synapse processing
+//! \param[in] synapse_params_address: base address for the synapse params in
+//!  SDRAM
+//! \param[in] n_neurons: the number of neurons to simulate
+//! \param[in] n_synapse_types: how many synapse types there are
+//! \param[out] ring_buffer_to_input_buffer_left_shifts:
+//! \return bool states true if successfully initialised. False otherwise.
 bool synapses_initialise(
-    address_t synapse_params_address, address_t direct_matrix_address,
+    address_t synapse_params_address,
     uint32_t n_neurons, uint32_t n_synapse_types,
-    uint32_t **ring_buffer_to_input_buffer_left_shifts,
-    address_t *direct_synapses_address);
+    uint32_t **ring_buffer_to_input_buffer_left_shifts);
 
 void synapses_do_timestep_update(timer_t time);
 

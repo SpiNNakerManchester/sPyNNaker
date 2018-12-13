@@ -31,8 +31,6 @@ static uint32_t max_n_words;
 
 static spike_t spike=-1;
 
-static uint32_t single_fixed_synapse[4];
-
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
@@ -63,12 +61,6 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
-
-static inline void _do_direct_row(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
-}
-
 void _setup_synaptic_dma_read() {
 
     // Set up to store the DMA location and size to read
@@ -91,7 +83,10 @@ void _setup_synaptic_dma_read() {
 
             // This is a direct row to process
             if (n_bytes_to_transfer == 0) {
-                _do_direct_row(row_address);
+                synaptic_row_t single_fixed_synapse =
+                    direct_synapses_get_direct_synapse(row_address);
+                synapses_process_synaptic_row(
+                    time, single_fixed_synapse, false, 0);
             } else {
                 _do_dma_read(row_address, n_bytes_to_transfer);
                 setup_done = true;
@@ -110,7 +105,10 @@ void _setup_synaptic_dma_read() {
 
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
-                    _do_direct_row(row_address);
+                    synaptic_row_t single_fixed_synapse =
+                        direct_synapses_get_direct_synapse(row_address);
+                    synapses_process_synaptic_row(
+                        time, single_fixed_synapse, false, 0);
                 } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
@@ -266,11 +264,6 @@ bool spike_processing_initialise(
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
         return false;
     }
-
-    // Set up for single fixed synapses (data that is consistent per direct row)
-    single_fixed_synapse[0] = 0;
-    single_fixed_synapse[1] = 1;
-    single_fixed_synapse[2] = 0;
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,

@@ -4,7 +4,7 @@
 #include <data_specification.h>
 #include <debug.h>
 #include <neuron/population_table/population_table.h>
-#include <neuron/synapses.h>
+#include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
 
 //! location to hold memory addresses
@@ -33,8 +33,12 @@ address_t row_address;
 // synapse row from sdram.
 uint32_t row_max_n_words;
 
+// used to store the dtcm based master pop entries. (used during pop table
+// init, and reading back synaptic rows).
+address_t direct_synapses_address;
+
 // storage location for the list of vertex addresses
-vertex_memory_regions_addresses* vertex_addresses;
+vertex_memory_regions_addresses** vertex_addresses;
 
 // the number of vertex regions to process
 uint32_t n_vertex_regions = 0;
@@ -90,7 +94,7 @@ void read_in_addresses(){
 
         // read in a vertex memory regions
         spin1_memcpy(
-            vertex_addresses[vertex_region_index], data[position],
+            vertex_addresses[vertex_region_index], &data[position],
             sizeof(vertex_memory_regions_addresses));
 
         // update sdram tracker
@@ -135,15 +139,15 @@ bool _create_fake_bit_field(){
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = _n_words_from_n_neurons(n_neurons);
-        bit_field_t bit_field = spin1_malloc(n_words * sizeof(uint32_t));
-        if (bit_field == NULL){
+        fake_bit_fields[master_pop_entry] =
+            (bit_field_t*) spin1_malloc(n_words * sizeof(bit_field_t));
+        if (fake_bit_fields[master_pop_entry] == NULL){
             log_error("could not allocate dtcm for bit field");
             return false;
         }
 
         // set bitfield elements to 1 and store in fake bitfields.
-        set_bit_field(bit_field, n_words);
-        fake_bit_fields[master_pop_entry] = bit_field;
+        set_bit_field((bit_field_t)fake_bit_fields[master_pop_entry], n_words);
     }
     return true;
 }
@@ -153,15 +157,10 @@ bool _create_fake_bit_field(){
 //! \param[in] vertex_id: the index in the memory region paths.
 //! \return: bool that states if the init was successful or not.
 bool initialise_master_pop_table(uint32_t vertex_id){
-    uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t direct_synapses_address;
 
     // init the synapses to get direct synapse address
-    if (!synapses_initialise(
-            vertex_addresses[vertex_id].synapse_params_region_base_address,
-            vertex_addresses[vertex_id].direct_matrix_region_base_address,
-            N_NEURONS, N_SYNAPSE_TYPES,
-            &ring_buffer_to_input_buffer_left_shifts,
+    if (!direct_synapses_initialise(
+            vertex_addresses[vertex_id]->direct_matrix_region_base_address,
             &direct_synapses_address)) {
         log_error("failed to init the synapses. failing");
         return false;
@@ -174,8 +173,8 @@ bool initialise_master_pop_table(uint32_t vertex_id){
 
     // init the master pop table
     if (!population_table_initialise(
-            vertex_addresses[vertex_id].master_pop_base_address,
-            vertex_addresses[vertex_id].synaptic_matrix_base_address,
+            vertex_addresses[vertex_id]->master_pop_base_address,
+            vertex_addresses[vertex_id]->synaptic_matrix_base_address,
             direct_synapses_address, &row_max_n_words)) {
         log_error("failed to init the master pop table. failing");
         return false;
@@ -226,8 +225,8 @@ bool process_synaptic_row(synaptic_row_t row){
 //! \brief processes direct row based synaptic matrix
 //! \param[in] row_address: the address of the row.
 bool _do_direct_row(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    return process_synaptic_row(single_fixed_synapse);
+    synaptic_row_t row = direct_synapses_get_direct_synapse(row_address);
+    return process_synaptic_row(row);
 }
 
 //! \brief do sdram read to get synaptic row
@@ -248,7 +247,7 @@ bool generate_bit_field(uint32_t vertex_id){
     // write how many entries (thus bitfields) are to be generated into sdram
     uint32_t position = 0;
     address_t bit_field_base_address =
-        vertex_addresses[vertex_id].bit_field_base_address;
+        vertex_addresses[vertex_id]->bit_field_base_address;
     bit_field_base_address[position] = population_table_length();
     position ++;
 
@@ -286,7 +285,7 @@ bool generate_bit_field(uint32_t vertex_id){
             // holder for the bytes to transfer if we need to read sdram.
             size_t n_bytes_to_transfer;
             if (population_table_get_first_address(
-                    new_key, row_address, n_bytes_to_transfer)){
+                    new_key, &row_address, &n_bytes_to_transfer)){
 
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
@@ -303,7 +302,7 @@ bool generate_bit_field(uint32_t vertex_id){
         }
 
         // write bitfield to sdram.
-        spin1_memcpy(bit_field_base_address[position], bit_field,
+        spin1_memcpy(&bit_field_base_address[position], bit_field,
                      n_words * BYTE_TO_WORD_CONVERSION);
         position += n_words;
 
@@ -329,12 +328,6 @@ bool free_dtcm(){
     // free pop table dtcm
     if(!population_table_shut_down()){
         log_error("failed to shut down the master pop table");
-        return false;
-    }
-
-    // free synapses dtcm
-    if(!synapses_shut_down()){
-        log_error("failed to shut down the synapses");
         return false;
     }
 

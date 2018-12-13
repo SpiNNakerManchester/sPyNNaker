@@ -184,6 +184,7 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 SOURCES = common/out_spikes.c \
           neuron/c_main.c \
           neuron/synapses.c \
+          neuron/direct_synapses.c \
           neuron/neuron.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
@@ -204,6 +205,11 @@ $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 
 $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
+	-mkdir -p $(dir $@)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+$(BUILD_DIR)neuron/direct_synapses.o: $(MODIFIED_DIR)neuron/direct_synapses.c
+	#direct_synapses.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
