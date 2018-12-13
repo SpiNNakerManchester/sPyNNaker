@@ -520,3 +520,14 @@ bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
 uint32_t synapses_get_empty_row_count(void){
     return empty_row_count;
 }
+
+//! \brief allows clearing of dtcm used by synapses
+//! \return bool true if successful false otherwise
+bool synapses_shut_down(){
+    sark_free(ring_buffer_to_input_left_shifts);
+    sark_free(ring_buffers);
+    num_fixed_pre_synaptic_events = 0;
+    saturation_count = 0;
+    empty_row_count = 0;
+    return true;
+}

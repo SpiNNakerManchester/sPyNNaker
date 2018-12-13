@@ -114,4 +114,8 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
                                uint32_t delay, uint32_t type);
 
+//! \brief allows clearing of dtcm used by synapses
+//! \return bool true if successful false otherwise
+bool synapses_shut_down();
+
 #endif // _SYNAPSES_H_

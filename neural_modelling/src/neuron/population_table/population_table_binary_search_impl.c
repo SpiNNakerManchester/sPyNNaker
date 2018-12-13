@@ -44,7 +44,7 @@ static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
 
 //! \brief pointer for the bitfield map
-uint32_t* connectivity_bit_field;
+bit_field_t** connectivity_bit_field;
 
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
 
@@ -198,8 +198,8 @@ bool population_table_get_first_address(
 
             // check that the bit flagged for this neuron id does hit a
             // neuron here. If not return false and avoid the DMA check.
-            if (!bit_field_test(connectivity_bit_field[position],
-                                last_neuron_id){
+            if (!bit_field_test(*connectivity_bit_field[position],
+                                last_neuron_id)){
                 return false;
             }
         }
@@ -324,7 +324,8 @@ uint32_t population_table_get_invalid_master_pop_hits(){
 
 //! \brief sets the connectivity lookup element
 //! \param[in] connectivity_lookup: the connectivity lookup
-void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup){
+void population_table_set_connectivity_lookup(
+        bit_field_t** connectivity_lookup){
     connectivity_bit_field = connectivity_lookup;
 }
 
@@ -338,6 +339,7 @@ bool population_table_shut_down(){
     last_neuron_id = 0;
     next_item = 0;
     items_to_go = 0;
+    connectivity_bit_field = NULL;
     return true;
 }
 

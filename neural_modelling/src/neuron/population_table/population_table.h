@@ -2,6 +2,7 @@
 #define _POPULATION_TABLE_H_
 
 #include <common/neuron-typedefs.h>
+#include <bit_field.h>
 
 //! \brief Sets up the table
 //! \param[in] table_address The address of the start of the table data
@@ -43,7 +44,8 @@ uint32_t population_table_get_ghost_pop_table_searches(void);
 
 //! \brief sets the connectivity lookup element
 //! \param[in] connectivity_lookup: the connectivity lookup
-void population_table_set_connectivity_lookup(uint32_t* connectivity_lookup);
+void population_table_set_connectivity_lookup(
+    bit_field_t** connectivity_lookup);
 
 //! \brief get the number of master pop table key misses
 //! \return the number of master pop table key misses
