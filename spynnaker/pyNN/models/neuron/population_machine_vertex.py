@@ -208,7 +208,7 @@ class PopulationMachineVertex(
                 " neurons per core".format(empty_row_reads))))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "DMA's that were completed"), dma_completes))
-        provenance_items.provenance_items.append(ProvenanceDataItem(
+        provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "how many spikes were processed"),
             spike_processing_count))
 

@@ -85,7 +85,7 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-bit_field_t **connectivity_lookup;
+bit_field_t *connectivity_lookup;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
@@ -135,7 +135,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
     uint32_t n_bit_fields = bitfield_region[position];
 
     // try allocating dtcm for starting array for bitfields
-    connectivity_lookup = spin1_malloc(sizeof(bit_field_t*) * n_bit_fields);
+    connectivity_lookup = spin1_malloc(sizeof(bit_field_t) * n_bit_fields);
     if (connectivity_lookup == NULL){
         log_warning(
             "couldn't  initialise basic bit field holder. Will end up doing "
@@ -185,6 +185,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
         }
         position += n_words_for_bit_field;
     }
+    population_table_set_connectivity_lookup(connectivity_lookup);
     return true;
 }
 

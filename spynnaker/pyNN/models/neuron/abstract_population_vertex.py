@@ -2,6 +2,8 @@ import sys
 
 import math
 
+import struct
+
 from data_specification import utility_calls
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from spinn_utilities.overrides import overrides
@@ -74,6 +76,8 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
+
+_ONE_WORD = struct.Struct("<I")
 
 
 class AbstractPopulationVertex(
@@ -846,47 +850,57 @@ class AbstractPopulationVertex(
     @overrides(
         AbstractUsesPopulationTableAndSynapses.synaptic_matrix_base_address)
     def synaptic_matrix_base_address(self, transceiver, placement):
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        return utility_calls.get_region_base_address_offset(
-            regions_base_address,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value)
+        return self._locate_region_base_address_from_region_id(
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value, transceiver,
+            placement)
 
     @overrides(
         AbstractUsesPopulationTableAndSynapses.master_pop_table_base_address)
     def master_pop_table_base_address(self, transceiver, placement):
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        return utility_calls.get_region_base_address_offset(
-            regions_base_address,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+        return self._locate_region_base_address_from_region_id(
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value, transceiver,
+            placement)
 
     @overrides(
         AbstractUsesPopulationTableAndSynapses.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        return utility_calls.get_region_base_address_offset(
-            regions_base_address,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
+        return self._locate_region_base_address_from_region_id(
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value, transceiver,
+            placement)
 
     @overrides(
         AbstractUsesPopulationTableAndSynapses.synapse_params_base_address)
     def synapse_params_base_address(self, transceiver, placement):
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        return utility_calls.get_region_base_address_offset(
-            regions_base_address,
-            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+        return self._locate_region_base_address_from_region_id(
+            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value, transceiver,
+            placement)
 
     @overrides(
         AbstractUsesPopulationTableAndSynapses.direct_matrix_base_address)
     def direct_matrix_base_address(self, transceiver, placement):
+        return self._locate_region_base_address_from_region_id(
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value, transceiver,
+            placement)
+
+    @staticmethod
+    def _locate_region_base_address_from_region_id(
+            region_id, transceiver, placement):
+        """ locates the base address based off the region id
+        
+        :param region_id: dsg region id
+        :param transceiver: SpiNNMan instance
+        :param placement: placements of vertices
+        :return: the base address of the region
+        """
+        # TODO this should be a utility method somewhere. where has it gone?!
         regions_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
-        return utility_calls.get_region_base_address_offset(
-            regions_base_address,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value)
+        region_base_address_offset = \
+            utility_calls.get_region_base_address_offset(
+                regions_base_address, region_id)
+        base_address = transceiver.read_memory(
+            placement.x, placement.y, region_base_address_offset, 4)
+        return _ONE_WORD.unpack(base_address)[0]
 
     @overrides(
         AbstractUsesPopulationTableAndSynapses.get_connections_from_machine)

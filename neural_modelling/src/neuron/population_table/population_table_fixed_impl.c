@@ -1,6 +1,7 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <bit_field.h>
 
 #define MASTER_POPULATION_MAX 1152
 #define ROW_SIZE_TABLE_MAX 8
@@ -10,7 +11,7 @@ static address_t synaptic_rows_base_address;
 static uint32_t row_size_table[ROW_SIZE_TABLE_MAX];
 uint32_t ghost_pop_table_searches = 0;
 static uint32_t invalid_master_pop_hits = 0;
-uint32_t* connectivity_bit_field;
+bit_field_t* connectivity_bit_field;
 
 static inline void _print_master_population_table() {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -207,7 +208,7 @@ int population_table_position_in_the_master_pop_array(spike_t spike){
 //! \brief sets the connectivity lookup element
 //! \param[in] connectivity_lookup: the connectivity lookup
 void population_table_set_connectivity_lookup(
-        bit_field_t** connectivity_lookup){
+        bit_field_t* connectivity_lookup){
     connectivity_bit_field = connectivity_lookup;
 }
 

@@ -137,6 +137,21 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                          app_vertex.direct_matrix_base_address(
                             transceiver, placement)))
 
+                    print "placement {}:{}:{} \n\n master table {:8x}, " \
+                          "\n synaptic_matrix {:8x}, \n bitfield {:8x} ,\n " \
+                          "synapse {:8x}, \n direct matrix {:8x}".format(
+                        placement.x, placement.y, placement.p,
+                        app_vertex.master_pop_table_base_address(
+                            transceiver, placement),
+                        app_vertex.synaptic_matrix_base_address(
+                            transceiver, placement),
+                        app_vertex.bit_field_base_address(
+                            transceiver, placement),
+                        app_vertex.synapse_params_base_address(
+                            transceiver, placement),
+                        app_vertex.direct_matrix_base_address(
+                            transceiver, placement))
+
         return data_address, expander_cores
 
     def _allocate_sdram_and_fill_in(self, data_address, transceiver):
