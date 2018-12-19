@@ -32,11 +32,16 @@ class FromListConnector(AbstractConnector):
             the index of the postsynaptic neuron.
         """
         super(FromListConnector, self).__init__(safe, verbose)
-        if conn_list is None or not len(conn_list):
+        if conn_list is None:
             raise InvalidParameterType(
                 "The connection list for the FromListConnector must contain"
-                " at least a list of tuples, each of which should contain:"
-                " (pre_idx, post_idx)")
+                " either a list of tuples, each of which should contain at "
+                "least: (pre_idx, post_idx), or be an empty list")
+
+        if not len(conn_list):
+            logger.warning(
+                'An empty list has been passed into a FromListConnector!')
+
         self._conn_list = conn_list
 
         # supports setting these at different times
@@ -59,9 +64,11 @@ class FromListConnector(AbstractConnector):
         if (self._weights is not None and self._delays is not None and not
                 self._converted_weights_and_delays):
             # add weights and delays to the conn list
-            temp_conn_list = numpy.dstack(
-                (self._conn_list[:, 0], self._conn_list[:, 1],
-                 self._weights, self._delays))[0]
+            temp_conn_list = []
+            if len(self._conn_list):
+                temp_conn_list = numpy.dstack(
+                    (self._conn_list[:, 0], self._conn_list[:, 1],
+                     self._weights, self._delays))[0]
 
             self._conn_list = list()
             for element in temp_conn_list:
@@ -75,11 +82,13 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
-        return numpy.max(self._conn_list["delay"])
+        return 0 if not len(self._conn_list) else numpy.max(
+            self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self):
-        return numpy.var(self._conn_list["delay"])
+        return 0 if not len(self._conn_list) else numpy.var(
+            self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -102,21 +111,25 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.max(numpy.bincount(self._conn_list["target"]))
+        return 0 if not len(self._conn_list) else numpy.max(
+            numpy.bincount(self._conn_list["target"]))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self):
-        return numpy.mean(numpy.abs(self._conn_list["weight"]))
+        return 0 if not len(self._conn_list) else numpy.mean(
+            numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.amax(numpy.abs(self._conn_list["weight"]))
+        return 0 if not len(self._conn_list) else numpy.amax(
+            numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self):
         # pylint: disable=too-many-arguments
-        return numpy.var(numpy.abs(self._conn_list["weight"]))
+        return 0 if not len(self._conn_list) else numpy.var(
+            numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
