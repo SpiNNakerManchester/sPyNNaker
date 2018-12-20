@@ -107,7 +107,8 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
     last_event_time = last_time;
 
     // Pick random number and use to draw from exponential distribution
-    uint32_t random = mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+    uint32_t random = (STDP_FIXED_POINT_ONE>>3)-1; //mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+
    if (syn_type == 0)
       window_length = pre_exp_dist_lookup_excit[random];
    else if (syn_type == 1)
@@ -116,6 +117,9 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
       window_length = pre_exp_dist_lookup_inhib[random];
    else
       window_length = pre_exp_dist_lookup_inhib2[random];
+
+
+   io_printf(IO_BUF, "Pre window length: %u\n", window_length);
     // Return window length
     return window_length;
 }
@@ -270,39 +274,69 @@ static inline update_state_t timing_apply_post_spike(
          if (previous_state.accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
+
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
+             io_printf(IO_BUF, "        Incrementing Accumulator to: %u\n", previous_state.accumulator);
          } else {
              previous_state.accumulator = 0;
+
+             io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
+            		 "weight update for synapse of type: %u, lock state: %u \n", syn_type, previous_state.lock);
+
              // If synapse is inhib-2, which his anti-Hebbian, perform depression:
              if (syn_type == 3) {
                 previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
                                                                       syn_type, STDP_FIXED_POINT_ONE);
+
+                io_printf(IO_BUF, "Updated weight: %u\n", previous_state.weight_state.weight);
                 return previous_state;
              }
-             // If synapse is not type inhib-2, perform potentiation:
+
+             // If synapse is not type inhib-2, potentiate:
              if (syn_type == 0) {
-                if (previous_state.weight_state.weight == (accum)0.0) {
-                   if (voltage_difference > (accum) 0.5) {
-                      // Make a full weight increment:
-                      //log_info("%d B", previous_state.weight_state);
-                      previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
-                                                               syn_type, STDP_FIXED_POINT_ONE);
-                      //log_info("%d", previous_state.weight_state);
-                   }
-                   else {
-                      // Weight is to be used, but we don't want or need a full weight increment.
-                      // make a tiny weight change so that this weight does not get used again until it decays:
-                      previous_state.weight_state.weight = 1; // Smallest non-zero weight.
-                   }
+            	 io_printf(IO_BUF, "Updating Type: 0 Synapse\n");
+
+            	 // Check synapse is unlocked
+                 if (previous_state.lock == 0) {
+
+                    // Gate on voltage
+                    if (voltage_difference > (accum) 5) { // this needs to accessible from Python code
+                    	io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
+                        io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
+
+                        // Make a full weight increment:
+                        previous_state.weight_state =
+                        		weight_one_term_apply_potentiation_sd(
+                        				previous_state.weight_state,
+                                        syn_type, STDP_FIXED_POINT_ONE);
+
+                        previous_state.lock = 1;
+
+                        io_printf(IO_BUF, "New Weight: %u \n", previous_state.weight_state);
+
+                    } else {
+                        // Weight is to be used, but we don't want or need a full weight increment.
+                        // make a tiny weight change so that this weight does not get used again until it decays:
+                	    io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
+
+                        previous_state.lock = 1;
+                    }
+
+                } else {
+                    io_printf(IO_BUF, "Synapse is already locked\n");
                 }
+
              } else { // syn_type excit 2 or inhib-1:
-                      previous_state.weight_state = weight_one_term_apply_potentiation_sd(previous_state.weight_state,
-                                                               syn_type, STDP_FIXED_POINT_ONE);
+                    previous_state.weight_state =
+                    		weight_one_term_apply_potentiation_sd(
+                    				previous_state.weight_state,
+                                    syn_type, STDP_FIXED_POINT_ONE);
 
              }
          }
       }
    }
+
    return previous_state;
 }
 
@@ -342,17 +376,13 @@ static inline weight_state_t weight_one_term_apply_potentiation_sd(
 
    //io_printf(IO_BUF, "        scale: %u, potentiation: %k \n", scale , potentiation << 4);
 
-//   // Multiply scale by potentiation and add
-//   // **NOTE** using standard STDP fixed-point format handles format conversion
    state.weight += (scale);
-   //STDP_FIXED_MUL_16X16(state.weight_region->max_weight - state.weight, potentiation);
-//   if (state.weight > state.weight_region->max_weight)
-//      state.weight = state.weight_region->max_weight;
+
 
    //io_printf(IO_BUF, "    Fixed Updated weight: %k, max weight: %k\n",
-//		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
+   //		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
    //io_printf(IO_BUF, "    Int   Updated weight: %u, max weight: %u\n",
-//		   state.weight, state.weight_region->max_weight);
+   //		   state.weight, state.weight_region->max_weight);
    return state;
 }
 

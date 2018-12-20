@@ -109,7 +109,7 @@ static inline final_state_t _plasticity_update_synapse(
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
-        log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
+        io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
         // Apply spike to state
@@ -125,16 +125,20 @@ static inline final_state_t _plasticity_update_synapse(
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
-    log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+    io_printf(IO_BUF, "\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
+    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
+
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
         post_window.prev_time, post_window.prev_trace, current_state, syn_type,
 		post_synaptic_neuron, post_synaptic_additional_input,
 		post_synaptic_threshold);
+
+    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -290,7 +294,7 @@ bool synapse_dynamics_process_plastic_synapses(
     }
 
     // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
+    io_printf(IO_BUF, "Adding pre-synaptic event to trace at time:%u\n", time);
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike_sd(time, last_pre_time,
                                                      last_pre_trace, syn_type);
@@ -329,6 +333,7 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
+        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
 
@@ -344,10 +349,6 @@ bool synapse_dynamics_process_plastic_synapses(
                 delay_axonal + delay_dendritic + time, type_index,
                 synapse_type_index_bits);
 
-        // Add weight to ring-buffer entry
-        // **NOTE** Dave suspects that this could be a
-        // potential location for overflow
-
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
@@ -356,6 +357,8 @@ bool synapse_dynamics_process_plastic_synapses(
             accumulation = sat_test - 1;
             plastic_saturation_count += 1;
         }
+
+        io_printf(IO_BUF, "Adding weight: %u \n", accumulation);
 
         ring_buffers[ring_buffer_index] = accumulation;
 

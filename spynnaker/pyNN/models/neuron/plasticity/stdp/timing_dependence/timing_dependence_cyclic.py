@@ -266,13 +266,14 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
             # Calculate inverse CDF
             x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE>>2)
-            p_float = math.log(1.0 - x_float) * -mean
+            p_float = -math.log(1.0 - x_float) * mean
 
             p = round(p_float)
-            if count == 5:
-               print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
-               count = 0
-            count += 1
+            print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
+#             if count == 5:
+#                print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
+#                count = 0
+#             count += 1
             spec.write_value(data=p, data_type=DataType.UINT16)
 
     @property

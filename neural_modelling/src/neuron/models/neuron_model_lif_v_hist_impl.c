@@ -34,12 +34,27 @@ state_t neuron_model_state_update(
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
+
+
+
+    	if (exc_input[1]>0){
+    		// Teacher input received, so fire
+    		neuron->V_membrane = 0.0k;
+    	}
+
+    	// Otherwise evolve subthreshold dynamics
 		REAL total_exc = 0;
 		REAL total_inh = 0;
 
-		for (int i=0; i < num_excitatory_inputs; i++){
-			total_exc += exc_input[i];
-		}
+
+
+//		for (int i=0; i < num_excitatory_inputs; i++){
+//			total_exc += exc_input[i];
+//		}
+
+		total_exc = exc_input[0];
+
+
 		for (int i=0; i< num_inhibitory_inputs; i++){
 			total_inh += inh_input[i];
 		}
