@@ -35,9 +35,9 @@ class SynapseStructureWeightRecurrentAccumulator(AbstractSynapseStructure):
 
     @overrides(AbstractSynapseStructure.get_n_half_words_per_connection)
     def get_n_half_words_per_connection(self):
-        """ Get the number of bytes for each connection
+        """ Get the number of half words for each connection
         """
-        return 2 # 2 16-bit half-words
+        return 3 # 2 16-bit half-words
 
     @overrides(AbstractSynapseStructure.get_weight_half_word)
     def get_weight_half_word(self):
