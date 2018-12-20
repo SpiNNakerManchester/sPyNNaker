@@ -57,7 +57,7 @@ _SYNAPSES_BASE_N_CPU_CYCLES = 8
 _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
-_SYNAPSE_SDRAM_OVERSCALE = 1.1
+_SYNAPSE_SDRAM_OVERSCALE = 4.0
 
 _ONE_WORD = struct.Struct("<I")
 
