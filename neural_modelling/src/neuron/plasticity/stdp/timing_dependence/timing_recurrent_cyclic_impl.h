@@ -1,6 +1,10 @@
 #ifndef _TIMING_RECURRENT_CYCLIC_IMPL_H_
 #define _TIMING_RECURRENT_CYCLIC_IMPL_H_
 
+#define print_plasticity false
+
+
+
 //---------------------------------------
 // Typedefines
 //---------------------------------------
@@ -118,8 +122,9 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
    else
       window_length = pre_exp_dist_lookup_inhib2[random];
 
-
-   io_printf(IO_BUF, "Pre window length: %u\n", window_length);
+   if (print_plasticity){
+	   io_printf(IO_BUF, "Pre window length: %u\n", window_length);
+   }
     // Return window length
     return window_length;
 }
@@ -276,34 +281,41 @@ static inline update_state_t timing_apply_post_spike(
              // If accumulator's not going to hit potentiation limit, increment it:
 
              previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
-             io_printf(IO_BUF, "        Incrementing Accumulator to: %u\n", previous_state.accumulator);
+             if (print_plasticity){
+            	 io_printf(IO_BUF, "        Incrementing Accumulator to: %u\n", previous_state.accumulator);
+             }
          } else {
              previous_state.accumulator = 0;
-
-             io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
+             if (print_plasticity){
+            	 io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
             		 "weight update for synapse of type: %u, lock state: %u \n", syn_type, previous_state.lock);
-
+             }
              // If synapse is inhib-2, which his anti-Hebbian, perform depression:
              if (syn_type == 3) {
                 previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
                                                                       syn_type, STDP_FIXED_POINT_ONE);
-
-                io_printf(IO_BUF, "Updated weight: %u\n", previous_state.weight_state.weight);
+                if (print_plasticity){
+                	io_printf(IO_BUF, "Updated weight: %u\n", previous_state.weight_state.weight);
+                }
                 return previous_state;
              }
 
              // If synapse is not type inhib-2, potentiate:
              if (syn_type == 0) {
-            	 io_printf(IO_BUF, "Updating Type: 0 Synapse\n");
+
+            	 if (print_plasticity){
+            		   io_printf(IO_BUF, "Updating Type: 0 Synapse\n");
+            	 }
 
             	 // Check synapse is unlocked
                  if (previous_state.lock == 0) {
 
                     // Gate on voltage
                     if (voltage_difference > (accum) 5) { // this needs to accessible from Python code
-                    	io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
-                        io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
-
+                    	if (print_plasticity){
+                    	    io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
+                            io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
+                    	}
                         // Make a full weight increment:
                         previous_state.weight_state =
                         		weight_one_term_apply_potentiation_sd(
@@ -312,18 +324,24 @@ static inline update_state_t timing_apply_post_spike(
 
                         previous_state.lock = 1;
 
-                        io_printf(IO_BUF, "New Weight: %u \n", previous_state.weight_state);
+                        if (print_plasticity){
+                        	io_printf(IO_BUF, "New Weight: %u \n", previous_state.weight_state);
+                        }
 
                     } else {
                         // Weight is to be used, but we don't want or need a full weight increment.
                         // make a tiny weight change so that this weight does not get used again until it decays:
-                	    io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
+                    	if (print_plasticity){
+                    		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
+                    	}
 
                         previous_state.lock = 1;
                     }
 
                 } else {
-                    io_printf(IO_BUF, "Synapse is already locked\n");
+                    if (print_plasticity){
+                        io_printf(IO_BUF, "Synapse is already locked\n");
+                    }
                 }
 
              } else { // syn_type excit 2 or inhib-1:

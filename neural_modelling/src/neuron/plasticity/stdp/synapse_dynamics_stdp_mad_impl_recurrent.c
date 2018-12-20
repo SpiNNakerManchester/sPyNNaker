@@ -5,6 +5,7 @@
 #include <neuron/synapses.h>
 #include "../synapse_dynamics.h"
 
+
 // Plasticity includes
 #include "maths.h"
 #include "post_events_inc_v.h"
@@ -17,6 +18,12 @@
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/models/neuron_model_lif_v_hist_impl.h>
+
+
+#ifndef print_plasticity
+#define print_plasticity false
+#error should have beend defined in synapse_dynamics
+#endif
 
 
 static uint32_t synapse_type_index_bits;
@@ -109,8 +116,10 @@ static inline final_state_t _plasticity_update_synapse(
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
-        io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
+        if (print_plasticity){
+        	io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
+        }
 
         // Apply spike to state
         current_state = timing_apply_post_spike(
@@ -125,12 +134,16 @@ static inline final_state_t _plasticity_update_synapse(
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
-    io_printf(IO_BUF, "\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+    if (print_plasticity){
+    	io_printf(IO_BUF, "\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
+    }
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
-    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
+    if (print_plasticity){
+    	io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
+    }
 
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
@@ -138,7 +151,7 @@ static inline final_state_t _plasticity_update_synapse(
 		post_synaptic_neuron, post_synaptic_additional_input,
 		post_synaptic_threshold);
 
-    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
+//    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
@@ -294,7 +307,7 @@ bool synapse_dynamics_process_plastic_synapses(
     }
 
     // Update pre-synaptic trace
-    io_printf(IO_BUF, "Adding pre-synaptic event to trace at time:%u\n", time);
+//    io_printf(IO_BUF, "Adding pre-synaptic event to trace at time:%u\n", time);
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike_sd(time, last_pre_time,
                                                      last_pre_trace, syn_type);
@@ -333,7 +346,7 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
 
-        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
+//        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
 
@@ -358,7 +371,7 @@ bool synapse_dynamics_process_plastic_synapses(
             plastic_saturation_count += 1;
         }
 
-        io_printf(IO_BUF, "Adding weight: %u \n", accumulation);
+//        io_printf(IO_BUF, "Adding weight: %u \n", accumulation);
 
         ring_buffers[ring_buffer_index] = accumulation;
 
