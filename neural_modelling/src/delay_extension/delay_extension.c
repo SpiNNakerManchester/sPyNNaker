@@ -68,6 +68,12 @@ static uint32_t expected_time;
 
 static uint32_t n_delays = 0;
 
+// Spin1 API ticks - to know when the timer wraps
+extern uint ticks;
+
+// Initialise
+static uint32_t timer_period = 0;
+
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
 static inline void zero_spike_counters(void *location, uint32_t num_items)
@@ -180,7 +186,7 @@ void _store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
-static bool initialize(uint32_t *timer_period) {
+static bool initialize() {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -194,7 +200,7 @@ static bool initialize(uint32_t *timer_period) {
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
+            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
             &infinite_run, SDP, DMA)) {
         return false;
     }
@@ -270,8 +276,7 @@ static void spike_process() {
     spin1_mode_restore(state);
 }
 
-void timer_callback(uint unused0, uint unused1) {
-    use(unused0);
+void timer_callback(uint timer_count, uint unused1) {
     use(unused1);
 
     // Process all the spikes from the last timestep
@@ -301,11 +306,8 @@ void timer_callback(uint unused0, uint unused1) {
         return;
     }
 
-    // Sleep for a random time
-    spin1_delay_us(random_backoff_us);
-
     // Set the next expected time to wait for between spike sending
-    expected_time = tc[T1_COUNT] - time_between_spikes;
+    expected_time = sv->cpu_clk * timer_period;
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
@@ -354,7 +356,7 @@ void timer_callback(uint unused0, uint unused1) {
                 }
 
                 // Wait until the expected time to send
-                while (tc[T1_COUNT] > expected_time) {
+                while ((ticks == timer_count) && tc[T1_COUNT] > expected_time) {
 
                     // Do Nothing
                     n_delays += 1;
@@ -372,8 +374,6 @@ void timer_callback(uint unused0, uint unused1) {
 // Entry point
 void c_main(void) {
 
-    // Initialise
-    uint32_t timer_period = 0;
     if (!initialize(&timer_period)) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
@@ -389,7 +389,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     log_debug("Timer period %u", timer_period);
-    spin1_set_timer_tick(timer_period);
+    spin1_set_timer_tick_and_phase(timer_period, random_backoff_us);
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);
