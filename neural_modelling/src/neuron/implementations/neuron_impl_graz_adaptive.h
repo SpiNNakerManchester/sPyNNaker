@@ -15,7 +15,7 @@
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
-#include <string.h>
+//#include <string.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
