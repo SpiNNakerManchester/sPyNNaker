@@ -42,7 +42,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics \
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 7
+_DELAY_PARAM_HEADER_WORDS = 8
 _DEFAULT_MALLOCS_USED = 2
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
