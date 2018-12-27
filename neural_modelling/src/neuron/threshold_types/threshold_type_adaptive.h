@@ -23,7 +23,7 @@ static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 			"b_0: %k, "
 			"e_to_dt_on_tau_a: %u, "
 			"beta: %k, "
-			"adpt: %u, ",
+			"adpt: %u, \n",
 			threshold_type->B,
 			threshold_type->b,
 			threshold_type->b_0,
@@ -47,7 +47,7 @@ static inline bool threshold_type_is_above_threshold(state_t value,
 static inline void threshold_type_update_threshold(state_t z,
 		threshold_type_pointer_t threshold_type){
 
-	_print_threshold_params(threshold_type);
+//	_print_threshold_params(threshold_type);
 
 	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
 	// Update small b (same regardless of spike - uses z from previous timestep)

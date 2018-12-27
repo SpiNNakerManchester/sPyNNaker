@@ -33,6 +33,8 @@
        shaping include
 #endif
 
+extern uint32_t time;
+
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
@@ -186,14 +188,25 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Get threshold and additional input parameters for this neuron
     threshold_type_pointer_t threshold_type =
         &threshold_type_array[neuron_index];
+
     additional_input_pointer_t additional_input =
         &additional_input_array[neuron_index];
+
     synapse_param_pointer_t synapse_type =
         &neuron_synapse_shaping_params[neuron_index];
 
+
+//    synapse_types_shape_input(synapse_type);
+
+
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    state_t B_t = threshold_type->B;
+    state_t z_t = neuron->z;
+
+//	io_printf(IO_BUF, "time: %u, old V: %k, old B: %k, z_t: %k\n",
+//			time, voltage, B_t, z_t);
+    // *********************************************************
 
     // Get the exc and inh values from the synapses
     input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
@@ -217,8 +230,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
 
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -229,17 +242,37 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
         additional_input, voltage);
 
+    threshold_type_update_threshold(neuron->z, threshold_type);
+
     // update neuron parameters
     state_t result = neuron_model_state_update(
-            NUM_EXCITATORY_RECEPTORS, exc_input_values,
-            NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron, -50k);
+        NUM_EXCITATORY_RECEPTORS, exc_input_values,
+        NUM_INHIBITORY_RECEPTORS, inh_input_values,
+        external_bias, neuron, threshold_type->B);
 
-    // determine if a spike should occur
-    bool spike = threshold_type_is_above_threshold(result, threshold_type);
+    // Also update Z (including using refractory period information)
+    state_t nu = (voltage - threshold_type->B)/threshold_type->B;
+    if REAL_COMPARE(nu, >, ZERO){
+    	neuron->z = 1 * neuron->A;
+    }
+
+    // *********************************************************
+    // Record updated state
+    // Record  V (just as cheap to set then to gate later)
+    recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
+
+    // Record Z
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = z_t;
+
+    // Record B
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = B_t; // threshold_type->B;
+
+
+	if REAL_COMPARE(z_t, >, ZERO){
+
 
     // If spike occurs, communicate to relevant parts of model
-    if (spike) {
+    //if (spike) {
         // Call relevant model-based functions
         // Tell the neuron model
         neuron_model_has_spiked(neuron);
@@ -256,7 +289,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     #endif // LOG_LEVEL >= LOG_DEBUG
 
     // Return the boolean to the model timestep update
-    return spike;
+    return REAL_COMPARE(z_t, >, ZERO);
 }
 
 //! \brief stores neuron parameter back into sdram

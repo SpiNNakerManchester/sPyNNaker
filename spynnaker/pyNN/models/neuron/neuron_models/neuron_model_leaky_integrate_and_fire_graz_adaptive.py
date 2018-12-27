@@ -52,7 +52,10 @@ class NeuronModelLeakyIntegrateAndFireGrazAdaptive(AbstractNeuronModel):
              DataType.S1615,   # i_offset
              DataType.INT32,   # count_refrac
              DataType.S1615,   # v_reset
-             DataType.INT32])  # tau_refrac
+             DataType.INT32,
+             DataType.S1615,   # Z
+             DataType.S1615    # A
+             ])  # tau_refrac
 
         if v_init is None:
             v_init = v_rest
