@@ -201,11 +201,11 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         if self.random_enabled:
             spec.write_value(data=1,
                 data_type=DataType.INT32)
-            print "random_enabled = true"
+            # print "random_enabled = true"
         else:
             spec.write_value(data=0,
                 data_type=DataType.INT32)
-            print "random_enabled = False"
+            # print "random_enabled = False"
 
 
 
