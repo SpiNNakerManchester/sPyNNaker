@@ -60,6 +60,7 @@ static uint32_t last_event_time;
 extern uint32_t last_spike;
 
 extern uint32_t recurrentSeed[4];
+extern int32_t random_enabled;
 
 extern uint32_t global_weight_scale;
 
@@ -110,17 +111,34 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
     uint16_t window_length;
     last_event_time = last_time;
 
-    // Pick random number and use to draw from exponential distribution
-    uint32_t random = (STDP_FIXED_POINT_ONE>>3)-1; //mars_kiss64_seed( recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+    // If enabled, pick random number and use to draw from exponential distribution
+    uint32_t random;
 
-   if (syn_type == 0)
-      window_length = pre_exp_dist_lookup_excit[random];
-   else if (syn_type == 1)
-      window_length = pre_exp_dist_lookup_excit2[random];
-   else if (syn_type == 2)
-      window_length = pre_exp_dist_lookup_inhib[random];
-   else
-      window_length = pre_exp_dist_lookup_inhib2[random];
+    if (!random_enabled){
+    		random = (STDP_FIXED_POINT_ONE>>3)-1;
+    		if (print_plasticity){
+    			io_printf(IO_BUF, "Random window generation disabled in timing_add_pre_spike\n");
+    		}
+    } else {
+    	random = mars_kiss64_seed(recurrentSeed) &
+    			((STDP_FIXED_POINT_ONE>>2) - 1);
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "Random window generation enabled in timing_add_pre_spike\n");
+    	}
+    }
+
+    if (print_plasticity){
+    	io_printf(IO_BUF, "Random number: %u\n", random);
+    }
+
+    if (syn_type == 0)
+       window_length = pre_exp_dist_lookup_excit[random];
+    else if (syn_type == 1)
+       window_length = pre_exp_dist_lookup_excit2[random];
+    else if (syn_type == 2)
+       window_length = pre_exp_dist_lookup_inhib[random];
+    else
+       window_length = pre_exp_dist_lookup_inhib2[random];
 
    if (print_plasticity){
 	   io_printf(IO_BUF, "Pre window length: %u\n", window_length);
@@ -248,16 +266,33 @@ static inline update_state_t timing_apply_post_spike(
 
    // Generate a windw size for this post-spike and extend the post window if it is
    // beyond the current value:
-   uint32_t random = 5 ;//mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+   uint32_t random;
+
+   if (!random_enabled) {
+	   random = (STDP_FIXED_POINT_ONE>>3)-1; //5;
+	   if (print_plasticity){
+           io_printf(IO_BUF, "Random window generation disabled in timing_apply_post_spike\n");
+	   }
+   } else {
+	   random = mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+	   if (print_plasticity){
+		   io_printf(IO_BUF, "Random window generation enabled in timing_apply_post_spike\n");
+	   }
+   }
+
+   if (print_plasticity){
+       io_printf(IO_BUF, "Random number: %u\n", random);
+   }
+
    uint16_t window_length;
    if (syn_type == 0)
-      window_length = post_exp_dist_lookup_excit[random];
+       window_length = post_exp_dist_lookup_excit[random];
    else if (syn_type == 1)
-      window_length = post_exp_dist_lookup_excit2[random];
+       window_length = post_exp_dist_lookup_excit2[random];
    else if (syn_type == 2)
-      window_length = post_exp_dist_lookup_inhib[random];
+       window_length = post_exp_dist_lookup_inhib[random];
    else
-      window_length = post_exp_dist_lookup_inhib2[random];
+       window_length = post_exp_dist_lookup_inhib2[random];
 
    uint32_t this_window_close_time = time + window_length;
 

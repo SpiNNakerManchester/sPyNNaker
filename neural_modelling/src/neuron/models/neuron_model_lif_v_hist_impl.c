@@ -39,7 +39,7 @@ state_t neuron_model_state_update(
 
     	if (exc_input[1]>0){
     		// Teacher input received, so fire
-    		neuron->V_membrane = 0.0k;
+    		neuron->V_membrane = 1024.0k;
     	}
 
     	// Otherwise evolve subthreshold dynamics

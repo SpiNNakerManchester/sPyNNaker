@@ -46,6 +46,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         'accum_dep_plus_one_inhib2',
         'accum_pot_minus_one_inhib2',
         'rng',
+        'random_enabled',
         '_synapse_structure'
         ]
 
@@ -69,7 +70,8 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         'accum_pot_thresh_inhib2':5,
         'pre_window_tc_inhib2':35.0,
         'post_window_tc_inhib2':45.0,
-        'seed':None}
+        'seed':None,
+        'random_enabled': True}
 
     def __init__(
             self, accum_decay = default_parameters['accum_decay'],
@@ -89,7 +91,8 @@ class TimingDependenceCyclic(AbstractTimingDependence):
             accum_pot_thresh_inhib2=default_parameters['accum_pot_thresh_inhib2'],
             pre_window_tc_inhib2=default_parameters['pre_window_tc_inhib2'],
             post_window_tc_inhib2=default_parameters['post_window_tc_inhib2'],
-            seed=default_parameters['seed']):
+            seed=default_parameters['seed'],
+            random_enabled=default_parameters['random_enabled']):
         AbstractTimingDependence.__init__(self)
 
         self.accum_decay = accum_decay
@@ -118,6 +121,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         #self.mean_pre_window = mean_pre_window
         #self.mean_post_window = mean_post_window
         self.rng = numpy.random.RandomState(seed)
+        self.random_enabled=random_enabled
 
         self._synapse_structure = SynapseStructureWeightRecurrentAccumulator()
 
@@ -157,7 +161,9 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         return (
             (thirty_two_bit_wordlength * numParams)
           + (sixteen_bit_wordlength * (plasticity_helpers.STDP_FIXED_POINT_ONE>>2) * numLUTs)
-          + (thirty_two_bit_wordlength * numSeeds))
+          + (thirty_two_bit_wordlength * numSeeds)
+          + thirty_two_bit_wordlength # for random_enabled flag
+          )
 
     @property
     def n_weight_terms(self):
@@ -191,6 +197,18 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         spec.write_value(data=self.accum_pot_minus_one_inhib2,  data_type=DataType.INT32)
         spec.write_value(data=self.pre_window_tc_inhib2,        data_type=DataType.INT32)
         spec.write_value(data=self.post_window_tc_inhib2,       data_type=DataType.INT32)
+
+        if self.random_enabled:
+            spec.write_value(data=1,
+                data_type=DataType.INT32)
+            print "random_enabled = true"
+        else:
+            spec.write_value(data=0,
+                data_type=DataType.INT32)
+            print "random_enabled = False"
+
+
+
 
         # Convert mean times into machine timesteps
         mean_pre_timesteps_excit = (float(self.pre_window_tc_excit) *
@@ -240,6 +258,9 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         #spec.write_value(data=0x7FFFFFF4,
         #                 data_type=DataType.UINT32)
 
+
+
+
     @property
     def pre_trace_size_bytes(self):
         # When using the separate FSMs, pre-trace contains window length,
@@ -285,5 +306,6 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         return ['acc_decay_per_ts' 'accum_dep_plus_one_excit', 'accum_pot_minus_one_excit', 'pre_window_tc_excit', 'post_window_tc_excit',
                                'accum_dep_plus_one_excit2', 'accum_pot_minus_one_excit2', 'pre_window_tc_excit2', 'post_window_tc_excit2',
                                'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib',
-                               'accum_dep_plus_one_inhib2', 'accum_pot_minus_one_inhib2', 'pre_window_tc_inhib2', 'post_window_tc_inhib2']
+                               'accum_dep_plus_one_inhib2', 'accum_pot_minus_one_inhib2', 'pre_window_tc_inhib2', 'post_window_tc_inhib2',
+                               'random_enabled']
 
