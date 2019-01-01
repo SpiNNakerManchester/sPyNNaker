@@ -1,4 +1,3 @@
-
 #ifndef _NEURON_IMPL_STANDARD_H_
 #define _NEURON_IMPL_STANDARD_H_
 
@@ -8,13 +7,14 @@
 #include <neuron/models/neuron_model.h>
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
-#include <neuron/threshold_types/threshold_type.h>
+#include <neuron/threshold_types/threshold_type_ht_dynamic.h>
 #include <neuron/synapse_types/synapse_types.h>
 
 // Further includes
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
+#include <string.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -221,9 +221,24 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         total_inh += inh_input_values[i];
     }
 
+    // hacked to enable recording of intrinsic currents
+    input_t* currents = additional_input_get_input_value_as_current(
+//    external_bias = additional_input_get_input_value_as_current(
+        additional_input, voltage);
+
+    external_bias = 0;
+    for (int i = 0; i<NUM_CURRENTS; i++){
+    	external_bias += currents[i];
+    }
+
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    		currents[2];
+//    		total_exc;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		currents[3];
+//    		threshold_type->threshold_value;
+//    		total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -231,13 +246,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_type_convert_inhibitory_input_to_current(
             inh_input_values, input_type, voltage);
 
-    input_t* currents = additional_input_get_input_value_as_current(
-        additional_input, voltage);
-
-    external_bias = 0;
-    for (int i = 0; i<NUM_CURRENTS; i++){
-    	external_bias += currents[i];
-    }
+//    external_bias += additional_input_get_input_value_as_current(
+//        additional_input, voltage);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(

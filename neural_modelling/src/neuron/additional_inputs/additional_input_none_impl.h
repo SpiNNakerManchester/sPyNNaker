@@ -3,15 +3,18 @@
 
 #include "additional_input.h"
 
+#define NUM_CURRENTS 1
+input_t currents[NUM_CURRENTS];
+
 typedef struct additional_input_t {
 } additional_input_t;
 
-static input_t additional_input_get_input_value_as_current(
+static input_t* additional_input_get_input_value_as_current(
         additional_input_pointer_t additional_input,
         state_t membrane_voltage) {
     use(additional_input);
     use(membrane_voltage);
-    return 0;
+    return &currents[0];
 }
 
 static void additional_input_has_spiked(
