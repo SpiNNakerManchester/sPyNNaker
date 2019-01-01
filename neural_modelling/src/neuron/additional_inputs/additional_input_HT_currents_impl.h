@@ -3,6 +3,7 @@
 
 #include "additional_input.h"
 #include "math.h"
+#include <debug.h>
 
 #define TIMESTEP 0.100006103515625k
 #define NUM_CURRENTS 4
@@ -50,8 +51,8 @@ typedef struct additional_input_t {
     accum    dt;
 } additional_input_t;
 
-// Variables to control 'patch clamp' tests
-static input_t local_v;
+//// Variables to control 'patch clamp' tests
+//static input_t local_v;
 
 
 
@@ -130,8 +131,8 @@ static input_t* additional_input_get_input_value_as_current(
 //	_print_additional_input_params(additional_input);
 
 //------------------------------------------------------------------------
-    profiler_write_entry_disable_irq_fiq(
-        PROFILER_ENTER | PROFILER_INTRINSIC_CURRENT);
+//    profiler_write_entry_disable_irq_fiq(
+//        PROFILER_ENTER | PROFILER_INTRINSIC_CURRENT);
 //------------------------------------------------------------------------
         // Pacemaker Current.
 
@@ -256,8 +257,8 @@ static input_t* additional_input_get_input_value_as_current(
 
         //    _print_additional_input_params(additional_input);
 //------------------------------------------------------------------------
-     profiler_write_entry_disable_irq_fiq(
-          PROFILER_EXIT | PROFILER_INTRINSIC_CURRENT);
+//     profiler_write_entry_disable_irq_fiq(
+//          PROFILER_EXIT | PROFILER_INTRINSIC_CURRENT);
 //------------------------------------------------------------------------
 
      return   &currents[0];
@@ -270,6 +271,7 @@ static input_t* additional_input_get_input_value_as_current(
 static void additional_input_has_spiked(
       additional_input_pointer_t additional_input) {
         // Do nothing.
+	use(additional_input);
         }
 
 

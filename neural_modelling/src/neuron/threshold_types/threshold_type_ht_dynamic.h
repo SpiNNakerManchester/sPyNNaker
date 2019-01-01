@@ -3,6 +3,7 @@
 
 #include "threshold_type.h"
 #include "../profile_tags.h"
+#include "debug.h"
 
 #include <profiler.h>
 

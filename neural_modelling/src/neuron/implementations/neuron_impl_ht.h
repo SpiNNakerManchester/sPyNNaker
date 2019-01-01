@@ -4,17 +4,16 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/models/neuron_model.h>
-#include <neuron/input_types/input_type.h>
-#include <neuron/additional_inputs/additional_input.h>
+#include <neuron/models/neuron_model_ht_impl.h>
+#include <neuron/synapse_types/synapse_types_ht_impl.h>
+#include <neuron/input_types/input_type_ht_conductance.h>
+#include <neuron/additional_inputs/additional_input_HT_currents_impl.h>
 #include <neuron/threshold_types/threshold_type_ht_dynamic.h>
-#include <neuron/synapse_types/synapse_types.h>
 
 // Further includes
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
-#include <string.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
