@@ -98,6 +98,12 @@ class PatchClamped(AbstractPyNNNeuronModelStandard):
             e_to_t_on_tau_m_DK = default_parameters['e_to_t_on_tau_m_DK'],
             D = default_parameters['D'],
             D_infinity = default_parameters['D_infinity'],
+
+            v_clamp = default_parameters['v_clamp'],
+            s_clamp = default_parameters['s_clamp'],
+            t_clamp = default_parameters['t_clamp'],
+            # Other
+            dt = default_parameters['dt'],
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelPatchClamped(
@@ -145,4 +151,4 @@ class PatchClamped(AbstractPyNNNeuronModelStandard):
             model_name="patch_clamped", binary="patch_clamped.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type,
-            additional_input=additional_input)
+            additional_input_type=additional_input)
