@@ -207,9 +207,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL total_exc = 0;
     REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        total_exc += exc_input_values[i];
-    }
+    // Only use excitatory input from receptor type 0
+    // for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+
+        total_exc += exc_input_values[0];
+    //}
     for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
         total_inh += inh_input_values[i];
     }
