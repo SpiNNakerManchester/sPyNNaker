@@ -349,7 +349,7 @@ static inline update_state_t timing_apply_post_spike(
                  if (previous_state.lock == 0) {
 
                     // Gate on voltage
-                    if (voltage_difference > (accum) 1) { // this needs to accessible from Python code
+                    if (voltage_difference > (accum) 2) { // this needs to accessible from Python code
                     	if (print_plasticity){
                     	    io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
                             io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
@@ -372,7 +372,7 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.1k;
                         previous_state.lock = 1;
                     }
 
