@@ -195,22 +195,25 @@ static inline update_state_t timing_apply_pre_spike(
     // Check if there was a post window open when this pre arrived and if so,
     // trigger an accum decrement (a step towards synaptic depression):
     if ((time > last_post_time) && (time < previous_state.longest_post_pre_window_closing_time)) {
-       // The pre-spike has occurred inside a post window.
-       // Get time of event relative to last post-synaptic event
-       uint32_t time_since_last_post = time - last_post_time;
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "Pre spike has occurred inside a post window!");
+    	}
+        // The pre-spike has occurred inside a post window.
+        // Get time of event relative to last post-synaptic event
+        uint32_t time_since_last_post = time - last_post_time;
 
-       if (previous_state.accumulator >
-          recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
-             // If accumulator's not going to hit depression limit, decrement it
-             previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
-          } else {
-             // Otherwise, reset accumulator and apply depression
-             previous_state.accumulator = 0;
-             // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
-             if (syn_type == 3) {
-                previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state,
+        if (previous_state.accumulator >
+           recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
+              // If accumulator's not going to hit depression limit, decrement it
+              previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
+        } else {
+              // Otherwise, reset accumulator and apply depression
+              previous_state.accumulator = 0;
+              // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
+              if (syn_type == 3) {
+                 previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state,
                                                                          syn_type, STDP_FIXED_POINT_ONE);
-             } else {
+              } else {
                 previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
                                                                          syn_type, STDP_FIXED_POINT_ONE);
                 }
@@ -346,7 +349,7 @@ static inline update_state_t timing_apply_post_spike(
                  if (previous_state.lock == 0) {
 
                     // Gate on voltage
-                    if (voltage_difference > (accum) 5) { // this needs to accessible from Python code
+                    if (voltage_difference > (accum) 1) { // this needs to accessible from Python code
                     	if (print_plasticity){
                     	    io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
                             io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
@@ -369,7 +372,7 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
                         previous_state.lock = 1;
                     }
 
