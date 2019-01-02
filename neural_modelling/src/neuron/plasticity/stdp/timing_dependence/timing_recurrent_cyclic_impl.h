@@ -152,7 +152,7 @@ static inline pre_trace_t timing_add_pre_spike_sd( uint32_t time, uint32_t last_
 // For other synapse types, this performs three functions:
 // 1) Decay the accumulator value. Long periods with no spikes should cause the state to forget as this
 //    will not correspond to a complete set of pattern repeats.
-// 2) Set the flag for pre_waiting_post (we've got a pre-spike so now waiting for a post -pike)
+// 2) Set the flag for pre_waiting_post (we've got a pre-spike so now waiting for a post-spike)
 // 3) Check if there was a post-spike window open at the time that this pre-spike was detected
 //    in which case we decrement the accumulator and perhaps perform synaptic depression.
 
@@ -327,12 +327,12 @@ static inline update_state_t timing_apply_post_spike(
              }
              // If synapse is inhib-2, which his anti-Hebbian, perform depression:
              if (syn_type == 3) {
-                previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
+                 previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
                                                                       syn_type, STDP_FIXED_POINT_ONE);
-                if (print_plasticity){
-                	io_printf(IO_BUF, "Updated weight: %u\n", previous_state.weight_state.weight);
-                }
-                return previous_state;
+                 if (print_plasticity){
+                  	io_printf(IO_BUF, "Updated weight: %u\n", previous_state.weight_state.weight);
+                 }
+                 return previous_state;
              }
 
              // If synapse is not type inhib-2, potentiate:
@@ -365,7 +365,7 @@ static inline update_state_t timing_apply_post_spike(
 
                     } else {
                         // Weight is to be used, but we don't want or need a full weight increment.
-                        // make a tiny weight change so that this weight does not get used again until it decays:
+                        // Lock so this weight does not get used again until it decays:
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
@@ -380,10 +380,10 @@ static inline update_state_t timing_apply_post_spike(
                 }
 
              } else { // syn_type excit 2 or inhib-1:
-                    previous_state.weight_state =
-                    		weight_one_term_apply_potentiation_sd(
-                    				previous_state.weight_state,
-                                    syn_type, STDP_FIXED_POINT_ONE);
+//                    previous_state.weight_state =
+//                    		weight_one_term_apply_potentiation_sd(
+//                    				previous_state.weight_state,
+//                                    syn_type, STDP_FIXED_POINT_ONE);
 
              }
          }
