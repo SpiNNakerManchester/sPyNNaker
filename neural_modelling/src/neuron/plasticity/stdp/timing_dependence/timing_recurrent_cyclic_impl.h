@@ -61,6 +61,7 @@ extern uint32_t last_spike;
 
 extern uint32_t recurrentSeed[4];
 extern int32_t random_enabled;
+extern REAL v_diff_pot_threshold;
 
 extern uint32_t global_weight_scale;
 
@@ -349,7 +350,7 @@ static inline update_state_t timing_apply_post_spike(
                  if (previous_state.lock == 0) {
 
                     // Gate on voltage
-                    if (voltage_difference > (accum) 2) { // this needs to accessible from Python code
+                    if (voltage_difference > v_diff_pot_threshold) {
                     	if (print_plasticity){
                     	    io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
                             io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);

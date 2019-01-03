@@ -47,6 +47,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         'accum_pot_minus_one_inhib2',
         'rng',
         'random_enabled',
+        'v_diff_pot_threshold',
         '_synapse_structure'
         ]
 
@@ -71,7 +72,8 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         'pre_window_tc_inhib2':35.0,
         'post_window_tc_inhib2':45.0,
         'seed':None,
-        'random_enabled': True}
+        'random_enabled': True,
+        'v_diff_pot_threshold': 1}
 
     def __init__(
             self, accum_decay = default_parameters['accum_decay'],
@@ -92,7 +94,8 @@ class TimingDependenceCyclic(AbstractTimingDependence):
             pre_window_tc_inhib2=default_parameters['pre_window_tc_inhib2'],
             post_window_tc_inhib2=default_parameters['post_window_tc_inhib2'],
             seed=default_parameters['seed'],
-            random_enabled=default_parameters['random_enabled']):
+            random_enabled=default_parameters['random_enabled'],
+            v_diff_pot_threshold=default_parameters['v_diff_pot_threshold']):
         AbstractTimingDependence.__init__(self)
 
         self.accum_decay = accum_decay
@@ -122,6 +125,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
         #self.mean_post_window = mean_post_window
         self.rng = numpy.random.RandomState(seed)
         self.random_enabled=random_enabled
+        self.v_diff_pot_threshold = v_diff_pot_threshold
 
         self._synapse_structure = SynapseStructureWeightRecurrentAccumulator()
 
@@ -152,7 +156,8 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        numParams = (4 * 4) + 1
+        numParams = (4 * 4) + 1 + 1 + 1
+        # +acc_decay_per_32ts, +random_enabled, +v_diff_pot_threshold
         numLUTs   = 8
         numSeeds  = 4
         thirty_two_bit_wordlength = 4
@@ -160,9 +165,9 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
         return (
             (thirty_two_bit_wordlength * numParams)
-          + (sixteen_bit_wordlength * (plasticity_helpers.STDP_FIXED_POINT_ONE>>2) * numLUTs)
+          + (sixteen_bit_wordlength *
+             (plasticity_helpers.STDP_FIXED_POINT_ONE>>2) * numLUTs)
           + (thirty_two_bit_wordlength * numSeeds)
-          + thirty_two_bit_wordlength # for random_enabled flag
           )
 
     @property
@@ -174,29 +179,47 @@ class TimingDependenceCyclic(AbstractTimingDependence):
 
         # Acc decay per timeStep is scaled up by 1024 to preserve 10-bit precision:
         #acc_decay_per_ts = (int)((float(self.accum_decay) * float(machine_time_step)*1.024))
-        acc_decay_per_32ts = (int)(float(self.accum_decay) * 32 * 1.024 * float(machine_time_step)/1000.0)
+        acc_decay_per_32ts = (int)(float(self.accum_decay) * 32 * 1.024
+                                   * float(machine_time_step)/1000.0)
+        spec.write_value(data=acc_decay_per_32ts,
+                         data_type=DataType.INT32)
 
         # Write parameters (four per synapse type):
-        spec.write_value(data=acc_decay_per_32ts,              data_type=DataType.INT32)
-        spec.write_value(data=self.accum_dep_plus_one_excit,   data_type=DataType.INT32)
-        spec.write_value(data=self.accum_pot_minus_one_excit,  data_type=DataType.INT32)
-        spec.write_value(data=self.pre_window_tc_excit,        data_type=DataType.INT32)
-        spec.write_value(data=self.post_window_tc_excit,       data_type=DataType.INT32)
+        spec.write_value(data=self.accum_dep_plus_one_excit,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.accum_pot_minus_one_excit,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.pre_window_tc_excit,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.post_window_tc_excit,
+                         data_type=DataType.INT32)
 
-        spec.write_value(data=self.accum_dep_plus_one_excit2,   data_type=DataType.INT32)
-        spec.write_value(data=self.accum_pot_minus_one_excit2,  data_type=DataType.INT32)
-        spec.write_value(data=self.pre_window_tc_excit2,        data_type=DataType.INT32)
-        spec.write_value(data=self.post_window_tc_excit2,       data_type=DataType.INT32)
+        spec.write_value(data=self.accum_dep_plus_one_excit2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.accum_pot_minus_one_excit2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.pre_window_tc_excit2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.post_window_tc_excit2,
+                         data_type=DataType.INT32)
 
-        spec.write_value(data=self.accum_dep_plus_one_inhib,   data_type=DataType.INT32)
-        spec.write_value(data=self.accum_pot_minus_one_inhib,  data_type=DataType.INT32)
-        spec.write_value(data=self.pre_window_tc_inhib,        data_type=DataType.INT32)
-        spec.write_value(data=self.post_window_tc_inhib,       data_type=DataType.INT32)
+        spec.write_value(data=self.accum_dep_plus_one_inhib,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.accum_pot_minus_one_inhib,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.pre_window_tc_inhib,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.post_window_tc_inhib,
+                         data_type=DataType.INT32)
 
-        spec.write_value(data=self.accum_dep_plus_one_inhib2,   data_type=DataType.INT32)
-        spec.write_value(data=self.accum_pot_minus_one_inhib2,  data_type=DataType.INT32)
-        spec.write_value(data=self.pre_window_tc_inhib2,        data_type=DataType.INT32)
-        spec.write_value(data=self.post_window_tc_inhib2,       data_type=DataType.INT32)
+        spec.write_value(data=self.accum_dep_plus_one_inhib2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.accum_pot_minus_one_inhib2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.pre_window_tc_inhib2,
+                         data_type=DataType.INT32)
+        spec.write_value(data=self.post_window_tc_inhib2,
+                         data_type=DataType.INT32)
 
         if self.random_enabled:
             spec.write_value(data=1,
@@ -207,7 +230,9 @@ class TimingDependenceCyclic(AbstractTimingDependence):
                 data_type=DataType.INT32)
             # print "random_enabled = False"
 
-
+        print self.v_diff_pot_threshold
+        spec.write_value(data=self.v_diff_pot_threshold,
+                         data_type=DataType.S1615)
 
 
         # Convert mean times into machine timesteps
@@ -307,5 +332,5 @@ class TimingDependenceCyclic(AbstractTimingDependence):
                                'accum_dep_plus_one_excit2', 'accum_pot_minus_one_excit2', 'pre_window_tc_excit2', 'post_window_tc_excit2',
                                'accum_dep_plus_one_inhib', 'accum_pot_minus_one_inhib', 'pre_window_tc_inhib', 'post_window_tc_inhib',
                                'accum_dep_plus_one_inhib2', 'accum_pot_minus_one_inhib2', 'pre_window_tc_inhib2', 'post_window_tc_inhib2',
-                               'random_enabled']
+                               'random_enabled', 'v_diff_pot_threshold']
 

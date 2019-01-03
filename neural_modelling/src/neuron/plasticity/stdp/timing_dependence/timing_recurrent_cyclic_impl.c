@@ -24,6 +24,7 @@ uint16_t post_exp_dist_lookup_inhib2[STDP_FIXED_POINT_ONE>>2];
 
 uint32_t recurrentSeed[4];
 int32_t random_enabled;
+REAL v_diff_pot_threshold;
 
 plasticity_params_recurrent_t recurrent_plasticity_params;
 
@@ -59,8 +60,7 @@ uint32_t *timing_initialise(address_t address) {
     recurrent_plasticity_params.post_window_tc[3]      = (int32_t) address[16];
 
     random_enabled = (int32_t) address[17];
-
-
+    v_diff_pot_threshold = kbits(address[18]); // Can't cast!
 
     io_printf(IO_BUF,"Accum decay per TS: %d\n", (int)(recurrent_plasticity_params.accum_decay_per_ts));
     io_printf(IO_BUF,"E1 pot thresh: %d\n", recurrent_plasticity_params.accum_pot_minus_one[0]+1);
@@ -79,10 +79,12 @@ uint32_t *timing_initialise(address_t address) {
     io_printf(IO_BUF,"I2 dep thresh: %d\n", recurrent_plasticity_params.accum_dep_plus_one[3]-1);
     io_printf(IO_BUF,"I2 pot tc:  %d\n", recurrent_plasticity_params.pre_window_tc[3]);
     io_printf(IO_BUF,"I2 dep tc: %d\n", recurrent_plasticity_params.post_window_tc[3]);
+    io_printf(IO_BUF, "Random enabled: %u\n",random_enabled);
+    io_printf(IO_BUF, "v_diff_pot_threshold: %k\n", v_diff_pot_threshold);
 
     // Copy LUTs from following memory
     address_t lut_address = maths_copy_int16_lut(
-        &address[18], STDP_FIXED_POINT_ONE>>2, (int16_t*) &pre_exp_dist_lookup_excit[0]);
+        &address[19], STDP_FIXED_POINT_ONE>>2, (int16_t*) &pre_exp_dist_lookup_excit[0]);
 
     lut_address = maths_copy_int16_lut(
         lut_address, STDP_FIXED_POINT_ONE>>2, (int16_t*) &post_exp_dist_lookup_excit[0]);
@@ -107,9 +109,8 @@ uint32_t *timing_initialise(address_t address) {
 //    memcpy(random_enabled, lut_address, sizeof(uint32_t));
 //    lut_address += 1;
 
-    io_printf(IO_BUF, "Random enabled: %u\n",random_enabled);
 
-    io_printf(IO_BUF,"timing_cyclic initialise: completed successfully");
+    io_printf(IO_BUF,"timing_cyclic initialise: completed successfully\n\n");
 
     return lut_address;
 }
