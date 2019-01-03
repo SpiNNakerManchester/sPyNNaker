@@ -30,11 +30,11 @@ static inline uint32_t _get_direct_address(address_and_row_length entry) {
 static inline uint32_t _get_address(address_and_row_length entry) {
 
     // The address is in words and is the top 23-bits but 1, so this down
-    // shifts by 8 and then multiplies by 4 (= up shifts by 2) = down shift by 6
+    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift by 4
     // with the given mask 0x7FFFFF00 to fully remove the row length
     // NOTE: The mask can be removed given the machine spec says it
     // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 6;
+    return (entry & 0x7FFFFF00) >> 4;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
@@ -51,19 +51,32 @@ static inline uint32_t _get_neuron_id(
 }
 
 static inline void _print_master_population_table() {
-    log_debug("master_population\n");
-    log_debug("------------------------------------------\n");
+    log_info("master_population\n");
+    log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            log_debug(
-                "index (%d, %d), key: 0x%.8x, mask: 0x%.8x, address: 0x%.8x,"
-                " row_length: %u\n", i, j, entry.key, entry.mask,
-                _get_address(address_list[j]),
-                _get_row_length(address_list[j]));
+            if (!_is_single(address_list[j])) {
+                log_info(
+                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
+                    " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
+                    i, j, entry.key, entry.mask,
+                    _get_address(address_list[j]),
+                    _get_address(address_list[j]) +
+                        (uint32_t) synaptic_rows_base_address,
+                    _get_row_length(address_list[j]));
+            } else {
+                log_info(
+                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
+                    " offset: 0x%.8x, address: 0x%.8x, single",
+                    i, j, entry.key, entry.mask,
+                    _get_direct_address(address_list[j]),
+                    _get_direct_address(address_list[j]) +
+                        (uint32_t) direct_rows_base_address);
+            }
         }
     }
-    log_debug("------------------------------------------\n");
+    log_info("------------------------------------------\n");
 }
 
 bool population_table_initialise(
@@ -120,10 +133,10 @@ bool population_table_initialise(
         n_address_list_bytes);
 
     // Store the base address
-    log_debug(
+    log_info(
         "the stored synaptic matrix base address is located at: 0x%08x",
         synapse_rows_address);
-    log_debug(
+    log_info(
         "the direct synaptic matrix base address is located at: 0x%08x",
         direct_rows_address);
     synaptic_rows_base_address = synapse_rows_address;

@@ -4,7 +4,6 @@
 #include "synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
-#include <spin1_api.h>
 #include <debug.h>
 
 // The number of DMA Buffers to use

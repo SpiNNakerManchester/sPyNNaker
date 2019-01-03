@@ -33,8 +33,6 @@ from spynnaker.pyNN.models.neural_projections.connectors \
     import OneToOneConnector, AllToAllConnector
 from spynnaker.pyNN.models.neuron.synapse_dynamics \
     import SynapseDynamicsStatic
-from spynnaker.pyNN.models.neuron.synapse_types \
-    import AbstractSynapseType
 
 from unittests.mocks import MockSimulator
 
@@ -90,30 +88,6 @@ class SimpleApplicationVertex(ApplicationVertex):
         return ResourceContainer()
 
 
-class MockSynapseType(AbstractSynapseType):
-
-    def get_n_synapse_types(self):
-        return 2
-
-    def get_synapse_id_by_target(self, target):
-        return 0
-
-    def get_synapse_targets(self):
-        return [0, 1]
-
-    def get_n_synapse_type_parameters(self):
-        return 0
-
-    def get_synapse_type_parameters(self):
-        return []
-
-    def get_synapse_type_parameter_types(self):
-        return []
-
-    def get_n_cpu_cycles_per_neuron(self):
-        return 0
-
-
 class TestSynapticManager(unittest.TestCase):
 
     def test_retrieve_synaptic_block(self):
@@ -127,7 +101,7 @@ class TestSynapticManager(unittest.TestCase):
         key = 0
 
         synaptic_manager = SynapticManager(
-            synapse_type=None, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, False)]}),
@@ -181,7 +155,7 @@ class TestSynapticManager(unittest.TestCase):
             struct.pack("<IIIIIIII", 0, 1, 0, 3, 0, 1, 0, 4))
 
         synaptic_manager = SynapticManager(
-            synapse_type=None, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, True), (1, n_rows * 4, True)]}),
@@ -232,15 +206,18 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_1.set_weights_and_delays(1.5, 1.0)
+        one_to_one_connector_1.set_weights_and_delays(
+            [1.5 for _ in range(10)], 1.0)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_2.set_weights_and_delays(2.5, 2.0)
+        one_to_one_connector_2.set_weights_and_delays(
+            [2.5 for _ in range(10)], 2.0)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector.set_weights_and_delays(4.5, 4.0)
+        all_to_all_connector.set_weights_and_delays(
+            [4.5 for _ in range(10) for _ in range(10)], 4.0)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, SynapseDynamicsStatic(), 0)
         direct_synapse_information_2 = SynapseInformation(
@@ -283,19 +260,18 @@ class TestSynapticManager(unittest.TestCase):
         master_pop_region = 0
         all_syn_block_sz = 2000
         synapse_region = 1
+        direct_region = 2
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
         spec.reserve_memory_region(synapse_region, all_syn_block_sz)
 
-        synapse_type = MockSynapseType()
-
         synaptic_manager = SynapticManager(
-            synapse_type=synapse_type, ring_buffer_sigma=5.0,
+            n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, routing_info, graph_mapper,
-            graph, machine_time_step)
+            master_pop_region, synapse_region, direct_region, routing_info,
+            graph_mapper, graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -306,18 +282,21 @@ class TestSynapticManager(unittest.TestCase):
 
         master_pop_table = executor.get_region(0)
         synaptic_matrix = executor.get_region(1)
+        direct_matrix = executor.get_region(2)
 
         all_data = bytearray()
         all_data.extend(master_pop_table.region_data[
             :master_pop_table.max_write_pointer])
         all_data.extend(synaptic_matrix.region_data[
             :synaptic_matrix.max_write_pointer])
+        all_data.extend(direct_matrix.region_data[
+            :direct_matrix.max_write_pointer])
         master_pop_table_address = 0
         synaptic_matrix_address = master_pop_table.max_write_pointer
-        direct_synapses_address = struct.unpack_from(
-            "<I", synaptic_matrix.region_data)[0]
-        direct_synapses_address += synaptic_matrix_address + 8
-        indirect_synapses_address = synaptic_matrix_address + 4
+        direct_synapses_address = (
+            synaptic_matrix_address + synaptic_matrix.max_write_pointer)
+        direct_synapses_address += 4
+        indirect_synapses_address = synaptic_matrix_address
         placement = Placement(None, 0, 0, 1)
         transceiver = MockTransceiverRawData(all_data)
 
@@ -331,9 +310,7 @@ class TestSynapticManager(unittest.TestCase):
         # the second is potentially direct, but has been restricted by the
         # restriction on the size of the direct matrix
         assert len(items) == 3
-
-        # TODO: This has been changed because direct matrices are disabled!
-        assert not items[0][2]
+        assert items[0][2]
         assert not items[1][2]
         assert not items[2][2]
 
