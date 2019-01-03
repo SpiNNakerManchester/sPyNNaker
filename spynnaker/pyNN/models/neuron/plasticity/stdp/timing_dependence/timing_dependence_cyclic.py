@@ -230,7 +230,6 @@ class TimingDependenceCyclic(AbstractTimingDependence):
                 data_type=DataType.INT32)
             # print "random_enabled = False"
 
-        print self.v_diff_pot_threshold
         spec.write_value(data=self.v_diff_pot_threshold,
                          data_type=DataType.S1615)
 
