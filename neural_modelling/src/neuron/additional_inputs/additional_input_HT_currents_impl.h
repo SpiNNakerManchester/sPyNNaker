@@ -229,7 +229,7 @@ static input_t* additional_input_get_input_value_as_current(
         accum D_cube = ((additional_input->D)
         		* (additional_input->D)
         		* (additional_input->D)
-//				* sqrt(additional_input->D)
+				* sqrtk(additional_input->D)
 //        		* (additional_input->D)
         		);
          // the -0.05 factor above was added to compensate the difference from 3.5 to 3.0 exponent, in this way
@@ -253,6 +253,7 @@ static input_t* additional_input_get_input_value_as_current(
                                  * additional_input->m_inf_DK
                                  * (membrane_voltage - additional_input->E_DK);
 
+        currents[0] = additional_input->D;
         currents[3] = additional_input->I_DK;
 
         //    _print_additional_input_params(additional_input);

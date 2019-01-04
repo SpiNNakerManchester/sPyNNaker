@@ -4,7 +4,7 @@ from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
 
 import numpy
-from objc._properties import attrsetter
+#from objc._properties import attrsetter
 
 V = "v_init"
 G_NA = "g_Na"
