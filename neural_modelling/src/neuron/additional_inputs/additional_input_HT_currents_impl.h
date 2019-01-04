@@ -245,8 +245,8 @@ static input_t* additional_input_get_input_value_as_current(
 //                                  )));              // TODO: Actual exponent is D^3.5.
 //
         additional_input->m_inf_DK = D_cube / (D_cube +
-        		0.015625k);   // 0.25^3 = 0.015625k
-//        		0.0078125k);  // 0.25^3.5 = 0.0078125
+//        		0.015625k);   // 0.25^3 = 0.015625k
+        		0.0078125k);  // 0.25^3.5 = 0.0078125
 //        		0.00390625k); // 0.25^4 = 0.00390625k
 
 
