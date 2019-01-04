@@ -234,8 +234,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_t* currents = additional_input_get_input_value_as_current(
         additional_input, voltage);
 
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = currents[0];
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = currents[3];
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = currents[2];
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = currents[3];
 
     external_bias = 0;
     for (int i = 2; i<NUM_CURRENTS; i++){
