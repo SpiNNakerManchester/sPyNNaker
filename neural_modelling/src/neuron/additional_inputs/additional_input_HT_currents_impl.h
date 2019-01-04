@@ -2,7 +2,8 @@
 #define _ADDITIONAL_INPUT_ALL_CURRENTS_
 
 #include "additional_input.h"
-#include "math.h"
+#include "sqrt.h"
+
 #include <debug.h>
 
 #define TIMESTEP 0.100006103515625k
