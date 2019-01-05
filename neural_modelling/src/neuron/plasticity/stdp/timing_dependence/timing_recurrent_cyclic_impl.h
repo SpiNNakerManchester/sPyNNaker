@@ -3,8 +3,6 @@
 
 #define print_plasticity false
 
-
-
 //---------------------------------------
 // Typedefines
 //---------------------------------------
@@ -175,6 +173,45 @@ static inline update_state_t timing_apply_pre_spike(
     use(&post_synaptic_additional_input);
     use(&post_synaptic_threshold);
 
+
+       uint32_t random;
+
+       if (!random_enabled) {
+    	   random = (STDP_FIXED_POINT_ONE>>3)-1; //5;
+    	   if (print_plasticity){
+               io_printf(IO_BUF, "Random window generation disabled in timing_apply_post_spike\n");
+    	   }
+       } else {
+    	   random = mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+    	   if (print_plasticity){
+    		   io_printf(IO_BUF, "Random window generation enabled in timing_apply_post_spike\n");
+    	   }
+       }
+
+       if (print_plasticity){
+           io_printf(IO_BUF, "Random number: %u\n", random);
+       }
+
+       uint16_t window_length;
+       if (syn_type == 0)
+           window_length = post_exp_dist_lookup_excit[random];
+       else if (syn_type == 1)
+           window_length = post_exp_dist_lookup_excit2[random];
+       else if (syn_type == 2)
+           window_length = post_exp_dist_lookup_inhib[random];
+       else
+           window_length = post_exp_dist_lookup_inhib2[random];
+
+       uint32_t this_window_close_time = last_post_time + window_length;
+
+       // Check if this post-spike extends the open window:
+       if (previous_state.longest_post_pre_window_closing_time < this_window_close_time) {
+          previous_state.longest_post_pre_window_closing_time = this_window_close_time;
+       }
+
+
+
+
     // Decay accum value so that long periods without spikes cause it to forget:
     uint32_t time_since_last_event = time - last_event_time;
 
@@ -197,29 +234,58 @@ static inline update_state_t timing_apply_pre_spike(
     // trigger an accum decrement (a step towards synaptic depression):
     if ((time > last_post_time) && (time < previous_state.longest_post_pre_window_closing_time)) {
     	if (print_plasticity){
-    		io_printf(IO_BUF, "Pre spike has occurred inside a post window!");
+    		io_printf(IO_BUF, "Pre spike has occurred inside a post window!\n");
     	}
         // The pre-spike has occurred inside a post window.
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
 
         if (previous_state.accumulator >
-           recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
-              // If accumulator's not going to hit depression limit, decrement it
-              previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
+            recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
+        	if (print_plasticity){
+        		io_printf(IO_BUF, "        Decrementing Accumulator from: %d ", previous_state.accumulator);
+        	}
+
+            // If accumulator's not going to hit depression limit, decrement it
+            previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
+
+            if (print_plasticity){
+            	io_printf(IO_BUF, " to %d \n", previous_state.accumulator);
+            }
+
         } else {
-              // Otherwise, reset accumulator and apply depression
-              previous_state.accumulator = 0;
-              // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
-              if (syn_type == 3) {
+        	if (syn_type ==0) {
+
+        		if (print_plasticity){
+        			io_printf(IO_BUF, "        Accumulator limit reached: Depressing\n");
+        		}
+        		if (previous_state.lock == 0){
+
+        			// Otherwise, reset accumulator and apply depression
+        			// Note: at present this is not gated on membrane potential
+        			previous_state.accumulator = 0;
+
+        			// Depress synapse using A2_minus rate
+        			previous_state.weight_state = weight_one_term_apply_depression_sd(
+        					previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+
+
+        			// Lock synapse in depressed state
+        			previous_state.lock = 1;
+
+        		} else {
+        			if (print_plasticity){
+        				io_printf(IO_BUF, "Synapse already loacked, so cannot depress\n");
+        			}
+        		}
+
+                // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
+        	} else if (syn_type == 3) {
                  previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state,
                                                                          syn_type, STDP_FIXED_POINT_ONE);
-              } else {
-                previous_state.weight_state = weight_one_term_apply_depression_sd( previous_state.weight_state,
-                                                                         syn_type, STDP_FIXED_POINT_ONE);
-                }
             }
-       }
+         }
+    }
        // Set the post window to be just before this pre-spike. This is the only way I've found to
        // reset it. It means that the first window length will be garbage.
        previous_state.longest_post_pre_window_closing_time = time - 1;
@@ -268,42 +334,6 @@ static inline update_state_t timing_apply_post_spike(
 
    // log_info("Post_synaptic_potential from within apply post spike: %k", post_synaptic_mem_V);
 
-   // Generate a windw size for this post-spike and extend the post window if it is
-   // beyond the current value:
-   uint32_t random;
-
-   if (!random_enabled) {
-	   random = (STDP_FIXED_POINT_ONE>>3)-1; //5;
-	   if (print_plasticity){
-           io_printf(IO_BUF, "Random window generation disabled in timing_apply_post_spike\n");
-	   }
-   } else {
-	   random = mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
-	   if (print_plasticity){
-		   io_printf(IO_BUF, "Random window generation enabled in timing_apply_post_spike\n");
-	   }
-   }
-
-   if (print_plasticity){
-       io_printf(IO_BUF, "Random number: %u\n", random);
-   }
-
-   uint16_t window_length;
-   if (syn_type == 0)
-       window_length = post_exp_dist_lookup_excit[random];
-   else if (syn_type == 1)
-       window_length = post_exp_dist_lookup_excit2[random];
-   else if (syn_type == 2)
-       window_length = post_exp_dist_lookup_inhib[random];
-   else
-       window_length = post_exp_dist_lookup_inhib2[random];
-
-   uint32_t this_window_close_time = time + window_length;
-
-   // Check if this post-spike extends the open window:
-   if (previous_state.longest_post_pre_window_closing_time < this_window_close_time) {
-      previous_state.longest_post_pre_window_closing_time = this_window_close_time;
-   }
 
    // Get time of event relative to last pre-synaptic event
    uint32_t time_since_last_pre = time - last_pre_time;
@@ -480,14 +510,35 @@ static inline weight_state_t weight_two_term_apply_potentiation_sd(
 static inline weight_state_t weight_one_term_apply_depression_sd(
    weight_state_t state, uint32_t syn_type, int32_t depression) {
    use(&syn_type);
+
+   uint16_t shift_to_print = 15 - state.weight_multiply_right_shift - global_weight_scale;
+
+   io_printf(IO_BUF, "    Fixed Initial weight: %k, min_weight: %k\n",
+		   state.weight << shift_to_print, state.weight_region->min_weight << shift_to_print);
+
+   io_printf(IO_BUF, "    Int   Initial weight: %u, min_weight: %u\n",
+		   state.weight, state.weight_region->min_weight);
+
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
-                   state.weight_region->a2_minus, state.weight_multiply_right_shift);
+                   state.weight_region->a2_minus, (state.weight_multiply_right_shift + global_weight_scale));
 
-    // Multiply scale by depression and subtract
-    // **NOTE** using standard STDP fixed-point format handles format conversion
-    state.weight -= STDP_FIXED_MUL_16X16(scale, depression);
-    return state;
+   io_printf(IO_BUF, "        A-: %u", state.weight_region->a2_minus);
+   io_printf(IO_BUF, "        shift: %u \n", state.weight_multiply_right_shift);
+
+   io_printf(IO_BUF, "        scale: %u, depression: %k \n", scale , depression << 4);
+
+   state.weight -= (scale);
+
+
+   //io_printf(IO_BUF, "    Fixed Updated weight: %k, max weight: %k\n",
+   //		   state.weight << shift_to_print, state.weight_region->max_weight << shift_to_print);
+   //io_printf(IO_BUF, "    Int   Updated weight: %u, max weight: %u\n",
+   //		   state.weight, state.weight_region->max_weight);
+
+
+
+   return state;
 }
 
 #endif  // _TIMING_RECURRENT_CYCLIC_IMPL_H_
