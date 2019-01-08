@@ -178,6 +178,13 @@ else
 endif
 SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 
+ifdef PARTNER_SELECTION
+    PARTNER_SELECTION_H := $(call replace_source_dirs,$(PARTNER_SELECTION_H))
+    PARTNER_SELECTION_C := $(call replace_source_dirs,$(PARTNER_SELECTION))
+    PARTNER_SELECTION := $(call strip_source_dirs,$(PARTNER_SELECTION))
+    PARTNER_SELECTION_O := $(BUILD_DIR)$(PARTNER_SELECTION:%.c=%.o)
+endif
+
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
@@ -188,7 +195,8 @@ SOURCES = common/out_spikes.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
+          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) \
+          $(PARTNER_SELECTION) $(OTHER_SOURCES_CONVERTED)
 
 include $(SPINN_DIRS)/make/local.mk
 
@@ -222,6 +230,11 @@ $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MOD
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
+SYNGEN_INCLUDES:=
+ifeq ($(SYNGEN_ENABLED), 1)
+    SYNGEN_INCLUDES:= -include $(PARTNER_SELECTION_H)
+endif
+
 #STDP Build rules If and only if STDP used
 ifeq ($(STDP_ENABLED), 1)
     STDP_INCLUDES:= -include $(SYNAPSE_TYPE_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
@@ -235,7 +248,7 @@ ifeq ($(STDP_ENABLED), 1)
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
 	-mkdir -p $(dir $@)
-	$(STDP_COMPILE) -o $@ $<
+	$(STDP_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
     $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
@@ -246,7 +259,7 @@ else
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
 	-mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+	$(SYNAPSE_TYPE_COMPILE) $(SYNGEN_INCLUDES) -o $@ $<
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O Synapese
@@ -268,6 +281,12 @@ $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+
+$(PARTNER_SELECTION_O): $(PARTNER_SELECTION_C) $(SYNAPSE_TYPE_H)
+	# PARTNER_SELECTION_O
+	-mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
+	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)

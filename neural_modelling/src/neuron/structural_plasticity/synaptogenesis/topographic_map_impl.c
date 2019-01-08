@@ -25,8 +25,8 @@
 #include <neuron/structural_plasticity/sp_structs.h>
 #include <simulation.h>
 
-// For last spike selection
-#include <circular_buffer.h>
+// (Potential) Presynaptic partner selection
+#include "partner_selection/partner.h"
 
 //-----------------------------------------------------------------------------
 // Static functions                                                           |
@@ -130,16 +130,11 @@ typedef struct {
     bool element_exists;
     // information extracted from the post to pre table
     uint32_t offset_in_table, pop_index, subpop_index, neuron_index;
-    // circular buffer indices
-    uint32_t my_cb_input, my_cb_output, no_spike_in_interval, cb_total_size;
-    // a local reference to the circular buffer
-    circular_buffer cb;
 } current_state_t;
 
 // instantiation of the previous struct
 current_state_t current_state;
 
-#define ANY_SPIKE ((spike_t) -1)
 
 //! abs function
 static int my_abs(int a) {
@@ -319,39 +314,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     return (address_t) sp_word;
 }
 
-//! after a set of rewiring attempts, update the indices in the circular buffer
-//! between which we will be looking at the next batch of attempts
-void update_goal_posts(uint32_t time) {
-    use(time);
-    if (!received_any_spike()) {
-        return;
-    }
-    current_state.cb = get_circular_buffer();
-    current_state.cb_total_size = circular_buffer_real_size(current_state.cb);
 
-    current_state.my_cb_output = current_state.my_cb_input;
-    current_state.my_cb_input = (
-        circular_buffer_input(current_state.cb)
-        & current_state.cb_total_size);
-
-    current_state.no_spike_in_interval = (
-        current_state.my_cb_input >= current_state.my_cb_output
-        ? current_state.my_cb_input - current_state.my_cb_output
-        : (current_state.my_cb_input + current_state.cb_total_size + 1) -
-            current_state.my_cb_output);
-}
-
-//! randomly (with uniform probability) select one of the last received spikes
-static inline spike_t select_last_spike(void) {
-    if (current_state.no_spike_in_interval == 0) {
-        return ANY_SPIKE;
-    }
-    uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-        current_state.no_spike_in_interval;
-    return circular_buffer_value_at_index(
-        current_state.cb,
-        (current_state.my_cb_output + offset) & current_state.cb_total_size);
-}
 
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
@@ -390,13 +353,11 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         &pre_sub_pop, &choice);
 
     current_state.element_exists = element_exists;
-    spike_t _spike = ANY_SPIKE;
+    spike_t _spike;
     if (!element_exists && !rewiring_data.random_partner) {
-        // Retrieve the last spike
-        if (received_any_spike()) {
-            _spike = select_last_spike();
-        }
-        if (_spike == ANY_SPIKE) {
+        _spike = potential_presynaptic_partner(rewiring_data.local_seed);
+
+        if (_spike == INVALID_SELECTION) {
             log_debug("No previous spikes");
             _setup_synaptic_dma_read();
             return;
