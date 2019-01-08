@@ -131,7 +131,7 @@ class AbstractPopulationVertex(
     ELEMENTS_USED_IN_BIT_FIELD_HEADER = 1  # n bitfields
 
     # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
-    BIT_IN_A_WORD = 32
+    BIT_IN_A_WORD = 32.0
 
     _n_vertices = 0
 
@@ -381,26 +381,29 @@ class AbstractPopulationVertex(
                     constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
-    def _exact_sdram_for_bit_field_region(self, machine_graph, graph_mapper):
+    def _exact_sdram_for_bit_field_region(
+            self, machine_graph, graph_mapper, vertex):
         """ calculates the correct sdram for the bitfield region based off \
             the machine graph and graph mapper
 
         :param machine_graph: machine graph
         :param graph_mapper: graph mapping between app and machine graphs.\
                              Used to locate atom slices.
+        :param vertex: the machine vertex
         :return: sdram in bytes
         """
         sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
                  constants.WORD_TO_BYTE_MULTIPLIER)
-        for incoming_edge in machine_graph.get_edges_ending_at_vertex(self):
+        for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
             atoms_of_source_vertex = \
-                graph_mapper.get_slice(incoming_edge.pre_vertex)
+                graph_mapper.get_slice(incoming_edge.pre_vertex).n_atoms
             n_words_for_atoms = int(math.ceil(
                 atoms_of_source_vertex / self.BIT_IN_A_WORD))
 
             sdram += (
                 (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
                 constants.WORD_TO_BYTE_MULTIPLIER)
+        print "sdram for bitfield for vertex {} is {}".format(self, sdram)
         return sdram
 
     def _get_number_of_mallocs_used_by_dsg(self):
@@ -445,7 +448,7 @@ class AbstractPopulationVertex(
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
             size=self._exact_sdram_for_bit_field_region(
-                machine_graph, graph_mapper),
+                machine_graph, graph_mapper, vertex),
             label="bit_field region")
 
         vertex.reserve_provenance_data_region(spec)
@@ -869,13 +872,6 @@ class AbstractPopulationVertex(
             placement)
 
     @overrides(
-        AbstractUsesPopulationTableAndSynapses.synapse_params_base_address)
-    def synapse_params_base_address(self, transceiver, placement):
-        return self._locate_region_base_address_from_region_id(
-            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value, transceiver,
-            placement)
-
-    @overrides(
         AbstractUsesPopulationTableAndSynapses.direct_matrix_base_address)
     def direct_matrix_base_address(self, transceiver, placement):
         return self._locate_region_base_address_from_region_id(
@@ -895,11 +891,17 @@ class AbstractPopulationVertex(
         # TODO this should be a utility method somewhere. where has it gone?!
         regions_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
+        print "for core {}:{}:{} the region base address is {:8x}".format(
+            placement.x, placement.y, placement.p, regions_base_address)
         region_base_address_offset = \
             utility_calls.get_region_base_address_offset(
                 regions_base_address, region_id)
+        print "for region {} the offset is {:8x}".format(
+            region_id, region_base_address_offset)
         base_address = transceiver.read_memory(
             placement.x, placement.y, region_base_address_offset, 4)
+        print "the region base address is {:8x}".format(
+            _ONE_WORD.unpack(base_address)[0])
         return _ONE_WORD.unpack(base_address)[0]
 
     @overrides(

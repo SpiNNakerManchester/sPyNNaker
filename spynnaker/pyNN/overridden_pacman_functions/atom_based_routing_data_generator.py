@@ -1,3 +1,5 @@
+import math
+
 from spinn_front_end_common.interface.interface_functions import \
     ChipIOBufExtractor
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
@@ -39,7 +41,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     # structs for performance requirements.
     _ONE_WORDS = struct.Struct("<I")
-    _FIVE_WORDS = struct.Struct("<IIIII")
+    _FOUR_WORDS = struct.Struct("<IIII")
 
     # binary name
     _BIT_FIELD_EXPANDER_APLX = "bit_field_expander.aplx"
@@ -80,8 +82,61 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder)
 
+        # read in bit fields for debugging purposes
+        self._read_back_bit_fields(
+            app_graph, graph_mapper, transceiver, placements, data_address)
+
         # update progress bar
         progress.end()
+
+    def _read_back_bit_fields(
+            self, app_graph, graph_mapper, transceiver, placements,
+            data_address):
+        for app_vertex in app_graph.vertices:
+            if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
+                machine_verts = graph_mapper.get_machine_vertices(app_vertex)
+                for machine_vertex in machine_verts:
+                    placement = \
+                        placements.get_placement_of_vertex(machine_vertex)
+                    bit_field_address = app_vertex.bit_field_base_address(
+                        transceiver, placement)
+                    n_bit_field_entries = struct.unpack(
+                        "<I", transceiver.read_memory(
+                            placement.x, placement.y, bit_field_address, 4))[0]
+                    reading_address = bit_field_address + 4
+                    for bit_field_index in range(0, n_bit_field_entries):
+                        master_pop_key = struct.unpack(
+                            "<I", transceiver.read_memory(
+                                placement.x, placement.y, reading_address,
+                                4))[0]
+                        reading_address += 4
+                        n_words_to_read = struct.unpack(
+                            "<I", transceiver.read_memory(
+                                placement.x, placement.y, reading_address,
+                                4))[0]
+                        reading_address += 4
+                        bit_field = struct.unpack(
+                            "<{}I".format(n_words_to_read),
+                            transceiver.read_memory(
+                                placement.x, placement.y, reading_address,
+                                n_words_to_read *
+                                constants.WORD_TO_BYTE_MULTIPLIER))
+                        reading_address += (
+                            n_words_to_read * constants.WORD_TO_BYTE_MULTIPLIER)
+                        n_neurons = n_words_to_read * 32
+                        for neuron_id in range(0, n_neurons):
+                            print \
+                                "for key {} neuron id {} has bit {} set".format(
+                                    master_pop_key, neuron_id,
+                                    self._bit_for_neuron_id(bit_field,
+                                                            neuron_id))
+
+    @staticmethod
+    def _bit_for_neuron_id(bit_field, neuron_id):
+        word_id = int(math.floor(neuron_id // 32))
+        bit_in_word = neuron_id % 32
+        flag = (bit_field[word_id] >> bit_in_word) & 1
+        return flag
 
     def _calculate_core_data(
             self, app_graph, graph_mapper, transceiver, placements, machine,
@@ -132,22 +187,18 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                              transceiver, placement),
                          app_vertex.bit_field_base_address(
                              transceiver, placement),
-                         app_vertex.synapse_params_base_address(
-                             transceiver, placement),
                          app_vertex.direct_matrix_base_address(
                             transceiver, placement)))
 
                     print "placement {}:{}:{} \n\n master table {:8x}, " \
-                          "\n synaptic_matrix {:8x}, \n bitfield {:8x} ,\n " \
-                          "synapse {:8x}, \n direct matrix {:8x}".format(
+                          "\n synaptic_matrix {:8x}, \n bitfield {:8x} , " \
+                          "\n direct matrix {:8x}".format(
                         placement.x, placement.y, placement.p,
                         app_vertex.master_pop_table_base_address(
                             transceiver, placement),
                         app_vertex.synaptic_matrix_base_address(
                             transceiver, placement),
                         app_vertex.bit_field_base_address(
-                            transceiver, placement),
-                        app_vertex.synapse_params_base_address(
                             transceiver, placement),
                         app_vertex.direct_matrix_base_address(
                             transceiver, placement))
@@ -185,12 +236,10 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         data = b''
         data += self._ONE_WORDS.pack(len(regions))
         for (master_pop_base_address, synaptic_matrix_base_address,
-             bit_field_base_address, synapse_params_base_address,
-             direct_matrix_base_address) in regions:
-            data += self._FIVE_WORDS.pack(
+             bit_field_base_address, direct_matrix_base_address) in regions:
+            data += self._FOUR_WORDS.pack(
                 master_pop_base_address, synaptic_matrix_base_address,
-                bit_field_base_address, synapse_params_base_address,
-                direct_matrix_base_address)
+                bit_field_base_address, direct_matrix_base_address)
         return bytearray(data)
 
     def _run_app(
@@ -227,6 +276,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         self._check_for_success(
             executable_cores, transceiver, provenance_file_path,
             bit_field_app_id, executable_finder)
+
+        iobuf_reader = ChipIOBufExtractor()
+        iobuf_reader(
+            transceiver, executable_cores, executable_finder,
+            provenance_file_path)
+
 
         # stop anything that's associated with the compressor binary
         transceiver.stop_application(bit_field_app_id)
