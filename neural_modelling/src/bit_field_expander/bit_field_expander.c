@@ -336,7 +336,7 @@ bool generate_bit_field(uint32_t vertex_id){
         for (uint32_t neuron_id =0; neuron_id < n_neurons; neuron_id++){
 
             // update key with neuron id
-            spike_t new_key = key & (spike_t) neuron_id;
+            spike_t new_key = (spike_t) (key + neuron_id);
             log_info("new key for neurons %d is %0x", neuron_id, new_key);
 
             // holder for the bytes to transfer if we need to read sdram.
