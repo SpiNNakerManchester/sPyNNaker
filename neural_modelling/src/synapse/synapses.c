@@ -266,7 +266,11 @@ bool synapses_initialise(
     log_debug("synapses_initialise: completed successfully");
     _print_synapse_parameters();
 
-    uint32_t n_neurons_power_2 = n_neurons;
+    uint32_t n_neurons_power_2 = n_neurons;#include "synapses.h"
+#include "spike_processing.h"
+#include "population_table/population_table.h"
+#include "plasticity/synapse_dynamics.h"
+#include "structural_plasticity/synaptogenesis_dynamics.h"
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {
