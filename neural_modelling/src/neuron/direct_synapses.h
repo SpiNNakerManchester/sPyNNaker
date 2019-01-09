@@ -14,4 +14,4 @@ bool direct_synapses_initialise(
 //! \return the synaptic row.
 synaptic_row_t direct_synapses_get_direct_synapse(address_t row_address);
 
-#endif // _DIRECT_SYNAPSES_H_
+#endif /* _DIRECT_SYNAPSES_H_ */

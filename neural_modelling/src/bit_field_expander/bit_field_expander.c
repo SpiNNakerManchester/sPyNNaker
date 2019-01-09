@@ -148,7 +148,7 @@ void _read_in_the_key_to_max_atom_map(){
     keys_to_max_atoms = spin1_malloc(
         sizeof(key_to_max_atoms_map*) * n_keys_to_max_atom_map);
 
-    if(keys_to_max_atoms == NULL){
+    if (keys_to_max_atoms == NULL){
         log_error("failed to allocate dtcm for the key to max atom map");
         rt_error(RTE_ABORT);
     }
@@ -191,7 +191,7 @@ void _read_in_the_key_to_max_atom_map(){
 //! \return the number of neurons from the key map based off this key
 uint32_t _n_neurons_from_key(uint32_t key){
     uint32_t key_index = 0;
-    while(key_index < n_keys_to_max_atom_map){
+    while (key_index < n_keys_to_max_atom_map){
         key_to_max_atoms_map* entry = keys_to_max_atoms[key_index];
         if (entry->key == key){
             return entry->n_atoms;
@@ -332,7 +332,7 @@ bool initialise(uint32_t vertex_id){
 //! \return bool stating true if there is target, false if no target.
 bool process_synaptic_row(synaptic_row_t row){
     // get address of plastic region from row
-    if(synapse_row_plastic_size(row) > 0){
+    if (synapse_row_plastic_size(row) > 0){
         log_debug("plastic row had entries, so cant be pruned");
         return true;
     }
@@ -435,7 +435,7 @@ bool generate_bit_field(uint32_t vertex_id){
                 } else {
                     // sdram read (faking dma transfer)
                     log_debug("dma read synapse");
-                    if(_do_sdram_read_and_test(
+                    if (_do_sdram_read_and_test(
                             row_address, n_bytes_to_transfer)){
                         bit_field_set(bit_field, neuron_id);
                     }
@@ -484,7 +484,7 @@ bool free_dtcm(){
 
     // free pop table dtcm
     log_debug("freeing pop table");
-    if(!population_table_shut_down()){
+    if (!population_table_shut_down()){
         log_error("failed to shut down the master pop table");
         return false;
     }
@@ -497,7 +497,7 @@ bool free_dtcm(){
 
     // free the key to max atoms map
     log_info("freeing key to max atom map");
-    for(uint32_t key_entry_index = 0; key_entry_index < n_keys_to_max_atom_map;
+    for (uint32_t key_entry_index = 0; key_entry_index < n_keys_to_max_atom_map;
             key_entry_index++){
         log_info("freeing key to max atom in index %d", key_entry_index);
         sark_free(keys_to_max_atoms[key_entry_index]);
@@ -522,20 +522,20 @@ void c_main(void) {
 
     // generate bit field for each vertex regions
     for (uint32_t vertex_id = 0; vertex_id < n_vertex_regions; vertex_id++){
-        if(!initialise(vertex_id)){
+        if (!initialise(vertex_id)){
             log_error(
                 "failed to init the master pop and synaptic matrix for vertex"
                  " %d", vertex_id);
             rt_error(RTE_ABORT);
         }
         log_info("generating bit field for vertex %d", vertex_id);
-        if(!generate_bit_field(vertex_id)){
+        if (!generate_bit_field(vertex_id)){
             log_error(
                 "failed to generate bitfield for the vertex %d", vertex_id);
             rt_error(RTE_ABORT);
         };
         log_info("freeing dtcm for vertex %d", vertex_id);
-        if(!free_dtcm()){
+        if (!free_dtcm()){
             log_error(
                 "failed to free dtcm from the master pop and synapses for "
                 "vertex %d", vertex_id);
