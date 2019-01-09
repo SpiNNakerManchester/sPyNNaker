@@ -173,7 +173,7 @@ static inline void _process_fixed_synapses(
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
         fixed_region_address);
 
-    // increment counter
+    // increment counter of rows that were empty (provenance data)
     if (fixed_synapse==0){
         empty_row_count++;
     }

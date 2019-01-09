@@ -656,7 +656,6 @@ class SynapticManager(object):
                 label='DirectMatrix')
             spec.switch_write_focus(direct_matrix_region)
             spec.write_value(len(single_data) * 4)
-            print "length of direct matrix region is {}".format(len(single_data) * 4)
             spec.write_array(single_data)
         else:
             spec.reserve_memory_region(

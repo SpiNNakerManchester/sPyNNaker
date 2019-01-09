@@ -889,20 +889,14 @@ class AbstractPopulationVertex(
         :param placement: placements of vertices
         :return: the base address of the region
         """
-        # TODO this should be a utility method somewhere. where has it gone?!
+        # TODO this ust to be a utility method somewhere. where has it gone?!
         regions_base_address = transceiver.get_cpu_information_from_core(
             placement.x, placement.y, placement.p).user[0]
-        print "for core {}:{}:{} the region base address is {:8x}".format(
-            placement.x, placement.y, placement.p, regions_base_address)
         region_base_address_offset = \
             utility_calls.get_region_base_address_offset(
                 regions_base_address, region_id)
-        print "for region {} the offset is {:8x}".format(
-            region_id, region_base_address_offset)
         base_address = transceiver.read_memory(
             placement.x, placement.y, region_base_address_offset, 4)
-        print "the region base address is {:8x}".format(
-            _ONE_WORD.unpack(base_address)[0])
         return _ONE_WORD.unpack(base_address)[0]
 
     @overrides(

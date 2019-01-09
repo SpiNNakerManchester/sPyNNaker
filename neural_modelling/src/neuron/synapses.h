@@ -64,6 +64,9 @@ bool synapses_initialise(
     uint32_t n_neurons, uint32_t n_synapse_types,
     uint32_t **ring_buffer_to_input_buffer_left_shifts);
 
+//! \brief updates synapses for a time step
+//! \param[in] time. the timer
+//! \return None
 void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row

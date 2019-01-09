@@ -15,6 +15,7 @@ from spynnaker.pyNN.models.abstract_models.\
 
 import struct
 import logging
+import os
 
 from spynnaker.pyNN.utilities import constants
 
@@ -39,6 +40,18 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     # master pop, synaptic matrix, bitfield base addresses
     _N_ELEMENTS_PER_REGION_ELEMENT = 5
 
+    # bytes per word
+    _BYTES_PER_WORD = 4
+
+    # bits in a word
+    _BITS_IN_A_WORD = 32
+
+    # bit to mask a bit
+    BIT_MASK = 1
+
+    # bit field report file name
+    BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
+
     # structs for performance requirements.
     _ONE_WORDS = struct.Struct("<I")
     _FOUR_WORDS = struct.Struct("<IIII")
@@ -48,7 +61,9 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, machine, transceiver, graph_mapper):
+            provenance_file_path, machine, transceiver, graph_mapper,
+            read_bit_field_generator_iobuf, generating_bitfield_report,
+            default_report_folder):
         """ loads and runs the bit field generator on chip
 
         :param placements: placements
@@ -59,6 +74,9 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param machine: the SpiNNMachine instance
         :param transceiver: the SpiNNMan instance
         :param graph_mapper: mapper between application an machine graphs.
+        :param read_bit_field_generator_iobuf: bool flag for report
+        :param generating_bitfield_report: bool flag for report
+        :param default_report_folder: the file path for reports
         :rtype: None
         """
 
@@ -80,41 +98,78 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         # run app
         self._run_app(
             expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder)
+            provenance_file_path, executable_finder,
+            read_bit_field_generator_iobuf)
 
         # read in bit fields for debugging purposes
-        self._read_back_bit_fields(
-            app_graph, graph_mapper, transceiver, placements, data_address)
+        if generating_bitfield_report:
+            self._read_back_bit_fields(
+                app_graph, graph_mapper, transceiver, placements,
+                default_report_folder)
 
         # update progress bar
         progress.end()
 
     def _read_back_bit_fields(
             self, app_graph, graph_mapper, transceiver, placements,
-            data_address):
+            default_report_folder):
+        """ report of the bitfields that were generated
+
+        :param app_graph: app graph
+        :param graph_mapper: the graph mapper
+        :param transceiver: the SPiNNMan instance
+        :param placements: The placements
+        :param default_report_folder:the file path for where reports are.
+        :rtype: None 
+        """
+
+        # generate file
+        file_path = os.path.join(
+            default_report_folder, self.BIT_FIELD_REPORT_FILENAME)
+        output = open(file_path, "w")
+
+        # read in for each app vertex that would have a bitfield
         for app_vertex in app_graph.vertices:
             if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
+
+                # get machine verts
                 for machine_vertex in machine_verts:
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
+                    output.write(
+                        "For core {}:{}:{}. Bitfields as follows: \n\n".format(
+                            placement.x, placement.y, placement.p))
+
+                    # get bitfield address
                     bit_field_address = app_vertex.bit_field_base_address(
                         transceiver, placement)
+
+                    # read how many bitfields there are
                     n_bit_field_entries = struct.unpack(
                         "<I", transceiver.read_memory(
-                            placement.x, placement.y, bit_field_address, 4))[0]
-                    reading_address = bit_field_address + 4
+                            placement.x, placement.y, bit_field_address,
+                            self._BYTES_PER_WORD))[0]
+                    reading_address = bit_field_address + self._BYTES_PER_WORD
+
+                    # read in each bitfield
                     for bit_field_index in range(0, n_bit_field_entries):
+
+                        # master pop key
                         master_pop_key = struct.unpack(
                             "<I", transceiver.read_memory(
                                 placement.x, placement.y, reading_address,
-                                4))[0]
-                        reading_address += 4
+                                self._BYTES_PER_WORD))[0]
+                        reading_address += self._BYTES_PER_WORD
+
+                        # how many words the bitfield uses
                         n_words_to_read = struct.unpack(
                             "<I", transceiver.read_memory(
                                 placement.x, placement.y, reading_address,
-                                4))[0]
-                        reading_address += 4
+                                self._BYTES_PER_WORD))[0]
+                        reading_address += self._BYTES_PER_WORD
+
+                        # get bitfield words
                         bit_field = struct.unpack(
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(
@@ -123,19 +178,27 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                                 constants.WORD_TO_BYTE_MULTIPLIER))
                         reading_address += (
                             n_words_to_read * constants.WORD_TO_BYTE_MULTIPLIER)
-                        n_neurons = n_words_to_read * 32
-                        for neuron_id in range(0, n_neurons):
-                            print \
-                                "for key {} neuron id {} has bit {} set".format(
-                                    master_pop_key, neuron_id,
-                                    self._bit_for_neuron_id(bit_field,
-                                                            neuron_id))
 
-    @staticmethod
-    def _bit_for_neuron_id(bit_field, neuron_id):
-        word_id = int(math.floor(neuron_id // 32))
-        bit_in_word = neuron_id % 32
-        flag = (bit_field[word_id] >> bit_in_word) & 1
+                        # put into report
+                        n_neurons = n_words_to_read * self._BITS_IN_A_WORD
+                        for neuron_id in range(0, n_neurons):
+                            output.write(
+                                "for key {} neuron id {} has bit {} "
+                                "set \n".format(
+                                    master_pop_key, neuron_id,
+                                    self._bit_for_neuron_id(
+                                        bit_field, neuron_id)))
+
+    def _bit_for_neuron_id(self, bit_field, neuron_id):
+        """ locate the bit for the neuron in the bitfield
+        
+        :param bit_field: the block of words which represent the bitfield
+        :param neuron_id: the neuron id to find the bit in the bitfield
+        :return: the bit
+        """
+        word_id = int(math.floor(neuron_id // self._BITS_IN_A_WORD))
+        bit_in_word = neuron_id % self._BITS_IN_A_WORD
+        flag = (bit_field[word_id] >> bit_in_word) & self.BIT_MASK
         return flag
 
     def _calculate_core_data(
@@ -190,19 +253,6 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                          app_vertex.direct_matrix_base_address(
                             transceiver, placement)))
 
-                    print "placement {}:{}:{} \n\n master table {:8x}, " \
-                          "\n synaptic_matrix {:8x}, \n bitfield {:8x} , " \
-                          "\n direct matrix {:8x}".format(
-                        placement.x, placement.y, placement.p,
-                        app_vertex.master_pop_table_base_address(
-                            transceiver, placement),
-                        app_vertex.synaptic_matrix_base_address(
-                            transceiver, placement),
-                        app_vertex.bit_field_base_address(
-                            transceiver, placement),
-                        app_vertex.direct_matrix_base_address(
-                            transceiver, placement))
-
         return data_address, expander_cores
 
     def _allocate_sdram_and_fill_in(self, data_address, transceiver):
@@ -215,6 +265,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
         # new app id for the bitfield expander
         bit_field_generator_app_id = transceiver.app_id_tracker.get_new_id()
+
+        # for each chip, allocate and fill in bitfield generated data.
         for (chip_x, chip_y) in data_address.keys():
             regions = data_address[(chip_x, chip_y)]
             base_address = transceiver.malloc_sdram(
@@ -234,7 +286,10 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                  generator
         """
         data = b''
+        # x bitfields
         data += self._ONE_WORDS.pack(len(regions))
+
+        # load each regions data for bitfield
         for (master_pop_base_address, synaptic_matrix_base_address,
              bit_field_base_address, direct_matrix_base_address) in regions:
             data += self._FOUR_WORDS.pack(
@@ -244,7 +299,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _run_app(
             self, executable_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder):
+            provenance_file_path, executable_finder,
+            read_bit_field_generator_iobuf):
         """ executes the app
 
         :param executable_cores: the cores to run the bit field expander on
@@ -252,12 +308,14 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param transceiver: the SpiNNMan instance
         :param provenance_file_path: the path for where provenance data is\
         stored
+        :param read_bit_field_generator_iobuf: bool flag for report
         :param executable_finder: finder for executable paths
         :rtype: None
         """
 
         # load the bitfield expander executable
         transceiver.execute_application(executable_cores, bit_field_app_id)
+
         # Wait for the executable to finish
         succeeded = False
         try:
@@ -277,11 +335,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             executable_cores, transceiver, provenance_file_path,
             bit_field_app_id, executable_finder)
 
-        iobuf_reader = ChipIOBufExtractor()
-        iobuf_reader(
-            transceiver, executable_cores, executable_finder,
-            provenance_file_path)
-
+        # if doing iobuf, read iobuf
+        if read_bit_field_generator_iobuf:
+            iobuf_reader = ChipIOBufExtractor()
+            iobuf_reader(
+                transceiver, executable_cores, executable_finder,
+                provenance_file_path)
 
         # stop anything that's associated with the compressor binary
         transceiver.stop_application(bit_field_app_id)
