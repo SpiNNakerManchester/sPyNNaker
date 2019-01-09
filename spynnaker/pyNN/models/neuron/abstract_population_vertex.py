@@ -404,7 +404,6 @@ class AbstractPopulationVertex(
             sdram += (
                 (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
                 constants.WORD_TO_BYTE_MULTIPLIER)
-        print "sdram for bitfield for vertex {} is {}".format(self, sdram)
         return sdram
 
     def _get_number_of_mallocs_used_by_dsg(self):
