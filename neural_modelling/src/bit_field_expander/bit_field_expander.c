@@ -389,7 +389,7 @@ bool generate_bit_field(uint32_t vertex_id){
         // determine keys masks and n_neurons
         spike_t key = population_table_get_spike_for_index(master_pop_entry);
         uint32_t mask = population_table_get_mask_for_entry(master_pop_entry);
-        uint32_t n_neurons = _n_neurons_from_key(mask);
+        uint32_t n_neurons = _n_neurons_from_key(key);
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = _n_words_from_n_neurons(n_neurons);
