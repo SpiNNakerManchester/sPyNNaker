@@ -132,7 +132,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param transceiver: the SPiNNMan instance
         :param placements: The placements
         :param default_report_folder:the file path for where reports are.
-        :rtype: None 
+        :rtype: None
         """
 
         # generate file
@@ -189,7 +189,8 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                                 n_words_to_read *
                                 constants.WORD_TO_BYTE_MULTIPLIER))
                         reading_address += (
-                            n_words_to_read * constants.WORD_TO_BYTE_MULTIPLIER)
+                            n_words_to_read *
+                            constants.WORD_TO_BYTE_MULTIPLIER)
 
                         # put into report
                         n_neurons = n_words_to_read * self._BITS_IN_A_WORD
@@ -203,7 +204,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def _bit_for_neuron_id(self, bit_field, neuron_id):
         """ locate the bit for the neuron in the bitfield
-        
+
         :param bit_field: the block of words which represent the bitfield
         :param neuron_id: the neuron id to find the bit in the bitfield
         :return: the bit
@@ -280,7 +281,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     def _get_edge_to_max_atoms_map(
             machine_vertex, machine_graph, routing_infos, graph_mapper):
         """ generates the map between key and n_atoms
-        
+
         :param machine_vertex: the machine vertex which is the destination of\
          the edges to be considered
         :param machine_graph: the machine graph

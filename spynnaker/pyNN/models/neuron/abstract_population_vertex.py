@@ -882,7 +882,7 @@ class AbstractPopulationVertex(
     def _locate_region_base_address_from_region_id(
             region_id, transceiver, placement):
         """ locates the base address based off the region id
-        
+
         :param region_id: dsg region id
         :param transceiver: SpiNNMan instance
         :param placement: placements of vertices
