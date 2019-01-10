@@ -41,7 +41,7 @@ class SpikeInjectorVertex(
             self, n_neurons, label, constraints, port, virtual_key,
             spike_buffer_max_size, buffer_size_before_receive,
             time_between_requests, buffer_notification_ip_address,
-            buffer_notification_port):
+            buffer_notification_port, reserve_reverse_ip_tag):
         # pylint: disable=too-many-arguments
         config = get_simulator().config
         if buffer_notification_ip_address is None:
@@ -53,7 +53,8 @@ class SpikeInjectorVertex(
 
         super(SpikeInjectorVertex, self).__init__(
             n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True,
+            virtual_key=virtual_key,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             buffer_notification_ip_address=buffer_notification_ip_address,
             buffer_notification_port=buffer_notification_port,
             constraints=constraints)

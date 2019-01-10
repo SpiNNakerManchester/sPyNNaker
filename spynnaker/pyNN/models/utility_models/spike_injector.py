@@ -9,7 +9,8 @@ _population_parameters = {
     "buffer_size_before_receive": None,
     "time_between_requests": None,
     "buffer_notification_ip_address": None,
-    "buffer_notification_port": None
+    "buffer_notification_port": None,
+    "reserve_reverse_ip_tag": False
 }
 
 
@@ -23,9 +24,9 @@ class SpikeInjector(AbstractPyNNModel):
             self, n_neurons, label, constraints, port, virtual_key,
             spike_buffer_max_size, buffer_size_before_receive,
             time_between_requests, buffer_notification_ip_address,
-            buffer_notification_port):
+            buffer_notification_port, reserve_reverse_ip_tag):
         return SpikeInjectorVertex(
             n_neurons, label, constraints, port, virtual_key,
             spike_buffer_max_size, buffer_size_before_receive,
             time_between_requests, buffer_notification_ip_address,
-            buffer_notification_port)
+            buffer_notification_port, reserve_reverse_ip_tag)
