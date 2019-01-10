@@ -881,6 +881,13 @@ class SynapticManager(object):
             self, application_vertex, application_graph, machine_timestep,
             weight_scale):
         """ Get the ring buffer shifts for this vertex
+
+        :param application_vertex: app vertex
+        :param application_graph: app graph
+        :param machine_timestep: machine time step
+        :param weight_scale: the scale for weights
+        :rtype: list
+        :return ring buffer shifts
         """
         if self._ring_buffer_shifts is None:
             self._ring_buffer_shifts = \
@@ -892,7 +899,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step, placements):
+            graph_mapper, weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)

@@ -9,14 +9,11 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_uses_population_table_and_synapses import \
-    AbstractUsesPopulationTableAndSynapses
-
 import struct
 import logging
 import os
 
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)
@@ -28,17 +25,11 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     __slots__ = ()
 
-    # the sdram tag being used here
-    _SDRAM_TAG = 2
-
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
 
     # the number of bytes needed to read the user2 register
     _USER_2_BYTES = 4
-
-    # master pop, synaptic matrix, bitfield base addresses
-    _N_ELEMENTS_PER_REGION_ELEMENT = 5
 
     # n key to n neurons maps size in words
     _N_KEYS_DATA_SET_IN_WORDS = 1
@@ -71,7 +62,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, machine, transceiver, graph_mapper,
+            provenance_file_path, transceiver, graph_mapper,
             read_bit_field_generator_iobuf, generating_bitfield_report,
             default_report_folder, machine_graph, routing_infos):
         """ loads and runs the bit field generator on chip
@@ -81,7 +72,6 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param executable_finder: the executable finder
         :param provenance_file_path: the path to where provenance data items\
                                      is written
-        :param machine: the SpiNNMachine instance
         :param transceiver: the SpiNNMan instance
         :param graph_mapper: mapper between application an machine graphs.
         :param read_bit_field_generator_iobuf: bool flag for report
@@ -98,13 +88,11 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             "Running bitfield generation on chip")
 
         # get data
-        data_address, expander_cores = self._calculate_core_data(
-            app_graph, graph_mapper, transceiver, placements, machine,
-            progress, executable_finder, machine_graph, routing_infos)
+        expander_cores = self._calculate_core_data(
+            app_graph, graph_mapper, placements, progress, executable_finder)
 
         # load data
-        bit_field_app_id = self._allocate_sdram_and_fill_in(
-            data_address, transceiver)
+        bit_field_app_id = transceiver.app_id_tracker.get_new_id()
         progress.update(1)
 
         # run app
@@ -142,7 +130,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
         # read in for each app vertex that would have a bitfield
         for app_vertex in app_graph.vertices:
-            if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
+            if isinstance(app_vertex, AbstractPopulationVertex):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
 
                 # get machine verts
@@ -215,24 +203,17 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         return flag
 
     def _calculate_core_data(
-            self, app_graph, graph_mapper, transceiver, placements, machine,
-            progress, executable_finder, machine_graph, routing_infos):
+            self, app_graph, graph_mapper, placements, progress,
+            executable_finder):
         """ gets the data needed for the bit field expander for the machine
 
         :param app_graph: app graph
         :param graph_mapper: graph mapper between app graph and machine graph
-        :param transceiver: SpiNNMan instance
         :param placements: placements
-        :param machine: SpiNNMachine instance
         :param progress: progress bar
         :param executable_finder: where to find the executable
-        :param machine_graph: the machine graph
-        :param routing_infos: the key to edge map
         :return: data and expander cores
         """
-
-        # storage for the data addresses needed for the bitfield
-        data_address = dict()
 
         # cores to place bitfield expander
         expander_cores = ExecutableTargets()
@@ -243,139 +224,18 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
 
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
-            if isinstance(app_vertex, AbstractUsesPopulationTableAndSynapses):
+            if isinstance(app_vertex, AbstractPopulationVertex):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
                 for machine_vertex in machine_verts:
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
 
                     # check if the chip being considered already.
-                    if (placement.x, placement.y) not in data_address:
-                        data_address[(placement.x, placement.y)] = dict()
-                        expander_cores.add_processor(
-                            bit_field_expander_path, placement.x, placement.y,
-                            machine.get_chip_at(placement.x, placement.y).
-                            get_first_none_monitor_processor().processor_id)
+                    expander_cores.add_processor(
+                        bit_field_expander_path, placement.x, placement.y,
+                        placement.p)
 
-                    # find the max atoms from source from each edge
-                    edge_key_to_max_atom_map = \
-                        self._get_edge_to_max_atoms_map(
-                            machine_vertex, machine_graph, routing_infos,
-                            graph_mapper)
-
-                    # add the extra data
-                    data_address[(placement.x, placement.y)][placement.p] = (
-                        (app_vertex.master_pop_table_base_address(
-                            transceiver, placement),
-                         app_vertex.synaptic_matrix_base_address(
-                             transceiver, placement),
-                         app_vertex.bit_field_base_address(
-                             transceiver, placement),
-                         app_vertex.direct_matrix_base_address(
-                            transceiver, placement),
-                         edge_key_to_max_atom_map))
-
-        return data_address, expander_cores
-
-    @staticmethod
-    def _get_edge_to_max_atoms_map(
-            machine_vertex, machine_graph, routing_infos, graph_mapper):
-        """ generates the map between key and n_atoms
-
-        :param machine_vertex: the machine vertex which is the destination of\
-         the edges to be considered
-        :param machine_graph: the machine graph
-        :param routing_infos: the key to edge map
-        :param graph_mapper: mapping between app and machine vertex
-        :return: dict of key to max_atoms
-        """
-        keys_to_max_atoms_map = dict()
-        in_coming_edges = \
-            machine_graph.get_edges_ending_at_vertex(machine_vertex)
-        for in_coming_edge in in_coming_edges:
-            key = routing_infos.get_first_key_from_partition(
-                machine_graph.get_outgoing_partition_for_edge(in_coming_edge))
-            keys_to_max_atoms_map[key] = (
-                graph_mapper.get_slice(in_coming_edge.pre_vertex).n_atoms)
-        return keys_to_max_atoms_map
-
-    def _allocate_sdram_and_fill_in(self, data_address, transceiver):
-        """ loads the app data for the bitfield generation
-
-        :param data_address: the data base addresses for the cores in question
-        :param transceiver: SpiNNMan instance
-        :return: the bitfield app id
-        """
-
-        # new app id for the bitfield expander
-        bit_field_generator_app_id = transceiver.app_id_tracker.get_new_id()
-
-        # for each chip, allocate and fill in bitfield generated data.
-        for (chip_x, chip_y) in data_address.keys():
-            sdram_required = 0
-
-            # chip level regions
-            regions = data_address[(chip_x, chip_y)]
-
-            # get each processor addresses and key to n_atoms map
-            for processor in data_address[(chip_x, chip_y)].keys():
-                sdram_required += (
-                    (self._N_REGION_DATA_SETS_IN_WORDS +
-                     self._N_ELEMENTS_PER_REGION_ELEMENT) *
-                    constants.WORD_TO_BYTE_MULTIPLIER)
-                (_, _, _, _, key_to_n_atoms) = \
-                    data_address[(chip_x, chip_y)][processor]
-                sdram_required += (
-                    (self._N_KEYS_DATA_SET_IN_WORDS + (
-                        len(key_to_n_atoms.keys()) *
-                        self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) *
-                     constants.WORD_TO_BYTE_MULTIPLIER))
-
-            # allocate sdram on chip for data size
-            base_address = transceiver.malloc_sdram(
-                chip_x, chip_y, sdram_required, bit_field_generator_app_id,
-                self._SDRAM_TAG)
-            transceiver.write_memory(
-                chip_x, chip_y, base_address, self._generate_data(regions))
-        return bit_field_generator_app_id
-
-    def _generate_data(self, regions):
-        """ generates the chips worth of data for regions to bitfield
-
-        :param regions: list of tuples of master pop, synaptic matrix
-        :return: data in byte array format for a given chip's bit field \
-                 generator
-        """
-        data = b''
-
-        key_to_atom_regions = list()
-
-        # x bitfields
-        data += self._ONE_WORDS.pack(len(regions))
-
-        # load each regions data for bitfield
-        for processor_id in regions.keys():
-            (master_pop_base_address, synaptic_matrix_base_address,
-             bit_field_base_address, direct_matrix_base_address,
-             key_to_n_atoms) = regions[processor_id]
-
-            # write the region base address's
-            data += self._FOUR_WORDS.pack(
-                master_pop_base_address, synaptic_matrix_base_address,
-                bit_field_base_address, direct_matrix_base_address)
-
-            # store for bottom store
-            key_to_atom_regions.append(key_to_n_atoms)
-
-        # plonk these at the bottom to ensure we can get them during the
-        # process without dtcm issues.
-        for key_to_n_atoms in key_to_atom_regions:
-            data += self._ONE_WORDS.pack(len(key_to_n_atoms))
-            # write the key to n atom maps
-            for routing_key in key_to_n_atoms:
-                data += self._TWO_WORDS.pack(
-                    int(routing_key), int(key_to_n_atoms[routing_key]))
-        return bytearray(data)
+        return expander_cores
 
     def _run_app(
             self, executable_cores, bit_field_app_id, transceiver,
@@ -436,7 +296,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: path to provenance folder
         :param compressor_app_id: the app id for the compressor c code
-        :param executable_finder: exeuctable path finder
+        :param executable_finder: executable path finder
         :rtype: None
         """
 

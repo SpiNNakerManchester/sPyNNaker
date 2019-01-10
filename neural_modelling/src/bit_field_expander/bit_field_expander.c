@@ -3,17 +3,10 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include <neuron/regions.h>
 #include <neuron/population_table/population_table.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
-
-//! location to hold memory addresses
-typedef struct vertex_memory_regions_addresses {
-    address_t master_pop_base_address;
-    address_t synaptic_matrix_base_address;
-    address_t bit_field_base_address;
-    address_t direct_matrix_region_base_address;
-} vertex_memory_regions_addresses;
 
 //! store of key to n atoms map
 typedef struct key_to_max_atoms_map {
@@ -34,16 +27,28 @@ typedef struct key_to_max_atoms_map {
 // be used in reality.
 address_t row_address;
 
-// used to store the max row size for dma reads (used when extracting a
-// synapse row from sdram.
-uint32_t row_max_n_words;
+//! master pop address
+address_t master_pop_base_address;
+
+// synaptic matrix base address
+address_t synaptic_matrix_base_address;
+
+// bitfield base address
+address_t bit_field_base_address;
+
+// direct matrix base address
+address_t direct_matrix_region_base_address;
+
+// bitfield builder data base address
+address_t bit_field_builder_base_address;
 
 // used to store the dtcm based master pop entries. (used during pop table
 // init, and reading back synaptic rows).
 address_t direct_synapses_address;
 
-// storage location for the list of vertex addresses
-vertex_memory_regions_addresses** vertex_addresses;
+// used to store the max row size for dma reads (used when extracting a
+// synapse row from sdram.
+uint32_t row_max_n_words;
 
 // storage location for the list of key to max atom maps
 key_to_max_atoms_map** keys_to_max_atoms;
@@ -62,85 +67,41 @@ bit_field_t* fake_bit_fields;
 //! \brief used to hold sdram read row
 uint32_t * row_data;
 
-//! \brief used to track position in the sdram read
-int position_in_sdram_init_data = 0;
-
 //! \brief reads in the vertex region addresses
 void read_in_addresses(){
 
     // get the data (linked to sdram tag 2 and assume the app ids match)
-    address_t data = sark_tag_ptr(2, 0);
+    address_t core_address = data_specification_get_data_address();
 
-    // get how many vertex's we're to process
-    n_vertex_regions = data[position_in_sdram_init_data];
-    position_in_sdram_init_data += 1;
+    master_pop_base_address = data_specification_get_region(
+        POPULATION_TABLE_REGION, core_address);
+    synaptic_matrix_base_address = data_specification_get_region(
+        SYNAPTIC_MATRIX_REGION, core_address);
+    bit_field_base_address = data_specification_get_region(
+        BIT_FIELD_FILTER_REGION, core_address);
+    direct_matrix_region_base_address = data_specification_get_region(
+        DIRECT_MATRIX_REGION, core_address);
+    bit_field_builder_base_address = data_specification_get_region(
+        BIT_FIELD_BUILDER, core_address);
 
-    // allocate dtcm for the vertex's
-    vertex_addresses = spin1_malloc(
-        sizeof(vertex_memory_regions_addresses*) * n_vertex_regions);
-
-    // check dtcm was allocated
-    if (vertex_addresses == NULL){
-        log_error("cant allocate dtcm for the vertex region addresses");
-        rt_error(RTE_ABORT);
-    }
-
-    // allocate each regions dtcm and read in data
-    for (uint32_t vertex_region_index = 0;
-            vertex_region_index < n_vertex_regions;
-            vertex_region_index++){
-
-        // allocate dtcm for region struct.
-        vertex_addresses[vertex_region_index] =
-            (vertex_memory_regions_addresses *) spin1_malloc(
-                sizeof(vertex_memory_regions_addresses));
-
-        // check dtcm was allocated
-        if (vertex_addresses[vertex_region_index] == NULL){
-            log_error("cant allocate dtcm for vertex %d regions",
-                      vertex_region_index);
-            rt_error(RTE_ABORT);
-        }
-
-        // read in a vertex memory regions
-        spin1_memcpy(
-            vertex_addresses[vertex_region_index],
-            &data[position_in_sdram_init_data],
-            sizeof(vertex_memory_regions_addresses));
-
-        // update sdram tracker
-        position_in_sdram_init_data += (
-            sizeof(vertex_memory_regions_addresses) / BYTE_TO_WORD_CONVERSION);
-
-        // printer
-        log_debug(
-            "vertex %d master_pop_table_base_address = %0x",
-             vertex_region_index,
-             vertex_addresses[vertex_region_index]->master_pop_base_address);
-        log_debug(
-            "vertex %d synaptic_matrix_base_address = %0x",
-             vertex_region_index,
-             vertex_addresses[
-                vertex_region_index]->synaptic_matrix_base_address);
-        log_debug(
-            "vertex %d bit_field_base_address = %0x",
-             vertex_region_index,
-             vertex_addresses[vertex_region_index]->bit_field_base_address);
-        log_debug(
-            "vertex %d direct_matrix_region_base_address = %0x",
-             vertex_region_index,
-             vertex_addresses[
-                vertex_region_index]->direct_matrix_region_base_address);
-    }
+    // printer
+    log_debug("master_pop_table_base_address = %0x", master_pop_base_address);
+    log_debug(
+        "synaptic_matrix_base_address = %0x", synaptic_matrix_base_address);
+    log_debug("bit_field_base_address = %0x", bit_field_base_address);
+    log_debug("direct_matrix_region_base_address = %0x",
+              direct_matrix_region_base_address);
+    log_debug("bit_field_builder = %0x", bit_field_builder_base_address);
     log_info("finished reading in vertex data region addresses");
 }
 
 
 void _read_in_the_key_to_max_atom_map(){
-    address_t data = sark_tag_ptr(2, 0);
 
     // allocate dtcm for the key to max atom map
-    n_keys_to_max_atom_map = data[position_in_sdram_init_data];
+    uint32_t position_in_sdram_init_data = 0;
+    n_keys_to_max_atom_map =
+        bit_field_builder_base_address[position_in_sdram_init_data];
     log_info(" n keys to max atom map entries is %d",
              n_keys_to_max_atom_map);
     position_in_sdram_init_data += 1;
@@ -172,7 +133,8 @@ void _read_in_the_key_to_max_atom_map(){
 
         spin1_memcpy(
             keys_to_max_atoms[key_to_max_atom_index],
-            &data[position_in_sdram_init_data], sizeof(key_to_max_atoms_map));
+            &bit_field_builder_base_address[position_in_sdram_init_data],
+            sizeof(key_to_max_atoms_map));
         position_in_sdram_init_data +=
             sizeof(key_to_max_atoms_map) / BYTE_TO_WORD_CONVERSION;
 
@@ -265,15 +227,13 @@ void _print_fake_bit_field(){
 
 //! \brief sets up the master pop table and synaptic matrix for the bit field
 //!        processing
-//! \param[in] vertex_id: the index in the memory region paths.
 //! \return: bool that states if the init was successful or not.
-bool initialise(uint32_t vertex_id){
+bool initialise(){
 
     // init the synapses to get direct synapse address
     log_info("direct synapse init");
     if (!direct_synapses_initialise(
-            vertex_addresses[vertex_id]->direct_matrix_region_base_address,
-            &direct_synapses_address)) {
+            direct_matrix_region_base_address, &direct_synapses_address)) {
         log_error("failed to init the synapses. failing");
         return false;
     }
@@ -281,8 +241,7 @@ bool initialise(uint32_t vertex_id){
     // init the master pop table
     log_info("pop table init");
     if (!population_table_initialise(
-            vertex_addresses[vertex_id]->master_pop_base_address,
-            vertex_addresses[vertex_id]->synaptic_matrix_base_address,
+            master_pop_base_address, synaptic_matrix_base_address,
             direct_synapses_address, &row_max_n_words)) {
         log_error("failed to init the master pop table. failing");
         return false;
@@ -334,7 +293,8 @@ bool process_synaptic_row(synaptic_row_t row){
         uint32_t fixed_synapse =
             synapse_row_num_fixed_synapses(fixed_region_address);
         if (fixed_synapse == 0){
-            log_debug("plastic and fixed do not have entries, so can be pruned");
+            log_debug(
+                "plastic and fixed do not have entries, so can be pruned");
             return false;
         }
         else{
@@ -359,14 +319,11 @@ bool _do_sdram_read_and_test(
 //! \brief creates the bitfield for this master pop table and synaptic matrix
 //! \param[in] vertex_id: the index in the regions.
 //! \return bool that states if it was successful at generating the bitfield
-bool generate_bit_field(uint32_t vertex_id){
+bool generate_bit_field(){
 
     // write how many entries (thus bitfields) are to be generated into sdram
 
     uint32_t position = 0;
-    log_debug("bit_field_base_address");
-    address_t bit_field_base_address =
-        vertex_addresses[vertex_id]->bit_field_base_address;
     log_debug("mem cpy for pop length");
     bit_field_base_address[position] = population_table_length();
     log_debug("update position");
@@ -458,51 +415,6 @@ bool generate_bit_field(uint32_t vertex_id){
     return true;
 }
 
-//! \brief frees the dtcm allocated so that the next cycle doesnt run out of
-//!        dtcm
-//! \return bool that states if it was successful at freeing the dtcm
-bool free_dtcm(){
-
-    // free the fake bit field.
-    log_debug("freeing fake b it field");
-    for (uint32_t bit_field_index = 0;
-            bit_field_index < population_table_length();
-            bit_field_index++){
-        log_debug("freeing bitfield in index %d", bit_field_index);
-        sark_free(fake_bit_fields[bit_field_index]);
-    }
-    log_debug("freeing top free bit field");
-    sark_free(fake_bit_fields);
-
-    // free pop table dtcm
-    log_debug("freeing pop table");
-    if (!population_table_shut_down()){
-        log_error("failed to shut down the master pop table");
-        return false;
-    }
-
-    // free the allocated from synapses
-    log_debug("freeing direct synapses");
-    if (direct_synapses_address != NULL){
-        sark_free(direct_synapses_address);
-    }
-
-    // free the key to max atoms map
-    log_info("freeing key to max atom map");
-    for (uint32_t key_entry_index = 0; key_entry_index < n_keys_to_max_atom_map;
-            key_entry_index++){
-        log_info("freeing key to max atom in index %d", key_entry_index);
-        sark_free(keys_to_max_atoms[key_entry_index]);
-    }
-    sark_free(keys_to_max_atoms);
-
-    // free the row data holder
-    log_debug("freeing row data");
-    sark_free(row_data);
-    log_debug("done all freeing yey!");
-    return true;
-}
-
 void c_main(void) {
     // set to running state
     sark_cpu_state(CPU_STATE_RUN);
@@ -513,30 +425,16 @@ void c_main(void) {
     read_in_addresses();
 
     // generate bit field for each vertex regions
-    for (uint32_t vertex_id = 0; vertex_id < n_vertex_regions; vertex_id++){
-        if (!initialise(vertex_id)){
-            log_error(
-                "failed to init the master pop and synaptic matrix for vertex"
-                 " %d", vertex_id);
-            rt_error(RTE_ABORT);
-        }
-        log_info("generating bit field for vertex %d", vertex_id);
-        if (!generate_bit_field(vertex_id)){
-            log_error(
-                "failed to generate bitfield for the vertex %d", vertex_id);
-            rt_error(RTE_ABORT);
-        };
-        log_info("freeing dtcm for vertex %d", vertex_id);
-        if (!free_dtcm()){
-            log_error(
-                "failed to free dtcm from the master pop and synapses for "
-                "vertex %d", vertex_id);
-            rt_error(RTE_ABORT);
-        }
-        log_info(
-            "successfully processed the bitfield for vertex %d", vertex_id);
+    if (!initialise()){
+        log_error("failed to init the master pop and synaptic matrix");
+        rt_error(RTE_ABORT);
     }
+    log_info("generating bit field");
+    if (!generate_bit_field()){
+        log_error("failed to generate bitfield");
+        rt_error(RTE_ABORT);
+    };
 
-    // done!
-    log_info("Finished bitfield expander!");
+    log_info("successfully processed the bitfield");
+
 }

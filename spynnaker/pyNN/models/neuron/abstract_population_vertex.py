@@ -3,10 +3,6 @@ import sys
 
 import math
 
-import struct
-
-from data_specification import utility_calls
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from spinn_utilities.overrides import overrides
 
 # pacman imports
@@ -16,6 +12,7 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 
 # front end common imports
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -40,9 +37,6 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
-from spynnaker.pyNN.models.abstract_models.\
-    abstract_uses_population_table_and_synapses import \
-    AbstractUsesPopulationTableAndSynapses
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -52,12 +46,13 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron.population_machine_vertex \
     import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable
+    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
 from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS, \
+    WORD_TO_BYTE_MULTIPLIER
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 
@@ -78,8 +73,6 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-_ONE_WORD = struct.Struct("<I")
-
 
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
@@ -90,7 +83,7 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractUsesPopulationTableAndSynapses, ProvidesKeyToAtomMappingImpl):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -131,6 +124,12 @@ class AbstractPopulationVertex(
 
     ELEMENTS_USED_IN_BIT_FIELD_HEADER = 1  # n bitfields
 
+    # n elements in each key to n atoms map for bitfield
+    _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
+
+    # n key to n neurons maps size in words
+    _N_KEYS_DATA_SET_IN_WORDS = 1
+
     # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
     BIT_IN_A_WORD = 32.0
 
@@ -143,7 +142,6 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments, too-many-locals
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
-        AbstractUsesPopulationTableAndSynapses.__init__(self)
 
         self._n_atoms = n_neurons
 
@@ -344,9 +342,36 @@ class AbstractPopulationVertex(
             profile_utils.get_profile_region_size(
                 self._n_profile_samples) +
             self._get_estimated_sdram_for_bit_field_region(
-                graph.get_edges_ending_at_vertex(self)))
+                graph.get_edges_ending_at_vertex(self)) +
+            self._get_estimated_sdram_for_bit_field_builder_region(graph))
 
         return sdram_requirement
+
+    def _get_estimated_sdram_for_bit_field_builder_region(self, app_graph):
+        """ gets an estimate of the bitfield builder region
+
+        :param app_graph: the app graph
+        :return: sdram needed
+        """
+
+        # basic sdram
+        sdram = self._N_KEYS_DATA_SET_IN_WORDS * WORD_TO_BYTE_MULTIPLIER
+        for in_edge in app_graph.get_edges_ending_at_vertex(self):
+
+            # Get the number of likely vertices
+            max_atoms = sys.maxsize
+            edge_pre_vertex = in_edge.pre_vertex
+            if (isinstance(
+                    edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+            if in_edge.pre_vertex.n_atoms < max_atoms:
+                max_atoms = in_edge.pre_vertex.n_atoms
+            n_edge_vertices = int(math.ceil(
+                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+            sdram += (n_edge_vertices *
+                      self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
+                      WORD_TO_BYTE_MULTIPLIER)
+        return sdram
 
     def _get_estimated_sdram_for_bit_field_region(self, incoming_edges):
         """ estimates the sdram for the bit field region
@@ -633,10 +658,51 @@ class AbstractPopulationVertex(
         self._synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step, placements)
+            weight_scale, machine_time_step)
+
+        # write up the bitfield builder data
+        self._write_bitfield_init_data(
+            spec, vertex, machine_graph, routing_info, graph_mapper)
 
         # End the writing of this specification:
         spec.end_specification()
+
+    def _write_bitfield_init_data(
+            self, spec, machine_vertex, machine_graph, routing_info,
+            graph_mapper):
+        """ writes the init data needed for the bitfield generator
+
+        :param spec: data spec writer
+        :param machine_vertex: machine vertex
+        :param machine_graph: machine graph
+        :param routing_info: keys
+        :param graph_mapper: mapping between graphs
+        :rtype: None
+        """
+        # deduce sdram for the truer setup
+        sdram = (
+            self._N_KEYS_DATA_SET_IN_WORDS +
+            len(machine_graph.get_edges_ending_at_vertex(machine_vertex)) *
+            self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
+
+        # reserve memory region
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            size=sdram, label="bitfield setup data")
+        spec.switch_write_focus(
+            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
+
+        # write n keys max atom map
+        spec.write_value(
+            len(machine_graph.get_edges_ending_at_vertex(machine_vertex)))
+
+        # load in key to max atoms map
+        for in_coming_edge in machine_graph.get_edges_ending_at_vertex(
+                machine_vertex):
+            spec.write_value(routing_info.get_first_key_from_partition(
+                machine_graph.get_outgoing_partition_for_edge(in_coming_edge)))
+            spec.write_value(
+                graph_mapper.get_slice(in_coming_edge.pre_vertex).n_atoms)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -851,55 +917,7 @@ class AbstractPopulationVertex(
             connection_holder, edge, synapse_info)
 
     @overrides(
-        AbstractUsesPopulationTableAndSynapses.synaptic_matrix_base_address)
-    def synaptic_matrix_base_address(self, transceiver, placement):
-        return self._locate_region_base_address_from_region_id(
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value, transceiver,
-            placement)
-
-    @overrides(
-        AbstractUsesPopulationTableAndSynapses.master_pop_table_base_address)
-    def master_pop_table_base_address(self, transceiver, placement):
-        return self._locate_region_base_address_from_region_id(
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value, transceiver,
-            placement)
-
-    @overrides(
-        AbstractUsesPopulationTableAndSynapses.bit_field_base_address)
-    def bit_field_base_address(self, transceiver, placement):
-        return self._locate_region_base_address_from_region_id(
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value, transceiver,
-            placement)
-
-    @overrides(
-        AbstractUsesPopulationTableAndSynapses.direct_matrix_base_address)
-    def direct_matrix_base_address(self, transceiver, placement):
-        return self._locate_region_base_address_from_region_id(
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value, transceiver,
-            placement)
-
-    @staticmethod
-    def _locate_region_base_address_from_region_id(
-            region_id, transceiver, placement):
-        """ locates the base address based off the region id
-
-        :param region_id: dsg region id
-        :param transceiver: SpiNNMan instance
-        :param placement: placements of vertices
-        :return: the base address of the region
-        """
-        # TODO this ust to be a utility method somewhere. where has it gone?!
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        region_base_address_offset = \
-            utility_calls.get_region_base_address_offset(
-                regions_base_address, region_id)
-        base_address = transceiver.read_memory(
-            placement.x, placement.y, region_base_address_offset, 4)
-        return _ONE_WORD.unpack(base_address)[0]
-
-    @overrides(
-        AbstractUsesPopulationTableAndSynapses.get_connections_from_machine)
+        AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
