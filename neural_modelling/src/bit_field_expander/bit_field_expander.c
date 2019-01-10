@@ -203,13 +203,6 @@ uint32_t _n_neurons_from_key(uint32_t key){
     return NULL;
 }
 
-//! \brief deduces the n words for n neurons
-//! \param[in] n_neurons: the n neurons to convert to n words
-//! \return the number of words to cover the number of neurons
-uint32_t _n_words_from_n_neurons(uint32_t n_neurons){
-    return get_bit_field_size(n_neurons);
-}
-
 //! \brief creates a fake bitfield where every bit is set to 1.
 //! \return bool, which states if the creation of the fake bitfield was
 //!               successful or not.
@@ -233,11 +226,10 @@ bool _create_fake_bit_field(){
                   master_pop_entry, key, n_neurons);
 
         // generate the bitfield for this master pop entry
-        uint32_t n_words = _n_words_from_n_neurons(n_neurons);
+        uint32_t n_words = get_bit_field_size(n_neurons);
 
         log_debug("n neurons is %d. n words is %d", n_neurons, n_words);
-        fake_bit_fields[master_pop_entry] =
-            (bit_field_t) spin1_malloc(n_words * sizeof(uint32_t));
+        fake_bit_fields[master_pop_entry] = bit_field_alloc(n_neurons);
         if (fake_bit_fields[master_pop_entry] == NULL){
             log_error("could not allocate %d bytes of dtcm for bit field",
                       n_words * sizeof(uint32_t));
@@ -392,11 +384,11 @@ bool generate_bit_field(uint32_t vertex_id){
         uint32_t n_neurons = _n_neurons_from_key(key);
 
         // generate the bitfield for this master pop entry
-        uint32_t n_words = _n_words_from_n_neurons(n_neurons);
+        uint32_t n_words = get_bit_field_size(n_neurons);
 
         log_debug("pop entry %d, key = %d, mask = %0x, n_neurons = %d",
                   master_pop_entry, (uint32_t) key, mask, n_neurons);
-        bit_field_t bit_field = spin1_malloc(n_words * sizeof(uint32_t));
+        bit_field_t bit_field = bit_field_alloc(n_neurons);
         if (bit_field == NULL){
             log_error("could not allocate dtcm for bit field");
             return false;
