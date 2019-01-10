@@ -8,6 +8,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
+from spinnman.constants import SCP_SCAMP_PORT
 
 _MAX_RATES_PER_PACKET = 32
 
@@ -86,12 +87,13 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         if not control_label.endswith(self._control_label_extension):
             control_label = self._control_label(label)
         pos = 0
+        x, y, p, ip_address = self._send_address_details[label]
         while pos < len(neuron_id_rates):
             message, pos = self._assemble_message(
                 self._atom_id_to_key[control_label], neuron_id_rates, pos)
-            ip_address, port = self._send_address_details[control_label]
-            self._sender_connection.send_eieio_message_to(
-                message, ip_address, port)
+            self._sender_connection.send_to(
+                self._get_sdp_data(message, x, y, p),
+                (ip_address, SCP_SCAMP_PORT))
 
     @staticmethod
     def _assemble_message(id_to_key_map, neuron_id_rates, pos):
