@@ -36,10 +36,12 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :type control_label_extension: str
 
         """
-        control_labels = [
-            "{}{}".format(label, control_label_extension)
-            for label in poisson_labels
-        ]
+        control_labels = None
+        if poisson_labels is not None:
+            control_labels = [
+                "{}{}".format(label, control_label_extension)
+                for label in poisson_labels
+            ]
 
         super(SpynnakerPoissonControlConnection, self).__init__(
             live_packet_gather_label=None, send_labels=control_labels,
