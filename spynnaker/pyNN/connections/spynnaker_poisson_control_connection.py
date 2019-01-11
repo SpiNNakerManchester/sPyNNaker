@@ -60,6 +60,12 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         super(SpynnakerPoissonControlConnection, self).add_start_callback(
             self._control_label(label), start_callback)
 
+    @overrides(LiveEventConnection.add_start_resume_callback)
+    def add_start_resume_callback(self, label, start_resume_callback):
+        super(SpynnakerPoissonControlConnection, self)\
+            .add_start_resume_callback(
+            self._control_label(label), start_resume_callback)
+
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
         super(SpynnakerPoissonControlConnection, self).add_init_callback(
@@ -69,6 +75,11 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def add_receive_callback(self, label, live_event_callback):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
+
+    @overrides(LiveEventConnection.add_pause_stop_callback)
+    def add_pause_stop_callback(self, label, pause_stop_callback):
+        super(SpynnakerPoissonControlConnection, self).add_pause_stop_callback(
+            self._control_label(label), pause_stop_callback)
 
     def set_rate(self, label, neuron_id, rate):
         """ Set the rate of a Poisson neuron within a Poisson source
