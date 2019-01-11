@@ -48,8 +48,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         self._control_label_extension = control_label_extension
 
     def add_poisson_label(self, label):
-        control_label = "{}{}".format(label, self._control_label_extension)
-        self.add_send_label(control_label)
+        self.add_send_label(self._control_label(label))
 
     def _control_label(self, label):
         return "{}{}".format(label, self._control_label_extension)
