@@ -1,6 +1,18 @@
 from six import add_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
+from enum import Enum
+
+
+class SendType(Enum):
+    """ The data type to be sent in the payload of the multicast packet
+    """
+    SEND_TYPE_INT = 0
+    SEND_TYPE_UINT = 1
+    SEND_TYPE_ACCUM = 2
+    SEND_TYPE_UACCUM = 3
+    SEND_TYPE_FRACT = 4
+    SEND_TYPE_UFRACT = 5
 
 
 @add_metaclass(AbstractBase)
@@ -47,9 +59,17 @@ class AbstractMulticastControllableDevice(object):
         :rtype: float
         """
 
+    @abstractproperty
     def device_control_timesteps_between_sending(self):
         """ The number of timesteps between sending commands to the device.\
             This defines the "sampling interval" for the device.
 
         :rtype: int
+        """
+
+    @abstractproperty
+    def device_control_send_type(self):
+        """ The type of data to be sent
+
+        :rtype: :py:class:`.SendType`
         """

@@ -3,9 +3,19 @@
 
 #include "threshold_type.h"
 #include <spin1_api.h>
+#include <stdfix-full-iso.h>
 
 static uint32_t time_between_spikes;
 static uint32_t expected_time;
+
+enum send_type {
+    SEND_TYPE_INT=0,
+    SEND_TYPE_UINT,
+    SEND_TYPE_ACCUM,
+    SEND_TYPE_UACCUM,
+    SEND_TYPE_FRACT,
+    SEND_TYPE_UFRACT,
+};
 
 typedef struct threshold_type_t {
 
@@ -28,6 +38,9 @@ typedef struct threshold_type_t {
 
     // The time until the next sending of the value (initially 0)
     uint32_t time_until_next_send;
+
+    // Send type
+    enum send_type type;
 
 } threshold_type_t;
 
@@ -68,6 +81,27 @@ static inline void send_packet(
     }
 }
 
+static inline uint get_payload(enum send_type type, accum value) {
+    switch (type) {
+    case SEND_TYPE_INT:
+        return int_bits((int) value);
+    case SEND_TYPE_UINT:
+        return (uint) value;
+    case SEND_TYPE_ACCUM:
+        return int_bits(bitsk(value));
+    case SEND_TYPE_UACCUM:
+        return bitsuk((unsigned accum) value);
+    case SEND_TYPE_FRACT:
+        return int_bits(bitslr((long fract) value));
+    case SEND_TYPE_UFRACT:
+        return bitsulr((long unsigned fract) value);
+    default:
+        log_error("Unknown enum value %u", value);
+        rt_error(RTE_SWERR);
+    }
+    return 0;
+}
+
 static bool threshold_type_is_above_threshold(
         state_t value, threshold_type_pointer_t threshold_type) {
 
@@ -83,7 +117,7 @@ static bool threshold_type_is_above_threshold(
                 value_to_send = threshold_type->min_value;
             }
 
-            uint payload = int_bits((int) value_to_send);
+            uint payload = get_payload(threshold_type->type, value_to_send);
 
             log_debug("Sending key=0x%08x payload=0x%08x",
                     threshold_type->key, payload);

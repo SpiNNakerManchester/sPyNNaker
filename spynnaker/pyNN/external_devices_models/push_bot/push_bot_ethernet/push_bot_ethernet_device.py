@@ -59,6 +59,12 @@ class PushBotEthernetDevice(AbstractMulticastControllableDevice):
         return self._time_between_send
 
     @property
+    @overrides(AbstractMulticastControllableDevice
+               .device_control_send_type)
+    def device_control_send_type(self):
+        return self._device.send_type
+
+    @property
     def protocol(self):
         """ The protocol instance, for use in the subclass
         """

@@ -24,7 +24,8 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
             DataType.S1615,    # min_value
             DataType.S1615,    # max_value
             DataType.UINT32,   # time steps between sending
-            DataType.UINT32])  # time steps until next send
+            DataType.UINT32,   # time steps until next send
+            DataType.UINT32])  # type to send
         self._device = device
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
@@ -65,11 +66,14 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
                 # This is the "state" variable that keeps track of how many
                 # timesteps to go before a send is done
                 # Set to a different value for each item to avoid being in step
-                [i for i in range(vertex_slice.n_atoms)]]
+                [i for i in range(vertex_slice.n_atoms)],
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_send_type.value)]
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_key, _uses_payload, _min, _max, _between, time_until_send) = values
+        (_key, _uses_payload, _min, _max, _between, time_until_send,
+         _send_type) = values
         state_variables[TIME_UNTIL_SEND] = time_until_send
