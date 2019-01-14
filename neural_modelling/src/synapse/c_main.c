@@ -47,7 +47,7 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    MC = -1, TIMER = 0
 } callback_priorities;
 
 //! The number of regions that are to be used for recording
@@ -117,7 +117,6 @@ static bool initialise(uint32_t *timer_period) {
 
     // Get the address this core's DTCM data starts at from SRAM
     address_t address = data_specification_get_data_address();
-
     // Read the header
     if (!data_specification_read_header(address)) {
         return false;
@@ -203,8 +202,16 @@ static bool initialise(uint32_t *timer_period) {
 //! \param[in] unused unused parameter kept for API consistency
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
+    uint cpsr;
+
     use(timer_count);
     use(unused);
+
+    cpsr = spin1_int_disable();
+
+    //DMA Write
+
+    spin1_mode_restore(cpsr);
 }
 
 //! \brief The entry point for this model.
@@ -224,7 +231,7 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
               timer_period);
-    spin1_set_timer_tick(timer_period);
+    spin1_set_timer_tick_and_phase(timer_period, dma_shift);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
