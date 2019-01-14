@@ -7,6 +7,8 @@ NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
 THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
-ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_HT_currents_impl.h
+#ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_HT_currents_impl.h
+#ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_HT_currents_mixed_precision_impl.h
+ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_HT_currents_RTN_mult_impl.h
 
 include ../neural_build.mk
