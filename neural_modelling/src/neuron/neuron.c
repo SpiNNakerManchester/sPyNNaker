@@ -76,6 +76,9 @@ static uint32_t expected_time;
 //! The number of recordings outstanding
 static uint32_t n_recordings_outstanding = 0;
 
+//! The synaptic contributions for the current timestep
+static uint16_t *synaptic_contributions;
+
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
@@ -193,6 +196,13 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
+        return false;
+    }
+
+    // Allocate space for the synaptic contribution buffer
+    synaptic_contributions = (uint16_t *) spin1_malloc(n_neurons);
+    if (synaptic_contributions == NULL) {
+        log_error("Unable to allocate Synaptic contribution buffers");
         return false;
     }
 
