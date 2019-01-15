@@ -1,4 +1,5 @@
-BUILDS = spike_source/poisson \
+BUILDS = compressor_with_bit_field \
+         spike_source/poisson \
          delay_extension \
          neuron \
          robot_motor_control \

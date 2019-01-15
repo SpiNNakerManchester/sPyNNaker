@@ -116,11 +116,14 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_load_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("SpynnakerAtomBasedRoutingDataGenerator")
+        extra_load_algorithms.append("BitFieldRouterCompressor")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
+            extra_mapping_algorithms.append(
+                "PreAllocateForBitFieldRouterCompressor")
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 

@@ -3,6 +3,8 @@ import sys
 
 import math
 
+from data_specification import utility_calls
+
 from spinn_utilities.overrides import overrides
 
 # pacman imports
@@ -37,6 +39,8 @@ from spinn_front_end_common.interface.buffer_management\
 from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -73,6 +77,8 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
+_ONE_WORD = struct.Struct("<I")
+
 
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
@@ -81,7 +87,7 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun,
+        AbstractChangableAfterRun, AbstractUsesBitFieldFilter,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
@@ -994,6 +1000,20 @@ class AbstractPopulationVertex(
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
+
+    @overrides(AbstractUsesBitFieldFilter.bit_field_base_address)
+    def bit_field_base_address(self, transceiver, placement):
+
+        # TODO this ust to be a utility method somewhere. where has it gone?!
+        regions_base_address = transceiver.get_cpu_information_from_core(
+            placement.x, placement.y, placement.p).user[0]
+        region_base_address_offset = \
+            utility_calls.get_region_base_address_offset(
+                regions_base_address,
+                POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
+        base_address = transceiver.read_memory(
+            placement.x, placement.y, region_base_address_offset, 4)
+        return _ONE_WORD.unpack(base_address)[0]
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):

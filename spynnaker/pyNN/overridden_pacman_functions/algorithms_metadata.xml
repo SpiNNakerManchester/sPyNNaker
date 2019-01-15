@@ -2,6 +2,95 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
 			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="PreAllocateForBitFieldRouterCompressor">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.pre_allocate_for_bit_field_router_compressor</python_module>
+        <python_class>PreAllocateForBitFieldRouterCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>pre_allocated_resources</param_name>
+                <param_type>MemoryPreAllocatedResources</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>machine</param_name>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>pre_allocated_resources</param_name>
+        </optional_inputs>
+        <outputs>
+            <param_type>MemoryPreAllocatedResources</param_type>
+            <token part="BitFieldRouterCompressor">GeneratedPreAllocatedResources</token>
+        </outputs>
+    </algorithm>
+    <algorithm name="BitFieldRouterCompressor">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.bit_field_router_compressor</python_module>
+        <python_class>BitFieldRouterCompressor</python_class>
+        <input_definitions>
+            <parameter>
+                <param_name>routing_tables</param_name>
+                <param_type>MemoryRoutingTables</param_type>
+            </parameter>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine</param_name>
+                <param_type>MemoryMachine</param_type>
+            </parameter>
+            <parameter>
+                <param_name>app_id</param_name>
+                <param_type>APPID</param_type>
+            </parameter>
+            <parameter>
+                <param_name>provenance_file_path</param_name>
+                <param_type>ProvenanceFilePath</param_type>
+            </parameter>
+            <parameter>
+                <param_name>compress_only_when_needed</param_name>
+                <param_type>BitFieldRouterCompressorCompAsNeeded</param_type>
+            </parameter>
+            <parameter>
+                <param_name>compress_as_much_as_possible</param_name>
+                <param_type>BitFieldRouterCompressorCompAsFarAsPos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>graph_mapper</param_name>
+                <param_type>MemoryGraphMapper</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>routing_tables</param_name>
+            <param_name>transceiver</param_name>
+            <param_name>machine</param_name>
+            <param_name>app_id</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>provenance_file_path</param_name>
+            <param_name>machine_graph</param_name>
+            <param_name>graph_mapper</param_name>
+            <param_name>placements</param_name>
+            <token part="BitFieldData">DataLoaded</token>
+        </required_inputs>
+        <optional_inputs>
+            <param_name>compress_only_when_needed</param_name>
+            <param_name>compress_as_much_as_possible</param_name>
+        </optional_inputs>
+        <outputs>
+            <token part="MulticastRoutesLoaded">DataLoaded</token>
+        </outputs>
+    </algorithm>
     <algorithm name="SpynnakerAtomBasedRoutingDataGenerator">
         <python_module>spynnaker.pyNN.overridden_pacman_functions.atom_based_routing_data_generator</python_module>
         <python_class>SpynnakerAtomBasedRoutingDataGenerator</python_class>
