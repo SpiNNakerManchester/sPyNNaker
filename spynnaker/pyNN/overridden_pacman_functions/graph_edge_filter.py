@@ -93,9 +93,12 @@ class GraphEdgeFilter(object):
                 if isinstance(syn_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
                     return False
+
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
+            return False
+        elif edge.label == "spinnakear":
             return False
         raise FilterableException(
             "cannot figure out if edge {} is prunable or not".format(edge))

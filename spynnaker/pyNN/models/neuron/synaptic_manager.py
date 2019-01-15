@@ -507,7 +507,7 @@ class SynapticManager(object):
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
 
-        if "fixed_weight_scale" in application_vertex.label:  # isinstance(synapse_dynamics,SynapseDynamicsSTDP):# and isinstance(connector, AllToAllConnector):#
+        if application_vertex.label is not None and "fixed_weight_scale" in application_vertex.label:  # isinstance(synapse_dynamics,SynapseDynamicsSTDP):# and isinstance(connector, AllToAllConnector):#
             if "cond" in application_vertex.label:
                 output = [13, 13]
             else:

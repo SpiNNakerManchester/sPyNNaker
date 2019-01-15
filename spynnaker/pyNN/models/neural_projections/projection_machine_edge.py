@@ -10,6 +10,8 @@ from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
+from DRNL_vertex import DRNLVertex
+from IHCAN_vertex import IHCANVertex
 
 
 class ProjectionMachineEdge(
@@ -38,20 +40,46 @@ class ProjectionMachineEdge(
         # Filter one-to-one connections that are out of range
         for synapse_info in self._synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                if isinstance(self.pre_vertex,IHCANVertex):
+                    # need to map the IDs to the correct IHC instances
+                    spinnakear_vertex = graph_mapper.get_application_vertex(self.pre_vertex)
+                    # 1 ID corresponds to 2 AN outputs so multiply i by 2
+                    ihc_ids = [i*2 for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'ihc']
+                    pre_lo = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).lo_atom)
+                    pre_hi = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).hi_atom)
+                else:
+                    pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                    pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     return True
             elif isinstance(synapse_info.connector,FromListConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                if isinstance(self.pre_vertex,IHCANVertex):
+                    # need to map the IDs to the correct IHC instances
+                    spinnakear_vertex = graph_mapper.get_application_vertex(self.pre_vertex)
+                    # 1 ID corresponds to 2 AN outputs so multiply i by 2
+                    ihc_ids = [i*2 for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'ihc']
+                    pre_lo = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).lo_atom*2)
+                    pre_hi = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).hi_atom*2)
+                    post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                elif isinstance(self.post_vertex, DRNLVertex):
+                    # need to map the IDs to the correct DRNL instances
+                    spinnakear_vertex = graph_mapper.get_application_vertex(self.post_vertex)
+                    drnl_ids = [i for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'drnl']
+                    post_lo = drnl_ids.index(graph_mapper.get_slice(self.post_vertex).lo_atom)
+                    post_hi = drnl_ids.index(graph_mapper.get_slice(self.post_vertex).hi_atom)
+                    pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                    pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                else:
+                    pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                    pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                    post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom#TODO: check whether hi atoms are included in partition
                 #run through connection list and return false if we find any connections between the pre and post vertices
                 try:
-                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi,post_lo:post_hi].max()>0:
+                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi+1,post_lo:post_hi+1].max()>0:
                         return False
                 except ValueError:
                     print "Value error"
