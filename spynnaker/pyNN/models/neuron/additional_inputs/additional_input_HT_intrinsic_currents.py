@@ -236,6 +236,7 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
             DataType.S1615, #E_DK = (22, )
             DataType.S1615, #m_inf_DK = (23, )
             DataType.S1615, #e_to_t_on_tau_m_DK = (24, )
+#             DataType.U032, #e_to_t_on_tau_m_DK = (24, )
             DataType.S1615, #D = (25, )
             DataType.S1615, #D_infinity = (26, )
             # Voltage Clamp

@@ -7,7 +7,9 @@
 #include <neuron/models/neuron_model_ht_impl.h>
 #include <neuron/synapse_types/synapse_types_ht_impl.h>
 #include <neuron/input_types/input_type_ht_conductance.h>
-#include <neuron/additional_inputs/additional_input_HT_currents_impl.h>
+//#include <neuron/additional_inputs/additional_input_HT_currents_impl.h>
+//#include <neuron/additional_inputs/additional_input_HT_currents_mixed_precision_impl.h>
+#include <neuron/additional_inputs/additional_input_HT_currents_RTN_mult_impl.h>
 #include <neuron/threshold_types/threshold_type_ht_dynamic.h>
 
 // Further includes

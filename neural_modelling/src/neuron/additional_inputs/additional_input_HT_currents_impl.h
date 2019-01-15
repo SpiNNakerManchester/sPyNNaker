@@ -42,6 +42,7 @@ typedef struct additional_input_t {
     accum    E_DK;        // potassium reversal potential
     accum    m_inf_DK;
     accum    e_to_t_on_tau_m_DK;
+//    decay_t    e_to_t_on_tau_m_DK;
     accum    D;           // instead of h_DK
     accum    D_influx;  // instead of h_inf_DK
     // Voltage Clamp
@@ -226,6 +227,10 @@ static input_t* additional_input_get_input_value_as_current(
                               (additional_input->D
                              - additional_input->D_influx)
                              * additional_input->e_to_t_on_tau_m_DK;
+
+//        additional_input->D = additional_input->D_influx +
+//        		decay_s1615((additional_input->D - additional_input->D_influx),
+//        				additional_input->e_to_t_on_tau_m_DK);
 
         accum D_cube = ((additional_input->D)
         		* (additional_input->D)
