@@ -291,7 +291,7 @@ class AdditionalInputHTIntrinsicCurrents(AbstractAdditionalInput):
         self._D_infinity = 0.001 + ((1250.0 * 0.025)
                                        / (1.0 + numpy.exp(-(self._v_init - -10.0) * 0.2)))
         self._D = self._D_infinity
-        self._m_inf_DK = 1 / (1 + (0.25 / self._D)**3)
+        self._m_inf_DK = 1 / (1 + (0.25 / self._D)**3.5)
         self._v_clamp = v_clamp
         self._s_clamp = s_clamp
         self._t_clamp = t_clamp
