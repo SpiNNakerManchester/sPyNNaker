@@ -237,7 +237,7 @@ bool synapses_initialise(
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
         n_synapse_types * sizeof(uint32_t));
     spin1_memcpy(
-        ring_buffer_to_input_left_shifts, synapse_params_address,
+    ring_buffer_to_input_left_shifts, synapse_params_address,
         n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
         ring_buffer_to_input_left_shifts;
@@ -266,11 +266,7 @@ bool synapses_initialise(
     log_debug("synapses_initialise: completed successfully");
     _print_synapse_parameters();
 
-    uint32_t n_neurons_power_2 = n_neurons;#include "synapses.h"
-#include "spike_processing.h"
-#include "population_table/population_table.h"
-#include "plasticity/synapse_dynamics.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
+    uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {
@@ -308,13 +304,46 @@ bool synapses_initialise(
     return true;
 }
 
-void synapses_do_timestep_update(timer_t time) {
+void synapses_do_timestep_update(timer_t time) {  //MODIFY THIS!!! INSTEAD OF CALLING NEURON_ADD DO A DMA TRANSFER!!!!
 
     _print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
+    // Size of the memory chunk containing this timestep's ring buffers
+    size_t size_to_be_transferred = n_neurons * n_synapse_types * sizeof(weight_t);
+
+    // Starting position of the memory chunk
+    uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+                time, 0, 0, synapse_type_index_bits,
+                synapse_index_bits);
+
+    // Start the transfer, ? IS THE SDRAM ADDRESS
+    spin1_dma_transfer(
+        0, ?, ring_buffers[ring_buffer_index],
+        DMA_WRITE, size_to_be_transferred);
+
+    // Clean the ring buffers
+    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
+            neuron_index++) {
+
+        // Loop through all synapse types
+        for (uint32_t synapse_type_index = 0;
+                synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+            // Get index in the ring buffers for the current time slot for
+            // this synapse type and neuron
+            ring_buffer_index = synapses_get_ring_buffer_index(
+                time, synapse_type_index, neuron_index, synapse_type_index_bits,
+                synapse_index_bits);
+
+            // Clear ring buffer
+            ring_buffers[ring_buffer_index] = 0;
+        }
+    }
+
+    /*
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
@@ -325,14 +354,15 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Get index in the ring buffers for the current time slot for
             // this synapse type and neuron
-            uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+            ring_buffer_index = synapses_get_ring_buffer_index(
                 time, synapse_type_index, neuron_index, synapse_type_index_bits,
                 synapse_index_bits);
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
             neuron_add_inputs(
-                synapse_type_index, neuron_index,
+                synapse_type_index,
+                neuron_index,
                 synapses_convert_weight_to_input(
                     ring_buffers[ring_buffer_index],
                     ring_buffer_to_input_left_shifts[synapse_type_index]));
@@ -341,6 +371,7 @@ void synapses_do_timestep_update(timer_t time) {
             ring_buffers[ring_buffer_index] = 0;
         }
     }
+    */
 
     _print_inputs();
 

@@ -126,6 +126,10 @@ void _setup_synaptic_dma_read() {
         dma_busy = false;
     }
     spin1_mode_restore(cpsr);
+
+    //Start DMA Writing procedure for the contribution of this timestep
+    synapses_do_timestep_update(time);
+
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
@@ -198,7 +202,7 @@ void _dma_complete_callback(uint unused, uint tag) {
     do {
 
         // Are there any more incoming spikes from the same pre-synaptic
-        // neuron?
+        // neuron?population_table_get_next_address
         subsequent_spikes = in_spikes_is_next_spike_equal(
             current_buffer->originating_spike);
 
@@ -307,7 +311,7 @@ bool get_dma_busy() {
 bool do_rewiring(int number_of_rew) {
     number_of_rewires+=number_of_rew;
     return true;
-}
+}population_table_get_next_address
 
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool

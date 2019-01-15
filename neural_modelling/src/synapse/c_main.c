@@ -201,17 +201,11 @@ static bool initialise(uint32_t *timer_period) {
 //!            executed since start of simulation
 //! \param[in] unused unused parameter kept for API consistency
 //! \return None
-void timer_callback(uint timer_count, uint unused) {
+void timer_callback(uint timer_count, uint unused) { //THIS IS NECESSARY TO COUNT TIMER TICK, IN ORDER TO KICK THE DMA_WRITE IF END OF TIMESTEP IS APPROACHING AND SPIKE PROCESSING IS NOT OVER YET. CHECK OLIVER BRANCH TO IMPLEMENT IT. not sure if the cb is necessary or if just the timer tick is sufficient
     uint cpsr;
 
     use(timer_count);
     use(unused);
-
-    cpsr = spin1_int_disable();
-
-    //DMA Write
-
-    spin1_mode_restore(cpsr);
 }
 
 //! \brief The entry point for this model.
@@ -231,7 +225,7 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
               timer_period);
-    spin1_set_timer_tick_and_phase(timer_period, dma_shift);
+    spin1_set_timer_tick(timer_period);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
