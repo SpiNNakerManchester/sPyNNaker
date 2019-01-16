@@ -81,6 +81,7 @@ bool rewiring = false;
 uint32_t count_rewires = 0;
 
 
+
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
@@ -113,6 +114,11 @@ void c_main_store_provenance_data(address_t provenance_region){
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(uint32_t *timer_period) {
+
+    uint32_t n_neurons;
+    uint32_t n_synapse_types;
+    uint32_t incoming_spike_buffer_size;
+
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -143,11 +149,13 @@ static bool initialise(uint32_t *timer_period) {
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, address);
+
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
             data_specification_get_region(DIRECT_MATRIX_REGION, address),
-            n_neurons, n_synapse_types,
+            &n_neurons, &n_synapse_types,
+            &incoming_spike_buffer_size,
             &ring_buffer_to_input_buffer_left_shifts,
             &direct_synapses_address)) {
         return false;
@@ -202,10 +210,27 @@ static bool initialise(uint32_t *timer_period) {
 //! \param[in] unused unused parameter kept for API consistency
 //! \return None
 void timer_callback(uint timer_count, uint unused) { //THIS IS NECESSARY TO COUNT TIMER TICK, IN ORDER TO KICK THE DMA_WRITE IF END OF TIMESTEP IS APPROACHING AND SPIKE PROCESSING IS NOT OVER YET. CHECK OLIVER BRANCH TO IMPLEMENT IT. not sure if the cb is necessary or if just the timer tick is sufficient
-    uint cpsr;
 
     use(timer_count);
     use(unused);
+
+    time++;
+
+    if(infinite_run != TRUE && time >= simulation_ticks) {
+
+        // Enter pause and resume state to avoid another tick
+        simulation_handle_pause_resume(resume_callback);
+
+        log_debug("Completed a run");
+
+        // Subtract 1 from the time so this tick gets done again on the next
+        // run
+        time--;
+
+        simulation_ready_to_read();
+
+        return;
+    }
 }
 
 //! \brief The entry point for this model.

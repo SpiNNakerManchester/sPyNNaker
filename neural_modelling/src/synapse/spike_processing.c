@@ -36,6 +36,7 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -126,10 +127,6 @@ void _setup_synaptic_dma_read() {
         dma_busy = false;
     }
     spin1_mode_restore(cpsr);
-
-    //Start DMA Writing procedure for the contribution of this timestep
-    synapses_do_timestep_update(time);
-
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
@@ -226,6 +223,20 @@ void _dma_complete_callback(uint unused, uint tag) {
             rt_error(RTE_SWERR);
         }
     } while (subsequent_spikes);
+
+    // if too close to the end of the timer tick or all the spikes
+    // have been processed write in memory the synaptic contribution
+    if(tc[T1_COUNT] < ?? || in_spikes_buffer_empty()) {
+
+        uint cpsr = spin1_int_disable();
+        uint32_t spikes_remaining = in_spikes_flush_buffer();
+
+        //Start DMA Writing procedure for the contribution of this timestep
+        synapses_do_timestep_update(time);
+        spin1_mode_restore(cpsr);
+
+        return;
+    }
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();

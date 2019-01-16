@@ -37,6 +37,13 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
+//! parameters that reside in the synapse_parameter_data_region in human
+//! readable form
+typedef enum parameters_in_neuron_parameter_data_region {
+    N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
+    RING_BUFFER_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
+} parameters_in_neuron_parameter_data_region;
+
 
 /* PRIVATE FUNCTIONS */
 
@@ -225,19 +232,28 @@ static inline void _print_synapse_parameters() {
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
-        uint32_t n_neurons_value, uint32_t n_synapse_types_value,
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *incoming_spike_buffer_size,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *direct_synapses_address) {
 
     log_debug("synapses_initialise: starting");
-    n_neurons = n_neurons_value;
-    n_synapse_types = n_synapse_types_value;
+
+    // Neuron details
+    *n_neurons_value = synapse_params_address[N_NEURON_TO SIMULATE];
+    n_neurons = *n_neurons_value;
+
+    *n_synapse_types_value = synapse_params_address[N_SYNAPSE_TYPES];
+    n_synapse_types = *n_synapse_types_value;
+
+    // Read the size of the incoming spike buffer to use
+    *incoming_spike_buffer_size = synapse_params_address[INCOMING_SPIKE_BUFFER_SIZE];
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
         n_synapse_types * sizeof(uint32_t));
     spin1_memcpy(
-    ring_buffer_to_input_left_shifts, synapse_params_address,
+    ring_buffer_to_input_left_shifts, synapse_params_address + RING_BUFFER_LEFT_SHIFT,
         n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
         ring_buffer_to_input_left_shifts;
@@ -304,7 +320,7 @@ bool synapses_initialise(
     return true;
 }
 
-void synapses_do_timestep_update(timer_t time) {  //MODIFY THIS!!! INSTEAD OF CALLING NEURON_ADD DO A DMA TRANSFER!!!!
+void synapses_do_timestep_update(timer_t time) {
 
     _print_ring_buffers(time);
 
@@ -321,7 +337,7 @@ void synapses_do_timestep_update(timer_t time) {  //MODIFY THIS!!! INSTEAD OF CA
 
     // Start the transfer, ? IS THE SDRAM ADDRESS
     spin1_dma_transfer(
-        0, ?, ring_buffers[ring_buffer_index],
+        0, ?, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
 
     // Clean the ring buffers

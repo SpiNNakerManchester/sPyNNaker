@@ -137,12 +137,8 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     // Set up the neurons
-    uint32_t n_neurons;
-    uint32_t n_synapse_types;
-    uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, address),
-            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size)) {
+            data_specification_get_region(NEURON_PARAMS_REGION, address))) {
         return false;
     }
 
@@ -224,6 +220,7 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
+    /*
     uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
@@ -252,8 +249,8 @@ void timer_callback(uint timer_count, uint unused) {
         // enable interrupts
         spin1_mode_restore(cpsr);
         count_rewires++;
-    }
-    // otherwise do synapse and neuron time step updates
+    }*/
+    // otherwise do neuron time step update
     neuron_do_timestep_update(time);
 
     // trigger buffering_out_mechanism
