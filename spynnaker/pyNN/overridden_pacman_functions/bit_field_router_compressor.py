@@ -11,6 +11,8 @@ from spinn_front_end_common.mapping_algorithms.\
     MundyOnChipRouterCompression
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_machine import CoreSubsets
+from spinn_utilities.progress_bar import ProgressBar
+from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models.\
     abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
@@ -42,6 +44,9 @@ class BitFieldRouterCompressor(object):
     # structs for performance requirements.
     _TWO_WORDS = struct.Struct("<II")
 
+    # binary name
+    _ROUTER_TABLE_WITH_BIT_FIELD_APLX = "bit_field_router_compressor.aplx"
+
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
             provenance_file_path, machine_graph, graph_mapper,
@@ -71,15 +76,24 @@ class BitFieldRouterCompressor(object):
         routing_table_compressor_app_id = \
             transceiver.app_id_tracker.get_new_id()
 
+        progress_bar = ProgressBar(
+            total_number_of_things_to_do=(
+                len(machine_graph.vertices) + len(
+                    routing_tables.routing_tables) + 1),
+            string_describing_what_being_progressed=(
+                "compressing routing tables and merging in bitfields as "
+                "appropriate"))
+
         # locate data and cores to load binary on
         addresses, cores = self._generate_addresses(
-            machine_graph, placements, transceiver, machine)
+            machine_graph, placements, transceiver, machine, executable_finder,
+            progress_bar)
 
         # load data into sdram
         self._load_data(
             addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed,
-            compress_as_much_as_possible)
+            compress_as_much_as_possible, progress_bar)
 
         # load and run binaries
         utility_calls.run_system_application(
@@ -87,6 +101,9 @@ class BitFieldRouterCompressor(object):
                 executable_finder, read_algorithm_iobuf,
                 self._check_for_success, self._handle_failure,
                 [CPUState.FINISHED])
+
+        #complete progress bar
+        progress_bar.end()
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
@@ -152,7 +169,7 @@ class BitFieldRouterCompressor(object):
     def _load_data(
             self, addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed,
-            compress_as_much_as_possible):
+            compress_as_much_as_possible, progress_bar):
         """ load all data onto the chip
 
         :param addresses: the addresses for bitfields in sdram
@@ -162,6 +179,7 @@ class BitFieldRouterCompressor(object):
         :param app_id: the appid of the application
         :param compress_only_when_needed: bool flag asking if compress only \
         when needed
+        :param progress_bar: progress bar
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
         :rtype: None
@@ -171,10 +189,11 @@ class BitFieldRouterCompressor(object):
             self.load_address_data(
                 addresses, chip_x, chip_y, transceiver,
                 routing_table_compressor_app_id)
+        for routing_table in routing_tables.routing_tables:
             self.load_routing_table_data(
-                routing_tables, chip_x, chip_y, app_id, transceiver,
-                compress_only_when_needed, compress_as_much_as_possible,
-                routing_table_compressor_app_id)
+                routing_table, app_id, transceiver, compress_only_when_needed,
+                compress_as_much_as_possible, routing_table_compressor_app_id,
+                progress_bar)
 
     def load_address_data(
             self, addresses, chip_x, chip_y, transceiver,
@@ -206,55 +225,61 @@ class BitFieldRouterCompressor(object):
             chip_x, chip_y, sdram_address, address_data)
 
     def load_routing_table_data(
-            self, routing_tables, chip_x, chip_y, app_id, transceiver,
-            compress_only_when_needed, compress_as_much_as_possible,
-            routing_table_compressor_app_id):
+            self, routing_table, app_id, transceiver, compress_only_when_needed,
+            compress_as_much_as_possible, routing_table_compressor_app_id,
+            progress_bar):
         """ loads the routing table data
 
-        :param routing_tables: the routing tables for the entire app
-        :param chip_x: chip x
-        :param chip_y: chip y
+        :param routing_table: the routing table to load
         :param app_id: application app id
         :param transceiver: spinnman instance
         :param compress_only_when_needed: bool flag asking if compress only \
         when needed
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
+        :param progress_bar: progress bar
         :param routing_table_compressor_app_id: system app id
         :rtype: None
         """
+
         routing_table_data = \
             MundyOnChipRouterCompression.build_routing_table_data(
-                routing_tables.get_routing_table_for_chip(chip_x, chip_y),
-                app_id, compress_only_when_needed,
+                routing_table, app_id, compress_only_when_needed,
                 compress_as_much_as_possible)
 
         # go to spinnman and ask for a memory region of that size per chip.
         base_address = transceiver.malloc_sdram(
-            chip_x, chip_y, len(routing_table_data),
+            routing_table.x, routing_table.y, len(routing_table_data),
             routing_table_compressor_app_id, self.ROUTING_TABLE_SDRAM_TAG)
 
         # write SDRAM requirements per chip
         transceiver.write_memory(
-            chip_x, chip_y, base_address, routing_table_data)
+            routing_table.x, routing_table.y, base_address, routing_table_data)
 
-    @staticmethod
-    def _generate_addresses(machine_graph, placements, transceiver, machine):
+        # update progress bar
+        progress_bar.update()
+
+    def _generate_addresses(
+            self, machine_graph, placements, transceiver, machine,
+            executable_finder, progress_bar):
         """ generates the bitfield sdram addresses
 
         :param machine_graph: machine graph
         :param placements: placements
         :param transceiver: spinnman instance
         :param machine: spinnmachine instance
-        :return: addresses and the cores to load the router table compressor\
-        with bitfield.
+        :param progress_bar: the progress bar
+        :param executable_finder: binary finder
+        :return: addresses and the executable targets to load the router \
+        table compressor with bitfield.
         """
 
         # data holders
         addresses = defaultdict(list)
         cores = CoreSubsets()
 
-        for vertex in machine_graph.vertices:
+        for vertex in progress_bar.over(
+                machine_graph.vertices, finish_at_end=False):
             if isinstance(vertex, AbstractUsesBitFieldFilter):
                 placement = placements.get_placement_of_vertex(vertex)
                 bit_field_sdram_address = vertex.bit_field_base_address(
@@ -268,7 +293,15 @@ class BitFieldRouterCompressor(object):
                         placement.x, placement.y,
                         machine.get_chip_at(placement.x, placement.y).
                         get_first_none_monitor_processor())
-        return addresses, cores
+
+        # convert core subsets into executable targets
+        executable_targets = ExecutableTargets()
+        # bit field expander executable file path
+        executable_path = executable_finder.get_executable_path(
+            self._ROUTER_TABLE_WITH_BIT_FIELD_APLX)
+        executable_targets.add_subsets(binary=executable_path, subsets=cores)
+
+        return addresses, executable_targets
 
     @staticmethod
     def _generate_chip_data(address_list):

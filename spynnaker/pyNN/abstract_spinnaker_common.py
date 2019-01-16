@@ -107,6 +107,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self.config.getboolean("Reports", "read_bif_field_iobuf")
         extra_mapping_inputs["GenerateBitFieldReport"] = \
             self.config.getboolean("Reports", "generate_bit_field_report")
+        extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
+            self.config.getboolean(
+                "Reports", "read_router_compressor_with_bitfield_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 

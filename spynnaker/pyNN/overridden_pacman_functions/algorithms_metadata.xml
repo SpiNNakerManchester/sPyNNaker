@@ -59,6 +59,14 @@
                 <param_type>BitFieldRouterCompressorCompAsFarAsPos</param_type>
             </parameter>
             <parameter>
+                <param_name>executable_finder</param_name>
+                <param_type>ExecutableFinder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>read_algorithm_iobuf</param_name>
+                <param_type>RouterCompressorWithBitFieldReadIOBuf</param_type>
+            </parameter>
+            <parameter>
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
@@ -72,6 +80,8 @@
             </parameter>
         </input_definitions>
         <required_inputs>
+            <param_name>executable_finder</param_name>
+            <param_name>read_algorithm_iobuf</param_name>
             <param_name>routing_tables</param_name>
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
