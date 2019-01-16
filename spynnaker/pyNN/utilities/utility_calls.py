@@ -6,6 +6,8 @@ import os
 import logging
 import math
 
+from spinn_front_end_common.interface.interface_functions import \
+    ChipIOBufExtractor
 from spinn_utilities.safe_eval import SafeEval
 
 from scipy.stats import binom
@@ -138,17 +140,17 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
-        min_atom = 0
+        min_atom = 0.0
     if max_atom is None:
         max_atom = float('inf')
     if min_time is None:
-        min_time = 0
+        min_time = 0.0
     if max_time is None:
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as fsource:
-        read_data = fsource.readlines()
+    with open(file_path, 'r') as f_source:
+        read_data = f_source.readlines()
 
     evaluator = SafeEval()
     for line in read_data:
@@ -283,3 +285,58 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log(n_values, 2)))
+
+
+def run_system_application(
+        executable_cores, app_id, transceiver, provenance_file_path,
+        executable_finder, read_algorithm_iobuf, check_for_success_function,
+        handle_failure_function, cpu_end_states):
+    """ executes the app
+
+    :param executable_cores: the cores to run the bit field expander on
+    :param app_id: the appid for the bit field expander
+    :param transceiver: the SpiNNMan instance
+    :param provenance_file_path: the path for where provenance data is\
+    stored
+    :param read_algorithm_iobuf: bool flag for report
+    :param executable_finder: finder for executable paths
+    :param check_for_success_function: function used to check success: \
+    expects executable_cores, transceiver, provenance_file_path,\
+    app_id, executable_finder as inputs
+    :param handle_failure_function: function used to deal with failures\
+    expects executable_cores, transceiver, provenance_file_path,\
+    app_id, executable_finder as inputs
+    :rtype: None
+    """
+
+    # load the bitfield expander executable
+    transceiver.execute_application(executable_cores, app_id)
+
+    # Wait for the executable to finish
+    succeeded = False
+    try:
+        transceiver.wait_for_cores_to_be_in_state(
+            executable_cores.all_core_subsets, app_id, cpu_end_states)
+        succeeded = True
+    finally:
+        # get the debug data
+        if not succeeded:
+            handle_failure_function(
+                executable_cores, transceiver, provenance_file_path,
+                app_id, executable_finder)
+
+    # Check if any cores have not completed successfully
+    check_for_success_function(
+        executable_cores, transceiver, provenance_file_path,
+        app_id, executable_finder)
+
+    # if doing iobuf, read iobuf
+    if read_algorithm_iobuf:
+        iobuf_reader = ChipIOBufExtractor()
+        iobuf_reader(
+            transceiver, executable_cores, executable_finder,
+            provenance_file_path)
+
+    # stop anything that's associated with the compressor binary
+    transceiver.stop_application(app_id)
+    transceiver.app_id_tracker.free_id(app_id)

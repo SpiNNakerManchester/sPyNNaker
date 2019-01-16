@@ -8,8 +8,8 @@ class AbstractUsesBitFieldFilter(object):
     @abstractmethod
     def bit_field_base_address(self, transceiver, placement):
         """ returns the sdram address for the synaptic matrix table data
-        
+
         :param transceiver: txrx
         :param placement: placement
-        :return: 
+        :return: the sdram address for the bitfield address
         """

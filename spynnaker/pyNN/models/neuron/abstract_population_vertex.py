@@ -3,8 +3,6 @@ import sys
 
 import math
 
-from data_specification import utility_calls
-
 from spinn_utilities.overrides import overrides
 
 # pacman imports
@@ -76,8 +74,6 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
-
-_ONE_WORD = struct.Struct("<I")
 
 
 class AbstractPopulationVertex(
@@ -1003,17 +999,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractUsesBitFieldFilter.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
-
-        # TODO this ust to be a utility method somewhere. where has it gone?!
-        regions_base_address = transceiver.get_cpu_information_from_core(
-            placement.x, placement.y, placement.p).user[0]
-        region_base_address_offset = \
-            utility_calls.get_region_base_address_offset(
-                regions_base_address,
-                POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
-        base_address = transceiver.read_memory(
-            placement.x, placement.y, region_base_address_offset, 4)
-        return _ONE_WORD.unpack(base_address)[0]
+        return helpful_functions.locate_memory_region_for_placement(
+            placement=placement, transceiver=transceiver,
+            region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):

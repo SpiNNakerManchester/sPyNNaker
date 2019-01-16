@@ -14,7 +14,7 @@ import logging
 import os
 
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import constants, utility_calls
 
 logger = logging.getLogger(__name__)
 
@@ -96,10 +96,11 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
         progress.update(1)
 
         # run app
-        self._run_app(
+        utility_calls.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
-            read_bit_field_generator_iobuf)
+            read_bit_field_generator_iobuf, self._check_for_success,
+            self._handle_failure, [CPUState.FINISHED])
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:
@@ -236,55 +237,6 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
                         placement.p)
 
         return expander_cores
-
-    def _run_app(
-            self, executable_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder,
-            read_bit_field_generator_iobuf):
-        """ executes the app
-
-        :param executable_cores: the cores to run the bit field expander on
-        :param bit_field_app_id: the appid for the bit field expander
-        :param transceiver: the SpiNNMan instance
-        :param provenance_file_path: the path for where provenance data is\
-        stored
-        :param read_bit_field_generator_iobuf: bool flag for report
-        :param executable_finder: finder for executable paths
-        :rtype: None
-        """
-
-        # load the bitfield expander executable
-        transceiver.execute_application(executable_cores, bit_field_app_id)
-
-        # Wait for the executable to finish
-        succeeded = False
-        try:
-            transceiver.wait_for_cores_to_be_in_state(
-                executable_cores.all_core_subsets, bit_field_app_id,
-                [CPUState.FINISHED])
-            succeeded = True
-        finally:
-            # get the debug data
-            if not succeeded:
-                self._handle_failure(
-                    executable_cores, transceiver, provenance_file_path,
-                    bit_field_app_id, executable_finder)
-
-        # Check if any cores have not completed successfully
-        self._check_for_success(
-            executable_cores, transceiver, provenance_file_path,
-            bit_field_app_id, executable_finder)
-
-        # if doing iobuf, read iobuf
-        if read_bit_field_generator_iobuf:
-            iobuf_reader = ChipIOBufExtractor()
-            iobuf_reader(
-                transceiver, executable_cores, executable_finder,
-                provenance_file_path)
-
-        # stop anything that's associated with the compressor binary
-        transceiver.stop_application(bit_field_app_id)
-        transceiver.app_id_tracker.free_id(bit_field_app_id)
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
