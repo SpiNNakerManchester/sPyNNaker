@@ -37,6 +37,7 @@ from spynnaker.pyNN.utilities.constants \
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
+from spinnakear_vertex import SpiNNakEarVertex
 
 TIME_STAMP_BYTES = 4
 
@@ -228,6 +229,8 @@ class SynapticManager(object):
                         synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
                     n_atoms = in_edge.pre_vertex.n_atoms
+                    if isinstance(in_edge.pre_vertex,SpiNNakEarVertex):
+                        n_atoms = in_edge.pre_vertex._size
                     memory_size = self._poptable_type.get_next_allowed_address(
                         memory_size)
                     memory_size += max_row_info.undelayed_max_bytes * n_atoms

@@ -527,7 +527,7 @@ class PyNNPopulationCommon(object):
     def size(self):
         """ The number of neurons in the population
         """
-        return self._vertex.n_atoms
+        return self._size#self._vertex.n_atoms
 
     @property
     def _get_vertex(self):

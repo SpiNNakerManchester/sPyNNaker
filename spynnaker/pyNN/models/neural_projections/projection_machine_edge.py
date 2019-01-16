@@ -55,16 +55,17 @@ class ProjectionMachineEdge(
                 if pre_hi < post_lo or pre_lo > post_hi:
                     return True
             elif isinstance(synapse_info.connector,FromListConnector):
-                if isinstance(self.pre_vertex,IHCANVertex):
-                    # need to map the IDs to the correct IHC instances
-                    spinnakear_vertex = graph_mapper.get_application_vertex(self.pre_vertex)
-                    # 1 ID corresponds to 2 AN outputs so multiply i by 2
-                    ihc_ids = [i*2 for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'ihc']
-                    pre_lo = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).lo_atom*2)
-                    pre_hi = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).hi_atom*2)
-                    post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                elif isinstance(self.post_vertex, DRNLVertex):
+                # if isinstance(self.pre_vertex,IHCANVertex):
+                #     # need to map the IDs to the correct IHC instances
+                #     spinnakear_vertex = graph_mapper.get_application_vertex(self.pre_vertex)
+                #     # 1 ID corresponds to 2 AN outputs so multiply i by 2
+                #     ihc_ids = [i*2 for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'ihc']
+                #     pre_lo = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).lo_atom*2)
+                #     pre_hi = ihc_ids.index(graph_mapper.get_slice(self.pre_vertex).hi_atom*2)
+                #     post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                #     post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                # elif isinstance(self.post_vertex, DRNLVertex):
+                if isinstance(self.post_vertex, DRNLVertex):
                     # need to map the IDs to the correct DRNL instances
                     spinnakear_vertex = graph_mapper.get_application_vertex(self.post_vertex)
                     drnl_ids = [i for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'drnl']
