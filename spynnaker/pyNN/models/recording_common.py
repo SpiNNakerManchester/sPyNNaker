@@ -1,33 +1,36 @@
 from spinn_utilities import logger_utils
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spinn_front_end_common.utilities import globals_variables
 
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
 from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 
 from collections import defaultdict
 import numpy
 import logging
+from six.moves import xrange
+# pylint: disable=protected-access
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class RecordingCommon(object):
-    def __init__(self, population, sampling_interval=None):
-        """ object to hold recording behaviour
+    """ Object to hold recording behaviour.
+    """
+    # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
+    # __slots__ = [
+    #     "_indices_to_record",
+    #     "_population",
+    #     "_write_to_files_indicators"]
 
+    def __init__(self, population):
+        """
         :param population: the population to record for
-        :param simulator: the spinnaker control class
         """
 
         self._population = population
-
-        self._sampling_interval = None
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
 
         # file flags, allows separate files for the recorded variables
         self._write_to_files_indicators = {
@@ -36,103 +39,103 @@ class RecordingCommon(object):
             'gsyn_inh': None,
             'v': None}
 
-        # Create default dictionary of population-size filters
-        self._indices_to_record = self._create_full_filter_list(0)
+        # Create a dict of variable name -> bool array of indices in population
+        # that are recorded (initially all False)
+        self._indices_to_record = defaultdict(
+            lambda: numpy.repeat(False, population.size))
 
-    def _record(self, variable, new_ids, sampling_interval, to_file):
-        """ tells the vertex to record data
+    def _record(self, variable, sampling_interval=None, to_file=None,
+                indexes=None):
+        """ Tell the vertex to record data.
 
-        :param variable: the variable to record, valued variables to record
-        are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
-        :param new_ids:  ids to record
+        :param variable: the variable to record, valued variables to record\
+            are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param sampling_interval: the interval to record them
-        :return:  None
+        :param indexes: List of indexes to record or None for all
+        :return: None
         """
 
-        globals_variables.get_simulator().verify_not_running()
+        get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
-            self._set_spikes_recording()
+            if not isinstance(self._population._vertex,
+                              AbstractSpikeRecordable):
+                raise Exception("This population does not support the "
+                                "recording of spikes!")
+            self._population._vertex.set_recording_spikes(
+                sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
-            self._set_spikes_recording()
-            self._population._vertex.set_recording(variable)
+            raise Exception("Illegal call with all")
         else:
-            self._population._vertex.set_recording(variable)
+            if not isinstance(self._population._vertex,
+                              AbstractNeuronRecordable):
+                raise Exception("This population does not support the "
+                                "recording of {}!".format(variable))
+            self._population._vertex.set_recording(
+                variable, sampling_interval=sampling_interval, indexes=indexes)
 
         # update file writer
         self._write_to_files_indicators[variable] = to_file
 
-        # Get bit array of indices to record for this variable
-        indices = self._indices_to_record[variable]
-
-        # update sampling interval
-        if sampling_interval is not None:
-            self._sampling_interval = sampling_interval
-
-        # Loop through the new ids
-        for new_id in new_ids:
-            # Convert to index
-            new_index = self._population.id_to_index(new_id)
-
-            # Set this bit in indices
-            indices[new_index] = True
-
         if variable == "gsyn_exc":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
-                msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input. " \
-                      "You will receive current measurements instead."
-                logger_utils.warn_once(logger, msg)
+            if not self._population._vertex.conductance_based:
+                logger_utils.warn_once(
+                    logger, "You are trying to record the excitatory "
+                    "conductance from a model which does not use conductance "
+                    "input. You will receive current measurements instead.")
         elif variable == "gsyn_inh":
-            if not isinstance(self._population._vertex.input_type,
-                              InputTypeConductance):
-                msg = "You are trying to record the excitatory conductance " \
-                      "from a model which does not use conductance input. " \
-                      "You will receive current measurements instead."
-                logger_utils.warn_once(logger, msg)
+            if not self._population._vertex.conductance_based:
+                logger_utils.warn_once(
+                    logger, "You are trying to record the inhibitory "
+                    "conductance from a model which does not use conductance "
+                    "input. You will receive current measurements instead.")
 
     def _set_v_recording(self):
-        """ sets the parameters etc that are used by the v recording
+        """ Set the parameters etc that are used by the voltage recording.
 
         :return: None
         """
         self._population._vertex.set_recording("v")
 
-    def _set_spikes_recording(self):
-        """ sets the parameters etc that are used by the spikes recording
+    def _set_spikes_recording(self, sampling_interval, indexes=None):
+        """ Set the parameters, etc., that are used by the spikes recording.
 
         :return: None
         """
-        if not isinstance(self._population._vertex, AbstractSpikeRecordable):
-            raise Exception(
-                "This population does not support the recording of spikes!")
-        self._population._vertex.set_recording_spikes()
 
-    @property
-    def sampling_interval(self):
-        """ forced by the public nature of pynn variables
+    @staticmethod
+    def pynn7_format(data, ids, sampling_interval, data2=None):
+        n_machine_time_steps = len(data)
+        n_neurons = len(ids)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval
+                 for i in xrange(0, n_machine_time_steps)]
+        if data2 is None:
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
+        else:
+            pynn7 = numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length),
+                numpy.transpose(data2).reshape(column_length)))
+        return pynn7
 
-        :return:
-        """
+    def _get_recorded_pynn7(self, variable):
+        if variable == "spikes":
+            data = self._get_spikes()
 
-        return self._sampling_interval
+        (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
+        return self.pynn7_format(data, ids, sampling_interval)
 
-    @sampling_interval.setter
-    def sampling_interval(self, new_value):
-        """ forced by the public nature of pynn variables
-
-        :param new_value: new value for the sampling_interval
-        :return: None
-        """
-        self._sampling_interval = new_value
-
-    def _get_recorded_variable(self, variable):
-        """ method that contains all the safety checks and gets the recorded
-        data from the vertex
+    def _get_recorded_matrix(self, variable):
+        """ Perform safety checks and get the recorded data from the vertex\
+            in matrix format.
 
         :param variable: the variable name to read. supported variable names
-        are :'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+            are :'gsyn_exc', 'gsyn_inh', 'v'
         :return: the data
         """
         timer = Timer()
@@ -140,46 +143,51 @@ class RecordingCommon(object):
         data = None
         sim = get_simulator()
 
-        globals_variables.get_simulator().verify_not_running()
-        if variable == "spikes":
-            data = self._get_spikes()
+        get_simulator().verify_not_running()
 
         # check that we're in a state to get voltages
-        elif not isinstance(
+        if not isinstance(
                 self._population._vertex, AbstractNeuronRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record {}"
                 .format(variable))
-        elif not self._population._vertex.is_recording(variable):
+
+        if not self._population._vertex.is_recording(variable):
             raise ConfigurationException(
                 "This population has not been set to record {}"
                 .format(variable))
 
-        elif not sim.has_ran:
-            logger.warn(
+        if not sim.has_ran:
+            logger.warning(
                 "The simulation has not yet run, therefore {} cannot"
                 " be retrieved, hence the list will be empty".format(
                     variable))
             data = numpy.zeros((0, 3))
-
+            indexes = []
+            sampling_interval = self._population._vertex.\
+                get_neuron_sampling_interval(variable)
         elif sim.use_virtual_board:
-            logger.warn(
+            logger.warning(
                 "The simulation is using a virtual machine and so has not"
                 " truly ran, hence the list will be empty")
             data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = self._population._vertex.\
+                get_neuron_sampling_interval(variable)
         else:
             # assuming we got here, everything is ok, so we should go get the
-            # voltages
-            data = self._population._vertex.get_data(
+            # data
+            results = self._population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
-        return data
+        return (data, indexes, sampling_interval)
 
     def _get_spikes(self):
-        """ method for getting spikes from a vertex
+        """ How to get spikes from a vertex.
 
         :return: the spikes from a vertex
         """
@@ -194,39 +202,37 @@ class RecordingCommon(object):
 
         sim = get_simulator()
         if not sim.has_ran:
-            logger.warn(
-                "The simulation has not yet run, therefore spikes cannot"
-                " be retrieved, hence the list will be empty")
+            logger.warning(
+                "The simulation has not yet run, therefore spikes cannot "
+                "be retrieved, hence the list will be empty")
             return numpy.zeros((0, 2))
 
         if sim.use_virtual_board:
-            logger.warn(
-                "The simulation is using a virtual machine and so has not"
-                " truly ran, hence the list will be empty")
+            logger.warning(
+                "The simulation is using a virtual machine and so has not "
+                "truly ran, hence the list will be empty")
             return numpy.zeros((0, 2))
 
-        # assuming we got here, everything is ok, so we should go get the
+        # assuming we got here, everything is OK, so we should go get the
         # spikes
         return self._population._vertex.get_spikes(
             sim.placements, sim.graph_mapper, sim.buffer_manager,
             sim.machine_time_step)
 
-    def _create_full_filter_list(self, filter_value):
-        # Create default dictionary of population-size boolean arrays
-        return defaultdict(
-            lambda: numpy.repeat(filter_value, self._population.size).astype(
-                "bool"))
+    def _turn_off_all_recording(self, indexes=None):
+        """ Turns off recording, is used by a pop saying `.record()`
 
-    def _turn_off_all_recording(self):
-        """
-        turns off recording, is used by a pop saying .record()
         :rtype: None
         """
 
-        # check for standard record
+        # check for standard record which includes spikes
         if isinstance(self._population._vertex, AbstractNeuronRecordable):
-            self._population._vertex.set_recording("all", False)
+            variables = self._population._vertex.get_recordable_variables()
+            for variable in variables:
+                self._population._vertex.set_recording(
+                    variable, new_state=False, indexes=indexes)
 
         # check for spikes
-        if isinstance(self._population._vertex, AbstractSpikeRecordable):
-            self._population._vertex.set_recording_spikes(False)
+        elif isinstance(self._population._vertex, AbstractSpikeRecordable):
+            self._population._vertex.set_recording_spikes(
+                new_state=False, indexes=indexes)

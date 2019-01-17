@@ -1,40 +1,73 @@
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
+from .abstract_threshold_type import AbstractThresholdType
+from pacman.executor.injection_decorator import inject_items
 
-import numpy
-from enum import Enum
+DU_TH = "du_th"
+TAU_TH = "tau_th"
+V_THRESH = "v_thresh"
 
-
-class _MAASS_TYPES(Enum):
-    DU_TH = (1, DataType.S1615)
-    TAU_TH = (2, DataType.S1615)
-    V_THRESH = (3, DataType.S1615)
-
-    def __new__(cls, value, data_type):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    DU_TH: "mV",
+    TAU_TH: "ms",
+    V_THRESH: "mV"
+}
 
 
 class ThresholdTypeMaassStochastic(AbstractThresholdType):
     """ A stochastic threshold
     """
+    __slots__ = [
+        "_du_th",
+        "_tau_th",
+        "_v_thresh"]
 
-    def __init__(self, n_neurons, du_th, tau_th, v_thresh):
-        AbstractThresholdType.__init__(self)
-        self._n_neurons = n_neurons
+    def __init__(self, du_th, tau_th, v_thresh):
+        super(ThresholdTypeMaassStochastic, self).__init__([
+            DataType.S1615,   # 1 / du_th
+            DataType.S1615,   # 1 / tau_th
+            DataType.S1615,   # v_thresh
+            DataType.S1615])  # ts / 10
+        self._du_th = du_th
+        self._tau_th = tau_th
+        self._v_thresh = v_thresh
 
-        self._du_th = utility_calls.convert_param_to_numpy(du_th, n_neurons)
-        self._tau_th = utility_calls.convert_param_to_numpy(tau_th, n_neurons)
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, n_neurons)
+    @overrides(AbstractThresholdType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        return 30 * n_neurons
+
+    @overrides(AbstractThresholdType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[DU_TH] = self._du_th
+        parameters[TAU_TH] = self._tau_th
+        parameters[V_THRESH] = self._v_thresh
+
+    @overrides(AbstractThresholdType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        pass
+
+    @overrides(AbstractThresholdType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractThresholdType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractThresholdType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
+
+        # Add the rest of the data
+        return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
+                parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
+                parameters[V_THRESH], float(ts) / 10000.0]
+
+    @overrides(AbstractThresholdType.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
 
     @property
     def v_thresh(self):
@@ -42,8 +75,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @v_thresh.setter
     def v_thresh(self, v_thresh):
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, self._n_neurons)
+        self._v_thresh = v_thresh
 
     @property
     def du_th(self):
@@ -51,8 +83,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @du_th.setter
     def du_th(self, du_th):
-        self._du_th = utility_calls.convert_param_to_numpy(
-            du_th, self._n_neurons)
+        self._du_th = du_th
 
     @property
     def tau_th(self):
@@ -60,29 +91,4 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @tau_th.setter
     def tau_th(self, tau_th):
-        self._tau_th = utility_calls.convert_param_to_numpy(
-            tau_th, self._n_neurons)
-
-    @property
-    def _du_th_inv(self):
-        return numpy.divide(1.0, self._du_th)
-
-    @property
-    def _tau_th_inv(self):
-        return numpy.divide(1.0, self._tau_th)
-
-    def get_n_threshold_parameters(self):
-        return 3
-
-    def get_threshold_parameters(self):
-        return [
-            NeuronParameter(self._du_th_inv, _MAASS_TYPES.DU_TH.data_type),
-            NeuronParameter(self._tau_th_inv, _MAASS_TYPES.TAU_TH.data_type),
-            NeuronParameter(self._v_thresh, _MAASS_TYPES.V_THRESH.data_type)
-        ]
-
-    def get_threshold_parameter_types(self):
-        return [item.data_type for item in _MAASS_TYPES]
-
-    def get_n_cpu_cycles_per_neuron(self):
-        return 30
+        self._tau_th = tau_th

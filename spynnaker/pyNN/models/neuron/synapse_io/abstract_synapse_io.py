@@ -5,6 +5,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractSynapseIO(object):
+    # pylint: disable=too-many-arguments
 
     __slots__ = ()
 
@@ -14,33 +15,31 @@ class AbstractSynapseIO(object):
             before extensions are required, or None if any delay is supported
         """
 
-    @abstractmethod
-    def get_sdram_usage_in_bytes(
-            self, edge, n_pre_slices, pre_slice_index,
-            n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages, population_table):
-        """ Get the SDRAM usage of a list of synapse information objects for\
-            the given slices, and given number of delay stages (each stage\
-            representing a multiple of the maximum delay supported), returning\
-            the size for the non-delayed synapse information and the size for\
-            the delayed information
+    def get_max_row_info(
+            self, synapse_info, post_vertex_slice, n_delay_stages,
+            population_table, machine_time_step, in_edge):
+        """ Get the information about the maximum lengths of delayed and\
+            undelayed rows in bytes (including header), words (without header)\
+            and number of synapses
         """
 
     @abstractmethod
     def get_synapses(
-            self, edge, n_pre_slices, pre_slice_index,
-            n_post_slices, post_slice_index, pre_vertex_slice,
+            self, synapse_info, pre_slices, pre_slice_index,
+            post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            n_synapse_types, weight_scales, machine_time_step):
+            n_synapse_types, weight_scales, machine_time_step,
+            app_edge, machine_edge):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses
         """
 
     @abstractmethod
     def read_synapses(
-            self, edge, synapse_info, pre_vertex_slice, post_vertex_slice,
+            self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, machine_time_step):
+            weight_scales, data, delayed_data, n_delay_stages,
+            machine_time_step):
         """ Read the synapses for a given projection synapse information\
             object out of the given data
         """

@@ -1,11 +1,9 @@
-# pynn imports
-
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject, supports_injection
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot \
     import AbstractPushBotRetinaDevice
-from pacman.model.decorators import overrides
 
 import logging
 
@@ -15,19 +13,17 @@ logger = logging.getLogger(__name__)
 @supports_injection
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
+    __slots__ = [
+        "_graph_mapper",
+        "_new_key_command",
+        "_routing_infos"]
 
     default_parameters = {'label': None, 'board_address': None}
 
     def __init__(
-            self, n_neurons, spinnaker_link_id, protocol, resolution,
+            self, spinnaker_link_id, protocol, resolution,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
-
-        if n_neurons is not None and n_neurons != resolution.value.n_neurons:
-            logger.warn(
-                "The specified number of neurons for the push bot retina"
-                " device has been ignored {} will be used instead"
-                .format(resolution.value.n_neurons))
 
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(

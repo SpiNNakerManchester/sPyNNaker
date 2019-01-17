@@ -55,7 +55,18 @@ POPULATION_BASED_REGIONS = Enum(
            ('SYNAPSE_DYNAMICS', 5),
            ('RECORDING', 6),
            ('PROVENANCE_DATA', 7),
-           ('PROFILING', 8)])
+           ('PROFILING', 8),
+           ('CONNECTOR_BUILDER', 9),
+           ('DIRECT_MATRIX', 10)])
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
+
+# names for recording components
+SPIKES = 'spikes'
+MEMBRANE_POTENTIAL = "v"
+GSYN_EXCIT = "gsyn_exc"
+GSYN_INHIB = "gsyn_inh"
+
+# The partition ID used for Poisson live control data
+LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"

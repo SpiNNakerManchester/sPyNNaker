@@ -1,14 +1,14 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractproperty
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 @add_metaclass(AbstractBase)
 class AbstractMulticastControllableDevice(object):
-    """ A device that can be controlled by sending Multicast packets to it,\
+    """ A device that can be controlled by sending multicast packets to it,\
         either directly, or via Ethernet using an AbstractEthernetTranslator
     """
+    __slots__ = []
 
     @abstractproperty
     def device_control_partition_id(self):

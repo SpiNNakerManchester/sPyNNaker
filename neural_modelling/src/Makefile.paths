@@ -1,7 +1,4 @@
-MAKEFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
-CURRENT_DIR := $(dir $(MAKEFILE_PATH))
-SOURCE_DIR := $(abspath $(CURRENT_DIR))
-SOURCE_DIRS += $(SOURCE_DIR)
-ifndef APP_OUTPUT_DIR
-    APP_OUTPUT_DIR := $(abspath $(CURRENT_DIR)../../spynnaker/pyNN/model_binaries/)/
-endif
+# THIS FILE WAS USED IN AN OLDER MAKE STYLE
+# Make now has to convert c files before building
+# SEE http://spinnakermanchester.github.io/spynnaker/5.0.0/Makefiles.html
+$(error inclusion of sPyNNaker/neural_modelling/src/Makefile.paths)

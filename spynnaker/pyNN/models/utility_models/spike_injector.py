@@ -1,36 +1,31 @@
-from pacman.model.decorators import overrides
-from spinn_front_end_common.abstract_models \
-    import AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from .spike_injector_vertex import SpikeInjectorVertex
 
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
+_population_parameters = {
+    "port": None,
+    "virtual_key": None,
+    "spike_buffer_max_size": None,
+    "buffer_size_before_receive": None,
+    "time_between_requests": None,
+    "buffer_notification_ip_address": None,
+    "buffer_notification_port": None
+}
 
 
-class SpikeInjector(ReverseIpTagMultiCastSource,
-                    AbstractProvidesOutgoingPartitionConstraints):
-    """ An Injector of Spikes for PyNN populations.  This only allows the user\
-        to specify the virtual_key of the population to identify the population
-    """
+class SpikeInjector(AbstractPyNNModel):
 
-    default_parameters = {
-        'label': "spikeInjector", 'port': None, 'virtual_key': None}
+    default_population_parameters = _population_parameters
 
-    def __init__(
-            self, n_neurons, label=default_parameters['label'],
-            port=default_parameters['port'],
-            virtual_key=default_parameters['virtual_key']):
-
-        ReverseIpTagMultiCastSource.__init__(
-            self, n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True)
-
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-
-    @overrides(AbstractProvidesOutgoingPartitionConstraints.
-               get_outgoing_partition_constraints)
-    def get_outgoing_partition_constraints(self, partition):
-        constraints = ReverseIpTagMultiCastSource\
-            .get_outgoing_partition_constraints(self, partition)
-        constraints.append(ContiguousKeyRangeContraint())
-        return constraints
+    @overrides(AbstractPyNNModel.create_vertex,
+               additional_arguments=_population_parameters.keys())
+    def create_vertex(
+            self, n_neurons, label, constraints, port, virtual_key,
+            spike_buffer_max_size, buffer_size_before_receive,
+            time_between_requests, buffer_notification_ip_address,
+            buffer_notification_port):
+        return SpikeInjectorVertex(
+            n_neurons, label, constraints, port, virtual_key,
+            spike_buffer_max_size, buffer_size_before_receive,
+            time_between_requests, buffer_notification_ip_address,
+            buffer_notification_port)

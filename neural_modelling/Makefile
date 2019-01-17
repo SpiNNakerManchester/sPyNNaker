@@ -1,14 +1,8 @@
-BUILDS = spike_source/poisson delay_extension neuron robot_motor_control
-DIRS = $(BUILDS:%=src/%)
+BUILDS = spike_source/poisson delay_extension neuron robot_motor_control synapse_expander
+DIRS = $(BUILDS:%=makefiles/%)
 
 all: $(DIRS)
-	for d in $(DIRS); do (cd $$d; "$(MAKE)") || exit $$?; done
-
-%.aplx: %
-	cd $*; "$(MAKE)"
-
-%.aplx: neuron/builds/%
-	cd neuron/builds/$*; "$(MAKE)"
+	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
-	for d in $(DIRS); do (cd $$d; "$(MAKE)" clean) || exit $$?; done
+	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done

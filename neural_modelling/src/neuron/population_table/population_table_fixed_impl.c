@@ -1,7 +1,6 @@
 #include "population_table.h"
-#include "../synapse_row.h"
+#include <neuron/synapse_row.h>
 #include <debug.h>
-#include <string.h>
 
 #define MASTER_POPULATION_MAX 1152
 #define ROW_SIZE_TABLE_MAX 8
@@ -44,11 +43,11 @@ static inline uint32_t _get_table_index(key_t x, key_t y, key_t p) {
 bool population_table_initialise(address_t table_address,
                                  address_t synapse_rows_address,
                                  uint32_t *row_max_n_words) {
-    log_info("population_table_initialise: starting");
+    log_debug("population_table_initialise: starting");
     // Copy the master population table
     log_debug("reading master pop table from address 0x%.8x", table_address);
-    memcpy(master_population_table, table_address,
-           MASTER_POPULATION_MAX * sizeof(uint16_t));
+    spin1_memcpy(master_population_table, table_address,
+            MASTER_POPULATION_MAX * sizeof(uint16_t));
 
     // Store the base address
     log_debug("the stored synaptic matrix base address is located at: 0x%.8x",
@@ -59,16 +58,16 @@ bool population_table_initialise(address_t table_address,
     log_debug("reading row length table of %d bytes from mem address 0x%.8x",
               ROW_SIZE_TABLE_MAX * sizeof(uint32_t),
               table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4));
-    memcpy(row_size_table,
-           table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4),
-           ROW_SIZE_TABLE_MAX * sizeof(uint32_t));
+    spin1_memcpy(row_size_table,
+            table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4),
+            ROW_SIZE_TABLE_MAX * sizeof(uint32_t));
 
     // The the maximum number of words to be the entry at the end of the
     // row size table
     *row_max_n_words = row_size_table[ROW_SIZE_TABLE_MAX - 1]
                        + N_SYNAPSE_ROW_HEADER_WORDS;
 
-    log_info("population_table_initialise: completed successfully");
+    log_debug("population_table_initialise: completed successfully");
     _print_master_population_table();
     _print_row_size_table();
 
@@ -77,7 +76,7 @@ bool population_table_initialise(address_t table_address,
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the x field of the key (assuming the key is in the format
@@ -88,7 +87,7 @@ static inline key_t _key_x(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the y field of the key (assuming the key is in the format
@@ -99,7 +98,7 @@ static inline key_t _key_y(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the p field of the key (assuming the key is in the format
@@ -110,7 +109,7 @@ static inline key_t _key_p(key_t k) {
 
 //! \helpful method for converting a key with the field ranges of:
 //! [x][y][p][n] where x, y and p represent the x,y and p coordinate of the
-//! core that transmitted the spike and n represents the atom id which that
+//! core that transmitted the spike and n represents the atom ID which that
 //! core has spiked with.
 //! \param[in] k The key that needs translating
 //! \return the n field of the key (assuming the key is in the format

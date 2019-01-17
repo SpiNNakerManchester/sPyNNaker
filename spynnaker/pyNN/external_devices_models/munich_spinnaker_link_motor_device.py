@@ -1,10 +1,10 @@
 # spynnaker imports
 import logging
 
+from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints \
     import FixedMaskConstraint
-from pacman.model.decorators import overrides
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application \
     import ApplicationSpiNNakerLinkVertex, ApplicationVertex
@@ -16,12 +16,13 @@ from spinn_front_end_common.abstract_models\
     import AbstractProvidesOutgoingPartitionConstraints
 from spinn_front_end_common.abstract_models.impl import \
     ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities.utility_objs import ExecutableStartType
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.abstract_models \
     import AbstractVertexWithEdgeToDependentVertices
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.defaults import defaults
 
 logger = logging.getLogger(__name__)
 
@@ -29,62 +30,52 @@ MOTOR_PARTITION_ID = "MOTOR"
 
 
 class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
+    __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):
-
-        ApplicationSpiNNakerLinkVertex.__init__(
-            self, n_atoms=6, spinnaker_link_id=spinnaker_link_id,
+        super(_MunichMotorDevice, self).__init__(
+            n_atoms=6, spinnaker_link_id=spinnaker_link_id,
             label="External Munich Motor", max_atoms_per_core=6,
             board_address=board_address)
 
 
+@defaults
 class MunichMotorDevice(
-        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
+        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
     """ An Omnibot motor control device - has a real vertex and an external\
         device vertex
     """
+    __slots__ = [
+        "_continue_if_not_different",
+        "_delay_time",
+        "_delta_threshold",
+        "_dependent_vertices",
+        "_sample_time",
+        "_speed",
+        "_update_time"]
 
     SYSTEM_REGION = 0
     PARAMS_REGION = 1
 
     PARAMS_SIZE = 7 * 4
 
-    default_parameters = {
-        'speed': 30, 'sample_time': 4096, 'update_time': 512, 'delay_time': 5,
-        'delta_threshold': 23, 'continue_if_not_different': True,
-        'label': "RobotMotorControl", 'board_address': None}
-
     def __init__(
-            self, n_neurons, spinnaker_link_id,
-            board_address=default_parameters['board_address'],
-            speed=default_parameters['speed'],
-            sample_time=default_parameters['sample_time'],
-            update_time=default_parameters['update_time'],
-            delay_time=default_parameters['delay_time'],
-            delta_threshold=default_parameters['delta_threshold'],
-            continue_if_not_different=default_parameters[
-                'continue_if_not_different'],
-            label=default_parameters['label']):
-        """
-        """
+            self, spinnaker_link_id, board_address=None, speed=30,
+            sample_time=4096, update_time=512, delay_time=5,
+            delta_threshold=23, continue_if_not_different=True, label=None):
+        # pylint: disable=too-many-arguments
 
-        if n_neurons != 6:
-            logger.warn("The specified number of neurons for the munich motor"
-                        " device has been ignored; 6 will be used instead")
-
-        ApplicationVertex.__init__(self, label)
-        AbstractProvidesOutgoingPartitionConstraints.__init__(self)
-        ProvidesKeyToAtomMappingImpl.__init__(self)
+        super(MunichMotorDevice, self).__init__(label)
 
         self._speed = speed
         self._sample_time = sample_time
         self._update_time = update_time
         self._delay_time = delay_time
         self._delta_threshold = delta_threshold
-        self._continue_if_not_different = continue_if_not_different
+        self._continue_if_not_different = bool(continue_if_not_different)
         self._dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
@@ -116,36 +107,19 @@ class MunichMotorDevice(
         return list([FixedMaskConstraint(0xFFFFF800)])
 
     @inject_items({
-        "graph_mapper": "MemoryGraphMapper",
-        "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "application_graph": "MemoryApplicationGraph",
-        "tags": "MemoryTags",
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "graph_mapper", "application_graph", "machine_graph",
-            "routing_info", "tags", "machine_time_step",
-            "time_scale_factor"
+            "routing_info", "machine_time_step", "time_scale_factor"
         })
     def generate_data_specification(
-            self, spec, placement, graph_mapper, application_graph,
-            machine_graph, routing_info, tags,
+            self, spec, placement, routing_info,
             machine_time_step, time_scale_factor):
-        iptags = tags.get_ip_tags_for_vertex(placement.vertex)
-        reverse_iptags = tags.get_reverse_ip_tags_for_vertex(placement.vertex)
-        self.generate_application_data_specification(
-            spec, placement, graph_mapper, application_graph, machine_graph,
-            routing_info, iptags, reverse_iptags, machine_time_step,
-            time_scale_factor)
-
-    def generate_application_data_specification(
-            self, spec, placement, graph_mapper, application_graph,
-            machine_graph, routing_info, iptags, reverse_iptags,
-            machine_time_step, time_scale_factor):
+        # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
         self.reserve_memory_regions(spec)
@@ -174,10 +148,7 @@ class MunichMotorDevice(
         spec.write_value(data=self._update_time)
         spec.write_value(data=self._delay_time)
         spec.write_value(data=self._delta_threshold)
-        if self._continue_if_not_different:
-            spec.write_value(data=1)
-        else:
-            spec.write_value(data=0)
+        spec.write_value(data=int(self._continue_if_not_different))
 
         # End-of-Spec:
         spec.end_specification()
@@ -188,11 +159,10 @@ class MunichMotorDevice(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
-        return ExecutableStartType.USES_SIMULATION_INTERFACE
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     def reserve_memory_regions(self, spec):
-        """
-        Reserve SDRAM space for memory areas:
+        """ Reserve SDRAM space for memory areas:
         1) Area for information on what data to record
         2) area for start commands
         3) area for end commands
@@ -201,13 +171,10 @@ class MunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            region=self.SYSTEM_REGION,
-            size=SYSTEM_BYTES_REQUIREMENT,
-            label='setup')
+            self.SYSTEM_REGION, SYSTEM_BYTES_REQUIREMENT, label='setup')
 
-        spec.reserve_memory_region(region=self.PARAMS_REGION,
-                                   size=self.PARAMS_SIZE,
-                                   label='params')
+        spec.reserve_memory_region(
+            self.PARAMS_REGION, self.PARAMS_SIZE, label='params')
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):

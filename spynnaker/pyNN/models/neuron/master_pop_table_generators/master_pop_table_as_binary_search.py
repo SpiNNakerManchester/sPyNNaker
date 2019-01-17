@@ -3,9 +3,12 @@
 import struct
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
+from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException,\
+    SynapticConfigurationException
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 # general imports
@@ -19,8 +22,12 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class _MasterPopEntry(object):
-    """ internal class that contains a master pop entry
+    """ Internal class that contains a master population table entry
     """
+    __slots__ = [
+        "_addresses_and_row_lengths",
+        "_mask",
+        "_routing_key"]
 
     MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
@@ -54,15 +61,18 @@ class _MasterPopEntry(object):
     def addresses_and_row_lengths(self):
         """
         :return: the memory address that this master pop entry points at\
-        (synaptic matrix)
+            (synaptic matrix)
         """
         return self._addresses_and_row_lengths
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
+    """ Master population table, implemented as binary search master.
     """
-    binary search master pop class.
-    """
+    __slots__ = [
+        "_entries",
+        "_n_addresses",
+        "_n_single_entries"]
 
     # Switched ordering of count and start as numpy will switch them back
     # when asked for view("<4")
@@ -75,15 +85,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     SINGLE_BIT_FLAG_BIT = 0x80000000
     ROW_LENGTH_MASK = 0xFF
     ADDRESS_MASK = 0x7FFFFF00
+    ADDRESS_SCALE = 16
+    ADDRESS_SCALED_SHIFT = 8 - 4
 
     def __init__(self):
-        AbstractMasterPopTableFactory.__init__(self)
         self._entries = None
         self._n_addresses = 0
+        self._n_single_entries = None
 
+    @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
-
         :param vertex_slice: the slice of the vertex
         :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
@@ -100,7 +112,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxint
+                max_atoms = sys.maxsize
                 edge_pre_vertex = in_edge.pre_vertex
                 if (isinstance(edge_pre_vertex, ApplicationVertex) and
                         isinstance(
@@ -130,13 +142,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = 0
+        n_vertices = len(in_edges)
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
-            n_vertices += 1
 
         # Multiply by 2 to get an upper bound
         return (
@@ -146,48 +157,57 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_allowed_row_length(self, row_length):
         """
-
         :param row_length: the row length being considered
         :return: the row length available
         """
         if row_length > 255:
-            raise Exception("Only rows of up to 255 entries are allowed")
+            raise SynapseRowTooBigException(
+                255, "Only rows of up to 255 entries are allowed")
         return row_length
 
     def get_next_allowed_address(self, next_address):
         """
-
         :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
         """
+        next_address = (
+            (next_address + (self.ADDRESS_SCALE - 1)) //
+            self.ADDRESS_SCALE) * self.ADDRESS_SCALE
+        if (next_address / self.ADDRESS_SCALE) > 0x7FFFFF:
+            raise SynapticConfigurationException(
+                "Address {} is out of range for this population table!".format(
+                    hex(next_address)))
         return next_address
 
     def initialise_table(self, spec, master_population_table_region):
-        """ Initialises the master pop data structure
+        """ Initialise the master pop data structure
 
-        :param spec: the dsg writer
-        :param master_population_table_region: the region in memory that the\
-                master pop table will be written in
+        :param spec: the DSG writer
+        :param master_population_table_region: \
+            the region in memory that the master pop table will be written in
         :rtype: None
         """
         self._entries = dict()
         self._n_addresses = 0
         self._n_single_entries = 0
 
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
+               extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ Adds a entry in the binary search to deal with the synaptic matrix
+        """ Add an entry in the binary search to deal with the synaptic matrix
 
-        :param spec: the writer for dsg
+        :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
-        :param master_pop_table_region: the region id for the master pop
-        :param is_single: flag that states if the entry is a direct entry for\
-                a single row.
+        :param master_pop_table_region: the region ID for the master pop
+        :param is_single: \
+            Flag that states if the entry is a direct entry for a single row.
         :rtype: None
         """
+        # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask)
@@ -195,26 +215,19 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # if single, don' t add to start address as its going in its own block
         if not is_single:
-            start_addr = block_start_addr / 4
+            start_addr = block_start_addr // self.ADDRESS_SCALE
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
 
+    @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Completes any operations required after all entries have been added
-
-        :param spec: the writer for the dsg
-        :param master_pop_table_region: the region to which the master pop\
-                resides in
-        :rtype: None
-        """
-
         spec.switch_write_focus(region=master_pop_table_region)
 
         # sort entries by key
         entries = sorted(
             self._entries.values(),
-            key=lambda pop_table_entry: pop_table_entry.routing_key)
+            key=lambda entry: entry.routing_key)
 
         # write no master pop entries and the address list size
         n_entries = len(entries)
@@ -222,46 +235,48 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_value(self._n_addresses)
 
         # Generate the table and list as arrays
-        pop_table = numpy.zeros(
-            n_entries, dtype=self.MASTER_POP_ENTRY_DTYPE)
+        pop_table = numpy.zeros(n_entries, dtype=self.MASTER_POP_ENTRY_DTYPE)
         address_list = numpy.zeros(
             self._n_addresses, dtype=self.ADDRESS_LIST_DTYPE)
         start = 0
         for i, entry in enumerate(entries):
-            pop_table[i]["key"] = entry.routing_key
-            pop_table[i]["mask"] = entry.mask
-            pop_table[i]["start"] = start
-            count = len(entry.addresses_and_row_lengths)
-            pop_table[i]["count"] = count
-            for j, (address, row_length, is_single) in enumerate(
-                    entry.addresses_and_row_lengths):
-                single_bit = 0
-                if is_single:
-                    single_bit = \
-                        MasterPopTableAsBinarySearch.SINGLE_BIT_FLAG_BIT
-                address_list[start + j] = (
-                    (single_bit |
-                     (address & 0x7FFFFF) << 8) |
-                    (row_length &
-                     MasterPopTableAsBinarySearch.ROW_LENGTH_MASK))
-            start += count
+            start += self._make_pop_table_entry(
+                entry, i, start, pop_table, address_list)
 
         # Write the arrays
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
 
+        self._entries.clear()
         del self._entries
         self._entries = None
         self._n_addresses = 0
 
+    def _make_pop_table_entry(self, entry, i, start, pop_table, address_list):
+        # pylint: disable=too-many-arguments
+        pop_table[i]["key"] = entry.routing_key
+        pop_table[i]["mask"] = entry.mask
+        pop_table[i]["start"] = start
+        count = len(entry.addresses_and_row_lengths)
+        pop_table[i]["count"] = count
+        for j, (address, row_length, is_single) in enumerate(
+                entry.addresses_and_row_lengths):
+            single_bit = self.SINGLE_BIT_FLAG_BIT if is_single else 0
+            address_list[start + j] = (
+                (single_bit | (address & 0x7FFFFF) << 8) |
+                (row_length & self.ROW_LENGTH_MASK))
+        return count
+
+    @overrides(
+        AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
-            self, incoming_key_combo, master_pop_base_mem_address, txrx,
+            self, incoming_key, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
+        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # get entries in master pop
-        count_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address, 8)
-        n_entries, n_addresses = _TWO_WORDS.unpack(buffer(count_data))
+        n_entries, n_addresses = _TWO_WORDS.unpack(txrx.read_memory(
+            chip_x, chip_y, master_pop_base_mem_address, _TWO_WORDS.size))
         n_entry_bytes = (
             n_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
         n_address_bytes = (
@@ -269,7 +284,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # read in master pop structure
         full_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address + 8,
+            chip_x, chip_y, master_pop_base_mem_address + _TWO_WORDS.size,
             n_entry_bytes + n_address_bytes)
 
         # convert into a numpy arrays
@@ -280,7 +295,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             full_data, 'uint8', n_address_bytes, n_entry_bytes).view(
                 dtype=self.ADDRESS_LIST_DTYPE)
 
-        entry = self._locate_entry(entry_list, incoming_key_combo)
+        entry = self._locate_entry(entry_list, incoming_key)
         if entry is None:
             return []
         addresses = list()
@@ -298,23 +313,24 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             if is_single:
                 address = address >> 8
             else:
-                address = address >> 6
+                address = address >> self.ADDRESS_SCALED_SHIFT
 
             addresses.append((row_length, address, is_single))
         return addresses
 
-    def _locate_entry(self, entries, key):
-        """ searches the binary tree structure for the correct entry.
+    @staticmethod
+    def _locate_entry(entries, key):
+        """ Search the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
         :return: the entry for this given key
-        :rtype: _MasterPopEntry
+        :rtype: :py:class:`_MasterPopEntry`
         """
         imin = 0
         imax = len(entries)
 
         while imin < imax:
-            imid = (imax + imin) / 2
+            imid = (imax + imin) // 2
             entry = entries[imid]
             if key & entry["mask"] == entry["key"]:
                 return entry
@@ -324,8 +340,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 imax = imid
         return None
 
+    @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
-        """ Returns any constraints placed on the edges because of having this\
-            master pop table implemented in the cores.
-        """
         return list()

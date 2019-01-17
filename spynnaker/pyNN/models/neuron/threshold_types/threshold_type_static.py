@@ -1,43 +1,54 @@
-from pacman.model.decorators import overrides
-
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spinn_utilities.overrides import overrides
 from .abstract_threshold_type import AbstractThresholdType
-
 from data_specification.enums import DataType
 
-from enum import Enum
+V_THRESH = "v_thresh"
+
+UNITS = {V_THRESH: "mV"}
 
 
-class _STATIC_TYPES(Enum):
-    V_THRESH = (1, DataType.S1615)
-
-    def __new__(cls, value, data_type):
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
-
-
-class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
-
+class ThresholdTypeStatic(AbstractThresholdType):
     """ A threshold that is a static value
     """
+    __slots__ = ["_v_thresh"]
 
-    def __init__(self, n_neurons, v_thresh):
-        AbstractThresholdType.__init__(self)
-        AbstractContainsUnits.__init__(self)
+    def __init__(self, v_thresh):
+        super(ThresholdTypeStatic, self).__init__([
+            DataType.S1615])  # v_thresh
+        self._v_thresh = v_thresh
 
-        self._units = {'v_thresh': "mV"}
+    @overrides(AbstractThresholdType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # Just a comparison, but 2 just in case!
+        return 2 * n_neurons
 
-        self._n_neurons = n_neurons
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, n_neurons)
+    @overrides(AbstractThresholdType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[V_THRESH] = self._v_thresh
+
+    @overrides(AbstractThresholdType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        pass
+
+    @overrides(AbstractThresholdType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractThresholdType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @overrides(AbstractThresholdType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
+
+        # Add the rest of the data
+        return [parameters[V_THRESH]]
+
+    @overrides(AbstractThresholdType.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (_v_thresh,) = values
 
     @property
     def v_thresh(self):
@@ -45,28 +56,4 @@ class ThresholdTypeStatic(AbstractThresholdType, AbstractContainsUnits):
 
     @v_thresh.setter
     def v_thresh(self, v_thresh):
-        self._v_thresh = utility_calls.convert_param_to_numpy(
-            v_thresh, self._n_neurons)
-
-    @overrides(AbstractThresholdType.get_n_threshold_parameters)
-    def get_n_threshold_parameters(self):
-        return 1
-
-    @overrides(AbstractThresholdType.get_threshold_parameters)
-    def get_threshold_parameters(self):
-        return [
-            NeuronParameter(self._v_thresh, _STATIC_TYPES.V_THRESH.data_type)
-        ]
-
-    @overrides(AbstractThresholdType.get_threshold_parameter_types)
-    def get_threshold_parameter_types(self):
-        return [item.data_type for item in _STATIC_TYPES]
-
-    def get_n_cpu_cycles_per_neuron(self):
-
-        # Just a comparison, but 2 just in case!
-        return 2
-
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]
+        self._v_thresh = v_thresh

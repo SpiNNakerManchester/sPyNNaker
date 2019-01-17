@@ -1,4 +1,4 @@
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
 
 
@@ -18,7 +18,6 @@ class SimplePopulationSettable(AbstractPopulationSettable):
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        if hasattr(self, key):
-            setattr(self, key, value)
-        else:
+        if not hasattr(self, key):
             raise Exception("Parameter {} not found".format(key))
+        setattr(self, key, value)

@@ -1,7 +1,6 @@
 from six import add_metaclass
 
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
@@ -9,13 +8,14 @@ class AbstractEthernetController(object):
     """ A controller that can send multicast packets which can be received\
         over Ethernet and translated to control an external device
     """
+    __slots__ = ()
 
     @abstractmethod
     def get_message_translator(self):
         """ Get the translator of messages
 
         :rtype:\
-            :py:class:`spynnaker_external_devices_plugin.pyNN.external_devices_models.abstract_ethernet_translator.AbstractEthernetTranslator`
+            :py:class:`spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator`
         """
 
     @abstractmethod
@@ -26,7 +26,7 @@ class AbstractEthernetController(object):
 
     @abstractmethod
     def get_outgoing_partition_ids(self):
-        """ Get the partition ids of messages coming out of the controller
+        """ Get the partition IDs of messages coming out of the controller
 
-        :rtype: list of str
+        :rtype: list(str)
         """
