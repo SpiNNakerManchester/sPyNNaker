@@ -8,7 +8,7 @@
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
 #include <neuron/threshold_types/threshold_type.h>
-#include <neuron/synapse_types/synapse_types.h>
+#include <synapse/synapse_types/synapse_types.h>
 
 // Further includes
 #include <common/out_spikes.h>

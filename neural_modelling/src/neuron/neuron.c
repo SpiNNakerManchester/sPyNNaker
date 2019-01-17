@@ -7,7 +7,6 @@
 #include "neuron.h"
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
-#include <synapse/synapse_row.h>
 #include <common/out_spikes.h>
 #include <debug.h>
 #include <simulation.h>
@@ -16,7 +15,23 @@
 void spin1_wfi();
 
 #define SPIKE_RECORDING_CHANNEL 0
-DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 0
+#define DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 0
+
+//! how many bits the synapse delay will take
+#ifndef SYNAPSE_DELAY_BITS
+#define SYNAPSE_DELAY_BITS 4
+#endif
+
+// Create some masks based on the number of bits
+//! the mask for the synapse delay in the row
+#define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
+
+// Define the type of the weights
+#ifdef SYNAPSE_WEIGHTS_SIGNED
+typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
+#else
+typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
+#endif
 
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
@@ -85,14 +100,19 @@ static uint32_t n_recordings_outstanding = 0;
 //! The synaptic contributions for the current timestep
 static weight_t_t *synaptic_contributions;
 
+static uint32_t *synaptic_contributions_to_input_left_shifts;
+
 static timer_t current_time;
+
+//! Size of DMA read for synaptic contributions
+static size_t dma_size;
 
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
     RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
+    N_RECORDED_VARIABLES, SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {
@@ -160,6 +180,19 @@ static bool _neuron_load_neuron_parameters(address_t address) {
     return true;
 }
 
+static inline input_t convert_weight_to_input(
+        weight_t weight, uint32_t left_shift) {
+
+    union {
+        int_k_t input type;
+        s1615 output_type;
+        } converter;
+
+        converter.input_type = (int_k_t) (weight) << left_shift;
+
+        return converter.output_type;
+}
+
 bool neuron_reload_neuron_parameters(address_t address){
     log_debug("neuron_reloading_neuron_parameters: starting");
     return _neuron_load_neuron_parameters(address);
@@ -182,21 +215,27 @@ void recording_done_callback() {
     n_recordings_outstanding -= 1;
 }
 
-void neuron_do_timestep_update(timer_t time) {
+bool neuron_do_timestep_update(timer_t time) {
 
     current_time = time;
 
     // DMA read of the synaptic contribution for this timestep
-    size_t size_to_be_transferred =
-        n_neurons * n_synapse_types * sizeof(weight_t);
     spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, ?, synaptic_contributions,
-        DMA_READ, size_to_be_transferred);
-}
+        DMA_READ, dma_size);
 
-void _do_timestep_update(uint unused1, uint unused2) {
+    // Busy wait until DMA transfer is finished
+    while(dma[DMA_STAT] & 1) {
 
-    //FIRST THING IS TO CONVERT THE DMA READ INTO NEURON INPUTS!!!!!
+        // Do nothing
+    }
+
+    //DMA Failed, NECESSARY?? (YES IF NOT DONE INTERNALLY)
+    if(dma[DMA_STAT] & 2) {
+
+        log_error("Failed reading synaptic contributions from memory");
+        return false;
+    }
 
     // Wait a random number of clock cycles
     uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
@@ -225,9 +264,23 @@ void _do_timestep_update(uint unused1, uint unused2) {
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
+        for (index_t synapse_type_index = 0 ; synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+            uint32_t buff_index = (((time & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
+            | neuron_index);
+
+            neuron_impl_add_inputs(
+                synapse_type_index,
+                neuron_index,
+                convert_weight_to_input(
+                    synaptic_contributions[buff_index],
+                    synaptic_contributions_to_input_left_shifts[synapse_type_index]));
+        }
+
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
-            synapse_dynamics_get_intrinsic_bias(time, neuron_index);
+            synapse_dynamics_get_intrinsic_bias(time, neuron_index); // 0 in case of non plastic synapses!!!!
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
@@ -306,6 +359,8 @@ void _do_timestep_update(uint unused1, uint unused2) {
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
+
+    return true;
 }
 
 bool neuron_initialise(address_t address) {
@@ -334,6 +389,8 @@ bool neuron_initialise(address_t address) {
     n_neurons = address[N_NEURONS_TO_SIMULATE];
     n_synapse_types = address[N_SYNAPSE_TYPES];
 
+    dma_size = n_neurons * n_synapse_types * sizeof(weight_t);
+
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
@@ -352,6 +409,16 @@ bool neuron_initialise(address_t address) {
         log_error("Unable to allocate Synaptic contribution buffers");
         return false;
     }
+
+    synaptic_contributions_to_input_left_shifts = (uint32_t *) spin1_malloc(
+        n_synapse_types * sizeof(uint32_t));
+    if (synaptic_contributions_to_input_left_shifts == NULL) {
+        log_error("Unable to allocate Synaptic contribution shift array");
+        return false;
+    }
+    spin1_memcpy(
+        synaptic_contributions_to_input_left_shifts, address + SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT,
+        n_synapse_types * sizeof(uint32_t));
 
     buffers_positions = (address_t *) spin1_malloc();
 
@@ -422,17 +489,7 @@ bool neuron_initialise(address_t address) {
         return false;
     }
 
-    simulation_dma_transfer_done_callback_on(
-        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, _do_timestep_update);
-
     _reset_record_counter();
 
     return true;
-}
-
-void neuron_add_inputs(
-        index_t synapse_type_index, index_t neuron_index,
-        input_t weights_this_timestep) {
-    neuron_impl_add_inputs(
-        synapse_type_index, neuron_index, weights_this_timestep);
 }

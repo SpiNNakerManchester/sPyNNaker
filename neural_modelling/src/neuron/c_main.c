@@ -251,7 +251,9 @@ void timer_callback(uint timer_count, uint unused) {
         count_rewires++;
     }*/
     // otherwise do neuron time step update
-    neuron_do_timestep_update(time);
+    if(!neuron_do_timestep_update(time)) {
+        rt_error(RTE_SWERR); //Maybe a bit too extreme?
+    }
 
     // trigger buffering_out_mechanism
     if (recording_flags > 0) {

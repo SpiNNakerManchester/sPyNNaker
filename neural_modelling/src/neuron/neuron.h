@@ -29,7 +29,7 @@
 //              the model
 //! \param[out] incoming_spike_buffer_size Returns the number of spikes to
 //!             support in the incoming spike buffer
-//! \return boolean which is True is the translation was successful
+//! \return boolean which is True if the translation was successful
 //!         otherwise False
 bool neuron_initialise(
     address_t address, uint32_t *n_neurons_value,
@@ -38,8 +38,8 @@ bool neuron_initialise(
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.
 //! \param[in] time the timer tick value currently being executed
-//! \return nothing
-void neuron_do_timestep_update(uint32_t time);
+//! \return boolean which is True if the update succeded otherwise False
+bool neuron_do_timestep_update(uint32_t time);
 
 //! \brief interface for reloading neuron parameters as needed
 //! \param[in] address: the address where the neuron parameters are stored
