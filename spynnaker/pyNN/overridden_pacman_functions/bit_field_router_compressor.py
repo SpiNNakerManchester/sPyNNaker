@@ -44,8 +44,11 @@ class BitFieldRouterCompressor(object):
     # structs for performance requirements.
     _TWO_WORDS = struct.Struct("<II")
 
+    _ONE_WORDS = struct.Struct("<I")
+
     # binary name
     _ROUTER_TABLE_WITH_BIT_FIELD_APLX = "bit_field_router_compressor.aplx"
+    #_ROUTER_TABLE_WITH_BIT_FIELD_APLX = "rt_minimise.aplx"
 
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
@@ -87,7 +90,7 @@ class BitFieldRouterCompressor(object):
         # locate data and cores to load binary on
         addresses, cores = self._generate_addresses(
             machine_graph, placements, transceiver, machine, executable_finder,
-            progress_bar)
+            progress_bar, graph_mapper)
 
         # load data into sdram
         self._load_data(
@@ -97,12 +100,12 @@ class BitFieldRouterCompressor(object):
 
         # load and run binaries
         utility_calls.run_system_application(
-                cores, app_id, transceiver, provenance_file_path,
-                executable_finder, read_algorithm_iobuf,
-                self._check_for_success, self._handle_failure,
-                [CPUState.FINISHED])
+            cores, routing_table_compressor_app_id, transceiver,
+            provenance_file_path, executable_finder,
+            read_algorithm_iobuf, self._check_for_success, self._handle_failure,
+            [CPUState.FINISHED])
 
-        #complete progress bar
+        # complete progress bar
         progress_bar.end()
 
     def _check_for_success(
@@ -124,7 +127,7 @@ class BitFieldRouterCompressor(object):
             y = core_subset.y
             for p in core_subset.processor_ids:
 
-                # Read the result from USER0 register
+                # Read the result from USER1 register
                 user_2_base_address = \
                     transceiver.get_user_2_register_address_from_core(p)
                 result = struct.unpack(
@@ -222,7 +225,7 @@ class BitFieldRouterCompressor(object):
 
         # write sdram
         transceiver.write_memory(
-            chip_x, chip_y, sdram_address, address_data)
+            chip_x, chip_y, sdram_address, address_data, sdram)
 
     def load_routing_table_data(
             self, routing_table, app_id, transceiver, compress_only_when_needed,
@@ -261,7 +264,7 @@ class BitFieldRouterCompressor(object):
 
     def _generate_addresses(
             self, machine_graph, placements, transceiver, machine,
-            executable_finder, progress_bar):
+            executable_finder, progress_bar, graph_mapper):
         """ generates the bitfield sdram addresses
 
         :param machine_graph: machine graph
@@ -269,6 +272,7 @@ class BitFieldRouterCompressor(object):
         :param transceiver: spinnman instance
         :param machine: spinnmachine instance
         :param progress_bar: the progress bar
+        :param: graph_mapper: mapping between graphs
         :param executable_finder: binary finder
         :return: addresses and the executable targets to load the router \
         table compressor with bitfield.
@@ -280,9 +284,11 @@ class BitFieldRouterCompressor(object):
 
         for vertex in progress_bar.over(
                 machine_graph.vertices, finish_at_end=False):
-            if isinstance(vertex, AbstractUsesBitFieldFilter):
+
+            app_vertex = graph_mapper.get_application_vertex(vertex)
+            if isinstance(app_vertex, AbstractUsesBitFieldFilter):
                 placement = placements.get_placement_of_vertex(vertex)
-                bit_field_sdram_address = vertex.bit_field_base_address(
+                bit_field_sdram_address = app_vertex.bit_field_base_address(
                     transceiver, placement)
                 addresses[placement.x, placement.y].append(
                     bit_field_sdram_address)
@@ -292,7 +298,7 @@ class BitFieldRouterCompressor(object):
                     cores.add_processor(
                         placement.x, placement.y,
                         machine.get_chip_at(placement.x, placement.y).
-                        get_first_none_monitor_processor())
+                        get_first_none_monitor_processor().processor_id)
 
         # convert core subsets into executable targets
         executable_targets = ExecutableTargets()
@@ -303,15 +309,14 @@ class BitFieldRouterCompressor(object):
 
         return addresses, executable_targets
 
-    @staticmethod
-    def _generate_chip_data(address_list):
+    def _generate_chip_data(self, address_list):
         """ generate byte array data for a list of sdram addresses
 
         :param address_list: the list of sdram addresses
         :return: the byte array
         """
         data = b""
-        data += len(address_list)
+        data += self._ONE_WORDS.pack(len(address_list))
         for memory_address in address_list:
-            data += memory_address
+            data += self._ONE_WORDS.pack(memory_address)
         return data
