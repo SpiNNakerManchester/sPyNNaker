@@ -2,7 +2,6 @@ from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from pacman.model.decorators import overrides
 import logging
 import numpy
 import math
@@ -68,9 +67,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        self.set_probabilities()
+        self._set_probabilities()
 
-    def set_probabilities(self):
+    def _set_probabilities(self):
         # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self._d_expression)
@@ -137,7 +136,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
 
-        probs = self._probs[pre_slice_index, post_slice_index]
+        probs = self._probs[
+            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 

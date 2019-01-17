@@ -28,9 +28,9 @@ class SmallWorldConnector(AbstractConnector):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        self.set_probabilities()
+        self._set_probabilities()
 
-    def set_probabilities(self):
+    def _set_probabilities(self):
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
@@ -57,15 +57,11 @@ class SmallWorldConnector(AbstractConnector):
     def get_delay_maximum(self):
         return self._get_delay_maximum(self._n_connections)
 
-    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
-        return numpy.sum(self._mask[pre_vertex_slice.as_slice,
-                                    post_vertex_slice.as_slice])
-
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = numpy.amax([
+        n_connections = numpy.sum([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
             for i in range(self._n_pre_neurons)])
 
@@ -78,7 +74,7 @@ class SmallWorldConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.amax([
+        return numpy.sum([
             numpy.sum(self._mask[:, i]) for i in range(self._n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
