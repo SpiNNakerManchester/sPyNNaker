@@ -1,7 +1,6 @@
 import scipy.stats
 import logging
 import math
-import random
 import numpy
 
 from spinn_utilities.overrides import overrides
@@ -64,6 +63,9 @@ MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 
+# The microseconds per timestep will be divided by this to get the max offset
+_MAX_OFFSET_DENOMINATOR = 10
+
 
 _PoissonStruct = Struct([
     DataType.UINT32,  # Start Scaled
@@ -88,10 +90,6 @@ class SpikeSourcePoissonVertex(
     _DEFAULT_MALLOCS_USED = 2
     SPIKE_RECORDING_REGION_ID = 0
 
-    # A count of the number of poisson vertices, to work out the random
-    # back off range
-    _n_poisson_machine_vertices = 0
-
     def __init__(
             self, n_neurons, constraints, label, rate, start, duration, seed,
             max_atoms_per_core, model):
@@ -106,6 +104,8 @@ class SpikeSourcePoissonVertex(
         self._model_name = "SpikeSourcePoisson"
         self._model = model
         self._seed = None
+        self._n_subvertices = 0
+        self._n_data_specs = 0
 
         # check for changes parameters
         self._change_requires_mapping = True
@@ -216,7 +216,7 @@ class SpikeSourcePoissonVertex(
             self, vertex_slice, resources_required, n_machine_time_steps,
             machine_time_step, label=None, constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        SpikeSourcePoissonVertex._n_poisson_machine_vertices += 1
+        self._n_subvertices += 1
         buffered_sdram_per_timestep =\
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
@@ -356,10 +356,13 @@ class SpikeSourcePoissonVertex(
             incoming_mask = ~incoming_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
-        # Write the random back off value
-        spec.write_value(random.randint(0, min(
-            self._n_poisson_machine_vertices,
-            MICROSECONDS_PER_SECOND // machine_time_step)))
+        # Write the offset value
+        max_offset = (
+            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        spec.write_value(
+            int(math.ceil(max_offset / self._n_subvertices)) *
+            self._n_data_specs)
+        self._n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
