@@ -37,6 +37,8 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
+extern bool contribution_written;
+
 //! parameters that reside in the synapse_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
@@ -323,6 +325,8 @@ bool synapses_initialise(
 void synapses_do_timestep_update(timer_t time) {
 
     _print_ring_buffers(time);
+
+    contribution_written = false;
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();

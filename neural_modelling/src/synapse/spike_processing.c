@@ -36,6 +36,8 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
+bool contribution_written;
+
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -102,10 +104,25 @@ void _setup_synaptic_dma_read() {
             // Decode spike to get address of destination synaptic row
             if (population_table_get_first_address(
                     spike, &row_address, &n_bytes_to_transfer)) {
-
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
                     _do_direct_row(row_address);
+
+                    // In case the end of the timer tick is approaching and spikes are in DTCM
+                    // Kicks the DMA write of synaptic contributions
+                    if(tc[T1_COUNT] < ?? && !contribution_written) {
+
+                        uint cpsr = spin1_int_disable();
+                        uint32_t spikes_remaining = in_spikes_flush_buffer();
+
+                        //Start DMA Writing procedure for the contribution of this timestep
+                        synapses_do_timestep_update(time);
+                        spin1_mode_restore(cpsr);
+
+                        contribution_written = true;
+
+                        return;
+                    }
                 } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
@@ -226,7 +243,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // if too close to the end of the timer tick or all the spikes
     // have been processed write in memory the synaptic contribution
-    if(tc[T1_COUNT] < ?? || in_spikes_buffer_empty()) {
+    if((tc[T1_COUNT] < ?? || in_spikes_buffer_empty()) && !contribution_written) {
 
         uint cpsr = spin1_int_disable();
         uint32_t spikes_remaining = in_spikes_flush_buffer();
@@ -234,6 +251,8 @@ void _dma_complete_callback(uint unused, uint tag) {
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
         spin1_mode_restore(cpsr);
+
+        contribution_written = true;
 
         return;
     }
@@ -274,6 +293,8 @@ bool spike_processing_initialise(
     single_fixed_synapse[0] = 0;
     single_fixed_synapse[1] = 1;
     single_fixed_synapse[2] = 0;
+
+    contribution_written = false;
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
