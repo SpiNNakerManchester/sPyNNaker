@@ -78,7 +78,7 @@ static uint32_t n_recordings_outstanding = 0;
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
-    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY, TRANSMISSION_KEY,
+    TIMER_START_OFFSET, TIME_BETWEEN_SPIKES, HAS_KEY, TRANSMISSION_KEY,
     N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
     N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
@@ -162,14 +162,14 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-    	uint32_t *random_backoff) {
+        uint32_t *timer_offset) {
     log_debug("neuron_initialise: starting");
 
-    *random_backoff = address[RANDOM_BACKOFF];
+    *timer_offset = address[TIMER_START_OFFSET];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
     log_debug(
         "\t back off = %u, time between spikes %u",
-        *random_backoff, time_between_spikes);
+        *timer_offset, time_between_spikes);
 
     // Check if there is a key to use
     use_key = address[HAS_KEY];

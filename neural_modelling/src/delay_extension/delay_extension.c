@@ -45,7 +45,7 @@ static uint32_t n_spikes_added = 0;
 
 //! An amount of microseconds to back off before starting the timer, in an
 //! attempt to avoid overloading the network
-static uint32_t random_backoff_us;
+static uint32_t timer_offset;
 
 //! The number of clock ticks between processing each neuron at each delay
 //! stage
@@ -101,7 +101,7 @@ static bool read_parameters(address_t address) {
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
     num_delay_stages = address[N_DELAY_STAGES];
-    random_backoff_us = address[RANDOM_BACKOFF];
+    timer_offset = address[RANDOM_BACKOFF];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
 
     uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
@@ -117,7 +117,7 @@ static bool read_parameters(address_t address) {
 
     log_debug(
         "\t random back off = %u, time_between_spikes = %u",
-        random_backoff_us, time_between_spikes);
+        timer_offset, time_between_spikes);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage
@@ -379,7 +379,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     log_debug("Timer period %u", timer_period);
-    spin1_set_timer_tick_and_phase(timer_period, random_backoff_us);
+    spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Register callbacks
     spin1_callback_on(MC_PACKET_RECEIVED, incoming_spike_callback, MC_PACKET);

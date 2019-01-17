@@ -61,7 +61,7 @@ typedef enum callback_priorities{
 uint32_t time;
 
 static uint32_t timer_period;
-static uint32_t random_backoff;
+static uint32_t timer_offset;
 
 //! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
@@ -151,7 +151,7 @@ static bool initialise() {
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, address),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
-            &random_backoff)) {
+            &timer_offset)) {
         return false;
     }
 
@@ -335,7 +335,7 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
               timer_period);
-    spin1_set_timer_tick_and_phase(timer_period, random_backoff);
+    spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

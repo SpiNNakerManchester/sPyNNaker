@@ -65,8 +65,8 @@ struct global_parameters {
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
 
-    //! The random backoff between timer ticks to desynchronize sources
-    uint32_t random_backoff_us;
+    //! The offset of the timer ticks to desynchronize sources
+    uint32_t timer_offset;
 
     //! The expected time to wait between spikes
     uint32_t time_between_spikes;
@@ -207,9 +207,9 @@ bool read_global_parameters(address_t address) {
     spin1_memcpy(&global_parameters, address, sizeof(global_parameters));
 
     log_info(
-        "\t key = %08x, set rate mask = %08x, back off = %u",
+        "\t key = %08x, set rate mask = %08x, timer offset = %u",
         global_parameters.key, global_parameters.set_rate_neuron_id_mask,
-        global_parameters.random_backoff_us);
+        global_parameters.timer_offset);
 
     log_info("\t seed = %u %u %u %u", global_parameters.spike_source_seed[0],
         global_parameters.spike_source_seed[1],
@@ -645,7 +645,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     spin1_set_timer_tick_and_phase(
-        timer_period, global_parameters.random_backoff_us);
+        timer_period, global_parameters.timer_offset);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
