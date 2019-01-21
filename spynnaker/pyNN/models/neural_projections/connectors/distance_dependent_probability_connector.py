@@ -105,8 +105,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         max_prob = numpy.amax(
             self._probs[0:self._n_pre_neurons, post_vertex_slice.as_slice])
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons, self._n_pre_neurons,
-            max_prob)
+            self._n_pre_neurons * self._n_post_neurons,
+            post_vertex_slice.n_atoms, max_prob)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))

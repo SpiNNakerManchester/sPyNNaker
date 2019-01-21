@@ -28,9 +28,9 @@ class SmallWorldConnector(AbstractConnector):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        self._set_probabilities()
+        self._set_n_connections()
 
-    def _set_probabilities(self):
+    def _set_n_connections(self):
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
@@ -61,7 +61,7 @@ class SmallWorldConnector(AbstractConnector):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
-        n_connections = numpy.sum([
+        n_connections = numpy.amax([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
             for i in range(self._n_pre_neurons)])
 
@@ -74,7 +74,7 @@ class SmallWorldConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.sum([
+        return numpy.amax([
             numpy.sum(self._mask[:, i]) for i in range(self._n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -89,14 +89,12 @@ class SmallWorldConnector(AbstractConnector):
             synapse_type):
         # pylint: disable=too-many-arguments
         ids = numpy.where(self._mask[
-            pre_vertex_slice.as_slice, post_vertex_slice.as_slice])[0]
-        n_connections = len(ids)
+            pre_vertex_slice.as_slice, post_vertex_slice.as_slice])
+        n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = (
-            (ids // post_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
-        block["target"] = (
-            (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
+        block["source"] = ids[0]
+        block["target"] = ids[1]
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
