@@ -125,10 +125,11 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        return utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons,
-            numpy.amax(self._probs))
+        return self._get_weight_maximum(
+            utility_calls.get_probable_maximum_selected(
+                self._n_pre_neurons * self._n_post_neurons,
+                self._n_pre_neurons * self._n_post_neurons,
+                numpy.amax(self._probs)))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
