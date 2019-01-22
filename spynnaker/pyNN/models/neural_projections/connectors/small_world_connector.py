@@ -93,8 +93,10 @@ class SmallWorldConnector(AbstractConnector):
         n_connections = len(ids[0])
 
         block = numpy.zeros(n_connections, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = ids[0]
-        block["target"] = ids[1]
+        block["source"] = (
+            (ids[0] % pre_vertex_slice.n_atoms) + pre_vertex_slice.lo_atom)
+        block["target"] = (
+            (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
             self._weights, n_connections, None)
         block["delay"] = self._generate_delays(
