@@ -80,6 +80,9 @@ bool rewiring = false;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+//! Flag for synaptic contribution writing in SDRAM
+bool contribution_written;
+
 
 
 //! \brief Initialises the recording parts of the model
@@ -195,6 +198,8 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
+    contribution_written = false;
+
     // Setup profiler
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
@@ -215,6 +220,7 @@ void timer_callback(uint timer_count, uint unused) {
     use(unused);
 
     time++;
+    contribution_written = false;
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
 

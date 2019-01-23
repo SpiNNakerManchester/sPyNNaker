@@ -36,7 +36,7 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
-bool contribution_written;
+extern bool contribution_written;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -110,7 +110,7 @@ void _setup_synaptic_dma_read() {
 
                     // In case the end of the timer tick is approaching and spikes are in DTCM
                     // Kicks the DMA write of synaptic contributions
-                    if(tc[T1_COUNT] < ?? && !contribution_written) {
+                    if(tc[T1_COUNT] < 6657 && !contribution_written) {
 
                         uint cpsr = spin1_int_disable();
                         uint32_t spikes_remaining = in_spikes_flush_buffer();
@@ -243,7 +243,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // if too close to the end of the timer tick or all the spikes
     // have been processed write in memory the synaptic contribution
-    if((tc[T1_COUNT] < ?? || in_spikes_buffer_empty()) && !contribution_written) {
+    if((tc[T1_COUNT] < 6657 || in_spikes_buffer_empty()) && !contribution_written) {
 
         uint cpsr = spin1_int_disable();
         uint32_t spikes_remaining = in_spikes_flush_buffer();
@@ -293,8 +293,6 @@ bool spike_processing_initialise(
     single_fixed_synapse[0] = 0;
     single_fixed_synapse[1] = 1;
     single_fixed_synapse[2] = 0;
-
-    contribution_written = false;
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
