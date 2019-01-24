@@ -10,13 +10,16 @@
  * Minimise a routing table loaded into SDRAM and load the minimised table into
  * the router using the specified application ID.
  *
- * the exit code is stored in the user0 register
+ * the exit code is stored in the user2 register
  *
  * The memory address with tag "1" is expected contain the following struct
  * (entry_t is defined in `routing_table.h` but is described below).
  */
 
-
+//! enum for the different states to report through the user2 address.
+typedef enum exit_states_for_user_two{
+    EXITED_CLEANLY = 0, EXIT_FAIL = 1
+} exit_states_for_user_two;
 
 
 typedef struct {
@@ -147,7 +150,7 @@ void cleanup_and_exit(header_t *header, table_t table) {
     sark_xfree(sv->sdram_heap, (void *) header, ALLOC_LOCK);
 
     log_info("completed router compressor");
-    sark.vcpu->user2 = 0;
+    sark.vcpu->user2 = EXITED_CLEANLY;
     spin1_exit(0);
 }
 
@@ -161,14 +164,14 @@ void compress_start() {
     log_info("reading data from 0x%08x", (uint32_t) header);
     print_header(header);
 
-    // set the flag to something none useful
-    sark.vcpu->user2 = 20;
-
     // Load the routing table
     table_t table;
     log_info("start reading table");
     read_table(&table, header);
     log_info("finished reading table");
+
+    // load in the bitfield addresses
+    
 
     // Store intermediate sizes for later reporting (if we fail to minimise)
     uint32_t size_original, size_rde, size_oc;
@@ -240,7 +243,7 @@ void compress_start() {
                 FREE((void *) header);
 
                 // set the failed flag and exit
-                sark.vcpu->user2 = 1;
+                sark.vcpu->user2 = EXIT_FAIL;
                 spin1_exit(0);
             } else {
                 cleanup_and_exit(header, table);

@@ -326,9 +326,10 @@ def run_system_application(
                 app_id, executable_finder)
 
     # Check if any cores have not completed successfully
-    check_for_success_function(
-        executable_cores, transceiver, provenance_file_path,
-        app_id, executable_finder)
+    if check_for_success_function is not None:
+        check_for_success_function(
+            executable_cores, transceiver, provenance_file_path,
+            app_id, executable_finder)
 
     # if doing iobuf, read iobuf
     if read_algorithm_iobuf:

@@ -207,9 +207,9 @@ int population_table_position_in_the_master_pop_array(spike_t spike){
 
 //! \brief sets the connectivity lookup element
 //! \param[in] connectivity_lookup: the connectivity lookup
-void population_table_set_connectivity_lookup(
-        bit_field_t* connectivity_lookup){
-    connectivity_bit_field = connectivity_lookup;
+void population_table_set_connectivity_bit_field(
+        bit_field_t* connectivity_bit_fields){
+    connectivity_bit_field = connectivity_bit_fields;
 }
 
 //! \brief get the number of master pop table key misses

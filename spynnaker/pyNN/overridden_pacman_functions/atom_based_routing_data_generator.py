@@ -52,11 +52,6 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
     # bit field report file name
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
 
-    # structs for performance requirements.
-    _ONE_WORDS = struct.Struct("<I")
-    _TWO_WORDS = struct.Struct("<II")
-    _FOUR_WORDS = struct.Struct("<IIII")
-
     # binary name
     _BIT_FIELD_EXPANDER_APLX = "bit_field_expander.aplx"
 

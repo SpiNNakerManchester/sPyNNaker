@@ -43,9 +43,9 @@ bool population_table_get_next_address(
 uint32_t population_table_get_ghost_pop_table_searches(void);
 
 //! \brief sets the connectivity lookup element
-//! \param[in] connectivity_lookup: the connectivity lookup
-void population_table_set_connectivity_lookup(
-    bit_field_t* connectivity_lookup);
+//! \param[in] connectivity_lookup: the connectivity bitfield
+void population_table_set_connectivity_bit_field(
+    bit_field_t* connectivity_bit_fields);
 
 //! \brief get the number of master pop table key misses
 //! \return the number of master pop table key misses
