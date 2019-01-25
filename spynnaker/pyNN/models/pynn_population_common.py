@@ -65,7 +65,8 @@ class PyNNPopulationCommon(object):
                 population_parameters.update(additional_parameters)
             if label is None:
                 label = "Population {}".format(
-                    globals_variables.get_simulator().none_labelled_vertex_count)
+                    globals_variables.get_simulator(
+                        ).none_labelled_vertex_count)
                 self._label = label
             self._vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
