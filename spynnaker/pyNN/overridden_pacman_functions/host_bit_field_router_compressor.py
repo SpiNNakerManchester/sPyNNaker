@@ -224,6 +224,12 @@ class HostBasedBitFieldRouterCompressor(object):
         """
         entries = list()
 
+        processors_filtered = list()
+
+        for (_, processor_id) in bit_fields:
+            processors_filtered.append(processor_id)
+
+
         # get some basic values
         entry_links = routing_table_entry.link_ids
         base_key = routing_table_entry.routing_entry_key
@@ -234,9 +240,18 @@ class HostBasedBitFieldRouterCompressor(object):
         # add processor
         for neuron in range(0, n_neurons):
             processors = list()
+
+            # add processors that are not going to be filtered
+            for processor_id in routing_table_entry.processor_ids:
+                if processor_id not in processors_filtered:
+                    processors.append(processor_id)
+
+            # process bitfields
             for (bit_field, processor_id) in bit_fields:
                 if self._bit_for_neuron_id(bit_field, neuron):
                     processors.append(processor_id)
+
+            # build new entry for this neuron
             entries.append(MulticastRoutingEntry(
                 routing_entry_key=base_key + neuron,
                 mask=self.NEURON_LEVEL_MASK,
@@ -402,6 +417,18 @@ class HostBasedBitFieldRouterCompressor(object):
         for router_table in router_tables:
             entries.extend(MundyRouterCompressor.convert_to_mundy_format(
                 router_table))
+
+        # HACK IN TO BYPASS COMPRESSION
+        #if len(entries) < self.MAX_SUPPORTED_LENGTH:
+        #    # convert back to pacman model
+        #    compressed_pacman_table = \
+        #        MundyRouterCompressor.convert_to_pacman_router_table(
+        #            entries, chip_x, chip_y,
+        #            self.MAX_SUPPORTED_LENGTH)
+
+        #    return compressed_pacman_table
+        #else:
+        #    raise MinimisationFailedError(self.MAX_SUPPORTED_LENGTH)
 
         # compress the router entries
         compressed_router_table_entries = \
