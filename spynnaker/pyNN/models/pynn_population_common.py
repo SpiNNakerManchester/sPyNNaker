@@ -63,6 +63,10 @@ class PyNNPopulationCommon(object):
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
+            if label is None:
+                label = "Population {}".format(
+                    globals_variables.get_simulator().none_labelled_vertex_count)
+                self._label = label
             self._vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -88,10 +92,6 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "Model must be either an AbstractPyNNModel or an"
                 " ApplicationVertex")
-
-        if self._label is None:
-            self._label = "Population {}".format(
-                globals_variables.get_simulator().none_labelled_vertex_count)
 
         # Introspect properties of the vertex
         self._vertex_population_settable = \
