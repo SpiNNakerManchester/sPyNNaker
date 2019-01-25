@@ -87,8 +87,6 @@ class HostBasedBitFieldRouterCompressor(object):
         :return: compressed routing table entries
         """
 
-        target_length = self.MAX_SUPPORTED_LENGTH
-
         # create progress bar
         progress = ProgressBar(
             len(router_tables.routing_tables) * 2,
