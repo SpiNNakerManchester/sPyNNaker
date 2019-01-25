@@ -107,19 +107,19 @@ static inline void _print_master_population_table() {
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
-    log_info("population_table_initialise: starting");
+    log_debug("population_table_initialise: starting");
 
-    log_info("master pop base address is %d", &table_address[0]);
+    log_debug("master pop base address is %d", &table_address[0]);
 
     master_population_table_length = table_address[0];
-    log_info("master pop table length is %d\n",
+    log_debug("master pop table length is %d\n",
               master_population_table_length);
-    log_info("master pop table entry size is %d\n",
+    log_debug("master pop table entry size is %d\n",
               sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
         master_population_table_length * sizeof(master_population_table_entry);
     uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
-    log_info("pop table size is %d\n", n_master_pop_bytes);
+    log_debug("pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0){
@@ -145,10 +145,10 @@ bool population_table_initialise(
         }
     }
 
-    log_info(
+    log_debug(
         "pop table size: %u (%u bytes)", master_population_table_length,
         n_master_pop_bytes);
-    log_info(
+    log_debug(
         "address list size: %u (%u bytes)", address_list_length,
         n_address_list_bytes);
 
@@ -179,50 +179,50 @@ bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
     // locate the position in the binary search / array
-    log_info("searching for key %d", spike);
+    log_debug("searching for key %d", spike);
     int position = population_table_position_in_the_master_pop_array(spike);
-    log_info("position = %d", position);
+    log_debug("position = %d", position);
 
     // check we don't have a complete miss
     if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
         master_population_table_entry entry = master_population_table[position];
         if (entry.count == 0) {
-            log_info(
+            log_debug(
                 "spike %u (= %x): population found in master population"
                 "table but count is 0");
         }
 
-        log_info("about to try to find neuron id");
+        log_debug("about to try to find neuron id");
         last_neuron_id = _get_neuron_id(entry, spike);
-        log_info("found neuron id of %d", last_neuron_id);
+        log_debug("found neuron id of %d", last_neuron_id);
 
         // check we have a entry in the bit field for this (possible not to due
         // to dtcm limitations or router table compression). If not, go to
         // DMA check.
-        log_info("checking bit field");
+        log_debug("checking bit field");
         if (connectivity_bit_field[position] != NULL){
-            log_info("can be checked, bitfield isnt not allocated");
+            log_debug("can be checked, bitfield isnt not allocated");
             // check that the bit flagged for this neuron id does hit a
             // neuron here. If not return false and avoid the DMA check.
             if (!bit_field_test(
                     connectivity_bit_field[position],  last_neuron_id)){
-                log_info("tested and wasnt set");
+                log_debug("tested and wasnt set");
                 return false;
             }
-            log_info("was set, carrying on");
+            log_debug("was set, carrying on");
         }
         else{
-            log_info("wasnt set up. likely lack of dtcm");
+            log_debug("wasnt set up. likely lack of dtcm");
         }
 
         // going to do a DMA to read the matrix and see if there's a hit.
-        log_info("about to set items");
+        log_debug("about to set items");
         next_item = entry.start;
         items_to_go = entry.count;
 
-        log_info("about to do some other print");
+        log_debug("about to do some other print");
 
-        log_info(
+        log_debug(
             "spike = %08x, entry_index = %u, start = %u, count = %u",
             spike, position, next_item, items_to_go);
 
@@ -241,8 +241,8 @@ bool population_table_get_first_address(
         invalid_master_pop_hits ++;
     }
 
-    log_info("Ghost searches: %u\n", ghost_pop_table_searches);
-    log_info(
+    log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
+    log_debug(
         "spike %u (= %x): population not found in master population table",
         spike, spike);
     return false;
@@ -310,7 +310,7 @@ bool population_table_get_next_address(
                 *row_address = (address_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
 
-                log_info(
+                log_debug(
                     "neuron_id = %u, block_address = 0x%.8x,"
                     "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
                     last_neuron_id, block_address, row_length, *row_address,
