@@ -9,6 +9,7 @@ from spynnaker.pyNN.models.neural_projections.connectors \
 from unittests.mocks import MockSimulator, MockPopulation
 from unittest import SkipTest
 
+
 @pytest.fixture(scope="module", params=[10, 100])
 def n_pre(request):
     return request.param
@@ -104,14 +105,15 @@ def test_connectors(
             max_row_length = connector.\
                 get_n_connections_from_pre_vertex_maximum(post_vertex_slice)
         else:
-            assert(max_row_length == connector.\
-                get_n_connections_from_pre_vertex_maximum(post_vertex_slice))
-        if max_col_length == None:
+            assert(max_row_length == connector.
+                   get_n_connections_from_pre_vertex_maximum(
+                        post_vertex_slice))
+        if max_col_length is None:
             max_col_length = connector.\
                 get_n_connections_to_post_vertex_maximum()
         else:
-            assert(max_col_length == connector.\
-                get_n_connections_to_post_vertex_maximum())
+            assert(max_col_length == connector.
+                   get_n_connections_to_post_vertex_maximum())
         synaptic_block = connector.create_synaptic_block(
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_type)
