@@ -66,6 +66,7 @@
         </required_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
+            <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
     <algorithm name="BitFieldRouterCompressor">

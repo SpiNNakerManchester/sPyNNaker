@@ -198,7 +198,7 @@ bool population_table_get_first_address(
 
         // check we have a entry in the bit field for this (possible not to due
         // to dtcm limitations or router table compression). If not, go to
-        // DMA check. TODO need to verify that correct process
+        // DMA check.
         log_info("checking bit field");
         if (connectivity_bit_field[position] != NULL){
             log_info("can be checked, bitfield isnt not allocated");
@@ -231,6 +231,8 @@ bool population_table_get_first_address(
 
         // tracks surplus dmas
         if (!get_next){
+            log_debug(
+                "found a entry which has a ghost entry for key %d", spike);
             ghost_pop_table_searches ++;
         }
         return get_next;

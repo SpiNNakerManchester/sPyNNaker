@@ -47,7 +47,8 @@ class PopulationMachineVertex(
                ("FAILED_TO_READ_BIT_FIELDS", 6),
                ("EMPTY_ROW_READS", 7),
                ("DMA_COMPLETES", 8),
-               ("SPIKE_PROGRESSING_COUNT", 9)])
+               ("SPIKE_PROGRESSING_COUNT", 9),
+               ("INVALID_MASTER_POP_HITS", 10)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -133,6 +134,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.DMA_COMPLETES.value]
         spike_processing_count = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.SPIKE_PROGRESSING_COUNT.value]
+        invalid_master_pop_hits = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.INVALID_MASTER_POP_HITS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -211,6 +214,14 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "how many spikes were processed"),
             spike_processing_count))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_names(names, "Invalid Master Pop hits"),
+            invalid_master_pop_hits, report=invalid_master_pop_hits > 0,
+            message=(
+                "There were {} keys which were received by core {}:{}:{} which "
+                "had no master pop entry for it. This is a error, which most "
+                "likely strives from bad routing.".format(
+                    invalid_master_pop_hits, x, y, p))))
 
         return provenance_items
 

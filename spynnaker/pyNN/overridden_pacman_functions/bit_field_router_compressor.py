@@ -12,6 +12,7 @@ from spinn_front_end_common.mapping_algorithms.\
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_machine import CoreSubsets
 from spinn_utilities.progress_bar import ProgressBar
+from spinnman.exceptions import SpinnmanInvalidParameterException
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models.\
@@ -39,7 +40,7 @@ class BitFieldRouterCompressor(object):
     N_REGIONS_ELEMENT = 1
 
     # the number of bytes needed to read the user 2 register
-    _USER_2_BYTES = 4
+    _USER_BYTES = 4
 
     # structs for performance requirements.
     _TWO_WORDS = struct.Struct("<II")
@@ -48,7 +49,6 @@ class BitFieldRouterCompressor(object):
 
     # binary name
     _ROUTER_TABLE_WITH_BIT_FIELD_APLX = "bit_field_router_compressor.aplx"
-    #_ROUTER_TABLE_WITH_BIT_FIELD_APLX = "rt_minimise.aplx"
 
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
@@ -92,21 +92,50 @@ class BitFieldRouterCompressor(object):
             machine_graph, placements, transceiver, machine, executable_finder,
             progress_bar, graph_mapper)
 
+        # track what verts needs to have their synaptic matrix rewritten as
+        # the space was needed for routing table writing
+        synaptic_expander_rerun_cores = ExecutableTargets()
+
         # load data into sdram
         self._load_data(
             addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed,
-            compress_as_much_as_possible, progress_bar)
+            compress_as_much_as_possible, progress_bar, cores)
 
         # load and run binaries
         utility_calls.run_system_application(
             cores, routing_table_compressor_app_id, transceiver,
             provenance_file_path, executable_finder,
-            read_algorithm_iobuf, self._check_for_success, self._handle_failure,
+            read_algorithm_iobuf, self._check_for_success,
+            self._handle_failure_for_bit_field_router_compressor,
             [CPUState.FINISHED])
+
+        # if there are cores that need their synaptic expander reran
+        if synaptic_expander_rerun_cores.total_processors != 0:
+            self._rerun_synaptic_cores(
+                cores, transceiver, provenance_file_path, executable_finder)
 
         # complete progress bar
         progress_bar.end()
+
+    def _rerun_synaptic_cores(
+            self, synaptic_expander_rerun_cores, transceiver,
+            provenance_file_path, executable_finder):
+        """ reruns the synaptic expander
+        
+        :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
+        matrix generator for
+        :param transceiver: spinnman instance
+        :param provenance_file_path: prov file path
+        :param executable_finder: finder of binary file paths
+        :rtype: None 
+        """
+        expander_app_id = transceiver.app_id_tracker.get_new_id()
+        utility_calls.run_system_application(
+            synaptic_expander_rerun_cores, expander_app_id, transceiver,
+            provenance_file_path, executable_finder, True, None,
+            self._handle_failure_for_synaptic_expander_rerun,
+            [CPUState.FINISHED])
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
@@ -132,11 +161,11 @@ class BitFieldRouterCompressor(object):
                     transceiver.get_user_2_register_address_from_core(p)
                 result = struct.unpack(
                     "<I", transceiver.read_memory(
-                        x, y, user_2_base_address, self._USER_2_BYTES))[0]
+                        x, y, user_2_base_address, self._USER_BYTES))[0]
 
                 # The result is 0 if success, otherwise failure
                 if result != self.SUCCESS:
-                    self._handle_failure(
+                    self._handle_failure_for_bit_field_router_compressor(
                         executable_targets, transceiver, provenance_file_path,
                         compressor_app_id, executable_finder)
 
@@ -144,9 +173,8 @@ class BitFieldRouterCompressor(object):
                         "The router compressor with bit field on {}, "
                         "{} failed to complete".format(x, y))
 
-    @staticmethod
-    def _handle_failure(
-            executable_targets, transceiver, provenance_file_path,
+    def _handle_failure_for_bit_field_router_compressor(
+            self, executable_targets, transceiver, provenance_file_path,
             compressor_app_id, executable_finder):
         """handles the state where some cores have failed.
 
@@ -158,6 +186,40 @@ class BitFieldRouterCompressor(object):
         :rtype: None
         """
         logger.info("routing table compressor with bit field has failed")
+        self._call_iobuf_and_clean_up(
+            executable_targets, transceiver, provenance_file_path,
+            compressor_app_id, executable_finder)
+
+    def _handle_failure_for_synaptic_expander_rerun(
+            self, executable_targets, transceiver, provenance_file_path,
+            compressor_app_id, executable_finder):
+        """handles the state where some cores have failed.
+
+        :param executable_targets: cores which are running the router \
+        compressor with bitfield.
+        :param transceiver: SpiNNMan instance
+        :param provenance_file_path: provenance file path
+        :param executable_finder: executable finder
+        :rtype: None
+        """
+        logger.info("rerunning of the synaptic expander has failed")
+        self._call_iobuf_and_clean_up(
+            executable_targets, transceiver, provenance_file_path,
+            compressor_app_id, executable_finder)
+
+    @staticmethod
+    def _call_iobuf_and_clean_up(
+            executable_targets, transceiver, provenance_file_path,
+            compressor_app_id, executable_finder):
+        """handles the reading of iobuf and cleaning the cores off the machine
+
+        :param executable_targets: cores which are running the router \
+        compressor with bitfield.
+        :param transceiver: SpiNNMan instance
+        :param provenance_file_path: provenance file path
+        :param executable_finder: executable finder
+        :rtype: None
+        """
         iobuf_extractor = ChipIOBufExtractor()
         io_errors, io_warnings = iobuf_extractor(
             transceiver, executable_targets, executable_finder,
@@ -172,7 +234,7 @@ class BitFieldRouterCompressor(object):
     def _load_data(
             self, addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed,
-            compress_as_much_as_possible, progress_bar):
+            compress_as_much_as_possible, progress_bar, cores):
         """ load all data onto the chip
 
         :param addresses: the addresses for bitfields in sdram
@@ -185,22 +247,23 @@ class BitFieldRouterCompressor(object):
         :param progress_bar: progress bar
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
+        :param cores: the cores that compressor will run on
         :rtype: None
         """
 
         for (chip_x, chip_y) in addresses:
             self.load_address_data(
                 addresses, chip_x, chip_y, transceiver,
-                routing_table_compressor_app_id)
+                routing_table_compressor_app_id, cores)
         for routing_table in routing_tables.routing_tables:
             self.load_routing_table_data(
                 routing_table, app_id, transceiver, compress_only_when_needed,
                 compress_as_much_as_possible, routing_table_compressor_app_id,
-                progress_bar)
+                progress_bar, cores)
 
     def load_address_data(
             self, addresses, chip_x, chip_y, transceiver,
-            routing_table_compressor_app_id):
+            routing_table_compressor_app_id, cores):
         """ loads the bitfield addresses space
 
         :param addresses: the addresses to load
@@ -208,29 +271,36 @@ class BitFieldRouterCompressor(object):
         :param chip_y: the chip y to consider here
         :param transceiver: the spinnman instance
         :param routing_table_compressor_app_id: system app id.
+        :param cores: the cores that compressor will run on
         :rtype: None
         """
         # generate address_data
         address_data = self._generate_chip_data(addresses[(chip_x, chip_y)])
 
-        # deduce sdram requirement
-        sdram = (
-            (len(addresses[(chip_x, chip_y)]) + self.N_REGIONS_ELEMENT) *
-            WORD_TO_BYTE_MULTIPLIER)
-
         # get sdram address on chip
         sdram_address = transceiver.malloc_sdram(
-            chip_x, chip_y, sdram, routing_table_compressor_app_id,
-            self.BIT_FIELD_ADDRESSES_SDRAM_TAG)
+            chip_x, chip_y, len(address_data), routing_table_compressor_app_id)
 
         # write sdram
         transceiver.write_memory(
-            chip_x, chip_y, sdram_address, address_data, sdram)
+            chip_x, chip_y, sdram_address, address_data, len(address_data))
+
+        # get the only processor on the chip
+        processor_id = cores.all_core_subsets.get_core_subset_for_chip(
+            chip_x, chip_y).processor_ids[0]
+
+        # update user 2 with location
+        user_2_base_address = transceiver.get_user_2_register_address_from_core(
+            processor_id)
+        transceiver.write_memory(
+            chip_x, chip_y, user_2_base_address,
+            self._ONE_WORDS.pack(sdram_address), self._USER_BYTES)
+
 
     def load_routing_table_data(
             self, routing_table, app_id, transceiver, compress_only_when_needed,
             compress_as_much_as_possible, routing_table_compressor_app_id,
-            progress_bar):
+            progress_bar, cores):
         """ loads the routing table data
 
         :param routing_table: the routing table to load
@@ -242,6 +312,7 @@ class BitFieldRouterCompressor(object):
         compress as much as possible
         :param progress_bar: progress bar
         :param routing_table_compressor_app_id: system app id
+        :param cores: the cores that the compressor going to run on
         :rtype: None
         """
 
@@ -251,13 +322,28 @@ class BitFieldRouterCompressor(object):
                 compress_as_much_as_possible)
 
         # go to spinnman and ask for a memory region of that size per chip.
-        base_address = transceiver.malloc_sdram(
-            routing_table.x, routing_table.y, len(routing_table_data),
-            routing_table_compressor_app_id, self.ROUTING_TABLE_SDRAM_TAG)
+        base_address = None
+        try:
+            base_address = transceiver.malloc_sdram(
+                routing_table.x, routing_table.y, len(routing_table_data),
+                routing_table_compressor_app_id)
+        except SpinnmanInvalidParameterException as e:
+            pass
 
         # write SDRAM requirements per chip
         transceiver.write_memory(
             routing_table.x, routing_table.y, base_address, routing_table_data)
+
+        # get the only processor on the chip
+        processor_id = cores.all_core_subsets.get_core_subset_for_chip(
+            routing_table.x, routing_table.y).processor_ids[0]
+
+        # update user 3 with location
+        user_3_base_address = transceiver.get_user_3_register_address_from_core(
+            processor_id)
+        transceiver.write_memory(
+            routing_table.x, routing_table.y, user_3_base_address,
+            self._ONE_WORDS.pack(base_address), self._USER_BYTES)
 
         # update progress bar
         progress_bar.update()

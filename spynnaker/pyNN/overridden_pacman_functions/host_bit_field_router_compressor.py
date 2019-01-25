@@ -5,7 +5,7 @@ from collections import defaultdict
 
 import math
 
-from pacman.exceptions import PacmanAlgorithmFailedToCompleteException
+from pacman.exceptions import PacmanAlgorithmFailedToGenerateOutputsException
 from pacman.model.routing_tables import MulticastRoutingTables, \
     UnCompressedMulticastRoutingTable
 from pacman.operations.algorithm_reports.reports import format_route
@@ -86,6 +86,8 @@ class HostBasedBitFieldRouterCompressor(object):
         :param target_length: length of table entries to get to.
         :return: compressed routing table entries
         """
+
+        target_length = self.MAX_SUPPORTED_LENGTH
 
         # create progress bar
         progress = ProgressBar(
@@ -330,11 +332,10 @@ class HostBasedBitFieldRouterCompressor(object):
                 [router_table], target_length, router_table.x, router_table.y)
             self._last_successful_bit_fields_merged = []
         except MinimisationFailedError:
-            raise PacmanAlgorithmFailedToCompleteException(
-                algorithm="host bitfield router compressor", tb=None,
-                exception="cant compress the uncompressed routing tables, "
-                          "regardless of bitfield merging. System is "
-                          "fundamentally flawed here")
+            raise PacmanAlgorithmFailedToGenerateOutputsException(
+                "host bitfield router compressor cant compress the "
+                "uncompressed routing tables, regardless of bitfield merging. "
+                "System is fundamentally flawed here")
 
         max_size = 0
         for master_pop_key in bit_fields_by_key.keys():

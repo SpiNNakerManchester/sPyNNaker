@@ -294,6 +294,12 @@ uint32_t spike_processing_get_ghost_pop_table_searches(){
 	return population_table_get_ghost_pop_table_searches();
 }
 
+//! \brief returns the number of master pop table failed hits
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits(){
+    return population_table_get_invalid_master_pop_hits();
+}
+
 //! \brief returns the number of DMA's that were completed
 //! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count(){
