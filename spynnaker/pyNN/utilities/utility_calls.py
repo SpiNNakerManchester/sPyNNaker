@@ -15,6 +15,8 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from decimal import Decimal
 
+from spinnman.exceptions import SpinnmanTimeoutException
+
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
 logger = logging.getLogger(__name__)
@@ -318,6 +320,10 @@ def run_system_application(
         transceiver.wait_for_cores_to_be_in_state(
             executable_cores.all_core_subsets, app_id, cpu_end_states)
         succeeded = True
+    except SpinnmanTimeoutException as e:
+        handle_failure_function(
+            executable_cores, transceiver, provenance_file_path,
+            app_id, executable_finder)
     finally:
         # get the debug data
         if not succeeded:

@@ -1,3 +1,5 @@
+from __future__ import division
+
 import functools
 import os
 import struct
@@ -17,8 +19,8 @@ from spinn_utilities.find_max_success import find_max_success
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.abstract_models.\
     abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
-from rig.routing_table import ordered_covering as rigs_compressor, \
-    MinimisationFailedError
+from spynnaker.pyNN.utilities import ordered_covering as rigs_compressor
+from rig.routing_table import MinimisationFailedError
 
 from spynnaker.pyNN.utilities import constants
 
@@ -29,25 +31,31 @@ class HostBasedBitFieldRouterCompressor(object):
     """
 
     __slots__ = [
-        "_cached_entries",
+        "_chip_cached_entries",
         "_last_successful",
         "_last_successful_bit_fields_merged"
     ]
 
     # max entries that can be used by the application code
-    MAX_SUPPORTED_LENGTH = 1023
+    _MAX_SUPPORTED_LENGTH = 1023
+
+    # the amount of time each attempt at router compression can be allowed to
+    #  take (in seconds)
+    # _DEFAULT_TIME_PER_ITERATION = 5 * 60
+    _DEFAULT_TIME_PER_ITERATION = 10
 
     # report name
-    REPORT_NAME = "router_compressor_with_bitfield.rpt"
+    _REPORT_FOLDER_NAME = "router_compressor_with_bitfield"
+    _REPORT_NAME = "router_{}_{}.rpt"
 
     # bytes per word
     _BYTES_PER_WORD = 4
 
     # key id for the initial entry
-    ORIGINAL_ENTRY = 0
+    _ORIGINAL_ENTRY = 0
 
     # key id for the bitfield entries
-    ENTRIES = 1
+    _ENTRIES = 1
 
     # bits in a word
     _BITS_IN_A_WORD = 32
@@ -56,7 +64,7 @@ class HostBasedBitFieldRouterCompressor(object):
     _BIT_MASK = 1
 
     # mask for neuron level
-    NEURON_LEVEL_MASK = 0xFFFFFFFF
+    _NEURON_LEVEL_MASK = 0xFFFFFFFF
 
     # structs for performance requirements.
     _ONE_WORDS = struct.Struct("<I")
@@ -67,13 +75,15 @@ class HostBasedBitFieldRouterCompressor(object):
     _LOWER_16_BITS = 0xFFFF
 
     def __init__(self):
-        self._cached_entries = dict()
+        self._chip_cached_entries = defaultdict(dict)
         self._last_successful = None
         self._last_successful_bit_fields_merged = None
 
     def __call__(
             self, router_tables, machine, placements, transceiver,
-            graph_mapper, default_report_folder, target_length=None):
+            graph_mapper, default_report_folder, produce_report,
+            use_timer_cut_off, target_length=None,
+            time_to_try_for_each_iteration=None):
         """ compresses bitfields and router table entries together as /
         feasible as possible
         
@@ -82,10 +92,19 @@ class HostBasedBitFieldRouterCompressor(object):
         :param placements: placements
         :param transceiver: SpiNNMan instance
         :param graph_mapper: mapping between graphs
+        :param produce_report: boolean flag for producing report
         :param default_report_folder: report folder
         :param target_length: length of table entries to get to.
+        :param use_timer_cut_off: bool flag for using timer or not for \
+            compressor
         :return: compressed routing table entries
         """
+
+        if target_length is None:
+            target_length = self._MAX_SUPPORTED_LENGTH
+
+        if time_to_try_for_each_iteration is None:
+            time_to_try_for_each_iteration = self._DEFAULT_TIME_PER_ITERATION
 
         # create progress bar
         progress = ProgressBar(
@@ -93,8 +112,11 @@ class HostBasedBitFieldRouterCompressor(object):
             "Compressing routing Tables with bitfields in host")
 
         # create report
-        report_file_path = os.path.join(default_report_folder, self.REPORT_NAME)
-        report_out = open(report_file_path, "w")
+        report_folder_path = None
+        if produce_report:
+            report_folder_path = \
+                os.path.join(default_report_folder, self._REPORT_FOLDER_NAME)
+            os.mkdir(report_folder_path)
 
         # holder for the bitfields in
         bit_field_sdram_base_addresses = defaultdict(dict)
@@ -122,7 +144,17 @@ class HostBasedBitFieldRouterCompressor(object):
                                     machine_vertex))
 
         # start the routing table choice conversion
-        for router_table in router_tables.routing_tables:
+        for router_table in progress.over(router_tables.routing_tables):
+            # create report file
+            report_out = None
+            if produce_report:
+                report_file_path = os.path.join(
+                    report_folder_path,
+                    self._REPORT_NAME.format(router_table.x, router_table.y))
+                report_out = open(report_file_path, "w")
+
+            # clear cache
+            self._chip_cached_entries.clear()
 
             # iterate through bitfields on this chip and convert to router table
             bit_field_chip_base_addresses = bit_field_sdram_base_addresses[
@@ -136,7 +168,8 @@ class HostBasedBitFieldRouterCompressor(object):
 
             # execute binary search
             self._start_binary_search(
-                router_table, bit_field_by_key, target_length)
+                router_table, bit_field_by_key, target_length,
+                time_to_try_for_each_iteration, use_timer_cut_off)
 
             # add final to compressed tables
             compressed_pacman_router_tables.add_routing_table(
@@ -150,13 +183,12 @@ class HostBasedBitFieldRouterCompressor(object):
                 bit_field_chip_base_addresses, bit_fields_by_processor)
 
             # report
-            self._record_changes(
-                router_table, self._last_successful,
-                self._last_successful_bit_fields_merged, report_out)
-
-        # clean report
-        report_out.flush()
-        report_out.close()
+            if produce_report:
+                self._create_table_report(
+                    router_table, self._last_successful, bit_field_by_key,
+                    self._last_successful_bit_fields_merged, report_out)
+                report_out.flush()
+                report_out.close()
 
         # return compressed tables
         return compressed_pacman_router_tables
@@ -180,30 +212,29 @@ class HostBasedBitFieldRouterCompressor(object):
         for master_pop_key in bitfields_by_key.keys():
 
             # if not cached, generate
-            if master_pop_key not in self._cached_entries:
-                self._cached_entries[master_pop_key] = dict()
-
+            if master_pop_key not in self._chip_cached_entries:
                 # store the original entry that's going to be deleted from this
-                self._cached_entries[master_pop_key][self.ORIGINAL_ENTRY] = \
+                self._chip_cached_entries[master_pop_key][
+                    self._ORIGINAL_ENTRY] = \
                     router_table.get_entry_by_routing_entry_key(master_pop_key)
 
                 # store the bitfield routing table
-                self._cached_entries[master_pop_key][self.ENTRIES] = \
+                self._chip_cached_entries[master_pop_key][self._ENTRIES] = \
                     UnCompressedMulticastRoutingTable(
                         router_table.x, router_table.y,
                         multicast_routing_entries=(
                             self._generate_entries_from_bitfield(
                                 bitfields_by_key[master_pop_key],
-                                self._cached_entries[master_pop_key][
-                                    self.ORIGINAL_ENTRY])))
+                                self._chip_cached_entries[master_pop_key][
+                                    self._ORIGINAL_ENTRY])))
 
             # add to the list
             bit_field_router_tables.append(
-                self._cached_entries[master_pop_key][self.ENTRIES])
+                self._chip_cached_entries[master_pop_key][self._ENTRIES])
 
             # remove entry
             original_route_entries.remove(
-                self._cached_entries[master_pop_key][self.ORIGINAL_ENTRY])
+                self._chip_cached_entries[master_pop_key][self._ORIGINAL_ENTRY])
 
         # create reduced
         reduced_original_table = UnCompressedMulticastRoutingTable(
@@ -229,7 +260,6 @@ class HostBasedBitFieldRouterCompressor(object):
         for (_, processor_id) in bit_fields:
             processors_filtered.append(processor_id)
 
-
         # get some basic values
         entry_links = routing_table_entry.link_ids
         base_key = routing_table_entry.routing_entry_key
@@ -254,10 +284,8 @@ class HostBasedBitFieldRouterCompressor(object):
             # build new entry for this neuron
             entries.append(MulticastRoutingEntry(
                 routing_entry_key=base_key + neuron,
-                mask=self.NEURON_LEVEL_MASK,
-                link_ids=entry_links,
-                defaultable=False,
-                processor_ids=processors))
+                mask=self._NEURON_LEVEL_MASK, link_ids=entry_links,
+                defaultable=False, processor_ids=processors))
 
         # return the entries
         return entries
@@ -330,19 +358,25 @@ class HostBasedBitFieldRouterCompressor(object):
         return bit_fields_by_processor, bit_field_by_key
 
     def _start_binary_search(
-            self, router_table, bit_fields_by_key, target_length):
+            self, router_table, bit_fields_by_key, target_length,
+            time_to_try_for_each_iteration, use_timer_cut_off):
         """ start binary search of the merging of bitfield to router table
         
         :param router_table: uncompressed router table 
         :param bit_fields_by_key: the sorted bitfields
         :param target_length: length to compress to
+        :param time_to_try_for_each_iteration: the time to allow compressor \
+            to run for.
+        :param use_timer_cut_off: bool flag for if we should use the timer \
+            cutoff for compression
         :return: final_routing_table, bit_fields_merged
         """
 
         # try first just uncompressed. so see if its possible
         try:
             self._last_successful = self.do_mundy_host_compression(
-                [router_table], target_length, router_table.x, router_table.y)
+                [router_table], target_length, router_table.x, router_table.y,
+                time_to_try_for_each_iteration, use_timer_cut_off)
             self._last_successful_bit_fields_merged = []
         except MinimisationFailedError:
             raise PacmanAlgorithmFailedToGenerateOutputsException(
@@ -356,15 +390,28 @@ class HostBasedBitFieldRouterCompressor(object):
 
         find_max_success(max_size, functools.partial(
             self._binary_search_check, bit_fields_by_key=bit_fields_by_key,
-            routing_table=router_table, target_length=target_length))
+            routing_table=router_table, target_length=target_length,
+            time_to_try_for_each_iteration=time_to_try_for_each_iteration,
+            use_timer_cut_off=use_timer_cut_off))
 
     def _binary_search_check(
-            self, mid_point, bit_fields_by_key, routing_table, target_length):
+            self, mid_point, bit_fields_by_key, routing_table, target_length,
+            time_to_try_for_each_iteration, use_timer_cut_off):
         """ check function for fix max success
         
         :param mid_point: the point if the list to stop at
+        :param bit_fields_by_key: the dict of lists of bitfields by key
+        :param routing_table: the basic routing table
+        :param target_length: the target length to reach
+        :param time_to_try_for_each_iteration: the time in seconds to run for
+        :param use_timer_cut_off: bool for if the timer cutoff should be \
+            used by the compressor.
         :return: bool that is true if it compresses 
         """
+
+        count = 0
+        for master_pop_key in bit_fields_by_key.keys():
+            count += len(bit_fields_by_key[master_pop_key])
 
         # find new set of bitfields to try from midpoint
         new_set_of_bit_fields = DefaultOrderedDict(list)
@@ -391,14 +438,16 @@ class HostBasedBitFieldRouterCompressor(object):
         try:
             self._last_successful = self.do_mundy_host_compression(
                 bit_field_router_tables, target_length, routing_table.x,
-                routing_table.y)
+                routing_table.y, time_to_try_for_each_iteration,
+                use_timer_cut_off)
             self._last_successful_bit_fields_merged = new_set_of_bit_fields
             return True
         except MinimisationFailedError:
             return False
 
     def do_mundy_host_compression(
-            self, router_tables, target_length, chip_x, chip_y):
+            self, router_tables, target_length, chip_x, chip_y,
+            time_to_try_for_each_iteration, use_timer_cut_off):
         """ attempts to covert the mega router tables into 1 router table. will\
         raise a MinimisationFailedError exception if it fails to compress to \
         the correct length
@@ -406,9 +455,11 @@ class HostBasedBitFieldRouterCompressor(object):
         :param router_tables: the set of router tables that together need to be\
         merged into 1 router table
         :param target_length: the number 
-        :param chip_x: 
-        :param chip_y: 
-        :return: 
+        :param chip_x:  chip x
+        :param chip_y: chip y
+        :param time_to_try_for_each_iteration: time for compressor to run for
+        :param use_timer_cut_off: bool flag for using timer cutoff
+        :return: compressor router table 
         :throws: MinimisationFailedError 
         """
 
@@ -418,27 +469,16 @@ class HostBasedBitFieldRouterCompressor(object):
             entries.extend(MundyRouterCompressor.convert_to_mundy_format(
                 router_table))
 
-        # HACK IN TO BYPASS COMPRESSION
-        #if len(entries) < self.MAX_SUPPORTED_LENGTH:
-        #    # convert back to pacman model
-        #    compressed_pacman_table = \
-        #        MundyRouterCompressor.convert_to_pacman_router_table(
-        #            entries, chip_x, chip_y,
-        #            self.MAX_SUPPORTED_LENGTH)
-
-        #    return compressed_pacman_table
-        #else:
-        #    raise MinimisationFailedError(self.MAX_SUPPORTED_LENGTH)
-
         # compress the router entries
-        compressed_router_table_entries = \
-            rigs_compressor.minimise(entries, target_length)
+        compressed_router_table_entries = rigs_compressor.minimise(
+            entries, target_length, time_to_try_for_each_iteration,
+            use_timer_cut_off)
 
         # convert back to pacman model
         compressed_pacman_table = \
             MundyRouterCompressor.convert_to_pacman_router_table(
                 compressed_router_table_entries, chip_x, chip_y,
-                self.MAX_SUPPORTED_LENGTH)
+                self._MAX_SUPPORTED_LENGTH)
 
         return compressed_pacman_table
 
@@ -502,27 +542,45 @@ class HostBasedBitFieldRouterCompressor(object):
                         len(bit_field) * self._BYTES_PER_WORD)
                     writing_address += len(bit_field) * self._BYTES_PER_WORD
 
-    def _record_changes(
-            self, router_table, final_routing_table, bit_fields_merged,
-            report_out):
+    def _create_table_report(
+            self, router_table, final_routing_table,
+            bit_fields_by_key, bit_fields_merged, report_out):
 
         n_bit_fields_merged = 0
         for master_pop_key in bit_fields_merged.keys():
             n_bit_fields_merged += len(bit_fields_merged[master_pop_key])
 
+        n_possible_bit_fields = 0
+        for master_pop_key in bit_fields_by_key.keys():
+            n_possible_bit_fields += len(bit_fields_by_key[master_pop_key])
+
+        percentage_done = 100
+        if n_possible_bit_fields != 0:
+            percentage_done = (
+                (100.0 // float(n_possible_bit_fields)) *
+                float(n_bit_fields_merged))
+
         report_out.write(
-            "Table {}:{} has {} bitfields merged. These are \n\n".format(
-                router_table.x, router_table.y, n_bit_fields_merged))
+            "Table {}:{} has {} bitfields merged from {} bitfields. "
+            "Producing a compression of {} %.\n"
+            "\n\n".format(
+                router_table.x, router_table.y, n_bit_fields_merged,
+                n_possible_bit_fields, percentage_done))
+        report_out.write(
+            "The uncompressed table had {} entries, the compressed one has"
+            " {} entries. \n\n".format(
+                router_table.number_of_entries,
+                final_routing_table.number_of_entries))
+
+        report_out.write("The bit_fields merged are as follows:\n\n")
+
         for master_pop_key in bit_fields_merged.keys():
             for (_, processor_id) in bit_fields_merged[master_pop_key]:
                 report_out.write("bitfield on core {} for key {} \n".format(
                     processor_id, master_pop_key))
 
         report_out.write("\n\n\n")
-
-        report_out.write(
-            "The final routing table contains {} entries and is below: "
-            "\n\n".format(final_routing_table.number_of_entries))
+        report_out.write("The final routing table entries are as follows:\n\n")
 
         report_out.write(
             "{: <5s} {: <10s} {: <10s} {: <10s} {: <7s} {}\n".format(

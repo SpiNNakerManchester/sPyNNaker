@@ -1,4 +1,5 @@
 # utils imports
+from spinn_front_end_common.utilities.helpful_functions import read_config
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.utility_models import synapse_expander
@@ -100,6 +101,31 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
+            self.config.getboolean(
+                "Reports", "generate_router_compression_with_bitfield_report")
+
+        extra_mapping_inputs['RouterCompressorBitFieldUseCutOff'] = \
+            self.config.getboolean(
+                "Mapping",
+                "router_table_compression_with_bit_field_use_time_cutoff")
+
+        time = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_iteration_time")
+        if time is not None:
+            time = int(time)
+        extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
+
+        target_length = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_target_length")
+        if target_length is not None:
+            target_length = int(target_length)
+        extra_mapping_inputs[
+            'RouterCompressorBitFieldTargetLength'] = target_length
+
+
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
