@@ -249,8 +249,8 @@ class HostBasedBitFieldRouterCompressor(object):
         return bit_field_router_tables
 
     def _generate_entries_from_bitfield(self, bit_fields, routing_table_entry):
-        """ generate neuron level entries 
-        
+        """ generate neuron level entries
+
         :param bit_fields: the bitfields for a given key
         :param routing_table_entry: the original entry from it
         :return: the set of bitfield entries
@@ -307,12 +307,12 @@ class HostBasedBitFieldRouterCompressor(object):
     def _read_in_bit_fields(
             self, transceiver, chip_x, chip_y, bit_field_chip_base_addresses):
         """ reads in the bitfields from the cores
-        
+
         :param transceiver: SpiNNMan instance
         :param chip_x: chip x coord
         :param chip_y: chip y coord
-        :param bit_field_chip_base_addresses: dict of core id to base address  
-        :return: dict of lists of processor id to bitfields. 
+        :param bit_field_chip_base_addresses: dict of core id to base address
+        :return: dict of lists of processor id to bitfields.
         """
 
         # data holder
@@ -321,7 +321,8 @@ class HostBasedBitFieldRouterCompressor(object):
 
         # read in for each app vertex that would have a bitfield
         for processor_id in bit_field_chip_base_addresses.keys():
-            bit_field_base_address = bit_field_chip_base_addresses[processor_id]
+            bit_field_base_address = \
+                bit_field_chip_base_addresses[processor_id]
 
             # read how many bitfields there are
             n_bit_field_entries = struct.unpack("<I", transceiver.read_memory(
@@ -363,8 +364,8 @@ class HostBasedBitFieldRouterCompressor(object):
             self, router_table, bit_fields_by_key, target_length,
             time_to_try_for_each_iteration, use_timer_cut_off):
         """ start binary search of the merging of bitfield to router table
-        
-        :param router_table: uncompressed router table 
+
+        :param router_table: uncompressed router table
         :param bit_fields_by_key: the sorted bitfields
         :param target_length: length to compress to
         :param time_to_try_for_each_iteration: the time to allow compressor \
@@ -400,7 +401,7 @@ class HostBasedBitFieldRouterCompressor(object):
             self, mid_point, bit_fields_by_key, routing_table, target_length,
             time_to_try_for_each_iteration, use_timer_cut_off):
         """ check function for fix max success
-        
+
         :param mid_point: the point if the list to stop at
         :param bit_fields_by_key: the dict of lists of bitfields by key
         :param routing_table: the basic routing table
@@ -408,7 +409,7 @@ class HostBasedBitFieldRouterCompressor(object):
         :param time_to_try_for_each_iteration: the time in seconds to run for
         :param use_timer_cut_off: bool for if the timer cutoff should be \
             used by the compressor.
-        :return: bool that is true if it compresses 
+        :return: bool that is true if it compresses
         """
 
         count = 0
@@ -453,16 +454,16 @@ class HostBasedBitFieldRouterCompressor(object):
         """ attempts to covert the mega router tables into 1 router table. will\
         raise a MinimisationFailedError exception if it fails to compress to \
         the correct length
-        
-        :param router_tables: the set of router tables that together need to be\
-        merged into 1 router table
-        :param target_length: the number 
+
+        :param router_tables: the set of router tables that together need to \
+        be merged into 1 router table
+        :param target_length: the number
         :param chip_x:  chip x
         :param chip_y: chip y
         :param time_to_try_for_each_iteration: time for compressor to run for
         :param use_timer_cut_off: bool flag for using timer cutoff
-        :return: compressor router table 
-        :throws: MinimisationFailedError 
+        :return: compressor router table
+        :throws: MinimisationFailedError
         """
 
         # convert to rig format
@@ -497,7 +498,7 @@ class HostBasedBitFieldRouterCompressor(object):
         :param transceiver: spinnman instance
         :param bit_field_chip_base_addresses: base addresses of chip bit fields
         :param bit_fields_by_processor: map of processor to bitfields
-        :rtype: None 
+        :rtype: None
         """
 
         # get data back ina  form useful for write back
@@ -515,7 +516,8 @@ class HostBasedBitFieldRouterCompressor(object):
                 len(merged_bit_field_by_core[processor_id]))
 
             # base address for the region
-            bit_field_base_address = bit_field_chip_base_addresses[processor_id]
+            bit_field_base_address = \
+                bit_field_chip_base_addresses[processor_id]
             writing_address = bit_field_base_address
 
             # write correct number of elements.
@@ -527,7 +529,8 @@ class HostBasedBitFieldRouterCompressor(object):
             # iterate through the original bitfields and omit the ones deleted
             for (master_pop_key, bit_field) in bit_fields_by_processor[
                     processor_id]:
-                if master_pop_key not in merged_bit_field_by_core[processor_id]:
+                if master_pop_key not in merged_bit_field_by_core[
+                        processor_id]:
 
                     # write key and n words
                     transceiver.write_memory(
@@ -548,9 +551,9 @@ class HostBasedBitFieldRouterCompressor(object):
             self, router_table, final_routing_table,
             bit_fields_by_key, bit_fields_merged, report_out):
         """ creates the report entry
-        
+
         :param router_table: the uncompressed router table to process
-        :param final_routing_table: the compressed router table to process 
+        :param final_routing_table: the compressed router table to process
         :param bit_fields_by_key: the bitfields by key overall
         :param bit_fields_merged: the bitfields merged
         :param report_out: the report writer

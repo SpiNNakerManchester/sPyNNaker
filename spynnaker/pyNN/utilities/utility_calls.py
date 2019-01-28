@@ -320,7 +320,7 @@ def run_system_application(
         transceiver.wait_for_cores_to_be_in_state(
             executable_cores.all_core_subsets, app_id, cpu_end_states)
         succeeded = True
-    except SpinnmanTimeoutException as e:
+    except SpinnmanTimeoutException:
         handle_failure_function(
             executable_cores, transceiver, provenance_file_path,
             app_id, executable_finder)
