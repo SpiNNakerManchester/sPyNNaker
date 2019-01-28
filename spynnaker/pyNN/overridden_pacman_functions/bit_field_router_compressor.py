@@ -18,7 +18,6 @@ from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.abstract_models.\
     abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
 from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 
 
 logger = logging.getLogger(__name__)
@@ -122,13 +121,13 @@ class BitFieldRouterCompressor(object):
             self, synaptic_expander_rerun_cores, transceiver,
             provenance_file_path, executable_finder):
         """ reruns the synaptic expander
-        
+
         :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
         matrix generator for
         :param transceiver: spinnman instance
         :param provenance_file_path: prov file path
         :param executable_finder: finder of binary file paths
-        :rtype: None 
+        :rtype: None
         """
         expander_app_id = transceiver.app_id_tracker.get_new_id()
         utility_calls.run_system_application(
@@ -290,17 +289,16 @@ class BitFieldRouterCompressor(object):
             chip_x, chip_y).processor_ids[0]
 
         # update user 2 with location
-        user_2_base_address = transceiver.get_user_2_register_address_from_core(
-            processor_id)
+        user_2_base_address = \
+            transceiver.get_user_2_register_address_from_core(processor_id)
         transceiver.write_memory(
             chip_x, chip_y, user_2_base_address,
             self._ONE_WORDS.pack(sdram_address), self._USER_BYTES)
 
-
     def load_routing_table_data(
-            self, routing_table, app_id, transceiver, compress_only_when_needed,
-            compress_as_much_as_possible, routing_table_compressor_app_id,
-            progress_bar, cores):
+            self, routing_table, app_id, transceiver,
+            compress_only_when_needed, compress_as_much_as_possible,
+            routing_table_compressor_app_id, progress_bar, cores):
         """ loads the routing table data
 
         :param routing_table: the routing table to load
@@ -327,7 +325,7 @@ class BitFieldRouterCompressor(object):
             base_address = transceiver.malloc_sdram(
                 routing_table.x, routing_table.y, len(routing_table_data),
                 routing_table_compressor_app_id)
-        except SpinnmanInvalidParameterException as e:
+        except SpinnmanInvalidParameterException:
             pass
 
         # write SDRAM requirements per chip
@@ -339,8 +337,8 @@ class BitFieldRouterCompressor(object):
             routing_table.x, routing_table.y).processor_ids[0]
 
         # update user 3 with location
-        user_3_base_address = transceiver.get_user_3_register_address_from_core(
-            processor_id)
+        user_3_base_address = \
+            transceiver.get_user_3_register_address_from_core(processor_id)
         transceiver.write_memory(
             routing_table.x, routing_table.y, user_3_base_address,
             self._ONE_WORDS.pack(base_address), self._USER_BYTES)

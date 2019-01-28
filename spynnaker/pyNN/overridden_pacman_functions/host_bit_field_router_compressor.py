@@ -86,7 +86,7 @@ class HostBasedBitFieldRouterCompressor(object):
             time_to_try_for_each_iteration=None):
         """ compresses bitfields and router table entries together as /
         feasible as possible
-        
+
         :param router_tables: routing tables (uncompressed)
         :param machine: SpiNNMachine instance
         :param placements: placements
@@ -156,7 +156,8 @@ class HostBasedBitFieldRouterCompressor(object):
             # clear cache
             self._chip_cached_entries.clear()
 
-            # iterate through bitfields on this chip and convert to router table
+            # iterate through bitfields on this chip and convert to router
+            # table
             bit_field_chip_base_addresses = bit_field_sdram_base_addresses[
                 (router_table.x, router_table.y)]
 
@@ -175,8 +176,8 @@ class HostBasedBitFieldRouterCompressor(object):
             compressed_pacman_router_tables.add_routing_table(
                 self._last_successful)
 
-            # remove bitfields from cores that have been merged into the router\
-            # table
+            # remove bitfields from cores that have been merged into the
+            # router table
             self._remove_merged_bitfields_from_cores(
                 self._last_successful_bit_fields_merged, router_table.x,
                 router_table.y, transceiver,
@@ -197,10 +198,10 @@ class HostBasedBitFieldRouterCompressor(object):
             self, router_table, bitfields_by_key):
         """ converts the bitfield into router table entries for compression. \
         based off the entry located in the original router table
-        
+
         :param router_table: the original routing table
         :param bitfields_by_key: the bitfields of the chip.
-        :return: routing tables . 
+        :return: routing tables.
         """
         bit_field_router_tables = list()
 
@@ -234,7 +235,8 @@ class HostBasedBitFieldRouterCompressor(object):
 
             # remove entry
             original_route_entries.remove(
-                self._chip_cached_entries[master_pop_key][self._ORIGINAL_ENTRY])
+                self._chip_cached_entries[master_pop_key][
+                    self._ORIGINAL_ENTRY])
 
         # create reduced
         reduced_original_table = UnCompressedMulticastRoutingTable(
@@ -545,10 +547,27 @@ class HostBasedBitFieldRouterCompressor(object):
     def _create_table_report(
             self, router_table, final_routing_table,
             bit_fields_by_key, bit_fields_merged, report_out):
+        """ creates the report entry
+        
+        :param router_table: the uncompressed router table to process
+        :param final_routing_table: the compressed router table to process 
+        :param bit_fields_by_key: the bitfields by key overall
+        :param bit_fields_merged: the bitfields merged
+        :param report_out: the report writer
+        :rtype: None
+        """
 
         n_bit_fields_merged = 0
         for master_pop_key in bit_fields_merged.keys():
             n_bit_fields_merged += len(bit_fields_merged[master_pop_key])
+
+        n_packets_filtered = 0
+        for master_pop_key in bit_fields_merged.keys():
+            for (bit_field, _) in bit_fields_merged[master_pop_key]:
+                n_neurons = len(bit_field) * self._BITS_IN_A_WORD
+                for neuron_id in range(0, n_neurons):
+                    if self._bit_for_neuron_id(bit_field, neuron_id) == 0:
+                        n_packets_filtered += 1
 
         n_possible_bit_fields = 0
         for master_pop_key in bit_fields_by_key.keys():
@@ -557,20 +576,27 @@ class HostBasedBitFieldRouterCompressor(object):
         percentage_done = 100
         if n_possible_bit_fields != 0:
             percentage_done = (
-                (100.0 // float(n_possible_bit_fields)) *
+                (100.0 / float(n_possible_bit_fields)) *
                 float(n_bit_fields_merged))
 
         report_out.write(
-            "Table {}:{} has {} bitfields merged from {} bitfields. "
-            "Producing a compression of {} %.\n"
-            "\n\n".format(
+            "Table{}:{} has integrated {} out of {} available chip level "
+            "bitfields into the routing table. There by producing a "
+            "compression of {}%.\n\n".format(
                 router_table.x, router_table.y, n_bit_fields_merged,
                 n_possible_bit_fields, percentage_done))
+
         report_out.write(
-            "The uncompressed table had {} entries, the compressed one has"
-            " {} entries. \n\n".format(
+            "The uncompressed routing table had {} entries, the compressed "
+            "one with {} integrated bitfields has {} entries. \n\n".format(
                 router_table.number_of_entries,
-                final_routing_table.number_of_entries))
+                final_routing_table.number_of_entries, n_bit_fields_merged))
+
+        report_out.write(
+            "The integration of {} bitfields removes up to {} MC packets "
+            "that otherwise would be being processed by the cores on the "
+            "chip, just to be dropped as they do not target anything.".format(
+                n_bit_fields_merged, n_packets_filtered))
 
         report_out.write("The bit_fields merged are as follows:\n\n")
 

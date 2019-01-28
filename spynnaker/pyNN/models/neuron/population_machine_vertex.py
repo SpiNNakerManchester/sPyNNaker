@@ -218,8 +218,8 @@ class PopulationMachineVertex(
             self._add_names(names, "Invalid Master Pop hits"),
             invalid_master_pop_hits, report=invalid_master_pop_hits > 0,
             message=(
-                "There were {} keys which were received by core {}:{}:{} which "
-                "had no master pop entry for it. This is a error, which most "
+                "There were {} keys which were received by core {}:{}:{} which"
+                " had no master pop entry for it. This is a error, which most "
                 "likely strives from bad routing.".format(
                     invalid_master_pop_hits, x, y, p))))
 
