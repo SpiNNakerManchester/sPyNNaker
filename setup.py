@@ -7,6 +7,7 @@ exec(open("spynnaker/_version.py").read())
 assert __version__
 
 install_requires = [
+    'SpiNNak-Ear >= 1.0',
     'SpiNNUtilities >= 1!4.0.1, < 1!5.0.0',
     'SpiNNStorageHandlers >= 1!4.0.1, < 1!5.0.0',
     'SpiNNMachine >= 1!4.0.1, < 1!5.0.0',

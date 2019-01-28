@@ -1,17 +1,16 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
-from spinn_front_end_common.utilities import globals_variables
+from pacman.model.graphs.machine import MachineEdge
 from spinn_front_end_common.interface.provenance \
     import AbstractProvidesLocalProvenanceData
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
-    import OneToOneConnector
-from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
-    import FromListConnector
+from spinn_front_end_common.utilities import globals_variables
+from spinn_utilities.overrides import overrides
+from spinnak_ear.DRNL_vertex import DRNLVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
-from pacman.model.graphs.machine import MachineEdge
-from DRNL_vertex import DRNLVertex
-from IHCAN_vertex import IHCANVertex
+from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
+    import FromListConnector
+from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
+    import OneToOneConnector
+from spynnaker.pyNN.utilities import utility_calls
 
 
 class ProjectionMachineEdge(
@@ -36,7 +35,6 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-        import numpy as np
         # Filter one-to-one connections that are out of range
         for synapse_info in self._synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
