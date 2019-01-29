@@ -12,7 +12,6 @@ from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 # spinn utilities
 from spinn_utilities.helpful_functions import get_valid_components
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
-from numpy import rate
 
 # front-end common
 from spinn_front_end_common.utilities.helpful_functions \
