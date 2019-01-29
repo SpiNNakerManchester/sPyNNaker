@@ -133,6 +133,11 @@ class PyNNProjectionCommon(object):
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
+        # If this is a BPTT Training projection, add the BPTT Vertices
+
+
+
+
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self._virtual_connection_list = None

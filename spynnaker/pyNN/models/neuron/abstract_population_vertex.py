@@ -173,6 +173,9 @@ class AbstractPopulationVertex(
             self._neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
             spikes_per_second, config)
 
+        # Maybe here is a better place to add the BPTT vertex?
+        # This gives you access to the synaptic manager.
+
         # bool for if state has changed.
         self._change_requires_mapping = True
         self._change_requires_neuron_parameters_reload = False
