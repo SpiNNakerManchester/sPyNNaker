@@ -12,6 +12,7 @@ from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 # spinn utilities
 from spinn_utilities.helpful_functions import get_valid_components
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
+from numpy import rate
 
 # front-end common
 from spinn_front_end_common.utilities.helpful_functions \
@@ -461,7 +462,17 @@ class SynapticManager(object):
                     spikes_per_second = self._spikes_per_second
                     if isinstance(app_edge.pre_vertex,
                                   SpikeSourcePoissonVertex):
-                        spikes_per_second = app_edge.pre_vertex.rate
+                        rate = app_edge.pre_vertex.rate
+                        # If non-zero rate then use it; otherwise keep default
+                        if hasattr(rate, "__getitem__"):
+                            sumrate = 0
+                            for i in range(len(rate)):
+                                sumrate += rate[i]
+                            if (sumrate != 0):
+                                spikes_per_second = rate
+                        else:
+                            if (rate != 0):
+                                spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
                         elif get_simulator().is_a_pynn_random(
