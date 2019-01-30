@@ -15,7 +15,7 @@ LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
 
 
-class TimingDependenceSpikePair(AbstractTimingDependence):
+class TimingDependenceERBP(AbstractTimingDependence):
     __slots__ = [
         "_synapse_structure",
         "_tau_minus",
@@ -43,7 +43,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
-        if not isinstance(timing_dependence, TimingDependenceSpikePair):
+        if not isinstance(timing_dependence, TimingDependenceERBP):
             return False
         return (self.tau_plus == timing_dependence.tau_plus and
                 self.tau_minus == timing_dependence.tau_minus)
