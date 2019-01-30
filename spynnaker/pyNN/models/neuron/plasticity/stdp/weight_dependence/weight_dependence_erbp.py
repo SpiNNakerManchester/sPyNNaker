@@ -4,7 +4,7 @@ from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
 
-class WeightDependenceAdditive(
+class WeightDependenceERBP(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
         "_w_max",
@@ -26,7 +26,7 @@ class WeightDependenceAdditive(
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
-        if not isinstance(weight_dependence, WeightDependenceAdditive):
+        if not isinstance(weight_dependence, WeightDependenceERBP):
             return False
         return (
             (self._w_min == weight_dependence.w_min) and
