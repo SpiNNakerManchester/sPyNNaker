@@ -24,7 +24,8 @@ class IFCurrDualExpBase(AbstractPyNNNeuronModelStandard):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeDualExponential(
-            tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2, isyn_inh)
+            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
+             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(v_thresh)
 

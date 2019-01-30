@@ -4,7 +4,7 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/models/neuron_model.h>
+#include <neuron/models/neuron_model_lif_erbp_impl.h>
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
 #include <neuron/threshold_types/threshold_type.h>
@@ -215,7 +215,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
 
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->local_err;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
     // Call functions to convert exc_input and inh_input to current
