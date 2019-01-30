@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
     import plasticity_helpers
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
+    import SynapseStructureWeightAndTrace
 
 
 import logging
@@ -27,7 +27,7 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 
-        self._synapse_structure = SynapseStructureWeightOnly()
+        self._synapse_structure = SynapseStructureWeightAndTrace()
 
         # provenance data
         self._tau_plus_last_entry = None

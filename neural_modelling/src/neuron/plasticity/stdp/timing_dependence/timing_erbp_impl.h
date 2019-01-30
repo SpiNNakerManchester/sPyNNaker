@@ -7,7 +7,7 @@
 typedef int16_t post_trace_t;
 typedef int16_t pre_trace_t;
 
-#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_and_trace_impl.h>
 #include "timing.h"
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 
@@ -73,7 +73,27 @@ static inline post_trace_t timing_add_post_spike(
 
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
+        uint32_t time, uint32_t last_time, pre_trace_t last_trace,
+		neuron_pointer_t neuron) {
+
+
+	// Calculate p_j(V) using the triangle or box function
+//	REAL m = 0.5;
+//	REAL gamma = 0.3;
+//	if (V > V_centre) { // above threshold (centerline)
+//		if ((V - V_centre) > limit){
+//			p_j = 0;
+//		} else {
+//			p_j = gamma - (V - V_centre) * m;
+//		}
+//	} else { // below centerline
+//		if ((V_centre - V) > limit) {
+//			p_j = 0;
+//		} else{
+//			p_j = gamma - (V_centre - V) * m;
+//		}
+//	}
+
 
     // Get time since last spike
     uint32_t delta_time = time - last_time;
@@ -82,8 +102,9 @@ static inline pre_trace_t timing_add_pre_spike(
     int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(
         last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
 
+    // now scale STDP_FIXED_POINT_ONE by p_j(t), and multiply
     // Add energy caused by new spike to trace
-    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
+    int32_t new_r1_trace = decayed_r1_trace + (STDP_FIXED_POINT_ONE ;
 
     log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
 
@@ -122,15 +143,24 @@ static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(last_post_time);
+    use(&trace); // this contains the error
+    use(last_post_time); // this contains the post time
     use(&last_post_trace);
+
+    // Maybe need this to convert scaled weight to real units?
+//    input_t synapses_convert_weight_to_input(
+//            weight_t weight, uint32_t left_shift)
+
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {
+
+    	// This allows us to decay the pre trace to the time of the error spike
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
             last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+
+
 
         log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
                   time_since_last_pre, decayed_r1);

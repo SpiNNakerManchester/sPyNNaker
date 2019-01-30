@@ -337,7 +337,7 @@ void neuron_do_timestep_update(timer_t time) {
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+//            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
 

@@ -172,6 +172,7 @@ static inline void _process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
+
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
@@ -184,6 +185,11 @@ static inline void _process_fixed_synapses(
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
                 synaptic_word, synapse_type_index_mask);
         uint32_t weight = synapse_row_sparse_weight(synaptic_word);
+
+        index_t neuron_index = synapse_row_sparse_index(synaptic_word,
+        		synapse_index_mask);
+        index_t synapse_type = synapse_row_sparse_type(synaptic_word,
+        		synapse_index_bits, synapse_type_mask);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -205,6 +211,16 @@ static inline void _process_fixed_synapses(
 
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
+
+        // Store error weight in post synaptic event history (note this needs to be done
+        // on a per neuron basis for the error spike
+        if (synapse_type == 1){
+        	// add error to the excitatory error event history
+        	synapse_dynamics_process_post_synaptic_event(time, neuron_index, weight);
+        } else if (synapse_type == 3){
+        	// add the weight to the inhibitory error history
+        	synapse_dynamics_process_post_synaptic_event(time, neuron_index, weight);
+        }
     }
 }
 

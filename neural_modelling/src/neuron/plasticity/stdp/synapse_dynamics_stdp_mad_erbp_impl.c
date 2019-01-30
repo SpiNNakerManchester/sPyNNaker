@@ -265,9 +265,9 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
+    event_history->prev_time = time; // this is still useful
+//    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
+//        last_pre_trace, neuron); // this is now redundant, as we store a per synapse trace instead
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -291,6 +291,19 @@ bool synapse_dynamics_process_plastic_synapses(
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
+
+
+
+
+        // Get current value of trace (now it's per synapse, so do inside loop)
+        const pre_trace_t last_pre_trace = current_state.trace;
+
+        // Update the per synapse trace using the neuron membrane potential
+        // (although note that we use the old state in calculations)
+        current_state.trace = timing_add_pre_spike(time, last_pre_time, last_pre_trace, neuron);
+
+
+
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
@@ -326,7 +339,7 @@ bool synapse_dynamics_process_plastic_synapses(
 }
 
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
+        uint32_t time, index_t neuron_index, REAL error) {
     log_debug("Adding post-synaptic event to trace at time:%u", time);
 
     // Add post-event
@@ -334,8 +347,9 @@ void synapse_dynamics_process_post_synaptic_event(
     const uint32_t last_post_time = history->times[history->count_minus_one];
     const post_trace_t last_post_trace =
         history->traces[history->count_minus_one];
-    post_events_add(time, history, timing_add_post_spike(time, last_post_time,
-                                                         last_post_trace));
+    post_events_add(time, history, error);
+//    		timing_add_post_spike(time, last_post_time,
+//                                                         last_post_trace));
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
