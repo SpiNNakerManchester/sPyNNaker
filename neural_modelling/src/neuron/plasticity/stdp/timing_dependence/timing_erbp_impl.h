@@ -10,6 +10,7 @@ typedef int16_t pre_trace_t;
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_and_trace_impl.h>
 #include "timing.h"
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
+#include <neuron/models/neuron_model_lif_erbp_impl.h>
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -76,23 +77,26 @@ static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace,
 		neuron_pointer_t neuron) {
 
+	REAL mem_potential = neuron->V_membrane;
+	REAL threshold_potential = -50.0k;
+	REAL m = 0.25; // this factor already includes gamma
+	REAL p_j;
+	REAL limit = threshold_potential - neuron->V_rest;
 
-	// Calculate p_j(V) using the triangle or box function
-//	REAL m = 0.5;
-//	REAL gamma = 0.3;
-//	if (V > V_centre) { // above threshold (centerline)
-//		if ((V - V_centre) > limit){
-//			p_j = 0;
-//		} else {
-//			p_j = gamma - (V - V_centre) * m;
-//		}
-//	} else { // below centerline
-//		if ((V_centre - V) > limit) {
-//			p_j = 0;
-//		} else{
-//			p_j = gamma - (V_centre - V) * m;
-//		}
-//	}
+	// Calculate p_j(V) using the triangle function
+	if (mem_potential > threshold_potential) { // above threshold (centerline)
+		if ((mem_potential - threshold_potential) > limit){
+			p_j = 0;
+		} else {
+			p_j = (mem_potential - threshold_potential) * m;
+		}
+	} else { // below centerline
+		if ((threshold_potential - mem_potential) > limit) {
+			p_j = 0;
+		} else{
+			p_j = (threshold_potential - mem_potential) * m;
+		}
+	}
 
 
     // Get time since last spike
@@ -104,7 +108,7 @@ static inline pre_trace_t timing_add_pre_spike(
 
     // now scale STDP_FIXED_POINT_ONE by p_j(t), and multiply
     // Add energy caused by new spike to trace
-    int32_t new_r1_trace = decayed_r1_trace + (STDP_FIXED_POINT_ONE ;
+    int32_t new_r1_trace = decayed_r1_trace + (STDP_FIXED_POINT_ONE * p_j); // !!! NEED TO CHECK THIS MULTIPLY !!!
 
     log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
 
@@ -132,8 +136,12 @@ static inline update_state_t timing_apply_pre_spike(
                   time_since_last_post, decayed_o1);
 
         // Apply depression to state (which is a weight_state)
-        return weight_one_term_apply_depression(previous_state, decayed_o1);
-    } else {
+
+        previous_state.weight_state = weight_one_term_apply_depression(
+        		previous_state.weight_state, decayed_o1);
+
+        return previous_state;
+    } else { // the else is now redundant
         return previous_state;
     }
 }
@@ -152,6 +160,11 @@ static inline update_state_t timing_apply_post_spike(
 //            weight_t weight, uint32_t left_shift)
 
 
+
+    // Here we decay the pre trace to the time of the error spike, and then
+    // multiply it by the weight of the error spike (which we'd stored in the
+    //postsynaptic event history)
+
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {
@@ -166,8 +179,9 @@ static inline update_state_t timing_apply_post_spike(
                   time_since_last_pre, decayed_r1);
 
         // Apply potentiation to state (which is a weight_state)
-        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
-    } else {
+        previous_state.weight_state = weight_one_term_apply_potentiation(previous_state.weight_state, decayed_r1);
+        return previous_state;
+    } else { // else is now redundant
         return previous_state;
     }
 }

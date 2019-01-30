@@ -4,6 +4,10 @@
 #include <common/neuron-typedefs.h>
 #include <neuron/synapse_row.h>
 #include <neuron/structural_plasticity/sp_structs.h>
+#include <neuron/models/neuron_model.h>
+//#include <neuron/threshold_types/threshold_type.h>
+//#include <neuron/additional_inputs/additional_input.h>
+
 
 address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
@@ -28,6 +32,14 @@ void synapse_dynamics_print_plastic_synapses(
 //!        returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array);
+
+//void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array);
+//
+//void synapse_dynamics_set_additional_input_array(
+//			additional_input_pointer_t additional_input_array);
+
 
 //! \brief returns the number of ring buffer saturation events due to adding
 //! plastic weights.

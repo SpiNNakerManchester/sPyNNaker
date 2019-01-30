@@ -113,6 +113,16 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
         }
     }
 
+    // Initialise pointers to Neuron parameters in STDP code
+    synapse_dynamics_set_neuron_array(neuron_array);
+    log_info("set pointer to neuron array in stdp code");
+
+//    synapse_dynamics_set_additional_input_array(additional_input_array);
+//    log_info("set pointer to additional input array in stdp code");
+//
+//    synapse_dynamics_set_threshold_array(threshold_type_array);
+//    log_info("set pointer to threshold type array in stdp code");
+
     return true;
 }
 

@@ -265,6 +265,8 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
 
     _reset_record_counter();
 
+
+
     return true;
 }
 
