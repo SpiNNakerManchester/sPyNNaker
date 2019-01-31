@@ -50,7 +50,9 @@ typedef enum extra_provenance_data_region_entries{
 	FAILED_TO_READ_BIT_FIELDS = 6,
 	EMPTY_ROW_READS = 7,
 	DMA_COMPLETES = 8,
-	SPIKE_PROGRESSING_COUNT = 9
+	SPIKE_PROGRESSING_COUNT = 9,
+	INVALID_MASTER_POP_HITS = 10,
+	BIT_FIELD_FILTERED_COUNT = 11
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -85,7 +87,7 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-bit_field_t *connectivity_lookup;
+bit_field_t *connectivity_bit_field;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
@@ -126,6 +128,11 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_dma_complete_count();
     provenance_region[SPIKE_PROGRESSING_COUNT] =
         spike_processing_get_spike_processing_count();
+    provenance_region[INVALID_MASTER_POP_HITS] =
+        spike_processing_get_invalid_master_pop_table_hits();
+    provenance_region[BIT_FIELD_FILTERED_COUNT] =
+        population_table_get_filtered_packet_count();
+
     log_debug("finished other provenance data");
 }
 
@@ -134,14 +141,24 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
     uint32_t position = 0;
     uint32_t n_bit_fields = bitfield_region[position];
 
+    log_info("n bitfields = %d", n_bit_fields);
+
     // try allocating dtcm for starting array for bitfields
-    connectivity_lookup = spin1_malloc(sizeof(bit_field_t) * n_bit_fields);
-    if (connectivity_lookup == NULL){
+    connectivity_bit_field =
+        spin1_malloc(sizeof(bit_field_t) * population_table_length());
+    if (connectivity_bit_field == NULL){
         log_warning(
             "couldn't  initialise basic bit field holder. Will end up doing "
             "possibly more DMA's during the execution than required");
         return true;
     }
+
+    // set all to NULL for when they not filled in.
+    for (uint32_t cur_bit_field = 0; cur_bit_field < population_table_length();
+            cur_bit_field++){
+         connectivity_bit_field[cur_bit_field] = NULL;
+    }
+
     position += 1;
 
     // try allocating dtcm for each bit field
@@ -157,9 +174,9 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
             population_table_position_in_the_master_pop_array(key);
 
         // alloc sdram into right region
-        connectivity_lookup[position_in_array] = spin1_malloc(
+        connectivity_bit_field[position_in_array] = spin1_malloc(
             sizeof(bit_field_t) * n_words_for_bit_field);
-        if (connectivity_lookup[position_in_array] == NULL){
+        if (connectivity_bit_field[position_in_array] == NULL){
             log_warning(
                 "could not initialise bit field for key %d, packets with"
                 " that key will use a DMA to check if the packet targets "
@@ -170,7 +187,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
 
             // read in the bits for the bitfield (think this avoids a for loop)
             spin1_memcpy(
-                connectivity_lookup[position_in_array],
+                connectivity_bit_field[position_in_array],
                 &bitfield_region[position],
                 sizeof(uint32_t) * n_words_for_bit_field);
 
@@ -179,13 +196,13 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
             for (uint32_t bit_field_word_index = 0;
                     bit_field_word_index < n_words_for_bit_field;
                     bit_field_word_index++){
-                log_debug("%x", connectivity_lookup[position_in_array]
+                log_debug("%x", connectivity_bit_field[position_in_array]
                                                    [bit_field_word_index]);
             }
         }
         position += n_words_for_bit_field;
     }
-    population_table_set_connectivity_lookup(connectivity_lookup);
+    population_table_set_connectivity_bit_field(connectivity_bit_field);
     return true;
 }
 

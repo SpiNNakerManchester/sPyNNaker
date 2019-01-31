@@ -47,7 +47,9 @@ class PopulationMachineVertex(
                ("FAILED_TO_READ_BIT_FIELDS", 6),
                ("EMPTY_ROW_READS", 7),
                ("DMA_COMPLETES", 8),
-               ("SPIKE_PROGRESSING_COUNT", 9)])
+               ("SPIKE_PROGRESSING_COUNT", 9),
+               ("INVALID_MASTER_POP_HITS", 10),
+               ("BIT_FIELD_FILTERED_COUNT", 11)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -133,6 +135,10 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.DMA_COMPLETES.value]
         spike_processing_count = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.SPIKE_PROGRESSING_COUNT.value]
+        invalid_master_pop_hits = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.INVALID_MASTER_POP_HITS.value]
+        n_packets_filtered_by_bit_field_filter = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.BIT_FIELD_FILTERED_COUNT.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -211,6 +217,29 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "how many spikes were processed"),
             spike_processing_count))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Invalid Master Pop hits"),
+            invalid_master_pop_hits, report=invalid_master_pop_hits > 0,
+            message=(
+                "There were {} keys which were received by core {}:{}:{} which"
+                " had no master pop entry for it. This is a error, which most "
+                "likely strives from bad routing.".format(
+                    invalid_master_pop_hits, x, y, p))))
+        provenance_items.append((ProvenanceDataItem(
+            self._add_name(
+                names,
+                "How many packets were filtered by the bitfield filterer."),
+            n_packets_filtered_by_bit_field_filter,
+            report=n_packets_filtered_by_bit_field_filter > 0,
+            message=(
+                "There were {} packets received by {}:{}:{} that were "
+                "filtered by the Bitfield filterer on the core. These packets "
+                "were having to be stored and processed on core, which means "
+                "the core may not be running as efficiently as it could. "
+                "Please adjust the network or the mapping so that these "
+                "packets are filtered in the router to improve "
+                "performance.".format(
+                    n_packets_filtered_by_bit_field_filter, x, y, p)))))
 
         return provenance_items
 

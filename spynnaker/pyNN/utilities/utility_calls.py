@@ -138,17 +138,17 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
-        min_atom = 0
+        min_atom = 0.0
     if max_atom is None:
         max_atom = float('inf')
     if min_time is None:
-        min_time = 0
+        min_time = 0.0
     if max_time is None:
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as fsource:
-        read_data = fsource.readlines()
+    with open(file_path, 'r') as f_source:
+        read_data = f_source.readlines()
 
     evaluator = SafeEval()
     for line in read_data:

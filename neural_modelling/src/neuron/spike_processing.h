@@ -27,6 +27,10 @@ uint32_t spike_processing_get_dma_complete_count();
 //! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count();
 
+//! \brief returns the number of master pop table failed hits
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits();
+
 //! DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
 

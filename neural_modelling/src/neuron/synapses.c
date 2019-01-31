@@ -175,6 +175,7 @@ static inline void _process_fixed_synapses(
 
     // increment counter of rows that were empty (provenance data)
     if (fixed_synapse==0){
+        log_debug("empty row found");
         empty_row_count++;
     }
 
@@ -415,7 +416,8 @@ bool find_static_neuron_with_id(uint32_t id, address_t row,
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
         weight = synapse_row_sparse_weight(synaptic_word);
-        delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+        delay = synapse_row_sparse_delay(
+            synaptic_word, synapse_type_index_bits);
         if (synapse_row_sparse_index(synaptic_word, synapse_index_mask)==id){
             found = true;
             break;

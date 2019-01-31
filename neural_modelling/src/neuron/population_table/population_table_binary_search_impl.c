@@ -43,6 +43,10 @@ static uint16_t next_item = 0;
 //! \brief how many items are left to go
 static uint16_t items_to_go = 0;
 
+//! \brief how many packets were dropped because the bitfield filter says
+//!        they don't hit anything
+static uint32_t bit_field_filtered_packets = 0;
+
 //! \brief pointer for the bitfield map
 bit_field_t* connectivity_bit_field;
 
@@ -198,15 +202,16 @@ bool population_table_get_first_address(
 
         // check we have a entry in the bit field for this (possible not to due
         // to dtcm limitations or router table compression). If not, go to
-        // DMA check. TODO need to verify that correct process
+        // DMA check.
         log_debug("checking bit field");
-        if (&connectivity_bit_field[position] != 0){
+        if (connectivity_bit_field[position] != NULL){
             log_debug("can be checked, bitfield isnt not allocated");
             // check that the bit flagged for this neuron id does hit a
             // neuron here. If not return false and avoid the DMA check.
             if (!bit_field_test(
                     connectivity_bit_field[position],  last_neuron_id)){
-                log_debug("tested and wasnt set");
+                log_debug("tested and was not set");
+                bit_field_filtered_packets += 1;
                 return false;
             }
             log_debug("was set, carrying on");
@@ -231,6 +236,8 @@ bool population_table_get_first_address(
 
         // tracks surplus dmas
         if (!get_next){
+            log_debug(
+                "found a entry which has a ghost entry for key %d", spike);
             ghost_pop_table_searches ++;
         }
         return get_next;
@@ -338,8 +345,9 @@ uint32_t population_table_get_invalid_master_pop_hits(){
 
 //! \brief sets the connectivity lookup element
 //! \param[in] connectivity_lookup: the connectivity lookup
-void population_table_set_connectivity_lookup(bit_field_t* connectivity_lookup){
-    connectivity_bit_field = connectivity_lookup;
+void population_table_set_connectivity_bit_field(
+        bit_field_t* connectivity_bit_fields){
+    connectivity_bit_field = connectivity_bit_fields;
 }
 
 //! \brief clears the dtcm allocated by the population table.
@@ -351,6 +359,7 @@ bool population_table_shut_down(){
     invalid_master_pop_hits = 0;
     last_neuron_id = 0;
     next_item = 0;
+    bit_field_filtered_packets = 0;
     items_to_go = 0;
     connectivity_bit_field = NULL;
     return true;
@@ -374,4 +383,10 @@ spike_t population_table_get_spike_for_index(uint32_t index){
 //! \return the mask associated with this entry
 uint32_t population_table_get_mask_for_entry(uint32_t index){
     return master_population_table[index].mask;
+}
+
+//! \brief get the number of packets that were filtered from the bitfield filter
+//! \return the number of packets filtered by the bitfield filter
+uint32_t population_table_get_filtered_packet_count(){
+    return bit_field_filtered_packets;
 }
