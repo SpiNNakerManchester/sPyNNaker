@@ -20,7 +20,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
     def __init__(self, spike_times=[]):
-        self._spike_times = spike_times
+        self.__spike_times = spike_times
 
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
@@ -31,8 +31,12 @@ class SpikeSourceArray(AbstractPyNNModel):
             buffer_size_before_receive):
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self._spike_times, port, tag, ip_address, board_address,
+            n_neurons, self.__spike_times, port, tag, ip_address, board_address,
             max_on_chip_memory_usage_for_spikes_in_bytes,
             space_before_notification, constraints, label,
             spike_recorder_buffer_size, buffer_size_before_receive, max_atoms,
             self)
+
+    @property
+    def _spike_times(self):
+        return self.__spike_times

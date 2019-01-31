@@ -36,10 +36,20 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                               SpynnakerSimulatorInterface):
     """ Main interface for neural code.
     """
+    __slots__ = [
+        "__command_edge_count",
+        "__edge_count",
+        "__id_counter",
+        "__live_spike_recorder",
+        "__max_delay",
+        "__min_delay",
+        "__neurons_per_core_set",
+        "__populations",
+        "__projections"]
 
     CONFIG_FILE_NAME = "spynnaker.cfg"
 
-    _EXECUTABLE_FINDER = ExecutableFinder()
+    __EXECUTABLE_FINDER = ExecutableFinder()
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
@@ -51,19 +61,19 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         # pylint: disable=too-many-arguments, too-many-locals
 
         # add model binaries
-        self._EXECUTABLE_FINDER.add_path(
+        self.__EXECUTABLE_FINDER.add_path(
             os.path.dirname(model_binaries.__file__))
 
         # pynn population objects
-        self._populations = []
-        self._projections = []
-        self._edge_count = 0
-        self._id_counter = 0
+        self.__populations = []
+        self.__projections = []
+        self.__edge_count = 0
+        self.__id_counter = 0
 
         # the number of edges that are associated with commands being sent to
         # a vertex
-        self._command_edge_count = 0
-        self._live_spike_recorder = dict()
+        self.__command_edge_count = 0
+        self.__live_spike_recorder = dict()
 
         # create XML path for where to locate sPyNNaker related functions when
         # using auto pause and resume
@@ -78,10 +88,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
         # timing parameters
-        self._min_delay = None
-        self._max_delay = None
+        self.__min_delay = None
+        self.__max_delay = None
 
-        self._neurons_per_core_set = set()
+        self.__neurons_per_core_set = set()
 
         versions = [("sPyNNaker", version)]
         if front_end_versions is not None:
@@ -89,7 +99,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         super(AbstractSpiNNakerCommon, self).__init__(
             configfile=self.CONFIG_FILE_NAME,
-            executable_finder=self._EXECUTABLE_FINDER,
+            executable_finder=self.__EXECUTABLE_FINDER,
             graph_label=graph_label,
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
@@ -161,9 +171,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 "current machine time step".format(
                     constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
         if min_delay is not None:
-            self._min_delay = min_delay
+            self.__min_delay = min_delay
         else:
-            self._min_delay = self._machine_time_step / 1000.0
+            self.__min_delay = self._machine_time_step / 1000.0
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -181,9 +191,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 "current machine time step".format(
                     0.144 * self._machine_time_step))
         if max_delay is not None:
-            self._max_delay = max_delay
+            self.__max_delay = max_delay
         else:
-            self._max_delay = (
+            self.__max_delay = (
                 max_delay_tics_supported * (self._machine_time_step / 1000.0))
 
         # Sort out the time scale factor if not user specified
@@ -231,14 +241,14 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             _detect_if_graph_has_changed(reset_flags)
 
         # Additionally check populations for changes
-        for population in self._populations:
+        for population in self.__populations:
             if population.requires_mapping:
                 changed = True
             if reset_flags:
                 population.mark_no_changes()
 
         # Additionally check projections for changes
-        for projection in self._projections:
+        for projection in self.__projections:
             if projection.requires_mapping:
                 changed = True
             if reset_flags:
@@ -250,13 +260,13 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def min_delay(self):
         """ The minimum supported delay, in milliseconds.
         """
-        return self._min_delay
+        return self.__min_delay
 
     @property
     def max_delay(self):
         """ The maximum supported delay, in milliseconds.
         """
-        return self._max_delay
+        return self.__max_delay
 
     def add_application_vertex(self, vertex_to_add):
         if isinstance(vertex_to_add, CommandSender):
@@ -272,12 +282,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def add_population(self, population):
         """ Called by each population to add itself to the list.
         """
-        self._populations.append(population)
+        self.__populations.append(population)
 
     def add_projection(self, projection):
         """ Called by each projection to add itself to the list.
         """
-        self._projections.append(projection)
+        self.__projections.append(projection)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
@@ -295,7 +305,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :rtype: None
         """
         # pylint: disable=protected-access
-        for population in self._populations:
+        for population in self.__populations:
             population._end()
 
         super(AbstractSpiNNakerCommon, self).stop(
@@ -312,7 +322,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
-        for projection in self._projections:
+        for projection in self.__projections:
             projection._clear_cache()
         super(AbstractSpiNNakerCommon, self).run(run_time)
 
@@ -332,7 +342,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :param search_path: absolute search path for binaries
         """
         # pylint: disable=protected-access
-        AbstractSpiNNakerCommon._EXECUTABLE_FINDER.add_path(search_path)
+        AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
         if not hasattr(neuron_type, "set_model_max_atoms_per_core"):
@@ -346,10 +356,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                     "from {} to {} ignored", previous, max_permitted)
                 return
         neuron_type.set_model_max_atoms_per_core(max_permitted)
-        self._neurons_per_core_set.add(neuron_type)
+        self.__neurons_per_core_set.add(neuron_type)
 
     def reset_number_of_neurons_per_core(self):
-        for neuron_type in self._neurons_per_core_set:
+        for neuron_type in self.__neurons_per_core_set:
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
@@ -452,7 +462,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :return:
         :rtype: int
         """
-        return self._id_counter
+        return self.__id_counter
 
     @id_counter.setter
     def id_counter(self, new_value):
@@ -465,4 +475,4 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :type new_value: int
         :return:
         """
-        self._id_counter = new_value
+        self.__id_counter = new_value

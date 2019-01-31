@@ -8,12 +8,12 @@ from six import add_metaclass, string_types
 @add_metaclass(AbstractBase)
 class FromFileConnector(FromListConnector):
     # pylint: disable=redefined-builtin
-    __slots__ = ["_file"]
+    __slots__ = ["__file"]
 
     def __init__(
             self, file,  # @ReservedAssignment
             distributed=False, safe=True, verbose=False):
-        self._file = file
+        self.__file = file
         if isinstance(file, string_types):
             real_file = self.get_reader(file)
             try:
@@ -40,7 +40,7 @@ class FromFileConnector(FromListConnector):
         return numpy.concatenate(conns)
 
     def __repr__(self):
-        return "FromFileConnector({})".format(self._file)
+        return "FromFileConnector({})".format(self.__file)
 
     @abstractmethod
     def get_reader(self, file):  # @ReservedAssignment

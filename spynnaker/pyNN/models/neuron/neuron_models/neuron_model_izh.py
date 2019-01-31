@@ -23,9 +23,8 @@ UNITS = {
 
 
 class NeuronModelIzh(AbstractNeuronModel):
-
     __slots__ = [
-        "_a", "_b", "_c", "_d", "_v_init", "_u_init", "_i_offset"
+        "__a", "__b", "__c", "__d", "__v_init", "__u_init", "__i_offset"
     ]
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
@@ -39,14 +38,13 @@ class NeuronModelIzh(AbstractNeuronModel):
              DataType.S1615,   # i_offset
              DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
-
-        self._a = a
-        self._b = b
-        self._c = c
-        self._d = d
-        self._i_offset = i_offset
-        self._v_init = v_init
-        self._u_init = u_init
+        self.__a = a
+        self.__b = b
+        self.__c = c
+        self.__d = d
+        self.__i_offset = i_offset
+        self.__v_init = v_init
+        self.__u_init = u_init
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -55,16 +53,16 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters[A] = self._a
-        parameters[B] = self._b
-        parameters[C] = self._c
-        parameters[D] = self._d
-        parameters[I_OFFSET] = self._i_offset
+        parameters[A] = self.__a
+        parameters[B] = self.__b
+        parameters[C] = self.__c
+        parameters[D] = self.__d
+        parameters[I_OFFSET] = self.__i_offset
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[V] = self._v_init
-        state_variables[U] = self._u_init
+        state_variables[V] = self.__v_init
+        state_variables[U] = self.__u_init
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -103,56 +101,56 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def a(self):
-        return self._a
+        return self.__a
 
     @a.setter
     def a(self, a):
-        self._a = a
+        self.__a = a
 
     @property
     def b(self):
-        return self._b
+        return self.__b
 
     @b.setter
     def b(self, b):
-        self._b = b
+        self.__b = b
 
     @property
     def c(self):
-        return self._c
+        return self.__c
 
     @c.setter
     def c(self, c):
-        self._c = c
+        self.__c = c
 
     @property
     def d(self):
-        return self._d
+        return self.__d
 
     @d.setter
     def d(self, d):
-        self._d = d
+        self.__d = d
 
     @property
     def i_offset(self):
-        return self._i_offset
+        return self.__i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._i_offset = i_offset
+        self.__i_offset = i_offset
 
     @property
     def v_init(self):
-        return self._v_init
+        return self.__v_init
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v_init = v_init
+        self.__v_init = v_init
 
     @property
     def u_init(self):
-        return self._u_init
+        return self.__u_init
 
     @u_init.setter
     def u_init(self, u_init):
-        self._u_init = u_init
+        self.__u_init = u_init

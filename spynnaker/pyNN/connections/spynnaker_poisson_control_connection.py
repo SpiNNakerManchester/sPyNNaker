@@ -14,7 +14,7 @@ _MAX_RATES_PER_PACKET = 32
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
     __slots__ = [
-        "_control_label_extension"]
+        "__control_label_extension"]
 
     def __init__(
             self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,
@@ -44,10 +44,10 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
-        self._control_label_extension = control_label_extension
+        self.__control_label_extension = control_label_extension
 
     def _control_label(self, label):
-        return "{}{}".format(label, self._control_label_extension)
+        return "{}{}".format(label, self.__control_label_extension)
 
     @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label, start_callback):
@@ -72,7 +72,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param rate: The rate to set in Hz
         """
         control_label = label
-        if not control_label.endswith(self._control_label_extension):
+        if not control_label.endswith(self.__control_label_extension):
             control_label = self._control_label(label)
         self.set_rates(control_label, [(neuron_id, rate)])
 
@@ -83,7 +83,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param neuron_id_rates: A list of tuples of (neuron ID, rate) to be set
         """
         control_label = label
-        if not control_label.endswith(self._control_label_extension):
+        if not control_label.endswith(self.__control_label_extension):
             control_label = self._control_label(label)
         pos = 0
         while pos < len(neuron_id_rates):

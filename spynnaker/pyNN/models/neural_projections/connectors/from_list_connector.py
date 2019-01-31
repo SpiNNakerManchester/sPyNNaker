@@ -12,8 +12,8 @@ class FromListConnector(AbstractConnector):
     """ Make connections according to a list.
     """
     __slots__ = [
-        "_conn_list",
-        "_converted_weights_and_delays"]
+        "__conn_list",
+        "__converted_weights_and_delays"]
 
     CONN_LIST_DTYPE = numpy.dtype([
         ("source", numpy.uint32), ("target", numpy.uint32),
@@ -37,12 +37,12 @@ class FromListConnector(AbstractConnector):
                 "The connection list for the FromListConnector must contain"
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
-        self._conn_list = conn_list
+        self.__conn_list = conn_list
 
         # supports setting these at different times
         self._weights = None
         self._delays = None
-        self._converted_weights_and_delays = False
+        self.__converted_weights_and_delays = False
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
@@ -50,36 +50,36 @@ class FromListConnector(AbstractConnector):
         # synapse data)
         if self._weights is None:
             self._weights = convert_param_to_numpy(
-                weights, len(self._conn_list))
+                weights, len(self.__conn_list))
         if self._delays is None:
             self._delays = convert_param_to_numpy(
-                delays, len(self._conn_list))
+                delays, len(self.__conn_list))
 
         # if got data, build connlist with correct dtypes
         if (self._weights is not None and self._delays is not None and not
-                self._converted_weights_and_delays):
+                self.__converted_weights_and_delays):
             # add weights and delays to the conn list
             temp_conn_list = numpy.dstack(
-                (self._conn_list[:, 0], self._conn_list[:, 1],
+                (self.__conn_list[:, 0], self.__conn_list[:, 1],
                  self._weights, self._delays))[0]
 
-            self._conn_list = list()
+            self.__conn_list = list()
             for element in temp_conn_list:
-                self._conn_list.append((element[0], element[1], element[2],
-                                        element[3]))
+                self.__conn_list.append((element[0], element[1], element[2],
+                                         element[3]))
 
-            # set dtypes (cant we just set them within the array?)
-            self._conn_list = numpy.asarray(self._conn_list,
-                                            dtype=self.CONN_LIST_DTYPE)
-            self._converted_weights_and_delays = True
+            # set dtypes (can't we just set them within the array?)
+            self.__conn_list = numpy.asarray(self.__conn_list,
+                                             dtype=self.CONN_LIST_DTYPE)
+            self.__converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
-        return numpy.max(self._conn_list["delay"])
+        return numpy.max(self.__conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self):
-        return numpy.var(self._conn_list["delay"])
+        return numpy.var(self.__conn_list["delay"])
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -87,14 +87,14 @@ class FromListConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         mask = None
         if min_delay is None or max_delay is None:
-            mask = ((self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                    (self._conn_list["target"] <= post_vertex_slice.hi_atom))
+            mask = ((self.__conn_list["target"] >= post_vertex_slice.lo_atom) &
+                    (self.__conn_list["target"] <= post_vertex_slice.hi_atom))
         else:
-            mask = ((self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                    (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
-                    (self._conn_list["delay"] >= min_delay) &
-                    (self._conn_list["delay"] <= max_delay))
-        sources = self._conn_list["source"][mask]
+            mask = ((self.__conn_list["target"] >= post_vertex_slice.lo_atom) &
+                    (self.__conn_list["target"] <= post_vertex_slice.hi_atom) &
+                    (self.__conn_list["delay"] >= min_delay) &
+                    (self.__conn_list["delay"] <= max_delay))
+        sources = self.__conn_list["source"][mask]
         if sources.size == 0:
             return 0
         return numpy.max(numpy.bincount(sources.view('int32')))
@@ -102,21 +102,21 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.max(numpy.bincount(self._conn_list["target"]))
+        return numpy.max(numpy.bincount(self.__conn_list["target"]))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self):
-        return numpy.mean(numpy.abs(self._conn_list["weight"]))
+        return numpy.mean(numpy.abs(self.__conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        return numpy.amax(numpy.abs(self._conn_list["weight"]))
+        return numpy.amax(numpy.abs(self.__conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self):
         # pylint: disable=too-many-arguments
-        return numpy.var(numpy.abs(self._conn_list["weight"]))
+        return numpy.var(numpy.abs(self.__conn_list["weight"]))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -124,11 +124,11 @@ class FromListConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
-        mask = ((self._conn_list["source"] >= pre_vertex_slice.lo_atom) &
-                (self._conn_list["source"] <= pre_vertex_slice.hi_atom) &
-                (self._conn_list["target"] >= post_vertex_slice.lo_atom) &
-                (self._conn_list["target"] <= post_vertex_slice.hi_atom))
-        items = self._conn_list[mask]
+        mask = ((self.__conn_list["source"] >= pre_vertex_slice.lo_atom) &
+                (self.__conn_list["source"] <= pre_vertex_slice.hi_atom) &
+                (self.__conn_list["target"] >= post_vertex_slice.lo_atom) &
+                (self.__conn_list["target"] <= post_vertex_slice.hi_atom))
+        items = self.__conn_list[mask]
         block = numpy.zeros(items.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = items["source"]
         block["target"] = items["target"]
@@ -139,12 +139,12 @@ class FromListConnector(AbstractConnector):
 
     def __repr__(self):
         return "FromListConnector(n_connections={})".format(
-            len(self._conn_list))
+            len(self.__conn_list))
 
     @property
     def conn_list(self):
-        return self._conn_list
+        return self.__conn_list
 
     @conn_list.setter
     def conn_list(self, new_value):
-        self._conn_list = new_value
+        self.__conn_list = new_value

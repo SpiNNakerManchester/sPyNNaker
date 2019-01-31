@@ -9,9 +9,9 @@ from .synapse_dynamics_static import SynapseDynamicsStatic
 
 class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
                                       SynapseDynamicsStatic):
-    """ Class that enables synaptic rewiring. It acts as a wrapper
+    """ Class that enables synaptic rewiring. It acts as a wrapper\
         around SynapseDynamicsStatic.
-        This means rewiring can operate in parallel with these
+        This means rewiring can operate in parallel with these\
         types of synapses.
 
         Written by Petrut Bogdan.
@@ -37,7 +37,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
             )
 
 
-    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will
+    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will\
         be done per second.
     :type f_rew: int
     :param weight: Initial weight assigned to a newly formed connection
@@ -60,16 +60,16 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
     :type p_elim_dep: float
     :param grid: Grid shape
     :type grid: 2d int array
-    :param lateral_inhibition: Flag whether to mark synapses formed within a
+    :param lateral_inhibition: Flag whether to mark synapses formed within a\
         layer as inhibitory or excitatory
     :type lateral_inhibition: bool
-    :param random_partner: Flag whether to randomly select pre-synaptic
+    :param random_partner: Flag whether to randomly select pre-synaptic\
         partner for formation
     :type random_partner: bool
     :param seed: seed the random number generators
     :type seed: int
     """
-    __slots__ = ["_common_sp"]
+    __slots__ = ["__common_sp"]
 
     def __init__(self, stdp_model=CommonSP.default_parameters['stdp_model'],
                  f_rew=CommonSP.default_parameters['f_rew'],
@@ -97,7 +97,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
         SynapseDynamicsStatic.__init__(self, pad_to_length=s_max)
         AbstractSynapseDynamicsStructural.__init__(self)
 
-        self._common_sp = CommonSP(
+        self.__common_sp = CommonSP(
             stdp_model=self, f_rew=f_rew, weight=weight,
             delay=delay, s_max=s_max,
             sigma_form_forward=sigma_form_forward,
@@ -121,7 +121,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
         super(SynapseDynamicsStructuralStatic, self).write_parameters(
             spec, region, machine_time_step, weight_scales)
 
-        self._common_sp.write_parameters(
+        self.__common_sp.write_parameters(
             spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
             machine_vertex, graph_mapper, routing_info)
@@ -130,18 +130,13 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic):
             return False
-        return self._common_sp.is_same_as(synapse_dynamics)
-
-    @overrides(SynapseDynamicsStatic.are_weights_signed)
-    def are_weights_signed(self):
-        return super(SynapseDynamicsStructuralStatic,
-                     self).are_weights_signed()
+        return self.__common_sp.is_same_as(synapse_dynamics)
 
     @overrides(SynapseDynamicsStatic.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         name = super(SynapseDynamicsStructuralStatic,
                      self).get_vertex_executable_suffix()
-        name += self._common_sp.get_vertex_executable_suffix()
+        name += self.__common_sp.get_vertex_executable_suffix()
         return name
 
     @overrides(SynapseDynamicsStatic.get_parameters_sdram_usage_in_bytes,
@@ -153,7 +148,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
             get_parameters_sdram_usage_in_bytes(
                 n_neurons, n_synapse_types)
         initial_size += \
-            self._common_sp.get_parameters_sdram_usage_in_bytes(
+            self.__common_sp.get_parameters_sdram_usage_in_bytes(
                 n_neurons, n_synapse_types, in_edges)
         return initial_size
 
@@ -161,7 +156,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
     def get_n_words_for_static_connections(self, n_connections):
         value = super(SynapseDynamicsStructuralStatic,
                       self).get_n_words_for_static_connections(n_connections)
-        self._common_sp.n_words_for_static_connections(value)
+        self.__common_sp.n_words_for_static_connections(value)
         return value
 
     @overrides(SynapseDynamicsStatic.get_static_synaptic_data,
@@ -169,7 +164,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
     def get_static_synaptic_data(self, connections, connection_row_indices,
                                  n_rows, post_vertex_slice,
                                  n_synapse_types, app_edge, machine_edge):
-        self._common_sp.synaptic_data_update(
+        self.__common_sp.synaptic_data_update(
             connections, post_vertex_slice,
             app_edge, machine_edge)
         return super(SynapseDynamicsStructuralStatic,
@@ -177,34 +172,9 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
             connections, connection_row_indices, n_rows, post_vertex_slice,
             n_synapse_types)
 
-    @overrides(SynapseDynamicsStatic.get_n_static_words_per_row)
-    def get_n_static_words_per_row(self, ff_size):
-
-        return super(SynapseDynamicsStructuralStatic,
-                     self).get_n_static_words_per_row(ff_size)
-
-    @overrides(SynapseDynamicsStatic.get_n_synapses_in_rows)
-    def get_n_synapses_in_rows(self, ff_size):
-        return super(SynapseDynamicsStructuralStatic,
-                     self).get_n_synapses_in_rows(ff_size)
-
-    @overrides(SynapseDynamicsStatic.read_static_synaptic_data)
-    def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types,
-                                  ff_size, ff_data):
-        return super(SynapseDynamicsStructuralStatic,
-                     self).read_static_synaptic_data(post_vertex_slice,
-                                                     n_synapse_types, ff_size,
-                                                     ff_data)
-
     @overrides(SynapseDynamicsStatic.get_parameter_names)
     def get_parameter_names(self):
         names = super(SynapseDynamicsStructuralStatic,
                       self).get_parameter_names()
-        names.extend(self._common_sp.get_parameter_names())
-
+        names.extend(self.__common_sp.get_parameter_names())
         return names
-
-    @overrides(SynapseDynamicsStatic.get_max_synapses)
-    def get_max_synapses(self, n_words):
-        return super(SynapseDynamicsStructuralStatic, self).get_max_synapses(
-            n_words)

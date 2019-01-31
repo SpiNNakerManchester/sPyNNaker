@@ -13,27 +13,29 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         connect cell i in the presynaptic pynn_population.py to cell i in the\
         postsynaptic pynn_population.py for all i.
     """
-    __slots__ = ["_random_number_class"]
+    __slots__ = ["__random_number_class"]
 
     def __init__(
             self, random_number_class, safe=True, verbose=False):
         """
         """
-        self._random_number_class = random_number_class
+        self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.set_weights_and_delays)
     def set_weights_and_delays(self, weights, delays):
         if self._weights is not None:
             logger.warning(
-                'Weights were already set in '+str(self)+', possibly in '
+                'Weights were already set in %s, possibly in '
                 'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
+                'in the previous projection. For now, set up a new connector.',
+                str(self))
         if self._delays is not None:
             logger.warning(
-                'Delays were already set in '+str(self)+', possibly in '
+                'Delays were already set in %s, possibly in '
                 'another projection: currently this will overwrite the values '
-                'in the previous projection. For now, set up a new connector.')
+                'in the previous projection. For now, set up a new connector.',
+                str(self))
         self._weights = weights
         self._delays = delays
         self._check_parameters(weights, delays, allow_lists=True)
@@ -54,7 +56,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             if self._delays >= min_delay and self._delays <= max_delay:
                 return 1
             return 0
-        if isinstance(self._delays, self._random_number_class):
+        if isinstance(self._delays, self.__random_number_class):
             return 1
 
         slice_min_delay = min(self._delays)

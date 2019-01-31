@@ -15,12 +15,12 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     """
 
     __slots__ = [
-        "_allow_self_connections",
-        "_p_connect"]
+        "__allow_self_connections",
+        "__p_connect"]
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False):
+            verbose=False, rng=None):
         """
         :param p_connect:
             a float between zero and one. Each potential connection is created\
@@ -36,10 +36,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             weights or delays - not implemented
         """
         super(FixedProbabilityConnector, self).__init__(safe, verbose)
-        self._p_connect = p_connect
-        self._allow_self_connections = allow_self_connections
-
-        if not 0 <= self._p_connect <= 1:
+        self.__p_connect = p_connect
+        self.__allow_self_connections = allow_self_connections
+        self._rng = rng
+        if not 0 <= self.__p_connect <= 1:
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
 
@@ -47,13 +47,13 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     def get_delay_maximum(self):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons, self._p_connect)
+            self._n_pre_neurons * self._n_post_neurons, self.__p_connect)
         return self._get_delay_maximum(n_connections)
 
     def _get_n_connections(self, out_of):
         return utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons, out_of,
-            self._p_connect)
+            self.__p_connect)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -61,7 +61,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            post_vertex_slice.n_atoms, self._p_connect)
+            post_vertex_slice.n_atoms, self.__p_connect)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -75,7 +75,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons, self._p_connect)
+            self._n_pre_neurons, self.__p_connect)
         return n_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
@@ -83,7 +83,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons, self._p_connect)
+            self._n_pre_neurons * self._n_post_neurons, self.__p_connect)
         return self._get_weight_maximum(n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
@@ -97,10 +97,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
-        if not self._allow_self_connections:
+        if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
-        present = items < self._p_connect
+        present = items < self.__p_connect
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
@@ -117,7 +117,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         return block
 
     def __repr__(self):
-        return "FixedProbabilityConnector({})".format(self._p_connect)
+        return "FixedProbabilityConnector({})".format(self.__p_connect)
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
@@ -131,9 +131,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         params = [
-            self.allow_self_connections,
+            self.__allow_self_connections,
             round(decimal.Decimal(
-                str(self._p_connect)) * DataType.U032.scale)]
+                str(self.__p_connect)) * DataType.U032.scale)]
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")

@@ -31,31 +31,31 @@ class AbstractConnector(object):
 
     __slots__ = [
         "_delays",
-        "_min_delay",
-        "_pre_population",
-        "_post_population",
-        "_n_clipped_delays",
+        "__min_delay",
+        "__pre_population",
+        "__post_population",
+        "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
         "_rng",
-        "_safe",
-        "_space",
-        "_verbose",
+        "__safe",
+        "__space",
+        "__verbose",
         "_weights"]
 
     def __init__(self, safe=True, verbose=False):
-        self._safe = safe
-        self._space = None
-        self._verbose = verbose
+        self.__safe = safe
+        self.__space = None
+        self.__verbose = verbose
 
-        self._pre_population = None
-        self._post_population = None
+        self.__pre_population = None
+        self.__post_population = None
         self._n_pre_neurons = None
         self._n_post_neurons = None
         self._rng = None
 
-        self._n_clipped_delays = 0
-        self._min_delay = 0
+        self.__n_clipped_delays = 0
+        self.__min_delay = 0
         self._weights = None
         self._delays = None
 
@@ -65,7 +65,7 @@ class AbstractConnector(object):
         :param space:
         :return:
         """
-        self._space = space
+        self.__space = space
 
     def _set_weights_and_delays(self, weights, delays, allow_lists):
         """ Set the weights and delays as needed.
@@ -99,14 +99,12 @@ class AbstractConnector(object):
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
-        self._pre_population = pre_population
-        self._post_population = post_population
+        self.__pre_population = pre_population
+        self.__post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
-        self._rng = rng
-        if self._rng is None:
-            self._rng = get_simulator().get_pynn_NumpyRNG()
-        self._min_delay = machine_time_step / 1000.0
+        self._rng = (rng or get_simulator().get_pynn_NumpyRNG())
+        self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
@@ -287,18 +285,18 @@ class AbstractConnector(object):
                 values[connection_slice]
                 for connection_slice in connection_slices]).astype("float64")
         elif isinstance(values, string_types) or callable(values):
-            if self._space is None:
+            if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
-                        self._pre_population, self._post_population))
+                        self.__pre_population, self.__post_population))
 
             expand_distances = True
             if isinstance(values, string_types):
                 expand_distances = self._expand_distances(values)
 
-            d = self._space.distances(
-                self._pre_population.positions,
-                self._post_population.positions,
+            d = self.__space.distances(
+                self.__pre_population.positions,
+                self.__post_population.positions,
                 expand_distances)
 
             if isinstance(values, string_types):
@@ -311,7 +309,7 @@ class AbstractConnector(object):
         """
         weights = self._generate_values(
             values, n_connections, connection_slices)
-        if self._safe:
+        if self.__safe:
             if not weights.size:
                 logger_utils.warn_once(logger,
                                        "No connection in " + str(self))
@@ -320,8 +318,8 @@ class AbstractConnector(object):
                 raise Exception(
                     "Weights must be either all positive or all negative"
                     " in projection {}->{}".format(
-                        self._pre_population.label,
-                        self._post_population.label))
+                        self.__pre_population.label,
+                        self.__post_population.label))
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
@@ -329,15 +327,15 @@ class AbstractConnector(object):
         """
 
         # count values that could be clipped
-        self._n_clipped_delays = numpy.sum(delays < self._min_delay)
+        self.__n_clipped_delays = numpy.sum(delays < self.__min_delay)
 
         # clip values
         if numpy.isscalar(delays):
-            if delays < self._min_delay:
-                delays = self._min_delay
+            if delays < self.__min_delay:
+                delays = self.__min_delay
         else:
             if delays.size:
-                delays[delays < self._min_delay] = self._min_delay
+                delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
@@ -360,49 +358,49 @@ class AbstractConnector(object):
 
     def get_provenance_data(self):
         name = "{}_{}_{}".format(
-            self._pre_population.label, self._post_population.label,
+            self.__pre_population.label, self.__post_population.label,
             self.__class__.__name__)
         return [ProvenanceDataItem(
             [name, "Times_synaptic_delays_got_clipped"],
-            self._n_clipped_delays,
-            report=self._n_clipped_delays > 0,
+            self.__n_clipped_delays,
+            report=self.__n_clipped_delays > 0,
             message=(
                 "The delays in the connector {} from {} to {} was clipped "
                 "to {} a total of {} times.  This can be avoided by reducing "
                 "the timestep or increasing the minimum delay to one "
                 "timestep".format(
-                    self.__class__.__name__, self._pre_population.label,
-                    self._post_population.label, self._min_delay,
-                    self._n_clipped_delays)))]
+                    self.__class__.__name__, self.__pre_population.label,
+                    self.__post_population.label, self.__min_delay,
+                    self.__n_clipped_delays)))]
 
     @property
     def safe(self):
-        return self._safe
+        return self.__safe
 
     @safe.setter
     def safe(self, new_value):
-        self._safe = new_value
+        self.__safe = new_value
 
     @property
     def space(self):
-        return self._space
+        return self.__space
 
     @space.setter
     def space(self, new_value):
-        self._space = new_value
+        self.__space = new_value
 
     @property
     def verbose(self):
-        return self._verbose
+        return self.__verbose
 
     @verbose.setter
     def verbose(self, new_value):
-        self._verbose = new_value
+        self.__verbose = new_value
 
     @property
     def pre_population(self):
-        return self._pre_population
+        return self.__pre_population
 
     @property
     def post_population(self):
-        return self._post_population
+        return self.__post_population

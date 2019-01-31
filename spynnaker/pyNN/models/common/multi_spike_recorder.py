@@ -14,22 +14,22 @@ _TWO_WORDS = struct.Struct("<II")
 
 class MultiSpikeRecorder(object):
     __slots__ = [
-        "_record"]
+        "__record"]
 
     def __init__(self):
-        self._record = False
+        self.__record = False
 
     @property
     def record(self):
-        return self._record
+        return self.__record
 
     @record.setter
     def record(self, record):
-        self._record = record
+        self.__record = record
 
     def get_sdram_usage_in_bytes(
             self, n_neurons, spikes_per_timestep, n_machine_time_steps):
-        if not self._record:
+        if not self.__record:
             return 0
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
@@ -37,12 +37,12 @@ class MultiSpikeRecorder(object):
             n_machine_time_steps, out_spike_bytes * spikes_per_timestep)
 
     def get_dtcm_usage_in_bytes(self):
-        if not self._record:
+        if not self.__record:
             return 0
         return 4
 
     def get_n_cpu_cycles(self, n_neurons):
-        if not self._record:
+        if not self.__record:
             return 0
         return n_neurons * 4
 

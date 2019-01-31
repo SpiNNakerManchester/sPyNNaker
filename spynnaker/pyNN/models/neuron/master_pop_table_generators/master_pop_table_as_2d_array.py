@@ -53,6 +53,8 @@ def get_mpt_sb_mem_addrs_from_coords(x, y, p):
 
 
 class MasterPopTableAs2dArray(AbstractMasterPopTableFactory):
+    __slots__ = []
+
     def initialise_table(self, spec, master_population_table_region):
         # Zero all entries in the Master Population Table so that all unused
         # entries are assumed empty:

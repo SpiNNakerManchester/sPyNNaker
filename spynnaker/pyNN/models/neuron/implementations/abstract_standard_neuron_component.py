@@ -9,16 +9,15 @@ class AbstractStandardNeuronComponent(object):
     """ Represents a component of a standard neural model
     """
 
-    __slots__ = ("_struct")
+    __slots__ = ["__struct"]
 
     def __init__(self, data_types):
         """
-
         :param data_types:\
             A list of data types in the component structure, in the order that\
             they appear
         """
-        self._struct = Struct(data_types)
+        self.__struct = Struct(data_types)
 
     @property
     def struct(self):
@@ -27,7 +26,7 @@ class AbstractStandardNeuronComponent(object):
         :rtype:\
             :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
         """
-        return self._struct
+        return self.__struct
 
     @abstractmethod
     def get_n_cpu_cycles(self, n_neurons):

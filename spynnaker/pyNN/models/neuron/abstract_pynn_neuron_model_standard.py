@@ -3,6 +3,7 @@ from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
 
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
+    __slots__ = []
 
     def __init__(
             self, model_name, binary, neuron_model, input_type,
