@@ -272,7 +272,7 @@ bool initialise(){
     log_debug("finished dtcm for row data");
     // set up the fake connectivity lookup into the master pop table
 
-    population_table_set_connectivity_lookup(fake_bit_fields);
+    population_table_set_connectivity_bit_field(fake_bit_fields);
     log_info("finished pop table set connectivity lookup");
 
     return true;
