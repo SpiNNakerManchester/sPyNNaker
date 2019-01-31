@@ -279,6 +279,7 @@ def ordered_covering(
         # aliases dictionary.
         routing_table, aliases = merge.apply(aliases)
 
+        # control for limiting the search
         if use_timer_cut_off:
             diff = timer.take_sample()
             if diff.total_seconds() >= time_to_run_for:

@@ -13,6 +13,10 @@ uint32_t ghost_pop_table_searches = 0;
 static uint32_t invalid_master_pop_hits = 0;
 bit_field_t* connectivity_bit_field;
 
+//! \brief how many packets were dropped because the bitfield filter says
+//!        they don't hit anything
+static uint32_t bit_field_filtered_packets = 0;
+
 static inline void _print_master_population_table() {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("master_population\n");
@@ -242,4 +246,10 @@ spike_t population_table_get_spike_for_index(uint32_t index){
 //! \return the mask associated with this entry
 uint32_t population_table_get_mask_for_entry(uint32_t index){
     return 0x7FF;
+}
+
+//! \brief get the number of packets that were filtered from the bitfield filter
+//! \return the number of packets filtered by the bitfield filter
+uint32_t population_table_get_filtered_packet_count(){
+    return bit_field_filtered_packets;
 }

@@ -70,6 +70,10 @@
                 <param_name>use_timer_cut_off</param_name>
                 <param_type>RouterCompressorBitFieldUseCutOff</param_type>
             </parameter>
+            <parameter>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
@@ -80,6 +84,7 @@
             <param_name>default_report_folder</param_name>
             <param_name>produce_report</param_name>
             <param_name>use_timer_cut_off</param_name>
+            <param_name>machine_graph</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>

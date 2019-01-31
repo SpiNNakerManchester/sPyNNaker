@@ -69,4 +69,8 @@ spike_t population_table_get_spike_for_index(uint32_t index);
 //! \return the mask associated with this entry
 uint32_t population_table_get_mask_for_entry(uint32_t index);
 
+//! \brief get the number of packets that were filtered from the bitfield filter
+//! \return the number of packets filtered by the bitfield filter
+uint32_t population_table_get_filtered_packet_count();
+
 #endif // _POPULATION_TABLE_H_

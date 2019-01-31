@@ -82,7 +82,7 @@ class HostBasedBitFieldRouterCompressor(object):
     def __call__(
             self, router_tables, machine, placements, transceiver,
             graph_mapper, default_report_folder, produce_report,
-            use_timer_cut_off, target_length=None,
+            use_timer_cut_off, machine_graph, target_length=None,
             time_to_try_for_each_iteration=None):
         """ compresses bitfields and router table entries together as /
         feasible as possible
@@ -94,6 +94,7 @@ class HostBasedBitFieldRouterCompressor(object):
         :param graph_mapper: mapping between graphs
         :param produce_report: boolean flag for producing report
         :param default_report_folder: report folder
+        :param machine_graph: the machine graph level
         :param target_length: length of table entries to get to.
         :param use_timer_cut_off: bool flag for using timer or not for \
             compressor
@@ -162,14 +163,17 @@ class HostBasedBitFieldRouterCompressor(object):
                 (router_table.x, router_table.y)]
 
             # read in bitfields.
-            bit_fields_by_processor, bit_field_by_key = \
+            bit_fields_by_processor, sorted_bit_fields = \
                 self._read_in_bit_fields(
                     transceiver, router_table.x, router_table.y,
-                    bit_field_chip_base_addresses)
+                    bit_field_chip_base_addresses, machine_graph,
+                    placements, machine.get_chip_at(
+                        router_table.x, router_table.y).n_processors,
+                    graph_mapper)
 
             # execute binary search
             self._start_binary_search(
-                router_table, bit_field_by_key, target_length,
+                router_table, sorted_bit_fields, target_length,
                 time_to_try_for_each_iteration, use_timer_cut_off)
 
             # add final to compressed tables
@@ -186,7 +190,7 @@ class HostBasedBitFieldRouterCompressor(object):
             # report
             if produce_report:
                 self._create_table_report(
-                    router_table, self._last_successful, bit_field_by_key,
+                    router_table, self._last_successful, sorted_bit_fields,
                     self._last_successful_bit_fields_merged, report_out)
                 report_out.flush()
                 report_out.close()
@@ -305,19 +309,25 @@ class HostBasedBitFieldRouterCompressor(object):
         return flag
 
     def _read_in_bit_fields(
-            self, transceiver, chip_x, chip_y, bit_field_chip_base_addresses):
+            self, transceiver, chip_x, chip_y, bit_field_chip_base_addresses,
+            machine_graph, placements, n_processors_on_chip, graph_mapper):
         """ reads in the bitfields from the cores
 
         :param transceiver: SpiNNMan instance
         :param chip_x: chip x coord
         :param chip_y: chip y coord
+        :param machine_graph: machine graph
+        :param placements: the placements
+        :param graph_mapper: the mapping between graphs
+        :param n_processors_on_chip: the number of processors on this chip
         :param bit_field_chip_base_addresses: dict of core id to base address
         :return: dict of lists of processor id to bitfields.
         """
 
         # data holder
         bit_fields_by_processor = defaultdict(list)
-        bit_field_by_key = DefaultOrderedDict(list)
+        bit_fields_by_coverage = defaultdict(list)
+        processor_coverage_by_bitfield = defaultdict(list)
 
         # read in for each app vertex that would have a bitfield
         for processor_id in bit_field_chip_base_addresses.keys():
@@ -352,21 +362,115 @@ class HostBasedBitFieldRouterCompressor(object):
                 reading_address += (
                     n_words_to_read * constants.WORD_TO_BYTE_MULTIPLIER)
 
+                n_redundant_packets = self._detect_redundant_packet_count(
+                    bit_field)
+
+                # sorted by best coverage of redundant packets
+                bit_fields_by_coverage[n_redundant_packets].append(
+                    (processor_id, bit_field, master_pop_key))
+                processor_coverage_by_bitfield[processor_id].append(
+                    n_redundant_packets)
+
                 # add to the bitfields tracker
                 bit_fields_by_processor[processor_id].append(
                     (master_pop_key, bit_field))
-                bit_field_by_key[master_pop_key].append(
-                    (bit_field, processor_id))
 
-        return bit_fields_by_processor, bit_field_by_key
+        # use the ordered process to find the best ones to do first
+        list_of_bitfields_in_impact_order = self._order_bit_fields(
+            bit_fields_by_coverage, machine_graph, chip_x, chip_y, placements,
+            n_processors_on_chip, graph_mapper, processor_coverage_by_bitfield)
+
+        return bit_fields_by_processor, list_of_bitfields_in_impact_order
+
+    @staticmethod
+    def _order_bit_fields(
+            bit_fields_by_coverage, machine_graph, chip_x, chip_y,
+            placements, n_processors_on_chip, graph_mapper,
+            processor_coverage_by_bitfield):
+
+        sorted_bit_fields = list()
+
+        # get incoming bandwidth for the cores
+        most_costly_cores = dict()
+        for processor_id in range(0, n_processors_on_chip):
+            if placements.is_processor_occupied(chip_x, chip_y, processor_id):
+                vertex = placements.get_vertex_on_processor(
+                    chip_x, chip_y, processor_id)
+                app_vertex = graph_mapper.get_application_vertex(
+                    vertex)
+                if isinstance(app_vertex, AbstractUsesBitFieldFilter):
+                    most_costly_cores[processor_id] = \
+                        len(machine_graph.get_edges_ending_at_vertex(vertex))
+
+        # get cores that are the most likely to have the worst time and order
+        #  bitfields accordingly
+        cores = list(most_costly_cores.keys())
+        cores = sorted(cores, key=lambda k: most_costly_cores[k], reverse=True)
+
+        # only add bit fields from the worst affected cores, which will
+        # build as more and more are taken to make the worst a collection
+        # instead of a individual
+        cores_to_add_for = list()
+        for worst_core_id in range(0, len(cores) - 1):
+
+            # determine how many of the worst to add before it balances with
+            # next one
+            cores_to_add_for.append(cores[worst_core_id])
+            diff = (
+                most_costly_cores[cores[worst_core_id]] -
+                most_costly_cores[cores[worst_core_id + 1]])
+
+            # order over most effective bitfields
+            coverage = processor_coverage_by_bitfield[cores[worst_core_id]]
+            coverage.sort(reverse=True)
+
+            # cycle till at least the diff is covered
+            covered = 0
+            for redundant_packet_count in coverage:
+                to_delete = list()
+                for (processor_id, bit_field, master_pop_key) in \
+                        bit_fields_by_coverage[redundant_packet_count]:
+                    if processor_id in cores_to_add_for:
+                        if covered < diff:
+                            to_delete.append((
+                                processor_id, bit_field, master_pop_key))
+                            sorted_bit_fields.append(
+                                (processor_id, bit_field, master_pop_key))
+                            covered += 1
+                for element in to_delete:
+                    bit_fields_by_coverage[
+                        redundant_packet_count].remove(element)
+
+        # take left overs
+        coverage_levels = list(bit_fields_by_coverage.keys())
+        coverage_levels.sort(reverse=True)
+        for coverage_level in coverage_levels:
+            for element in bit_fields_by_coverage[coverage_level]:
+                sorted_bit_fields.append(element)
+
+        return sorted_bit_fields
+
+    def _detect_redundant_packet_count(self, bitfield):
+        """ locate in the bitfield how many possible packets it can filter 
+        away when integrated into the router table. 
+        
+        :param bitfield: the memory blocks that represent the bitfield
+        :return: the number of redundant packets being captured. 
+        """
+        n_packets_filtered = 0
+        n_neurons = len(bitfield) * self._BITS_IN_A_WORD
+        for neuron_id in range(0, n_neurons):
+            if self._bit_for_neuron_id(bitfield, neuron_id) == 0:
+                n_packets_filtered += 1
+        return n_packets_filtered
 
     def _start_binary_search(
-            self, router_table, bit_fields_by_key, target_length,
+            self, router_table, sorted_bit_fields, target_length,
             time_to_try_for_each_iteration, use_timer_cut_off):
         """ start binary search of the merging of bitfield to router table
 
         :param router_table: uncompressed router table
-        :param bit_fields_by_key: the sorted bitfields
+        :param sorted_bit_fields: the sorted bitfields
         :param target_length: length to compress to
         :param time_to_try_for_each_iteration: the time to allow compressor \
             to run for.
@@ -387,23 +491,19 @@ class HostBasedBitFieldRouterCompressor(object):
                 "uncompressed routing tables, regardless of bitfield merging. "
                 "System is fundamentally flawed here")
 
-        max_size = 0
-        for master_pop_key in bit_fields_by_key.keys():
-            max_size += len(bit_fields_by_key[master_pop_key])
-
-        find_max_success(max_size, functools.partial(
-            self._binary_search_check, bit_fields_by_key=bit_fields_by_key,
+        find_max_success(len(sorted_bit_fields), functools.partial(
+            self._binary_search_check, sorted_bit_fields=sorted_bit_fields,
             routing_table=router_table, target_length=target_length,
             time_to_try_for_each_iteration=time_to_try_for_each_iteration,
             use_timer_cut_off=use_timer_cut_off))
 
     def _binary_search_check(
-            self, mid_point, bit_fields_by_key, routing_table, target_length,
+            self, mid_point, sorted_bit_fields, routing_table, target_length,
             time_to_try_for_each_iteration, use_timer_cut_off):
         """ check function for fix max success
 
         :param mid_point: the point if the list to stop at
-        :param bit_fields_by_key: the dict of lists of bitfields by key
+        :param sorted_bit_fields: lists of bitfields 
         :param routing_table: the basic routing table
         :param target_length: the target length to reach
         :param time_to_try_for_each_iteration: the time in seconds to run for
@@ -412,26 +512,14 @@ class HostBasedBitFieldRouterCompressor(object):
         :return: bool that is true if it compresses
         """
 
-        count = 0
-        for master_pop_key in bit_fields_by_key.keys():
-            count += len(bit_fields_by_key[master_pop_key])
-
         # find new set of bitfields to try from midpoint
         new_set_of_bit_fields = DefaultOrderedDict(list)
 
-        values_added = 0
-        for master_pop_key in bit_fields_by_key.keys():
-            n_processor_bit_fields = len(bit_fields_by_key[master_pop_key])
-            if values_added + n_processor_bit_fields <= mid_point:
-                new_set_of_bit_fields[master_pop_key].extend(
-                    bit_fields_by_key[master_pop_key])
-                values_added += n_processor_bit_fields
-            else:
-                values_to_add = mid_point - values_added
-                if values_to_add != 0:
-                    new_set_of_bit_fields[master_pop_key].extend(
-                        bit_fields_by_key[master_pop_key][0:values_to_add])
-                values_added += values_to_add
+        for element in range(0, mid_point):
+            (processor_id, bit_field, master_pop_key) = \
+                sorted_bit_fields[element]
+            new_set_of_bit_fields[master_pop_key].append(
+                (bit_field, processor_id))
 
         # convert bitfields into router tables
         bit_field_router_tables = self._convert_bitfields_into_router_tables(
@@ -549,12 +637,12 @@ class HostBasedBitFieldRouterCompressor(object):
 
     def _create_table_report(
             self, router_table, final_routing_table,
-            bit_fields_by_key, bit_fields_merged, report_out):
+            sorted_bit_fields, bit_fields_merged, report_out):
         """ creates the report entry
 
         :param router_table: the uncompressed router table to process
         :param final_routing_table: the compressed router table to process
-        :param bit_fields_by_key: the bitfields by key overall
+        :param sorted_bit_fields: the bitfields overall
         :param bit_fields_merged: the bitfields merged
         :param report_out: the report writer
         :rtype: None
@@ -572,9 +660,7 @@ class HostBasedBitFieldRouterCompressor(object):
                     if self._bit_for_neuron_id(bit_field, neuron_id) == 0:
                         n_packets_filtered += 1
 
-        n_possible_bit_fields = 0
-        for master_pop_key in bit_fields_by_key.keys():
-            n_possible_bit_fields += len(bit_fields_by_key[master_pop_key])
+        n_possible_bit_fields = len(sorted_bit_fields)
 
         percentage_done = 100
         if n_possible_bit_fields != 0:

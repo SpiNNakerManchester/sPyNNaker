@@ -51,7 +51,8 @@ typedef enum extra_provenance_data_region_entries{
 	EMPTY_ROW_READS = 7,
 	DMA_COMPLETES = 8,
 	SPIKE_PROGRESSING_COUNT = 9,
-	INVALID_MASTER_POP_HITS = 10
+	INVALID_MASTER_POP_HITS = 10,
+	BIT_FIELD_FILTERED_COUNT = 11
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -129,6 +130,8 @@ void c_main_store_provenance_data(address_t provenance_region){
         spike_processing_get_spike_processing_count();
     provenance_region[INVALID_MASTER_POP_HITS] =
         spike_processing_get_invalid_master_pop_table_hits();
+    provenance_region[BIT_FIELD_FILTERED_COUNT] =
+        population_table_get_filtered_packet_count();
 
     log_debug("finished other provenance data");
 }
