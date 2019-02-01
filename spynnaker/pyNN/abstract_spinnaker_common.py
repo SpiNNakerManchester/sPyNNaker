@@ -44,8 +44,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         "__max_delay",
         "__min_delay",
         "__neurons_per_core_set",
-        "__populations",
-        "__projections"]
+        "_populations",
+        "_projections"]
 
     CONFIG_FILE_NAME = "spynnaker.cfg"
 
@@ -65,8 +65,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             os.path.dirname(model_binaries.__file__))
 
         # pynn population objects
-        self.__populations = []
-        self.__projections = []
+        self._populations = []
+        self._projections = []
         self.__edge_count = 0
         self.__id_counter = 0
 
@@ -241,14 +241,14 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             _detect_if_graph_has_changed(reset_flags)
 
         # Additionally check populations for changes
-        for population in self.__populations:
+        for population in self._populations:
             if population.requires_mapping:
                 changed = True
             if reset_flags:
                 population.mark_no_changes()
 
         # Additionally check projections for changes
-        for projection in self.__projections:
+        for projection in self._projections:
             if projection.requires_mapping:
                 changed = True
             if reset_flags:
@@ -282,12 +282,12 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
     def add_population(self, population):
         """ Called by each population to add itself to the list.
         """
-        self.__populations.append(population)
+        self._populations.append(population)
 
     def add_projection(self, projection):
         """ Called by each projection to add itself to the list.
         """
-        self.__projections.append(projection)
+        self._projections.append(projection)
 
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
@@ -305,7 +305,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         :rtype: None
         """
         # pylint: disable=protected-access
-        for population in self.__populations:
+        for population in self._populations:
             population._end()
 
         super(AbstractSpiNNakerCommon, self).stop(
@@ -322,7 +322,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
         # extra post run algorithms
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
-        for projection in self.__projections:
+        for projection in self._projections:
             projection._clear_cache()
         super(AbstractSpiNNakerCommon, self).run(run_time)
 

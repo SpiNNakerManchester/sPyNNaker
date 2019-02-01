@@ -16,7 +16,7 @@ class FixedNumberPreConnector(AbstractConnector):
 
     __slots__ = [
         "__allow_self_connections",
-        "__n_pre",
+        "_n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
         "__with_replacement"]
@@ -48,7 +48,7 @@ class FixedNumberPreConnector(AbstractConnector):
         # weights or delays - not implemented
         # :type space: pyNN.Space
         super(FixedNumberPreConnector, self).__init__(safe, verbose)
-        self.__n_pre = n
+        self._n_pre = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
@@ -58,13 +58,13 @@ class FixedNumberPreConnector(AbstractConnector):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        if (not self.__with_replacement and self.__n_pre > self._n_pre_neurons):
+        if (not self.__with_replacement and self._n_pre > self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False and n > n_pre_neurons")
 
         if (not self.__with_replacement and not self.__allow_self_connections and
-                self.__n_pre == self._n_pre_neurons):
+                self._n_pre == self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
@@ -72,7 +72,7 @@ class FixedNumberPreConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self):
-        return self._get_delay_maximum(self.__n_pre * self._n_post_neurons)
+        return self._get_delay_maximum(self._n_pre * self._n_post_neurons)
 
     def _get_pre_neurons(self):
         # If we haven't set the array up yet, do it now
@@ -87,7 +87,7 @@ class FixedNumberPreConnector(AbstractConnector):
                 with open(filename, 'w') as file_handle:
                     numpy.savetxt(file_handle,
                                   [(self._n_pre_neurons, self._n_post_neurons,
-                                    self.__n_pre)],
+                                    self._n_pre)],
                                   fmt="%u,%u,%u")
 
             # Loop over all the post neurons
@@ -104,11 +104,11 @@ class FixedNumberPreConnector(AbstractConnector):
 
                     # Now use this list in the random choice
                     self.__pre_neurons[m] = numpy.random.choice(
-                        no_self_pre_neurons, self.__n_pre,
+                        no_self_pre_neurons, self._n_pre,
                         self.__with_replacement)
                 else:
                     self.__pre_neurons[m] = numpy.random.choice(
-                        self._n_pre_neurons, self.__n_pre,
+                        self._n_pre_neurons, self._n_pre,
                         self.__with_replacement)
 
                 # Sort the neurons now that we have them
@@ -120,7 +120,7 @@ class FixedNumberPreConnector(AbstractConnector):
                     numpy.savetxt(
                         file_handle,
                         self.__pre_neurons[m][None, :],
-                        fmt=("%u," * (self.__n_pre - 1) + "%u"))
+                        fmt=("%u," * (self._n_pre - 1) + "%u"))
 
         return self.__pre_neurons
 
@@ -141,7 +141,7 @@ class FixedNumberPreConnector(AbstractConnector):
         prob_selection = 1.0 / float(self._n_pre_neurons)
         n_connections_total = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self.__n_pre * self._n_post_neurons, prob_selection,
+            self._n_pre * self._n_post_neurons, prob_selection,
             chance=1.0/10000.0)
         prob_in_slice = (
             float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
@@ -159,12 +159,12 @@ class FixedNumberPreConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return self.__n_pre
+        return self._n_pre
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        return self._get_weight_maximum(self.__n_pre * self._n_post_neurons)
+        return self._get_weight_maximum(self._n_pre * self._n_post_neurons)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -209,7 +209,7 @@ class FixedNumberPreConnector(AbstractConnector):
         return block
 
     def __repr__(self):
-        return "FixedNumberPreConnector({})".format(self.__n_pre)
+        return "FixedNumberPreConnector({})".format(self._n_pre)
 
     @property
     def allow_self_connections(self):
