@@ -1,5 +1,5 @@
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
-from six import add_metaclass
+from six import with_metaclass
 import numpy
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neural_projections.connectors\
@@ -44,8 +44,8 @@ class ConnectorIDs(Enum):
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
 
 
-@add_metaclass(AbstractBase)
-class AbstractGenerateConnectorOnMachine(AbstractConnector):
+class AbstractGenerateConnectorOnMachine(with_metaclass(
+        AbstractBase, AbstractConnector)):
     """ Indicates that the connectivity can be generated on the machine
     """
 

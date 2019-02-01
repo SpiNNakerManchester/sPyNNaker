@@ -13,6 +13,7 @@ class MatrixGeneratorID(Enum):
 class AbstractGenerateOnMachine(object):
     """ A synapse dynamics that can be generated on the machine
     """
+    __slots__ = []
 
     def generate_on_machine(self):
         """ Determines if this instance should be generated on the machine.

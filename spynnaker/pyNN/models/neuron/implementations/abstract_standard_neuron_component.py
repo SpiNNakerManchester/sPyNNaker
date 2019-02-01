@@ -1,11 +1,10 @@
-from six import add_metaclass
+from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
-@add_metaclass(AbstractBase)
-class AbstractStandardNeuronComponent(object):
+class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
     """ Represents a component of a standard neural model
     """
 

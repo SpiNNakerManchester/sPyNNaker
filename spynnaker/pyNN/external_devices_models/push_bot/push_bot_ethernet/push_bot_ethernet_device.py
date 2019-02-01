@@ -1,14 +1,14 @@
 from spynnaker.pyNN.external_devices_models \
     import AbstractMulticastControllableDevice
 
-from six import add_metaclass
+from six import with_metaclass
 
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
-@add_metaclass(AbstractBase)
-class PushBotEthernetDevice(AbstractMulticastControllableDevice):
+class PushBotEthernetDevice(with_metaclass(
+        AbstractBase, AbstractMulticastControllableDevice)):
     """ An arbitrary PushBot device
     """
 

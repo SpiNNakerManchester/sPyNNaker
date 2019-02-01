@@ -2,11 +2,10 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .from_list_connector import FromListConnector
 import os
 import numpy
-from six import add_metaclass, string_types
+from six import string_types, with_metaclass
 
 
-@add_metaclass(AbstractBase)
-class FromFileConnector(FromListConnector):
+class FromFileConnector(with_metaclass(AbstractBase, FromListConnector)):
     # pylint: disable=redefined-builtin
     __slots__ = ["__file"]
 

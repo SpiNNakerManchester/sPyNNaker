@@ -1,10 +1,9 @@
-from six import add_metaclass
+from six import with_metaclass
 
 from spinn_utilities.abstract_base import AbstractBase
 
 
-@add_metaclass(AbstractBase)
-class AbstractHasAPlusAMinus(object):
+class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
     __slots__ = [
         # things
         '__a_plus',

@@ -1,4 +1,4 @@
-from six import add_metaclass, string_types
+from six import string_types, with_metaclass
 from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -20,8 +20,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
-@add_metaclass(AbstractBase)
-class AbstractConnector(object):
+class AbstractConnector(with_metaclass(AbstractBase, object)):
     """ Abstract class that all PyNN Connectors extend.
     """
 

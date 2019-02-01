@@ -20,7 +20,7 @@ from spynnaker.pyNN.spynnaker_simulator_interface \
 from spynnaker import __version__ as version
 
 # general imports
-from six import add_metaclass
+from six import with_metaclass
 import logging
 import math
 import os
@@ -30,10 +30,8 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
-
-@add_metaclass(AbstractBase)
-class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
-                              SpynnakerSimulatorInterface):
+class AbstractSpiNNakerCommon(with_metaclass(
+        AbstractBase, AbstractSpinnakerBase, SpynnakerSimulatorInterface)):
     """ Main interface for neural code.
     """
     __slots__ = [
