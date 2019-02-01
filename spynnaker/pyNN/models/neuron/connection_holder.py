@@ -148,7 +148,7 @@ class ConnectionHolder(object):
                 self.__data_items = connections[order]
 
             # There is more than one item to return, so let numpy do its magic
-            elif len(self._data_items_to_return) > 1:
+            elif len(self.__data_items_to_return) > 1:
                 self.__data_items = \
                     connections[order][self.__data_items_to_return]
 
