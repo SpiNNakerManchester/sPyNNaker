@@ -25,10 +25,6 @@ class AbstractConnector(object):
     """ Abstract class that all PyNN Connectors extend.
     """
 
-    NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
-                            ("weight", "float64"), ("delay", "float64"),
-                            ("synapse_type", "uint8")]
-
     __slots__ = [
         "_delays",
         "__min_delay",
@@ -42,6 +38,10 @@ class AbstractConnector(object):
         "__space",
         "__verbose",
         "_weights"]
+
+    NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
+                            ("weight", "float64"), ("delay", "float64"),
+                            ("synapse_type", "uint8")]
 
     def __init__(self, safe=True, verbose=False):
         self.__safe = safe
