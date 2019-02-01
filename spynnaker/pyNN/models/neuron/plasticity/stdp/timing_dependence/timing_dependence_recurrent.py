@@ -33,7 +33,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             dual_fsm=default_parameters['dual_fsm']):
         # pylint: disable=too-many-arguments
         self.__accumulator_depression_plus_one = accumulator_depression + 1
-        self.__accumulator_potentiation_minus_one = accumulator_potentiation - 1
+        self.__accumulator_potentiation_minus_one = \
+            accumulator_potentiation - 1
         self.__mean_pre_window = mean_pre_window
         self.__mean_post_window = mean_post_window
         self.__dual_fsm = dual_fsm
@@ -49,8 +50,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                  timing_dependence.accumulator_depression_plus_one) and
                 (self.__accumulator_potentiation_minus_one ==
                  timing_dependence.accumulator_potentiation_minus_one) and
-                (self.__mean_pre_window == timing_dependence.mean_pre_window) and
-                (self.__mean_post_window == timing_dependence.mean_post_window))
+                (self.__mean_pre_window ==
+                 timing_dependence.mean_pre_window) and
+                (self.__mean_post_window ==
+                 timing_dependence.mean_post_window))
 
     @property
     def vertex_executable_suffix(self):

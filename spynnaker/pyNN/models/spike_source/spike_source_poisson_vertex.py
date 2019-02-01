@@ -257,7 +257,8 @@ class SpikeSourcePoissonVertex(
 
     @rate.setter
     def rate(self, rate):
-        self.__rate = utility_calls.convert_param_to_numpy(rate, self.__n_atoms)
+        self.__rate = utility_calls.convert_param_to_numpy(
+            rate, self.__n_atoms)
 
     @property
     def start(self):

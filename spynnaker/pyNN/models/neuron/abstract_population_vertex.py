@@ -542,7 +542,8 @@ class AbstractPopulationVertex(
             self.__neuron_impl.binary_name)
 
         # Reunite title and extension and return
-        return (binary_title + self.__synapse_manager.vertex_executable_suffix +
+        return (binary_title +
+                self.__synapse_manager.vertex_executable_suffix +
                 binary_extension)
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)

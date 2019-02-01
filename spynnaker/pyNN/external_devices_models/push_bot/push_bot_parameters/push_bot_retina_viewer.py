@@ -37,7 +37,8 @@ class PushBotRetinaViewer(Thread):
         self._init_socket(port)
 
         # Determine mask for coordinates
-        self.__coordinate_mask = (1 << (2 * resolution.bits_per_coordinate)) - 1
+        self.__coordinate_mask = \
+            (1 << (2 * resolution.bits_per_coordinate)) - 1
 
         # Set up the image
         self.__image_data = numpy.zeros(resolution.pixels * resolution.pixels)
@@ -55,7 +56,8 @@ class PushBotRetinaViewer(Thread):
         self.__spike_socket.bind(("0.0.0.0", port))
         self.__spike_socket.setblocking(False)
 
-        self.__local_host, self.__local_port = self.__spike_socket.getsockname()
+        self.__local_host, self.__local_port = \
+            self.__spike_socket.getsockname()
 
     @property
     def local_host(self):

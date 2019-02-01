@@ -31,8 +31,8 @@ class SpikeSourceArray(AbstractPyNNModel):
             buffer_size_before_receive):
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
-            n_neurons, self.__spike_times, port, tag, ip_address, board_address,
-            max_on_chip_memory_usage_for_spikes_in_bytes,
+            n_neurons, self.__spike_times, port, tag, ip_address,
+            board_address, max_on_chip_memory_usage_for_spikes_in_bytes,
             space_before_notification, constraints, label,
             spike_recorder_buffer_size, buffer_size_before_receive, max_atoms,
             self)

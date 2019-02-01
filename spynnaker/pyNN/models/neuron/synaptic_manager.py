@@ -222,24 +222,27 @@ class SynapticManager(object):
         """ Get the size of the synaptic blocks in bytes
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
-
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
-                    max_row_info = self._get_max_row_info(
-                        synapse_info, post_vertex_slice, in_edge,
+                    memory_size = self.__add_synapse_size(
+                        memory_size, synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
-                    n_atoms = in_edge.pre_vertex.n_atoms
-                    memory_size = self.__poptable_type.get_next_allowed_address(
-                        memory_size)
-                    memory_size += max_row_info.undelayed_max_bytes * n_atoms
-                    memory_size = self.__poptable_type.get_next_allowed_address(
-                        memory_size)
-                    memory_size += (
-                        max_row_info.delayed_max_bytes * n_atoms *
-                        in_edge.n_delay_stages)
-
         return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+
+    def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
+                           in_edge, machine_time_step):
+        max_row_info = self._get_max_row_info(
+            synapse_info, post_vertex_slice, in_edge, machine_time_step)
+        n_atoms = in_edge.pre_vertex.n_atoms
+        memory_size = self.__poptable_type.get_next_allowed_address(
+            memory_size)
+        memory_size += max_row_info.undelayed_max_bytes * n_atoms
+        memory_size = self.__poptable_type.get_next_allowed_address(
+            memory_size)
+        memory_size += (
+            max_row_info.delayed_max_bytes * n_atoms * in_edge.n_delay_stages)
+        return memory_size
 
     def _get_size_of_generator_information(self, in_edges):
         """ Get the size of the synaptic expander parameters
@@ -623,7 +626,8 @@ class SynapticManager(object):
                             spec, synaptic_matrix_region, synapse_info,
                             pre_slices, pre_slice_idx, post_slices,
                             post_slice_index, pre_vertex_slice,
-                            post_vertex_slice, app_edge, self.__n_synapse_types,
+                            post_vertex_slice, app_edge,
+                            self.__n_synapse_types,
                             single_synapses, master_pop_table_region,
                             weight_scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
@@ -900,8 +904,8 @@ class SynapticManager(object):
                 pre_vertex_slice = graph_mapper.get_slice(
                     m_edge.pre_vertex)
                 self.__delay_key_index[app_edge.pre_vertex.source_vertex,
-                                      pre_vertex_slice.lo_atom,
-                                      pre_vertex_slice.hi_atom] = \
+                                       pre_vertex_slice.lo_atom,
+                                       pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
         post_slices = graph_mapper.get_slices(application_vertex)
@@ -1032,7 +1036,7 @@ class SynapticManager(object):
             placement.x, placement.y)
 
     def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
-                        weight_scales, data1, data2, n_delays, timestep):
+                       weight_scales, data1, data2, n_delays, timestep):
         return self.__synapse_io.read_synapses(
             info, pre_slice, post_slice, len1, len2, len3, weight_scales,
             data1, data2, n_delays, timestep)
@@ -1089,7 +1093,8 @@ class SynapticManager(object):
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
 
-        self.__retrieved_blocks[placement, key, index] = (block, max_row_length)
+        self.__retrieved_blocks[placement, key, index] = \
+            (block, max_row_length)
         return block, max_row_length
 
     def __read_multiple_synaptic_blocks(

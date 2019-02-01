@@ -204,7 +204,8 @@ class DelayExtensionVertex(
 
         vertex.reserve_provenance_data_region(spec)
 
-        self.write_setup_info(spec, self.__machine_time_step, self.__timescale_factor)
+        self.write_setup_info(
+            spec, self.__machine_time_step, self.__timescale_factor)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 

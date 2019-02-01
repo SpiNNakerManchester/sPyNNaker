@@ -254,7 +254,7 @@ class PyNNPopulationCommon(object):
                 raise ValueError(
                     "id should be in the range [{},{}], actually {}".format(
                         self.__first_id, self.__last_id, id))
-            return int(id - self.__first_id)  # this assumes IDs are consecutive
+            return int(id - self.__first_id)  # assume IDs are consecutive
         return id - self.__first_id
 
     def index_to_id(self, index):

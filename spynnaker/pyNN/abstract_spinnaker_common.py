@@ -30,6 +30,7 @@ from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
+
 class AbstractSpiNNakerCommon(with_metaclass(
         AbstractBase, AbstractSpinnakerBase, SpynnakerSimulatorInterface)):
     """ Main interface for neural code.

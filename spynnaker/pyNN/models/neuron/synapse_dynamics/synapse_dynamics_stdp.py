@@ -46,7 +46,7 @@ class SynapseDynamicsSTDP(
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
-        if self.__timing_dependence is None or self.__weight_dependence is None:
+        if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
                 "Both timing_dependence and weight_dependence must be"
                 "specified")

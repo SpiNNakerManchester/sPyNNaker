@@ -63,7 +63,8 @@ class FixedNumberPreConnector(AbstractConnector):
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False and n > n_pre_neurons")
 
-        if (not self.__with_replacement and not self.__allow_self_connections and
+        if (not self.__with_replacement and
+                not self.__allow_self_connections and
                 self._n_pre == self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
