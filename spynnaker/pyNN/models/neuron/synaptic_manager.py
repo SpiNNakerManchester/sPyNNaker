@@ -792,7 +792,7 @@ class SynapticManager(object):
         if (app_edge, synapse_info) in self.__pre_run_connection_holders:
             for conn_holder in self.__pre_run_connection_holders[
                     app_edge, synapse_info]:
-                conn_holder.add_connections(self.__synapse_io.read_synapses(
+                conn_holder.add_connections(self._read_synapses(
                     synapse_info, pre_vertex_slice, post_vertex_slice,
                     row_length, delayed_row_length, n_synapse_types,
                     weight_scales, row_data, delayed_row_data,
@@ -1004,7 +1004,7 @@ class SynapticManager(object):
                 handle_time_out_configuration, fixed_routes)
 
         # Convert the blocks into connections
-        return self.__synapse_io.read_synapses(
+        return self._read_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_len, self.__n_synapse_types,
             self.__weight_scales[placement], data, delayed_data,
@@ -1025,6 +1025,18 @@ class SynapticManager(object):
             transceiver) + 4
         return master_pop_table, direct_synapses, synaptic_matrix
 
+    def _extract_synaptic_matrix_data_location(
+            self, key, master_pop_table_address, transceiver, placement):
+        return self.__poptable_type.extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver,
+            placement.x, placement.y)
+
+    def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
+                        weight_scales, data1, data2, n_delays, timestep):
+        return self.__synapse_io.read_synapses(
+            info, pre_slice, post_slice, len1, len2, len3, weight_scales,
+            data1, data2, n_delays, timestep)
+
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
@@ -1039,9 +1051,8 @@ class SynapticManager(object):
         if (placement, key, index) in self.__retrieved_blocks:
             return self.__retrieved_blocks[placement, key, index]
 
-        items = self.__poptable_type.extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver,
-            placement.x, placement.y)
+        items = self._extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver, placement)
         if index >= len(items):
             return None, None
 

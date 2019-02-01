@@ -301,10 +301,8 @@ class TestSynapticManager(unittest.TestCase):
         transceiver = MockTransceiverRawData(all_data)
 
         # Get the master population table details
-        items = synaptic_manager._poptable_type\
-            .extract_synaptic_matrix_data_location(
-                key, master_pop_table_address, transceiver,
-                placement.x, placement.y)
+        items = synaptic_manager._extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver, placement)
 
         # The first entry should be direct, but the rest should be indirect;
         # the second is potentially direct, but has been restricted by the
@@ -321,7 +319,7 @@ class TestSynapticManager(unittest.TestCase):
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=0,
             using_extra_monitor_cores=False)
-        connections_1 = synaptic_manager._synapse_io.read_synapses(
+        connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
             row_len_1, 0, 2, weight_scales, data_1, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -341,7 +339,7 @@ class TestSynapticManager(unittest.TestCase):
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=1,
             using_extra_monitor_cores=False)
-        connections_2 = synaptic_manager._synapse_io.read_synapses(
+        connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
             row_len_2, 0, 2, weight_scales, data_2, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -361,7 +359,7 @@ class TestSynapticManager(unittest.TestCase):
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=2,
             using_extra_monitor_cores=False)
-        connections_3 = synaptic_manager._synapse_io.read_synapses(
+        connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
             app_edge.n_delay_stages, machine_time_step)
