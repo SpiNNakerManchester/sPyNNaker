@@ -17,6 +17,10 @@ typedef struct {
 
     int32_t a2_plus;
     int32_t a2_minus;
+
+    uint32_t weight_shift;
+
+
 } plasticity_weight_region_data_t;
 
 typedef struct {
@@ -24,7 +28,6 @@ typedef struct {
 
     int32_t a2_plus;
     int32_t a2_minus;
-
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
 
@@ -34,6 +37,7 @@ typedef struct {
 // Externals
 //---------------------------------------
 extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+extern uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // STDP weight dependance functions
@@ -45,7 +49,7 @@ static inline weight_state_t weight_get_initial(weight_t weight,
         .initial_weight = (int32_t) weight,
         .a2_plus = 0,
         .a2_minus = 0,
-        .weight_region = &plasticity_weight_region_data[synapse_type]
+        .weight_region = &plasticity_weight_region_data[synapse_type],
     };
 }
 
@@ -81,8 +85,8 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     new_weight = MIN(new_state.weight_region->max_weight,
                      MAX(new_weight, new_state.weight_region->min_weight));
 
-    log_debug("\told_weight:%u, a2+:%d, a2-:%d, scaled a2+:%d, scaled a2-:%d,"
-              " new_weight:%d",
+    io_printf(IO_BUF, "            old_weight:%u, a2+:%d, a2-:%d, scaled a2+:%d, scaled a2-:%d,"
+              " new_weight:%d\n",
               new_state.initial_weight, new_state.a2_plus, new_state.a2_minus,
               scaled_a2_plus, scaled_a2_minus, new_weight);
 

@@ -6,7 +6,7 @@ from .timing_dependence_recurrent import TimingDependenceRecurrent
 from .timing_dependence_spike_nearest_pair \
     import TimingDependenceSpikeNearestPair
 from .timing_dependence_vogels_2011 import TimingDependenceVogels2011
-from .timing_dependence_erbp import TimingDepedenceERBP
+from .timing_dependence_erbp import TimingDependenceERBP
 
 __all__ = [
     "AbstractTimingDependence", "TimingDependenceSpikePair",

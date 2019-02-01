@@ -12,7 +12,7 @@ class WeightDependenceERBP(
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
-        super(WeightDependenceAdditive, self).__init__()
+        super(WeightDependenceERBP, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
 

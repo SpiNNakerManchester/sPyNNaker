@@ -1,5 +1,5 @@
-#ifndef _SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H_
-#define _SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H_
+#ifndef SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H
+#define SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H
 
 //---------------------------------------
 // Structures
@@ -65,4 +65,4 @@ static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
     return final_state;
 }
 
-#endif _SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H_
+#endif // SYNAPSE_STRUCUTRE_WEIGHT_AND_TRACE_IMPL_H

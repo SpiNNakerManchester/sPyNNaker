@@ -78,6 +78,8 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history) {
 
+	use(&new_pre_trace);
+
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
@@ -94,14 +96,14 @@ static inline final_state_t _plasticity_update_synapse(
         post_window.num_events);
 
     // print_event_history(post_event_history);
-    // print_delayed_window_events(post_event_history, window_begin_time,
-    //		window_end_time, delay_dendritic);
+     print_delayed_window_events(post_event_history, window_begin_time,
+    		window_end_time, delay_dendritic);
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
-        log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
+        io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
 
         // Apply spike to state
@@ -269,7 +271,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Get last pre-synaptic event from event history
     const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
+    // const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
@@ -297,16 +299,10 @@ bool synapse_dynamics_process_plastic_synapses(
             control_word, synapse_type_index_mask);
 
         neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
-//        additional_input_pointer_t post_synaptic_additional_input =
-//                		&additional_input_array_plasticity[index];
-//        threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
-
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
             *plastic_words, type);
-
-
 
         // Get current value of trace (now it's per synapse, so do inside loop)
         const pre_trace_t last_pre_trace = current_state.trace;
@@ -354,16 +350,17 @@ bool synapse_dynamics_process_plastic_synapses(
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index, REAL error) {
+
     log_debug("Adding post-synaptic event to trace at time:%u", time);
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
-    const uint32_t last_post_time = history->times[history->count_minus_one];
-    const post_trace_t last_post_trace =
-        history->traces[history->count_minus_one];
+    //const uint32_t last_post_time = history->times[history->count_minus_one];
+    //const post_trace_t last_post_trace =
+    //    history->traces[history->count_minus_one];
     post_events_add(time, history, error);
-//    		timing_add_post_spike(time, last_post_time,
-//                                                         last_post_trace));
+    //		timing_add_post_spike(time, last_post_time,
+    //                                                     last_post_trace));
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,

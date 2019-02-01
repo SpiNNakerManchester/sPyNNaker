@@ -10,6 +10,8 @@
 #include <neuron/threshold_types/threshold_type.h>
 #include <neuron/synapse_types/synapse_types.h>
 
+#include <neuron/plasticity/synapse_dynamics.h>
+
 // Further includes
 #include <common/out_spikes.h>
 #include <recording.h>
@@ -217,16 +219,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL total_exc = 0;
     REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS-1; i++){
         total_exc += exc_input_values[i];
     }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS-1; i++){
         total_inh += inh_input_values[i];
     }
 
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->local_err;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->local_err;
+    //total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(

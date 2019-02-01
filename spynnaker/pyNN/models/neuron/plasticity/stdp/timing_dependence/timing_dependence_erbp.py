@@ -9,9 +9,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
 import logging
 logger = logging.getLogger(__name__)
 
-LOOKUP_TAU_PLUS_SIZE = 256
+LOOKUP_TAU_PLUS_SIZE = 2048
 LOOKUP_TAU_PLUS_SHIFT = 0
-LOOKUP_TAU_MINUS_SIZE = 256
+LOOKUP_TAU_MINUS_SIZE = 0
 LOOKUP_TAU_MINUS_SHIFT = 0
 
 
@@ -78,9 +78,9 @@ class TimingDependenceERBP(AbstractTimingDependence):
         self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
             spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
-        self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
-            LOOKUP_TAU_MINUS_SHIFT)
+#         self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
+#             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
+#             LOOKUP_TAU_MINUS_SHIFT)
 
     @property
     def synaptic_structure(self):
@@ -92,9 +92,9 @@ class TimingDependenceERBP(AbstractTimingDependence):
         prov_data.append(plasticity_helpers.get_lut_provenance(
             pre_population_label, post_population_label, "SpikePairRule",
             "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
-        prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label, "SpikePairRule",
-            "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
+#         prov_data.append(plasticity_helpers.get_lut_provenance(
+#             pre_population_label, post_population_label, "SpikePairRule",
+#             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
         return prov_data
 
     @overrides(AbstractTimingDependence.get_parameter_names)

@@ -192,10 +192,10 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
 }
 
 
-static inline void print_event_history(post_event_history_t *events){
-	log_debug("		##  printing entire post event history  ##");
+static inline void print_event_history(const post_event_history_t *events){
+	io_printf(IO_BUF, "		##  printing entire post event history  ##\n");
 	for (uint i = 0; i <= events->count_minus_one; i++){
-		log_debug("post event: %u, time: %u, trace: %u",
+		io_printf(IO_BUF, "post event: %u, time: %u, trace: %u",
 				i,
 				events->times[i],
 				events->traces[i]
@@ -203,16 +203,16 @@ static inline void print_event_history(post_event_history_t *events){
 	}
 }
 
-static inline void print_delayed_window_events(post_event_history_t *post_event_history,
+static inline void print_delayed_window_events(const post_event_history_t *post_event_history,
 		uint32_t begin_time, uint32_t end_time, uint32_t delay_dendritic){
-	log_debug("		##  printing post window  ##");
+	io_printf(IO_BUF, "		##  printing post window  ##\n");
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, begin_time, end_time);
 
     while (post_window.num_events > 0) {
     	const uint32_t delayed_post_time = *post_window.next_time
     	                                           + delay_dendritic;
-    	log_debug("post spike: %u, time: %u, trace: %u",
+    	io_printf(IO_BUF, "            post spike: %u, time: %u, trace: %u\n",
     			post_window.num_events, delayed_post_time,
 				*post_window.next_trace);
 
