@@ -21,9 +21,10 @@ class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
-        # ??????????????
+        # Flag: whether there is state in this class that is not reflected on
+        # the SpiNNaker system
         "__change_requires_mapping",
-        # ??????????????
+        # Fraction of delay that is dendritic (instead of axonal or synaptic)
         "__dendritic_delay_fraction",
         # timing dependence to use for the STDP rule
         "__timing_dependence",
@@ -118,11 +119,11 @@ class SynapseDynamicsSTDP(
             return False
         return (
             self.__timing_dependence.is_same_as(
-                synapse_dynamics._timing_dependence) and
+                synapse_dynamics.timing_dependence) and
             self.__weight_dependence.is_same_as(
-                synapse_dynamics._weight_dependence) and
+                synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
-             synapse_dynamics._dendritic_delay_fraction))
+             synapse_dynamics.dendritic_delay_fraction))
 
     def are_weights_signed(self):
         return False
@@ -158,7 +159,7 @@ class SynapseDynamicsSTDP(
     def _n_header_bytes(self):
         # The header contains a single timestamp and pre-trace
         n_bytes = (
-            TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
+            TIME_STAMP_BYTES + self.__timing_dependence.pre_trace_n_bytes)
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
