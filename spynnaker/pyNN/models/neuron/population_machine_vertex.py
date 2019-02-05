@@ -114,6 +114,11 @@ class PopulationMachineVertex(
         provenance_data = self._get_remaining_provenance_data_items(
             provenance_data)
 
+        times_timer_tic_overran = 0
+        for item in provenance_items:
+            if item.names[-1] == self._TIMER_TICK_OVERRUN:
+                times_timer_tic_overran = item.value
+
         n_saturations = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.SATURATION_COUNT.value]
         n_buffer_overflows = provenance_data[
@@ -230,7 +235,9 @@ class PopulationMachineVertex(
                 names,
                 "How many packets were filtered by the bitfield filterer."),
             n_packets_filtered_by_bit_field_filter,
-            report=n_packets_filtered_by_bit_field_filter > 0,
+            report=(
+                n_packets_filtered_by_bit_field_filter > 0 and (
+                    n_buffer_overflows > 0 or times_timer_tic_overran > 0)),
             message=(
                 "There were {} packets received by {}:{}:{} that were "
                 "filtered by the Bitfield filterer on the core. These packets "

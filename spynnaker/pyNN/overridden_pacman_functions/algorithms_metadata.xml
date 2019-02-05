@@ -27,7 +27,7 @@
         </outputs>
     </algorithm>
     <algorithm name="HostBasedBitFieldRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.host_bit_field_router_compressor</python_module>
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.compression.host_bit_field_router_compressor</python_module>
         <python_class>HostBasedBitFieldRouterCompressor</python_class>
         <input_definitions>
             <parameter>
@@ -74,6 +74,22 @@
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
+            <parameter>
+                <param_name>use_expresso</param_name>
+                <param_type>UseExpresso</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+            <parameter>
+                <param_name>time_scale_factor</param_name>
+                <param_type>TimeScaleFactor</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
@@ -85,6 +101,10 @@
             <param_name>produce_report</param_name>
             <param_name>use_timer_cut_off</param_name>
             <param_name>machine_graph</param_name>
+            <param_name>use_expresso</param_name>
+            <param_name>machine_time_step</param_name>
+            <param_name>time_scale_factor</param_name>
+            <param_name>routing_infos</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
@@ -97,7 +117,7 @@
         </outputs>
     </algorithm>
     <algorithm name="BitFieldRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.bit_field_router_compressor</python_module>
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.compression.bit_field_router_compressor</python_module>
         <python_class>BitFieldRouterCompressor</python_class>
         <input_definitions>
             <parameter>
