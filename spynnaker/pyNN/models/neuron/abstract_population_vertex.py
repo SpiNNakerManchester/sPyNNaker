@@ -186,6 +186,10 @@ class AbstractPopulationVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @property
+    def _neuron_recorder(self):  # for testing only
+        return self.__neuron_recorder
+
     @inject_items({
         "graph": "MemoryApplicationGraph",
         "n_machine_time_steps": "TotalMachineTimeSteps",

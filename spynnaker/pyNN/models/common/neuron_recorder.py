@@ -18,6 +18,20 @@ logger = logging.getLogger(__name__)
 SPIKES = "spikes"
 
 
+class _ReadOnlyDict(dict):
+    def __readonly__(self, *args, **kwargs):
+        raise RuntimeError("Cannot modify ReadOnlyDict")
+
+    __setitem__ = __readonly__
+    __delitem__ = __readonly__
+    pop = __readonly__
+    popitem = __readonly__
+    clear = __readonly__
+    update = __readonly__
+    setdefault = __readonly__
+    del __readonly__
+
+
 class NeuronRecorder(object):
     __slots__ = [
         "__indexes", "__n_neurons", "__sampling_rates"]
@@ -555,3 +569,7 @@ class NeuronRecorder(object):
                         local_indexes.append(n_recording)
             params.append(NeuronParameter(local_indexes, DataType.UINT8))
         return params
+
+    @property
+    def _indexes(self):  # for testing only
+        return _ReadOnlyDict(self.__indexes)
