@@ -62,14 +62,32 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 "n_connections is not implemented for"
                 " DistanceDependentProbabilityConnector on this platform")
 
-        # Get the probabilities up-front for now
+    @overrides(AbstractConnector.set_projection_information)
+    def set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step):
+        AbstractConnector.set_projection_information(
+            self, pre_population, post_population, rng, machine_time_step)
+        self._set_probabilities()
+
+    def _set_probabilities(self):
+        # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self._d_expression)
         pre_positions = self._pre_population.positions
         post_positions = self._post_population.positions
 
-        d = self._space.distances(
+        d1 = self._space.distances(
             pre_positions, post_positions, expand_distances)
+
+        # PyNN 0.8 returns a flattened (C-style) array from space.distances,
+        # so the easiest thing to do here is to reshape back to the "expected"
+        # PyNN 0.7 shape; otherwise later code gets confusing and difficult
+        if (len(d1.shape) == 1):
+            d = numpy.reshape(d1, (pre_positions.shape[0],
+                                   post_positions.shape[0]))
+        else:
+            d = d1
+
         self._probs = _d_expr_context.eval(self._d_expression, d=d)
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -87,8 +105,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         max_prob = numpy.amax(
             self._probs[0:self._n_pre_neurons, post_vertex_slice.as_slice])
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons, self._n_pre_neurons,
-            max_prob)
+            self._n_pre_neurons * self._n_post_neurons,
+            post_vertex_slice.n_atoms, max_prob)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -107,24 +125,25 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
-        return utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons,
-            numpy.amax(self._probs))
+        return self._get_weight_maximum(
+            utility_calls.get_probable_maximum_selected(
+                self._n_pre_neurons * self._n_post_neurons,
+                self._n_pre_neurons * self._n_post_neurons,
+                numpy.amax(self._probs)))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        # pylint: disable=too-many-arguments
+
         probs = self._probs[
-            pre_slice_index.to_slice, post_slice_index.to_slice]
+            pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
 
-        # If self connections are not allowed, remove possibility the self
-        # connections by setting them to a value of infinity
+        # If self connections are not allowed, remove the possibility of
+        # self connections by setting them to a value of infinity
         if not self._allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
