@@ -3,6 +3,7 @@
 
 // sPyNNaker neural modelling includes
 #include <neuron/synapses.h>
+#include <neuron/plasticity/stdp/stdp_typedefs.h>
 
 // Plasticity includes
 #include "maths.h"
@@ -70,7 +71,7 @@ typedef struct {
 
 
 
-_print_pre_event_history(pre_event_history_t pre_eve_hist){
+void _print_pre_event_history(pre_event_history_t pre_eve_hist){
 
 	io_printf(IO_BUF, "\n\n************************\n\n");
 	io_printf(IO_BUF, "Number recorded MF spikes: %u\n", pre_eve_hist.num_recorded_mf_spikes_minus_one);
@@ -111,14 +112,17 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
-
-    io_printf(IO_BUF, "    Printing PC history\n");
-    print_event_history(post_event_history);
+    if (print_plasticity){
+    	io_printf(IO_BUF, "    Printing PC history\n");
+    	print_event_history(post_event_history);
+    }
 //     print_delayed_window_events(post_event_history, window_begin_time,
 //    		window_end_time, delay_dendritic);
 
-	io_printf(IO_BUF, "\n############ Phase 1 #############\n");
-    io_printf(IO_BUF, "\n    Looping over PC spikes:\n");
+    if (print_plasticity){
+    	io_printf(IO_BUF, "\n############ Phase 1 #############\n");
+    	io_printf(IO_BUF, "\n    Looping over PC spikes:\n");
+    }
 
     delay_dendritic = 0;
 
@@ -133,20 +137,24 @@ static inline final_state_t _plasticity_update_synapse(
         post_event_window_t pre_window = post_events_get_window_delayed(
         		pre_event_history, mf_begin_time, delayed_post_time);
 
-
-        io_printf(IO_BUF, "    Looping over MF window for this PC spike: %u \n",
+        if (print_plasticity){
+        	io_printf(IO_BUF, "    Looping over MF window for this PC spike: %u \n",
                       delayed_post_time);
+        }
 
         while (pre_window.num_events > 0) {
 
             const uint32_t delayed_pre_time = *pre_window.next_time
                                                + delay_dendritic;
-            io_printf(IO_BUF, "        MF Spike: %u \n", delayed_pre_time);
 
-            io_printf(IO_BUF, "            delta t = %u (delayed MF = %u, delayed PC = %u)\n",
+            if (print_plasticity){
+            	io_printf(IO_BUF, "        MF Spike: %u \n", delayed_pre_time);
+
+            	io_printf(IO_BUF, "            delta t = %u (delayed MF = %u, delayed PC = %u)\n",
             		delayed_post_time - delayed_pre_time,
 					delayed_pre_time,
 					delayed_post_time);
+            }
 
         	current_state = timing_apply_post_spike(
         			delayed_post_time, *post_window.next_trace,
@@ -171,17 +179,23 @@ static inline final_state_t _plasticity_update_synapse(
     post_event_window_t fwd_post_window = post_events_get_window_delayed(
                 post_event_history, fwd_window_begin_time, window_end_time);
 
-	io_printf(IO_BUF, "\n############ Phase 2 #############\n");
-    io_printf(IO_BUF,
+
+    if (print_plasticity){
+    	io_printf(IO_BUF, "\n############ Phase 2 #############\n");
+    	io_printf(IO_BUF,
     		"    Looping over all PC spikes and comparing to latest MF spike at: %u\n",
 			time+delay_dendritic);
+    }
 
     while (fwd_post_window.num_events > 0) {
     	const uint32_t delayed_mf_time = *fwd_post_window.next_time + delay_dendritic;
-    	io_printf(IO_BUF, "        PC spike: %u, dt: %u\n",
+
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "        PC spike: %u, dt: %u\n",
     			delayed_mf_time,
 				(time+delay_dendritic - delayed_mf_time)
 				);
+    	}
 
     	current_state = timing_apply_post_spike(
     			delayed_mf_time, *fwd_post_window.next_trace,
@@ -195,8 +209,11 @@ static inline final_state_t _plasticity_update_synapse(
     // **************
 
     const uint32_t delayed_pre_time = time + delay_axonal;
-    log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+
+    if (print_plasticity){
+    	log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
+    }
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
@@ -330,7 +347,9 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
 
-	io_printf(IO_BUF, "\n############ New Plasticity Update #############\n");
+	if (print_plasticity){
+		io_printf(IO_BUF, "\n############ New Plasticity Update #############\n");
+	}
 
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
@@ -359,10 +378,11 @@ bool synapse_dynamics_process_plastic_synapses(
     // NOTE: this uses the post_event_history_t handling code
     post_events_add(time, event_history, 0);
 
-
     // Update pre-synaptic trace
-    io_printf(IO_BUF,
+    if (print_plasticity){
+    	io_printf(IO_BUF,
     		"\nAdding pre-synaptic event (mossy fibre spike) at time: %u\n\n", time);
+    }
 
 
     timing_add_pre_spike(time, last_pre_time, last_pre_trace);
@@ -424,13 +444,18 @@ bool synapse_dynamics_process_plastic_synapses(
             final_state);
     }
 
-	io_printf(IO_BUF, "\n############ Completed Plasticity Update #############\n");
+    if (print_plasticity){
+    	io_printf(IO_BUF, "\n############ Completed Plasticity Update #############\n");
+    }
     return true;
 }
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index) {
-    log_debug("Adding post-synaptic event (PC spike)to history at time:%u", time);
+
+	if (print_plasticity){
+		log_debug("Adding post-synaptic event (PC spike)to history at time:%u", time);
+	}
 
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];

@@ -509,6 +509,9 @@ class SynapticManager(object):
             w + 1 if (2 ** w) <= a else w
             for w, a in zip(max_weight_powers, max_weights))
 
+        max_weight_powers = [6 for w in max_weight_powers]
+
+
         # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows
         if weights_signed:

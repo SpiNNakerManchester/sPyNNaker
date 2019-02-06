@@ -193,7 +193,7 @@ static inline void _process_fixed_synapses(
         if (type == 0){
         	index_t neuron_index = synapse_row_sparse_index(synaptic_word, synapse_index_mask);
 
-        	io_printf(IO_BUF, "\nSpike on type: %u at time: %u\n", type, time);
+        	// io_printf(IO_BUF, "\nSpike on type: %u at time: %u\n", type, time);
         	synapse_dynamics_process_post_synaptic_event(time, neuron_index);
         }
 

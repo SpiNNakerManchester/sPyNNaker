@@ -48,8 +48,9 @@ static inline post_trace_t timing_get_initial_post_trace() {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-
-	io_printf(IO_BUF, "Adding climbing fibre spike to post-event history (stored on neuron\n");
+	if (print_plasticity){
+		io_printf(IO_BUF, "Adding climbing fibre spike to post-event history (stored on neuron\n");
+	}
 
 //    // Get time since last spike
 //    uint32_t delta_time = time - last_time;
@@ -87,7 +88,9 @@ static inline update_state_t timing_apply_pre_spike(
     use(&last_pre_trace);
 
     // Here we will potentiate by the fixed amount alpha
-    io_printf(IO_BUF, "    This is where we'll do potentiation\n");
+    if (print_plasticity){
+    	io_printf(IO_BUF, "    This is where we'll do potentiation\n");
+    }
 
     return weight_one_term_apply_potentiation(previous_state, 0);
 
@@ -132,22 +135,28 @@ static inline update_state_t timing_apply_post_spike(
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = last_pre_time; //time - last_pre_time;
-    io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+
+    if (print_plasticity){
+    	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+    }
 
     if (time_since_last_pre < 255){
 
-
         uint32_t multiplier = EXP_SIN_LOOKUP(time_since_last_pre);
 
-        io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
+        if (print_plasticity){
+        	io_printf(IO_BUF, "multiplier: %k (fixed = %u)\n", multiplier << 4, multiplier);
+        }
 
         return weight_one_term_apply_depression(previous_state, multiplier);
 
 
     }
-//
-	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
-	io_printf(IO_BUF, "        out of LUT range (do nothing)");
+
+    if (print_plasticity){
+    	io_printf(IO_BUF, "            delta t = %u,    ", time_since_last_pre);
+    	io_printf(IO_BUF, "        out of LUT range (do nothing)");
+    }
 
 //    if (time_since_last_pre > 0) {
 //        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
