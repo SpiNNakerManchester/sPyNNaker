@@ -15,7 +15,7 @@ install_requires = [
     'SpiNNaker_DataSpecification >= 1!4.0.1, < 1!5.0.0',
     'spalloc >= 1.0.1, < 2.0.0',
     'SpiNNFrontEndCommon >= 1!4.0.1, < 1!5.0.0',
-    'numpy', 'lxml', 'six']
+    'numpy', 'lxml', 'six', 'csa']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
     # scipy must be added in config.py as a mock
@@ -25,7 +25,7 @@ if os.environ.get('READTHEDOCS', None) != 'True':
 # Build a list of all project modules, as well as supplementary files
 main_package = "spynnaker"
 extensions = {".aplx", ".boot", ".cfg", ".json", ".sql", ".template", ".xml",
-              ".xsd"}
+              ".xsd", ".dict"}
 main_package_dir = os.path.join(os.path.dirname(__file__), main_package)
 start = len(main_package_dir)
 packages = []
@@ -45,7 +45,7 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
 setup(
     name="sPyNNaker",
     version=__version__,
-    description="Spinnaker implementation of PyNN",
+    description="SpiNNaker implementation of PyNN",
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=packages,
     package_data=package_data,

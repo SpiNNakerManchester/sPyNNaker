@@ -14,7 +14,7 @@ class Test(unittest.TestCase):
 
     def _test_device_enum(self, enum_class):
         for item in enum_class:
-            print item
+            print(item)
             item.value
             item.protocol_property
             item.min_value

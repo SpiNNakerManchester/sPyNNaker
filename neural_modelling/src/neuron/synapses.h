@@ -1,18 +1,20 @@
 #ifndef _SYNAPSES_H_
 #define _SYNAPSES_H_
 
-#include "../common/neuron-typedefs.h"
-#include "../common/sp_structs.h"
+#include <common/neuron-typedefs.h>
+#include <neuron/structural_plasticity/sp_structs.h>
 #include "synapse_row.h"
+#include "neuron.h"
 
 // Get the index of the ring buffer for a given timestep, synapse type and
 // neuron index
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
-        uint32_t neuron_index){
+        uint32_t neuron_index, uint32_t synapse_type_index_bits,
+        uint32_t synapse_index_bits){
     return (((simuation_timestep & SYNAPSE_DELAY_MASK)
-             << SYNAPSE_TYPE_INDEX_BITS)
-            | (synapse_type_index << SYNAPSE_INDEX_BITS)
+             << synapse_type_index_bits)
+            | (synapse_type_index << synapse_index_bits)
             | neuron_index);
 }
 
@@ -20,9 +22,10 @@ static inline index_t synapses_get_ring_buffer_index(
 // synapse type and neuron index (as stored in a synapse row)
 static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
-        uint32_t combined_synapse_neuron_index) {
+        uint32_t combined_synapse_neuron_index,
+        uint32_t synapse_type_index_bits) {
     return (((simulation_timestep & SYNAPSE_DELAY_MASK)
-             << SYNAPSE_TYPE_INDEX_BITS)
+             << synapse_type_index_bits)
             | combined_synapse_neuron_index);
 }
 
@@ -50,10 +53,10 @@ static inline void synapses_print_weight(
 }
 
 bool synapses_initialise(
-    address_t synapse_params_address, address_t synaptic_matrix_address,
-    uint32_t n_neurons, synapse_param_t **neuron_synapse_shaping_params_value,
+    address_t synapse_params_address, address_t direct_matrix_address,
+    uint32_t n_neurons, uint32_t n_synapse_types,
     uint32_t **ring_buffer_to_input_buffer_left_shifts,
-    address_t *indirect_synapses_address, address_t *direct_synapses_address);
+    address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 
@@ -83,8 +86,8 @@ uint32_t synapses_get_pre_synaptic_events();
 //------------------------------------------------------------------------------
 
 //! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic id
-//! \param[in] id: the (core-local) id of the neuron to search for in the
+//!         specified post-synaptic ID
+//! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[out] sp_data: the address of a struct through which to return
@@ -100,7 +103,7 @@ bool find_static_neuron_with_id(uint32_t id, address_t row,
 bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 
 //! \brief  Add a static entry in the synaptic row
-//! \param[in] is: the (core-local) id of the post-synaptic neuron to be added
+//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection

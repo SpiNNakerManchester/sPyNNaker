@@ -2,9 +2,9 @@
 #define _WEIGHT_MULTIPLICATIVE_IMPL_H_
 
 // Include generic plasticity maths functions
-#include "../../common/maths.h"
-#include "../../common/stdp_typedefs.h"
-#include "../../../synapse_row.h"
+#include <neuron/plasticity/stdp/maths.h>
+#include <neuron/plasticity/stdp/stdp_typedefs.h>
+#include <neuron/synapse_row.h>
 
 #include <debug.h>
 
@@ -31,9 +31,8 @@ typedef struct {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern plasticity_weight_region_data_t
-    plasticity_weight_region_data[SYNAPSE_TYPE_COUNT];
-extern uint32_t weight_multiply_right_shift[SYNAPSE_TYPE_COUNT];
+extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+extern uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Weight dependance functions

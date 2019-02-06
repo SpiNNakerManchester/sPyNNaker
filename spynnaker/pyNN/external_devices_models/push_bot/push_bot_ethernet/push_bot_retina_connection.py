@@ -51,7 +51,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self._lock = RLock()
 
     def _receive_retina_data(self, data):
-        """ Receive retina packets from the pushbot and converts them into\
+        """ Receive retina packets from the PushBot and converts them into\
             neuron spikes within the spike injector system.
 
         :param data: Data to be processed

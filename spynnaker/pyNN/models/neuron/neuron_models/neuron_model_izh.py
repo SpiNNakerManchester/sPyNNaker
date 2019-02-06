@@ -1,221 +1,158 @@
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
 from .abstract_neuron_model import AbstractNeuronModel
 from data_specification.enums import DataType
-
-from enum import Enum
+from pacman.executor.injection_decorator import inject_items
 
 A = 'a'
 B = 'b'
 C = 'c'
 D = 'd'
-V_INIT = 'v_init'
-U_INIT = 'u_init'
+V = 'v'
+U = 'u'
 I_OFFSET = 'i_offset'
 
-
-class _IZH_TYPES(Enum):
-    A = (1, DataType.S1615)
-    B = (2, DataType.S1615)
-    C = (3, DataType.S1615)
-    D = (4, DataType.S1615)
-    V_INIT = (5, DataType.S1615)
-    U_INIT = (6, DataType.S1615)
-    I_OFFSET = (7, DataType.S1615)
-    THIS_H = (8, DataType.S1615)
-
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    A: "ms",
+    B: "ms",
+    C: "mV",
+    D: "mV/ms",
+    V: "mV",
+    U: "mV/ms",
+    I_OFFSET: "nA"
+}
 
 
-class _IZH_GLOBAL_TYPES(Enum):
-    TIMESTEP = (1, DataType.S1615)
+class NeuronModelIzh(AbstractNeuronModel):
 
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
-
-
-class NeuronModelIzh(AbstractNeuronModel, AbstractContainsUnits):
     __slots__ = [
-        "_data",
-        "_n_neurons",
-        "_units"]
+        "_a", "_b", "_c", "_d", "_v_init", "_u_init", "_i_offset"
+    ]
 
-    def __init__(self, n_neurons, a, b, c, d, v_init, u_init, i_offset):
-        # pylint: disable=too-many-arguments
-        self._units = {
-            A: "ms",
-            B: "ms",
-            C: "mV",
-            D: "mV/ms",
-            V_INIT: "mV",
-            U_INIT: "mV/ms",
-            I_OFFSET: "nA"}
+    def __init__(self, a, b, c, d, v_init, u_init, i_offset):
+        super(NeuronModelIzh, self).__init__(
+            [DataType.S1615,   # a
+             DataType.S1615,   # b
+             DataType.S1615,   # c
+             DataType.S1615,   # d
+             DataType.S1615,   # v
+             DataType.S1615,   # u
+             DataType.S1615,   # i_offset
+             DataType.S1615],  # this_h (= machine_time_step)
+            [DataType.S1615])  # machine_time_step
 
-        self._n_neurons = n_neurons
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
-        self._data[A] = a
-        self._data[B] = b
-        self._data[C] = c
-        self._data[D] = d
-        self._data[V_INIT] = v_init
-        self._data[U_INIT] = u_init
-        self._data[I_OFFSET] = i_offset
+        self._a = a
+        self._b = b
+        self._c = c
+        self._d = d
+        self._i_offset = i_offset
+        self._v_init = v_init
+        self._u_init = u_init
+
+    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        # A bit of a guess
+        return 150 * n_neurons
+
+    @overrides(AbstractNeuronModel.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[A] = self._a
+        parameters[B] = self._b
+        parameters[C] = self._c
+        parameters[D] = self._d
+        parameters[I_OFFSET] = self._i_offset
+
+    @overrides(AbstractNeuronModel.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[V] = self._v_init
+        state_variables[U] = self._u_init
+
+    @overrides(AbstractNeuronModel.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractNeuronModel.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_global_values,
+               additional_arguments={'machine_time_step'})
+    def get_global_values(self, machine_time_step):
+        return [float(machine_time_step)/1000.0]
+
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
+
+        # Add the rest of the data
+        return [
+            parameters[A], parameters[B], parameters[C], parameters[D],
+            state_variables[V], state_variables[U], parameters[I_OFFSET],
+            float(ts) / 1000.0
+        ]
+
+    @overrides(AbstractNeuronModel.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Decode the values
+        _a, _b, _c, _d, v, u, _i_offset, _this_h = values
+
+        # Copy the changed data only
+        state_variables[V] = v
+        state_variables[U] = u
 
     @property
     def a(self):
-        return self._data[A]
+        return self._a
 
     @a.setter
     def a(self, a):
-        self._data.set_value(key=A, value=a)
+        self._a = a
 
     @property
     def b(self):
-        return self._data[B]
+        return self._b
 
     @b.setter
     def b(self, b):
-        self._data.set_value(key=B, value=b)
+        self._b = b
 
     @property
     def c(self):
-        return self._data[C]
+        return self._c
 
     @c.setter
     def c(self, c):
-        self._data.set_value(key=C, value=c)
+        self._c = c
 
     @property
     def d(self):
-        return self._data[D]
+        return self._d
 
     @d.setter
     def d(self, d):
-        self._data.set_value(key=D, value=d)
+        self._d = d
 
     @property
     def i_offset(self):
-        return self._data[I_OFFSET]
+        return self._i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._data.set_value(key=I_OFFSET, value=i_offset)
+        self._i_offset = i_offset
 
     @property
     def v_init(self):
-        return self._data[V_INIT]
+        return self._v_init
 
     @v_init.setter
     def v_init(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
+        self._v_init = v_init
 
     @property
     def u_init(self):
-        return self._data[U_INIT]
+        return self._u_init
 
     @u_init.setter
     def u_init(self, u_init):
-        self._data.set_value(key=U_INIT, value=u_init)
-
-    def initialize_v(self, v_init):
-        self._data.set_value(key=V_INIT, value=v_init)
-
-    def initialize_u(self, u_init):
-        self._data.set_value(key=U_INIT, value=u_init)
-
-    @overrides(AbstractNeuronModel.get_n_neural_parameters)
-    def get_n_neural_parameters(self):
-        return 8
-
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_neural_parameters,
-               additional_arguments={'machine_time_step'})
-    def get_neural_parameters(self, machine_time_step):
-        # pylint: disable=arguments-differ
-        return [
-            # REAL A
-            NeuronParameter(self._data[A], _IZH_TYPES.A.data_type),
-
-            # REAL B
-            NeuronParameter(self._data[B], _IZH_TYPES.B.data_type),
-
-            # REAL C
-            NeuronParameter(self._data[C], _IZH_TYPES.C.data_type),
-
-            # REAL D
-            NeuronParameter(self._data[D], _IZH_TYPES.D.data_type),
-
-            # REAL V
-            NeuronParameter(self._data[V_INIT], _IZH_TYPES.V_INIT.data_type),
-
-            # REAL U
-            NeuronParameter(self._data[U_INIT], _IZH_TYPES.U_INIT.data_type),
-
-            # offset current [nA]
-            # REAL I_offset;
-            NeuronParameter(self._data[I_OFFSET],
-                            _IZH_TYPES.I_OFFSET.data_type),
-
-            # current timestep - simple correction for threshold
-            # REAL this_h;
-            NeuronParameter(
-                machine_time_step / 1000.0, _IZH_TYPES.THIS_H.data_type)
-        ]
-
-    @overrides(AbstractNeuronModel.get_neural_parameter_types)
-    def get_neural_parameter_types(self):
-        return [item.data_type for item in _IZH_TYPES]
-
-    @overrides(AbstractNeuronModel.get_n_global_parameters)
-    def get_n_global_parameters(self):
-        return 1
-
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_global_parameters,
-               additional_arguments={'machine_time_step'})
-    def get_global_parameters(self, machine_time_step):
-        # pylint: disable=arguments-differ
-        return [NeuronParameter(
-            machine_time_step / 1000.0,
-            _IZH_GLOBAL_TYPES.TIMESTEP.data_type)]
-
-    @overrides(AbstractNeuronModel.get_global_parameter_types)
-    def get_global_parameter_types(self):
-        return [item.data_type for item in _IZH_GLOBAL_TYPES]
-
-    @overrides(AbstractNeuronModel.set_neural_parameters)
-    def set_neural_parameters(self, neural_parameters, vertex_slice):
-        self._data[V_INIT][vertex_slice.as_slice] = neural_parameters[4]
-        self._data[U_INIT][vertex_slice.as_slice] = neural_parameters[5]
-
-    def get_n_cpu_cycles_per_neuron(self):
-
-        # A bit of a guess
-        return 150
-
-    @overrides(AbstractContainsUnits.get_units)
-    def get_units(self, variable):
-        return self._units[variable]
+        self._u_init = u_init

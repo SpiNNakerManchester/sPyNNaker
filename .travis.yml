@@ -1,6 +1,9 @@
 language: python
-python: "2.7"
+python:
+  - 2.7
+  - 3.6
 dist: trusty
+cache: pip
 
 addons:
   apt:
@@ -11,15 +14,13 @@ addons:
       - gcc-arm-none-eabi
       - libnewlib-arm-none-eabi
 
-cache: pip
-
 before_install:
   # Work around ludicrous Travis bug
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
+  - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
@@ -38,7 +39,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls
+  - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
 
 before_script:
@@ -63,7 +64,7 @@ script:
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
   - make -C neural_modelling
-  - support/run-vera.sh neural_modelling
+  - support/run-vera.sh neural_modelling/src
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json

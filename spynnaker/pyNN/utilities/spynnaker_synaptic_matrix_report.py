@@ -12,11 +12,11 @@ _TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
-    """ generates the synaptic matrix for reporting purposes
+    """ Generate the synaptic matrix for reporting purposes
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):
-        """ converts synaptic matrix for every application edge.
+        """ Convert synaptic matrix for every application edge.
         """
 
         # Update the print options to display everything
@@ -57,5 +57,5 @@ class SpYNNakerSynapticMatrixReport(object):
                 for info in edge.synapse_information:
                     f.write("{}".format(connection_holder[edge, info]))
         except IOError:
-            logger.error("Generate_placement_reports: Can't open file"
-                         " %s for writing.", file_name, exc_info=True)
+            logger.exception("Generate_placement_reports: Can't open file"
+                             " %s for writing.", file_name)

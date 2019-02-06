@@ -7,7 +7,8 @@ from spinn_utilities.overrides import overrides
 
 from spynnaker.pyNN.models.neural_projections \
     import ProjectionApplicationEdge, ProjectionMachineEdge
-from spynnaker.pyNN.exceptions import SynapseRowTooBigException
+from spynnaker.pyNN.exceptions import SynapseRowTooBigException,\
+    SynapticConfigurationException
 from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 # general imports
@@ -21,7 +22,7 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 class _MasterPopEntry(object):
-    """ internal class that contains a master pop entry
+    """ Internal class that contains a master population table entry
     """
     __slots__ = [
         "_addresses_and_row_lengths",
@@ -66,7 +67,7 @@ class _MasterPopEntry(object):
 
 
 class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
-    """ binary search master pop class.
+    """ Master population table, implemented as binary search master.
     """
     __slots__ = [
         "_entries",
@@ -84,6 +85,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     SINGLE_BIT_FLAG_BIT = 0x80000000
     ROW_LENGTH_MASK = 0xFF
     ADDRESS_MASK = 0x7FFFFF00
+    ADDRESS_SCALE = 16
+    ADDRESS_SCALED_SHIFT = 8 - 4
 
     def __init__(self):
         self._entries = None
@@ -93,7 +96,6 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """
-
         :param vertex_slice: the slice of the vertex
         :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
@@ -110,7 +112,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxint
+                max_atoms = sys.maxsize
                 edge_pre_vertex = in_edge.pre_vertex
                 if (isinstance(edge_pre_vertex, ApplicationVertex) and
                         isinstance(
@@ -140,13 +142,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
-        n_vertices = 0
+        n_vertices = len(in_edges)
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
                 edge = graph_mapper.get_application_edge(in_edge)
                 n_entries += len(edge.synapse_information)
-            n_vertices += 1
 
         # Multiply by 2 to get an upper bound
         return (
@@ -169,10 +170,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
         """
+        next_address = (
+            (next_address + (self.ADDRESS_SCALE - 1)) //
+            self.ADDRESS_SCALE) * self.ADDRESS_SCALE
+        if (next_address / self.ADDRESS_SCALE) > 0x7FFFFF:
+            raise SynapticConfigurationException(
+                "Address {} is out of range for this population table!".format(
+                    hex(next_address)))
         return next_address
 
     def initialise_table(self, spec, master_population_table_region):
-        """ Initialises the master pop data structure
+        """ Initialise the master pop data structure
 
         :param spec: the DSG writer
         :param master_population_table_region: \
@@ -183,17 +191,18 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_addresses = 0
         self._n_single_entries = 0
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
+               extend_doc=False)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ Adds a entry in the binary search to deal with the synaptic matrix
+        """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
-        :param master_pop_table_region: the region id for the master pop
+        :param master_pop_table_region: the region ID for the master pop
         :param is_single: \
             Flag that states if the entry is a direct entry for a single row.
         :rtype: None
@@ -206,21 +215,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # if single, don' t add to start address as its going in its own block
         if not is_single:
-            start_addr = block_start_addr / 4
+            start_addr = block_start_addr // self.ADDRESS_SCALE
         self._entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self._n_addresses += 1
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
-        """ Completes any operations required after all entries have been added
-
-        :param spec: the writer for the DSG
-        :param master_pop_table_region: \
-            the region to which the master pop resides in
-        :rtype: None
-        """
-
         spec.switch_write_focus(region=master_pop_table_region)
 
         # sort entries by key
@@ -246,6 +247,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
 
+        self._entries.clear()
         del self._entries
         self._entries = None
         self._n_addresses = 0
@@ -273,9 +275,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # get entries in master pop
-        count_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address, 8)
-        n_entries, n_addresses = _TWO_WORDS.unpack(buffer(count_data))
+        n_entries, n_addresses = _TWO_WORDS.unpack(txrx.read_memory(
+            chip_x, chip_y, master_pop_base_mem_address, _TWO_WORDS.size))
         n_entry_bytes = (
             n_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
         n_address_bytes = (
@@ -283,7 +284,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # read in master pop structure
         full_data = txrx.read_memory(
-            chip_x, chip_y, master_pop_base_mem_address + 8,
+            chip_x, chip_y, master_pop_base_mem_address + _TWO_WORDS.size,
             n_entry_bytes + n_address_bytes)
 
         # convert into a numpy arrays
@@ -312,23 +313,24 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             if is_single:
                 address = address >> 8
             else:
-                address = address >> 6
+                address = address >> self.ADDRESS_SCALED_SHIFT
 
             addresses.append((row_length, address, is_single))
         return addresses
 
-    def _locate_entry(self, entries, key):
-        """ searches the binary tree structure for the correct entry.
+    @staticmethod
+    def _locate_entry(entries, key):
+        """ Search the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
         :return: the entry for this given key
-        :rtype: _MasterPopEntry
+        :rtype: :py:class:`_MasterPopEntry`
         """
         imin = 0
         imax = len(entries)
 
         while imin < imax:
-            imid = (imax + imin) / 2
+            imid = (imax + imin) // 2
             entry = entries[imid]
             if key & entry["mask"] == entry["key"]:
                 return entry
@@ -340,7 +342,4 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
-        """ Returns any constraints placed on the edges because of having this\
-            master pop table implemented in the cores.
-        """
         return list()
