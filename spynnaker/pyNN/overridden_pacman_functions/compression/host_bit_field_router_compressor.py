@@ -120,10 +120,8 @@ class HostBasedBitFieldRouterCompressor(object):
             covering.
         :return: compressed routing table entries
         """
-        threshold_packets = (
-            ((int(math.floor(machine_time_step / self._MS_TO_SEC))) *
-             time_scale_factor * self._N_PACKETS_PER_SECOND) /
-            self._THRESHOLD_FRACTION_EFFECT)
+        threshold_packets = self.calculate_threshold(
+            machine_time_step, time_scale_factor)
 
         if target_length is None:
             target_length = self._MAX_SUPPORTED_LENGTH
@@ -139,16 +137,63 @@ class HostBasedBitFieldRouterCompressor(object):
         # create report
         report_folder_path = None
         if produce_report:
-            report_folder_path = \
-                os.path.join(default_report_folder, self._REPORT_FOLDER_NAME)
-            os.mkdir(report_folder_path)
-
-        # holder for the bitfields in
-        bit_field_sdram_base_addresses = defaultdict(dict)
+            report_folder_path = self.generate_report_path(
+                default_report_folder)
 
         # compressed router table
         compressed_pacman_router_tables = MulticastRoutingTables()
 
+        # build key to n atoms map
+        key_to_n_atoms_map = self.generate_key_to_atom_map(
+            machine_graph, routing_infos, graph_mapper)
+
+        # holder for the bitfields in
+        bit_field_sdram_base_addresses = defaultdict(dict)
+        for router_table in progress.over(router_tables.routing_tables, False):
+            self.collect_bit_field_sdram_base_addresses(
+                router_table.x, router_table.y, machine, placements,
+                transceiver, graph_mapper, bit_field_sdram_base_addresses)
+
+        # start the routing table choice conversion
+        for router_table in progress.over(router_tables.routing_tables):
+            self.start_compression_selection_process(
+                router_table, produce_report, report_folder_path,
+                bit_field_sdram_base_addresses, transceiver, machine_graph,
+                placements, machine, graph_mapper, target_length,
+                time_to_try_for_each_iteration, use_timer_cut_off,
+                use_expresso, use_rob_paul, threshold_packets,
+                key_to_n_atoms_map, compressed_pacman_router_tables)
+        # return compressed tables
+        return compressed_pacman_router_tables
+
+    @staticmethod
+    def collect_bit_field_sdram_base_addresses(
+            chip_x, chip_y, machine, placements, transceiver, graph_mapper,
+            bit_field_sdram_base_addresses):
+
+        # locate the bitfields in a chip level scope
+        n_processors_on_chip = machine.get_chip_at(chip_x, chip_y).n_processors
+        for processor_id in range(0, n_processors_on_chip):
+            if placements.is_processor_occupied(chip_x, chip_y, processor_id):
+                machine_vertex = placements.get_vertex_on_processor(
+                    chip_x, chip_y, processor_id)
+                app_vertex = graph_mapper.get_application_vertex(
+                    machine_vertex)
+                if isinstance(app_vertex, AbstractUsesBitFieldFilter):
+                    bit_field_sdram_base_addresses[
+                        (chip_x, chip_y)][processor_id] = \
+                        app_vertex.bit_field_base_address(
+                            transceiver, placements.get_placement_of_vertex(
+                                machine_vertex))
+
+    def calculate_threshold(self, machine_time_step, time_scale_factor):
+        return(
+            ((int(math.floor(machine_time_step / self._MS_TO_SEC))) *
+             time_scale_factor * self._N_PACKETS_PER_SECOND) /
+            self._THRESHOLD_FRACTION_EFFECT)
+
+    @staticmethod
+    def generate_key_to_atom_map(machine_graph, routing_infos, graph_mapper):
         # build key to n atoms map
         key_to_n_atoms_map = dict()
         for vertex in machine_graph.vertices:
@@ -157,80 +202,99 @@ class HostBasedBitFieldRouterCompressor(object):
                     get_outgoing_edge_partitions_starting_at_vertex(vertex):
                 key_to_n_atoms_map[
                     routing_infos.get_first_key_from_pre_vertex(
-                        vertex, outgoing_partition.identifier)] =\
-                            graph_mapper.get_slice(vertex).n_atoms
+                        vertex, outgoing_partition.identifier)] = \
+                    graph_mapper.get_slice(vertex).n_atoms
+        return key_to_n_atoms_map
 
-        # locate the bitfields in a chip level scope
-        for router_table in progress.over(router_tables.routing_tables, False):
-            n_processors_on_chip = machine.get_chip_at(
-                router_table.x, router_table.y).n_processors
-            for processor_id in range(0, n_processors_on_chip):
-                if placements.is_processor_occupied(
-                        router_table.x, router_table.y, processor_id):
-                    machine_vertex = placements.get_vertex_on_processor(
-                        router_table.x, router_table.y, processor_id)
-                    app_vertex = graph_mapper.get_application_vertex(
-                        machine_vertex)
-                    if isinstance(app_vertex, AbstractUsesBitFieldFilter):
-                        bit_field_sdram_base_addresses[
-                            (router_table.x, router_table.y)][processor_id] = \
-                            app_vertex.bit_field_base_address(
-                                transceiver,
-                                placements.get_placement_of_vertex(
-                                    machine_vertex))
+    def generate_report_path(self, default_report_folder):
+        report_folder_path = \
+            os.path.join(default_report_folder, self._REPORT_FOLDER_NAME)
+        os.mkdir(report_folder_path)
+        return report_folder_path
 
-        # start the routing table choice conversion
-        for router_table in progress.over(router_tables.routing_tables):
-            # create report file
-            report_out = None
-            if produce_report:
-                report_file_path = os.path.join(
-                    report_folder_path,
-                    self._REPORT_NAME.format(router_table.x, router_table.y))
-                report_out = open(report_file_path, "w")
+    def start_compression_selection_process(
+            self, router_table, produce_report, report_folder_path,
+            bit_field_sdram_base_addresses, transceiver, machine_graph,
+            placements, machine, graph_mapper, target_length,
+            time_to_try_for_each_iteration, use_timer_cut_off, use_expresso,
+            use_rob_paul, threshold_packets, key_to_n_atoms_map,
+            compressed_pacman_router_tables):
+        """ entrance method for doing on host compression. Utilisable as a 
+        public method for other compressors. 
+        
+        :param router_table: the routing table in question to compress
+        :param produce_report: bool flag if the report should be generated
+        :param report_folder_path: the report folder base address
+        :param bit_field_sdram_base_addresses: the sdram addresses for \ 
+            bitfields used in the chip.
+        :param transceiver: spinnMan instance
+        :param machine_graph: machine graph 
+        :param placements: placements
+        :param machine: SpiNNMan instance
+        :param graph_mapper: mapping between 2 graphs
+        :param target_length: length of router compressor to get to
+        :param time_to_try_for_each_iteration: time in seconds to run each 
+        compression attempt for
+        :param use_timer_cut_off: bool flag that indicates if the timer cut \
+        off is to be used 
+        :param use_expresso: bool flag saying should we use expresso
+        :param use_rob_paul: bool flag that says if we should use the rob \
+        paul for peter compression
+        :param threshold_packets: the threshold of how many packets a core 
+        should be allowed to handle per timestep
+        :param key_to_n_atoms_map: map between keys to n atoms
+        :param compressed_pacman_router_tables: a data holder for compressed \
+        tables
+        :return: None
+        """
 
-            # iterate through bitfields on this chip and convert to router
-            # table
-            bit_field_chip_base_addresses = bit_field_sdram_base_addresses[
-                (router_table.x, router_table.y)]
+        # create report file
+        report_out = None
+        if produce_report:
+            report_file_path = os.path.join(
+                report_folder_path,
+                self._REPORT_NAME.format(router_table.x, router_table.y))
+            report_out = open(report_file_path, "w")
 
-            # read in bitfields.
-            bit_fields_by_processor, sorted_bit_fields = \
-                self._read_in_bit_fields(
-                    transceiver, router_table.x, router_table.y,
-                    bit_field_chip_base_addresses, machine_graph,
-                    placements, machine.get_chip_at(
-                        router_table.x, router_table.y).n_processors,
-                    graph_mapper)
+        # iterate through bitfields on this chip and convert to router
+        # table
+        bit_field_chip_base_addresses = bit_field_sdram_base_addresses[
+            (router_table.x, router_table.y)]
 
-            # execute binary search
-            self._start_binary_search(
-                router_table, sorted_bit_fields, target_length,
-                time_to_try_for_each_iteration, use_timer_cut_off,
-                use_expresso, report_folder_path, use_rob_paul,
-                bit_fields_by_processor, threshold_packets, machine,
-                key_to_n_atoms_map)
+        # read in bitfields.
+        bit_fields_by_processor, sorted_bit_fields = \
+            self._read_in_bit_fields(
+                transceiver, router_table.x, router_table.y,
+                bit_field_chip_base_addresses, machine_graph,
+                placements, machine.get_chip_at(
+                    router_table.x, router_table.y).n_processors,
+                graph_mapper)
 
-            # add final to compressed tables
-            compressed_pacman_router_tables.add_routing_table(
-                self._best_routing_table)
+        # execute binary search
+        self._start_binary_search(
+            router_table, sorted_bit_fields, target_length,
+            time_to_try_for_each_iteration, use_timer_cut_off,
+            use_expresso, report_folder_path, use_rob_paul,
+            bit_fields_by_processor, threshold_packets, machine,
+            key_to_n_atoms_map)
 
-            # remove bitfields from cores that have been merged into the
-            # router table
-            self._remove_merged_bitfields_from_cores(
-                self._best_bit_fields_by_processor, router_table.x,
-                router_table.y, transceiver,
-                bit_field_chip_base_addresses, bit_fields_by_processor)
+        # add final to compressed tables
+        compressed_pacman_router_tables.add_routing_table(
+            self._best_routing_table)
 
-            # report
-            if produce_report:
-                self._create_table_report(
-                    router_table, sorted_bit_fields, report_out)
-                report_out.flush()
-                report_out.close()
+        # remove bitfields from cores that have been merged into the
+        # router table
+        self._remove_merged_bitfields_from_cores(
+            self._best_bit_fields_by_processor, router_table.x,
+            router_table.y, transceiver,
+            bit_field_chip_base_addresses, bit_fields_by_processor)
 
-        # return compressed tables
-        return compressed_pacman_router_tables
+        # report
+        if produce_report:
+            self._create_table_report(
+                router_table, sorted_bit_fields, report_out)
+            report_out.flush()
+            report_out.close()
 
     def _convert_bitfields_into_router_tables(
             self, router_table, bitfields_by_key, key_to_n_atoms_map):

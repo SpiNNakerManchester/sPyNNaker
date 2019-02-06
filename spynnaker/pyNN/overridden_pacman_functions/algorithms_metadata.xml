@@ -116,9 +116,9 @@
             <token part="CompressedRoutingTablesGenerated">RoutingTablesGenerated</token>
         </outputs>
     </algorithm>
-    <algorithm name="BitFieldRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.compression.bit_field_router_compressor</python_module>
-        <python_class>BitFieldRouterCompressor</python_class>
+    <algorithm name="MachineBitFieldRouterCompressor">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.compression.machine_bit_field_router_compressor</python_module>
+        <python_class>MachineBitFieldRouterCompressor</python_class>
         <input_definitions>
             <parameter>
                 <param_name>routing_tables</param_name>

@@ -1003,6 +1003,20 @@ class AbstractPopulationVertex(
             placement=placement, transceiver=transceiver,
             region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
+    @overrides(AbstractUsesBitFieldFilter.
+               synaptic_expander_base_address_and_size)
+    def synaptic_expander_base_address_and_size(
+            self, transceiver, placement):
+        synaptic_matrix_base_address = \
+            helpful_functions.locate_memory_region_for_placement(
+                placement=placement, transceiver=transceiver,
+                region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
+        on_chip_begins_at = (
+            synaptic_matrix_base_address +
+            self._synapse_manager.host_written_matrix_size)
+        return (on_chip_begins_at,
+                self._synapse_manager.on_chip_written_matrix_size)
+
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):
         if self._neuron_impl.is_recordable(variable):
