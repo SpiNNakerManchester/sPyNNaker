@@ -61,6 +61,9 @@ class ProjectionMachineEdge(
                 #run through connection list and return false if we find any connections between the pre and post vertices
                 try:
                     if synapse_info.connector._conn_matrix[pre_lo:pre_hi+1,post_lo:post_hi+1].max()>0:
+                        #add moc vertex
+                        if isinstance(self.post_vertex, DRNLVertex):
+                            self.post_vertex.add_moc_vertex(self.pre_vertex,synapse_info.connector._conn_matrix[pre_lo:pre_hi+1,post_lo:post_hi+1])
                         return False
                 except ValueError:
                     print "Value error"
