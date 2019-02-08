@@ -1,6 +1,4 @@
-
 import unittest
-
 from spinn_front_end_common.utility_models import LivePacketGather
 
 

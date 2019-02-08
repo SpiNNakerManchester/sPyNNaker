@@ -5,17 +5,15 @@ import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-
+from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
-from spinn_utilities.index_is_value import IndexIsValue
-from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = logging.getLogger(__name__)
-
 SPIKES = "spikes"
 
 
