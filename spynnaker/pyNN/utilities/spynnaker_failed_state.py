@@ -1,8 +1,8 @@
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.failed_state import FailedState, \
-    FAILED_STATE_MSG
-from spynnaker.pyNN.spynnaker_simulator_interface \
-    import SpynnakerSimulatorInterface
+from spinn_front_end_common.utilities.failed_state import (
+    FailedState, FAILED_STATE_MSG)
+from spynnaker.pyNN.spynnaker_simulator_interface import (
+    SpynnakerSimulatorInterface)
 
 
 class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):

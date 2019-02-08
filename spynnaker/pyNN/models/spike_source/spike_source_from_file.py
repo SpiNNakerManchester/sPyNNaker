@@ -1,9 +1,6 @@
-# spynnaker imports
+import numpy
 from .spike_source_array import SpikeSourceArray
 from spynnaker.pyNN.utilities import utility_calls
-
-# general imports
-import numpy
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
