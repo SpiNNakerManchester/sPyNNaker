@@ -1,4 +1,3 @@
-
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
         and synapse dynamics

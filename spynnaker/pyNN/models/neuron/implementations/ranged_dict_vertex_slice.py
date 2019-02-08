@@ -1,6 +1,6 @@
-from spinn_utilities.helpful_functions import is_singleton
-import numpy
 import itertools
+import numpy
+from spinn_utilities.helpful_functions import is_singleton
 
 
 class RangedDictVertexSlice(object):

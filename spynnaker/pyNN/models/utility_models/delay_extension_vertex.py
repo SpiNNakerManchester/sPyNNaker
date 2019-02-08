@@ -1,48 +1,38 @@
+from collections import defaultdict
 import logging
 import math
 import random
 import sys
-from collections import defaultdict
-
 from spinn_utilities.overrides import overrides
-
-from spinn_front_end_common.utilities.constants import \
-    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT
-
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.model.constraints.partitioner_constraints \
-    import SameAtomsAsVertexConstraint
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from pacman.model.constraints.partitioner_constraints import (
+    SameAtomsAsVertexConstraint)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-
-from spinn_front_end_common.abstract_models \
-    import AbstractProvidesNKeysForPartition
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from spinn_front_end_common.utilities.constants import (
+    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT)
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification,
+    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-
-from spinn_front_end_common.abstract_models \
-    import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
-from spynnaker.pyNN.models.neural_projections \
-    import DelayedApplicationEdge
-from spynnaker.pyNN.models.neural_projections.connectors\
-    import AbstractGenerateConnectorOnMachine
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractGenerateOnMachine
-
+from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine)
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 7
+_DELAY_PARAM_HEADER_WORDS = 8
 _DEFAULT_MALLOCS_USED = 2
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS

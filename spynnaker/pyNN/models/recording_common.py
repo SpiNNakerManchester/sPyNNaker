@@ -1,16 +1,14 @@
+from collections import defaultdict
+import logging
+import numpy
+from six.moves import xrange
 from spinn_utilities import logger_utils
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-
-from collections import defaultdict
-import numpy
-import logging
-from six.moves import xrange
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable)
 # pylint: disable=protected-access
 
 logger = FormatAdapter(logging.getLogger(__name__))

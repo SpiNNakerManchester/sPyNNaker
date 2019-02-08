@@ -1,13 +1,13 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
-from .abstract_connector import AbstractConnector
 import decimal
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import math
 import numpy
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.utilities import utility_calls
+from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):

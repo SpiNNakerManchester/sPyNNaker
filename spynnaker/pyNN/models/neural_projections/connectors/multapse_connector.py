@@ -1,16 +1,15 @@
+import logging
+import math
+import numpy.random
+from six import raise_from
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
-from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_utilities.abstract_base import abstractmethod
+from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 
-import numpy.random
-import math
-from six import raise_from
-
-import logging
 logger = logging.getLogger(__name__)
 
 

@@ -1,31 +1,26 @@
-# spynnaker imports
 import logging
-
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedMaskConstraint
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedMaskConstraint)
 from pacman.model.graphs.machine import SimpleMachineVertex
-from pacman.model.graphs.application \
-    import ApplicationSpiNNakerLinkVertex, ApplicationVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-from spinn_front_end_common.abstract_models import\
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models\
-    import AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl import \
-    ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.abstract_models \
-    import AbstractVertexWithEdgeToDependentVertices
+from pacman.model.graphs.application import (
+    ApplicationSpiNNakerLinkVertex, ApplicationVertex)
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from spinn_front_end_common.abstract_models import (
+    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractVertexWithEdgeToDependentVertices)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 
 logger = logging.getLogger(__name__)
-
 MOTOR_PARTITION_ID = "MOTOR"
 
 

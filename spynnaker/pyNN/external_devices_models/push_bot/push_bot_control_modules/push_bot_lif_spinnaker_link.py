@@ -1,9 +1,7 @@
+import logging
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
 from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.models.defaults \
-    import default_initial_values
-
-import logging
+from spynnaker.pyNN.models.defaults import default_initial_values
 
 logger = logging.getLogger(__name__)
 

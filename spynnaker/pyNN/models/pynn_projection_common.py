@@ -1,23 +1,18 @@
-from pacman.model.constraints.partitioner_constraints \
-    import SameAtomsAsVertexConstraint
+import logging
+import math
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.partitioner_constraints import (
+    SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
-
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.neural_projections \
-    import DelayedApplicationEdge, SynapseInformation
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, DelayAfferentApplicationEdge
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses)
+from spynnaker.pyNN.models.neural_projections import (
+    DelayedApplicationEdge, SynapseInformation,
+    ProjectionApplicationEdge, DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-from spinn_utilities.progress_bar import ProgressBar
-
-import logging
-import math
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
