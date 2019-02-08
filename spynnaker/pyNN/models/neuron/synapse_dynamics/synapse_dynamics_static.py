@@ -1,11 +1,10 @@
 import numpy
-
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    MatrixGeneratorID
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits

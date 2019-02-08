@@ -1,6 +1,6 @@
 from spinn_utilities.overrides import overrides
-from .abstract_threshold_type import AbstractThresholdType
 from data_specification.enums import DataType
+from .abstract_threshold_type import AbstractThresholdType
 
 V_THRESH = "v_thresh"
 

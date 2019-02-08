@@ -1,7 +1,6 @@
-# pacman imports
 from pacman.model.graphs.application import ApplicationFPGAVertex
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 
 
 class ArbitraryFPGADevice(

@@ -1,49 +1,39 @@
-import scipy.stats
 import logging
 import math
 import random
 import numpy
-
+import scipy.stats
 from spinn_utilities.overrides import overrides
-
 from data_specification.enums import DataType
-
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
 from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-
-from spinn_front_end_common.abstract_models import \
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from spinn_front_end_common.abstract_models import (
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
+    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractRewritesDataSpecification)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.abstract_models \
-    import AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.interface.buffer_management \
-    import recording_utilities
-from spinn_front_end_common.utilities.constants \
-    import SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE
-from spinn_front_end_common.abstract_models \
-    import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.utilities import (
+    helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.constants import (
+    SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import MultiSpikeRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.utilities import utility_calls
-from spynnaker.pyNN.models.abstract_models\
-    import AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.common.simple_population_settable \
-    import SimplePopulationSettable
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
+from spynnaker.pyNN.utilities import constants, utility_calls
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.models.neuron.implementations import Struct
-from .spike_source_poisson_machine_vertex \
-    import SpikeSourcePoissonMachineVertex
+from .spike_source_poisson_machine_vertex import (
+    SpikeSourcePoissonMachineVertex)
 
 logger = logging.getLogger(__name__)
 

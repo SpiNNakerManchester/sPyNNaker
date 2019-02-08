@@ -1,18 +1,18 @@
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+from spynnaker.pyNN.utilities.spynnaker_failed_state import (
+    SpynnakerFailedState)
 
 
-class MockSimulator(object):
+class _MockBasicSimulator(object):
     @property
     def machine_time_step(self):
         return 1000
 
 
 def test_simple_record():
-    simulator = MockSimulator()
+    simulator = _MockBasicSimulator()
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
