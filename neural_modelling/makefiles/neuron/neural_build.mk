@@ -183,10 +183,11 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
           neuron/c_main.c \
-          neuron/synapses.c \
+	  synapse/c_main.c
+          synapse/synapses.c \
           neuron/neuron.c \
-          neuron/spike_processing.c \
-          neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+          synapse/spike_processing.c \
+          synapse/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
           $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
 
@@ -197,27 +198,32 @@ FEC_OPT = $(OSPACE)
 # Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
 
+$(BUILD_DIR)synapse/c_main.o: $(MODIFIED_DIR)synapse/c_main.c
+	#syn_c_cmain.c
+	-mkdir -p $(dir $@)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
+$(BUILD_DIR)synapse/synapses.o: $(MODIFIED_DIR)synapse/synapses.c
 	#synapses.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
+$(BUILD_DIR)synapse/spike_processing.o: $(MODIFIED_DIR)synapse/spike_processing.c
 	#spike_processing.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_fixed_impl.c
+$(BUILD_DIR)synapse/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)synapse/population_table/population_table_fixed_impl.c
 	#population_table/population_table_fixed_impln.c
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
-$(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
+$(BUILD_DIR)synapse/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)synapse/population_table/population_table_binary_search_impl.c
 	#population_table/population_table_binary_search_impl
 	-mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
@@ -237,7 +243,7 @@ ifeq ($(STDP_ENABLED), 1)
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
-    $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
+    $(BUILD_DIR)synapse/plasticity/common/post_events.o: $(MODIFIED_DIR)synapse/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
 	-mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
