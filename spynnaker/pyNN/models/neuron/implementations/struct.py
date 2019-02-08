@@ -1,8 +1,8 @@
+import numpy
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
-from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-import numpy
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class Struct(object):
