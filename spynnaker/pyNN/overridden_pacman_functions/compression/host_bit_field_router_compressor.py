@@ -21,7 +21,7 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.find_max_success import find_max_success
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.abstract_models. \
-    abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
+    abstract_supports_bit_field_generation import AbstractSupportsBitFieldGeneration
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
     bit_field_data import BitFieldData
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
@@ -179,7 +179,7 @@ class HostBasedBitFieldRouterCompressor(object):
                     chip_x, chip_y, processor_id)
                 app_vertex = graph_mapper.get_application_vertex(
                     machine_vertex)
-                if isinstance(app_vertex, AbstractUsesBitFieldFilter):
+                if isinstance(app_vertex, AbstractSupportsBitFieldGeneration):
                     bit_field_sdram_base_addresses[
                         (chip_x, chip_y)][processor_id] = \
                         app_vertex.bit_field_base_address(
@@ -372,7 +372,7 @@ class HostBasedBitFieldRouterCompressor(object):
         entry_links = routing_table_entry.link_ids
         base_key = routing_table_entry.routing_entry_key
         first = bit_fields[0]
-        n_neurons = len(first.bit_field) * self._BITS_IN_A_WORD
+        n_neurons = key_to_n_atoms_map[base_key]
 
         # check each neuron to see if any bitfields care, and if so,
         # add processor
@@ -501,7 +501,7 @@ class HostBasedBitFieldRouterCompressor(object):
                     chip_x, chip_y, processor_id)
                 app_vertex = graph_mapper.get_application_vertex(
                     vertex)
-                if isinstance(app_vertex, AbstractUsesBitFieldFilter):
+                if isinstance(app_vertex, AbstractSupportsBitFieldGeneration):
                     most_costly_cores[processor_id] = \
                         len(machine_graph.get_edges_ending_at_vertex(vertex))
 

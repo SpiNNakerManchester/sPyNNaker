@@ -56,8 +56,10 @@ class ExpressoCompression(object):
             # Perform the minimisation and read back the result
             with tempfile.TemporaryFile() as g:
                 print os.path.abspath(compression_file)
+                expresso_name = self._find_expresso_name()
                 subprocess.call(
-                    ["espresso", os.path.abspath(compression_file)], stdout=g)
+                    [expresso_name, os.path.abspath(compression_file)],
+                    stdout=g)
 
                 # Read back from g()
                 g.seek(0)
@@ -69,6 +71,10 @@ class ExpressoCompression(object):
                             RoutingTableEntry(route, key, mask))
 
         return new_table
+
+    def _find_expresso_name(self):
+        return "expresso"
+        #return os.path.join(os.path.dirname(__file__), "expresso")
 
     @staticmethod
     def _key_mask_to_espresso(key, mask):

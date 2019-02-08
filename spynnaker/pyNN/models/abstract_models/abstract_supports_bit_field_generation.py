@@ -3,7 +3,7 @@ from six import add_metaclass
 
 
 @add_metaclass(AbstractBase)
-class AbstractUsesBitFieldFilter(object):
+class AbstractSupportsBitFieldGeneration(object):
 
     @abstractmethod
     def bit_field_base_address(self, transceiver, placement):
@@ -25,4 +25,3 @@ class AbstractUsesBitFieldFilter(object):
         :return: tuple containing (the sdram address for the chip synaptic 
         matrix expander address, the size used by the chip synaptic matrix)
         """
-

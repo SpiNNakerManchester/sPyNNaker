@@ -38,7 +38,9 @@ from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
 from spynnaker.pyNN.models.abstract_models.\
-    abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
+    abstract_supports_bit_field_generation import AbstractSupportsBitFieldGeneration
+from spynnaker.pyNN.models.abstract_models.abstract_supports_bit_field_routing_compression import \
+    AbstractSupportsBitFieldRoutingCompression
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import AbstractSpikeRecordable
@@ -83,9 +85,10 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractUsesBitFieldFilter,
+        AbstractChangableAfterRun, AbstractSupportsBitFieldGeneration,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractSupportsBitFieldRoutingCompression):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -997,13 +1000,13 @@ class AbstractPopulationVertex(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
 
-    @overrides(AbstractUsesBitFieldFilter.bit_field_base_address)
+    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
     def bit_field_base_address(self, transceiver, placement):
         return helpful_functions.locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
-    @overrides(AbstractUsesBitFieldFilter.
+    @overrides(AbstractSupportsBitFieldGeneration.
                synaptic_expander_base_address_and_size)
     def synaptic_expander_base_address_and_size(
             self, transceiver, placement):
@@ -1016,6 +1019,13 @@ class AbstractPopulationVertex(
             self._synapse_manager.host_written_matrix_size)
         return (on_chip_begins_at,
                 self._synapse_manager.on_chip_written_matrix_size)
+
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+               key_to_atom_map_region_base_address)
+    def key_to_atom_map_region_base_address(self, transceiver, placement):
+        return helpful_functions.locate_memory_region_for_placement(
+            placement=placement, transceiver=transceiver,
+            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):

@@ -90,10 +90,6 @@ class SynapticManager(object):
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
 
-        # Track writes inside the synaptic matrix region (to meet sizes):
-        self._host_generated_block_addr = 0
-        self._on_chip_generated_block_addr = 0
-
         # Get the type of population table
         self._poptable_type = population_table_type
         if population_table_type is None:
@@ -140,6 +136,10 @@ class SynapticManager(object):
         # A map of synapse information to maximum row / delayed row length and
         # size in bytes
         self._max_row_info = dict()
+
+        # Track writes inside the synaptic matrix region (to meet sizes):
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
 
     @property
     def host_written_matrix_size(self):
@@ -946,8 +946,11 @@ class SynapticManager(object):
             application_vertex)
         static_synaptic_matrix = self._get_synaptic_blocks_size(
             post_vertex_slice, in_edges, machine_time_step, False)
-        on_chip_expanded_synaptic_matrix = self._get_synaptic_blocks_size(
-            post_vertex_slice, in_edges, machine_time_step, True)
+        on_chip_expanded_synaptic_matrix = (
+            self._get_synaptic_blocks_size(
+                post_vertex_slice, in_edges, machine_time_step, True) +
+            static_synaptic_matrix)
+
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
             static_synaptic_matrix, on_chip_expanded_synaptic_matrix,
@@ -958,6 +961,11 @@ class SynapticManager(object):
             weight_scale)
         weight_scales = self._write_synapse_parameters(
             spec, ring_buffer_shifts, post_vertex_slice, weight_scale)
+
+        # set where the synaptic expanded stuff starts off to end of host
+        # generated stuff
+        self._on_chip_generated_block_addr = self._get_synaptic_blocks_size(
+            post_vertex_slice, in_edges, machine_time_step, False)
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,

@@ -90,6 +90,10 @@
                 <param_name>routing_infos</param_name>
                 <param_type>MemoryRoutingInfos</param_type>
             </parameter>
+            <parameter>
+                <param_name>use_rob_paul</param_name>
+                <param_type>CompressionUseRobPaul</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>router_tables</param_name>
@@ -110,6 +114,7 @@
         <optional_inputs>
             <param_name>time_to_try_for_each_iteration</param_name>
             <param_name>target_length</param_name>
+            <param_name>use_rob_paul</param_name>
         </optional_inputs>
         <outputs>
             <param_type>MemoryCompressedRoutingTables</param_type>
@@ -168,6 +173,46 @@
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
+            <parameter>
+                <param_name>produce_report</param_name>
+                <param_type>RouterBitfieldCompressionReport</param_type>
+            </parameter>
+            <parameter>
+                <param_name>default_report_folder</param_name>
+                <param_type>ReportFolder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>target_length</param_name>
+                <param_type>RouterCompressorBitFieldTargetLength</param_type>
+            </parameter>
+            <parameter>
+                <param_name>routing_infos</param_name>
+                <param_type>MemoryRoutingInfos</param_type>
+            </parameter>
+            <parameter>
+                <param_name>time_to_try_for_each_iteration</param_name>
+                <param_type>RouterCompressorBitFieldTimePerAttempt</param_type>
+            </parameter>
+            <parameter>
+                <param_name>use_timer_cut_off</param_name>
+                <param_type>RouterCompressorBitFieldUseCutOff</param_type>
+            </parameter>
+            <parameter>
+                <param_name>use_expresso</param_name>
+                <param_type>UseExpresso</param_type>
+            </parameter>
+            <parameter>
+                <param_name>use_rob_paul</param_name>
+                <param_type>CompressionUseRobPaul</param_type>
+            </parameter>
+            <parameter>
+                <param_name>machine_time_step</param_name>
+                <param_type>MachineTimeStep</param_type>
+            </parameter>
+            <parameter>
+                <param_name>time_scale_factor</param_name>
+                <param_type>TimeScaleFactor</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>executable_finder</param_name>
@@ -181,11 +226,21 @@
             <param_name>machine_graph</param_name>
             <param_name>graph_mapper</param_name>
             <param_name>placements</param_name>
+            <param_name>produce_report</param_name>
+            <param_name>default_report_folder</param_name>
+            <param_name>target_length</param_name>
+            <param_name>routing_infos</param_name>
+            <param_name>time_to_try_for_each_iteration</param_name>
+            <param_name>use_timer_cut_off</param_name>
+            <param_name>use_expresso</param_name>
+            <param_name>machine_time_step</param_name>
+            <param_name>time_scale_factor</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
             <param_name>compress_only_when_needed</param_name>
             <param_name>compress_as_much_as_possible</param_name>
+            <param_name>use_rob_paul</param_name>
         </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>

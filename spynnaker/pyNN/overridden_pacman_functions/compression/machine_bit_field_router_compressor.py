@@ -17,8 +17,10 @@ from spinnman.exceptions import SpinnmanInvalidParameterException, \
     SpinnmanUnexpectedResponseCodeException
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spynnaker.pyNN.exceptions import CantFindSDRAMToUse
 from spynnaker.pyNN.models.abstract_models.\
-    abstract_uses_bit_field_filterer import AbstractUsesBitFieldFilter
+    abstract_supports_bit_field_routing_compression import \
+    AbstractSupportsBitFieldRoutingCompression
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
     host_bit_field_router_compressor import HostBasedBitFieldRouterCompressor
 from spynnaker.pyNN.utilities import utility_calls
@@ -28,6 +30,8 @@ logger = logging.getLogger(__name__)
 
 
 class MachineBitFieldRouterCompressor(object):
+
+    __slots__ = []
 
     # sdram tag the router compressor expects to find there routing tables in
     ROUTING_TABLE_SDRAM_TAG = 1
@@ -46,6 +50,8 @@ class MachineBitFieldRouterCompressor(object):
     _USER_BYTES = 4
 
     # structs for performance requirements.
+    _THREE_WORDS = struct.Struct("<III")
+
     _TWO_WORDS = struct.Struct("<II")
 
     _ONE_WORDS = struct.Struct("<I")
@@ -104,18 +110,22 @@ class MachineBitFieldRouterCompressor(object):
             addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed, machine,
             compress_as_much_as_possible, progress_bar, on_chip_cores,
-            matrix_addresses_and_size)
+            matrix_addresses_and_size, time_to_try_for_each_iteration)
 
         # adjust cores to exclude the ones which are going to compress by
-        # host processing
+        # host processing for compression. but needed to be in the synaptic
+        # cores, as it might have overwritten sdram whilst attempting to load
+        #  all 3 data blocks.
         if len(on_host_chips) != 0:
-            on_chip_cores = self._regenerate_cores(
+            compressor_chip_cores = self._regenerate_cores(
                 on_chip_cores, on_host_chips, executable_path)
+        else:
+            compressor_chip_cores = on_chip_cores
 
         # load and run binaries
         utility_calls.run_system_application(
-            on_chip_cores, routing_table_compressor_app_id, transceiver,
-            provenance_file_path, executable_finder,
+            compressor_chip_cores, routing_table_compressor_app_id,
+            transceiver, provenance_file_path, executable_finder,
             read_algorithm_iobuf, self._check_for_success,
             self._handle_failure_for_bit_field_router_compressor,
             [CPUState.FINISHED])
@@ -177,6 +187,13 @@ class MachineBitFieldRouterCompressor(object):
 
     @staticmethod
     def _regenerate_cores(cores, run_on_host, executable_path):
+        """ removes host based cores for synaptic matrix regeneration
+        
+        :param cores: the cores for everything
+        :param run_on_host: the chips that had to be ran on host
+        :param executable_path: the binary path
+        :return: new targets for synaptic expander
+        """
         new_cores = ExecutableTargets()
 
         core_subsets = cores.get_cores_for_binary(executable_path)
@@ -228,13 +245,12 @@ class MachineBitFieldRouterCompressor(object):
             for p in core_subset.processor_ids:
 
                 # Read the result from USER1 register
-                user_2_base_address = \
-                    transceiver.get_user_2_register_address_from_core(p)
+                user_1_base_address = \
+                    transceiver.get_user_1_register_address_from_core(p)
                 result = struct.unpack(
                     "<I", transceiver.read_memory(
-                        x, y, user_2_base_address, self._USER_BYTES))[0]
+                        x, y, user_1_base_address, self._USER_BYTES))[0]
 
-                # The result is 0 if success, otherwise failure
                 if result != self.SUCCESS:
                     self._handle_failure_for_bit_field_router_compressor(
                         executable_targets, transceiver, provenance_file_path,
@@ -306,7 +322,7 @@ class MachineBitFieldRouterCompressor(object):
             self, addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed, machine,
             compress_as_much_as_possible, progress_bar, cores,
-            matrix_addresses_and_size):
+            matrix_addresses_and_size, time_per_iteration):
         """ load all data onto the chip
 
         :param addresses: the addresses for bitfields in sdram
@@ -322,6 +338,7 @@ class MachineBitFieldRouterCompressor(object):
         :param cores: the cores that compressor will run on
         :param matrix_addresses_and_size: dict of chips to regeneration 
         sdram and size for exploitation
+        :param time_per_iteration: time per compression cycle
         :return: the list of tuples saying which chips this will need to use \ 
         host compression, as the malloc failed.
         :rtype: list of tuples saying which chips this will need to use host \
@@ -334,22 +351,24 @@ class MachineBitFieldRouterCompressor(object):
             if (table is not None and not machine.get_chip_at(
                     table.x, table.y).virtual):
                 try:
-                    self._load_usable_sdram(
-                        matrix_addresses_and_size, chip_x, chip_y, transceiver,
-                        routing_table_compressor_app_id, cores)
-
-                    self._load_address_data(
-                        addresses, chip_x, chip_y, transceiver,
-                        routing_table_compressor_app_id, cores)
-
                     self._load_routing_table_data(
                         table, app_id, transceiver,
                         compress_only_when_needed, compress_as_much_as_possible,
-                        routing_table_compressor_app_id, progress_bar, cores)
-                except SpinnmanInvalidParameterException:
+                        routing_table_compressor_app_id, progress_bar, cores,
+                        matrix_addresses_and_size[(table.x, table.y)])
+
+                    self._load_address_data(
+                        addresses, chip_x, chip_y, transceiver, 
+                        time_per_iteration, routing_table_compressor_app_id, 
+                        cores, matrix_addresses_and_size[(table.x, table.y)])
+
+                    self._load_usable_sdram(
+                        matrix_addresses_and_size[(table.x, table.y)], chip_x,
+                        chip_y, transceiver, routing_table_compressor_app_id,
+                        cores)
+                except CantFindSDRAMToUse:
                     run_by_host.append((chip_x, chip_y))
-                except SpinnmanUnexpectedResponseCodeException:
-                    run_by_host.append((chip_x, chip_y))
+
         return run_by_host
 
     def _load_usable_sdram(
@@ -365,12 +384,18 @@ class MachineBitFieldRouterCompressor(object):
         :param cores: the cores that compressor will run on
         :rtype: None
         """
-        address_data = self._generate_chip_matrix_data(
-            matrix_addresses_and_size[(chip_x, chip_y)])
+        address_data = \
+            self._generate_chip_matrix_data(matrix_addresses_and_size)
 
         # get sdram address on chip
-        sdram_address = transceiver.malloc_sdram(
-            chip_x, chip_y, len(address_data), routing_table_compressor_app_id)
+        try:
+            sdram_address = transceiver.malloc_sdram(
+                chip_x, chip_y, len(address_data),
+                routing_table_compressor_app_id)
+        except (SpinnmanInvalidParameterException,
+                SpinnmanUnexpectedResponseCodeException):
+            sdram_address = self._steal_from_matrix_addresses(
+                matrix_addresses_and_size, len(address_data))
 
         # write sdram
         transceiver.write_memory(
@@ -388,6 +413,11 @@ class MachineBitFieldRouterCompressor(object):
             self._ONE_WORDS.pack(sdram_address), self._USER_BYTES)
 
     def _generate_chip_matrix_data(self, list_of_sizes_and_address):
+        """ generate the data for the chip matrix data
+        
+        :param list_of_sizes_and_address: list of sdram addresses and sizes
+        :return: byte array of data
+        """
         data = b""
         data += self._ONE_WORDS.pack(len(list_of_sizes_and_address))
         for (memory_address, size) in list_of_sizes_and_address:
@@ -395,24 +425,32 @@ class MachineBitFieldRouterCompressor(object):
         return data
 
     def _load_address_data(
-            self, addresses, chip_x, chip_y, transceiver,
-            routing_table_compressor_app_id, cores):
+            self, addresses, chip_x, chip_y, transceiver, time_per_iteration,
+            routing_table_compressor_app_id, cores, matrix_addresses_and_size):
         """ loads the bitfield addresses space
 
         :param addresses: the addresses to load
         :param chip_x: the chip x to consider here
         :param chip_y: the chip y to consider here
         :param transceiver: the spinnman instance
+        :param time_per_iteration: time per comprssion iteration
         :param routing_table_compressor_app_id: system app id.
         :param cores: the cores that compressor will run on
         :rtype: None
         """
         # generate address_data
-        address_data = self._generate_chip_data(addresses[(chip_x, chip_y)])
+        address_data = self._generate_chip_data(
+            addresses[(chip_x, chip_y)], time_per_iteration)
 
         # get sdram address on chip
-        sdram_address = transceiver.malloc_sdram(
-            chip_x, chip_y, len(address_data), routing_table_compressor_app_id)
+        try:
+            sdram_address = transceiver.malloc_sdram(
+                chip_x, chip_y, len(address_data),
+                routing_table_compressor_app_id)
+        except (SpinnmanInvalidParameterException,
+                SpinnmanUnexpectedResponseCodeException):
+            sdram_address = self._steal_from_matrix_addresses(
+                matrix_addresses_and_size, len(address_data))
 
         # write sdram
         transceiver.write_memory(
@@ -430,12 +468,13 @@ class MachineBitFieldRouterCompressor(object):
             self._ONE_WORDS.pack(sdram_address), self._USER_BYTES)
 
     def _load_routing_table_data(
-            self, routing_table, app_id, transceiver,
+            self, table, app_id, transceiver,
             compress_only_when_needed, compress_as_much_as_possible,
-            routing_table_compressor_app_id, progress_bar, cores):
+            routing_table_compressor_app_id, progress_bar, cores,
+            matrix_addresses_and_size):
         """ loads the routing table data
 
-        :param routing_table: the routing table to load
+        :param table: the routing table to load
         :param app_id: application app id
         :param transceiver: spinnman instance
         :param compress_only_when_needed: bool flag asking if compress only \
@@ -446,39 +485,50 @@ class MachineBitFieldRouterCompressor(object):
         :param routing_table_compressor_app_id: system app id
         :param cores: the cores that the compressor going to run on
         :rtype: None
+        :raises CantFindSDRAMToUse when sdram isnt malloced or stolen
         """
 
         routing_table_data = \
             MundyOnChipRouterCompression.build_routing_table_data(
-                routing_table, app_id, compress_only_when_needed,
+                table, app_id, compress_only_when_needed,
                 compress_as_much_as_possible)
 
         # go to spinnman and ask for a memory region of that size per chip.
-        base_address = None
         try:
             base_address = transceiver.malloc_sdram(
-                routing_table.x, routing_table.y, len(routing_table_data),
+                table.x, table.y, len(routing_table_data),
                 routing_table_compressor_app_id)
-        except SpinnmanInvalidParameterException:
-            pass
+        except (SpinnmanInvalidParameterException,
+                SpinnmanUnexpectedResponseCodeException):
+            base_address = self._steal_from_matrix_addresses(
+                matrix_addresses_and_size, len(routing_table_data))
 
         # write SDRAM requirements per chip
         transceiver.write_memory(
-            routing_table.x, routing_table.y, base_address, routing_table_data)
+            table.x, table.y, base_address, routing_table_data)
 
         # get the only processor on the chip
         processor_id = cores.all_core_subsets.get_core_subset_for_chip(
-            routing_table.x, routing_table.y).processor_ids[0]
+            table.x, table.y).processor_ids[0]
 
         # update user 1 with location
         user_1_base_address = \
             transceiver.get_user_1_register_address_from_core(processor_id)
         transceiver.write_memory(
-            routing_table.x, routing_table.y, user_1_base_address,
+            table.x, table.y, user_1_base_address,
             self._ONE_WORDS.pack(base_address), self._USER_BYTES)
 
         # update progress bar
         progress_bar.update()
+
+    @staticmethod
+    def _steal_from_matrix_addresses(matrix_addresses_and_size, size_to_steal):
+        for pos, (base_address, size) in enumerate(matrix_addresses_and_size):
+            if size >= size_to_steal:
+                new_size = size - size_to_steal
+                matrix_addresses_and_size[pos] = (base_address, new_size)
+                return base_address
+        raise CantFindSDRAMToUse()
 
     def _generate_addresses(
             self, machine_graph, placements, transceiver, machine,
@@ -492,13 +542,13 @@ class MachineBitFieldRouterCompressor(object):
         :param progress_bar: the progress bar
         :param: graph_mapper: mapping between graphs
         :param executable_finder: binary finder
-        :return: bit_field_addresses and the executable targets to load the \
+        :return: region_addresses and the executable targets to load the \
         router table compressor with bitfield. and the executable path\ and 
         the synaptic matrix spaces to corrupt
         """
 
         # data holders
-        bit_fieldaddresses = defaultdict(list)
+        region_addresses = defaultdict(list)
         synaptic_matrix_addresses_and_sizes = defaultdict(list)
         cores = CoreSubsets()
 
@@ -506,18 +556,28 @@ class MachineBitFieldRouterCompressor(object):
                 machine_graph.vertices, finish_at_end=False):
 
             app_vertex = graph_mapper.get_application_vertex(vertex)
-            if isinstance(app_vertex, AbstractUsesBitFieldFilter):
+            if isinstance(
+                    app_vertex, AbstractSupportsBitFieldRoutingCompression):
                 placement = placements.get_placement_of_vertex(vertex)
+
+                # store the region sdram address's
                 bit_field_sdram_address = app_vertex.bit_field_base_address(
                     transceiver, placement)
-                bit_fieldaddresses[placement.x, placement.y].append(
-                    bit_field_sdram_address)
-                synaptic_matrix_addresses_and_sizes[
-                    placement.x, placement.y].append(
-                        app_vertex.synaptic_expander_base_address_and_size(
-                            transceiver, placement))
+                key_to_atom_map = \
+                    app_vertex.key_to_atom_map_region_base_address(
+                        transceiver, placement)
+                region_addresses[placement.x, placement.y].append(
+                    bit_field_sdram_address, key_to_atom_map, placement.p)
 
-                # only add to the cores if the chip hasnt been considered yet
+                # store the available space from the matrix to steal
+                (address, size) = \
+                    app_vertex.synaptic_expander_base_address_and_size(
+                        transceiver, placement)
+                if size != 0:
+                    synaptic_matrix_addresses_and_sizes[
+                        placement.x, placement.y].append((address, size))
+
+                # only add to the cores if the chip has not been considered yet
                 if not cores.is_chip(placement.x, placement.y):
                     cores.add_processor(
                         placement.x, placement.y,
@@ -531,17 +591,21 @@ class MachineBitFieldRouterCompressor(object):
             self._ROUTER_TABLE_WITH_BIT_FIELD_APLX)
         executable_targets.add_subsets(binary=executable_path, subsets=cores)
 
-        return (bit_fieldaddresses, executable_targets, executable_path,
+        return (region_addresses, executable_targets, executable_path,
                 synaptic_matrix_addresses_and_sizes)
 
-    def _generate_chip_data(self, address_list):
-        """ generate byte array data for a list of sdram addresses
+    def _generate_chip_data(self, address_list, time_per_iteration):
+        """ generate byte array data for a list of sdram addresses and 
+        finally the time to run per compression iteration
 
         :param address_list: the list of sdram addresses
+        :param time_per_iteration: time per iteration
         :return: the byte array
         """
         data = b""
         data += self._ONE_WORDS.pack(len(address_list))
-        for memory_address in address_list:
-            data += self._ONE_WORDS.pack(memory_address)
+        for (bit_field, key_to_atom, processor_id) in address_list:
+            data += self._THREE_WORDS.pack(
+                bit_field, key_to_atom, processor_id)
+        data += self._ONE_WORDS.pack(time_per_iteration)
         return data
