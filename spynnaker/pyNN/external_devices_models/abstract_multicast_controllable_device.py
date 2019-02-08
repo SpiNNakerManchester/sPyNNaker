@@ -53,3 +53,10 @@ class AbstractMulticastControllableDevice(object):
 
         :rtype: int
         """
+
+    @property
+    def device_control_scaling_factor(self):  # pragma: no cover
+        """The scaling factor used to send the payload to this device
+
+        :rtype: int"""
+        return 1
