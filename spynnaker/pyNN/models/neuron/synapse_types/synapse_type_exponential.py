@@ -28,9 +28,9 @@ class SynapseTypeExponential(AbstractSynapseType):
         super(SynapseTypeExponential, self).__init__([
             DataType.U032,    # decay_E
             DataType.U032,    # init_E
+            DataType.S1615,   # isyn_exc
             DataType.U032,    # decay_I
             DataType.U032,    # init_I
-            DataType.S1615,   # isyn_exc
             DataType.S1615])  # isyn_inh
         self._tau_syn_E = tau_syn_E
         self._tau_syn_I = tau_syn_I
@@ -70,15 +70,16 @@ class SynapseTypeExponential(AbstractSynapseType):
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),
                 parameters[TAU_SYN_E].apply_operation(init),
+                state_variables[ISYN_EXC],
                 parameters[TAU_SYN_I].apply_operation(decay),
                 parameters[TAU_SYN_I].apply_operation(init),
-                state_variables[ISYN_EXC], state_variables[ISYN_INH]]
+                state_variables[ISYN_INH]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_decay_E, _init_E, _decay_I, _init_I, isyn_exc, isyn_inh) = values
+        (_decay_E, _init_E, isyn_exc, _decay_I, _init_I, isyn_inh) = values
 
         state_variables[ISYN_EXC] = isyn_exc
         state_variables[ISYN_INH] = isyn_inh
