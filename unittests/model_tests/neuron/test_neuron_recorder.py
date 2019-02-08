@@ -1,3 +1,4 @@
+from unittests.mocks import MockSimulator
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import NeuronRecorder
