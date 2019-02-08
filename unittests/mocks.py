@@ -1,8 +1,8 @@
 import configparser
 import numpy
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+from spynnaker.pyNN.utilities.spynnaker_failed_state import (
+    SpynnakerFailedState)
 
 
 class MockPopulation(object):
@@ -53,8 +53,32 @@ class MockSimulator(object):
     def get_pynn_NumpyRNG(self):
         return MockRNG()
 
+    def add_population(self, pop):
+        pass
+
+    def add_application_vertex(self, vertex):
+        pass
+
+    def verify_not_running(self):
+        pass
+
+    def has_ran(self):
+        return False
+
+    def has_reset_last(self):
+        return False
+
+    @property
+    def id_counter(self):
+        return 1
+
+    @id_counter.setter
+    def id_counter(self, value):
+        pass
+
     @classmethod
     def setup(cls):
         simulator = MockSimulator()
         globals_variables.set_failed_state(SpynnakerFailedState())
         globals_variables.set_simulator(simulator)
+        return simulator

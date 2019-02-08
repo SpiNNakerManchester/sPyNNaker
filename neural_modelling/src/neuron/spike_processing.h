@@ -3,6 +3,7 @@
 
 #include <common/neuron-typedefs.h>
 #include <common/in_spikes.h>
+#include <spin1_api.h>
 
 bool spike_processing_initialise(
     size_t row_max_n_bytes, uint mc_packet_callback_priority,
@@ -37,12 +38,12 @@ typedef struct dma_buffer {
 //! \return address of circular buffer
 circular_buffer get_circular_buffer();
 
-//! \brief set the dma status
-//! param[in] busy: bool
+//! \brief set the DMA status
+//! \param[in] busy: bool
 //! \return None
 void set_dma_busy(bool busy);
 
-//! \brief retrieve the dma status
+//! \brief retrieve the DMA status
 //! \return bool
 bool get_dma_busy();
 

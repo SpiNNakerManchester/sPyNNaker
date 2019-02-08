@@ -3,6 +3,11 @@ python:
   - 2.7
   - 3.6
 dist: trusty
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 cache: pip
 
 addons:
@@ -20,7 +25,7 @@ before_install:
   - python support/travis_blocking_stdout.py
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
-  - pip install --only-binary=numpy,scipy numpy scipy
+  - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
@@ -39,7 +44,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls
+  - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
 
 before_script:
@@ -64,7 +69,7 @@ script:
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
   - make -C neural_modelling
-  - support/run-vera.sh neural_modelling
+  - support/run-vera.sh neural_modelling/src
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json

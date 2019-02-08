@@ -1,24 +1,65 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
-from spynnaker.pyNN.utilities.ranged.spynakker_ranged_dict import \
-    SpynakkerRangeDictionary
+from .abstract_synapse_type import AbstractSynapseType
 
-INITIAL_INPUT_EXC = "initial_input_exc"
-INITIAL_INPUT_INH = "initial_input_inh"
+ISYN_EXC = "isyn_exc"
+ISYN_INH = "isyn_inh"
+
+UNITS = {
+    ISYN_EXC: "",
+    ISYN_EXC: ""
+}
 
 
 class SynapseTypeDelta(AbstractSynapseType):
     """ This represents a synapse type with two delta synapses
     """
     __slots__ = [
-        "_data"]
+        "_isyn_exc",
+        "_isyn_inh"]
 
-    def __init__(self, n_neurons, initial_input_exc, initial_input_inh):
-        self._data = SpynakkerRangeDictionary(size=n_neurons)
-        self._data[INITIAL_INPUT_EXC] = initial_input_exc
-        self._data[INITIAL_INPUT_INH] = initial_input_inh
+    def __init__(self, isyn_exc, isyn_inh):
+        super(SynapseTypeDelta, self).__init__([
+            DataType.S1615,   # isyn_exc
+            DataType.S1615])  # isyn_inh
+        self._isyn_exc = isyn_exc
+        self._isyn_inh = isyn_inh
+
+    @overrides(AbstractSynapseType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        return 1 * n_neurons
+
+    @overrides(AbstractSynapseType.add_parameters)
+    def add_parameters(self, parameters):
+        pass
+
+    @overrides(AbstractSynapseType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[ISYN_EXC] = self._isyn_exc
+        state_variables[ISYN_INH] = self._isyn_inh
+
+    @overrides(AbstractSynapseType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
+
+    @overrides(AbstractSynapseType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
+
+    @overrides(AbstractSynapseType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
+
+        # Add the rest of the data
+        return [state_variables[ISYN_EXC], state_variables[ISYN_INH]]
+
+    @overrides(AbstractSynapseType.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (isyn_exc, isyn_inh) = values
+
+        state_variables[ISYN_EXC] = isyn_exc
+        state_variables[ISYN_INH] = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):
@@ -36,37 +77,18 @@ class SynapseTypeDelta(AbstractSynapseType):
     def get_synapse_targets(self):
         return "excitatory", "inhibitory"
 
-    @overrides(AbstractSynapseType.get_n_synapse_type_parameters)
-    def get_n_synapse_type_parameters(self):
-        return 2
-
-    @overrides(AbstractSynapseType.get_synapse_type_parameters)
-    def get_synapse_type_parameters(self):
-        return [
-            NeuronParameter(self._data[INITIAL_INPUT_EXC], DataType.S1615),
-            NeuronParameter(self._data[INITIAL_INPUT_INH], DataType.S1615)
-        ]
-
-    @overrides(AbstractSynapseType.get_synapse_type_parameter_types)
-    def get_synapse_type_parameter_types(self):
-        return []
-
-    @overrides(AbstractSynapseType.get_n_cpu_cycles_per_neuron)
-    def get_n_cpu_cycles_per_neuron(self):
-        return 0
-
     @property
     def isyn_exc(self):
-        return self._data[INITIAL_INPUT_EXC]
+        return self._isyn_exc
 
     @isyn_exc.setter
-    def isyn_exc(self, new_value):
-        self._data.set_value(key=INITIAL_INPUT_EXC, value=new_value)
+    def isyn_exc(self, isyn_exc):
+        self._isyn_exc = isyn_exc
 
     @property
     def isyn_inh(self):
-        return self._data[INITIAL_INPUT_INH]
+        return self._isyn_inh
 
     @isyn_inh.setter
-    def isyn_inh(self, new_value):
-        self._data.set_value(key=INITIAL_INPUT_INH, value=new_value)
+    def isyn_inh(self, isyn_inh):
+        self._isyn_inh = isyn_inh

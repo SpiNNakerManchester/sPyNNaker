@@ -5,16 +5,14 @@ import math
 import numpy
 from six import iteritems, raise_from
 from six.moves import range, xrange
-
+from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
-from spinn_utilities.index_is_value import IndexIsValue
-from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = logging.getLogger(__name__)
-
 SPIKES = "spikes"
 
 
@@ -58,7 +56,7 @@ class NeuronRecorder(object):
         return recording
 
     def get_neuron_sampling_interval(self, variable):
-        """ Returns the current sampling interval for this variable
+        """ Return the current sampling interval for this variable
 
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
@@ -69,12 +67,12 @@ class NeuronRecorder(object):
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, n_machine_time_steps):
-        """ method for reading a uint32 mapped to time and neuron ids from\
-            the SpiNNaker machine
+        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
+            machine.
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
-        :param region: the dsg region id used for this data
+        :param region: the DSG region ID used for this data
         :param placements: the placements object
         :param graph_mapper: \
             the mapping between application and machine vertices
@@ -142,7 +140,7 @@ class NeuronRecorder(object):
             if data is None:
                 data = fragment
             else:
-                # Add the slice fragment on axis 1 which is ids/ channel_index
+                # Add the slice fragment on axis 1 which is IDs/channel_index
                 data = numpy.append(data, fragment, axis=1)
         if len(missing_str) > 0:
             logger.warn(
@@ -176,9 +174,6 @@ class NeuronRecorder(object):
                     for index in self._indexes[SPIKES])
                 if neurons_recording == 0:
                     continue
-                if neurons_recording < vertex_slice.n_atoms:
-                    # For spikes the overflow position is also returned
-                    neurons_recording += 1
             # Read the spikes
             n_words = int(math.ceil(neurons_recording / 32.0))
             n_bytes = n_words * self.N_BYTES_PER_WORD
@@ -245,11 +240,10 @@ class NeuronRecorder(object):
         return results
 
     def _compute_rate(self, sampling_interval):
-        """ Converts a sampling interval into a rate
+        """ Convert a sampling interval into a rate. \
+            Remember, machine time step is in nanoseconds
 
-        Remember machine time step is in nano seconds
-
-        :param sampling_interval: interval between samples in micro seconds
+        :param sampling_interval: interval between samples in microseconds
         :return: rate
         """
         if sampling_interval is None:
@@ -324,16 +318,31 @@ class NeuronRecorder(object):
             self._sampling_rates[variable] = 0
             self._indexes[variable] = None
 
+    def _check_complete_overwrite(self, variable, indexes):
+        if indexes is None:
+            # overwriting all OK!
+            return
+        if self._indexes[variable] is None:
+            if set(set(range(self._n_neurons))).issubset(set(indexes)):
+                # overwriting all previous so OK!
+                return
+        else:
+            if set(self._indexes[variable]).issubset(set(indexes)):
+                # overwriting all previous so OK!
+                return
+        raise ConfigurationException(
+            "Current implementation does not support multiple "
+            "sampling_intervals for {} on one population.".format(
+                variable))
+
     def _turn_on_recording(self, variable, sampling_interval, indexes):
 
         rate = self._compute_rate(sampling_interval)
         if self._sampling_rates[variable] == 0:
+            # Previously not recording so OK
             self._sampling_rates[variable] = rate
         elif rate != self._sampling_rates[variable]:
-            msg = "Current implementation does not support multiple " \
-                  "sampling_intervals for {} on one population. ".format(
-                      variable)
-            raise ConfigurationException(msg)
+            self._check_complete_overwrite(variable, indexes)
         # else rate not changed so no action
 
         if indexes is None:
@@ -367,7 +376,7 @@ class NeuronRecorder(object):
                 variable))
 
     def get_buffered_sdram_per_record(self, variable, vertex_slice):
-        """ Returns the sdram used per record
+        """ Return the SDRAM used per record
 
         :param variable:
         :param vertex_slice:
@@ -377,10 +386,7 @@ class NeuronRecorder(object):
         if n_neurons == 0:
             return 0
         if variable == SPIKES:
-            if n_neurons < vertex_slice.n_atoms:
-                # Indexing is used rather than gating to determine recording
-                # Non recoding neurons write to an extra slot
-                n_neurons += 1
+            # Overflow can be ignored as it is not save if in an extra word
             out_spike_words = int(math.ceil(n_neurons / 32.0))
             out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
@@ -389,7 +395,7 @@ class NeuronRecorder(object):
                         n_neurons * self.N_BYTES_PER_VALUE
 
     def get_buffered_sdram_per_timestep(self, variable, vertex_slice):
-        """ Returns the sdram used per timestep
+        """ Return the SDRAM used per timestep.
 
         In the case where sampling is used it returns the average\
         for recording and none recording based on the recording rate
@@ -409,7 +415,7 @@ class NeuronRecorder(object):
             return data_size // rate
 
     def get_sampling_overflow_sdram(self, vertex_slice):
-        """ Gets the extra sdram that should be reserved if using per_timestep
+        """ Get the extra SDRAM that should be reserved if using per_timestep
 
         This is the extra that must be reserved if per_timestep is an average\
         rather than fixed for every timestep.
@@ -433,7 +439,7 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the sdram used per timestep
+        """ Return the SDRAM used per timestep
 
         In the case where sampling is used it returns the average\
         for recording and none recording based on the recording rate
@@ -451,38 +457,27 @@ class NeuronRecorder(object):
             records = records + 1
         return data_size * records
 
-    def get_sdram_usage_for_global_parameters_in_bytes(self):
-        return len(self._sampling_rates) * \
-               (self.N_BYTES_PER_RATE + self.N_BYTES_PER_INDEX)
-
-    def get_sdram_usage_per_neuron_in_bytes(self):
-        """ Gets the sdram usage for indexing and other controls
-
-        :return:
-        """
-        return len(self._sampling_rates) * self.N_BYTES_PER_INDEX
+    def get_sdram_usage_in_bytes(self, vertex_slice):
+        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        n_bytes_for_n_neurons = n_words_for_n_neurons * 4
+        return (8 + n_bytes_for_n_neurons) * len(self._sampling_rates)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
-        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        # global_record_params_t
-        usage = self.get_sdram_usage_for_global_parameters_in_bytes()
-        # indexes_t
-        usage += self.get_sdram_usage_per_neuron_in_bytes() * total_neurons
-        # *_index + *_increment
+        # *_rate + n_neurons_recording_* + *_indexes
+        usage = self.get_sdram_usage_in_bytes(vertex_slice)
+        # *_count + *_increment
         usage += len(self._sampling_rates) * self.N_BYTES_PER_POINTER * 2
-        # out_spikes voltages inputs_excitatory inputs_inhibitory
+        # out_spikes, *_values
         for variable in self._sampling_rates:
-            n_neurons = self._count_recording_per_slice(variable, vertex_slice)
             if variable == SPIKES:
-                out_spike_words = int(math.ceil(n_neurons / 32.0))
+                out_spike_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
                 out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
                 usage += self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
-                usage += self.N_BYTES_FOR_TIMESTAMP + \
-                         n_neurons * self.N_BYTES_PER_VALUE
-        # sizes
+                usage += (self.N_BYTES_FOR_TIMESTAMP +
+                          vertex_slice.n_atoms * self.N_BYTES_PER_VALUE)
+        # *_size
         usage += len(self._sampling_rates) * self.N_BYTES_PER_SIZE
-        # random_backoff  time_between_spikes expected_time
         # n_recordings_outstanding
         usage += self.N_BYTES_PER_WORD * 4
         return usage
@@ -490,6 +485,35 @@ class NeuronRecorder(object):
     def get_n_cpu_cycles(self, n_neurons):
         return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
                 len(self.recording_variables)
+
+    def get_data(self, vertex_slice):
+        data = list()
+        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        n_bytes_for_n_neurons = n_words_for_n_neurons * 4
+        for variable in self._sampling_rates:
+            rate = self._sampling_rates[variable]
+            n_recording = self._count_recording_per_slice(
+                variable, vertex_slice)
+            data.append(numpy.array([rate, n_recording], dtype="uint32"))
+            if rate == 0:
+                data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
+            elif self._indexes[variable] is None:
+                data.append(numpy.arange(
+                    n_bytes_for_n_neurons, dtype="uint8").view("uint32"))
+            else:
+                indexes = self._indexes[variable]
+                local_index = 0
+                local_indexes = list()
+                for index in xrange(n_bytes_for_n_neurons):
+                    if index + vertex_slice.lo_atom in indexes:
+                        local_indexes.append(local_index)
+                        local_index += 1
+                    else:
+                        # write to one beyond recording range
+                        local_indexes.append(n_recording)
+                data.append(
+                    numpy.array(local_indexes, dtype="uint8").view("uint32"))
+        return numpy.concatenate(data)
 
     def get_global_parameters(self, vertex_slice):
         params = []
@@ -526,11 +550,3 @@ class NeuronRecorder(object):
                         local_indexes.append(n_recording)
             params.append(NeuronParameter(local_indexes, DataType.UINT8))
         return params
-
-    def get_size_of_global_parameters(self, vertex_slice):
-        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
-        # global_record_params_t
-        usage = self.get_sdram_usage_for_global_parameters_in_bytes()
-        # indexes_t
-        usage += self.get_sdram_usage_per_neuron_in_bytes() * total_neurons
-        return usage

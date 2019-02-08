@@ -1,15 +1,13 @@
+import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
-
 from .projection_machine_edge import ProjectionMachineEdge
-
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class ProjectionApplicationEdge(ApplicationEdge):
-    """ An edge which terminates on an AbstractPopulationVertex
+    """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
         "_delay_edge",

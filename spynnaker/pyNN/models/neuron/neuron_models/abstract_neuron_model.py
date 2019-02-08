@@ -1,117 +1,70 @@
-from six import add_metaclass
+import numpy
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent, Struct)
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-_BYTES_PER_PARAMETER = 4
-
-
-@add_metaclass(AbstractBase)
-class AbstractNeuronModel(object):
-    """ Represents a neuron model
+class AbstractNeuronModel(AbstractStandardNeuronComponent):
+    """ Represents a neuron model.
     """
 
-    __slots__ = ()
+    __slots__ = ("_global_struct")
 
-    @abstractmethod
-    def get_n_neural_parameters(self):
-        """ Get the number of neural parameters
-
-        :return: The number of parameters
-        :rtype: int
+    def __init__(self, data_types, global_data_types=None):
         """
 
-    @abstractmethod
-    def get_neural_parameters(self):
-        """ Get the neural parameters
+        :param data_types:\
+            A list of data types in the neuron structure, in the order that\
+            they appear
+        :param global_data_types:\
+            A list of data types in the neuron global structure, in the order\
+            that they appear
 
-        :return: an array of parameters
-        :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
         """
+        super(AbstractNeuronModel, self).__init__(data_types)
+        if global_data_types is None:
+            global_data_types = []
+        self._global_struct = Struct(global_data_types)
 
-    @abstractmethod
-    def get_neural_parameter_types(self):
-        """ Get the types of the neural parameters
-
-        :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.DataType`
+    @property
+    def global_struct(self):
+        """ Get the global parameters structure
         """
+        return self._global_struct
 
-    @abstractmethod
-    def get_n_global_parameters(self):
-        """ Get the number of global parameters
+    @overrides(AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes)
+    def get_dtcm_usage_in_bytes(self, n_neurons):
+        usage = super(AbstractNeuronModel, self).get_dtcm_usage_in_bytes(
+            n_neurons)
+        return usage + (self.global_struct.get_size_in_whole_words() * 4)
 
-        :return: The number of global parameters
-        :rtype: int
+    @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
+    def get_sdram_usage_in_bytes(self, n_neurons):
+        usage = super(AbstractNeuronModel, self).get_sdram_usage_in_bytes(
+            n_neurons)
+        return usage + (self.global_struct.get_size_in_whole_words() * 4)
+
+    def get_global_values(self):
+        """ Get the global values to be written to the machine for this model
+
+        :return: A list with the same length as self.global_struct.field_types
+        :rtype: A list of single values
         """
+        return numpy.zeros(0, dtype="uint32")
 
-    @abstractmethod
-    def get_global_parameter_types(self):
-        """ Get the types of the global parameters
+    @overrides(AbstractStandardNeuronComponent.get_data)
+    def get_data(self, parameters, state_variables, vertex_slice):
+        super_data = super(AbstractNeuronModel, self).get_data(
+            parameters, state_variables, vertex_slice)
+        values = self.get_global_values()
+        global_data = self.global_struct.get_data(values)
+        return numpy.concatenate([global_data, super_data])
 
-        :return: A list of DataType objects, in the order of the parameters
-        :rtype: list of :py:class:`data_specification.enums.DataType`
-        """
+    @overrides(AbstractStandardNeuronComponent.read_data)
+    def read_data(
+            self, data, offset, vertex_slice, parameters, state_variables):
 
-    @abstractmethod
-    def get_global_parameters(self):
-        """ Get the global parameters
-
-        :return: an array of parameters
-        :rtype: array of\
-                :py:class:`spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter`
-        """
-
-    @abstractmethod
-    def get_n_cpu_cycles_per_neuron(self):
-        """ Get the total number of CPU cycles executed by \
-            neuron_model_state_update and neuron_model_has_spiked, per neuron
-
-        :return: The number of CPU cycles executed
-        :rtype: int
-        """
-
-    def get_sdram_usage_per_neuron_in_bytes(self):
-        """ Get the total sdram usage in bytes
-
-        :return: The SDRAM usage
-        :rtype: int
-        """
-        return self.get_n_neural_parameters() * _BYTES_PER_PARAMETER
-
-    def get_dtcm_usage_per_neuron_in_bytes(self):
-        """ Get the DTCM usage of this neuron model in bytes
-
-        :return: The DTCM usage
-        :rtype: int
-        """
-        return self.get_n_neural_parameters() * _BYTES_PER_PARAMETER
-
-    def get_sdram_usage_for_global_parameters_in_bytes(self):
-        """ Get the SDRAM usage of the global parameters in bytes
-
-        :return: The SDRAM usage
-        :rtype: int
-        """
-        return self.get_n_global_parameters() * _BYTES_PER_PARAMETER
-
-    def set_global_parameters(self, parameters):
-        """ Sets any global parameters.  Override if there are changing\
-            variables in the global parameters
-
-        :param parameters:\
-            the parameter values as a list, ordered the same as\
-            get_global_parameters
-        """
-        pass
-
-    def set_neural_parameters(self, neural_parameters, vertex_slice):
-        """ Sets any neural parameters.  Override if there are changing\
-            variables in the neural parameters
-
-        :param neural_parameters:\
-            the parameter values in a list of numpy arrays, ordered the same\
-            as get_neural_parameters
-        :param vertex_slice: The neurons to which the parameters apply
-        """
-        pass
+        # Assume that the global data doesn't change
+        offset += (self.global_struct.get_size_in_whole_words() * 4)
+        return super(AbstractNeuronModel, self).read_data(
+            data, offset, vertex_slice, parameters, state_variables)

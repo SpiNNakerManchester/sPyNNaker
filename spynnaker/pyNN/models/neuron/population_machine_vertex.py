@@ -1,27 +1,20 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
-
-# pacman imports
 from pacman.model.graphs.machine import MachineVertex
-
-# spinn front end common imports
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models \
-    import AbstractReceiveBuffersToHost
-from spinn_front_end_common.interface.buffer_management\
-    import recording_utilities
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import AbstractRecordable
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
-from spinn_front_end_common.interface.profiling.profile_utils \
-    import get_profiling_data
-
-# spynnaker imports
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data)
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
-
-from enum import Enum
 
 
 class PopulationMachineVertex(
@@ -58,14 +51,13 @@ class PopulationMachineVertex(
             buffered_sdram_per_timestep, label, constraints=None,
             overflow_sdram=0):
         """
-
         :param resources_required:
         :param is_recording:
         :param minimum_buffer_sdram_usage:
         :param buffered_sdram_per_timestep:
         :param label:
         :param constraints:
-        :param overflow_sdram: Extra sdram that may be required if
+        :param overflow_sdram: Extra SDRAM that may be required if\
             buffered_sdram_per_timestep is an average
         :type sampling: bool
         """
@@ -151,7 +143,7 @@ class PopulationMachineVertex(
             self._add_name(names,
                            "Times_plastic_synaptic_weights_have_saturated"),
             n_plastic_saturations,
-            report=n_saturations > 0,
+            report=n_plastic_saturations > 0,
             message=(
                 "The weights from the plastic synapses for {} on {}, {}, {} "
                 "saturated {} times. If this causes issue increase the "

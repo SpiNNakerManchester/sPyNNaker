@@ -4,7 +4,6 @@
 #include "synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
-#include <spin1_api.h>
 #include <debug.h>
 
 // The number of DMA Buffers to use
@@ -290,14 +289,14 @@ circular_buffer get_circular_buffer(){
     return buffer;
 }
 
-//! \brief set the dma status
-//! param[in] busy: bool
+//! \brief set the DMA status
+//! \param[in] busy: bool
 //! \return None
 void set_dma_busy(bool busy) {
     dma_busy = busy;
 }
 
-//! \brief retrieve the dma status
+//! \brief retrieve the DMA status
 //! \return bool
 bool get_dma_busy() {
     return dma_busy;

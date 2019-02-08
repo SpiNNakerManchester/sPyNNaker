@@ -1,5 +1,4 @@
 from six import add_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -15,16 +14,12 @@ class AbstractSynapseIO(object):
             before extensions are required, or None if any delay is supported
         """
 
-    @abstractmethod
-    def get_sdram_usage_in_bytes(
-            self, synapse_info, n_pre_slices, pre_slice_index,
-            n_post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages, population_table):
-        """ Get the SDRAM usage of a list of synapse information objects for\
-            the given slices, and given number of delay stages (each stage\
-            representing a multiple of the maximum delay supported), returning\
-            the size for the non-delayed synapse information and the size for\
-            the delayed information
+    def get_max_row_info(
+            self, synapse_info, post_vertex_slice, n_delay_stages,
+            population_table, machine_time_step, in_edge):
+        """ Get the information about the maximum lengths of delayed and\
+            undelayed rows in bytes (including header), words (without header)\
+            and number of synapses
         """
 
     @abstractmethod
