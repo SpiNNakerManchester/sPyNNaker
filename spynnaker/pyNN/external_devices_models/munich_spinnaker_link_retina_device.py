@@ -64,7 +64,7 @@ class MunichRetinaDevice(
 
     def __init__(
             self, retina_key, spinnaker_link_id, position,
-            label=default_parameters['label'], n_neurons=None,
+            label=None,
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
         # pylint: disable=too-many-arguments
@@ -95,10 +95,6 @@ class MunichRetinaDevice(
         if self._position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this _position")
-
-        if n_neurons != fixed_n_neurons and n_neurons is not None:
-            print("Warning, the retina will have {} neurons".format(
-                fixed_n_neurons))
 
     @inject_items({"machine_graph": "MemoryMachineGraph"})
     @overrides(

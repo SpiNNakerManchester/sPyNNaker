@@ -12,11 +12,11 @@ _TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
-    """ generates the synaptic matrix for reporting purposes
+    """ Generate the synaptic matrix for reporting purposes
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):
-        """ converts synaptic matrix for every application edge.
+        """ Convert synaptic matrix for every application edge.
         """
 
         # Update the print options to display everything

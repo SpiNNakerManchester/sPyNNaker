@@ -12,8 +12,9 @@ class AbstractFilterableEdge(object):
 
     @abstractmethod
     def filter_edge(self, graph_mapper):
-        """ method to allow edges to determine if a edge is filter-able
+        """ Determine if this edge should be filtered out
 
         :param graph_mapper: the mapper between graphs
+        :return: True if the edge should be filtered
         :rtype: bool
         """

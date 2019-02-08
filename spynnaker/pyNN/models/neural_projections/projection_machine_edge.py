@@ -47,25 +47,13 @@ class ProjectionMachineEdge(
     def update_weight(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
             self.pre_vertex)
-        pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self.pre_vertex)
         pre_vertex_slice = graph_mapper.get_slice(
             self.pre_vertex)
-        pre_slices = graph_mapper.get_slices(pre_vertex)
-        post_vertex = graph_mapper.get_application_vertex(
-            self.post_vertex)
-        post_slice_index = graph_mapper.get_machine_vertex_index(
-            self.post_vertex)
-        post_vertex_slice = graph_mapper.get_slice(
-            self.post_vertex)
-        post_slices = graph_mapper.get_slices(post_vertex)
 
         weight = 0
         for synapse_info in self._synapse_information:
             new_weight = synapse_info.connector.\
-                get_n_connections_to_post_vertex_maximum(
-                    pre_slices, pre_slice_index, post_slices,
-                    post_slice_index, pre_vertex_slice, post_vertex_slice)
+                get_n_connections_to_post_vertex_maximum()
             new_weight *= pre_vertex_slice.n_atoms
             if hasattr(pre_vertex, "rate"):
                 rate = pre_vertex.rate

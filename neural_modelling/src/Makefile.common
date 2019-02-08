@@ -1,4 +1,4 @@
-# THIS FILE IS A STUB FOR A RENAMED VERSION
-# IT IS KEPT FOR BACKWARD COMPATIBILITY ONLY
-$(warning inclusion of Makefile.common instead of common.mk)
-include $(dir $(abspath $(lastword $(MAKEFILE_LIST))))common.mk
+# THIS FILE WAS USED IN AN OLDER MAKE STYLE
+# Make now has to convert c files before building
+# SEE http://spinnakermanchester.github.io/spynnaker/5.0.0/Makefiles.html
+$(error inclusion of sPyNNaker/neural_modelling/src/Makefile.common)
