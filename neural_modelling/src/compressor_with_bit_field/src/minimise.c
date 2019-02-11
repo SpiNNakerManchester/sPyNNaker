@@ -16,67 +16,36 @@
  * (entry_t is defined in `routing_table.h` but is described below).
  */
 
-//! \brief struct for a bitfield address point
-typedef struct _bit_field_list_element{
-    // the address of the bitfield data
-    address_t bit_field_address;
-    // next element
-    _bit_field_list_element *next;
-}_bit_field_list_element;
+//! \brief struct for bitfield by processor
+typedef struct _bit_field_by_processor_t{
+    // processor id
+    uint processor_id;
+    // length of list
+    uint length_of_list;
+    // list of addresses where the bitfields start
+    address_t * bit_field_addresses;
+} _bit_field_by_processor_t;
 
-//! \brief struct for a redundant packet list element
-typedef struct _redundant_packet_list_element{
-    // the n redundant packets
+//! \brief struct for processor coverage by bitfield
+typedef struct _proc_cov_by_bitfield_t{
+    // processor id
+    uint processor_id;
+    // length of the list
+    uint length_of_list;
+    // list of the number of redundant packets from a bitfield
+    uint * redundant_packets;
+} _proc_cov_by_bitfield_t;
+
+//! \brief struct for n redudnant packets and the bitfield addresses of it
+typedef struct _bit_fields_by_coverage{
+    // n redundant packets
     uint n_redundant_packets;
-    // next element
-    _redundant_packet_list_element *next;
-}_redundant_packet_list_element;
+    // length of list
+    uint length_of_list;
+    // list of addresses of bitfields with this x redundant packets
+    address_t * bit_field_addresses
+}_bit_fields_by_coverage;
 
-//! \brief struct for list of coverage by bitfield components
-typedef struct _bit_field_by_coverage_first_element{
-    // element
-    uint32_t n_redundant_packets;
-    // length of the list
-    uint32_t length;
-    // last element
-    _bit_field_list_element last_element;
-    // next element
-    _bit_field_list_element first_element;
-} _bit_field_by_coverage_first_element;
-
-//! \brief struct for list of bitfield components
-typedef struct _coverage_by_processor_first_element{
-    // element
-    uint32_t processor_id;
-    // length of the list
-    uint32_t length;
-    // last element
-    _redundant_packet_list_element last_element;
-    // next element
-    _redundant_packet_list_element first_element;
-} _bit_field_by_processor_first_element;
-
-//! \brief struct for list of bitfield components
-typedef struct _bit_field_by_processor_first_element{
-    // element
-    uint32_t processor_id;
-    // length of the list
-    uint32_t length;
-    // last element
-    _bit_field_list_element last_element;
-    // next element
-    _bit_field_list_element first_element;
-} _bit_field_by_processor_first_element;
-
-//! \brief struct for a redundant packet list element
-typedef struct _bit_field_by_coverage{
-    // first element
-    _bit_field_by_coverage_first_element *element;
-    // last element
-    _bit_field_by_coverage_first_element *last;
-    // length
-    uint length;
-}_bit_field_by_coverage;
 
 
 //! enum for the different states to report through the user2 address.
@@ -109,7 +78,17 @@ typedef enum addresses_elements{
     ADDRESS_PAIR_LENGTH = 3
 } addresses_elements;
 
-//! enum stating the compoennts of a bitfield struct
+//! enum mapping bitfield region top elements
+typedef enum bit_field_data_top_elements{
+    N_BIT_FIELDS = 0, START_OF_BIT_FIELD_TOP_DATA = 1
+} bit_field_data_top_elements;
+
+//! enum mapping top elements of the adresses space
+typedef enum top_level-addresses_space_elements{
+    N_PAIRS = 0, START_OF_ADDRESSES_DATA = 1
+}
+
+//! enum stating the components of a bitfield struct
 typedef enum bit_field_data_elements{
     BIT_FIELD_BASE_KEY = 0, BIT_FIELD_N_WORDS = 1, START_OF_BIT_FIELD_DATA = 2
 } bit_field_data_elements;
@@ -153,7 +132,7 @@ table_t last_compressed_table = NULL;
 _bit_field_data_t * sorted_bit_fields = NULL;
 
 //! the bitfield by processor global holder
-_bit_field_by_processor_first_element *bit_field_by_processor;
+_bit_field_by_processor_t * bit_field_by_processor;
 
 
 //! \brief reads in the addresses region and from there reads in the key atom
@@ -268,64 +247,204 @@ bool minimise_read_in_bit_fields(){
 
     // count how many bitfields there are in total
     uint position_in_region_data = 0;
+    uint total_bit_fields = 0;
     uint32_t n_pairs_of_addresses =
-        user_register_content[REGION_ADDRESSES][position_in_region_data];
-    position_in_region_data += 1;
+        user_register_content[REGION_ADDRESSES][N_PAIRS];
+    position_in_region_data = START_OF_ADDRESSES_DATA;
 
-    // malloc the holders for the dicts that were going to build
-    // holder for list of processor id to the
+    // malloc the bt fields by processor
     bit_field_by_processor = MALLOC(
-        n_pairs_of_addresses * sizeof(_bit_field_by_processor_first_element*));
+        n_pairs_of_addresses * sizeof(_bit_field_by_processor_t*));
     if (bit_field_by_processor == NULL){
-        log_error("failed to alloc memory for bit_field_by_region_address");
+        log_error("failed to allocate memory for pairs, if it fails here. "
+                  "might as well give up");
+        return false;
+    }
+    
+    // build processor coverage by bitfield
+    _proc_cov_by_bitfield_t* proc_cov_by_bitfield = MALLOC(
+        n_pairs_of_addresses * sizeof(_proc_cov_by_bitfield_t*));
+    if (proc_cov_by_bitfield == NULL){
+        log_error("failed to allocate memory for processor coverage by "
+                  "bitfield, if it fails here. might as well give up");
         return false;
     }
 
-    // holder for redundant packets by processor
-    _coverage_by_processor_first_element processor_coverage = MALLOC(
-        n_pairs_of_addresses * sizeof(_coverage_by_processor_first_element));
-    if (processor_coverage == NULL){
-        log_error("failed to alloc memory for processor_coverage");
-        return false;
-    }
-
-    // track how many redundant packets there are
-    _bit_field_by_coverage bit_field_by_coverage = MALLOC(
-        sizeof(_bit_field_by_coverage));
-    if(bit_field_by_coverage == NULL){
-        log_error("failed to alloc memory for bit_field_by_coverage");
-        return false;
-    }
-    bit_field_by_coverage->element = NULL;
-    bit_field_by_coverage->last = NULL;
-
-
-    // iterate through a processors bitfields region and populate dicts
+    // iterate through a processors bitfield region and get n bitfields
     for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
+        // allocate memory for the given structs
+        bit_field_by_processor[region_id] = MALLOC(
+            sizeof(_bit_field_by_processor_t));
+        if (bit_field_by_processor[region_id] == NULL){
+            log_error("failed to allocate memory for bitfield by processor "
+                      "%d. might as well give up", region_id);
+            return false;
+        }
+        
+        // malloc for n redundant packets
+        proc_cov_by_bitfield[region_id] = MALLOC(sizeof(
+            _proc_cov_by_bitfield_t));
+        if (proc_cov_by_bitfield[region_id] == NULL){
+            log_error("failed to allocate memory for processor coverage for "
+                      "region %d. might as well give up", region_id);
+            return false;
+        }
+
+        // track processor id
+        bit_field_by_processor[region_id]->processor_id =
+            user_register_content[REGION_ADDRESSES][
+                position_in_region_data + PROCESSOR_ID];
+        proc_cov_by_bitfield[region_id]->processor_id = 
+            user_register_content[REGION_ADDRESSES][
+                position_in_region_data + PROCESSOR_ID];
+
+        // locate data for malloc memory calcs
         address_t bit_field_address = user_register_content[REGION_ADDRESSES][
             position_in_region_data + BITFIELD_REGION];
-        uint processor = user_register_content[REGION_ADDRESSES][
-            position_in_region_data + PROCESSOR_ID];
         position_in_region_data += ADDRESS_PAIR_LENGTH;
+        uint32_t pos_in_bitfield_region = N_BIT_FIELDS;
+        uint32_t core_n_bit_fields = bit_field_address[pos_in_bitfield_region];
+        pos_in_bitfield_region = START_OF_BIT_FIELD_TOP_DATA;
+        total_bit_fields += core_n_bit_fields;
+        
+        // track lengths
+        proc_cov_by_bitfield[region_id]->length_of_list = core_n_bit_fields;
+        bit_field_by_processor[region_id]->length_of_list = core_n_bit_fields;
+        
+        // malloc for bitfield region addresses
+        bit_field_by_processor[region_id]->bit_field_addresses = MALLOC(
+            core_n_bit_fields * sizeof(address_t));
+        if (bit_field_by_processor[region_id]->bit_field_addresses == NULL){
+            log_error("failed to allocate memory for bitfield addresses for "
+                      "region %d, might as well fail", region_id);
+            return false; 
+        }
+        
+        // malloc for n redundant packets
+        proc_cov_by_bitfield[region_id]->redundant_packets = MALLOC(
+            core_n_bit_fields * sizeof(uint));
+        if (proc_cov_by_bitfield[region_id]->redundant_packets == NULL){
+            log_error("failed to allocate memory for processor coverage for "
+                      "region %d, might as well fail", region_id);
+            return false;
+        }
 
-        // cycle through bitfields stored in bitfield region
-        uint position_in_bit_field_region = 0;
-        uint n_bit_fields = bit_field_address[position_in_bit_field_region];
-        position_in_bit_field_region += 1;
-        for(uint bit_field_id = 0; bit_field_id < n_bit_fields;
+        // populate tables: 1 for addresses where each bitfield component starts
+        //                  2 n redundant packets
+        for (uint32_t bitfield_id = 0; bit_field_id < core_n_bit_fields; 
                 bit_field_id++){
+            bit_field_by_processor[region_id]->bit_field_addresses[
+                bit_field_id] = *bit_field_address[pos_in_bitfield_region];
 
-            // determine redundant packets count
             uint n_redundant_packets = minimise_detect_redundant_packet_count(
-                bit_field_address[position_in_bit_field_region]);
+                bit_field_address[pos_in_bitfield_region]);
+            proc_cov_by_bitfield[region_id]->redundant_packets[bit_field_id] =
+                n_redundant_packets;
+            
+            pos_in_bitfield_region += 
+                START_OF_BIT_FIELD_DATA + bit_field_address[
+                    pos_in_bitfield_region + BIT_FIELD_N_WORDS];
+        }
+    }
 
-            bit_field_by_coverage
+    // populate the bitfield by coverage
+    uint length_n_redundant_packets = 0;
+    uint * redundant_packets = MALLOC(total_bit_fields * sizeof(uint));
 
-            // update position in search
-            n_words_read = bit_field_address[
-                position_in_bit_field_region + BIT_FIELD_N_WORDS];
-            position_in_bit_field_region +=
-                START_OF_BIT_FIELD_DATA + n_words_read;
+    // filter out duplicates in the n redundant packets
+    position_in_region_data = START_OF_ADDRESSES_DATA;
+    for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
+        // cycle through the bitfield regsters again to get n bitfields per core
+        address_t bit_field_address = user_register_content[REGION_ADDRESSES][
+            position_in_region_data + BITFIELD_REGION];
+        position_in_region_data += ADDRESS_PAIR_LENGTH;
+        uint32_t core_n_bit_fields = bit_field_address[N_BIT_FIELDS];
+
+        // check that each bitfield redundant packets are unqiue and add to set
+        for (uint32_t bitfield_id = 0; bit_field_id < core_n_bit_fields;
+                bit_field_id++){
+            uint x_packets = proc_cov_by_bitfield[
+                region_id]->redundant_packets[bit_field_id];
+            // check if seen this before
+            bool found = false;
+            for (uint index = 0; index < length_n_redundant_packets; index++){
+                if(redundant_packets[index] == x_packets){
+                    found = true;
+                }
+            }
+            // if not a duplicate, add to list and update size
+            if (!found){
+                redundant_packets[length_n_redundant_packets] = x_packets;
+                length_n_redundant_packets += 1;
+            }
+        }
+    }
+
+    // malloc space for the bitfield by coverage map
+    _bit_fields_by_coverage* bit_fields_by_coverage = MALLOC(
+        length_n_redundant_packets * sizeof(_bit_fields_by_coverage*));
+    if (bit_fields_by_coverage == NULL){
+        log_error("failed to malloc memory for the bitfields by coverage. "
+                  "might as well fail");
+        return false;
+    }
+    
+    // go through the unique x redundant packets and build the list of 
+    // bitfields for it
+    for (uint32_t r_packet_index = 0; 
+            r_packet_index < length_n_redundant_packets; r_packet_index++){
+        // malloc a redundant packet entry
+        bit_fields_by_coverage[r_packet_index] = MALLOC(
+            sizeof(_bit_fields_by_coverage));
+        if (bit_fields_by_coverage[r_packet_index] == NULL){
+            log_error("failed to malloc memory for the bitfields by coverage "
+                      "for index %d. might as well fail", r_packet_index);
+            return false;
+        }
+        
+        // update the redundant packet pointer
+        bit_fields_by_coverage[r_packet_index]->n_redundant_packets = 
+            redundant_packets;
+        
+        // search to see how long the list is going to be.
+        uint32_t n_bit_fields_with_same_x_r_packets = 0;
+        for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
+            uint length = proc_cov_by_bitfield[region_id].length_of_list
+            for(uint red_packet_index = 0; red_packet_index < length;
+                    red_packet_index ++){
+                if(proc_cov_by_bitfield[region_id][red_packet_index] == 
+                        redundant_packets){
+                    n_bit_fields_with_same_x_r_packets += 1;
+                }
+            }
+        }
+        
+        // update length of list
+        bit_fields_by_coverage[r_packet_index]->length_of_list = 
+            n_bit_fields_with_same_x_r_packets;
+        
+        // malloc list size for these addresses of bitfields with same 
+        // redundant packet counts.
+        bit_fields_by_coverage[r_packet_index]->bit_field_addresses = MALLOC(
+            n_bit_fields_with_same_x_r_packets * sizeof(address_t));
+        if(bit_fields_by_coverage[r_packet_index]->bit_field_addresses == NULL){
+            log_error("");
+            return false;
+        }
+            
+        // populate list of bitfields addresses which have same redundant 
+        //packet count.
+        for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
+            uint length = proc_cov_by_bitfield[region_id].length_of_list;
+            for(uint red_packet_index = 0; red_packet_index < length;
+                    red_packet_index ++){
+                if(proc_cov_by_bitfield[region_id][red_packet_index] == 
+                        redundant_packets){
+                    bit_fields_by_coverage[r_packet_index]->bit_field_addresses[
+                        red_packet_index] = bit_field_by_processor[region_id][
+                            red_packet_index];
+                }
+            }
         }
     }
 
