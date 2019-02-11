@@ -596,9 +596,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 # scale the exception weight according to the appropriate weight scale
                 spec.write_value(data=int(round(exceptional_weight * weight_scales[int(syn_type)])))
             else:
-                spec.write_value(data=int(round(self._initial_weight * weight_scales[0])))
-                # scale the inhibitory weight appropriately
-                spec.write_value(data=int(round(self._initial_weight * weight_scales[1])))
+                # scale the exception weight according to the appropriate weight scale
+                spec.write_value(data=int(round(self._initial_weight * weight_scales[int(syn_type)])))
 
 
 
