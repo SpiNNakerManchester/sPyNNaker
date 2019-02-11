@@ -566,10 +566,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 itervalues(projection_types)):
             # Population header(s)
             # Number of subpopulations
-            spec.write_value(data=len(subpopulation_list),
-                             data_type=DataType.UINT16)
             exceptions = subpopulation_list[0]
             subpopulation_list = subpopulation_list[1:]
+            spec.write_value(data=len(subpopulation_list),
+                             data_type=DataType.UINT16)
 
 
             # Custom header for commands / controls
