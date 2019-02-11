@@ -1,9 +1,8 @@
-from pacman.executor.injection_decorator import inject_items
-from data_specification.enums import DataType
-from spinn_utilities.overrides import overrides
-from .abstract_additional_input import AbstractAdditionalInput
-
 import numpy
+from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
+from pacman.executor.injection_decorator import inject_items
+from .abstract_additional_input import AbstractAdditionalInput
 
 I_ALPHA = "i_alpha"
 I_CA2 = "i_ca2"

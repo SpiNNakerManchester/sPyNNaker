@@ -1,17 +1,15 @@
 """
 utility class containing simple helper methods
 """
-import numpy
+from decimal import Decimal
 import os
 import logging
 import math
-
-from spinn_utilities.safe_eval import SafeEval
-
+import numpy
 from scipy.stats import binom
+from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from decimal import Decimal
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 

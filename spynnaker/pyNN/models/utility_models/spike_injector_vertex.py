@@ -1,17 +1,13 @@
 import logging
-
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-
-from spinn_front_end_common.abstract_models \
-    import AbstractProvidesOutgoingPartitionConstraints
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-from spynnaker.pyNN.models.common \
-    import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
-    SimplePopulationSettable
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
 logger = logging.getLogger(__name__)
 
