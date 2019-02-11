@@ -75,7 +75,10 @@ typedef struct {
 
 //! individual pre-synaptic sub-population information
 typedef struct {
-    int16_t no_pre_vertices, sp_control, connection_type;
+    int16_t no_pre_vertices, sp_control;
+    int16_t delay_lo, delay_hi;
+    uint32_t weight;
+    uint32_t connection_type;
     int32_t total_no_atoms;
     key_atom_info_t *key_atom_info;
 } subpopulation_info_t;
@@ -88,7 +91,7 @@ typedef struct {
 
 //! parameters of the synaptic rewiring model
 typedef struct {
-    uint32_t p_rew, fast, weight[2], delay_lo, delay_hi, s_max, app_no_atoms,
+    uint32_t p_rew, fast, s_max, app_no_atoms,
         machine_no_atoms, low_atom, high_atom,
         size_ff_prob, size_lat_prob, grid_x, grid_y, p_elim_dep, p_elim_pot;
     // the 2 seeds that are used: shared for sync, local for everything else
@@ -193,13 +196,6 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     int32_t *sp_word = (int32_t *) sdram_sp_address;
     rewiring_data.fast = *sp_word++;
     rewiring_data.p_rew = *sp_word++;
-    rewiring_data.weight[0] = *sp_word++;
-    rewiring_data.weight[1] = *sp_word++;
-
-    log_info("w[%d, %d]", rewiring_data.weight[0], rewiring_data.weight[1]);
-
-    rewiring_data.delay_lo = *sp_word++;
-    rewiring_data.delay_hi = *sp_word++;
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
     rewiring_data.random_partner = *sp_word++;
@@ -248,7 +244,12 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         half_word = (uint16_t *) sp_word;
         subpopinfo->no_pre_vertices = *half_word++;
         subpopinfo->sp_control = *half_word++;
+        subpopinfo->delay_lo = *half_word++;
+        subpopinfo->delay_hi = *half_word++;
+        log_info("delays  [%d, %d]", subpopinfo->delay_lo, subpopinfo->delay_hi);
         sp_word = (int32_t *) half_word;
+        subpopinfo->weight = *sp_word++;
+        log_info("weight %d", subpopinfo->weight);
         subpopinfo->connection_type = *sp_word++;
         log_info("syn_type %d", subpopinfo->connection_type);
         subpopinfo->total_no_atoms = *sp_word++;
@@ -540,7 +541,10 @@ bool synaptogenesis_dynamics_elimination_rule(void)
 {
     // Is synaptic weight <.5 g_max? (i.e. synapse is depressed)
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
-    int appr_scaled_weight = rewiring_data.weight[current_state.connection_type];
+
+    // get projection-specific weight from pop subpop info table
+    int appr_scaled_weight = rewiring_data.pre_pop_info_table
+            .subpop_info[current_state.pop_index].weight;
     if (current_state.sp_data.weight < (appr_scaled_weight / 2) &&
             r > rewiring_data.p_elim_dep) {
         return false;
@@ -597,12 +601,17 @@ bool synaptogenesis_dynamics_formation_rule(void)
     if (r > probability) {
         return false;
     }
-    int appr_scaled_weight = rewiring_data.weight[current_state.connection_type];
+    int appr_scaled_weight = rewiring_data.pre_pop_info_table
+            .subpop_info[current_state.pop_index].weight;
 
     uint  actual_delay;
-    int offset = rewiring_data.delay_hi - rewiring_data.delay_lo;
+    int offset = rewiring_data.pre_pop_info_table
+            .subpop_info[current_state.pop_index].delay_hi -
+            rewiring_data.pre_pop_info_table
+            .subpop_info[current_state.pop_index].delay_lo;
     actual_delay = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-	    offset + rewiring_data.delay_lo;
+	    offset + rewiring_data.pre_pop_info_table
+            .subpop_info[current_state.pop_index].delay_lo;
 
     if (!add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
             appr_scaled_weight, actual_delay,

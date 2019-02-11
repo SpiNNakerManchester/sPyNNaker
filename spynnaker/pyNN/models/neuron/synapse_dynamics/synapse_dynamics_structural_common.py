@@ -338,7 +338,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self.__write_presynaptic_information(
             spec, application_graph, machine_graph,
             app_vertex, post_slice, machine_vertex, graph_mapper,
-            routing_info)
+            routing_info, weight_scales)
 
     def __write_common_rewiring_data(self, spec, app_vertex, post_slice,
                                      weight_scales, machine_time_step):
@@ -375,17 +375,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # NOTE: it should be different between application vertices
         if app_vertex not in self._seeds.keys():
             self._seeds[app_vertex] = [self._rng.randint(0x7FFFFFFF) for _ in range(4)]
-        # scale the excitatory weight appropriately
-        spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[0])))
-        # scale the inhibitory weight appropriately
-        spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[1])))
-        if isinstance(self._initial_delay, collections.Iterable):
-            spec.write_array(self._initial_delay)
-        else:
-            spec.write_value(data=self._initial_delay)
-            spec.write_value(data=self._initial_delay)
         spec.write_value(data=int(self._s_max))
         spec.write_value(data=int(self._lateral_inhibition),
                          data_type=DataType.INT32)
@@ -523,7 +512,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                                         machine_graph,
                                         app_vertex, post_slice, machine_vertex,
                                         graph_mapper,
-                                        routing_info):
+                                        routing_info, weight_scales):
         """ All cores which do synaptic rewiring have information about all\
             the relevant pre-synaptic populations.
 
@@ -582,15 +571,47 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
 
 
+            # TODO write the weight to be used from this pre-synaptic population
+            # scale the excitatory weight appropriately
+            if exceptions and self.connectivity_exception_param.delay in exceptions.keys():
+                # does the current connection have have an exceptional delay distribution?
+                delays = exceptions[self.connectivity_exception_param.delay]
+                if isinstance(delays, collections.Iterable):
+                    delay_lo, delay_hi = delays
+                else:
+                    delay_lo = delay_hi = delays
+                spec.write_value(data=int(delay_lo), data_type=DataType.UINT16)
+                spec.write_value(data=int(delay_hi), data_type=DataType.UINT16)
+            else:
+                # the current connection has the default delay distribution
+                if isinstance(self._initial_delay, collections.Iterable):
+                    spec.write_value(data=int(self._initial_delay[0]), data_type=DataType.UINT16)
+                    spec.write_value(data=int(self._initial_delay[1]), data_type=DataType.UINT16)
+                else:
+                    spec.write_value(data=self._initial_delay, data_type=DataType.UINT16)
+                    spec.write_value(data=self._initial_delay, data_type=DataType.UINT16)
+
+            if exceptions and self.connectivity_exception_param.weight in exceptions.keys():
+                exceptional_weight = exceptions[self.connectivity_exception_param.weight]
+                # scale the exception weight according to the appropriate weight scale
+                spec.write_value(data=int(round(exceptional_weight * weight_scales[int(syn_type)])))
+            else:
+                spec.write_value(data=int(round(self._initial_weight * weight_scales[0])))
+                # scale the inhibitory weight appropriately
+                spec.write_value(data=int(round(self._initial_weight * weight_scales[1])))
+
+
+
+
 
             # Write connection type
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
-            # TODO write the weight to be used from this pre-synaptic population
+
 
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
                     subpopulation_list) > 0 else 0)
-            words_written = 2 + 1
+            words_written = 4 + 1
 
             # Ensure the following values are written in ascending
             # order of low_atom (implicit)
@@ -756,7 +777,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: SDRAM usage
         :rtype: int
         """
-        structure_size = 27 * 4 + 4 * 4  # parameters + rng seed
+        structure_size = 27 * 4 + 8 * 4  # parameters + rng seeds
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 
