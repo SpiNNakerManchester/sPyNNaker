@@ -1,16 +1,14 @@
 from six import add_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from spinn_utilities.ranged.abstract_list import AbstractList
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-
 from .abstract_settable import AbstractSettable
 
 
 @add_metaclass(AbstractBase)
 class AbstractPopulationSettable(AbstractSettable):
     """ Indicates that some properties of this object can be accessed from\
-        the PyNN population set and get methods
+        the PyNN population set and get methods.
     """
 
     __slots__ = ()
@@ -21,7 +19,7 @@ class AbstractPopulationSettable(AbstractSettable):
 
     def get_value_by_selector(self, selector, key):
         """ Gets the value for a particular key but only for the selected\
-            subset
+            subset.
 
         :param selector: See RangedList.get_value_by_selector as this is just \
             a pass through method
@@ -41,7 +39,7 @@ class AbstractPopulationSettable(AbstractSettable):
 
     def set_value_by_selector(self, selector, key, value):
         """ Sets the value for a particular key but only for the selected \
-            subset
+            subset.
 
         :param selector: See RangedList.set_value_by_selector as this is just\
             a pass through method

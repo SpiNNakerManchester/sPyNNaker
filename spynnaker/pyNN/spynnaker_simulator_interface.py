@@ -1,9 +1,6 @@
 from six import add_metaclass
-
-from spinn_utilities.abstract_base import AbstractBase
-from spinn_utilities.abstract_base import abstractproperty
-from spinn_utilities.abstract_base import abstractmethod
-
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractproperty, abstractmethod)
 from spinn_front_end_common.utilities import SimulatorInterface
 
 
@@ -17,7 +14,7 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     def get_distribution_to_stats(self):
         pass
 
-    # Implemented in FEC but only used by spynakker
+    # Implemented in FEC but only used by sPyNNaker
     @abstractmethod
     def get_current_time(self):
         pass

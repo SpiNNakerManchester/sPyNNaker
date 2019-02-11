@@ -1,7 +1,7 @@
+from six import Iterator
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
-from six import Iterator
 
 
 class _Range_Iterator(Iterator):
@@ -93,7 +93,7 @@ class _SingleValue_Iterator(Iterator):
 
         Allows a single Value parameter to be treated the same as parameters\
         with len. \
-        Caches cmd_word_list and cmd_string so they are only created once.
+        Caches `cmd_word_list` and `cmd_string` so they are only created once.
 
         :param value: The list or Abstract list holding the data
         :param datatype: The type of each element of data
@@ -133,8 +133,8 @@ class NeuronParameter(object):
         return self._data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
-        """
-        Creates an Iterator
+        """ Creates an Iterator.
+
         :param slice_start: Inclusive start of the range
         :param slice_stop: Exclusive end of the range
         :param spec: The data specification to write to

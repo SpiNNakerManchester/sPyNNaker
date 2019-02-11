@@ -1,7 +1,6 @@
-from six import add_metaclass
-import numpy
 import math
-
+import numpy
+from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
@@ -65,45 +64,29 @@ class AbstractSynapseDynamics(object):
         """
         return connector.get_delay_maximum()
 
-    def get_delay_variance(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_delay_variance(self, connector):
         """ Get the variance in delay for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance(
-            n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice)
+        return connector.get_delay_variance()
 
-    def get_weight_mean(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(self, connector):
         """ Get the mean weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean(
-            n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice)
+        return connector.get_weight_mean()
 
-    def get_weight_maximum(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(self, connector):
         """ Get the maximum weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_maximum(
-            n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice)
+        return connector.get_weight_maximum()
 
-    def get_weight_variance(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(self, connector):
         """ Get the variance in weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance(
-            n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice)
+        return connector.get_weight_variance()
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

@@ -1,9 +1,6 @@
-# spynnaker imports
+import numpy
 from .spike_source_array import SpikeSourceArray
 from spynnaker.pyNN.utilities import utility_calls
-
-# general imports
-import numpy
 
 
 class SpikeSourceFromFile(SpikeSourceArray):
@@ -11,23 +8,13 @@ class SpikeSourceFromFile(SpikeSourceArray):
     """
 
     def __init__(
-            self, n_neurons, spike_time_file, machine_time_step,
-            timescale_factor, port=None, tag=None, ip_address=None,
-            board_address=None, min_atom=None, max_atom=None, min_time=None,
-            max_time=None, max_on_chip_memory_usage_for_spikes_in_bytes=None,
-            constraints=None, split_value="\t", label="SpikeSourceArray"):
+            self, spike_time_file, min_atom=None, max_atom=None, min_time=None,
+            max_time=None, split_value="\t"):
         # pylint: disable=too-many-arguments, too-many-locals
         spike_times = utility_calls.read_spikes_from_file(
             spike_time_file, min_atom, max_atom, min_time, max_time,
             split_value)
-
-        super(SpikeSourceFromFile, self).__init__(
-            n_neurons, spike_times, machine_time_step, timescale_factor,
-            port=port, tag=tag, ip_address=ip_address,
-            board_address=board_address,
-            max_on_chip_memory_usage_for_spikes_in_bytes=(
-                max_on_chip_memory_usage_for_spikes_in_bytes),
-            constraints=constraints, label=label)
+        super(SpikeSourceFromFile, self).__init__(spike_times)
 
     @staticmethod
     def _subsample_spikes_by_time(spike_array, start, stop, step):

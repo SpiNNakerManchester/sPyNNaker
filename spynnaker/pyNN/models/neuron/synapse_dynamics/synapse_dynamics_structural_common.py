@@ -1,12 +1,11 @@
-from six import itervalues
-import numpy as np
 import collections
-
+import numpy as np
+from six import itervalues
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
-from .abstract_synapse_dynamics_structural import \
-    AbstractSynapseDynamicsStructural
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants
 
 
@@ -208,7 +207,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param sigma: spread
         :type sigma: float
         :return: distance-dependent probabilities
-        :rtype: np.ndarray of floats
+        :rtype: numpy.ndarray(float)
         """
         euclidian_distances = np.ones(self._grid ** 2) * np.nan
         for row in range(euclidian_distances.shape[0]):
@@ -283,23 +282,23 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type weight_scales: list(float)
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: None
         :rtype: None
         """
@@ -326,10 +325,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type spec: spec
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param weight_scales: scaling the weights
         :type weight_scales: list(float)
         :param machine_time_step: the duration of a machine time step (ms)
@@ -391,23 +390,23 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: pop info, routing key for current vertex, number of pre pops
         :rtype: tuple
         """
@@ -489,23 +488,23 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :type spec: spec
         :param application_graph: \
             the entire, highest level, graph of the network to be simulated
-        :type application_graph: ApplicationGraph
+        :type application_graph: :py:class:`ApplicationGraph`
         :param machine_graph: \
             the entire, lowest level, graph of the network to be simulated
-        :type machine_graph: MachineGraph
+        :type machine_graph: :py:class:`MachineGraph`
         :param app_vertex: \
             the highest level object of the post-synaptic population
-        :type app_vertex: ApplicationVertex
+        :type app_vertex: :py:class:`ApplicationVertex`
         :param post_slice: \
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: Slice
+        :type post_slice: :py:class:`Slice`
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
-        :type machine_vertex: MachineVertex
+        :type machine_vertex: :py:class:`MachineVertex`
         :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
+        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
-        :type routing_info: RoutingInfo
+        :type routing_info: :py:class:`RoutingInfo`
         :return: None
         :rtype: None
         """

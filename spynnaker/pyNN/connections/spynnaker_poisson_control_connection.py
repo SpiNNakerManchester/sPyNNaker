@@ -1,10 +1,7 @@
 from spinn_utilities.overrides import overrides
-
 from spinnman.messages.eieio import EIEIOType
 from spinnman.messages.eieio.data_messages import EIEIODataMessage
-
 from data_specification.enums import DataType
-
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
@@ -68,7 +65,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """ Set the rate of a Poisson neuron within a Poisson source
 
         :param label: The label of the Population to set the rates of
-        :param neuron_id: The neuron id to set the rate of
+        :param neuron_id: The neuron ID to set the rate of
         :param rate: The rate to set in Hz
         """
         control_label = label
@@ -80,7 +77,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         """ Set the rates of multiple Poisson neurons within a Poisson source
 
         :param label: The label of the Population to set the rates of
-        :param neuron_id_rates: A list of tuples of (neuron id, rate) to be set
+        :param neuron_id_rates: A list of tuples of (neuron ID, rate) to be set
         """
         control_label = label
         if not control_label.endswith(self._control_label_extension):

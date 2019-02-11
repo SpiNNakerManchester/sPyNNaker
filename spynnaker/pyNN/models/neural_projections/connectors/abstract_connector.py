@@ -1,13 +1,14 @@
+import logging
+import math
+import re
+import numpy
 from six import add_metaclass, string_types
+from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities import utility_calls
-import logging
-import numpy
-import math
-import re
 
 # global objects
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ _expr_context = SafeEval(
 
 @add_metaclass(AbstractBase)
 class AbstractConnector(object):
-    """ Abstract class which PyNN Connectors extend
+    """ Abstract class that all PyNN Connectors extend.
     """
 
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
@@ -59,23 +60,23 @@ class AbstractConnector(object):
         self._delays = None
 
     def set_space(self, space):
-        """ allows setting of the space object after instantiation
+        """ Set the space object (allowed after instantiation).
 
         :param space:
         :return:
         """
         self._space = space
 
-    def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
+    def _set_weights_and_delays(self, weights, delays, allow_lists):
+        """ Set the weights and delays as needed.
 
-        :param `float` weights:
+        :param weights:
             May either be a float, a !RandomDistribution object, a list 1D\
             array with at least as many items as connections to be created,\
-            or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic\
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler,\
+            or a distance dependence as per a d_expression. Units nA/uS.
+        :param delays: -- as `weights`. If `None`, all synaptic\
+            delays will be set to the global minimum delay. Units ms.
+        :raises Exception: when not a standard interface of list, scalar,\
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
@@ -91,7 +92,10 @@ class AbstractConnector(object):
                 'in the previous projection. For now, set up a new connector.')
         self._weights = weights
         self._delays = delays
-        self._check_parameters(weights, delays)
+        self._check_parameters(weights, delays, allow_lists)
+
+    def set_weights_and_delays(self, weights, delays):
+        self._set_weights_and_delays(weights, delays, allow_lists=False)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -105,7 +109,7 @@ class AbstractConnector(object):
         self._min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
-        """ Check that the types of the values is supported
+        """ Check that the types of the values is supported.
         """
         if (not numpy.isscalar(values) and
                 not (get_simulator().is_a_pynn_random(values)) and
@@ -118,208 +122,154 @@ class AbstractConnector(object):
 
     def _check_parameters(self, weights, delays, allow_lists=False):
         """ Check the types of the weights and delays are supported; lists can\
-            be disallowed if desired
+            be disallowed if desired.
         """
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
-    @staticmethod
-    def _get_delay_maximum(delays, n_connections):
+    def _get_delay_maximum(self, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
-            delays
+            delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
-                delays, n_connections)
-            high = utility_calls.high(delays)
+                self._delays, n_connections)
+            high = utility_calls.high(self._delays)
             if high is None:
                 return max_estimated_delay
 
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
-        elif numpy.isscalar(delays):
-            return delays
-        elif hasattr(delays, "__getitem__"):
-            return max(delays)
-        raise Exception("Unrecognised delay format")
+        elif numpy.isscalar(self._delays):
+            return self._delays
+        elif hasattr(self._delays, "__getitem__"):
+            return numpy.max(self._delays)
+        raise Exception("Unrecognised delay format: {:s}".format(
+            type(self._delays)))
 
     @abstractmethod
     def get_delay_maximum(self):
         """ Get the maximum delay specified by the user in ms, or None if\
-            unbounded
+            unbounded.
         """
 
-    @staticmethod
-    def _get_delay_variance(delays, connection_slices):
-        """ Get the variance of the delays
+    def get_delay_variance(self):
+        """ Get the variance of the delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
-            return utility_calls.get_variance(delays)
-        elif numpy.isscalar(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
+            return utility_calls.get_variance(self._delays)
+        elif numpy.isscalar(self._delays):
             return 0.0
-        elif hasattr(delays, "__getitem__"):
-            return numpy.var([
-                delays[connection_slice]
-                for connection_slice in connection_slices])
+        elif hasattr(self._delays, "__getitem__"):
+            return numpy.var(self._delays)
         raise Exception("Unrecognised delay format")
 
-    @abstractmethod
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the variance of the delays for this connection
-        """
-        # pylint: disable=too-many-arguments
-        pass
-
-    @staticmethod
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, n_total_connections, n_connections, connection_slices,
-            min_delay, max_delay):
-        """ Gets the expected number of delays that will fall within min_delay\
+            self, n_total_connections, n_connections, min_delay, max_delay):
+        """ Get the expected number of delays that will fall within min_delay\
             and max_delay given given a float, RandomDistribution or list of\
-            delays
+            delays.
         """
         # pylint: disable=too-many-arguments
-        if get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
             prob_in_range = utility_calls.get_probability_within_range(
-                delays, min_delay, max_delay)
+                self._delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
-        elif numpy.isscalar(delays):
-            if min_delay <= delays <= max_delay:
+        elif numpy.isscalar(self._delays):
+            if min_delay <= self._delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        elif hasattr(delays, "__getitem__"):
+        elif hasattr(self._delays, "__getitem__"):
             n_delayed = sum([len([
-                delay for delay in delays[connection_slice]
-                if min_delay <= delay <= max_delay])
-                for connection_slice in connection_slices])
+                delay for delay in self._delays
+                if min_delay <= delay <= max_delay])])
             if n_delayed == 0:
                 return 0
-            n_total = sum([
-                len(delays[connection_slice])
-                for connection_slice in connection_slices])
+            n_total = len(self._delays)
             prob_delayed = float(n_delayed) / float(n_total)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_delayed, prob_delayed)))
+                n_total_connections, n_connections, prob_delayed)))
         raise Exception("Unrecognised delay format")
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        """ Get the maximum number of connections between those from each of\
-            the neurons in the pre_vertex_slice to neurons in the\
+            self, post_vertex_slice, min_delay=None, max_delay=None):
+        """ Get the maximum number of connections between those from any\
+            neuron in the pre vertex to the neurons in the\
             post_vertex_slice, for connections with a delay between min_delay\
             and max_delay (inclusive) if both specified\
-            (otherwise all connections)
+            (otherwise all connections).
         """
         # pylint: disable=too-many-arguments
-        pass
 
     @abstractmethod
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the maximum number of connections between those to each of the\
-            neurons in the post_vertex_slice from neurons in the\
-            pre_vertex_slice
+    def get_n_connections_to_post_vertex_maximum(self):
+        """ Get the maximum number of connections between those to any neuron\
+            in the post vertex from neurons in the pre vertex.
         """
         # pylint: disable=too-many-arguments
-        pass
 
-    @staticmethod
-    def _get_weight_mean(weights, connection_slices):
-        """ Get the mean of the weights
+    def get_weight_mean(self):
+        """ Get the mean of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
-            return abs(utility_calls.get_mean(weights))
-        elif numpy.isscalar(weights):
-            return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.mean([
-                numpy.abs(weights[connection_slice])
-                for connection_slice in connection_slices])
+        if get_simulator().is_a_pynn_random(self._weights):
+            return abs(utility_calls.get_mean(self._weights))
+        elif numpy.isscalar(self._weights):
+            return abs(self._weights)
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.mean(self._weights)
         raise Exception("Unrecognised weight format")
 
-    @abstractmethod
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the mean of the weights for this connection
+    def _get_weight_maximum(self, n_connections):
+        """ Get the maximum of the weights.
         """
-        # pylint: disable=too-many-arguments
-        pass
-
-    @staticmethod
-    def _get_weight_maximum(weights, n_connections, connection_slices):
-        """ Get the maximum of the weights
-        """
-        if get_simulator().is_a_pynn_random(weights):
-            mean_weight = utility_calls.get_mean(weights)
+        if get_simulator().is_a_pynn_random(self._weights):
+            mean_weight = utility_calls.get_mean(self._weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
-                    weights, n_connections)
-                low = utility_calls.low(weights)
+                    self._weights, n_connections)
+                low = utility_calls.low(self._weights)
                 if low is None:
                     return abs(min_weight)
                 return abs(max(min_weight, low))
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
-                    weights, n_connections)
-                high = utility_calls.high(weights)
+                    self._weights, n_connections)
+                high = utility_calls.high(self._weights)
                 if high is None:
                     return abs(max_weight)
                 return abs(min(max_weight, high))
 
-        elif numpy.isscalar(weights):
-            return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.amax([
-                numpy.abs(weights[connection_slice])
-                for connection_slice in connection_slices])
+        elif numpy.isscalar(self._weights):
+            return abs(self._weights)
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.amax(numpy.abs(self._weights))
         raise Exception("Unrecognised weight format")
 
     @abstractmethod
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the maximum of the weights for this connection
+    def get_weight_maximum(self):
+        """ Get the maximum of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
-        pass
 
-    @staticmethod
-    def _get_weight_variance(weights, connection_slices):
-        """ Get the variance of the weights
+    def get_weight_variance(self):
+        """ Get the variance of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
-            return utility_calls.get_variance(weights)
-        elif numpy.isscalar(weights):
+        if get_simulator().is_a_pynn_random(self._weights):
+            return utility_calls.get_variance(self._weights)
+        elif numpy.isscalar(self._weights):
             return 0.0
-        elif hasattr(weights, "__getitem__"):
-            return numpy.var([
-                numpy.abs(weights[connection_slice])
-                for connection_slice in connection_slices])
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.var(self._weights)
         raise Exception("Unrecognised weight format")
-
-    @abstractmethod
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        """ Get the variance of the weights for this connection
-        """
-        # pylint: disable=too-many-arguments
-        pass
 
     def _expand_distances(self, d_expression):
-        """ Check if a distance expression contains at least one term d[x]. \
+        """ Check if a distance expression contains at least one term `d[x]`.\
             If yes, then the distances are expanded to distances in the\
             separate coordinates rather than the overall distance over all\
             coordinates, and we assume the user has specified an expression\
-            such as d[0] + d[2].
+            such as `d[0] + d[2]`.
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
@@ -357,13 +307,15 @@ class AbstractConnector(object):
         raise Exception("what on earth are you giving me?")
 
     def _generate_weights(self, values, n_connections, connection_slices):
-        """ Generate weight values
+        """ Generate weight values.
         """
         weights = self._generate_values(
             values, n_connections, connection_slices)
         if self._safe:
             if not weights.size:
-                logger.warning("No connection in " + str(self))
+                logger_utils.warn_once(logger,
+                                       "No connection in " + str(self))
+#                logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
@@ -373,7 +325,7 @@ class AbstractConnector(object):
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
-        """ Clip delay values, keeping track of how many have been clipped
+        """ Clip delay values, keeping track of how many have been clipped.
         """
 
         # count values that could be clipped
@@ -389,7 +341,7 @@ class AbstractConnector(object):
         return delays
 
     def _generate_delays(self, values, n_connections, connection_slices):
-        """ Generate valid delay values
+        """ Generate valid delay values.
         """
 
         delays = self._generate_values(
@@ -397,40 +349,14 @@ class AbstractConnector(object):
 
         return self._clip_delays(delays)
 
-    def _generate_lists_on_host(self, values):
-        """ Checks if the connector should generate lists on host rather than\
-            trying to generate the connectivity data on the machine, based on\
-            the types of the weights and/or delays
-        """
-
-        # Scalars are fine on the machine
-        if numpy.isscalar(values):
-            return True
-
-        # Only certain types of random distributions are supported for\
-        # generation on the machine
-        if get_simulator().is_a_pynn_random(values):
-            return values.name in (
-                "uniform", "uniform_int", "poisson", "normal", "exponential")
-
-        return False
-
-    @abstractmethod
-    def generate_on_machine(self):
-        """ Determines if the connector generation is supported on the machine\
-            or if the connector must be generated on the host
-        """
-        pass
-
     @abstractmethod
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        """ Create a synaptic block from the data
+        """ Create a synaptic block from the data.
         """
         # pylint: disable=too-many-arguments
-        pass
 
     def get_provenance_data(self):
         name = "{}_{}_{}".format(

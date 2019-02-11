@@ -1,5 +1,5 @@
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
 from spinn_front_end_common.utilities.database import DatabaseConnection
 

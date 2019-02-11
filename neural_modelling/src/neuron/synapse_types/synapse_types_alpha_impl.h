@@ -26,7 +26,7 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-typedef struct alpha_params{
+typedef struct alpha_params_t{
     // buffer for linear term
     input_t lin_buff;
 
@@ -42,11 +42,11 @@ typedef struct alpha_params{
     // Temporary value of
     input_t q_buff;
 
-}alpha_params;
+}alpha_params_t;
 
 typedef struct synapse_param_t {
-    alpha_params exc;
-    alpha_params inh;
+    alpha_params_t exc;
+    alpha_params_t inh;
 } synapse_param_t;
 
 //! human readable definition for the positions in the input regions for the
@@ -59,7 +59,7 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
-static inline void _alpha_shaping(alpha_params* a_params){
+static inline void alpha_shaping(alpha_params_t* a_params){
     a_params->lin_buff = a_params->lin_buff + (
     		a_params->q_buff * a_params->dt_divided_by_tau_sqr);
 
@@ -72,8 +72,8 @@ static inline void _alpha_shaping(alpha_params* a_params){
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(
 		synapse_param_pointer_t parameter){
-    _alpha_shaping(&parameter->exc);
-    _alpha_shaping(&parameter->inh);
+    alpha_shaping(&parameter->exc);
+    alpha_shaping(&parameter->inh);
 
     /*log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k",
             parameter->exc.lin_buff,
@@ -81,7 +81,12 @@ static inline void synapse_types_shape_input(
             parameter->exc.lin_buff * parameter->exc.exp_buff); */
 }
 
-static inline void _add_input_alpha(alpha_params* a_params, input_t input){
+//! \brief helper function to add input for a given timer period to a given
+//! neuron
+//! \param[in]  parameter: the pointer to the parameters to use
+//! \param[in] input the inputs to add.
+//! \return None
+static inline void add_input_alpha(alpha_params_t* a_params, input_t input){
     a_params->q_buff = input;
 
 	a_params->exp_buff =
@@ -100,10 +105,10 @@ static inline void synapse_types_add_neuron_input(
 
     if (input > ZERO){
         if (synapse_type_index == EXCITATORY) {
-                _add_input_alpha(&parameter->exc, input);
+                add_input_alpha(&parameter->exc, input);
 
         } else if (synapse_type_index == INHIBITORY) {
-                _add_input_alpha(&parameter->inh, input);
+                add_input_alpha(&parameter->inh, input);
         }
     }
 }

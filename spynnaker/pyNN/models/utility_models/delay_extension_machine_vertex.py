@@ -1,13 +1,9 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
-
-# front end common imports
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-
-# general imports
-from enum import Enum
 
 
 class DelayExtensionMachineVertex(
@@ -19,7 +15,8 @@ class DelayExtensionMachineVertex(
         value="DELAY_EXTENSION_REGIONS",
         names=[('SYSTEM', 0),
                ('DELAY_PARAMS', 1),
-               ('PROVENANCE_REGION', 2)])
+               ('PROVENANCE_REGION', 2),
+               ('EXPANDER_REGION', 3)])
 
     EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
         value="EXTRA_PROVENANCE_DATA_ENTRIES",
