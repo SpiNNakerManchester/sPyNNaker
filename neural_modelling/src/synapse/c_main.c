@@ -16,13 +16,13 @@
  */
 
 #include <common/in_spikes.h>
-#include "regions.h"
+#include "neuron/regions.h"
 #include "synapses.h"
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "plasticity/synapse_dynamics.h"
-#include "structural_plasticity/synaptogenesis_dynamics.h"
-#include "profile_tags.h"
+#include "synapse/structural_plasticity/synaptogenesis_dynamics.h"
+#include "neuron/profile_tags.h"
 
 #include <data_specification.h>
 #include <simulation.h>

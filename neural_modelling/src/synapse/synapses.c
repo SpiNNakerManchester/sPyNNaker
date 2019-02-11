@@ -1,7 +1,7 @@
 #include "synapses.h"
 #include "spike_processing.h"
-#include "neuron.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse/neuron.h"
+#include "synapse/plasticity/synapse_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>

@@ -182,14 +182,14 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
-	  synapse/c_main.c
-          synapse/synapses.c \
-          neuron/neuron.c \
-          synapse/spike_processing.c \
-          synapse/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
-          $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
-          $(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
+		neuron/c_main.c \
+		synapse/c_main.c \
+		synapse/synapses.c \
+		neuron/neuron.c \
+		synapse/spike_processing.c \
+		synapse/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
+		$(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
+		$(TIMING_DEPENDENCE) $(SYNAPTOGENESIS_DYNAMICS) $(OTHER_SOURCES_CONVERTED)
 
 include $(SPINN_DIRS)/make/local.mk
 
