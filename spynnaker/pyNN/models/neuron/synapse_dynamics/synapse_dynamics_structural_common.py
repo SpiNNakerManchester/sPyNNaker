@@ -9,7 +9,6 @@ from .abstract_synapse_dynamics_structural import \
     AbstractSynapseDynamicsStructural
 from spynnaker.pyNN.utilities import constants
 
-
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     """ Common class that enables synaptic rewiring. It acts as a wrapper
         around SynapseDynamicsStatic or SynapseDynamicsSTDP.
@@ -99,7 +98,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Exponentially decayed probability LUT for lateral formations
         "_lat_distance_probabilities",
         # The RNG used with the seed that is passed in
-        "_rng"
+        "_rng",
+        # Projection specific manager
+        "_manager"
     ]
 
     default_parameters = {
@@ -114,6 +115,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     BIT_MASK_16_BIT = 2 ** 16 - 1
     OFFSET_MASKED_POP = 32 - 8
     OFFSET_MASKED_SUB_POP = 16
+
+
+
 
     def __init__(self,
                  stdp_model=default_parameters['stdp_model'],
@@ -151,7 +155,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self._actual_row_max_length = self._s_max
 
         self._weight_dynamics = stdp_model
-
         self._rng = np.random.RandomState(seed)
         self._seeds = {}
 
@@ -164,6 +167,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self._lat_distance_probabilities = \
             self.generate_distance_probability_array(
                 self._p_form_lateral, self._sigma_form_lateral)
+        self._manager = {}
+
+    def set_projection_parameter(self, projection, param, value):
+        if value not in self._manager.keys():
+            self._manager[projection] = {}
+        self._manager[projection][param] = value
 
     @property
     def weight_dynamics(self):
@@ -453,9 +462,16 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
                     if synapse_info.synapse_dynamics is self._weight_dynamics:
+                        exception_case = None
+                        for mek in self._manager.keys():
+                            if app_edge == mek._projection_edge :
+                                exception_case = self._manager[mek]
+                                break
                         structural_application_edges.append(app_edge)
+
                         population_to_subpopulation_information[
-                            app_edge.pre_vertex] = []
+                            app_edge.pre_vertex] = [exception_case]
+
                         projection_types[
                             app_edge.pre_vertex] = synapse_info.synapse_type
                         break
@@ -552,17 +568,24 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             # Number of subpopulations
             spec.write_value(data=len(subpopulation_list),
                              data_type=DataType.UINT16)
+            exceptions = subpopulation_list[0]
+            subpopulation_list = subpopulation_list[1:]
+
 
             # Custom header for commands / controls
-            # currently, controls = True if the subvertex (on the current core)
+            # currently, controls = True if the subvertex
             # is part of this population
             # In other words, controls is 0 if connection is considered FF
             # otherwise the connections if lat
+            # TODO piggy-back on controls with low and hig delay (4 bits each)
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
 
+
+
             # Write connection type
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
+            # TODO write the weight to be used from this pre-synaptic population
 
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
@@ -666,7 +689,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                          ('lo_atom', 'int'), ('mask', 'uint')])
                     structured_array = np.array(
                         population_to_subpopulation_information[
-                            row[1].pre_vertex], dtype=dt)
+                            row[1].pre_vertex][1:], dtype=dt)
                     sorted_info_list = np.sort(
                         structured_array, order='lo_atom')
 
@@ -781,7 +804,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if post_vertex_slice.lo_atom not in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
-            (connections, app_edge, machine_edge))
+            (connections, app_edge, machine_edge))  # TODO extract weight and delay from here
 
     def n_words_for_plastic_connections(self, value):
         """ Get size of plastic connections in words

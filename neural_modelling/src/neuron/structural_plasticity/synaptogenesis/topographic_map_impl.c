@@ -62,6 +62,8 @@ static const number_of_connections_in_row_t number_of_connections_in_row =
 #define DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING 7
 
 #define MAX_SHORT 65535
+#define IS_CONNECTION_LAT 1
+
 
 //! information per atom
 typedef struct {
@@ -579,20 +581,19 @@ bool synaptogenesis_dynamics_formation_rule(void)
         return false;
     }
 
-    if ((current_state.current_controls == 0 &&
+    if ((!(current_state.current_controls & IS_CONNECTION_LAT) &&
         current_state.distance > rewiring_data.size_ff_prob)
-        || (current_state.current_controls == 1 &&
+        || ((current_state.current_controls & IS_CONNECTION_LAT) &&
             current_state.distance > rewiring_data.size_lat_prob)) {
         return false;
     }
 
-    if (current_state.current_controls == 0) {
+    if (!(current_state.current_controls & IS_CONNECTION_LAT)) {
         probability = rewiring_data.ff_probabilities[current_state.distance];
     } else {
         probability = rewiring_data.lat_probabilities[current_state.distance];
     }
-    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            MAX_SHORT;
+    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
     if (r > probability) {
         return false;
     }

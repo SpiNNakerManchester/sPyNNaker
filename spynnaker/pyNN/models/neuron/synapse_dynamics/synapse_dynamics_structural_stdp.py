@@ -130,6 +130,10 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
             application_graph, machine_graph, app_vertex, post_slice,
             machine_vertex, graph_mapper, routing_info)
 
+
+    def set_projection_parameter(self, projection, param, value):
+        self._common_sp.set_projection_parameter(projection, param, value)
+
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP):
