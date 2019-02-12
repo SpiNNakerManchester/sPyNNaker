@@ -1,45 +1,34 @@
+from collections import defaultdict
 import math
-import scipy.stats  # @UnresolvedImport
 import struct
 import sys
-from collections import defaultdict
-from scipy import special  # @UnresolvedImport
 import numpy
-
-# PACMAN imports
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
-
-# spinn utilities
+import scipy.stats  # @UnresolvedImport
+from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
-from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
-
-# front-end common
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-# dsg
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from data_specification.enums import DataType
-
-# spynnaker
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import OneToOneConnector, AbstractGenerateConnectorOnMachine
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic, AbstractSynapseDynamicsStructural, \
-    AbstractGenerateOnMachine
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
+    AbstractGenerateOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex \
-    import SpikeSourcePoissonVertex
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
-from spynnaker.pyNN.utilities.constants \
-    import POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT
-from spynnaker.pyNN.utilities.utility_calls \
-    import get_maximum_probable_value, get_n_bits
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-
 
 TIME_STAMP_BYTES = 4
 

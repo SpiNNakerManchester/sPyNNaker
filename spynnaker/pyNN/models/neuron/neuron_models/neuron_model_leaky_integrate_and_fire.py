@@ -1,9 +1,8 @@
+import numpy
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
-from data_specification.enums import DataType
-
-import numpy
 
 V = "v"
 V_REST = "v_rest"

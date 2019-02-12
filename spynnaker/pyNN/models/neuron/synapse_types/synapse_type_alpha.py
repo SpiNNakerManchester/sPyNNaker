@@ -1,8 +1,8 @@
+import numpy
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
-from data_specification.enums import DataType
-import numpy
 
 EXC_RESPONSE = "exc_response"
 EXC_EXP_RESPONSE = "exc_exp_response"
@@ -10,14 +10,18 @@ TAU_SYN_E = "tau_syn_E"
 INH_RESPONSE = "inh_response"
 INH_EXP_RESPONSE = "inh_exp_response"
 TAU_SYN_I = "tau_syn_I"
+Q_EXC = "q_exc"
+Q_INH = "q_inh"
 
 UNITS = {
     EXC_RESPONSE: "",
     EXC_EXP_RESPONSE: "",
     TAU_SYN_E: "ms",
+    Q_EXC: "",
     INH_RESPONSE: "",
     INH_EXP_RESPONSE: "",
-    TAU_SYN_I: "ms"
+    TAU_SYN_I: "ms",
+    Q_INH: ""
 }
 
 
@@ -28,19 +32,23 @@ class SynapseTypeAlpha(AbstractSynapseType):
         "_inh_exp_response",
         "_inh_response",
         "_tau_syn_E",
-        "_tau_syn_I"]
+        "_tau_syn_I",
+        "_q_exc",
+        "_q_inh"]
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         super(SynapseTypeAlpha, self).__init__([
-            DataType.S1615,  # exc_response
-            DataType.S1615,  # exc_exp_response
-            DataType.S1615,  # 1 / tau_syn_E^2
-            DataType.U032,   # e^(-ts / tau_syn_E)
-            DataType.S1615,  # inh_response
-            DataType.S1615,  # inh_exp_response
-            DataType.S1615,  # 1 / tau_syn_I^2
-            DataType.U032])  # e^(-ts / tau_syn_I)
+            DataType.S1615,   # exc_response
+            DataType.S1615,   # exc_exp_response
+            DataType.S1615,   # 1 / tau_syn_E^2
+            DataType.U032,    # e^(-ts / tau_syn_E)
+            DataType.S1615,   # excitatory q
+            DataType.S1615,   # inh_response
+            DataType.S1615,   # inh_exp_response
+            DataType.S1615,   # 1 / tau_syn_I^2
+            DataType.U032,    # e^(-ts / tau_syn_I)
+            DataType.S1615])  # inhibitory q
 
         # pylint: disable=too-many-arguments
         self._exc_response = exc_response
@@ -63,8 +71,10 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def add_state_variables(self, state_variables):
         state_variables[EXC_RESPONSE] = self._exc_response
         state_variables[EXC_EXP_RESPONSE] = self._exc_exp_response
+        state_variables[Q_EXC] = 0
         state_variables[INH_RESPONSE] = self._inh_response
         state_variables[INH_EXP_RESPONSE] = self._inh_exp_response
+        state_variables[Q_INH] = 0
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):
@@ -86,22 +96,26 @@ class SynapseTypeAlpha(AbstractSynapseType):
                 state_variables[EXC_EXP_RESPONSE],
                 parameters[TAU_SYN_E].apply_operation(init),
                 parameters[TAU_SYN_E].apply_operation(decay),
+                state_variables[Q_EXC],
                 state_variables[INH_RESPONSE],
                 state_variables[INH_EXP_RESPONSE],
                 parameters[TAU_SYN_I].apply_operation(init),
-                parameters[TAU_SYN_I].apply_operation(decay)]
+                parameters[TAU_SYN_I].apply_operation(decay),
+                state_variables[Q_INH]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (exc_resp, exc_exp_resp, _dt_over_tau_E_sq, _exp_tau_E,
-         inh_resp, inh_exp_resp, _dt_over_tau_I_sq, _exp_tau_I) = values
+        (exc_resp, exc_exp_resp, _dt_over_tau_E_sq, _exp_tau_E, q_exc,
+         inh_resp, inh_exp_resp, _dt_over_tau_I_sq, _exp_tau_I, q_inh) = values
 
         state_variables[EXC_RESPONSE] = exc_resp
         state_variables[EXC_EXP_RESPONSE] = exc_exp_resp
+        state_variables[Q_EXC] = q_exc
         state_variables[INH_RESPONSE] = inh_resp
         state_variables[INH_EXP_RESPONSE] = inh_exp_resp
+        state_variables[Q_INH] = q_inh
 
     @overrides(AbstractSynapseType.get_n_synapse_types)
     def get_n_synapse_types(self):

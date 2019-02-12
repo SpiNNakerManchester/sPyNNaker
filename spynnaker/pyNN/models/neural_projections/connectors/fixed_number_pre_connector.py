@@ -1,10 +1,10 @@
+import logging
+import math
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
-import numpy
-import logging
-import math
 
 logger = logging.getLogger(__file__)
 

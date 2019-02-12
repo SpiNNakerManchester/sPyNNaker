@@ -1,5 +1,5 @@
-import numpy
 import decimal
+import numpy
 from data_specification.enums.data_type import DataType
 
 

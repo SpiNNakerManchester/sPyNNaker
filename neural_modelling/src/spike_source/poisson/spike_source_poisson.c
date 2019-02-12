@@ -365,6 +365,18 @@ void resume_callback() {
         rt_error(RTE_SWERR);
     }
 
+    // Loop through slow spike sources and initialise 1st time to spike
+    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
+        if (!poisson_parameters[s].is_fast_source &&
+                poisson_parameters[s].time_to_spike_ticks == 0) {
+            poisson_parameters[s].time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(
+                    poisson_parameters[s].mean_isi_ticks);
+        }
+    }
+
+    log_info("Successfully resumed Poisson spike source at time: %u", time);
+
     // print spike sources for debug purposes
     // print_spike_sources();
 }

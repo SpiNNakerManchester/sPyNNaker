@@ -1,55 +1,37 @@
-from spinn_utilities.overrides import overrides
-
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-
-# front end common imports
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models\
-    import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management\
-    import recording_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
-
-# spynnaker imports
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron.population_machine_vertex \
-    import PopulationMachineVertex
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationSettable, AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-
-
 import logging
 import os
 import math
+from spinn_utilities.overrides import overrides
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from pacman.executor.injection_decorator import inject_items
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from spinn_front_end_common.abstract_models import (
+    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
+    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
+from spinn_front_end_common.utilities import (
+    constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.interface.profiling import profile_utils
+from .synaptic_manager import SynapticManager
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+from spynnaker.pyNN.utilities import constants
+from .population_machine_vertex import PopulationMachineVertex
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
+    AbstractPopulationSettable, AbstractReadParametersBeforeSet,
+    AbstractContainsUnits)
+from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 logger = logging.getLogger(__name__)
 
