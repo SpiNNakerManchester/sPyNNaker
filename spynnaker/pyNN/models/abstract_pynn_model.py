@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import sys
 from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
