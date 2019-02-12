@@ -1,7 +1,6 @@
 from collections import defaultdict
 import logging
 import math
-import random
 import sys
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
@@ -38,6 +37,9 @@ _DEFAULT_MALLOCS_USED = 2
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * 4
 
+# The microseconds per timestep will be divided by this for the max offset
+_MAX_OFFSET_DENOMINATOR = 10
+
 
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
@@ -53,9 +55,9 @@ class DelayExtensionVertex(
         "_n_atoms",
         "_n_delay_stages",
         "_source_vertex",
-        "_delay_generator_data"]
-
-    _n_vertices = 0
+        "_delay_generator_data",
+        "_n_subvertices",
+        "_n_data_specs"]
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, timescale_factor, constraints=None,
@@ -76,6 +78,8 @@ class DelayExtensionVertex(
         self._n_delay_stages = 0
         self._delay_per_stage = delay_per_stage
         self._delay_generator_data = defaultdict(list)
+        self._n_subvertices = 0
+        self._n_data_specs = 0
 
         # atom store
         self._n_atoms = n_neurons
@@ -90,7 +94,7 @@ class DelayExtensionVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        DelayExtensionVertex._n_vertices += 1
+        self._n_subvertices += 1
         return DelayExtensionMachineVertex(
             resources_required, label, constraints)
 
@@ -218,7 +222,7 @@ class DelayExtensionVertex(
             machine_graph.get_edges_starting_at_vertex(vertex))
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
-            self._n_vertices, machine_time_step, time_scale_factor,
+            self._n_subvertices, machine_time_step, time_scale_factor,
             n_outgoing_edges)
 
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
@@ -274,8 +278,12 @@ class DelayExtensionVertex(
         # Write the number of blocks of delays:
         spec.write_value(data=self._n_delay_stages)
 
-        # Write the random back off value
-        spec.write_value(random.randint(0, total_n_vertices))
+        # Write the offset value
+        max_offset = (
+            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        spec.write_value(
+            int(math.ceil(max_offset / total_n_vertices)) * self._n_data_specs)
+        self._n_data_specs += 1
 
         # Write the time between spikes
         spikes_per_timestep = self._n_delay_stages * vertex_slice.n_atoms

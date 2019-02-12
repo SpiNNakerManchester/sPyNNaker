@@ -1,6 +1,6 @@
 import logging
 import os
-import random
+import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -46,6 +46,9 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
+# The microseconds per timestep will be divided by this to get the max offset
+_MAX_OFFSET_DENOMINATOR = 10
+
 
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
@@ -78,7 +81,9 @@ class AbstractPopulationVertex(
         "_synapse_manager",
         "_time_between_requests",
         "_units",
-        "_using_auto_pause_and_resume"]
+        "_using_auto_pause_and_resume",
+        "_n_subvertices",
+        "_n_data_specs"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -102,6 +107,8 @@ class AbstractPopulationVertex(
             label, constraints, max_atoms_per_core)
 
         self._n_atoms = n_neurons
+        self._n_subvertices = 0
+        self._n_data_specs = 0
 
         # buffer data
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
@@ -252,7 +259,7 @@ class AbstractPopulationVertex(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
-        AbstractPopulationVertex._n_vertices += 1
+        self._n_subvertices += 1
 
         # return machine vertex
         return vertex
@@ -358,8 +365,12 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
-        spec.write_value(random.randint(
-            0, AbstractPopulationVertex._n_vertices))
+        max_offset = (
+            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        spec.write_value(
+            int(math.ceil(max_offset / self._n_subvertices)) *
+            self._n_data_specs)
+        self._n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
