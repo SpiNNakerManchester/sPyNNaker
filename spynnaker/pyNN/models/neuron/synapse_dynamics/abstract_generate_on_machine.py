@@ -1,7 +1,7 @@
-from six import add_metaclass
 from enum import Enum
-from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 import numpy
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 
 
 class MatrixGeneratorID(Enum):

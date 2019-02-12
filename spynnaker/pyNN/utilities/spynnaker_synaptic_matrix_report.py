@@ -1,8 +1,7 @@
 import logging
-import numpy
 import os
+import numpy
 from spinn_utilities.progress_bar import ProgressBar
-
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 

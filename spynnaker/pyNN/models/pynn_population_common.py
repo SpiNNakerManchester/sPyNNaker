@@ -1,26 +1,20 @@
+import logging
+import numpy
+from six import string_types, iteritems
+from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
-from pacman.model.constraints.placer_constraints\
-    import ChipAndCoreConstraint
-from pacman.model.constraints.partitioner_constraints\
-    import MaxVertexAtomsConstraint
-from pacman.model.graphs.application.application_vertex \
-    import ApplicationVertex
-
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractReadParametersBeforeSet, AbstractContainsUnits
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable, AbstractPopulationSettable
-from .abstract_pynn_model import AbstractPyNNModel
-
+from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
+from pacman.model.constraints.partitioner_constraints import (
+    MaxVertexAtomsConstraint)
+from pacman.model.graphs.application.application_vertex import (
+    ApplicationVertex)
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-
-from spinn_utilities.log import FormatAdapter
-
-import numpy
-import logging
-from six import string_types, iteritems
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractReadParametersBeforeSet, AbstractContainsUnits,
+    AbstractPopulationInitializable, AbstractPopulationSettable)
+from .abstract_pynn_model import AbstractPyNNModel
 
 logger = FormatAdapter(logging.getLogger(__file__))
 

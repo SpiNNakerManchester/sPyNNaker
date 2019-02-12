@@ -33,13 +33,15 @@
 //!         otherwise False
 bool neuron_initialise(
     address_t address, uint32_t *n_neurons_value,
-    uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size);
+    uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
+    uint32_t *timer_offset);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.
 //! \param[in] time the timer tick value currently being executed
 //! \return nothing
-void neuron_do_timestep_update(uint32_t time);
+void neuron_do_timestep_update(
+        uint32_t time, uint timer_count, uint timer_period);
 
 //! \brief interface for reloading neuron parameters as needed
 //! \param[in] address: the address where the neuron parameters are stored

@@ -1,5 +1,5 @@
-from spynnaker.pyNN.models.neuron.implementations\
-    import AbstractStandardNeuronComponent
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 
 class AbstractAdditionalInput(AbstractStandardNeuronComponent):

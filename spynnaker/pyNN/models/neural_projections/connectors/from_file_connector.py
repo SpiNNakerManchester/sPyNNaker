@@ -1,8 +1,8 @@
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from .from_list_connector import FromListConnector
 import os
 import numpy
 from six import add_metaclass, string_types
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from .from_list_connector import FromListConnector
 
 
 @add_metaclass(AbstractBase)

@@ -1,11 +1,11 @@
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+import logging
+import os
+from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-import logging
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_utilities.progress_bar import ProgressBar
-import os
 
 logger = logging.getLogger(__name__)
 
