@@ -19,6 +19,9 @@
 #include "regions.h"
 #include "neuron.h"
 #include "profile_tags.h"
+#include "synapse/synapses.h"
+#include "synapse/spike_processing.h"
+#include "synapse/plasticity/synapse_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>

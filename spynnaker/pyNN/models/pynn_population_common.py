@@ -5,6 +5,8 @@ from pacman.model.constraints.partitioner_constraints\
     import MaxVertexAtomsConstraint
 from pacman.model.graphs.application.application_vertex \
     import ApplicationVertex
+from pacman.model.graphs.application.application_edge \
+    import ApplicationEdge
 from pacman.model.constraints.partitioner_constraints\
     import SameAtomsAsVertexConstraint
 from pacman.model.constraints.placer_constraints\
@@ -46,7 +48,7 @@ class PyNNPopulationCommon(object):
         "_spinnaker_control",
         "_structure",
         "_neuron_vertex",
-        "_synapse_vertex",
+        "_synapse_vertices",
         "_vertex_changeable_after_run",
         "_vertex_contains_units",
         "_vertex_population_initializable",
@@ -59,6 +61,7 @@ class PyNNPopulationCommon(object):
         # pylint: disable=too-many-arguments
         self._label = label
         size = self._roundsize(size)
+        self._synapse_vertices = []
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -70,9 +73,17 @@ class PyNNPopulationCommon(object):
                 population_parameters.update(additional_parameters)
             self._neuron_vertex = model.create_vertex(
                 size, label+"_neuron", constraints, **population_parameters)
-            self._synapse_vertex = model.create_vertex(size, label+"_synapse", constraints, **population_parameters) #Check last arg!
-            self._synapse_vertex.add_constraints([SameChipAsConstraint(self._neuron_vertex)])
-            self._synapse_vertex.add_constraints([SameAtomsAsVertexConstraint(self._neuron_vertex)])
+
+            for target in self._neuron_vertex.get_synapse_targets():
+                syn_vertex = model.create_vertex(size, label + "_" + target + "_synapse",
+                                                 constraints, **population_parameters) #Check last arg!
+                syn_vertex.add_constraint(SameChipAsConstraint(self._neuron_vertex))
+                syn_vertex.add_constraint(SameAtomsAsVertexConstraint(self._neuron_vertex))
+                self._synapse_vertices.append(syn_vertex)
+                spinnaker_control.add_application_edge(ApplicationEdge(syn_vertex, self._neuron_vertex,
+                                                                       label="internal_edge {}".format(
+                                                                           spinnaker_control.none_labelled_edge_count)))
+                spinnaker_control.increment_none_labelled_edge_count()
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):
@@ -538,8 +549,12 @@ class PyNNPopulationCommon(object):
         return self._neuron_vertex.n_atoms
 
     @property
-    def _get_vertex(self):
+    def _get_neuron_vertex(self):
         return self._neuron_vertex
+
+    @property
+    def _get_syn_vertices(self):
+        return self._synapse_vertices
 
     @property
     def _internal_delay_vertex(self):

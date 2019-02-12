@@ -1,6 +1,6 @@
 #include "synapses.h"
 #include "spike_processing.h"
-#include "synapse/neuron.h"
+#include "neuron/neuron.h"
 #include "synapse/plasticity/synapse_dynamics.h"
 #include <profiler.h>
 #include <debug.h>
@@ -242,7 +242,7 @@ bool synapses_initialise(
     log_debug("synapses_initialise: starting");
 
     // Neuron details
-    *n_neurons_value = synapse_params_address[N_NEURON_TO SIMULATE];
+    *n_neurons_value = synapse_params_address[N_NEURON_TO_SIMULATE];
     n_neurons = *n_neurons_value;
 
     *n_synapse_types_value = synapse_params_address[N_SYNAPSE_TYPES];

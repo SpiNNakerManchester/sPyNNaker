@@ -154,10 +154,10 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         device_vertex = device
         if isinstance(device, PyNNPopulationCommon):
-            device_vertex = device._get_vertex
+            device_vertex = device._get_neuron_vertex
         # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
-            population._get_vertex, device_vertex,
+            population._get_neuron_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)
 
     @staticmethod
@@ -233,7 +233,7 @@ class SpynnakerExternalDevicePluginManager(object):
         :type database_notify_port_num: int
         """
         # pylint: disable=too-many-arguments, protected-access
-        vertex = poisson_population._get_vertex
+        vertex = poisson_population._get_neuron_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,

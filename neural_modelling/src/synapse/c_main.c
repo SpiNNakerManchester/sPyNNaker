@@ -47,8 +47,8 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, DMA = 0, TIMER = 1
-} callback_priorities;
+    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
+} callback_priorities; //LEFT THE SAME AS BEFORE!
 
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 4
@@ -207,6 +207,12 @@ static bool initialise(uint32_t *timer_period) {
     log_debug("Initialise: finished");
 
     return true;
+}
+
+void resume_callback() {
+
+    //FILL THIS!!!!!
+
 }
 
 //! \brief Timer interrupt callback
