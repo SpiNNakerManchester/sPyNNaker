@@ -1,14 +1,13 @@
-from data_specification.enums import DataType
-
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
-    import plasticity_helpers
-
 import logging
+from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    AbstractTimingDependence)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightOnly)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    plasticity_helpers)
+
 logger = logging.getLogger(__name__)
 
 # Constants

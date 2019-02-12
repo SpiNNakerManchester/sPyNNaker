@@ -1,12 +1,11 @@
-from six import itervalues
-import numpy as np
 import collections
-
+import numpy as np
+from six import itervalues
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
-from .abstract_synapse_dynamics_structural import \
-    AbstractSynapseDynamicsStructural
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants
 
 

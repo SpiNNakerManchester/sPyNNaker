@@ -1,14 +1,12 @@
+import math
+import socket
 from threading import Thread
 import numpy
-import socket
-import math
 
 # Value of brightest pixel to show
 _DISPLAY_MAX = 33.0
-
 # How regularity to display frames
 _FRAME_TIME_MS = 10
-
 # Time constant of pixel decay
 _DECAY_TIME_CONSTANT_MS = 100
 
