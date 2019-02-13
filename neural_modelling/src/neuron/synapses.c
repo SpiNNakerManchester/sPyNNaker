@@ -215,12 +215,13 @@ static inline void _process_fixed_synapses(
         // Store error weight in post synaptic event history (note this needs to be done
         // on a per neuron basis for the error spike
         if (synapse_type == 1){
-        	io_printf(IO_BUF, "Adding weight: %u to post synaptic event history\n", weight);
+        	io_printf(IO_BUF, "Adding excitatory error weight: %d to post synaptic event history\n", weight);
         	// add error to the excitatory error event history
         	synapse_dynamics_process_post_synaptic_event(time, neuron_index, weight);
         } else if (synapse_type == 3){
         	// add the weight to the inhibitory error history
-        	synapse_dynamics_process_post_synaptic_event(time, neuron_index, weight);
+        	io_printf(IO_BUF, "Adding inhibitory error weight: %d to post synaptic event history\n", -weight);
+        	synapse_dynamics_process_post_synaptic_event(time, neuron_index, -weight);
         }
     }
 }

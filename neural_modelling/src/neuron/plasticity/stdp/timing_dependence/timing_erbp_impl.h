@@ -140,24 +140,24 @@ static inline update_state_t timing_apply_pre_spike(
     use(&last_pre_trace);
     use(&last_post_trace);
 
-    // Get time of event relative to last post-synaptic event
-    uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-//        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-//            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
-    	int32_t decayed_o1 = 0;
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-                  time_since_last_post, decayed_o1);
-
-        // Apply depression to state (which is a weight_state)
-
-        previous_state.weight_state = weight_one_term_apply_depression(
-        		previous_state.weight_state, decayed_o1);
-
-        return previous_state;
-    } else { // the else is now redundant
-        return previous_state;
-    }
+//    // Get time of event relative to last post-synaptic event
+//    uint32_t time_since_last_post = time - last_post_time;
+//    if (time_since_last_post > 0) {
+////        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
+////            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+//    	int32_t decayed_o1 = 0;
+//        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
+//                  time_since_last_post, decayed_o1);
+//
+//        // Apply depression to state (which is a weight_state)
+//
+//        previous_state.weight_state = weight_one_term_apply_depression(
+//        		previous_state.weight_state, decayed_o1);
+//
+//        return previous_state;
+//    } else { // the else is now redundant
+//        return previous_state;
+//    }
 }
 
 //---------------------------------------
@@ -169,29 +169,44 @@ static inline update_state_t timing_apply_post_spike(
     use(last_post_time); // this contains the post time
     use(&last_post_trace);
 
-    weight_t weight = (weight_t) trace;
-
-    // Maybe need this to convert scaled weight to real units?
-    input_t w = synapses_convert_weight_to_input(
-    		weight,
-			previous_state.weight_state.weight_region->weight_shift
-			);
-
-
-
-    // Here we decay the pre trace to the time of the error spike, and then
-    // multiply it by the weight of the error spike (which we'd stored in the
-    //postsynaptic event history)
-
-    io_printf(IO_BUF, "Error value from apply post: %u\n", trace);
-    io_printf(IO_BUF, "Error value from apply post: %k\n", w);
-
-    io_printf(IO_BUF, "Shift: %u\n", previous_state.weight_state.weight_region->weight_shift);
 
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {
+
+
+
+    	// Check sign of weight to judge whether to do potentiation or depression
+        weight_t weight;
+
+        input_t w;
+        if (trace < 0){
+        	weight = (weight_t) -trace;
+        	w = synapses_convert_weight_to_input(
+        	    		weight,
+        				previous_state.weight_state.weight_region->weight_shift
+        				);
+        	w = -w;
+
+        } else { // weight is positive
+        	weight = (weight_t) trace;
+        	w = synapses_convert_weight_to_input(
+        	    		weight,
+        				previous_state.weight_state.weight_region->weight_shift
+        				);
+        }
+
+
+        // Here we decay the pre trace to the time of the error spike, and then
+        // multiply it by the weight of the error spike (which we'd stored in the
+        //postsynaptic event history)
+
+        io_printf(IO_BUF, "Error value from apply post: %d\n", trace);
+        io_printf(IO_BUF, "Error value from apply post: %k\n", w);
+
+        io_printf(IO_BUF, "Shift: %u\n", previous_state.weight_state.weight_region->weight_shift);
+
 
     	// This allows us to decay the pre trace to the time of the error spike
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
@@ -204,8 +219,14 @@ static inline update_state_t timing_apply_post_spike(
         		"decayed_eligibility_trace=%d, mult_by_err=%u\n",
                   time_since_last_pre, decayed_r1, error_by_trace);
 
-        // Apply potentiation to state (which is a weight_state)
-        previous_state.weight_state = weight_one_term_apply_potentiation(previous_state.weight_state, error_by_trace);
+        if (trace < 0){
+        	previous_state.weight_state = weight_one_term_apply_depression(
+        			previous_state.weight_state, error_by_trace);
+        } else {
+        	// Apply potentiation to state (which is a weight_state)
+        	previous_state.weight_state = weight_one_term_apply_potentiation(previous_state.weight_state, error_by_trace);
+        }
+
     }
     return previous_state;
 }
