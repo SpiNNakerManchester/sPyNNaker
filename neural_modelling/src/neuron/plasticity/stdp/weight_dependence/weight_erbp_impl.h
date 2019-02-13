@@ -72,10 +72,12 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
 
     // Scale potentiation and depression
     // **NOTE** A2+ and A2- are pre-scaled into weight format
-    int32_t scaled_a2_plus = STDP_FIXED_MUL_16X16(
-        new_state.a2_plus, new_state.weight_region->a2_plus);
-    int32_t scaled_a2_minus = STDP_FIXED_MUL_16X16(
-        new_state.a2_minus, new_state.weight_region->a2_minus);
+    int32_t scaled_a2_plus = new_state.a2_plus << 1;
+//    		STDP_FIXED_MUL_16X16(
+//        new_state.a2_plus, new_state.weight_region->a2_plus);
+    int32_t scaled_a2_minus = new_state.a2_minus << 1;
+//    		STDP_FIXED_MUL_16X16(
+//        new_state.a2_minus, new_state.weight_region->a2_minus);
 
     // Apply all terms to initial weight
     int32_t new_weight = new_state.initial_weight + scaled_a2_plus
