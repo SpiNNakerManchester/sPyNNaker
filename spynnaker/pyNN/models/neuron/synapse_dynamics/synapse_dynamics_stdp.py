@@ -311,21 +311,21 @@ class SynapseDynamicsSTDP(
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
-    def get_weight_mean(self, connector, weights):
+    def get_weight_mean(self, connector):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
         return self._weight_dependence.weight_maximum
 
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
-    def get_weight_maximum(self, connector, weights):
+    def get_weight_maximum(self, connector):
         # pylint: disable=too-many-arguments
 
         # The maximum weight is the largest that it could be set to from

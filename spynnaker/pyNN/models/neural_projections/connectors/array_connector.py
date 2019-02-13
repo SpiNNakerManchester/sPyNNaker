@@ -39,12 +39,12 @@ class ArrayConnector(AbstractConnector):
         self._array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
-        return self._get_delay_maximum(delays, len(self._array))
+    def get_delay_maximum(self):
+        return self._get_delay_maximum(len(self._array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, min_delay=None, max_delay=None):
         n_connections = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
@@ -57,20 +57,19 @@ class ArrayConnector(AbstractConnector):
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_total_connections, n_connections, min_delay,
-            max_delay)
+            self._n_total_connections, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         return self._n_total_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
-        return self._get_weight_maximum(weights, self._n_total_connections)
+    def get_weight_maximum(self):
+        return self._get_weight_maximum(self._n_total_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         pre_neurons = []
@@ -92,8 +91,10 @@ class ArrayConnector(AbstractConnector):
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
         block["source"] = pre_neurons
         block["target"] = post_neurons
-        block["weight"] = self._generate_weights(weights, n_connections, None)
-        block["delay"] = self._generate_delays(delays, n_connections, None)
+        block["weight"] = self._generate_weights(
+            self._weights, n_connections, None)
+        block["delay"] = self._generate_delays(
+            self._delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
 

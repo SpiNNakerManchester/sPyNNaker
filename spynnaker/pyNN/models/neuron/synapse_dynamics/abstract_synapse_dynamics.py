@@ -59,34 +59,34 @@ class AbstractSynapseDynamics(object):
         """
         return list()
 
-    def get_delay_maximum(self, connector, delays):
+    def get_delay_maximum(self, connector):
         """ Get the maximum delay for the synapses
         """
-        return connector.get_delay_maximum(delays)
+        return connector.get_delay_maximum()
 
-    def get_delay_variance(self, connector, delays):
+    def get_delay_variance(self, connector):
         """ Get the variance in delay for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance(delays)
+        return connector.get_delay_variance()
 
-    def get_weight_mean(self, connector, weights):
+    def get_weight_mean(self, connector):
         """ Get the mean weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean(weights)
+        return connector.get_weight_mean()
 
-    def get_weight_maximum(self, connector, weights):
+    def get_weight_maximum(self, connector):
         """ Get the maximum weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_maximum(weights)
+        return connector.get_weight_maximum()
 
-    def get_weight_variance(self, connector, weights):
+    def get_weight_variance(self, connector):
         """ Get the variance in weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance(weights)
+        return connector.get_weight_variance()
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

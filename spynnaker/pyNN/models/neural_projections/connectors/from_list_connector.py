@@ -111,16 +111,16 @@ class FromListConnector(AbstractConnector):
             self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
-        return numpy.max(delays)  # self._conn_list["delay"])
+    def get_delay_maximum(self):
+        return numpy.max(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(self, delays):
+    def get_delay_variance(self):
         return numpy.var(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         mask = None
         if min_delay is None or max_delay is None:
@@ -142,22 +142,22 @@ class FromListConnector(AbstractConnector):
         return numpy.max(numpy.bincount(self._conn_list["target"]))
 
     @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(self, weights):
+    def get_weight_mean(self):
         return numpy.mean(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
         return numpy.amax(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(self, weights):
+    def get_weight_variance(self):
         # pylint: disable=too-many-arguments
         return numpy.var(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments

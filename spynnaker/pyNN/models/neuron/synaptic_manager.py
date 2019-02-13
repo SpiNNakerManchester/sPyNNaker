@@ -253,11 +253,11 @@ class SynapticManager(object):
                     # Get the size
                     connector = synapse_info.connector
                     dynamics = synapse_info.synapse_dynamics
-                    weights = synapse_info.weight
-                    delays = synapse_info.delay
+#                    weights = synapse_info.weight
+#                    delays = synapse_info.delay
                     connector_gen = isinstance(
                         connector, AbstractGenerateConnectorOnMachine) and \
-                        connector.generate_on_machine(weights, delays)
+                        connector.generate_on_machine
                     synapse_gen = isinstance(
                         dynamics, AbstractGenerateOnMachine)
                     if connector_gen and synapse_gen:
@@ -427,34 +427,38 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
-                    weights = None
-                    if hasattr(synapse_dynamics, 'weight'):
-                        weights = synapse_dynamics.weight
-                    else:
-                        weights = synapse_info.weight
+#                     weights = None
+#                     if hasattr(synapse_dynamics, 'weight'):
+#                         weights = synapse_dynamics.weight
+#                     else:
+#                         weights = synapse_info.weight
+#
+#                     delays = None
+#                     if hasattr(synapse_dynamics, 'delay'):
+#                         delays = synapse_dynamics.delay
+#                     else:
+#                         delays = synapse_info.delay
 
-                    delays = None
-                    if hasattr(synapse_dynamics, 'delay'):
-                        delays = synapse_dynamics.delay
-                    else:
-                        delays = synapse_info.delay
+                    connector.set_weights_and_delays(
+                        synapse_info.weight, synapse_info.delay)
+
                     weight_mean = (
-                        synapse_dynamics.get_weight_mean(connector, weights) *
+                        synapse_dynamics.get_weight_mean(connector) *
                         weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum()
                     weight_variance = synapse_dynamics.get_weight_variance(
-                        connector, weights) * weight_scale_squared
+                        connector) * weight_scale_squared
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, delays)
+                        connector)
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, weights) * weight_scale)
+                        connector) * weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
@@ -611,8 +615,7 @@ class SynapticManager(object):
                     dynamics = synapse_info.synapse_dynamics
                     if (isinstance(
                             connector, AbstractGenerateConnectorOnMachine) and
-                            connector.generate_on_machine(
-                                synapse_info.weight, synapse_info.delay) and
+                            connector.generate_on_machine and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
                             dynamics.generate_on_machine and
                             not self.__is_direct(

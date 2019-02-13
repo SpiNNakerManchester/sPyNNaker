@@ -56,8 +56,8 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
-#         self._weights = None
-#         self._delays = None
+        self._weights = None
+        self._delays = None
 
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
@@ -80,10 +80,9 @@ class AbstractConnector(object):
             or random number generator
         :raises NotImplementedError: when lists are not supported and entered
         """
-        # Empty function here: only needed by the FromListConnector
-#         self._weights = weights
-#         self._delays = delays
-#         self._check_parameters(weights, delays)
+        self._weights = weights
+        self._delays = delays
+        self._check_parameters(weights, delays)
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -115,68 +114,66 @@ class AbstractConnector(object):
         self._check_parameter(weights, "weights", allow_lists)
         self._check_parameter(delays, "delays", allow_lists)
 
-    @staticmethod
-    def _get_delay_maximum(delays, n_connections):
+    def _get_delay_maximum(self, n_connections):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
-                delays, n_connections)
-            high = utility_calls.high(delays)
+                self._delays, n_connections)
+            high = utility_calls.high(self._delays)
             if high is None:
                 return max_estimated_delay
 
             # The maximum is the minimum of the possible maximums
             return min(max_estimated_delay, high)
-        elif numpy.isscalar(delays):
-            return delays
-        elif hasattr(delays, "__getitem__"):
-            return numpy.max(delays)
+        elif numpy.isscalar(self._delays):
+            return self._delays
+        elif hasattr(self._delays, "__getitem__"):
+            return numpy.max(self._delays)
         raise Exception("Unrecognised delay format: {:s}".format(
-            type(delays)))
+            type(self._delays)))
 
     @abstractmethod
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
         """
 
-    def get_delay_variance(self, delays):
+    def get_delay_variance(self):
         """ Get the variance of the delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
-            return utility_calls.get_variance(delays)
-        elif numpy.isscalar(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
+            return utility_calls.get_variance(self._delays)
+        elif numpy.isscalar(self._delays):
             return 0.0
-        elif hasattr(delays, "__getitem__"):
-            return numpy.var(delays)
+        elif hasattr(self._delays, "__getitem__"):
+            return numpy.var(self._delays)
         raise Exception("Unrecognised delay format")
 
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
-            self, delays, n_total_connections, n_connections, min_delay,
-            max_delay):
+            self, n_total_connections, n_connections, min_delay, max_delay):
         """ Get the expected number of delays that will fall within min_delay\
             and max_delay given given a float, RandomDistribution or list of\
             delays.
         """
         # pylint: disable=too-many-arguments
-        if get_simulator().is_a_pynn_random(delays):
+        if get_simulator().is_a_pynn_random(self._delays):
             prob_in_range = utility_calls.get_probability_within_range(
-                delays, min_delay, max_delay)
+                self._delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
-        elif numpy.isscalar(delays):
-            if min_delay <= delays <= max_delay:
+        elif numpy.isscalar(self._delays):
+            if min_delay <= self._delays <= max_delay:
                 return int(math.ceil(n_connections))
             return 0
-        elif hasattr(delays, "__getitem__"):
+        elif hasattr(self._delays, "__getitem__"):
             n_delayed = sum([len([
-                delay for delay in delays
+                delay for delay in self._delays
                 if min_delay <= delay <= max_delay])])
             if n_delayed == 0:
                 return 0
-            n_total = len(delays)
+            n_total = len(self._delays)
             prob_delayed = float(n_delayed) / float(n_total)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_delayed)))
@@ -184,7 +181,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from any\
             neuron in the pre vertex to the neurons in the\
             post_vertex_slice, for connections with a delay between min_delay\
@@ -200,58 +197,58 @@ class AbstractConnector(object):
         """
         # pylint: disable=too-many-arguments
 
-    def get_weight_mean(self, weights):
+    def get_weight_mean(self):
         """ Get the mean of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
-            return abs(utility_calls.get_mean(weights))
-        elif numpy.isscalar(weights):
-            return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.mean(weights)
+        if get_simulator().is_a_pynn_random(self._weights):
+            return abs(utility_calls.get_mean(self._weights))
+        elif numpy.isscalar(self._weights):
+            return abs(self._weights)
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.mean(self._weights)
         raise Exception("Unrecognised weight format")
 
-    def _get_weight_maximum(self, weights, n_connections):
+    def _get_weight_maximum(self, n_connections):
         """ Get the maximum of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
-            mean_weight = utility_calls.get_mean(weights)
+        if get_simulator().is_a_pynn_random(self._weights):
+            mean_weight = utility_calls.get_mean(self._weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
-                    weights, n_connections)
-                low = utility_calls.low(weights)
+                    self._weights, n_connections)
+                low = utility_calls.low(self._weights)
                 if low is None:
                     return abs(min_weight)
                 return abs(max(min_weight, low))
             else:
                 max_weight = utility_calls.get_maximum_probable_value(
-                    weights, n_connections)
-                high = utility_calls.high(weights)
+                    self._weights, n_connections)
+                high = utility_calls.high(self._weights)
                 if high is None:
                     return abs(max_weight)
                 return abs(min(max_weight, high))
 
-        elif numpy.isscalar(weights):
-            return abs(weights)
-        elif hasattr(weights, "__getitem__"):
-            return numpy.amax(numpy.abs(weights))
+        elif numpy.isscalar(self._weights):
+            return abs(self._weights)
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.amax(numpy.abs(self._weights))
         raise Exception("Unrecognised weight format")
 
     @abstractmethod
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self):
         """ Get the maximum of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
 
-    def get_weight_variance(self, weights):
+    def get_weight_variance(self):
         """ Get the variance of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
-            return utility_calls.get_variance(weights)
-        elif numpy.isscalar(weights):
+        if get_simulator().is_a_pynn_random(self._weights):
+            return utility_calls.get_variance(self._weights)
+        elif numpy.isscalar(self._weights):
             return 0.0
-        elif hasattr(weights, "__getitem__"):
-            return numpy.var(weights)
+        elif hasattr(self._weights, "__getitem__"):
+            return numpy.var(self._weights)
         raise Exception("Unrecognised weight format")
 
     def _expand_distances(self, d_expression):
@@ -341,7 +338,7 @@ class AbstractConnector(object):
 
     @abstractmethod
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         """ Create a synaptic block from the data.

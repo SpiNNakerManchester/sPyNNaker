@@ -65,7 +65,8 @@ class PyNNProjectionCommon(object):
         # Set and store synapse information for future processing
         if hasattr(synapse_dynamics_stdp, 'weight'):
             self._synapse_information = SynapseInformation(
-                connector, synapse_dynamics_stdp, synapse_type)
+                connector, synapse_dynamics_stdp, synapse_type,
+                synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
         else:
             self._synapse_information = SynapseInformation(
                 connector, synapse_dynamics_stdp, synapse_type,
@@ -76,10 +77,14 @@ class PyNNProjectionCommon(object):
             pre_synaptic_population, post_synaptic_population, rng,
             machine_time_step)
 
+        # Set weights and delays in connector
+        connector.set_weights_and_delays(
+            self._synapse_information.weight, self._synapse_information.delay)
+
         # handle max delay
         if hasattr(synapse_dynamics_stdp, 'delay'):
             max_delay = synapse_dynamics_stdp.get_delay_maximum(
-                connector, synapse_dynamics_stdp.delay)
+                connector)
         else:  # get the delay from connector
             max_delay = connector.get_delay_maximum(connector.get_delay())
         if max_delay is None:

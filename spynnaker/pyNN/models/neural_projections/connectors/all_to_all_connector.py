@@ -45,20 +45,20 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                 n_post_neurons)]
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self):
         return self._get_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons)
+            self._n_pre_neurons * self._n_post_neurons)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
 
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons,
+            self._n_pre_neurons * self._n_post_neurons,
             post_vertex_slice.n_atoms, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -66,14 +66,14 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         return self._n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self):
         # pylint: disable=too-many-arguments
         n_connections = self._n_pre_neurons * self._n_post_neurons
-        return self._get_weight_maximum(weights, n_connections)
+        return self._get_weight_maximum(n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -104,9 +104,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 pre_vertex_slice.n_atoms)
         block["weight"] = self._generate_weights(
-            weights, n_connections, connection_slices)
+            self._weights, n_connections, connection_slices)
         block["delay"] = self._generate_delays(
-            delays, n_connections, connection_slices)
+            self._delays, n_connections, connection_slices)
         block["synapse_type"] = synapse_type
         return block
 
