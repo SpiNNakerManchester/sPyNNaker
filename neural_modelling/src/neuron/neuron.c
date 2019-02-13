@@ -408,3 +408,17 @@ void neuron_add_inputs(
     neuron_impl_add_inputs(
         synapse_type_index, neuron_index, weights_this_timestep);
 }
+
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_print_inputs() {
+	neuron_impl_print_inputs(n_neurons);
+}
+
+void neuron_print_synapse_parameters() {
+	neuron_impl_print_synapse_parameters(n_neurons);
+}
+
+const char *neuron_get_synapse_type_char(uint32_t synapse_type) {
+	return neuron_impl_get_synapse_type_char(synapse_type);
+}
+#endif // LOG_LEVEL >= LOG_DEBUG
