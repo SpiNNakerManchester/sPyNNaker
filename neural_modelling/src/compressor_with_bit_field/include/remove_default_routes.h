@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdbool.h>
 #include "bit_set.h"
 #include "routing_table.h"

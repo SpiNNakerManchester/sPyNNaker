@@ -371,7 +371,6 @@ class HostBasedBitFieldRouterCompressor(object):
         # get some basic values
         entry_links = routing_table_entry.link_ids
         base_key = routing_table_entry.routing_entry_key
-        first = bit_fields[0]
         n_neurons = key_to_n_atoms_map[base_key]
 
         # check each neuron to see if any bitfields care, and if so,

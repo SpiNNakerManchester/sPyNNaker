@@ -3,7 +3,6 @@
  */
 #include "platform.h"
 #include "routing_table.h"
-#include <stdio.h>
 
 
 #ifndef __ALIASES_H__

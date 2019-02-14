@@ -1,4 +1,5 @@
-//#include <debug.h>
+#include "common-typedefs.h"
+#include <common/maths-util.h>
 
 #ifndef __PLATFORM_H__
 
@@ -13,6 +14,7 @@
     static inline void platform_new_heap_creation(address_t sizes_region){
         // TODO hook removal here if we decide on this insanity
         stolen_sdram_heap = sv->sdram_heap;
+        use(sizes_region);
         /*
         // set up states
         heap_t *stolen_sdram_heap = (heap_t *) base;
@@ -97,13 +99,13 @@
     static inline uint platform_max_available_block_size(){
         uint max_dtcm_block = sark_heap_max(sark.heap, ALLOC_LOCK);
         uint max_sdram_block = sark_heap_max(stolen_sdram_heap, ALLOC_LOCK);
-        return max(max_dtcm_block, max_sdram_block);
-        //if (max_dtcm_block > max_sdram_block){
-        //    return max_dtcm_block;
-        //}
-        //else{
-        //    return max_sdram_block;
-        //}
+        //return MAX(max_dtcm_block, max_sdram_block);
+        if (max_dtcm_block > max_sdram_block){
+            return max_dtcm_block;
+        }
+        else{
+            return max_sdram_block;
+        }
     }
 
     //! \brief frees the sdram allcoated from whatever heap it came from

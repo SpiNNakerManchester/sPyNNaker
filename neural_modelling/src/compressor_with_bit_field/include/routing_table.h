@@ -54,7 +54,7 @@ typedef struct _entry_t{
 } entry_t;
 
 
-typedef struct _table_t{
+typedef struct table_t{
 
     // Number of entries in the table
     unsigned int size;
