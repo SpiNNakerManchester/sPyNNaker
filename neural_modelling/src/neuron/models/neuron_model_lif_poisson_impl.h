@@ -40,7 +40,7 @@ typedef struct neuron_t {
 
     // Should be in global params
     mars_kiss64_seed_t spike_source_seed; // array of 4 values
-    UFRACT seconds_per_tick;
+//    UFRACT seconds_per_tick;
     REAL ticks_per_second;
 
 } neuron_t;

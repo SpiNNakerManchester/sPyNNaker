@@ -14,6 +14,13 @@ I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
+MEAN_ISI_TICKS = "mean_isi_ticks"
+TIME_TO_SPIKE_TICKS = "time_to_spike_ticks"
+SEED1 = "seed1"
+SEED2 = "seed2"
+SEED3 = "seed3"
+SEED4 = "seed4"
+TICKS_PER_SECOND = "ticks_per_second"
 
 UNITS = {
     V: 'mV',
@@ -34,10 +41,14 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         "_cm",
         "_i_offset",
         "_v_reset",
-        "_tau_refrac"]
+        "_tau_refrac",
+        "_mean_isi_ticks",
+        "_time_to_spike_ticks"
+        ]
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
+            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
+            mean_isi_ticks, time_to_spike_ticks):
         super(NeuronModelLeakyIntegrateAndFirePoisson, self).__init__(
 
             data_types= [
@@ -59,7 +70,7 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
                 DataType.UINT32,  # MARS KISS seed
                 DataType.UINT32,  # MARS KISS seed
                 DataType.UINT32,  # MARS KISS seed
-                DataType.U032,    # seconds per tick
+#                 DataType.U032,    # seconds per tick
                 DataType.S1615    # ticks_per_second
                 ]
             )
@@ -73,6 +84,8 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         self._i_offset = i_offset
         self._v_reset = v_reset
         self._tau_refrac = tau_refrac
+        self._mean_isi_ticks = mean_isi_ticks
+        self._time_to_spike_ticks = time_to_spike_ticks
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -87,11 +100,20 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         parameters[I_OFFSET] = self._i_offset
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[SEED1] = 10065
+        parameters[SEED2] = 232
+        parameters[SEED3] = 3634
+        parameters[SEED4] = 4877
+
+        parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self._v_init
         state_variables[COUNT_REFRAC] = 0
+        state_variables[MEAN_ISI_TICKS] = self._mean_isi_ticks
+        state_variables[TIME_TO_SPIKE_TICKS] = self._time_to_spike_ticks
+            # could eventually be set from membrane potential
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -114,14 +136,14 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
-                10,
-                0,
+                state_variables[MEAN_ISI_TICKS],
+                state_variables[TIME_TO_SPIKE_TICKS],
                 # Should be in global params
-                10065, # seed 1
-                232, # seed 2
-                3634, # seed 3
-                4877, # seed 4
-                float(ts) / MICROSECONDS_PER_SECOND, # seconds_per_tick
+                parameters[SEED1], # seed 1
+                parameters[SEED2], # seed 2
+                parameters[SEED3], # seed 3
+                parameters[SEED4], # seed 4
+#                 float(ts) / MICROSECONDS_PER_SECOND, # seconds_per_tick
                 MICROSECONDS_PER_SECOND / float(ts), # ticks_per_second
                 ]
 
@@ -130,12 +152,16 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac) = values
+         _v_reset, _tau_refrac,
+         mean_isi_ticks, time_to_spike_ticks,
+         _seed1, _seed2, _seed3, _seed4, _ticks_per_second
+         ) = values
 
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
-
+        state_variables[MEAN_ISI_TICKS] = mean_isi_ticks
+        state_variables[TIME_TO_SPIKE_TICKS] = time_to_spike_ticks
 
 #     # Global params
 #     @inject_items({"machine_time_step": "MachineTimeStep"})
@@ -219,3 +245,19 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self._tau_refrac = tau_refrac
+
+    @property
+    def mean_isi_ticks(self):
+        return self._mean_isi_ticks
+
+    @mean_isi_ticks.setter
+    def mean_isi_ticks(self, new_mean_isi_ticks):
+        self._mean_isi_ticks = new_mean_isi_ticks
+
+    @property
+    def time_to_spike_ticks(self):
+        return self._time_to_spike_ticks
+
+    @mean_isi_ticks.setter
+    def time_to_spike_ticks(self, new_time_to_spike_ticks):
+        self._time_to_spike_ticks = new_time_to_spike_ticks

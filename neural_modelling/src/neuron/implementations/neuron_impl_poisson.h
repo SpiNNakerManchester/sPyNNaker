@@ -50,6 +50,9 @@ static global_neuron_params_pointer_t global_parameters;
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
+static REAL next_spike_time;
+static REAL rate_at_last_time_calc;
+
 static bool neuron_impl_initialise(uint32_t n_neurons) {
 
     // allocate DTCM for the global parameter details
@@ -195,34 +198,6 @@ static void neuron_impl_load_neuron_parameters(
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 // Poisson Spike Source Functions
-void set_spike_source_rate(neuron_pointer_t neuron, REAL rate) {
-//    if ((id >= global_parameters.first_source_id) &&
-//            ((id - global_parameters.first_source_id) <
-//             global_parameters.n_spike_sources)) {
-//        uint32_t sub_id = id - global_parameters.first_source_id;
-//        log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
-//        REAL rate_per_tick = 10 * rate * global_parameters.seconds_per_tick;
-//        if (rate > global_parameters.slow_rate_per_tick_cutoff) {					// how is slow rate per tick cutoff calculated?
-//            neuron->is_fast_source = true;
-//            neuron->exp_minus_lambda =
-//                (UFRACT) EXP(-rate_per_tick);
-//        } else {
-//            neuron->is_fast_source = false;
-            neuron->mean_isi_ticks =
-//                rate *
-////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
-//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
-
-
-			neuron->ticks_per_second / rate  ; // shouldn't this be ticks_per_second/rate?
-
-            io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
-            		rate,
-            		neuron->mean_isi_ticks);
-//        }
-//    }
-}
-
 
 static inline REAL slow_spike_source_get_time_to_spike(
         REAL mean_inter_spike_interval_in_ticks, neuron_pointer_t neuron) {
@@ -232,7 +207,54 @@ static inline REAL slow_spike_source_get_time_to_spike(
 //			global_parameters->spike_source_seed
 			)
         * mean_inter_spike_interval_in_ticks;
+    rate_at_last_time_calc = neuron->V_membrane;
 }
+
+
+
+void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
+		threshold_type_pointer_t threshold_type) {
+
+	// clip rate to ensure divde by 0 and overflow don't occur
+	if (rate < 0.25){
+		rate = 0.25;
+	} else if (rate > threshold_type->threshold_value) {
+		rate = threshold_type->threshold_value;
+	}
+
+    neuron->mean_isi_ticks =
+//                rate *
+////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
+//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
+			neuron->ticks_per_second / rate  ; // shouldn't this be ticks_per_second/rate?
+
+    io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
+        		rate, neuron->mean_isi_ticks);
+
+    if (neuron->mean_isi_ticks < neuron->time_to_spike_ticks) {
+    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks;
+    }
+////
+//    // This ensures we update to reduced time_to_next_spike, even without spiking
+//    if (next_spike_time > neuron->mean_isi_ticks << 3){
+//    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks; // update to the new mean
+//    } else if (next_spike_time < neuron->mean_isi_ticks >> 3) {
+//    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks; // update to the new mean
+//    }
+
+//    REAL mod_rate_diff = (rate_at_last_time_calc - rate);
+//
+//    if (mod_rate_diff > 5) {
+//    	neuron->time_to_spike_ticks = slow_spike_source_get_time_to_spike(
+//                neuron->mean_isi_ticks, neuron);
+//    } else if (mod_rate_diff < -5) {
+//    	neuron->time_to_spike_ticks = slow_spike_source_get_time_to_spike(
+//                neuron->mean_isi_ticks, neuron);
+//    }
+}
+
+
+
 
 
 bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
@@ -250,23 +272,16 @@ bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
             neuron->time_to_spike_ticks, <=,
             REAL_CONST(0.0))) {
 
-//        // Write spike to out spikes
-//        _mark_spike(s, 1);
-//
-//        // if no key has been given, do not send spike to fabric.
-//        if (global_parameters.has_key) {
-//
-//            // Send package
-//            _send_spike(global_parameters.key | s, timer_count);
-//        }
-
         // Update time to spike
-        neuron->time_to_spike_ticks +=
-            slow_spike_source_get_time_to_spike(
+    	next_spike_time = slow_spike_source_get_time_to_spike(
                 neuron->mean_isi_ticks, neuron);
+
+        neuron->time_to_spike_ticks += next_spike_time;
+//        neuron->time_to_spike_ticks +=slow_spike_source_get_time_to_spike(
+//                neuron->mean_isi_ticks, neuron);
+
+
         has_spiked = true;
-
-
     }
 
     // Subtract tick
@@ -351,7 +366,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Update Poisson neuron rate based on updated V
     REAL rate = result; // just a linear scaling for now
-    set_spike_source_rate(neuron, rate);
+    set_spike_source_rate(neuron, rate, threshold_type);
 
     // judge whether poisson neuron should have fired
     bool spike = timer_update_determine_poisson_spiked(neuron);

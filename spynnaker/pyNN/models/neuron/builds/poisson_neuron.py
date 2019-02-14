@@ -12,14 +12,17 @@ class PoissonNeuron(AbstractPyNNNeuronModelStandard):
         set by the neurons membrane potential
     """
 
-    @default_initial_values({"v", "isyn_exc", "isyn_inh"})
+    @default_initial_values({"v", "isyn_exc", "isyn_inh",
+                             "mean_isi_ticks", "time_to_spike_ticks"})
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0,
             v_thresh=100, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
-            i_offset=0.0, v=50, isyn_exc=0.0, isyn_inh=0.0):
+            mean_isi_ticks=10, time_to_spike_ticks=100,
+            i_offset=0.0, v=50, isyn_exc=0.0, isyn_inh=0.0,):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFirePoisson(
-            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
+            mean_isi_ticks, time_to_spike_ticks)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()

@@ -85,10 +85,10 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     		neuron->time_to_spike_ticks);
 
     io_printf(IO_BUF, "Seed 1: %u\n", neuron->spike_source_seed[0]);
-    io_printf(IO_BUF, "Seed 2: $u\n", neuron->spike_source_seed[1]);
+    io_printf(IO_BUF, "Seed 2: %u\n", neuron->spike_source_seed[1]);
     io_printf(IO_BUF, "Seed 3: %u\n", neuron->spike_source_seed[2]);
     io_printf(IO_BUF, "Seed 4: %u\n", neuron->spike_source_seed[3]);
-    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
+//    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
     io_printf(IO_BUF, "ticks per second: %k\n", neuron->ticks_per_second);
 }
 
