@@ -4,6 +4,8 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
+MICROSECONDS_PER_SECOND = 1000000.0
+MICROSECONDS_PER_MILLISECOND = 1000.0
 V = "v"
 V_REST = "v_rest"
 TAU_M = "tau_m"
@@ -37,14 +39,30 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
         super(NeuronModelLeakyIntegrateAndFirePoisson, self).__init__(
-            [DataType.S1615,   # v
-             DataType.S1615,   # v_rest
-             DataType.S1615,   # r_membrane (= tau_m / cm)
-             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
-             DataType.S1615,   # i_offset
-             DataType.INT32,   # count_refrac
-             DataType.S1615,   # v_reset
-             DataType.INT32])  # tau_refrac
+
+            data_types= [
+                DataType.S1615,   # v
+                DataType.S1615,   # v_rest
+                DataType.S1615,   # r_membrane (= tau_m / cm)
+                DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
+                DataType.S1615,   # i_offset
+                DataType.INT32,   # count_refrac
+                DataType.S1615,   # v_reset
+                DataType.INT32,   # tau_refrac
+             #### Poisson Compartment Params ####
+                DataType.S1615,   # REAL mean_isi_ticks
+                DataType.S1615,    # REAL time_to_spike_ticks
+#                 ],
+#
+#             global_data_types=[
+                DataType.UINT32,  # MARS KISS seed
+                DataType.UINT32,  # MARS KISS seed
+                DataType.UINT32,  # MARS KISS seed
+                DataType.UINT32,  # MARS KISS seed
+                DataType.U032,    # seconds per tick
+                DataType.S1615    # ticks_per_second
+                ]
+            )
 
         if v_init is None:
             v_init = v_rest
@@ -95,7 +113,17 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
                 parameters[I_OFFSET], state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
+                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
+                10,
+                0,
+                # Should be in global params
+                10065, # seed 1
+                232, # seed 2
+                3634, # seed 3
+                4877, # seed 4
+                float(ts) / MICROSECONDS_PER_SECOND, # seconds_per_tick
+                MICROSECONDS_PER_SECOND / float(ts), # ticks_per_second
+                ]
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
@@ -107,6 +135,34 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
+
+
+#     # Global params
+#     @inject_items({"machine_time_step": "MachineTimeStep"})
+#     @overrides(AbstractNeuronModel.get_global_values,
+#                additional_arguments={'machine_time_step'})
+#     def get_global_values(self, machine_time_step):
+#         print float(machine_time_step) / MICROSECONDS_PER_SECOND
+#         print MICROSECONDS_PER_SECOND / float(machine_time_step)
+#         return [
+#                 1, # seed 1
+#                 2, # seed 2
+#                 3, # seed 3
+#                 4, # seed 4
+#                 2* float(machine_time_step) / MICROSECONDS_PER_SECOND, # seconds_per_tick
+#                 MICROSECONDS_PER_SECOND / float(machine_time_step), # ticks_per_second
+#                 ]
+
+#     # Write the number of seconds per timestep (unsigned long fract)
+#     spec.write_value(
+#         data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
+#         data_type=DataType.U032)
+
+#     # Write the number of timesteps per second (accum)
+#     spec.write_value(
+#         data=MICROSECONDS_PER_SECOND / float(machine_time_step),
+#         data_type=DataType.S1615)
+
 
     @property
     def v_init(self):

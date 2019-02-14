@@ -1,7 +1,8 @@
-#ifndef _NEURON_MODEL_LIF_CURR_IMPL_H_
-#define _NEURON_MODEL_LIF_CURR_IMPL_H_
+#ifndef _NEURON_MODEL_LIF_CURR_POISSON_IMPL_H_
+#define _NEURON_MODEL_LIF_CURR_POISSON_IMPL_H_
 
 #include "neuron_model.h"
+#include "random.h"
 
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
@@ -31,9 +32,23 @@ typedef struct neuron_t {
 
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
+
+
+    // Poisson compartment params
+    REAL mean_isi_ticks;
+    REAL time_to_spike_ticks;
+
+    // Should be in global params
+    mars_kiss64_seed_t spike_source_seed; // array of 4 values
+    UFRACT seconds_per_tick;
+    REAL ticks_per_second;
+
 } neuron_t;
 
 typedef struct global_neuron_params_t {
+////	mars_kiss64_seed_t spike_source_seed; // array of 4 values
+//	UFRACT seconds_per_tick;
+//	REAL ticks_per_second;
 } global_neuron_params_t;
 
-#endif // _NEURON_MODEL_LIF_CURR_IMPL_H_
+#endif // _NEURON_MODEL_LIF_CURR_POISSON_IMPL_H_

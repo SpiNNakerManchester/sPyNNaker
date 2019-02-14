@@ -14,6 +14,7 @@
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
+#include <random.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -162,6 +163,24 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
+//    io_printf(IO_BUF, "Printing global params\n");
+//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters[0]);
+//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters[1]);
+//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters[2]);
+//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters[3]);
+//    io_printf(IO_BUF, "seconds_per_tick: %k \n", global_parameters[4]);
+//    io_printf(IO_BUF, "ticks_per_second: %k \n", global_parameters[5]);
+
+
+    for (index_t n = 0; n < n_neurons; n++) {
+        neuron_model_print_parameters(&neuron_array[n]);
+    }
+
+    io_printf(IO_BUF, "size of global params: %u",
+    		sizeof(global_neuron_params_t));
+
+
+
     #if LOG_LEVEL >= LOG_DEBUG
         log_debug("-------------------------------------\n");
         for (index_t n = 0; n < n_neurons; n++) {
@@ -171,6 +190,99 @@ static void neuron_impl_load_neuron_parameters(
         //}
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
+
+
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+// Poisson Spike Source Functions
+void set_spike_source_rate(neuron_pointer_t neuron, REAL rate) {
+//    if ((id >= global_parameters.first_source_id) &&
+//            ((id - global_parameters.first_source_id) <
+//             global_parameters.n_spike_sources)) {
+//        uint32_t sub_id = id - global_parameters.first_source_id;
+//        log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
+//        REAL rate_per_tick = 10 * rate * global_parameters.seconds_per_tick;
+//        if (rate > global_parameters.slow_rate_per_tick_cutoff) {					// how is slow rate per tick cutoff calculated?
+//            neuron->is_fast_source = true;
+//            neuron->exp_minus_lambda =
+//                (UFRACT) EXP(-rate_per_tick);
+//        } else {
+//            neuron->is_fast_source = false;
+            neuron->mean_isi_ticks =
+//                rate *
+////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
+//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
+
+
+			neuron->ticks_per_second / rate  ; // shouldn't this be ticks_per_second/rate?
+
+            io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
+            		rate,
+            		neuron->mean_isi_ticks);
+//        }
+//    }
+}
+
+
+static inline REAL slow_spike_source_get_time_to_spike(
+        REAL mean_inter_spike_interval_in_ticks, neuron_pointer_t neuron) {
+    return exponential_dist_variate(
+            mars_kiss64_seed,
+			neuron->spike_source_seed
+//			global_parameters->spike_source_seed
+			)
+        * mean_inter_spike_interval_in_ticks;
+}
+
+
+bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
+	// NOTE: ALL SOURCES TREATED AS SLOW SOURCES!!!
+	// NOTE: NO SOURCE CAN SPIKE MORE THAN ONCE PER TIMESTEP
+    // If this spike source should spike now
+
+	bool has_spiked = false;
+
+
+	io_printf(IO_BUF, " 				Time to next spike: %k\n",
+			neuron->time_to_spike_ticks);
+
+    if (REAL_COMPARE(
+            neuron->time_to_spike_ticks, <=,
+            REAL_CONST(0.0))) {
+
+//        // Write spike to out spikes
+//        _mark_spike(s, 1);
+//
+//        // if no key has been given, do not send spike to fabric.
+//        if (global_parameters.has_key) {
+//
+//            // Send package
+//            _send_spike(global_parameters.key | s, timer_count);
+//        }
+
+        // Update time to spike
+        neuron->time_to_spike_ticks +=
+            slow_spike_source_get_time_to_spike(
+                neuron->mean_isi_ticks, neuron);
+        has_spiked = true;
+
+
+    }
+
+    // Subtract tick
+    neuron->time_to_spike_ticks -= REAL_CONST(1.0);
+
+
+    return has_spiked;
+}
+
+// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+
+
+
+
+
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
@@ -234,13 +346,24 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             external_bias, neuron);
 
     // determine if a spike should occur
-    bool spike = threshold_type_is_above_threshold(result, threshold_type);
+    // bool spike = threshold_type_is_above_threshold(result, threshold_type);
+
+
+    // Update Poisson neuron rate based on updated V
+    REAL rate = result; // just a linear scaling for now
+    set_spike_source_rate(neuron, rate);
+
+    // judge whether poisson neuron should have fired
+    bool spike = timer_update_determine_poisson_spiked(neuron);
+
+
+
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {
         // Call relevant model-based functions
         // Tell the neuron model
-        neuron_model_has_spiked(neuron);
+//        neuron_model_has_spiked(neuron);
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);
@@ -256,6 +379,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Return the boolean to the model timestep update
     return spike;
 }
+
+
+
+
 
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store

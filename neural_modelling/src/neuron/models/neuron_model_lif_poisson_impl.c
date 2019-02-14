@@ -1,4 +1,4 @@
-#include "neuron_model_lif_impl.h"
+#include "neuron_model_lif_poisson_impl.h"
 
 #include <debug.h>
 
@@ -71,13 +71,26 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    log_debug("V reset       = %11.4k mv", neuron->V_reset);
-    log_debug("V rest        = %11.4k mv", neuron->V_rest);
+    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
+    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
 
-    log_debug("I offset      = %11.4k nA", neuron->I_offset);
-    log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
+    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
+    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
 
-    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
 
-    log_debug("T refract     = %u timesteps", neuron->T_refract);
+    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
+    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
+    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
+    		neuron->time_to_spike_ticks);
+
+    io_printf(IO_BUF, "Seed 1: %u\n", neuron->spike_source_seed[0]);
+    io_printf(IO_BUF, "Seed 2: $u\n", neuron->spike_source_seed[1]);
+    io_printf(IO_BUF, "Seed 3: %u\n", neuron->spike_source_seed[2]);
+    io_printf(IO_BUF, "Seed 4: %u\n", neuron->spike_source_seed[3]);
+    io_printf(IO_BUF, "seconds per tick: %u\n", neuron->seconds_per_tick);
+    io_printf(IO_BUF, "ticks per second: %k\n", neuron->ticks_per_second);
 }
+
+
+
