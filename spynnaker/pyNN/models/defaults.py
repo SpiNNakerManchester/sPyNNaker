@@ -1,3 +1,4 @@
+import inspect
 try:
     from inspect import getfullargspec
 except ImportError:
