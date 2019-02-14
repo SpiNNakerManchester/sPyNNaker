@@ -313,7 +313,8 @@ class DelayExtensionVertex(
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
             connector, AbstractGenerateConnectorOnMachine) and \
-            connector.generate_on_machine
+            connector.generate_on_machine(
+                synapse_info.weight, synapse_info.delay)
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:

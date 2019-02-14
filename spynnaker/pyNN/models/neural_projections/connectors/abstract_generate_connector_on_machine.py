@@ -145,7 +145,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         raise ValueError("Unexpected value {}".format(values))
 
-    def generate_on_machine(self):
+    def generate_on_machine(self, weights, delays):
         """ Determine if this instance can generate on the machine.
 
         Default implementation returns True if the weights and delays can\
@@ -155,60 +155,56 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
 
         return (IS_PYNN_8 and
-                self._generate_lists_on_machine(self._weights) and
-                self._generate_lists_on_machine(self._delays))
+                self._generate_lists_on_machine(weights) and
+                self._generate_lists_on_machine(delays))
 
-    @property
-    def gen_weights_id(self):
+    def gen_weights_id(self, weights):
         """ Get the id of the weight generator on the machine
 
         :rtype: int
         """
-        return self._param_generator_id(self._weights)
+        return self._param_generator_id(weights)
 
-    def gen_weights_params(self, pre_vertex_slice, post_vertex_slice):
+    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the weight generator on the machine
 
         :rtype: numpy array of uint32
         """
         seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, self._weights,
+            pre_vertex_slice, post_vertex_slice, weights,
             self._weight_seed)
-        return self._param_generator_params(self._weights, seed)
+        return self._param_generator_params(weights, seed)
 
-    @property
-    def gen_weight_params_size_in_bytes(self):
+    def gen_weight_params_size_in_bytes(self, weights):
         """ The size of the weight parameters in bytes
 
         :rtype: int
         """
-        return self._param_generator_params_size_in_bytes(self._weights)
+        return self._param_generator_params_size_in_bytes(weights)
 
-    @property
-    def gen_delays_id(self):
+    def gen_delays_id(self, delays):
         """ Get the id of the delay generator on the machine
 
         :rtype: int
         """
-        return self._param_generator_id(self._delays)
+        return self._param_generator_id(delays)
 
-    def gen_delay_params(self, pre_vertex_slice, post_vertex_slice):
+    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the delay generator on the machine
 
         :rtype: numpy array of uint32
         """
         seed = self._generate_param_seed(
-            pre_vertex_slice, post_vertex_slice, self._delays,
+            pre_vertex_slice, post_vertex_slice, delays,
             self._delay_seed)
-        return self._param_generator_params(self._delays, seed)
+        return self._param_generator_params(delays, seed)
 
-    @property
-    def gen_delay_params_size_in_bytes(self):
+    def gen_delay_params_size_in_bytes(self, delays):
         """ The size of the delay parameters in bytes
 
         :rtype: int
         """
-        return self._param_generator_params_size_in_bytes(self._delays)
+        return self._param_generator_params_size_in_bytes(delays)
 
     @abstractproperty
     def gen_connector_id(self):

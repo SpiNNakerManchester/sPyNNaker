@@ -62,20 +62,20 @@ class SynapseIORowBased(AbstractSynapseIO):
                 max_delay_supported + numpy.finfo(numpy.double).tiny)
 
         # get delays to pass into connector
-        synapse_info.connector.set_weights_and_delays(
-            synapse_info.weight, synapse_info.delay)
+#        synapse_info.connector.set_weights_and_delays(
+#            synapse_info.weight, synapse_info.delay)
 
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                post_vertex_slice, 0, max_delay_supported)
+                synapse_info.delay, post_vertex_slice, 0, max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
         if n_delay_stages > 0:
             max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    post_vertex_slice,
+                    synapse_info.delay, post_vertex_slice,
                     min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
@@ -203,8 +203,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 #         else:
 #             delays = synapse_info.delay
 
-        synapse_info.connector.set_weights_and_delays(
-            synapse_info.weight, synapse_info.delay)
+#        synapse_info.connector.set_weights_and_delays(
+#            synapse_info.weight, synapse_info.delay)
 
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -213,9 +213,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_info.synapse_type)
+            synapse_info.weight, synapse_info.delay, pre_slices,
+            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice, synapse_info.synapse_type)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(

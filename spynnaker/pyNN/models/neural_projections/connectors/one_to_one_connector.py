@@ -23,26 +23,26 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         return self._get_delay_maximum(
-            max((self._n_pre_neurons, self._n_post_neurons)))
+            delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         if min_delay is None or max_delay is None:
             return 1
 
-        if numpy.isscalar(self._delays):
-            if self._delays >= min_delay and self._delays <= max_delay:
+        if numpy.isscalar(delays):
+            if delays >= min_delay and delays <= max_delay:
                 return 1
             return 0
-        if isinstance(self._delays, self._random_number_class):
+        if isinstance(delays, self._random_number_class):
             return 1
 
-        slice_min_delay = min(self._delays)
-        slice_max_delay = max(self._delays)
+        slice_min_delay = min(delays)
+        slice_max_delay = max(delays)
         if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
             return 1
         return 0
@@ -52,13 +52,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return 1
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         return self._get_weight_maximum(
-            max((self._n_pre_neurons, self._n_post_neurons)))
+            weights, max((self._n_pre_neurons, self._n_post_neurons)))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -74,9 +74,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, [connection_slice])
+            weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, [connection_slice])
+            delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
 
