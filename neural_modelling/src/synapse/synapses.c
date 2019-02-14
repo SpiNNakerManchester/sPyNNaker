@@ -18,8 +18,11 @@ uint32_t  num_fixed_pre_synaptic_events = 0;
 // The number of neurons
 static uint32_t n_neurons;
 
-// The number of synapse types
+// The number of synapse types implemented by this core
 static uint32_t n_synapse_types;
+
+// The index corresponding to the implemented synapse type
+static uint8_t synapse_index;
 
 // Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
@@ -37,14 +40,16 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
+static weight_t *synaptic_region;
+
 extern bool contribution_written;
 
 //! parameters that reside in the synapse_parameter_data_region in human
 //! readable form
-typedef enum parameters_in_neuron_parameter_data_region {
+typedef enum parameters_in_synapse_parameter_data_region {
     N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
-    RING_BUFFER_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
-} parameters_in_neuron_parameter_data_region;
+    [SYNAPSE_INDEX, RING_BUFFER_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
+} parameters_in_synapse_parameter_data_region;
 
 
 /* PRIVATE FUNCTIONS */
@@ -251,6 +256,8 @@ bool synapses_initialise(
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = synapse_params_address[INCOMING_SPIKE_BUFFER_SIZE];
 
+    synapse_index = synapse_params_address[SYNAPSE_INDEX];
+
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
         n_synapse_types * sizeof(uint32_t));
@@ -331,7 +338,7 @@ void synapses_do_timestep_update(timer_t time) {
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
-    // Size of the memory chunk containing this timestep's ring buffers
+    // Size of the memory chunk containing this timestep's ring buffers, CHECK THIS IN CASE IMPLEMENTING A SINGLE SYN!!!!
     size_t size_to_be_transferred = n_neurons * n_synapse_types * sizeof(weight_t);
 
     // Starting position of the memory chunk
@@ -339,12 +346,19 @@ void synapses_do_timestep_update(timer_t time) {
                 time, 0, 0, synapse_type_index_bits,
                 synapse_index_bits);
 
-    // Start the transfer, ? IS THE SDRAM ADDRESS
+    //If first timer tick retrieve the address of the buffer for synaptic contribution
+    if(time == 0) {
+
+        synaptic_region = sark_tag_ptr(255, 0);
+        synaptic_region += n_neurons * synapse_index;
+    }
+
+    // Start the transfer
     spin1_dma_transfer(
-        0, ?, &ring_buffers[ring_buffer_index],
+        0, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
 
-    // Clean the ring buffers
+    // Clean the ring buffers, CHECK THIS IN CASE A SINLE SYN IS IMPLEMENTED
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
 

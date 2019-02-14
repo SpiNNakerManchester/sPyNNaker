@@ -107,6 +107,8 @@ static timer_t current_time;
 //! Size of DMA read for synaptic contributions
 static size_t dma_size;
 
+static weight_t *synaptic_region;
+
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
@@ -221,7 +223,7 @@ bool neuron_do_timestep_update(timer_t time) {
 
     // DMA read of the synaptic contribution for this timestep
     spin1_dma_transfer(
-        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, ?, synaptic_contributions,
+        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region, synaptic_contributions,
         DMA_READ, dma_size);
 
     // Busy wait until DMA transfer is finished
@@ -266,6 +268,7 @@ bool neuron_do_timestep_update(timer_t time) {
 
         for (index_t synapse_type_index = 0 ; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
+            //IS THE DELAY RIGHT IN THE INDEX COMPUTATION SINCE WE HAVE ONLY THE LAST TIMESTEP BUFFER IN SDRAM??
             uint32_t buff_index = (((time & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
             | neuron_index);
@@ -278,6 +281,7 @@ bool neuron_do_timestep_update(timer_t time) {
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
         }
 
+        //SHOULD NOT BE USED AT THE MOMENT! SO DON'T WORRY! (ANDREW SAID SO)
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
             synapse_dynamics_get_intrinsic_bias(time, neuron_index); // 0 in case of non plastic synapses!!!!
@@ -389,7 +393,12 @@ bool neuron_initialise(address_t address) {
     n_neurons = address[N_NEURONS_TO_SIMULATE];
     n_synapse_types = address[N_SYNAPSE_TYPES];
 
+    //Size of the DMA region. Number of neurons multiplied by synapse types
     dma_size = n_neurons * n_synapse_types * sizeof(weight_t);
+
+    //Allocate the region in SDRAM for synaptic contribution. TAG 255 is to be sure
+    // is not assigned yet. size is dma_size
+    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, 255, 0);
 
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
