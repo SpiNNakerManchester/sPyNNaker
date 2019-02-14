@@ -4,6 +4,7 @@ from spinn_front_end_common.interface.provenance \
 from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.overrides import overrides
 from spinnak_ear.DRNL_vertex import DRNLVertex
+from spinnak_ear.IHCAN_vertex import IHCANVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \
@@ -57,9 +58,13 @@ class ProjectionMachineEdge(
                     pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                     pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
                     post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom#TODO: check whether hi atoms are included in partition
+                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 #run through connection list and return false if we find any connections between the pre and post vertices
                 try:
+                    if isinstance(self.pre_vertex,IHCANVertex):
+                        #find the 256 long "chunk" of ear pop that the edge will share a key with
+                        pre_lo = int(pre_lo/256.)
+                        pre_hi = int(pre_hi/256.)+255
                     if synapse_info.connector._conn_matrix[pre_lo:pre_hi+1,post_lo:post_hi+1].max()>0:
                         #add moc vertex
                         if isinstance(self.post_vertex, DRNLVertex):

@@ -15,6 +15,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import \
 # import logging
 import logging
 
+from spinnak_ear.IHCAN_vertex import IHCANVertex
+from pacman.model.constraints.key_allocator_constraints import ShareKeyConstraint
+
 logger = logging.getLogger(__name__)
 
 
@@ -37,6 +40,7 @@ class GraphEdgeFilter(object):
             machine_graph.n_outgoing_edge_partitions,
             "Filtering edges")
 
+
         # add the vertices directly, as they wont be pruned.
         for vertex in progress.over(machine_graph.vertices, False):
             self._add_vertex_to_new_graph(
@@ -46,6 +50,7 @@ class GraphEdgeFilter(object):
 
         # start checking edges to decide which ones need pruning....
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
+
             for edge in partition.edges:
                 if self._is_filterable(edge, graph_mapper):
                     logger.debug("this edge was pruned %s", edge)
@@ -57,6 +62,27 @@ class GraphEdgeFilter(object):
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
+        # if any vertex is spinnak-ear
+        ihc_partitions_left = [partition for partition in new_machine_graph.outgoing_edge_partitions
+                               if isinstance(partition.pre_vertex,
+                                             IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 0]
+        an_group_partitions_left = [ihc_partitions_left[i * 256:(i + 1) * 256] for i in
+                                    range((len(ihc_partitions_left) + 255) // 256)]
+        ihc_partitions_right = [partition for partition in new_machine_graph.outgoing_edge_partitions
+                                if isinstance(partition.pre_vertex,
+                                              IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 1]
+        an_group_partitions_right = [ihc_partitions_right[i * 256:(i + 1) * 256] for i in
+                                     range((len(ihc_partitions_right) + 255) // 256)]
+
+        partition_index_left = 0
+        partition_index_right = 0
+        for partition in new_machine_graph.outgoing_edge_partitions:
+            if partition in ihc_partitions_left:
+                partition.add_constraint(ShareKeyConstraint(an_group_partitions_left[partition_index_left//256]))
+                partition_index_left +=1
+            if partition in ihc_partitions_right:
+                partition.add_constraint(ShareKeyConstraint(an_group_partitions_right[partition_index_right//256]))
+                partition_index_right +=1
         # returned the pruned graph and graph_mapper
         print "prune_count:{} no_prune_count:{}".format(prune_count,no_prune_count)
         return new_machine_graph, new_graph_mapper
