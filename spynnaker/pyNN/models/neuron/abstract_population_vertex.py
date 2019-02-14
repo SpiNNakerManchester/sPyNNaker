@@ -7,8 +7,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, IPtagResource,
-    ResourceContainer)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -61,25 +60,18 @@ class AbstractPopulationVertex(
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
-        "_buffer_size_before_receive",
         "_change_requires_mapping",
         "_change_requires_neuron_parameters_reload",
         "_incoming_spike_buffer_size",
-        "_maximum_sdram_for_buffering",
-        "_minimum_buffer_sdram",
         "_n_atoms",
         "_n_profile_samples",
         "_neuron_impl",
         "_neuron_recorder",
         "_parameters",
         "_pynn_model",
-        "_receive_buffer_host",
-        "_receive_buffer_port",
         "_state_variables",
         "_synapse_manager",
-        "_time_between_requests",
-        "_units",
-        "_using_auto_pause_and_resume"]
+        "_units"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -129,31 +121,6 @@ class AbstractPopulationVertex(
         recordables.extend(self._neuron_impl.get_recordable_variables())
         self._neuron_recorder = NeuronRecorder(recordables, n_neurons)
 
-        self._time_between_requests = config.getint(
-            "Buffers", "time_between_requests")
-        self._minimum_buffer_sdram = config.getint(
-            "Buffers", "minimum_buffer_sdram")
-        self._using_auto_pause_and_resume = config.getboolean(
-            "Buffers", "use_auto_pause_and_resume")
-        self._receive_buffer_host = config.get(
-            "Buffers", "receive_buffer_host")
-        self._receive_buffer_port = helpful_functions.read_config_int(
-            config, "Buffers", "receive_buffer_port")
-
-        # If live buffering is enabled, set a maximum on the buffer sizes
-        spike_buffer_max_size = 0
-        variable_buffer_max_size = 0
-        self._buffer_size_before_receive = None
-        if config.getboolean("Buffers", "enable_buffered_recording"):
-            spike_buffer_max_size = config.getint(
-                "Buffers", "spike_buffer_size")
-            variable_buffer_max_size = config.getint(
-                "Buffers", "variable_buffer_size")
-
-        self._maximum_sdram_for_buffering = [spike_buffer_max_size]
-        for _ in self._neuron_impl.get_recordable_variables():
-            self._maximum_sdram_for_buffering.append(variable_buffer_max_size)
-
         # Set up synapse handling
         self._synapse_manager = SynapticManager(
             self._neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
@@ -186,12 +153,6 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        ip_tags = list()
-        if self._receive_buffer_host is not None:
-            ip_tags.append(IPtagResource(
-                self._receive_buffer_host, self._receive_buffer_port,
-                True, tag=None, traffic_identifier=self.TRAFFIC_IDENTIFIER))
-
         variableSDRAM = self._neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constantSDRAM = ConstantSDRAM(
@@ -203,8 +164,7 @@ class AbstractPopulationVertex(
             sdram=variableSDRAM + constantSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
-                self.get_cpu_usage_for_atoms(vertex_slice)),
-            iptags=ip_tags)
+                self.get_cpu_usage_for_atoms(vertex_slice)))
 
         # return the total resources.
         return container
@@ -237,22 +197,15 @@ class AbstractPopulationVertex(
                     variable, vertex_slice, n_machine_time_steps))
         return values
 
-    @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
-    @overrides(
-        ApplicationVertex.create_machine_vertex,
-        additional_arguments={"n_machine_time_steps"})
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, n_machine_time_steps,
-            label=None, constraints=None):
-        # pylint: disable=too-many-arguments, arguments-differ
-        vertex = PopulationMachineVertex(
-            resources_required, self._neuron_recorder.recorded_region_ids,
-            label, constraints)
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
 
         AbstractPopulationVertex._n_vertices += 1
-
-        # return machine vertex
-        return vertex
+        return PopulationMachineVertex(
+            resources_required, self._neuron_recorder.recorded_region_ids,
+            label, constraints)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         return (
@@ -441,7 +394,6 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "tags": "MemoryTags",
         "data_n_time_steps": "DataNTimeSteps",
         "placements": "MemoryPlacements"
     })
@@ -449,13 +401,13 @@ class AbstractPopulationVertex(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "application_graph", "machine_graph", "routing_info", "tags",
+            "application_graph", "machine_graph", "routing_info",
             "data_n_time_steps", "placements"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            tags, data_n_time_steps, placements):
+            data_n_time_steps, placements):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -484,13 +436,8 @@ class AbstractPopulationVertex(
         # Write the recording region
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.RECORDING.value)
-        ip_tags = tags.get_ip_tags_for_vertex(vertex)
-        recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            self._get_buffered_sdram(vertex_slice, data_n_time_steps),
-            self._maximum_sdram_for_buffering)
         spec.write_array(recording_utilities.get_recording_header_array(
-            recorded_region_sizes, self._time_between_requests,
-            self._buffer_size_before_receive, ip_tags))
+            self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
         # Write the neuron parameters
         self._write_neuron_parameters(

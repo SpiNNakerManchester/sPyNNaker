@@ -27,15 +27,13 @@ class SpikeSourcePoissonMachineVertex(
                ('PROVENANCE_REGION', 3)])
 
     def __init__(
-            self, resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, constraints=None, label=None):
+            self, resources_required, is_recording, constraints=None,
+            label=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
             label, constraints=constraints)
         self._is_recording = is_recording
         self._resources = resources_required
-        self._minimum_buffer_sdram = minimum_buffer_sdram
-        self._buffered_sdram_per_timestep = buffered_sdram_per_timestep
 
     @property
     @overrides(MachineVertex.resources_required)
