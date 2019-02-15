@@ -38,70 +38,24 @@ class FromListConnector(AbstractConnector):
                 " at least a list of tuples, each of which should contain:"
                 " (pre_idx, post_idx)")
         self._conn_list = conn_list
-
-        self._converted_weights_and_delays = False
-
-#     @staticmethod
-#     def _split_conn_list(conn_list, column_names):
-#         """ Separate the connection list into the blocks needed.
-#         :param conn_list: the original connection list
-#         :param column_names: the column names if exist
-#         :return: source dest list, weights list, delays list, extra list
-#         """
-#
-#         # weights and delay index
-#         weight_index = None
-#         delay_index = None
-#
-#         # conn lists
-#         weights = None
-#         delays = None
-#
-#         # locate weights and delay index in the listings
-#         if "weight" in column_names:
-#             weight_index = column_names.index("weight")
-#         if "delay" in column_names:
-#             delay_index = column_names.index("delay")
-#         element_index = list(range(2, len(column_names)))
-#
-#         # figure out where other stuff is
-#         conn_list = numpy.array(conn_list)
-#         source_destination_conn_list = conn_list[:, [0, 1]]
-#
-#         if weight_index is not None:
-#             element_index.remove(weight_index)
-#             weights = conn_list[:, weight_index]
-#         if delay_index is not None:
-#             element_index.remove(delay_index)
-#             delays = conn_list[:, delay_index]
-#
-#         # build other data element conn list (with source and destination)
-#         other_conn_list = None
-#         other_element_column_names = list()
-#         for element in element_index:
-#             other_element_column_names.append(column_names[element])
-#         if element_index:
-#             other_conn_list = conn_list[:, element_index]
-#             other_conn_list.dtype.names = other_element_column_names
-#
-#         # hand over split data
-#         return source_destination_conn_list, weights, delays, other_conn_list
+        self._weights = None
+        self._delays = None
 
     def create_weights_and_delays_from_list(self, weights, delays):
-        # set the data if not already set (supports none overriding via
-        # synapse data)
-        weight = convert_param_to_numpy(weights, len(self._conn_list))
-        delay = convert_param_to_numpy(delays, len(self._conn_list))
-
-        print("delay: converted ", delay)
+        # set the weights and delays if given by the user
+        if self._weights is None:
+            self._weights = convert_param_to_numpy(
+                weights, len(self._conn_list))
+        if self._delays is None:
+            self._delays = convert_param_to_numpy(
+                delays, len(self._conn_list))
 
         # if got data, build connlist with correct dtypes
-        if (weight is not None and delay is not None and not
-                self._converted_weights_and_delays):
+        if (self._weights is not None and self._delays is not None):
             # add weights and delays to the conn list
             temp_conn_list = numpy.dstack(
                 (self._conn_list[:, 0], self._conn_list[:, 1],
-                 weight, delay))[0]
+                 self._weights, self._delays))[0]
 
             self._conn_list = list()
             for element in temp_conn_list:
@@ -111,33 +65,35 @@ class FromListConnector(AbstractConnector):
             # set dtypes
             self._conn_list = numpy.asarray(self._conn_list,
                                             dtype=self.CONN_LIST_DTYPE)
-            self._converted_weights_and_delays = True
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
-        # check that conn_list has delays, if not then use the value passed in
-        print("conn_list delay is ", self._conn_list["delay"])
-        return numpy.max(self._conn_list["delay"])
+        if self._delays is None:
+            return numpy.max(delays)
+        else:
+            return numpy.max(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
-        # check that conn_list has delays, if not then use the value passed in
-        return numpy.var(self._conn_list["delay"])
+        if self._delays is None:
+            return numpy.var(delays)
+        else:
+            return numpy.var(self._conn_list["delay"])
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         mask = None
-        if min_delay is None or max_delay is None:
+        if min_delay is None or max_delay is None or self._delays is None:
             mask = ((self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                     (self._conn_list["target"] <= post_vertex_slice.hi_atom))
         else:
-            # check that conn_list has delays, if not then use the value
             mask = ((self._conn_list["target"] >= post_vertex_slice.lo_atom) &
                     (self._conn_list["target"] <= post_vertex_slice.hi_atom) &
                     (self._conn_list["delay"] >= min_delay) &
                     (self._conn_list["delay"] <= max_delay))
+
         sources = self._conn_list["source"][mask]
         if sources.size == 0:
             return 0
@@ -150,20 +106,26 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
-        # check that conn_list has weights, if not then use the value passed in
-        return numpy.mean(numpy.abs(self._conn_list["weight"]))
+        if self._weights is None:
+            return numpy.mean(weights)
+        else:
+            return numpy.mean(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
-        # check that conn_list has weights, if not then use the value passed in
-        return numpy.amax(numpy.abs(self._conn_list["weight"]))
+        if self._weights is None:
+            return numpy.amax(weights)
+        else:
+            return numpy.amax(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
-        # check that conn_list has weights, if not then use the value passed in
-        return numpy.var(numpy.abs(self._conn_list["weight"]))
+        if self._weights is None:
+            return numpy.var(weights)
+        else:
+            return numpy.var(numpy.abs(self._conn_list["weight"]))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -180,9 +142,15 @@ class FromListConnector(AbstractConnector):
         block["source"] = items["source"]
         block["target"] = items["target"]
         # check that conn_list has weights, if not then use the value passed in
-        block["weight"] = items["weight"]
+        if self._weights is None:
+            block["weight"] = self._generate_weights(weights, items.size, None)
+        else:
+            block["weight"] = items["weight"]
         # check that conn_list has delays, if not then use the value passed in
-        block["delay"] = self._clip_delays(items["delay"])
+        if self._delays is None:
+            block["delay"] = self._generate_delays(delays, items.size, None)
+        else:
+            block["delay"] = self._clip_delays(items["delay"])
         block["synapse_type"] = synapse_type
         return block
 
