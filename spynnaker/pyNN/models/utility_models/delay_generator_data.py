@@ -63,5 +63,6 @@ class DelayGeneratorData(object):
             self._post_slice_index, self._pre_vertex_slice,
             self._post_vertex_slice, self._synapse_information.synapse_type))
         items.append(connector.gen_delay_params(
-            self._pre_vertex_slice, self._post_vertex_slice))
+            self._synapse_information.delay, self._pre_vertex_slice,
+            self._post_vertex_slice))
         return numpy.concatenate(items)
