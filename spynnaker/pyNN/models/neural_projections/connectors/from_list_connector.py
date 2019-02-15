@@ -43,10 +43,10 @@ class FromListConnector(AbstractConnector):
 
     def create_weights_and_delays_from_list(self, weights, delays):
         # set the weights and delays if given by the user
-        if self._weights is None:
+        if self._weights is None and weights is not None:
             self._weights = convert_param_to_numpy(
                 weights, len(self._conn_list))
-        if self._delays is None:
+        if self._delays is None and delays is not None:
             self._delays = convert_param_to_numpy(
                 delays, len(self._conn_list))
 
@@ -65,6 +65,38 @@ class FromListConnector(AbstractConnector):
             # set dtypes
             self._conn_list = numpy.asarray(self._conn_list,
                                             dtype=self.CONN_LIST_DTYPE)
+        elif (self._weights is not None):
+            # add weights to the conn list
+            temp_conn_list = numpy.dstack(
+                (self._conn_list[:, 0], self._conn_list[:, 1],
+                 self._weights))[0]
+
+            self._conn_list = list()
+            for element in temp_conn_list:
+                self._conn_list.append((element[0], element[1], element[2]))
+
+            # set dtypes
+            self._conn_list = numpy.asarray(
+                self._conn_list,
+                dtype=numpy.dtype([
+                    ("source", numpy.uint32), ("target", numpy.uint32),
+                    ("weight", numpy.float64)]))
+        elif (self._delays is not None):
+            # add delays to the conn list
+            temp_conn_list = numpy.dstack(
+                (self._conn_list[:, 0], self._conn_list[:, 1],
+                 self._delays))[0]
+
+            self._conn_list = list()
+            for element in temp_conn_list:
+                self._conn_list.append((element[0], element[1], element[2]))
+
+            # set dtypes
+            self._conn_list = numpy.asarray(
+                self._conn_list,
+                dtype=numpy.dtype([
+                    ("source", numpy.uint32), ("target", numpy.uint32),
+                    ("delay", numpy.float64)]))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
