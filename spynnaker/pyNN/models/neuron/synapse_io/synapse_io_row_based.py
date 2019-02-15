@@ -189,23 +189,6 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
-
-        # Get the weights and delays to pass into the connector
-#         weights = None
-#         delays = None
-#         if hasattr(synapse_info.synapse_dynamics, 'weight'):
-#             weights = synapse_info.synapse_dynamics.weight
-#         else:
-#             weights = synapse_info.weight
-#
-#         if hasattr(synapse_info.synapse_dynamics, 'delay'):
-#             delays = synapse_info.synapse_dynamics.delay
-#         else:
-#             delays = synapse_info.delay
-
-#        synapse_info.connector.set_weights_and_delays(
-#            synapse_info.weight, synapse_info.delay)
-
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
