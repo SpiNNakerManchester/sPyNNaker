@@ -67,23 +67,6 @@ class AbstractConnector(object):
         """
         self._space = space
 
-#     def set_weights_and_delays(self, weights, delays):
-#         """ Set the weights and delays as needed.
-#
-#         :param weights:
-#             May either be a float, a !RandomDistribution object, a list 1D\
-#             array with at least as many items as connections to be created,\
-#             or a distance dependence as per a d_expression. Units nA/uS.
-#         :param delays: -- as `weights`. If `None`, all synaptic\
-#             delays will be set to the global minimum delay. Units ms.
-#         :raises Exception: when not a standard interface of list, scalar,\
-#             or random number generator
-#         :raises NotImplementedError: when lists are not supported and entered
-#         """
-#         self._weights = weights
-#         self._delays = delays
-#         self._check_parameters(weights, delays)
-
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
         self._pre_population = pre_population

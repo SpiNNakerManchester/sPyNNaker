@@ -80,9 +80,6 @@ def test_connectors(
             pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
             rng=None, machine_time_step=1000)
-        # do we keep this line here? the function only "exists" for
-        # the FromListConnector now...
-        # connector.set_weights_and_delays(weight, delay)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]

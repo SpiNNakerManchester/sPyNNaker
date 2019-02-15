@@ -61,10 +61,6 @@ class SynapseIORowBased(AbstractSynapseIO):
         min_delay_for_delay_extension = (
                 max_delay_supported + numpy.finfo(numpy.double).tiny)
 
-        # get delays to pass into connector
-#        synapse_info.connector.set_weights_and_delays(
-#            synapse_info.weight, synapse_info.delay)
-
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(

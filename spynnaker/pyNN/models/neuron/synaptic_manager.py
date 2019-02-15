@@ -430,20 +430,6 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
-#                     weights = None
-#                     if hasattr(synapse_dynamics, 'weight'):
-#                         weights = synapse_dynamics.weight
-#                     else:
-#                         weights = synapse_info.weight
-#
-#                     delays = None
-#                     if hasattr(synapse_dynamics, 'delay'):
-#                         delays = synapse_dynamics.delay
-#                     else:
-#                         delays = synapse_info.delay
-
-#                    connector.set_weights_and_delays(
-#                        synapse_info.weight, synapse_info.delay)
 
                     weight_mean = (
                         synapse_dynamics.get_weight_mean(
