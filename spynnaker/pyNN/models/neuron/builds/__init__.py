@@ -14,10 +14,11 @@ from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .if_curr_exp_erbp import IFCurrExpERBP
 from .poisson_neuron import PoissonNeuron
+from .readout_poisson_neuron import ReadoutPoissonNeuron
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrExpERBP", "PoissonNeuron"]
+           "IFCurrExpERBP", "PoissonNeuron", "ReadoutPoissonNeuron"]
