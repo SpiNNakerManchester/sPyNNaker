@@ -1,13 +1,13 @@
-from spinn_utilities.abstract_base import abstractproperty, AbstractBase
-from six import add_metaclass
-import numpy
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.models.neural_projections.connectors\
-    import AbstractConnector
-from data_specification.enums.data_type import DataType
+import decimal
 from distutils.version import StrictVersion
 from enum import Enum
-import decimal
+import numpy
+from six import add_metaclass
+from spinn_utilities.abstract_base import abstractproperty, AbstractBase
+from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
 
 # Travis fix - when sPyNNaker is installed, you will likely always have
 # PyNN installed as well, but sPyNNaker itself doesn't rely on PyNN

@@ -1,12 +1,10 @@
-from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.log import FormatAdapter
-
-from spynnaker.pyNN.models.common import recording_utils
-
 import math
-import numpy
 import logging
 import struct
+import numpy
+from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.log import FormatAdapter
+from spynnaker.pyNN.models.common import recording_utils
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")

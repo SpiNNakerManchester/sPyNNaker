@@ -1,9 +1,8 @@
+import logging
+import csa
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-
-import logging
-import numpy
-import csa
 
 logger = logging.getLogger(__name__)
 

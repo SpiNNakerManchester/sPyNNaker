@@ -1,5 +1,5 @@
-from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
 
 E_REV_E = "e_rev_E"

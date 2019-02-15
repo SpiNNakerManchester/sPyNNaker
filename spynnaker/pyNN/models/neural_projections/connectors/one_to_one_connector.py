@@ -1,10 +1,10 @@
+import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 
-import logging
 logger = logging.getLogger(__name__)
 
 

@@ -1,21 +1,16 @@
-import numpy
 import math
+import numpy
 from six import raise_from
 from spinn_utilities.overrides import overrides
-
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from spynnaker.pyNN.models.neuron.synapse_dynamics import \
-    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP
 from .abstract_synapse_io import AbstractSynapseIO
 from .max_row_info import MaxRowInfo
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP,
+    AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
+    SynapseDynamicsSTDP, AbstractSynapseDynamics)
 
 _N_HEADER_WORDS = 3
 

@@ -1,13 +1,11 @@
 import math
-
-from data_specification.enums import DataType
-
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from .abstract_timing_dependence import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
-    import SynapseStructureWeightAccumulator
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
-    import plasticity_helpers
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightAccumulator)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    plasticity_helpers)
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):

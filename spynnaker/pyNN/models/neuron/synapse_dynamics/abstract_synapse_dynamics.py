@@ -1,7 +1,6 @@
-from six import add_metaclass
-import numpy
 import math
-
+import numpy
+from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 

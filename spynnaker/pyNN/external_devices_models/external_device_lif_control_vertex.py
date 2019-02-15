@@ -1,21 +1,15 @@
-from spinn_utilities.overrides import overrides
-
-from .abstract_ethernet_controller import AbstractEthernetController
-
-from pacman.model.constraints.key_allocator_constraints import \
-    FixedKeyAndMaskConstraint
-from pacman.model.routing_info import BaseKeyAndMask
-
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models \
-    import AbstractVertexWithEdgeToDependentVertices
-
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-
-import logging
 from collections import OrderedDict
+import logging
+from spinn_utilities.overrides import overrides
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyAndMaskConstraint)
+from pacman.model.routing_info import BaseKeyAndMask
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractVertexWithEdgeToDependentVertices)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from .abstract_ethernet_controller import AbstractEthernetController
 
 logger = logging.getLogger(__name__)
 

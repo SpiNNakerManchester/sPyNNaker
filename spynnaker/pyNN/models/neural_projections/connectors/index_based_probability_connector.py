@@ -1,18 +1,17 @@
+import logging
+import math
+import numpy
+from numpy import (
+    arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
+    hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
+    minimum, e, pi)
 from spinn_utilities.overrides import overrides
+from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from spinn_utilities.safe_eval import SafeEval
-import logging
-import numpy
-import math
-
-# support for arbitrary expression for the indices
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
-from numpy import log, log10, modf, power, sin, sinh, sqrt
-from numpy import tan, tanh, maximum, minimum, e, pi
 
 logger = logging.getLogger(__name__)
+# support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
                                ldexp, log, log10, modf, power, sin, sinh, sqrt,

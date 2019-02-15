@@ -1,9 +1,9 @@
+import logging
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
-import logging
-import numpy
 
 logger = logging.getLogger(__name__)
 
