@@ -14,6 +14,7 @@
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <neuron/models/neuron_model_lif_erbp_impl.h>
+#include "stdp_typedefs.h"
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -95,16 +96,20 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
-    // print_event_history(post_event_history);
-     print_delayed_window_events(post_event_history, window_begin_time,
+    if (print_plasticity){
+    	// print_event_history(post_event_history);
+    	print_delayed_window_events(post_event_history, window_begin_time,
     		window_end_time, delay_dendritic);
+    }
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
         const uint32_t delayed_post_time = *post_window.next_time
                                            + delay_dendritic;
-        io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "\t\tApplying post-synaptic event at delayed time:%u\n",
               delayed_post_time);
+    	}
 
         // Apply spike to state
         current_state = timing_apply_post_spike(
@@ -117,6 +122,7 @@ static inline final_state_t _plasticity_update_synapse(
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;
+
     log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
 
@@ -350,6 +356,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
 void synapse_dynamics_process_post_synaptic_event(
         uint32_t time, index_t neuron_index, REAL error) {
+
 
     log_debug("Adding post-synaptic event to trace at time:%u", time);
 

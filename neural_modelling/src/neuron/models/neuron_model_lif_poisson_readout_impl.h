@@ -48,6 +48,8 @@ typedef struct neuron_t {
 typedef struct global_neuron_params_t {
  	mars_kiss64_seed_t spike_source_seed; // array of 4 values
 	REAL ticks_per_second;
+	REAL readout_V;
+	REAL target_V[1000];
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_POISSON_READOUT_IMPL_H_

@@ -103,14 +103,15 @@ static inline pre_trace_t timing_add_pre_spike(
 		}
 	}
 
-	io_printf(IO_BUF, "Voltage at time of pre spike: %k\n", mem_potential);
-	io_printf(IO_BUF, "p_j at time of pre spike: %k\n", p_j);
-
 	REAL to_add_to_trace = (p_j * STDP_FIXED_POINT_ONE) ;
 	int32_t bits_to_add = bitsk(to_add_to_trace) >> 15;
 
-	io_printf(IO_BUF, "Multiplication: %k\n", to_add_to_trace);
-	io_printf(IO_BUF, "Multiplication: %u\n", bits_to_add);
+	if (print_plasticity){
+		io_printf(IO_BUF, "Voltage at time of pre spike: %k\n", mem_potential);
+		io_printf(IO_BUF, "p_j at time of pre spike: %k\n", p_j);
+		io_printf(IO_BUF, "Multiplication: %k\n", to_add_to_trace);
+		io_printf(IO_BUF, "Multiplication: %u\n", bits_to_add);
+	}
 
     // Get time since last spike
     uint32_t delta_time = time - last_time;
@@ -123,7 +124,9 @@ static inline pre_trace_t timing_add_pre_spike(
     // Add energy caused by new spike to trace
     int32_t new_r1_trace = decayed_r1_trace + to_add_to_trace; // !!! NEED TO CHECK THIS MULTIPLY !!!
 
-    io_printf(IO_BUF, "\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
+	if (print_plasticity){
+		io_printf(IO_BUF, "\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
+	}
 
     // Return new pre-synaptic event with decayed trace values with energy
     // for new spike added
@@ -158,6 +161,7 @@ static inline update_state_t timing_apply_pre_spike(
 //    } else { // the else is now redundant
 //        return previous_state;
 //    }
+    return previous_state;
 }
 
 //---------------------------------------
@@ -202,11 +206,12 @@ static inline update_state_t timing_apply_post_spike(
         // multiply it by the weight of the error spike (which we'd stored in the
         //postsynaptic event history)
 
-        io_printf(IO_BUF, "Error value from apply post: %d\n", trace);
-        io_printf(IO_BUF, "Error value from apply post: %k\n", w);
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "Error value from apply post: %d\n", trace);
+    		io_printf(IO_BUF, "Error value from apply post: %k\n", w);
 
-        io_printf(IO_BUF, "Shift: %u\n", previous_state.weight_state.weight_region->weight_shift);
-
+    		io_printf(IO_BUF, "Shift: %u\n", previous_state.weight_state.weight_region->weight_shift);
+    	}
 
     	// This allows us to decay the pre trace to the time of the error spike
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
@@ -215,9 +220,11 @@ static inline update_state_t timing_apply_post_spike(
         uint32_t error_by_trace = (decayed_r1 * weight) >> (16 -
         		(previous_state.weight_state.weight_region->weight_shift + 1));
 
-        io_printf(IO_BUF, "                time_since_last_pre_event=%u, "
+    	if (print_plasticity){
+    		io_printf(IO_BUF, "                time_since_last_pre_event=%u, "
         		"decayed_eligibility_trace=%d, mult_by_err=%u\n",
                   time_since_last_pre, decayed_r1, error_by_trace);
+    	}
 
         if (trace < 0){
         	previous_state.weight_state = weight_one_term_apply_depression(
