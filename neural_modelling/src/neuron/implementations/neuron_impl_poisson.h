@@ -305,6 +305,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
+    io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
+
+
     // Get the input_type parameters and voltage for this neuron
     input_type_pointer_t input_type = &input_type_array[neuron_index];
 
