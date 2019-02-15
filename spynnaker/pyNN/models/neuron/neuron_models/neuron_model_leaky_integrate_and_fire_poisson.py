@@ -60,17 +60,16 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
                 DataType.INT32,   # count_refrac
                 DataType.S1615,   # v_reset
                 DataType.INT32,   # tau_refrac
-             #### Poisson Compartment Params ####
+                #### Poisson Compartment Params ####
                 DataType.S1615,   # REAL mean_isi_ticks
                 DataType.S1615,    # REAL time_to_spike_ticks
-#                 ],
-#
-#             global_data_types=[
+                ],
+
+            global_data_types=[
                 DataType.UINT32,  # MARS KISS seed
                 DataType.UINT32,  # MARS KISS seed
                 DataType.UINT32,  # MARS KISS seed
                 DataType.UINT32,  # MARS KISS seed
-#                 DataType.U032,    # seconds per tick
                 DataType.S1615    # ticks_per_second
                 ]
             )
@@ -138,13 +137,13 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
                 state_variables[MEAN_ISI_TICKS],
                 state_variables[TIME_TO_SPIKE_TICKS],
-                # Should be in global params
-                parameters[SEED1], # seed 1
-                parameters[SEED2], # seed 2
-                parameters[SEED3], # seed 3
-                parameters[SEED4], # seed 4
-#                 float(ts) / MICROSECONDS_PER_SECOND, # seconds_per_tick
-                MICROSECONDS_PER_SECOND / float(ts), # ticks_per_second
+#                 # Should be in global params
+#                 parameters[SEED1], # seed 1
+#                 parameters[SEED2], # seed 2
+#                 parameters[SEED3], # seed 3
+#                 parameters[SEED4], # seed 4
+# #                 float(ts) / MICROSECONDS_PER_SECOND, # seconds_per_tick
+#                 MICROSECONDS_PER_SECOND / float(ts), # ticks_per_second
                 ]
 
     @overrides(AbstractNeuronModel.update_values)
@@ -154,7 +153,7 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac,
          mean_isi_ticks, time_to_spike_ticks,
-         _seed1, _seed2, _seed3, _seed4, _ticks_per_second
+#          _seed1, _seed2, _seed3, _seed4, _ticks_per_second
          ) = values
 
         # Copy the changed data only
@@ -163,32 +162,18 @@ class NeuronModelLeakyIntegrateAndFirePoisson(AbstractNeuronModel):
         state_variables[MEAN_ISI_TICKS] = mean_isi_ticks
         state_variables[TIME_TO_SPIKE_TICKS] = time_to_spike_ticks
 
-#     # Global params
-#     @inject_items({"machine_time_step": "MachineTimeStep"})
-#     @overrides(AbstractNeuronModel.get_global_values,
-#                additional_arguments={'machine_time_step'})
-#     def get_global_values(self, machine_time_step):
-#         print float(machine_time_step) / MICROSECONDS_PER_SECOND
-#         print MICROSECONDS_PER_SECOND / float(machine_time_step)
-#         return [
-#                 1, # seed 1
-#                 2, # seed 2
-#                 3, # seed 3
-#                 4, # seed 4
-#                 2* float(machine_time_step) / MICROSECONDS_PER_SECOND, # seconds_per_tick
-#                 MICROSECONDS_PER_SECOND / float(machine_time_step), # ticks_per_second
-#                 ]
-
-#     # Write the number of seconds per timestep (unsigned long fract)
-#     spec.write_value(
-#         data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
-#         data_type=DataType.U032)
-
-#     # Write the number of timesteps per second (accum)
-#     spec.write_value(
-#         data=MICROSECONDS_PER_SECOND / float(machine_time_step),
-#         data_type=DataType.S1615)
-
+    # Global params
+    @inject_items({"machine_time_step": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_global_values,
+               additional_arguments={'machine_time_step'})
+    def get_global_values(self, machine_time_step):
+        return [
+                1, # seed 1
+                2, # seed 2
+                3, # seed 3
+                4, # seed 4
+                MICROSECONDS_PER_SECOND / float(machine_time_step) # ticks_per_second
+                ]
 
     @property
     def v_init(self):

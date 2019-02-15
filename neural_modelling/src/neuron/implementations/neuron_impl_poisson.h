@@ -166,13 +166,12 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
-//    io_printf(IO_BUF, "Printing global params\n");
-//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters[0]);
-//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters[1]);
-//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters[2]);
-//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters[3]);
-//    io_printf(IO_BUF, "seconds_per_tick: %k \n", global_parameters[4]);
-//    io_printf(IO_BUF, "ticks_per_second: %k \n", global_parameters[5]);
+    io_printf(IO_BUF, "\nPrinting global params\n");
+    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
+    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
+    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
+    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
+    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -203,8 +202,8 @@ static inline REAL slow_spike_source_get_time_to_spike(
         REAL mean_inter_spike_interval_in_ticks, neuron_pointer_t neuron) {
     return exponential_dist_variate(
             mars_kiss64_seed,
-			neuron->spike_source_seed
-//			global_parameters->spike_source_seed
+//			neuron->spike_source_seed
+			global_parameters->spike_source_seed
 			)
         * mean_inter_spike_interval_in_ticks;
     rate_at_last_time_calc = neuron->V_membrane;
@@ -226,7 +225,7 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 //                rate *
 ////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
 //				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
-			neuron->ticks_per_second / rate  ; // shouldn't this be ticks_per_second/rate?
+    		global_parameters->ticks_per_second / rate  ; // shouldn't this be ticks_per_second/rate?
 
     io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
         		rate, neuron->mean_isi_ticks);
@@ -234,6 +233,7 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
     if (neuron->mean_isi_ticks < neuron->time_to_spike_ticks) {
     	neuron->time_to_spike_ticks = neuron->mean_isi_ticks;
     }
+
 ////
 //    // This ensures we update to reduced time_to_next_spike, even without spiking
 //    if (next_spike_time > neuron->mean_isi_ticks << 3){

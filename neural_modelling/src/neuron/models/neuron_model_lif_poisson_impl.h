@@ -38,17 +38,16 @@ typedef struct neuron_t {
     REAL mean_isi_ticks;
     REAL time_to_spike_ticks;
 
-    // Should be in global params
-    mars_kiss64_seed_t spike_source_seed; // array of 4 values
-//    UFRACT seconds_per_tick;
-    REAL ticks_per_second;
+//    // Should be in global params
+//    mars_kiss64_seed_t spike_source_seed; // array of 4 values
+////    UFRACT seconds_per_tick;
+//    REAL ticks_per_second;
 
 } neuron_t;
 
 typedef struct global_neuron_params_t {
-////	mars_kiss64_seed_t spike_source_seed; // array of 4 values
-//	UFRACT seconds_per_tick;
-//	REAL ticks_per_second;
+ 	mars_kiss64_seed_t spike_source_seed; // array of 4 values
+	REAL ticks_per_second;
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_POISSON_IMPL_H_
