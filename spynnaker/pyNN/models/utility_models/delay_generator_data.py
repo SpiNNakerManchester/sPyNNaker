@@ -36,7 +36,8 @@ class DelayGeneratorData(object):
 
         return sum((self.BASE_SIZE,
                     connector.gen_connector_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes))
+                    connector.gen_delay_params_size_in_bytes(
+                        self._synapse_information.delay)))
 
     @property
     def gen_data(self):

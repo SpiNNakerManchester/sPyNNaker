@@ -320,7 +320,8 @@ class DelayExtensionVertex(
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes,
+                connector.gen_delay_params_size_in_bytes(
+                    synapse_info.delay),
                 connector.gen_connector_params_size_in_bytes,
             ))
         return 0
