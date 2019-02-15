@@ -23,9 +23,10 @@ address_t synapse_dynamics_initialise(
 
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
+        uint32_t time, index_t neuron_index, REAL error) {
     use(time);
     use(neuron_index);
+    use(error);
 }
 
 //---------------------------------------
