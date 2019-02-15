@@ -49,8 +49,19 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
             mean_isi_ticks, time_to_spike_ticks):
-        super(NeuronModelLeakyIntegrateAndFirePoissonReadout, self).__init__(
 
+        global_data_types=[
+                    DataType.UINT32,  # MARS KISS seed
+                    DataType.UINT32,  # MARS KISS seed
+                    DataType.UINT32,  # MARS KISS seed
+                    DataType.UINT32,  # MARS KISS seed
+                    DataType.S1615,    # ticks_per_second
+                    DataType.S1615    # global mem pot
+                    ]
+        global_data_types.extend([DataType.S1615 for i in range(1000)])
+
+
+        super(NeuronModelLeakyIntegrateAndFirePoissonReadout, self).__init__(
             data_types= [
                 DataType.S1615,   # v
                 DataType.S1615,   # v_rest
@@ -65,13 +76,7 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
                 DataType.S1615,    # REAL time_to_spike_ticks
                 ],
 
-            global_data_types=[
-                DataType.UINT32,  # MARS KISS seed
-                DataType.UINT32,  # MARS KISS seed
-                DataType.UINT32,  # MARS KISS seed
-                DataType.UINT32,  # MARS KISS seed
-                DataType.S1615    # ticks_per_second
-                ]
+            global_data_types=global_data_types
             )
 
         if v_init is None:
@@ -167,13 +172,23 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
-        return [
+        vals = [
                 1, # seed 1
                 2, # seed 2
                 3, # seed 3
                 4, # seed 4
-                MICROSECONDS_PER_SECOND / float(machine_time_step) # ticks_per_second
+                MICROSECONDS_PER_SECOND / float(machine_time_step), # ticks_per_second
+                0.0, # set to 0, as will be set in first timestep of model anyway
                 ]
+
+        target_data = []
+
+        for i in range(1000):
+            target_data.append(100* numpy.sin(2 * i * 2* numpy.pi / 1000))
+        vals.extend(target_data)
+        return vals
+
+
 
     @property
     def v_init(self):

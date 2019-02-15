@@ -52,6 +52,7 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 static REAL next_spike_time;
 static REAL rate_at_last_time_calc;
+static uint32_t timer = 0;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
 
@@ -304,76 +305,117 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
+    bool spike = false;
 
-    io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
+
+    	io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
+    	io_printf(IO_BUF, "Target: %k\n\n", global_parameters->target_V[timer]);
+
+    	// Get the input_type parameters and voltage for this neuron
+    	input_type_pointer_t input_type = &input_type_array[neuron_index];
+
+    	// Get threshold and additional input parameters for this neuron
+    	threshold_type_pointer_t threshold_type =
+    			&threshold_type_array[neuron_index];
+    	additional_input_pointer_t additional_input =
+    			&additional_input_array[neuron_index];
+    	synapse_param_pointer_t synapse_type =
+    			&neuron_synapse_shaping_params[neuron_index];
+
+    	// Get the voltage
+    	state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
 
-    // Get the input_type parameters and voltage for this neuron
-    input_type_pointer_t input_type = &input_type_array[neuron_index];
+    	// Get the exc and inh values from the synapses
+    	input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
+    	input_t* inh_value = synapse_types_get_inhibitory_input(synapse_type);
 
-    // Get threshold and additional input parameters for this neuron
-    threshold_type_pointer_t threshold_type =
-        &threshold_type_array[neuron_index];
-    additional_input_pointer_t additional_input =
-        &additional_input_array[neuron_index];
-    synapse_param_pointer_t synapse_type =
-        &neuron_synapse_shaping_params[neuron_index];
-
-    // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-
-    // Get the exc and inh values from the synapses
-    input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
-    input_t* inh_value = synapse_types_get_inhibitory_input(synapse_type);
-
-    // Call functions to obtain exc_input and inh_input
-    input_t* exc_input_values = input_type_get_input_value(
+    	// Call functions to obtain exc_input and inh_input
+    	input_t* exc_input_values = input_type_get_input_value(
             exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
-    input_t* inh_input_values = input_type_get_input_value(
+    	input_t* inh_input_values = input_type_get_input_value(
             inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
-    // Sum g_syn contributions from all receptors for recording
-    REAL total_exc = 0;
-    REAL total_inh = 0;
+    	// Sum g_syn contributions from all receptors for recording
+    	REAL total_exc = 0;
+    	REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        total_exc += exc_input_values[i];
-    }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
-        total_inh += inh_input_values[i];
-    }
+    	for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+    		total_exc += exc_input_values[i];
+    	}
+    	for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
+    		total_inh += inh_input_values[i];
+    	}
 
-    // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    	// Call functions to get the input values to be recorded
+    	recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+    	recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    			total_inh;
 
-    // Call functions to convert exc_input and inh_input to current
-    input_type_convert_excitatory_input_to_current(
-            exc_input_values, input_type, voltage);
-    input_type_convert_inhibitory_input_to_current(
-            inh_input_values, input_type, voltage);
+    	// Call functions to convert exc_input and inh_input to current
+    	input_type_convert_excitatory_input_to_current(
+    			exc_input_values, input_type, voltage);
+    	input_type_convert_inhibitory_input_to_current(
+    			inh_input_values, input_type, voltage);
 
-    external_bias += additional_input_get_input_value_as_current(
-        additional_input, voltage);
+    	external_bias += additional_input_get_input_value_as_current(
+    			additional_input, voltage);
 
-    // update neuron parameters
-    state_t result = neuron_model_state_update(
-            NUM_EXCITATORY_RECEPTORS, exc_input_values,
-            NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+    if (neuron_index == 0){
+    	recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    	// update neuron parameters
+    	state_t result = neuron_model_state_update(
+    			NUM_EXCITATORY_RECEPTORS, exc_input_values,
+				NUM_INHIBITORY_RECEPTORS, inh_input_values,
+				external_bias, neuron);
 
     // determine if a spike should occur
     // bool spike = threshold_type_is_above_threshold(result, threshold_type);
 
+    	// Finally, set global membrane potential to updated value
+    	global_parameters->readout_V = result;
 
-    // Update Poisson neuron rate based on updated V
-    REAL rate = result; // just a linear scaling for now
-    set_spike_source_rate(neuron, rate, threshold_type);
+    } else if (neuron_index == 1) { // this is the excitatory error source
 
-    // judge whether poisson neuron should have fired
-    bool spike = timer_update_determine_poisson_spiked(neuron);
+    	recorded_variable_values[V_RECORDING_INDEX] =
+    			global_parameters->target_V[timer];
 
+    	// Update Poisson neuron rate based on updated V
+        REAL rate =  global_parameters->target_V[timer] - global_parameters->readout_V; // calc difference to
+        io_printf(IO_BUF, "New Rate: %k", rate);
+
+        if (rate > 0) { // error is negative, so set rate = 0;
+        	set_spike_source_rate(neuron, rate,
+        			threshold_type);
+        } else {
+        	set_spike_source_rate(neuron, 0,
+        			threshold_type);
+        }
+
+        // judge whether poisson neuron should have fired
+        spike = timer_update_determine_poisson_spiked(neuron);
+
+    } else if (neuron_index == 2){
+    	// Update Poisson neuron rate based on updated V
+        REAL rate = global_parameters->target_V[timer] - global_parameters->readout_V; // calc difference to
+        io_printf(IO_BUF, "New Rate: %k", rate);
+
+        recorded_variable_values[V_RECORDING_INDEX] = rate;
+
+
+        if (rate < 0) { // error is negative, so set rate = 0;
+        	set_spike_source_rate(neuron, -rate,
+        			threshold_type);
+        } else {
+        	set_spike_source_rate(neuron, 0,
+        			threshold_type);
+        }
+
+        // judge whether poisson neuron should have fired
+        spike = timer_update_determine_poisson_spiked(neuron);
+        timer++; // update this here, as needs to be done once per iteration over all the neurons
+
+    }
 
 
 
