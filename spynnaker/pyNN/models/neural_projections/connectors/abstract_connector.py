@@ -103,7 +103,7 @@ class AbstractConnector(object):
         """
         if get_simulator().is_a_pynn_random(delays):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
-                self._delays, n_connections)
+                delays, n_connections)
             high = utility_calls.high(delays)
             if high is None:
                 return max_estimated_delay

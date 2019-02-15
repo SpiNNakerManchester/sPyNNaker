@@ -56,7 +56,7 @@ class DelayGeneratorData(object):
             (decimal.Decimal(str(1000.0 / float(self._machine_time_step))) *
              DataType.S1615.scale),
             connector.gen_connector_id,
-            connector.gen_delays_id],
+            connector.gen_delays_id(self._synapse_information.delay)],
             dtype="uint32"))
         items.append(connector.gen_connector_params(
             self._pre_slices, self._pre_slice_index, self._post_slices,
