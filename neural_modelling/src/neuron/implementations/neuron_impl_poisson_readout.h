@@ -4,7 +4,7 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/synapse_types/synapse_types_exponential_impl.h>
+#include <neuron/synapse_types/synapse_types_erbp_impl.h>
 #include <neuron/models/neuron_model_lif_poisson_readout_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>

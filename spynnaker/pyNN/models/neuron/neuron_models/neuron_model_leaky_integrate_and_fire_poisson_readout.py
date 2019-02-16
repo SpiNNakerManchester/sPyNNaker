@@ -58,7 +58,7 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
                     DataType.S1615,    # ticks_per_second
                     DataType.S1615    # global mem pot
                     ]
-        global_data_types.extend([DataType.S1615 for i in range(1000)])
+        global_data_types.extend([DataType.S1615 for i in range(1024)])
 
 
         super(NeuronModelLeakyIntegrateAndFirePoissonReadout, self).__init__(
@@ -183,8 +183,8 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
 
         target_data = []
 
-        for i in range(1000):
-            target_data.append(100* numpy.sin(2 * i * 2* numpy.pi / 1000))
+        for i in range(1024):
+            target_data.append(100* numpy.sin(2 * i * 2* numpy.pi / 1024))
         vals.extend(target_data)
         return vals
 
