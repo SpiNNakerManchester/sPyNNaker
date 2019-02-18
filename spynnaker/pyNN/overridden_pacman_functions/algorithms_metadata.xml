@@ -221,7 +221,6 @@
             <param_name>transceiver</param_name>
             <param_name>machine</param_name>
             <param_name>app_id</param_name>
-            <param_name>machine_graph</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
             <param_name>graph_mapper</param_name>

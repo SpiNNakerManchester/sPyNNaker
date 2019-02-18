@@ -14,16 +14,21 @@ from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_machine import CoreSubsets
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.exceptions import SpinnmanInvalidParameterException, \
-    SpinnmanUnexpectedResponseCodeException
+    SpinnmanUnexpectedResponseCodeException, SpinnmanException
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.exceptions import CantFindSDRAMToUse
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_supports_bit_field_generation import \
+    AbstractSupportsBitFieldGeneration
 from spynnaker.pyNN.models.abstract_models.\
     abstract_supports_bit_field_routing_compression import \
     AbstractSupportsBitFieldRoutingCompression
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
     host_bit_field_router_compressor import HostBasedBitFieldRouterCompressor
 from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.models.utility_models.synapse_expander.\
+    synapse_expander import SYNAPSE_EXPANDER
 
 
 logger = logging.getLogger(__name__)
@@ -65,8 +70,8 @@ class MachineBitFieldRouterCompressor(object):
             placements, executable_finder, read_algorithm_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            use_expresso, use_rob_paul, machine_time_step, time_scale_factor,
-            compress_only_when_needed=True,
+            use_expresso, machine_time_step, time_scale_factor,
+            compress_only_when_needed=True, use_rob_paul=False,
             compress_as_much_as_possible=False):
         """ entrance for routing table compression with bit field
 
@@ -116,19 +121,22 @@ class MachineBitFieldRouterCompressor(object):
         # host processing for compression. but needed to be in the synaptic
         # cores, as it might have overwritten sdram whilst attempting to load
         #  all 3 data blocks.
-        if len(on_host_chips) != 0:
-            compressor_chip_cores = self._regenerate_cores(
-                on_chip_cores, on_host_chips, executable_path)
-        else:
-            compressor_chip_cores = on_chip_cores
+        compressor_chip_cores = self._regenerate_cores(
+            on_chip_cores, on_host_chips, executable_finder, placements,
+            executable_path, machine)
 
         # load and run binaries
-        utility_calls.run_system_application(
-            compressor_chip_cores, routing_table_compressor_app_id,
-            transceiver, provenance_file_path, executable_finder,
-            read_algorithm_iobuf, self._check_for_success,
-            self._handle_failure_for_bit_field_router_compressor,
-            [CPUState.FINISHED])
+        try:
+            utility_calls.run_system_application(
+                compressor_chip_cores, routing_table_compressor_app_id,
+                transceiver, provenance_file_path, executable_finder,
+                read_algorithm_iobuf, self._check_for_success,
+                self._handle_failure_for_bit_field_router_compressor,
+                [CPUState.FINISHED])
+        except SpinnmanException:
+            self._handle_failure_for_bit_field_router_compressor(
+                compressor_chip_cores, transceiver, provenance_file_path,
+                routing_table_compressor_app_id, executable_finder)
 
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
@@ -186,24 +194,45 @@ class MachineBitFieldRouterCompressor(object):
         progress_bar.end()
 
     @staticmethod
-    def _regenerate_cores(cores, run_on_host, executable_path):
+    def _regenerate_cores(
+            cores, run_on_host, executable_finder, placements,
+            bit_field_router_compressor_executable_path, machine):
         """ removes host based cores for synaptic matrix regeneration
         
         :param cores: the cores for everything
         :param run_on_host: the chips that had to be ran on host
-        :param executable_path: the binary path
+        :param executable_finder: way to get binary path
+        :param bit_field_router_compressor_executable_path: the path to the \
+            routing compressor with bitfield
+        :param machine: spiNNMachine instance.
         :return: new targets for synaptic expander
         """
         new_cores = ExecutableTargets()
 
-        core_subsets = cores.get_cores_for_binary(executable_path)
+        # locate expander executable path
+        expander_executable_path = executable_finder.get_executable_path(
+            SYNAPSE_EXPANDER)
+
+        # get the cores for the router compressor with bitfield
+        core_subsets = cores.get_cores_for_binary(
+            bit_field_router_compressor_executable_path)
+
+        # if any ones are going to be ran on host, ignore them from the new
+        # core setup
         for core_subset in core_subsets.core_subsets:
             key = (core_subset.x, core_subset.y)
             if key not in run_on_host:
-                for processor_id in core_subset.processor_ids:
-                    new_cores.add_processor(
-                        executable_path, core_subset.x, core_subset.y,
-                        processor_id)
+                chip = machine.get_chip_at(core_subset.x, core_subset.y)
+                for processor_id in range(0, chip.n_processors):
+                    if placements.is_processor_occupied(
+                            core_subset.x, core_subset.y, processor_id):
+                        vertex = placements.get_vertex_on_processor(
+                            core_subset.x, core_subset.y, processor_id)
+                        if isinstance(
+                                vertex, AbstractSupportsBitFieldGeneration):
+                            new_cores.add_processor(
+                                expander_executable_path, core_subset.x,
+                                core_subset.y, processor_id)
         return new_cores
 
     def _rerun_synaptic_cores(
@@ -402,8 +431,8 @@ class MachineBitFieldRouterCompressor(object):
             chip_x, chip_y, sdram_address, address_data, len(address_data))
 
         # get the only processor on the chip
-        processor_id = cores.all_core_subsets.get_core_subset_for_chip(
-            chip_x, chip_y).processor_ids[0]
+        processor_id = list(cores.all_core_subsets.get_core_subset_for_chip(
+            chip_x, chip_y).processor_ids)[0]
 
         # update user 2 with location
         user_3_base_address = \
@@ -457,8 +486,8 @@ class MachineBitFieldRouterCompressor(object):
             chip_x, chip_y, sdram_address, address_data, len(address_data))
 
         # get the only processor on the chip
-        processor_id = cores.all_core_subsets.get_core_subset_for_chip(
-            chip_x, chip_y).processor_ids[0]
+        processor_id = list(cores.all_core_subsets.get_core_subset_for_chip(
+            chip_x, chip_y).processor_ids)[0]
 
         # update user 2 with location
         user_2_base_address = \
@@ -508,8 +537,8 @@ class MachineBitFieldRouterCompressor(object):
             table.x, table.y, base_address, routing_table_data)
 
         # get the only processor on the chip
-        processor_id = cores.all_core_subsets.get_core_subset_for_chip(
-            table.x, table.y).processor_ids[0]
+        processor_id = list(cores.all_core_subsets.get_core_subset_for_chip(
+            table.x, table.y).processor_ids)[0]
 
         # update user 1 with location
         user_1_base_address = \
@@ -567,7 +596,7 @@ class MachineBitFieldRouterCompressor(object):
                     app_vertex.key_to_atom_map_region_base_address(
                         transceiver, placement)
                 region_addresses[placement.x, placement.y].append(
-                    bit_field_sdram_address, key_to_atom_map, placement.p)
+                    (bit_field_sdram_address, key_to_atom_map, placement.p))
 
                 # store the available space from the matrix to steal
                 (address, size) = \
