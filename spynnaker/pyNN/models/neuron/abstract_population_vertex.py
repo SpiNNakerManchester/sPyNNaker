@@ -21,7 +21,6 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
-from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
@@ -150,10 +149,10 @@ class AbstractPopulationVertex(
         for _ in self._neuron_impl.get_recordable_variables():
             self._maximum_sdram_for_buffering.append(variable_buffer_max_size)
 
-        # Set up synapse handling
-        self._synapse_manager = SynapticManager(
-            self._neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config)
+        # # Set up synapse handling
+        # self._synapse_manager = SynapticManager(
+        #     self._neuron_impl.get_n_synapse_types(), n_neurons, ring_buffer_sigma,
+        #     spikes_per_second, config)
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -262,15 +261,13 @@ class AbstractPopulationVertex(
             _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
             (_NEURON_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms) +
             self._neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self._neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms) +
-            self._synapse_manager.get_n_cpu_cycles())
+            self._neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms))
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
             self._neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
-            self._neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice) +
-            self._synapse_manager.get_dtcm_usage_in_bytes())
+            self._neuron_recorder.get_dtcm_usage_in_bytes(vertex_slice))
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
@@ -292,9 +289,6 @@ class AbstractPopulationVertex(
                 len(self._neuron_impl.get_recordable_variables()) + 1) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
-            self._synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
             (self._get_number_of_mallocs_used_by_dsg() *
              common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
             profile_utils.get_profile_region_size(
@@ -839,6 +833,10 @@ class AbstractPopulationVertex(
 
     def get_synapse_id_by_target(self, target):
         return self._neuron_impl.get_synapse_id_by_target(target)
+
+    #used to know how many synapse vertices we need
+    def get_n_synapse_types(self):
+        return self._neuron_impl.get_n_synapse_types()
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)

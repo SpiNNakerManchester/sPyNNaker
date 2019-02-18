@@ -72,18 +72,15 @@ class PyNNPopulationCommon(object):
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
             self._neuron_vertex = model.create_vertex(
-                size, label+"_neuron", constraints, **population_parameters)
+                size, label, constraints, **population_parameters)
 
-            for target in self._neuron_vertex.get_synapse_targets():
-                syn_vertex = model.create_vertex(size, label + "_" + target + "_synapse",
-                                                 constraints, **population_parameters) #Check last arg!
-                syn_vertex.add_constraint(SameChipAsConstraint(self._neuron_vertex))
-                syn_vertex.add_constraint(SameAtomsAsVertexConstraint(self._neuron_vertex))
-                self._synapse_vertices.append(syn_vertex)
-                spinnaker_control.add_application_edge(ApplicationEdge(syn_vertex, self._neuron_vertex,
+            for index in range(1, len(self._neuron_vertex)):
+                spinnaker_control.add_application_edge(ApplicationEdge(self._neuron_vertex[index],
+                                                                       self._neuron_vertex[0],
                                                                        label="internal_edge {}".format(
                                                                            spinnaker_control.none_labelled_edge_count)))
                 spinnaker_control.increment_none_labelled_edge_count()
+
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):

@@ -5,12 +5,28 @@ import sys
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
+
+from spinn_utilities.overrides import overrides
+
 from spinn_utilities.helpful_functions import get_valid_components
+
 from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.executor.injection_decorator import inject_items
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+
 from data_specification.enums import DataType
+
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities import (
+    constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -34,7 +50,7 @@ TIME_STAMP_BYTES = 4
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 12
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -51,13 +67,13 @@ _SYNAPSE_SDRAM_OVERSCALE = 1.1
 _ONE_WORD = struct.Struct("<I")
 
 
-class SynapticManager(object):
+class SynapticManager(ApplicationVertex):
     """ Deals with synapses
     """
     # pylint: disable=too-many-arguments, too-many-locals
     __slots__ = [
         "_delay_key_index",
-        "_n_synapse_types",
+        "_n_synapse_types", #number of different synapse types implemented (set to one on higher level, but left as param here)
         "_one_to_one_connection_dtcm_max_bytes",
         "_poptable_type",
         "_pre_run_connection_holders",
@@ -69,13 +85,24 @@ class SynapticManager(object):
         "_weight_scales",
         "_ring_buffer_shifts",
         "_gen_on_machine",
-        "_max_row_info"]
+        "_max_row_info",
+        "_n_atoms",
+        "_vertex",
+        "_n_profile_samples"]
 
-    def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, population_table_type=None, synapse_io=None):
+    def __init__(self, n_synapse_types, n_neurons, constraints, label,
+                 max_atoms_per_core, ring_buffer_sigma, spikes_per_second,
+                 population_table_type=None, synapse_io=None):
+
         self._n_synapse_types = n_synapse_types
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
+        self._n_atoms = n_neurons
+
+        config = globals_variables.get_simulator().config
+
+        self._vertex = super(SynapticManager, self).__init__(
+            label, constraints, max_atoms_per_core)
 
         # Get the type of population table
         self._poptable_type = population_table_type
@@ -123,6 +150,19 @@ class SynapticManager(object):
         # A map of synapse information to maximum row / delayed row length and
         # size in bytes
         self._max_row_info = dict()
+
+        # Set up for profiling
+        self._n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
+
+    @property
+    def get_vertex(self):
+        return self._vertex
+
+    @property
+    @overrides(ApplicationVertex.n_atoms)
+    def n_atoms(self):
+        return self._n_atoms
 
     @property
     def synapse_dynamics(self):
@@ -174,13 +214,36 @@ class SynapticManager(object):
         self._pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
-    def get_n_cpu_cycles(self):
-        # TODO: Calculate this correctly
-        return 0
+    def get_n_cpu_cycles(self, vertex_slice):
+        return (
+            _SYNAPSES_BASE_N_CPU_CYCLES +
+            _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms)
+
+    def get_resources_used_by_atoms(
+            self, vertex_slice, graph, n_machine_time_steps,
+            machine_time_step):
+        # pylint: disable=arguments-differ
+
+        # set resources required from this object
+        container = ResourceContainer(
+            sdram=SDRAMResource(self.get_sdram_usage_in_bytes(vertex_slice, graph, machine_time_step)),
+            dtcm=DTCMResource(self.get_dtcm_usage_in_bytes()),
+            cpu_cycles=CPUCyclesPerTickResource(
+                self.get_n_cpu_cycles(vertex_slice)))
+
+        recording_sizes = recording_utilities.get_recording_region_sizes(
+            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
+            self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
+            self._using_auto_pause_and_resume)
+        container.extend(recording_utilities.get_recording_resources(
+            recording_sizes, self._receive_buffer_host,
+            self._receive_buffer_port))
+
+        # return the total resources.
+        return container
 
     def get_dtcm_usage_in_bytes(self):
-        # TODO: Calculate this correctly
-        return 0
+        return _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES
 
     def _get_synapse_params_size(self):
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
@@ -289,8 +352,11 @@ class SynapticManager(object):
                 vertex_slice.n_atoms, self._n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, vertex_slice, in_edges, machine_time_step):
+            self, vertex_slice, graph, machine_time_step):
+
+        in_edges = graph.get_edges_ending_at_vertex(self)
         return (
+            common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_synapse_params_size() +
             self._get_synapse_dynamics_parameter_size(vertex_slice,
                                                       in_edges=in_edges) +
@@ -298,11 +364,23 @@ class SynapticManager(object):
                 vertex_slice, in_edges, machine_time_step) +
             self._poptable_type.get_master_population_table_size(
                 vertex_slice, in_edges) +
-            self._get_size_of_generator_information(in_edges))
+            self._get_size_of_generator_information(in_edges) +
+            (self._get_number_of_mallocs_used_by_dsg() *
+             common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
+            profile_utils.get_profile_region_size(
+                self._n_profile_samples)
+        )
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
             machine_graph, all_syn_block_sz, graph_mapper):
+
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.SYSTEM.value,
+            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            label="SystemRegion"
+        )
+
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
@@ -328,6 +406,13 @@ class SynapticManager(object):
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
+
+        profile_utils.reserve_profile_region(
+            spec, POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
+
+        #Necessary? got from abstract_pop_vertex
+        machine_vertex.reserve_provenance_data_region(spec)
 
     def get_number_of_mallocs_used_by_dsg(self):
         return 4
@@ -514,7 +599,7 @@ class SynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    def _write_synapse_parameters(
+    def _write_synapse_parameters( #probably needs to be moved on neuron!!
             self, spec, ring_buffer_shifts, post_vertex_slice, weight_scale):
         # Get the ring buffer shifts and scaling factors
 

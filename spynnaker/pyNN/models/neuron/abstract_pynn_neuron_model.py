@@ -1,6 +1,12 @@
 from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+
+from pacman.model.constraints.partitioner_constraints\
+    import SameAtomsAsVertexConstraint
+from pacman.model.constraints.placer_constraints\
+    import SameChipAsConstraint
 
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 
@@ -30,12 +36,28 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             return DEFAULT_MAX_ATOMS_PER_CORE
         return super(AbstractPyNNNeuronModel, cls).get_max_atoms_per_core()
 
+
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size):
+
         max_atoms = self.get_max_atoms_per_core()
-        return AbstractPopulationVertex(
-            n_neurons, label, constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, self._model, self)
+
+        vertices = list()
+
+        vertices.append(AbstractPopulationVertex(
+            n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
+            ring_buffer_sigma, incoming_spike_buffer_size, self._model, self))
+
+        syn_constraints = constraints
+        syn_constraints.append(SameChipAsConstraint(vertices[0]))
+        syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
+
+        for index in range(vertices[0].get_n_synapse_types()):
+            vertices.append(SynapticManager(1, n_neurons, syn_constraints,
+                                            label+"_syn_vertex_"+str(index), max_atoms,
+                                            ring_buffer_sigma, spikes_per_second))
+
+        return vertices
