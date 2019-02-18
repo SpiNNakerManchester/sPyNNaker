@@ -4,13 +4,11 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/models/neuron_model_lif_erbp_impl.h>
+#include <neuron/models/neuron_model.h>
 #include <neuron/input_types/input_type.h>
 #include <neuron/additional_inputs/additional_input.h>
 #include <neuron/threshold_types/threshold_type.h>
 #include <neuron/synapse_types/synapse_types.h>
-
-#include <neuron/plasticity/synapse_dynamics.h>
 
 // Further includes
 #include <common/out_spikes.h>
@@ -115,16 +113,6 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
         }
     }
 
-    // Initialise pointers to Neuron parameters in STDP code
-    synapse_dynamics_set_neuron_array(neuron_array);
-    log_info("set pointer to neuron array in stdp code");
-
-//    synapse_dynamics_set_additional_input_array(additional_input_array);
-//    log_info("set pointer to additional input array in stdp code");
-//
-//    synapse_dynamics_set_threshold_array(threshold_type_array);
-//    log_info("set pointer to threshold type array in stdp code");
-
     return true;
 }
 
@@ -219,17 +207,16 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL total_exc = 0;
     REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS-1; i++){
+    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
         total_exc += exc_input_values[i];
     }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS-1; i++){
+    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
         total_inh += inh_input_values[i];
     }
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->local_err;
-    //total_inh;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(

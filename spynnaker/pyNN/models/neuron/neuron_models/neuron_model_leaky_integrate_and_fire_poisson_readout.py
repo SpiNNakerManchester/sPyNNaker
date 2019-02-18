@@ -184,7 +184,7 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
         target_data = []
 
         for i in range(1024):
-            target_data.append(100* numpy.sin(2 * i * 2* numpy.pi / 1024))
+            target_data.append(10* numpy.sin(2 * i * 2* numpy.pi / 1024))
         vals.extend(target_data)
         return vals
 
