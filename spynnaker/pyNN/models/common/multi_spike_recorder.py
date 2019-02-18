@@ -1,5 +1,6 @@
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
+# from spinnak_ear.spinnakear_vertex import SpiNNakEarVertex
 
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -55,6 +56,7 @@ class MultiSpikeRecorder(object):
         ms_per_tick = machine_time_step / 1000.0
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
+        #some more spinnak-ear filtering
         missing = []
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))

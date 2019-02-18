@@ -62,27 +62,32 @@ class GraphEdgeFilter(object):
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
-        # if any vertex is spinnak-ear
-        ihc_partitions_left = [partition for partition in new_machine_graph.outgoing_edge_partitions
-                               if isinstance(partition.pre_vertex,
-                                             IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 0]
-        an_group_partitions_left = [ihc_partitions_left[i * 256:(i + 1) * 256] for i in
-                                    range((len(ihc_partitions_left) + 255) // 256)]
-        ihc_partitions_right = [partition for partition in new_machine_graph.outgoing_edge_partitions
-                                if isinstance(partition.pre_vertex,
-                                              IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 1]
-        an_group_partitions_right = [ihc_partitions_right[i * 256:(i + 1) * 256] for i in
-                                     range((len(ihc_partitions_right) + 255) // 256)]
+        # # # if any vertex is spinnak-ear
+        # ihc_partitions_left = [partition for partition in new_machine_graph.outgoing_edge_partitions
+        #                        if isinstance(partition.pre_vertex,
+        #                                      IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 0]
+        # an_group_partitions_left = [ihc_partitions_left[i * 256:(i + 1) * 256] for i in
+        #                             range((len(ihc_partitions_left) + 255) // 256)]
+        # ihc_partitions_right = [partition for partition in new_machine_graph.outgoing_edge_partitions
+        #                         if isinstance(partition.pre_vertex,
+        #                                       IHCANVertex) and partition.identifier == 'SPIKE' and partition.pre_vertex._ear_index == 1]
+        # an_group_partitions_right = [ihc_partitions_right[i * 256:(i + 1) * 256] for i in
+        #                              range((len(ihc_partitions_right) + 255) // 256)]
+        #
+        # # only add constraint to first found partition in each group
+        # for group_partitions in an_group_partitions_left:
+        #     for partition in new_machine_graph.outgoing_edge_partitions:
+        #         if partition in group_partitions:
+        #             group_partitions_minus_self = [par for par in group_partitions if par is not partition]
+        #             partition.add_constraint(ShareKeyConstraint(group_partitions_minus_self))
+        #             break
+        # for group_partitions in an_group_partitions_right:
+        #     for partition in new_machine_graph.outgoing_edge_partitions:
+        #         if partition in group_partitions:
+        #             group_partitions_minus_self = [par for par in group_partitions if par is not partition]
+        #             partition.add_constraint(ShareKeyConstraint(group_partitions_minus_self))
+        #             break
 
-        partition_index_left = 0
-        partition_index_right = 0
-        for partition in new_machine_graph.outgoing_edge_partitions:
-            if partition in ihc_partitions_left:
-                partition.add_constraint(ShareKeyConstraint(an_group_partitions_left[partition_index_left//256]))
-                partition_index_left +=1
-            if partition in ihc_partitions_right:
-                partition.add_constraint(ShareKeyConstraint(an_group_partitions_right[partition_index_right//256]))
-                partition_index_right +=1
         # returned the pruned graph and graph_mapper
         print "prune_count:{} no_prune_count:{}".format(prune_count,no_prune_count)
         return new_machine_graph, new_graph_mapper
