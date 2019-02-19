@@ -75,7 +75,7 @@ class AbstractPopulationVertex(
         "_state_variables",
         "_synapse_manager",
         "_time_between_requests",
-        "_units"
+        "_units",
         "_n_subvertices",
         "_n_data_specs"]
 
