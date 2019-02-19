@@ -1,6 +1,5 @@
 import logging
 import math
-import random
 import numpy
 import scipy.stats
 from spinn_utilities.overrides import overrides
@@ -54,6 +53,9 @@ MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 1.0
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 
+# The microseconds per timestep will be divided by this to get the max offset
+_MAX_OFFSET_DENOMINATOR = 10
+
 
 _PoissonStruct = Struct([
     DataType.UINT32,  # Start Scaled
@@ -74,13 +76,8 @@ class SpikeSourcePoissonVertex(
     """ A Poisson Spike source object
     """
 
-    _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
     SPIKE_RECORDING_REGION_ID = 0
-
-    # A count of the number of poisson vertices, to work out the random
-    # back off range
-    _n_poisson_machine_vertices = 0
 
     def __init__(
             self, n_neurons, constraints, label, rate, start, duration, seed,
@@ -96,6 +93,8 @@ class SpikeSourcePoissonVertex(
         self._seed = seed
         self._kiss_seed = dict()
         self._rng = None
+        self._n_subvertices = 0
+        self._n_data_specs = 0
 
         # check for changes parameters
         self._change_requires_mapping = True
@@ -134,8 +133,11 @@ class SpikeSourcePoissonVertex(
         if max_rate == 0:
             return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
+        chance_ts = n_machine_time_steps
+        if n_machine_time_steps is None:
+            chance_ts = 100000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
-            1.0 - (1.0 / float(n_machine_time_steps)),
+            1.0 - (1.0 / float(chance_ts)),
             float(max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
@@ -174,7 +176,7 @@ class SpikeSourcePoissonVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        SpikeSourcePoissonVertex._n_poisson_machine_vertices += 1
+        self._n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
             constraints, label)
@@ -310,10 +312,13 @@ class SpikeSourcePoissonVertex(
             incoming_mask = ~incoming_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
 
-        # Write the random back off value
-        spec.write_value(random.randint(0, min(
-            self._n_poisson_machine_vertices,
-            MICROSECONDS_PER_SECOND // machine_time_step)))
+        # Write the offset value
+        max_offset = (
+            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        spec.write_value(
+            int(math.ceil(max_offset / self._n_subvertices)) *
+            self._n_data_specs)
+        self._n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
         total_mean_rate = numpy.sum(self._rate)
@@ -325,7 +330,7 @@ class SpikeSourcePoissonVertex(
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
-            time_between_spikes = 0.0
+            time_between_spikes = 1.0
             if spikes_per_timestep > 1:
                 time_between_spikes = (
                     (machine_time_step * time_scale_factor) /
