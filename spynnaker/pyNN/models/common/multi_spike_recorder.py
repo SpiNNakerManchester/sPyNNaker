@@ -32,7 +32,7 @@ class MultiSpikeRecorder(object):
             return ConstantSDRAM(0)
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
-        return VariableSDRAM(0, out_spike_bytes * spikes_per_timestep)
+        return VariableSDRAM(0, 8 + (out_spike_bytes * spikes_per_timestep))
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:
