@@ -44,14 +44,18 @@ class PyNNProjectionCommon(object):
         self._label = None
 
         # sort out synapse type
-        synapse_type = post_synaptic_population._get_neuron_vertex \
+        synapse_type = post_synaptic_population.get_neuron_vertex \
             .get_synapse_id_by_target(target)
+
+        pre_vertex = pre_synaptic_population.get_neuron_vertex
+        post_vertex = post_synaptic_population.get_syn_vertices[synapse_type]
+
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
-        if not isinstance(post_synaptic_population._get_syn_vertices[synapse_type],
+        if not isinstance(post_vertex,
                           AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(
                 "postsynaptic population is not designed to receive"
@@ -59,8 +63,7 @@ class PyNNProjectionCommon(object):
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
-        post_synaptic_population._get_syn_vertices[synapse_type]\
-            .set_synapse_dynamics(synapse_dynamics_stdp)
+        post_vertex.set_synapse_dynamics(synapse_dynamics_stdp)
 
         # Set and store information for future processing
         self._synapse_information = SynapseInformation(
@@ -77,8 +80,7 @@ class PyNNProjectionCommon(object):
         # check if all delays requested can fit into the natively supported
         # delays in the models (MODIFIED VERTEX HERE AS WELL)
         post_vertex_max_supported_delay_ms = \
-            post_synaptic_population._get_syn_vertices[synapse_type] \
-            .get_maximum_delay_supported_in_ms(machine_time_step)
+            post_vertex.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay > (post_vertex_max_supported_delay_ms +
                         _delay_extension_max_supported_delay):
             raise ConfigurationException(
@@ -98,8 +100,8 @@ class PyNNProjectionCommon(object):
 
         # Find out if there is an existing edge between the populations
         edge_to_merge = self._find_existing_edge(
-            pre_synaptic_population._get_neuron_vertex,
-            post_synaptic_population._get_syn_vertices[synapse_type])
+            pre_vertex,
+            post_vertex)
         if edge_to_merge is not None:
 
             # If there is an existing edge, add the connector
@@ -109,8 +111,8 @@ class PyNNProjectionCommon(object):
 
             # If there isn't an existing edge, create a new one
             self._projection_edge = ProjectionApplicationEdge(
-                pre_synaptic_population._get_neuron_vertex,
-                post_synaptic_population._get_syn_vertices[synapse_type],
+                pre_vertex,
+                post_vertex,
                 self._synapse_information, label=label)
 
             # add edge to the graph
@@ -133,8 +135,6 @@ class PyNNProjectionCommon(object):
         self._virtual_connection_list = None
         if spinnaker_control.use_virtual_board:
             self._virtual_connection_list = list()
-            pre_vertex = pre_synaptic_population._get_neuron_vertex
-            post_vertex = post_synaptic_population._get_syn_vertices[synapse_type]
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self._virtual_connection_list)
@@ -184,7 +184,7 @@ class PyNNProjectionCommon(object):
 
         # Create a delay extension vertex to do the extra delays
         delay_vertex = pre_synaptic_population._internal_delay_vertex
-        pre_vertex = pre_synaptic_population._get_neuron_vertex
+        pre_vertex = pre_synaptic_population.get_neuron_vertex
         if delay_vertex is None:
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
@@ -211,7 +211,7 @@ class PyNNProjectionCommon(object):
             delay_vertex.n_delay_stages = n_stages
 
         # Create the delay edge if there isn't one already (MODIFIED VERTEX HERE)
-        post_vertex = post_synaptic_population._get_syn_vertices[synapse_type]
+        post_vertex = post_synaptic_population.get_syn_vertices[synapse_type]
         delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
         if delay_edge is None:
             delay_edge = DelayedApplicationEdge(

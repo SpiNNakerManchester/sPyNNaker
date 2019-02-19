@@ -47,8 +47,7 @@ class PyNNPopulationCommon(object):
         "_size",
         "_spinnaker_control",
         "_structure",
-        "_neuron_vertex",
-        "_synapse_vertices",
+        "_vertex",
         "_vertex_changeable_after_run",
         "_vertex_contains_units",
         "_vertex_population_initializable",
@@ -61,7 +60,7 @@ class PyNNPopulationCommon(object):
         # pylint: disable=too-many-arguments
         self._label = label
         size = self._roundsize(size)
-        self._synapse_vertices = []
+        self._spinnaker_control = spinnaker_control
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -71,15 +70,16 @@ class PyNNPopulationCommon(object):
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
-            self._neuron_vertex = model.create_vertex(
+            self._vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
+            self._spinnaker_control.add_application_vertex(self._vertex[0])
 
-            for index in range(1, len(self._neuron_vertex)):
-                spinnaker_control.add_application_edge(ApplicationEdge(self._neuron_vertex[index],
-                                                                       self._neuron_vertex[0],
-                                                                       label="internal_edge {}".format(
-                                                                           spinnaker_control.none_labelled_edge_count)))
-                spinnaker_control.increment_none_labelled_edge_count()
+            for index in range(1, len(self._vertex)):
+                self._spinnaker_control.add_application_edge(ApplicationEdge(
+                    self._vertex[index], self._vertex[0],
+                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)))
+                self._spinnaker_control.increment_none_labelled_edge_count()
+                self._spinnaker_control.add_application_vertex(self._vertex[index])
 
 
         # Use a provided application vertex directly
@@ -88,16 +88,18 @@ class PyNNPopulationCommon(object):
                 raise ConfigurationException(
                     "Cannot accept additional parameters {} when the cell is"
                     " a vertex".format(additional_parameters))
-            self._neuron_vertex = model
+            self._vertex = []
+            self._vertex.append(model)
             if size is None:
-                size = self._neuron_vertex.n_atoms
-            elif size != self._neuron_vertex.n_atoms:
+                size = self._vertex[0].n_atoms
+            elif size != self._vertex[0].n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
             if label is None:
-                self._label = self._neuron_vertex.label
+                self._label = self._vertex[0].label
             if constraints is not None:
-                self._neuron_vertex.add_constraints(constraints)
+                self._vertex[0].add_constraints(constraints)
+            self._spinnaker_control.add_application_vertex(self._vertex[0])
 
         # Fail on anything else
         else:
@@ -111,17 +113,16 @@ class PyNNPopulationCommon(object):
 
         # Introspect properties of the vertex
         self._vertex_population_settable = \
-            isinstance(self._neuron_vertex, AbstractPopulationSettable)
+            isinstance(self._vertex[0], AbstractPopulationSettable)
         self._vertex_population_initializable = \
-            isinstance(self._neuron_vertex, AbstractPopulationInitializable)
+            isinstance(self._vertex[0], AbstractPopulationInitializable)
         self._vertex_changeable_after_run = \
-            isinstance(self._neuron_vertex, AbstractChangableAfterRun)
+            isinstance(self._vertex[0], AbstractChangableAfterRun)
         self._vertex_read_parameters_before_set = \
-            isinstance(self._neuron_vertex, AbstractReadParametersBeforeSet)
+            isinstance(self._vertex[0], AbstractReadParametersBeforeSet)
         self._vertex_contains_units = \
-            isinstance(self._neuron_vertex, AbstractContainsUnits)
+            isinstance(self._vertex[0], AbstractContainsUnits)
 
-        self._spinnaker_control = spinnaker_control
         self._delay_vertex = None
 
         # Internal structure now supported 23 November 2014 ADR
@@ -132,7 +133,6 @@ class PyNNPopulationCommon(object):
 
         # add objects to the SpiNNaker control class
         self._spinnaker_control.add_population(self)
-        self._spinnaker_control.add_application_vertex(self._neuron_vertex)
 
         # initialise common stuff
         self._size = size
@@ -196,8 +196,8 @@ class PyNNPopulationCommon(object):
     def conductance_based(self):
         """ True if the population uses conductance inputs
         """
-        if hasattr(self._neuron_vertex, "conductance_based"):
-            return self._neuron_vertex.conductance_based
+        if hasattr(self._vertex[0], "conductance_based"):
+            return self._vertex[0].conductance_based
         return False
 
     def __getitem__(self, index_or_slice):
@@ -219,10 +219,10 @@ class PyNNPopulationCommon(object):
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
-            return self._neuron_vertex.get_value(parameter_names)
+            return self._vertex[0].get_value(parameter_names)
         results = dict()
         for parameter_name in parameter_names:
-            results[parameter_name] = self._neuron_vertex.get_value(parameter_name)
+            results[parameter_name] = self._vertex[0].get_value(parameter_name)
         return results
 
     # NON-PYNN API CALL
@@ -244,11 +244,11 @@ class PyNNPopulationCommon(object):
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
-            return self._neuron_vertex.get_value_by_selector(
+            return self._vertex[0].get_value_by_selector(
                 selector, parameter_names)
         results = dict()
         for parameter_name in parameter_names:
-            results[parameter_name] = self._neuron_vertex.get_value_by_selector(
+            results[parameter_name] = self._vertex[0].get_value_by_selector(
                 selector, parameter_name)
         return results
 
@@ -297,7 +297,7 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
-        self._neuron_vertex.initialize(variable, value)
+        self._vertex[0].initialize(variable, value)
 
     def can_record(self, variable):
         """ Determine whether `variable` can be recorded from this population.
@@ -390,10 +390,10 @@ class PyNNPopulationCommon(object):
         if isinstance(parameter, string_types):
             if value is None:
                 raise Exception("A value (not None) must be specified")
-            self._neuron_vertex.set_value(parameter, value)
+            self._vertex[0].set_value(parameter, value)
             return
         for (key, value) in parameter.iteritems():
-            self._neuron_vertex.set_value(key, value)
+            self._vertex[0].set_value(key, value)
 
     # NON-PYNN API CALL
     def set_by_selector(self, selector, parameter, value=None):
@@ -416,10 +416,10 @@ class PyNNPopulationCommon(object):
 
         # set new parameters
         if type(parameter) is str:
-            self._neuron_vertex.set_value_by_selector(selector, parameter, value)
+            self._vertex[0].set_value_by_selector(selector, parameter, value)
         else:
             for (key, value) in parameter.iteritems():
-                self._neuron_vertex.set_value_by_selector(selector, key, value)
+                self._vertex[0].set_value_by_selector(selector, key, value)
 
     def _read_parameters_before_set(self):
         """ Reads parameters from the machine before "set" completes
@@ -436,7 +436,7 @@ class PyNNPopulationCommon(object):
                 and not globals_variables.get_simulator().use_virtual_board:
             # locate machine vertices from the application vertices
             machine_vertices = globals_variables.get_simulator().graph_mapper\
-                .get_machine_vertices(self._neuron_vertex)
+                .get_machine_vertices(self._vertex[0])
 
             # go through each machine vertex and read the neuron parameters
             # it contains
@@ -447,7 +447,7 @@ class PyNNPopulationCommon(object):
                 placement = globals_variables.get_simulator().placements.\
                     get_placement_of_vertex(machine_vertex)
 
-                self._neuron_vertex.read_parameters_from_machine(
+                self._vertex[0].read_parameters_from_machine(
                     globals_variables.get_simulator().transceiver, placement,
                     globals_variables.get_simulator().graph_mapper.get_slice(
                         machine_vertex))
@@ -459,8 +459,8 @@ class PyNNPopulationCommon(object):
         """
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
-                                minlength=self._neuron_vertex.n_atoms)
-        for i in range(self._neuron_vertex.n_atoms):
+                                minlength=self._vertex[0].n_atoms)
+        for i in range(self._vertex[0].n_atoms):
             n_spikes[i] = counts[i]
         return n_spikes
 
@@ -473,7 +473,7 @@ class PyNNPopulationCommon(object):
                 raise ValueError("attempted to retrieve positions "
                                  "for an unstructured population")
             self._positions = self._structure.generate_positions(
-                self._neuron_vertex.n_atoms)
+                self._vertex[0].n_atoms)
         return self._positions
 
     @property
@@ -492,7 +492,7 @@ class PyNNPopulationCommon(object):
             raise ConfigurationException(
                 "the constraint entered is not a recognised constraint")
 
-        self._neuron_vertex.add_constraint(constraint)
+        self._vertex[0].add_constraint(constraint)
         # state that something has changed in the population,
         self._change_requires_mapping = True
 
@@ -508,7 +508,7 @@ class PyNNPopulationCommon(object):
         :type p: int
         """
         globals_variables.get_simulator().verify_not_running()
-        self._neuron_vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
+        self._vertex[0].add_constraint(ChipAndCoreConstraint(x, y, p))
 
         # state that something has changed in the population,
         self._change_requires_mapping = True
@@ -534,7 +534,7 @@ class PyNNPopulationCommon(object):
         :param max_atoms_per_core: the new value for the max atoms per core.
         """
         globals_variables.get_simulator().verify_not_running()
-        self._neuron_vertex.add_constraint(
+        self._vertex[0].add_constraint(
             MaxVertexAtomsConstraint(max_atoms_per_core))
         # state that something has changed in the population
         self._change_requires_mapping = True
@@ -543,15 +543,18 @@ class PyNNPopulationCommon(object):
     def size(self):
         """ The number of neurons in the population
         """
-        return self._neuron_vertex.n_atoms
+        return self._vertex[0].n_atoms
 
     @property
-    def _get_neuron_vertex(self):
-        return self._neuron_vertex
+    def get_neuron_vertex(self):
+        return self._vertex[0]
 
     @property
-    def _get_syn_vertices(self):
-        return self._synapse_vertices
+    def get_syn_vertices(self):
+        if len(self._vertex > 0):
+            return self._vertex[1:len(self._vertex)]
+        raise ConfigurationException(
+            "There are not synapse vertices")
 
     @property
     def _internal_delay_vertex(self):
@@ -569,7 +572,7 @@ class PyNNPopulationCommon(object):
         :return: the units in string form
         """
         if self._vertex_contains_units:
-            return self._neuron_vertex.get_units(parameter_name)
+            return self._vertex[0].get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
 
