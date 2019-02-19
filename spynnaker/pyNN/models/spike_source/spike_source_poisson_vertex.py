@@ -623,9 +623,10 @@ class SpikeSourcePoissonVertex(
 
         # write recording data
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
-        recorded_region_sizes = [self._spike_recorder.get_sdram_usage_in_bytes(
+        sdram = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
-                    vertex_slice, n_machine_time_steps, machine_time_step))]
+                    vertex_slice, n_machine_time_steps, machine_time_step))
+        recorded_region_sizes = [sdram.get_total_sdram(n_machine_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
