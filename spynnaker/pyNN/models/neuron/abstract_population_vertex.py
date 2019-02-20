@@ -62,7 +62,6 @@ class AbstractPopulationVertex(
         "_buffer_size_before_receive",
         "_change_requires_mapping",
         "_change_requires_neuron_parameters_reload",
-        "_incoming_spike_buffer_size",
         "_maximum_sdram_for_buffering",
         "_minimum_buffer_sdram",
         "_n_atoms",
@@ -94,23 +93,15 @@ class AbstractPopulationVertex(
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
-            spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model):
+            spikes_per_second, ring_buffer_sigma, neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
 
         self._n_atoms = n_neurons
 
-        # buffer data
-        self._incoming_spike_buffer_size = incoming_spike_buffer_size
-
         # get config from simulator
         config = globals_variables.get_simulator().config
-
-        if incoming_spike_buffer_size is None:
-            self._incoming_spike_buffer_size = config.getint(
-                "Simulation", "incoming_spike_buffer_size")
 
         self._neuron_impl = neuron_impl
         self._pynn_model = pynn_model
@@ -375,8 +366,11 @@ class AbstractPopulationVertex(
         # Write the number of synapse types
         spec.write_value(data=self._neuron_impl.get_n_synapse_types())
 
-        # Write the size of the incoming spike buffer
-        spec.write_value(data=self._incoming_spike_buffer_size)
+        # Get the weight_scale value from the appropriate location
+        weight_scale = self._neuron_impl.get_global_weight_scale()
+
+        # Write Synaptic contribution left shift
+        #TODO
 
         # Write the number of variables that can be recorded
         spec.write_value(
@@ -497,9 +491,6 @@ class AbstractPopulationVertex(
         profile_utils.write_profile_region_data(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
-
-        # Get the weight_scale value from the appropriate location
-        weight_scale = self._neuron_impl.get_global_weight_scale()
 
         # allow the synaptic matrix to write its data spec-able data
         self._synapse_manager.write_data_spec(

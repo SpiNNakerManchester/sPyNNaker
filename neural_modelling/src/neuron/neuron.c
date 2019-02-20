@@ -114,7 +114,8 @@ static weight_t *synaptic_region;
 typedef enum parameters_in_neuron_parameter_data_region {
     RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    N_RECORDED_VARIABLES, SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
+    SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT, N_RECORDED_VARIABLES,
+    START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {

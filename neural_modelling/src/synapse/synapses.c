@@ -48,7 +48,7 @@ extern bool contribution_written;
 //! readable form
 typedef enum parameters_in_synapse_parameter_data_region {
     N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
-    [SYNAPSE_INDEX, RING_BUFFER_LEFT_SHIFT, START_OF_GLOBAL_PARAMETERS,
+    SYNAPSE_INDEX, RING_BUFFER_LEFT_SHIFT,
 } parameters_in_synapse_parameter_data_region;
 
 

@@ -49,15 +49,17 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         vertices.append(AbstractPopulationVertex(
             n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size, self._model, self))
+            ring_buffer_sigma, self._model, self))
 
         syn_constraints = constraints
         syn_constraints.append(SameChipAsConstraint(vertices[0]))
         syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
 
         for index in range(vertices[0].get_n_synapse_types()):
-            vertices.append(SynapticManager(1, n_neurons, syn_constraints,
+            vertices.append(SynapticManager(1, index, n_neurons, syn_constraints,
                                             label+"_syn_vertex_"+str(index), max_atoms,
-                                            ring_buffer_sigma, spikes_per_second))
+                                            self._model.get_global_weight_scale(),
+                                            ring_buffer_sigma, spikes_per_second,
+                                            incoming_spike_buffer_size))
 
         return vertices
