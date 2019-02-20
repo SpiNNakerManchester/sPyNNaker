@@ -21,7 +21,8 @@ from spinn_utilities.default_ordered_dict import DefaultOrderedDict
 from spinn_utilities.find_max_success import find_max_success
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.abstract_models. \
-    abstract_supports_bit_field_generation import AbstractSupportsBitFieldGeneration
+    abstract_supports_bit_field_generation import \
+    AbstractSupportsBitFieldGeneration
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
     bit_field_data import BitFieldData
 from spynnaker.pyNN.overridden_pacman_functions.compression.\
@@ -397,7 +398,6 @@ class HostBasedBitFieldRouterCompressor(object):
 
         # return the entries
         return entries
-
 
     def _bit_for_neuron_id(self, bit_field, neuron_id):
         """ locate the bit for the neuron in the bitfield

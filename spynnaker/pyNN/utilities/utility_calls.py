@@ -15,7 +15,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from decimal import Decimal
 
-from spinnman.exceptions import SpinnmanTimeoutException
+from spinnman.exceptions import SpinnmanTimeoutException, SpinnmanException
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -295,8 +295,8 @@ def run_system_application(
         handle_failure_function, cpu_end_states):
     """ executes the app
 
-    :param executable_cores: the cores to run the bit field expander on
-    :param app_id: the appid for the bit field expander
+    :param executable_cores: the cores to run the executable on
+    :param app_id: the appid for the executable
     :param transceiver: the SpiNNMan instance
     :param provenance_file_path: the path for where provenance data is\
     stored
@@ -311,7 +311,7 @@ def run_system_application(
     :rtype: None
     """
 
-    # load the bitfield expander executable
+    # load the executable
     transceiver.execute_application(executable_cores, app_id)
 
     # Wait for the executable to finish
@@ -320,7 +320,7 @@ def run_system_application(
         transceiver.wait_for_cores_to_be_in_state(
             executable_cores.all_core_subsets, app_id, cpu_end_states)
         succeeded = True
-    except SpinnmanTimeoutException:
+    except (SpinnmanTimeoutException, SpinnmanException):
         handle_failure_function(
             executable_cores, transceiver, provenance_file_path,
             app_id, executable_finder)
@@ -332,7 +332,7 @@ def run_system_application(
                 app_id, executable_finder)
 
     # Check if any cores have not completed successfully
-    if check_for_success_function is not None:
+    if succeeded and check_for_success_function is not None:
         check_for_success_function(
             executable_cores, transceiver, provenance_file_path,
             app_id, executable_finder)
