@@ -23,11 +23,13 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import profile_utils
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification)
+    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractProvidesIncomingPartitionConstraints)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
@@ -72,7 +74,9 @@ _ONE_WORD = struct.Struct("<I")
 
 
 class SynapticManager(
-    ApplicationVertex, AbstractGeneratesDataSpecification):
+    ApplicationVertex, AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary,
+    AbstractProvidesIncomingPartitionConstraints):
     """ Deals with synapses
     """
     # pylint: disable=too-many-arguments, too-many-locals
@@ -84,7 +88,7 @@ class SynapticManager(
         "_poptable_type",
         "_pre_run_connection_holders",
         "_retrieved_blocks",
-        "_weight_scale" #horrible naming!!!!!!
+        "_weight_scale"
         "_ring_buffer_sigma",
         "_spikes_per_second",
         "_synapse_dynamics",
@@ -97,6 +101,9 @@ class SynapticManager(
         "_vertex",
         "_n_profile_samples",
         "_incoming_spike_buffer_size"]
+
+    #4 ELEMENTS
+    BYTES_FOR_SYNAPSE_PARAMS = 16
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, constraints, label,
                  max_atoms_per_core, weight_scale, ring_buffer_sigma,
@@ -224,6 +231,14 @@ class SynapticManager(
     def spikes_per_second(self, spikes_per_second):
         self._spikes_per_second = spikes_per_second
 
+    @property
+    def weight_scale(self):
+        return self._weight_scale
+
+    @property
+    def n_synapse_types(self):
+        return self._n_synapse_types
+
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self._synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
@@ -231,6 +246,14 @@ class SynapticManager(
     @property
     def vertex_executable_suffix(self):
         return self._synapse_dynamics.get_vertex_executable_suffix()
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return self.vertex_executable_suffix + "_syn.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
@@ -269,8 +292,9 @@ class SynapticManager(
         return _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES
 
     def _get_synapse_params_size(self):
-        return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
-                (4 * self._n_synapse_types))
+        # Params plus ring buffer left shift
+        return (self.BYTES_FOR_SYNAPSE_PARAMS +
+                self._n_synapse_types * 4)
 
     def _get_static_synaptic_matrix_sdram_requirements(self):
 
@@ -394,6 +418,12 @@ class SynapticManager(
                 self._n_profile_samples)
         )
 
+    def _reserve_synapse_param_data_region(self, spec):
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            size=self._get_synapse_params_size(),
+            label='SynapseParams')
+
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
             machine_graph, all_syn_block_sz, graph_mapper):
@@ -404,10 +434,7 @@ class SynapticManager(
             label="SystemRegion"
         )
 
-        spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
-            size=self._get_synapse_params_size(),
-            label='SynapseParams')
+        self._reserve_synapse_param_data_region(spec)
 
         master_pop_table_sz = \
             self._poptable_type.get_exact_master_population_table_size(
@@ -434,7 +461,7 @@ class SynapticManager(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
 
-        #Necessary? got from abstract_pop_vertex
+        #Necessary? got from abstract_population_vertex
         machine_vertex.reserve_provenance_data_region(spec)
 
     def get_number_of_mallocs_used_by_dsg(self):
@@ -511,12 +538,11 @@ class SynapticManager(
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, application_vertex, application_graph, machine_timestep,
-            weight_scale):
+            self, application_vertex, application_graph, machine_timestep):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
         """
-        weight_scale_squared = weight_scale * weight_scale
+        weight_scale_squared = self._weight_scale * self._weight_scale
         n_synapse_types = self._n_synapse_types
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
@@ -535,7 +561,7 @@ class SynapticManager(
                     connector = synapse_info.connector
                     weight_mean = (
                         synapse_dynamics.get_weight_mean(connector) *
-                        weight_scale)
+                        self._weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum()
                     weight_variance = synapse_dynamics.get_weight_variance(
@@ -549,7 +575,7 @@ class SynapticManager(
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector) * weight_scale)
+                        connector) * self._weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
@@ -621,19 +647,6 @@ class SynapticManager(
             s1615 fixed point number
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
-
-    def _write_synapse_parameters( #probably needs to be DUPLICATED (not moved) on neuron!!
-            self, spec, ring_buffer_shifts, post_vertex_slice, weight_scale):
-        # Get the ring buffer shifts and scaling factors
-
-        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
-
-        spec.write_array(ring_buffer_shifts)
-
-        weight_scales = numpy.array([
-            self._get_weight_scale(r) * weight_scale
-            for r in ring_buffer_shifts])
-        return weight_scales
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
@@ -975,15 +988,13 @@ class SynapticManager(
         return block_addr, single_addr
 
     def _get_ring_buffer_shifts(
-            self, application_vertex, application_graph, machine_timestep,
-            weight_scale):
+            self, application_vertex, application_graph, machine_timestep):
         """ Get the ring buffer shifts for this vertex
         """
         if self._ring_buffer_shifts is None:
             self._ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
-                    weight_scale)
+                    application_vertex, application_graph, machine_timestep)
         return self._ring_buffer_shifts
 
     def _write_synapse_parameters(
@@ -1010,14 +1021,11 @@ class SynapticManager(
         spec.write_value(data=self._synapse_index)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
-            self, application_graph, machine_time_step,
-            self._weight_scale)
+            self, application_graph, machine_time_step)
 
         spec.write_array(ring_buffer_shifts)
 
         return ring_buffer_shifts
-
-
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
@@ -1068,10 +1076,6 @@ class SynapticManager(
             spec, vertex, vertex_slice, machine_graph,
             all_syn_block_sz, graph_mapper)
 
-        # Get the key, NOT SURE OF THIS!!!!
-        key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
-
         # Write the setup region
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.SYSTEM.value)
@@ -1080,17 +1084,17 @@ class SynapticManager(
             time_scale_factor))
 
         # Write the recording region
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.RECORDING.value)
-        ip_tags = tags.get_ip_tags_for_vertex(vertex)
-        recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
-            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
-            self._maximum_sdram_for_buffering)
-        spec.write_array(recording_utilities.get_recording_header_array(
-            recorded_region_sizes, self._time_between_requests,
-            self._buffer_size_before_receive, ip_tags))
+        #spec.switch_write_focus(
+        #    constants.POPULATION_BASED_REGIONS.RECORDING.value)
+        #ip_tags = tags.get_ip_tags_for_vertex(vertex)
+        #recorded_region_sizes = recording_utilities.get_recorded_region_sizes(
+        #    self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
+        #    self._maximum_sdram_for_buffering)
+        #spec.write_array(recording_utilities.get_recording_header_array(
+        #    recorded_region_sizes, self._time_between_requests,
+        #    self._buffer_size_before_receive, ip_tags))
 
-        ring_buffer_shifts= self._write_synapse_parameters(
+        ring_buffer_shifts = self._write_synapse_parameters(
             spec, vertex_slice, application_graph, machine_time_step)
 
         scales = numpy.array([
@@ -1130,75 +1134,13 @@ class SynapticManager(
         self._write_on_machine_data_spec(
             spec, vertex_slice, scales, gen_data)
 
-
-
-
-    def write_data_spec( #NOT SURE IF STILL NECESSARY AT THE END
-            self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step, placements):
-        # Create an index of delay keys into this vertex
-        #for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
-        #    app_edge = graph_mapper.get_application_edge(m_edge)
-        #    if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
-        #        pre_vertex_slice = graph_mapper.get_slice(
-        #            m_edge.pre_vertex)
-        #        self._delay_key_index[app_edge.pre_vertex.source_vertex,
-        #                              pre_vertex_slice.lo_atom,
-        #                              pre_vertex_slice.hi_atom] = \
-        #            routing_info.get_routing_info_for_edge(m_edge)
-
-        #post_slices = graph_mapper.get_slices(application_vertex)
-        #post_slice_idx = graph_mapper.get_machine_vertex_index(machine_vertex)
-
-        # Reserve the memory
-        #in_edges = application_graph.get_edges_ending_at_vertex(
-        #    application_vertex)
-        #all_syn_block_sz = self._get_synaptic_blocks_size(
-        #    post_vertex_slice, in_edges, machine_time_step)
-        #self._reserve_memory_regions(
-        #    spec, machine_vertex, post_vertex_slice, machine_graph,
-        #    all_syn_block_sz, graph_mapper)
-
-        #ring_buffer_shifts = self._get_ring_buffer_shifts(
-        #    application_vertex, application_graph, machine_time_step,
-        #    weight_scale)
-        #weight_scales = self._write_synapse_parameters(
-        #    spec, ring_buffer_shifts, post_vertex_slice, weight_scale)
-
-        #gen_data = self._write_synaptic_matrix_and_master_population_table(
-        #    spec, post_slices, post_slice_idx, machine_vertex,
-        #    post_vertex_slice, all_syn_block_sz, weight_scales,
-        #    POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-        #    POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-        #    POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-        #    routing_info, graph_mapper, machine_graph, machine_time_step)
-
-        #if isinstance(self._synapse_dynamics,
-        #              AbstractSynapseDynamicsStructural):
-        #    self._synapse_dynamics.write_parameters(
-        #        spec,
-        #        POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-        #        machine_time_step, weight_scales,
-        #        application_graph=application_graph,
-        #        machine_graph=machine_graph,
-        #        app_vertex=application_vertex, post_slice=post_vertex_slice,
-        #        machine_vertex=machine_vertex,
-        #        graph_mapper=graph_mapper, routing_info=routing_info)
-        #else:
-        #    self._synapse_dynamics.write_parameters(
-        #        spec,
-        #        POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-        #        machine_time_step, weight_scales)
-
-        #self._weight_scales[placement] = weight_scales
-
-        #self._write_on_machine_data_spec(
-        #    spec, post_vertex_slice, weight_scales, gen_data)
+        # End the writing of this specification
+        spec.end_specification()
 
     def clear_connection_cache(self):
         self._retrieved_blocks = dict()
 
+    #For retrieving data, it is wrapped in abstract_pop_vertex, remove the wrapper and call directly this in the caller!
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step,
@@ -1369,6 +1311,8 @@ class SynapticManager(
         return bytearray(numpy_block.tobytes()), 1
 
     # inherited from AbstractProvidesIncomingPartitionConstraints
+    @overrides(AbstractProvidesIncomingPartitionConstraints.
+               get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self):
         return self._poptable_type.get_edge_constraints()
 

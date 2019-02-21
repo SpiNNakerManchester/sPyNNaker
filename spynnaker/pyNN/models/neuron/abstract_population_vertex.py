@@ -1,13 +1,21 @@
 import logging
 import os
+import math
+import numpy
+import scipy.stats
 import random
+
+from scipy import special
+
 from spinn_utilities.overrides import overrides
+
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -17,10 +25,12 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
+
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
@@ -29,8 +39,14 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
+    SpikeSourcePoissonVertex)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
+from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.utilities.utility_calls import get_maximum_probable_value
+from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -73,10 +89,10 @@ class AbstractPopulationVertex(
         "_receive_buffer_host",
         "_receive_buffer_port",
         "_state_variables",
-        "_synapse_manager",
         "_time_between_requests",
         "_units",
-        "_using_auto_pause_and_resume"]
+        "_using_auto_pause_and_resume",
+        "_ring_buffer_shifts"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -139,11 +155,6 @@ class AbstractPopulationVertex(
         self._maximum_sdram_for_buffering = [spike_buffer_max_size]
         for _ in self._neuron_impl.get_recordable_variables():
             self._maximum_sdram_for_buffering.append(variable_buffer_max_size)
-
-        # # Set up synapse handling
-        # self._synapse_manager = SynapticManager(
-        #     self._neuron_impl.get_n_synapse_types(), n_neurons, ring_buffer_sigma,
-        #     spikes_per_second, config)
 
         # bool for if state has changed.
         self._change_requires_mapping = True
@@ -268,6 +279,7 @@ class AbstractPopulationVertex(
         """
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self._neuron_impl.get_n_synapse_types() * 4 +
             self._neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
             self._neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
@@ -291,7 +303,6 @@ class AbstractPopulationVertex(
         extra_mallocs = len(self._neuron_recorder.recording_variables)
         return (
             self.BASIC_MALLOC_USAGE +
-            self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
             extra_mallocs)
 
     def _reserve_memory_regions(self, spec, vertex_slice, vertex):
@@ -330,9 +341,195 @@ class AbstractPopulationVertex(
             size=params_size,
             label='NeuronParams')
 
+    @staticmethod
+    def _ring_buffer_expected_upper_bound(
+            weight_mean, weight_std_dev, spikes_per_second,
+            machine_timestep, n_synapses_in, sigma):
+        """ Provides expected upper bound on accumulated values in a ring\
+            buffer element.
+
+        Requires an assessment of maximum Poisson input rate.
+
+        Assumes knowledge of mean and SD of weight distribution, fan-in\
+        and timestep.
+
+        All arguments should be assumed real values except n_synapses_in\
+        which will be an integer.
+
+        :param weight_mean: Mean of weight distribution (in either nA or\
+            microSiemens as required)
+        :param weight_std_dev: SD of weight distribution
+        :param spikes_per_second: Maximum expected Poisson rate in Hz
+        :param machine_timestep: in us
+        :param n_synapses_in: No of connected synapses
+        :param sigma: How many SD above the mean to go for upper bound; a\
+            good starting choice is 5.0. Given length of simulation we can\
+            set this for approximate number of saturation events.
+        """
+        # E[ number of spikes ] in a timestep
+        steps_per_second = 1000000.0 / machine_timestep
+        average_spikes_per_timestep = (
+            float(n_synapses_in * spikes_per_second) / steps_per_second)
+
+        # Exact variance contribution from inherent Poisson variation
+        poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
+
+        # Upper end of range for Poisson summation required below
+        # upper_bound needs to be an integer
+        upper_bound = int(round(average_spikes_per_timestep +
+                                POSSION_SIGMA_SUMMATION_LIMIT *
+                                math.sqrt(average_spikes_per_timestep)))
+
+        # Closed-form exact solution for summation that gives the variance
+        # contributed by weight distribution variation when modulated by
+        # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma
+        # functions. Beware: incomplete gamma doesn't work the same as
+        # Mathematica because (1) it's regularised and needs a further
+        # multiplication and (2) it's actually the complement that is needed
+        # i.e. 'gammaincc']
+
+        weight_variance = 0.0
+
+        if weight_std_dev > 0:
+            lngamma = special.gammaln(1 + upper_bound)
+            gammai = special.gammaincc(
+                1 + upper_bound, average_spikes_per_timestep)
+
+            big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
+                         lngamma)
+
+            if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
+                log_weight_variance = (
+                    -average_spikes_per_timestep +
+                    math.log(average_spikes_per_timestep) +
+                    2.0 * math.log(weight_std_dev) +
+                    math.log(math.exp(average_spikes_per_timestep) * gammai -
+                             math.exp(big_ratio)))
+                weight_variance = math.exp(log_weight_variance)
+
+        # upper bound calculation -> mean + n * SD
+        return ((average_spikes_per_timestep * weight_mean) +
+                (sigma * math.sqrt(poisson_variance + weight_variance)))
+
+    def _get_ring_buffer_to_input_left_shifts(
+            self, application_vertex, application_graph, machine_timestep):
+        """ Get the scaling of the ring buffer to provide as much accuracy as\
+            possible without too much overflow
+        """
+        weight_scale_squared = application_vertex.weight_scale * application_vertex.weight_scale
+        n_synapse_types = application_vertex.n_synapse_types
+        running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
+        total_weights = numpy.zeros(n_synapse_types)
+        biggest_weight = numpy.zeros(n_synapse_types)
+        weights_signed = False
+        rate_stats = [RunningStats() for _ in range(n_synapse_types)]
+        steps_per_second = 1000000.0 / machine_timestep
+
+        for app_edge in application_graph.get_edges_ending_at_vertex(
+                application_vertex):
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    synapse_type = synapse_info.synapse_type
+                    synapse_dynamics = synapse_info.synapse_dynamics
+                    connector = synapse_info.connector
+                    weight_mean = (
+                        synapse_dynamics.get_weight_mean(connector) *
+                        application_vertex.weight_scale)
+                    n_connections = \
+                        connector.get_n_connections_to_post_vertex_maximum()
+                    weight_variance = synapse_dynamics.get_weight_variance(
+                        connector) * weight_scale_squared
+                    running_totals[synapse_type].add_items(
+                        weight_mean, weight_variance, n_connections)
+
+                    delay_variance = synapse_dynamics.get_delay_variance(
+                        connector)
+                    delay_running_totals[synapse_type].add_items(
+                        0.0, delay_variance, n_connections)
+
+                    weight_max = (synapse_dynamics.get_weight_maximum(
+                        connector) * application_vertex.weight_scale)
+                    biggest_weight[synapse_type] = max(
+                        biggest_weight[synapse_type], weight_max)
+
+                    spikes_per_tick = max(
+                        1.0, application_vertex.spikes_per_second / steps_per_second)
+                    spikes_per_second = application_vertex.spikes_per_second
+                    if isinstance(app_edge.pre_vertex,
+                                  SpikeSourcePoissonVertex):
+                        spikes_per_second = app_edge.pre_vertex.rate
+                        if hasattr(spikes_per_second, "__getitem__"):
+                            spikes_per_second = max(spikes_per_second)
+                        elif get_simulator().is_a_pynn_random(
+                                spikes_per_second):
+                            spikes_per_second = get_maximum_probable_value(
+                                spikes_per_second, app_edge.pre_vertex.n_atoms)
+                        prob = 1.0 - (
+                            (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
+                        spikes_per_tick = spikes_per_second / steps_per_second
+                        spikes_per_tick = scipy.stats.poisson.ppf(
+                            prob, spikes_per_tick)
+                    rate_stats[synapse_type].add_items(
+                        spikes_per_second, 0, n_connections)
+                    total_weights[synapse_type] += spikes_per_tick * (
+                        weight_max * n_connections)
+
+                    if synapse_dynamics.are_weights_signed():
+                        weights_signed = True
+
+        max_weights = numpy.zeros(n_synapse_types)
+        for synapse_type in range(n_synapse_types):
+            stats = running_totals[synapse_type]
+            rates = rate_stats[synapse_type]
+            if delay_running_totals[synapse_type].variance == 0.0:
+                max_weights[synapse_type] = max(total_weights[synapse_type],
+                                                biggest_weight[synapse_type])
+            else:
+                max_weights[synapse_type] = min(
+                    self._ring_buffer_expected_upper_bound(
+                        stats.mean, stats.standard_deviation, rates.mean,
+                        machine_timestep, stats.n_items,
+                        application_vertex.ring_buffer_sigma),
+                    total_weights[synapse_type])
+                max_weights[synapse_type] = max(
+                    max_weights[synapse_type], biggest_weight[synapse_type])
+
+        # Convert these to powers
+        max_weight_powers = (
+            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            for w in max_weights)
+
+        # If 2^max_weight_power equals the max weight, we have to add another
+        # power, as range is 0 - (just under 2^max_weight_power)!
+        max_weight_powers = (
+            w + 1 if (2 ** w) <= a else w
+            for w, a in zip(max_weight_powers, max_weights))
+
+        # If we have synapse dynamics that uses signed weights,
+        # Add another bit of shift to prevent overflows
+        if weights_signed:
+            max_weight_powers = (m + 1 for m in max_weight_powers)
+
+        return list(max_weight_powers)
+
+    def _get_ring_buffer_shifts(
+            self, application_graph, machine_timestep):
+        """ Get the ring buffer shifts for this vertex
+        """
+        if self._ring_buffer_shifts is None:
+            self._ring_buffer_shifts = []
+            for app_edge in application_graph.\
+                    get_edges_ending_at_vertex(self):
+                self._ring_buffer_shifts.extend(
+                    self._get_ring_buffer_to_input_left_shifts(
+                        app_edge.pre_vertex, application_graph,
+                        machine_timestep))
+        return self._ring_buffer_shifts
+
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor):
+            time_scale_factor, application_graph):
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -367,10 +564,13 @@ class AbstractPopulationVertex(
         spec.write_value(data=self._neuron_impl.get_n_synapse_types())
 
         # Get the weight_scale value from the appropriate location
-        weight_scale = self._neuron_impl.get_global_weight_scale()
+        #weight_scale = self._neuron_impl.get_global_weight_scale()
 
         # Write Synaptic contribution left shift
-        #TODO
+        ring_buffer_shifts = self._get_ring_buffer_shifts(
+            application_graph, machine_time_step)
+
+        spec.write_array(ring_buffer_shifts)
 
         # Write the number of variables that can be recorded
         spec.write_value(
@@ -485,18 +685,13 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, key, vertex_slice, machine_time_step,
+            time_scale_factor, application_graph)
 
         # write profile data
         profile_utils.write_profile_region_data(
             spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
-
-        # allow the synaptic matrix to write its data spec-able data
-        self._synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step, placements)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -505,12 +700,13 @@ class AbstractPopulationVertex(
     def get_binary_file_name(self):
 
         # Split binary name into title and extension
-        binary_title, binary_extension = os.path.splitext(
-            self._neuron_impl.binary_name)
+        #binary_title, binary_extension = os.path.splitext(
+        #    self._neuron_impl.binary_name)
 
         # Reunite title and extension and return
-        return (binary_title + self._synapse_manager.vertex_executable_suffix +
-                binary_extension)
+        #return (binary_title + self._synapse_manager.vertex_executable_suffix +
+        #        binary_extension)
+        return self._neuron_impl.binary_name
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -684,69 +880,6 @@ class AbstractPopulationVertex(
     def weight_scale(self):
         return self._neuron_impl.get_global_weight_scale()
 
-    @property
-    def ring_buffer_sigma(self):
-        return self._synapse_manager.ring_buffer_sigma
-
-    @ring_buffer_sigma.setter
-    def ring_buffer_sigma(self, ring_buffer_sigma):
-        self._synapse_manager.ring_buffer_sigma = ring_buffer_sigma
-
-    @property
-    def spikes_per_second(self):
-        return self._synapse_manager.spikes_per_second
-
-    @spikes_per_second.setter
-    def spikes_per_second(self, spikes_per_second):
-        self._synapse_manager.spikes_per_second = spikes_per_second
-
-    @property
-    def synapse_dynamics(self):
-        return self._synapse_manager.synapse_dynamics
-
-    def set_synapse_dynamics(self, synapse_dynamics):
-        self._synapse_manager.synapse_dynamics = synapse_dynamics
-
-    def add_pre_run_connection_holder(
-            self, connection_holder, edge, synapse_info):
-        # pylint: disable=arguments-differ
-        self._synapse_manager.add_pre_run_connection_holder(
-            connection_holder, edge, synapse_info)
-
-    @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
-    def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, data_receiver=None,
-            sender_extra_monitor_core_placement=None,
-            extra_monitor_cores_for_router_timeout=None,
-            handle_time_out_configuration=True, fixed_routes=None):
-        # pylint: disable=too-many-arguments
-        return self._synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_information, machine_time_step,
-            using_extra_monitor_cores, placements, data_receiver,
-            sender_extra_monitor_core_placement,
-            extra_monitor_cores_for_router_timeout,
-            handle_time_out_configuration, fixed_routes)
-
-    def clear_connection_cache(self):
-        self._synapse_manager.clear_connection_cache()
-
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self._synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
-
-    @overrides(AbstractProvidesIncomingPartitionConstraints.
-               get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
-        return self._synapse_manager.get_incoming_partition_constraints()
-
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
@@ -834,6 +967,3 @@ class AbstractPopulationVertex(
 
     def __repr__(self):
         return self.__str__()
-
-    def gen_on_machine(self, vertex_slice):
-        return self._synapse_manager.gen_on_machine(vertex_slice)
