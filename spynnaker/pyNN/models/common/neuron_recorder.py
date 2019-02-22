@@ -270,6 +270,14 @@ class NeuronRecorder(object):
 
         found = False
         warning = None
+        indexes = list(indexes)
+        if sorted(indexes) != indexes:
+            if len(indexes) != len(set(indexes)):
+                raise ConfigurationException(
+                    "Repeated indexes are currently not supported")
+            else:
+                raise ConfigurationException(
+                    "Unsorted indexes are currently not supported")
         for index in indexes:
             if index < 0:
                 raise ConfigurationException(
