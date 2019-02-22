@@ -16,6 +16,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from decimal import Decimal
 
 from spinnman.exceptions import SpinnmanTimeoutException, SpinnmanException
+from spinnman.messages.scp.enums import Signal
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -292,7 +293,8 @@ def get_n_bits(n_values):
 def run_system_application(
         executable_cores, app_id, transceiver, provenance_file_path,
         executable_finder, read_algorithm_iobuf, check_for_success_function,
-        handle_failure_function, cpu_end_states):
+        handle_failure_function, cpu_end_states, needs_sync_barrier,
+        no_sync_changes):
     """ executes the app
 
     :param executable_cores: the cores to run the executable on
@@ -308,11 +310,25 @@ def run_system_application(
     :param handle_failure_function: function used to deal with failures\
     expects executable_cores, transceiver, provenance_file_path,\
     app_id, executable_finder as inputs
+    :param needs_sync_barrier: bool flag for if needing sync barrier
+    :param no_sync_changes: the number of times sync signal been sent
     :rtype: None
     """
 
     # load the executable
     transceiver.execute_application(executable_cores, app_id)
+
+    if needs_sync_barrier:
+        if no_sync_changes % 2 == 0:
+            sync_signal = Signal.SYNC0
+        else:
+            sync_signal = Signal.SYNC1
+        # when it falls out of the running, it'll be in a next sync \
+        # state, thus update needed
+        no_sync_changes += 1
+
+        # fire all signals as required
+        transceiver.send_signal(app_id, sync_signal)
 
     # Wait for the executable to finish
     succeeded = False

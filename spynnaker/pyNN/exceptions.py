@@ -48,7 +48,7 @@ class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised.
     """
 
-class CantFindSDRAMToUse(SpynnakerException):
+class CantFindSDRAMToUseException(SpynnakerException):
     """ Raised when malloc and sdram stealing cannot occur.
     """
 

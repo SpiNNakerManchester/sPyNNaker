@@ -95,7 +95,7 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
-            self._handle_failure, [CPUState.FINISHED])
+            self._handle_failure, [CPUState.FINISHED], False, 0)
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:

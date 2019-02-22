@@ -69,6 +69,19 @@
         last->free = NULL;	// Not really necessary*/
     }
 
+    //! \brief allows a search of the SDRAM heap.
+    //! \param[in] bytes: the number of bytes to allocate.
+    //! \return: the address of the block of memory to utilise.
+    static inline void * safe_sdram_malloc(uint bytes){
+        // try SDRAM stolen from the cores synaptic matrix areas.
+        void * p = sark_xalloc(stolen_sdram_heap, bytes, 0, ALLOC_LOCK);
+
+        if (p == NULL){
+            //log_error("Failed to malloc %u bytes.\n", bytes);
+        }
+        return p;
+    }
+
     //! \brief resets the heap so that it looks like it was before
     static inline void platform_kill_fake_heap(){
         return;
@@ -84,14 +97,7 @@
         if (p != NULL){
             return p;
         }
-
-        // try SDRAM stolen from the cores synaptic matrix areas.
-        p = sark_xalloc(stolen_sdram_heap, bytes, 0, ALLOC_LOCK);
-
-        if (p == NULL){
-            //log_error("Failed to malloc %u bytes.\n", bytes);
-        }
-        return p;
+        return safe_sdram_malloc(bytes);
     }
 
     //! \brief locates the biggest block of available memory from the heaps
@@ -127,6 +133,7 @@
         #else
         #define MALLOC safe_malloc
         #define FREE   safe_x_free
+        #define MALLOC_SDRAM safe_sdram_malloc
     #endif
 
 #define __PLATFORM_H__

@@ -42,7 +42,7 @@ static inline key_mask_t key_mask_merge(key_mask_t a, key_mask_t b){
 }
 
 
-typedef struct _entry_t{
+typedef struct entry_t{
     // Key and mask
     key_mask_t key_mask;
 
@@ -57,12 +57,16 @@ typedef struct _entry_t{
 typedef struct table_t{
 
     // Number of entries in the table
-    unsigned int size;
+    uint32_t size;
 
     // Entries in the table
     entry_t *entries;
 } table_t;
 
+//! \brief deduces sdram requirements for a given size of table
+uint32_t routing_table_sdram_size_of_table(uint32_t n_entries){
+    return sizeof(uint32_t) + (sizeof(entry_t) * n_entries);
+}
 
 #define __ROUTING_TABLE_H__
 #endif  // __ROUTING_TABLE_H__

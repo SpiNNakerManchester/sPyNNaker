@@ -12,13 +12,13 @@ from spinn_front_end_common.mapping_algorithms.\
     on_chip_router_table_compression.mundy_on_chip_router_compression import \
     MundyOnChipRouterCompression
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
-from spinn_machine import CoreSubsets
+from spinn_machine import CoreSubsets, Router
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.exceptions import SpinnmanInvalidParameterException, \
     SpinnmanUnexpectedResponseCodeException, SpinnmanException
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.exceptions import CantFindSDRAMToUse
+from spynnaker.pyNN.exceptions import CantFindSDRAMToUseException
 from spynnaker.pyNN.models.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
@@ -56,6 +56,8 @@ class MachineBitFieldRouterCompressor(object):
     _USER_BYTES = 4
 
     # structs for performance requirements.
+    _FOUR_WORDS = struct.Struct("<IIII")
+
     _THREE_WORDS = struct.Struct("<III")
 
     _TWO_WORDS = struct.Struct("<II")
@@ -86,6 +88,7 @@ class MachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             use_expresso, machine_time_step, time_scale_factor,
+            no_sync_changes,
             compress_only_when_needed=True, use_rob_paul=False,
             compress_as_much_as_possible=False):
         """ entrance for routing table compression with bit field
@@ -156,8 +159,8 @@ class MachineBitFieldRouterCompressor(object):
                 functools.partial(
                     self._handle_failure_for_bit_field_router_compressor,
                     host_chips=on_host_chips),
-                [CPUState.FINISHED])
-        except SpinnmanException as e:
+                [CPUState.FINISHED], True, no_sync_changes)
+        except SpinnmanException:
             self._handle_failure_for_bit_field_router_compressor(
                 compressor_with_bit_field_cores, transceiver,
                 provenance_file_path, routing_table_compressor_app_id,
@@ -423,7 +426,6 @@ class MachineBitFieldRouterCompressor(object):
                 try:
                     self._load_routing_table_data(
                         table, app_id, transceiver,
-                        compress_only_when_needed, compress_as_much_as_possible,
                         routing_table_compressor_app_id, progress_bar, cores,
                         matrix_addresses_and_size[(table.x, table.y)])
 
@@ -438,17 +440,20 @@ class MachineBitFieldRouterCompressor(object):
                         matrix_addresses_and_size[(table.x, table.y)], chip_x,
                         chip_y, transceiver, routing_table_compressor_app_id,
                         cores)
+
                     self._load_compressor_data(
                         chip_x, chip_y, time_per_iteration, transceiver,
-                        bit_field_compressor_executable_path, cores)
-                except CantFindSDRAMToUse:
+                        bit_field_compressor_executable_path, cores,
+                        compress_only_when_needed, compress_as_much_as_possible)
+                except CantFindSDRAMToUseException:
                     run_by_host.append((chip_x, chip_y))
 
         return run_by_host
 
     def _load_compressor_data(
             self, chip_x, chip_y, time_per_iteration, transceiver,
-            bit_field_compressor_executable_path, cores):
+            bit_field_compressor_executable_path, cores,
+            compress_only_when_needed, compress_as_much_as_possible):
         """ updates the user1 address for the compressor cores so they can 
         set the time per attempt
         
@@ -458,6 +463,10 @@ class MachineBitFieldRouterCompressor(object):
         :param transceiver: SpiNNMan instance
         :param bit_field_compressor_executable_path: path for the compressor \
         binary 
+        :param compress_only_when_needed: bool flag asking if compress only \
+        when needed
+        :param compress_as_much_as_possible: bool flag asking if should \
+        compress as much as possible
         :param cores: the executable targets
         :rtype: None 
         """
@@ -467,9 +476,19 @@ class MachineBitFieldRouterCompressor(object):
                 chip_x, chip_y).processor_ids:
             user1_base_address = \
                 transceiver.get_user_1_register_address_from_core(processor_id)
+            user2_base_address = \
+                transceiver.get_user_2_register_address_from_core(processor_id)
+            user3_base_address = \
+                transceiver.get_user_3_register_address_from_core(processor_id)
             transceiver.write_memory(
                 chip_x, chip_y, user1_base_address, self._USER_BYTES,
                 self._ONE_WORDS.pack(time_per_iteration))
+            transceiver.write_memory(
+                chip_x, chip_y, user2_base_address, self._USER_BYTES,
+                self._ONE_WORDS.pack(compress_only_when_needed))
+            transceiver.write_memory(
+                chip_x, chip_y, user3_base_address, self._USER_BYTES,
+                self._ONE_WORDS.pack(compress_as_much_as_possible))
 
     def _load_usable_sdram(
             self, matrix_addresses_and_size, chip_x, chip_y, transceiver,
@@ -578,7 +597,6 @@ class MachineBitFieldRouterCompressor(object):
 
     def _load_routing_table_data(
             self, table, app_id, transceiver,
-            compress_only_when_needed, compress_as_much_as_possible,
             routing_table_compressor_app_id, progress_bar, cores,
             matrix_addresses_and_size):
         """ loads the routing table data
@@ -586,21 +604,14 @@ class MachineBitFieldRouterCompressor(object):
         :param table: the routing table to load
         :param app_id: application app id
         :param transceiver: spinnman instance
-        :param compress_only_when_needed: bool flag asking if compress only \
-        when needed
-        :param compress_as_much_as_possible: bool flag asking if should \
-        compress as much as possible
         :param progress_bar: progress bar
         :param routing_table_compressor_app_id: system app id
         :param cores: the cores that the compressor going to run on
         :rtype: None
-        :raises CantFindSDRAMToUse when sdram isnt malloced or stolen
+        :raises CantFindSDRAMToUse when sdram is not malloc-ed or stolen
         """
 
-        routing_table_data = \
-            MundyOnChipRouterCompression.build_routing_table_data(
-                table, app_id, compress_only_when_needed,
-                compress_as_much_as_possible)
+        routing_table_data = self._build_routing_table_data(app_id, table)
 
         # go to spinnman and ask for a memory region of that size per chip.
         try:
@@ -630,14 +641,39 @@ class MachineBitFieldRouterCompressor(object):
         # update progress bar
         progress_bar.update()
 
+    def _build_routing_table_data(self, app_id, routing_table):
+        """ builds routing data as needed for the compressor cores
+        
+        :param app_id: appid of the application to load entries with
+        :param routing_table: the uncompressed routing table
+        :return: data array
+        """
+        data = b''
+        data += self._TWO_WORDS.pack(app_id, routing_table.number_of_entries)
+
+        for entry in routing_table.multicast_routing_entries:
+            data += self._FOUR_WORDS.pack(
+                entry.routing_entry_key, entry.mask,
+                Router.convert_routing_table_entry_to_spinnaker_route(entry),
+                MundyOnChipRouterCompression.make_source_hack(entry))
+        return bytearray(data)
+
     @staticmethod
     def _steal_from_matrix_addresses(matrix_addresses_and_size, size_to_steal):
+        """ steals memory from synaptic matrix as needed
+        
+        :param matrix_addresses_and_size: matrix addresses and sizes
+        :param size_to_steal: size needed to steal from matrix's.
+        :return: address to start steal from
+        :raises CantFindSDRAMToUseException: when no space is big enough to /
+        steal from.
+        """
         for pos, (base_address, size) in enumerate(matrix_addresses_and_size):
             if size >= size_to_steal:
                 new_size = size - size_to_steal
                 matrix_addresses_and_size[pos] = (base_address, new_size)
                 return base_address
-        raise CantFindSDRAMToUse()
+        raise CantFindSDRAMToUseException()
 
     def _generate_addresses(
             self, machine_graph, placements, transceiver, machine,

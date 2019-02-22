@@ -1,4 +1,5 @@
-BUILDS = compressor_with_bit_field \
+BUILDS = compressor_with_bit_field_sorter_and_searcher \
+         compressor_with_bit_field_compressor \
          spike_source/poisson \
          delay_extension \
          neuron \
