@@ -24,7 +24,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False):
+            safe=True, verbose=False, rng=None):
         """
         :param n: \
             number of random post-synaptic neurons connected to pre-neurons.
@@ -43,7 +43,7 @@ class FixedNumberPostConnector(AbstractConnector):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose, rng)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
         self._with_replacement = with_replacement
@@ -104,11 +104,11 @@ class FixedNumberPostConnector(AbstractConnector):
                              numpy.arange(m + 1, self._n_post_neurons)])
 
                         # Now use this list in the random choice
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             no_self_post_neurons, self._n_post,
                             self._with_replacement)
                     else:
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             self._n_post_neurons, self._n_post,
                             self._with_replacement)
 
@@ -140,7 +140,7 @@ class FixedNumberPostConnector(AbstractConnector):
             post_vertex_slice.n_atoms / float(self._n_post_neurons))
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_pre_neurons,
-            self._n_post, prob_in_slice)
+            self._n_post, prob_in_slice, chance=1.0/10000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -156,7 +156,7 @@ class FixedNumberPostConnector(AbstractConnector):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_post_neurons * self._n_pre_neurons,
             self._n_post * self._n_pre_neurons, selection_prob,
-            chance=1.0/10000.0)
+            chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 
     @overrides(AbstractConnector.get_weight_maximum)
