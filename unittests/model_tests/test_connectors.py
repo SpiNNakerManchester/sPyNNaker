@@ -107,7 +107,7 @@ def test_connectors(
         else:
             assert(max_row_length == connector.
                    get_n_connections_from_pre_vertex_maximum(
-                        post_vertex_slice))
+                        delay, post_vertex_slice))
         if max_col_length is None:
             max_col_length = connector.\
                 get_n_connections_to_post_vertex_maximum()
