@@ -139,7 +139,7 @@ else
     SYNAPSE_DYNAMICS := $(call strip_source_dirs,$(SYNAPSE_DYNAMICS))
     SYNAPSE_DYNAMICS_O := $(BUILD_DIR)$(SYNAPSE_DYNAMICS:%.c=%.o)
     
-    SYNAPSE_DYNAMICS_STATIC := neuron/plasticity/synapse_dynamics_static_impl.c
+    SYNAPSE_DYNAMICS_STATIC := synapse/plasticity/synapse_dynamics_static_impl.c
     STDP_ENABLED = 0
     ifneq ($(SYNAPSE_DYNAMICS), $(SYNAPSE_DYNAMICS_STATIC))
         STDP_ENABLED = 1
@@ -169,7 +169,7 @@ endif
 
 SYNGEN_ENABLED = 1
 ifndef SYNAPTOGENESIS_DYNAMICS
-    SYNAPTOGENESIS_DYNAMICS := neuron/structural_plasticity/synaptogenesis_dynamics_static_impl.c
+    SYNAPTOGENESIS_DYNAMICS := synapse/structural_plasticity/synaptogenesis_dynamics_static_impl.c
     SYNAPTOGENESIS_DYNAMICS_C := $(MODIFIED_DIR)$(SYNAPTOGENESIS_DYNAMICS)
     SYNGEN_ENABLED = 0
 else
@@ -274,6 +274,7 @@ $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H)\
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
+
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)

@@ -341,8 +341,7 @@ bool get_dma_busy() {
 bool do_rewiring(int number_of_rew) {
     number_of_rewires+=number_of_rew;
     return true;
-}population_table_get_next_address
-
+}
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool
 bool received_any_spike() {

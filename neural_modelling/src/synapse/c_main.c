@@ -95,6 +95,7 @@ static bool initialise_recording(address_t recording_address){
     return success;
 }
 
+
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
 

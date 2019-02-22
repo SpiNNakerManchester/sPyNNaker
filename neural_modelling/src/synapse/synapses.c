@@ -247,7 +247,7 @@ bool synapses_initialise(
     log_debug("synapses_initialise: starting");
 
     // Neuron details
-    *n_neurons_value = synapse_params_address[N_NEURON_TO_SIMULATE];
+    *n_neurons_value = synapse_params_address[N_NEURONS_TO_SIMULATE];
     n_neurons = *n_neurons_value;
 
     *n_synapse_types_value = synapse_params_address[N_SYNAPSE_TYPES];

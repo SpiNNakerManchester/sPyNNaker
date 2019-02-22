@@ -6,9 +6,10 @@
 
 #include "neuron.h"
 #include "implementations/neuron_impl.h"
-#include "plasticity/synapse_dynamics.h"
+#include "synapse/plasticity/synapse_dynamics.h"
 #include <common/out_spikes.h>
 #include <debug.h>
+#include <utils.h>
 #include <simulation.h>
 
 // declare spin1_wfi
@@ -98,9 +99,12 @@ static uint32_t expected_time;
 static uint32_t n_recordings_outstanding = 0;
 
 //! The synaptic contributions for the current timestep
-static weight_t_t *synaptic_contributions;
+static weight_t *synaptic_contributions;
 
 static uint32_t *synaptic_contributions_to_input_left_shifts;
+
+static uint32_t synapse_type_index_bits;
+static uint32_t synapse_index_bits;
 
 static timer_t current_time;
 
@@ -187,7 +191,7 @@ static inline input_t convert_weight_to_input(
         weight_t weight, uint32_t left_shift) {
 
     union {
-        int_k_t input type;
+        int_k_t input_type;
         s1615 output_type;
         } converter;
 
@@ -369,6 +373,7 @@ bool neuron_do_timestep_update(timer_t time) {
 }
 
 bool neuron_initialise(address_t address) {
+
     log_debug("neuron_initialise: starting");
 
     random_backoff = address[RANDOM_BACKOFF];
@@ -404,8 +409,23 @@ bool neuron_initialise(address_t address) {
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
-    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
-            *incoming_spike_buffer_size);
+    uint32_t n_neurons_power_2 = n_neurons;
+    uint32_t log_n_neurons = 1;
+    if (n_neurons != 1) {
+        if (!is_power_of_2(n_neurons)) {
+            n_neurons_power_2 = next_power_of_2(n_neurons);
+        }
+        log_n_neurons = ilog_2(n_neurons_power_2);
+    }
+
+    uint32_t n_synapse_types_power_2 = n_synapse_types;
+    if (!is_power_of_2(n_synapse_types)) {
+        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
+    }
+    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
+
+    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
+    synapse_index_bits = log_n_neurons;
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -429,8 +449,6 @@ bool neuron_initialise(address_t address) {
     spin1_memcpy(
         synaptic_contributions_to_input_left_shifts, address + SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT,
         n_synapse_types * sizeof(uint32_t));
-
-    buffers_positions = (address_t *) spin1_malloc();
 
     // Set up the out spikes array - this is always n_neurons in size to ensure
     // it continues to work if changed between runs, but less might be used in

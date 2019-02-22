@@ -2,7 +2,7 @@
 #define _SYNAPSE_TYPES_H_
 
 #include <common/neuron-typedefs.h>
-#include <neuron/synapse_row.h>
+#include <synapse/synapse_row.h>
 
 
 //! Forward declaration of synapse type (creates a definition for a pointer

@@ -1,5 +1,5 @@
 #include "population_table.h"
-#include <neuron/synapse_row.h>
+#include <synapse/synapse_row.h>
 #include <debug.h>
 
 typedef struct master_population_table_entry {
