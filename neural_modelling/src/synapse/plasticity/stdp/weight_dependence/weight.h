@@ -17,7 +17,7 @@
 #define _WEIGHT_H_
 
 #include <common/neuron-typedefs.h>
-#include <neuron/synapse_row.h>
+#include <synapse/synapse_row.h>
 
 /*! \brief initialised the weight aspect of a STDP rule.
  * \param[in] address: the absolute address in SRAM where the weight parameters

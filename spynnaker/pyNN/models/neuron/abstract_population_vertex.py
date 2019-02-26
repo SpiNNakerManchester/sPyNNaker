@@ -17,9 +17,9 @@ from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
 
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
+    AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -36,9 +36,8 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.utilities import constants
 from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
-    AbstractPopulationSettable, AbstractReadParametersBeforeSet,
-    AbstractContainsUnits)
+    AbstractPopulationInitializable, AbstractPopulationSettable,
+    AbstractReadParametersBeforeSet, AbstractContainsUnits)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
@@ -67,11 +66,10 @@ class AbstractPopulationVertex(
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [

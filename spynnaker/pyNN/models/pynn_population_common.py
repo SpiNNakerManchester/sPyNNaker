@@ -1,3 +1,5 @@
+from collections import Iterable
+
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints\
     import ChipAndCoreConstraint
@@ -7,11 +9,8 @@ from pacman.model.graphs.application.application_vertex \
     import ApplicationVertex
 from pacman.model.graphs.application.application_edge \
     import ApplicationEdge
-from pacman.model.constraints.partitioner_constraints\
-    import SameAtomsAsVertexConstraint
-from pacman.model.constraints.placer_constraints\
-    import SameChipAsConstraint
 
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models \
     import AbstractReadParametersBeforeSet, AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
@@ -70,16 +69,23 @@ class PyNNPopulationCommon(object):
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
-            self._vertex = model.create_vertex(
+            vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
+
+            if isinstance(vertex, Iterable):
+                self._vertex = vertex
+            else:
+                self._vertex = list()
+                self._vertex.append(vertex)
+
             self._spinnaker_control.add_application_vertex(self._vertex[0])
 
             for index in range(1, len(self._vertex)):
+                self._spinnaker_control.add_application_vertex(self._vertex[index])
                 self._spinnaker_control.add_application_edge(ApplicationEdge(
                     self._vertex[index], self._vertex[0],
-                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)))
+                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)), constants.SPIKE_PARTITION_ID) #CHECK PARTITION!!!!
                 self._spinnaker_control.increment_none_labelled_edge_count()
-                self._spinnaker_control.add_application_vertex(self._vertex[index])
 
 
         # Use a provided application vertex directly
@@ -551,7 +557,7 @@ class PyNNPopulationCommon(object):
 
     @property
     def get_syn_vertices(self):
-        if len(self._vertex > 0):
+        if len(self._vertex) > 0:
             return self._vertex[1:len(self._vertex)]
         raise ConfigurationException(
             "There are not synapse vertices")

@@ -2,7 +2,7 @@
 #include "static-assert.h"
 
 // sPyNNaker neural modelling includes
-#include <neuron/synapses.h>
+#include <synapse/synapses.h>
 
 // Plasticity includes
 #include "maths.h"
@@ -12,7 +12,7 @@
 #include "timing_dependence/timing.h"
 #include <debug.h>
 #include <utils.h>
-#include <neuron/plasticity/synapse_dynamics.h>
+#include <synapse/plasticity/synapse_dynamics.h>
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;

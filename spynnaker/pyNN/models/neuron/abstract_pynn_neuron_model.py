@@ -51,8 +51,11 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, self._model, self))
 
-        syn_constraints = constraints
-        syn_constraints.append(SameChipAsConstraint(vertices[0]))
+        if constraints == None:
+            syn_constraints = list()
+        else:
+            syn_constraints = constraints
+        #syn_constraints.append(SameChipAsConstraint(vertices[0]))
         syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
 
         for index in range(vertices[0].get_n_synapse_types()):

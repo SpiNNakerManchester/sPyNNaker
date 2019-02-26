@@ -78,6 +78,8 @@ bool rewiring = false;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
+//DELETE AT THE END!!!!!
+bool contribution_written;
 
 
 //! \brief Initialises the recording parts of the model

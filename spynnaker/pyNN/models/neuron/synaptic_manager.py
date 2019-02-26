@@ -51,6 +51,9 @@ from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses)
+from .synapse_machine_vertex import SynapseMachineVertex
 
 TIME_STAMP_BYTES = 4
 
@@ -74,9 +77,8 @@ _ONE_WORD = struct.Struct("<I")
 
 
 class SynapticManager(
-    ApplicationVertex, AbstractGeneratesDataSpecification,
-    AbstractHasAssociatedBinary,
-    AbstractProvidesIncomingPartitionConstraints):
+        ApplicationVertex, AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+        AbstractProvidesIncomingPartitionConstraints, AbstractAcceptsIncomingSynapses):
     """ Deals with synapses
     """
     # pylint: disable=too-many-arguments, too-many-locals
@@ -88,7 +90,7 @@ class SynapticManager(
         "_poptable_type",
         "_pre_run_connection_holders",
         "_retrieved_blocks",
-        "_weight_scale"
+        "_weight_scale",
         "_ring_buffer_sigma",
         "_spikes_per_second",
         "_synapse_dynamics",
@@ -104,6 +106,8 @@ class SynapticManager(
 
     #4 ELEMENTS
     BYTES_FOR_SYNAPSE_PARAMS = 16
+
+    _n_vertices = 0
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, constraints, label,
                  max_atoms_per_core, weight_scale, ring_buffer_sigma,
@@ -198,8 +202,7 @@ class SynapticManager(
     def synapse_dynamics(self):
         return self._synapse_dynamics
 
-    @synapse_dynamics.setter
-    def synapse_dynamics(self, synapse_dynamics):
+    def set_synapse_dynamics(self, synapse_dynamics):
 
         # We can always override static dynamics or None
         if isinstance(self._synapse_dynamics, SynapseDynamicsStatic):
@@ -239,6 +242,10 @@ class SynapticManager(
     def n_synapse_types(self):
         return self._n_synapse_types
 
+    @overrides(AbstractAcceptsIncomingSynapses.get_synapse_id_by_target)
+    def get_synapse_id_by_target(self, target):
+        return self._synapse_index
+
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self._synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
@@ -249,7 +256,8 @@ class SynapticManager(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-        return self.vertex_executable_suffix + "_syn.aplx"
+        #return self.vertex_executable_suffix + "_syn.aplx"
+        return "Static_synapse.aplx"
 
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
@@ -277,13 +285,14 @@ class SynapticManager(
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_n_cpu_cycles(vertex_slice)))
 
-        recording_sizes = recording_utilities.get_recording_region_sizes(
-            self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
-            self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
-            self._using_auto_pause_and_resume)
-        container.extend(recording_utilities.get_recording_resources(
-            recording_sizes, self._receive_buffer_host,
-            self._receive_buffer_port))
+        #TODO: MODIFY FOR RECODING, SEE ABSTRACT_POP_VERTEX!!
+        #recording_sizes = recording_utilities.get_recording_region_sizes(
+        #    self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
+        #    self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
+        #    self._using_auto_pause_and_resume)
+        #container.extend(recording_utilities.get_recording_resources(
+        #    recording_sizes, self._receive_buffer_host,
+        #    self._receive_buffer_port))
 
         # return the total resources.
         return container
@@ -1313,7 +1322,7 @@ class SynapticManager(
     # inherited from AbstractProvidesIncomingPartitionConstraints
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self):
+    def get_incoming_partition_constraints(self, partition):
         return self._poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
@@ -1357,3 +1366,34 @@ class SynapticManager(
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self._gen_on_machine.get(key, False)
+
+    #TODO: IMPLEMENT THESE TWO METHODS FOR RECORDING!!
+    def _get_buffered_sdram_per_timestep(self, vertex_slice):
+        return []
+
+    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+        return []
+
+    @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
+    @overrides(
+        ApplicationVertex.create_machine_vertex,
+        additional_arguments={"n_machine_time_steps"})
+    def create_machine_vertex(
+            self, vertex_slice, resources_required, n_machine_time_steps,
+            label=None, constraints=None):
+        # pylint: disable=too-many-arguments, arguments-differ
+        is_recording = False #CHANGE IT FOR RECORDING
+        buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
+            vertex_slice)
+        buffered_sdram = self._get_buffered_sdram(
+            vertex_slice, n_machine_time_steps)
+        minimum_buffer_sdram = []
+        overflow_sdram = 0
+        vertex = SynapseMachineVertex(
+            resources_required, is_recording, minimum_buffer_sdram,
+            buffered_sdram_per_timestep, label, constraints, overflow_sdram)
+
+        SynapticManager._n_vertices += 1
+
+        # return machine vertex
+        return vertex
