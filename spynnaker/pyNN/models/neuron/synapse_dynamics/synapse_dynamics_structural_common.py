@@ -100,7 +100,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # The RNG used with the seed that is passed in
         "_rng",
         # Projection specific manager
-        "_manager"
+        "_manager",
+        # Flag controlling whether rewiring cares about distance
+        "_is_distance_dependent"
+
     ]
 
     default_parameters = {
@@ -109,7 +112,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         'p_form_forward': 0.16, 'p_form_lateral': 1.,
         'p_elim_pot': 1.36 * 10 ** -4, 'p_elim_dep': 0.0245,
         'grid': np.array([16, 16]), 'lateral_inhibition': 0,
-        'random_partner': False}
+        'random_partner': False, 'is_distance_dependent': True}
 
     BIT_MASK_8_BIT = 2 ** 8 - 1
     BIT_MASK_16_BIT = 2 ** 16 - 1
@@ -134,6 +137,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  grid=default_parameters['grid'],
                  lateral_inhibition=default_parameters['lateral_inhibition'],
                  random_partner=default_parameters['random_partner'],
+                 is_distance_dependent=default_parameters['is_distance_dependent'],
                  seed=None):
         self._f_rew = f_rew
         self._p_rew = 1. / self._f_rew
@@ -150,6 +154,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self._grid = np.asarray(grid, dtype=int)
         self._random_partner = random_partner
         self._connections = {}
+        self._is_distance_dependent = is_distance_dependent
 
         self.fudge_factor = 1.5
         self._actual_row_max_length = self._s_max
@@ -380,6 +385,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                          data_type=DataType.INT32)
         spec.write_value(data=int(self._random_partner),
                          data_type=DataType.INT32)
+
+        spec.write_value(data=int(self._is_distance_dependent),
+                         data_type=DataType.INT32)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms)
         # write local low, high and number of atoms
@@ -571,7 +579,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
 
 
-            # TODO write the weight to be used from this pre-synaptic population
+            # write the weight to be used from this pre-synaptic population
             # scale the excitatory weight appropriately
             if exceptions and self.connectivity_exception_param.delay in exceptions.keys():
                 # does the current connection have have an exceptional delay distribution?
@@ -776,7 +784,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: SDRAM usage
         :rtype: int
         """
-        structure_size = 27 * 4 + 8 * 4  # parameters + rng seeds
+        structure_size = 28 * 4 + 8 * 4  # parameters + rng seeds
         post_to_pre_table_size = n_neurons * self._s_max * 4
         structure_size += post_to_pre_table_size
 

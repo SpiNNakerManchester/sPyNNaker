@@ -88,6 +88,7 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                  lateral_inhibition=CommonSP.default_parameters[
                      'lateral_inhibition'],
                  random_partner=CommonSP.default_parameters['random_partner'],
+                 is_distance_dependent=CommonSP.default_parameters['is_distance_dependent'],
                  seed=None):
         if (stdp_model is not None and not isinstance(stdp_model,
                                                       SynapseDynamicsSTDP)):
@@ -111,7 +112,9 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
             p_elim_dep=p_elim_dep,
             p_elim_pot=p_elim_pot, grid=grid,
             lateral_inhibition=lateral_inhibition,
-            random_partner=random_partner, seed=seed)
+            random_partner=random_partner,
+            is_distance_dependent=is_distance_dependent,
+            seed=seed)
 
     @overrides(SynapseDynamicsSTDP.write_parameters,
                additional_arguments={"application_graph", "machine_graph",

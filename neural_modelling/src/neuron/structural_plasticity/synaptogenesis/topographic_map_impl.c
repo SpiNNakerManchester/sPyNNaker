@@ -104,7 +104,7 @@ typedef struct {
     int32_t *post_to_pre_table;
     // flags for synapse type of lateral connections and whether formations
     // sample randomly from all available neurons
-    int32_t lateral_inhibition, random_partner;
+    int32_t lateral_inhibition, random_partner, is_distance_dependent;
 } rewiring_data_t;
 
 // the instantiation of the previous truct
@@ -199,6 +199,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     rewiring_data.s_max = *sp_word++;
     rewiring_data.lateral_inhibition = *sp_word++;
     rewiring_data.random_partner = *sp_word++;
+    rewiring_data.is_distance_dependent = *sp_word++;
 
     rewiring_data.app_no_atoms = *sp_word++;
     rewiring_data.low_atom = *sp_word++;
@@ -438,6 +439,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     current_state.connection_type = rewiring_data.pre_pop_info_table
             .subpop_info[pre_app_pop].connection_type;
 
+
+    if (rewiring_data.is_distance_dependent) {
     // Compute distances
     // To do this I need to take the DIV and MOD of the
     // postsyn neuron ID, of the presyn neuron ID
@@ -480,6 +483,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     current_state.distance = delta_x * delta_x + delta_y * delta_y;
     current_state.global_pre_syn_id = pre_global_id;
     current_state.global_post_syn_id = post_global_id;
+    } // if the rewiring is distance dependent
+    // else, skip
 
     while (!spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address,
@@ -585,22 +590,25 @@ bool synaptogenesis_dynamics_formation_rule(void)
         return false;
     }
 
-    if ((!(current_state.current_controls & IS_CONNECTION_LAT) &&
-        current_state.distance > rewiring_data.size_ff_prob)
-        || ((current_state.current_controls & IS_CONNECTION_LAT) &&
-            current_state.distance > rewiring_data.size_lat_prob)) {
-        return false;
-    }
+    if (rewiring_data.is_distance_dependent) {
+        if ((!(current_state.current_controls & IS_CONNECTION_LAT) &&
+            current_state.distance > rewiring_data.size_ff_prob)
+            || ((current_state.current_controls & IS_CONNECTION_LAT) &&
+                current_state.distance > rewiring_data.size_lat_prob)) {
+            return false;
+        }
 
-    if (!(current_state.current_controls & IS_CONNECTION_LAT)) {
-        probability = rewiring_data.ff_probabilities[current_state.distance];
-    } else {
-        probability = rewiring_data.lat_probabilities[current_state.distance];
-    }
-    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
-    if (r > probability) {
-        return false;
-    }
+        if (!(current_state.current_controls & IS_CONNECTION_LAT)) {
+            probability = rewiring_data.ff_probabilities[current_state.distance];
+        } else {
+            probability = rewiring_data.lat_probabilities[current_state.distance];
+        }
+        uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
+        if (r > probability) {
+            return false;
+        }
+    } // if the rewiring is distance dependent
+    // else, skip
     int appr_scaled_weight = rewiring_data.pre_pop_info_table
             .subpop_info[current_state.pop_index].weight;
 
