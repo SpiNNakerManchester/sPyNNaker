@@ -104,6 +104,8 @@ class SynapticManager(
         "_n_profile_samples",
         "_incoming_spike_buffer_size"]
 
+    BASIC_MALLOC_USAGE = 2
+
     #4 ELEMENTS
     BYTES_FOR_SYNAPSE_PARAMS = 16
 
@@ -273,6 +275,21 @@ class SynapticManager(
             _SYNAPSES_BASE_N_CPU_CYCLES +
             _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms)
 
+    def _get_number_of_mallocs_used_by_dsg(self):
+        #TODO: add recording part
+        return self.BASIC_MALLOC_USAGE
+
+    @inject_items({
+        "graph": "MemoryApplicationGraph",
+        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "machine_time_step": "MachineTimeStep"
+    })
+    @overrides(
+        ApplicationVertex.get_resources_used_by_atoms,
+        additional_arguments={
+            "graph", "n_machine_time_steps", "machine_time_step"
+        }
+    )
     def get_resources_used_by_atoms(
             self, vertex_slice, graph, n_machine_time_steps,
             machine_time_step):

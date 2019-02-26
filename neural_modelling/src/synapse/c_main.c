@@ -144,10 +144,10 @@ static bool initialise(uint32_t *timer_period) {
         data_specification_get_region(PROVENANCE_DATA_REGION, address));
 
     // setup recording region
-    if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))){
-        return false;
-    }
+    //if (!initialise_recording(
+    //        data_specification_get_region(RECORDING_REGION, address))){
+    //    return false;
+    //}
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
@@ -256,6 +256,8 @@ void c_main(void) {
     if (!initialise(&timer_period)){
         rt_error(RTE_API);
     }
+
+    io_printf(IO_BUF, "Returned from initialise\n");
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;

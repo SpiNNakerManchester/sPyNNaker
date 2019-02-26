@@ -123,6 +123,7 @@ class AbstractPopulationVertex(
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self._neuron_impl.add_parameters(self._parameters)
         self._neuron_impl.add_state_variables(self._state_variables)
+        self._ring_buffer_shifts = None
 
         # Set up for recording
         recordables = ["spikes"]

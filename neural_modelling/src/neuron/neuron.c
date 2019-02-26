@@ -399,6 +399,8 @@ bool neuron_initialise(address_t address) {
     n_neurons = address[N_NEURONS_TO_SIMULATE];
     n_synapse_types = address[N_SYNAPSE_TYPES];
 
+    io_printf(IO_BUF, "\nneurons: %d syn types: %d\n", n_neurons, n_synapse_types);
+
     //Size of the DMA region. Number of neurons multiplied by synapse types
     dma_size = n_neurons * n_synapse_types * sizeof(weight_t);
 
@@ -408,6 +410,8 @@ bool neuron_initialise(address_t address) {
 
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
+
+    io_printf(IO_BUF, "RECORDED VARS: %d\n", n_recorded_vars);
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -431,6 +435,8 @@ bool neuron_initialise(address_t address) {
     if (!neuron_impl_initialise(n_neurons)) {
         return false;
     }
+
+    io_printf(IO_BUF, "Returned from neuron impl initialise");
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (weight_t *) spin1_malloc(n_neurons *
@@ -456,6 +462,8 @@ bool neuron_initialise(address_t address) {
     if (!out_spikes_initialize(n_neurons)) {
         return false;
     }
+
+    io_printf(IO_BUF, "returned from out spikes initialise\n");
 
     // Allocate recording space
     spike_recording_indexes = (uint8_t *) spin1_malloc(
@@ -512,10 +520,14 @@ bool neuron_initialise(address_t address) {
         }
     }
 
+    io_printf(IO_BUF, "Allocated recording areas");
+
     // load the data into the allocated DTCM spaces.
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
+
+    io_printf(IO_BUF, "GLOBAL PARAMS IS PROBLEM\n");
 
     _reset_record_counter();
 

@@ -141,6 +141,10 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
+    io_printf(IO_BUF, "pre neuron init");
+    while(1);
+
+
     // Set up the neurons
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, address))) {

@@ -253,10 +253,14 @@ bool synapses_initialise(
     *n_synapse_types_value = synapse_params_address[N_SYNAPSE_TYPES];
     n_synapse_types = *n_synapse_types_value;
 
+    io_printf(IO_BUF, "n_neurons: %d, syn types: %d\n", n_neurons, n_synapse_types);
+
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = synapse_params_address[INCOMING_SPIKE_BUFFER_SIZE];
 
     synapse_index = synapse_params_address[SYNAPSE_INDEX];
+
+    io_printf(IO_BUF, "syn index %d\n", synapse_index);
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
