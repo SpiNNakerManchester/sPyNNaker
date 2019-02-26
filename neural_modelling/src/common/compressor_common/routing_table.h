@@ -3,7 +3,13 @@
 
 #ifndef __ROUTING_TABLE_H__
 
-typedef struct _key_mask_t{
+//! enum covering top level entries for routing tables in sdram
+typedef enum routing_table_top_elements{
+    N_TABLE_ENTRIES = 0, START_OF_SDRAM_ENTRIES = 1
+} routing_table_top_elements;
+
+//! \brief struct holding key and mask
+typedef struct key_mask_t{
     // Key for the key_mask
     uint32_t key;
 
@@ -11,37 +17,7 @@ typedef struct _key_mask_t{
     uint32_t mask;
 } key_mask_t;
 
-
-// Get a mask of the Xs in a key_mask
-static inline uint32_t key_mask_get_xs(key_mask_t km){
-    return ~km.key & ~km.mask;
-}
-
-
-// Get a count of the Xs in a key_mask
-static inline unsigned int key_mask_count_xs(key_mask_t km){
-    return __builtin_popcount(key_mask_get_xs(km));
-}
-
-
-// Determine if two key_masks would match any of the same keys
-static inline bool key_mask_intersect(key_mask_t a, key_mask_t b){
-    return (a.key & b.mask) == (b.key & a.mask);
-}
-
-
-// Generate a new key-mask which is a combination of two other key_masks
-//     c := a | b
-static inline key_mask_t key_mask_merge(key_mask_t a, key_mask_t b){
-    key_mask_t c;
-    uint32_t new_xs = ~(a.key ^ b.key);
-    c.mask = a.mask & b.mask & new_xs;
-    c.key = (a.key | b.key) & c.mask;
-
-    return c;
-}
-
-
+//! \brief struct holding routing table entry data
 typedef struct entry_t{
     // Key and mask
     key_mask_t key_mask;
@@ -53,7 +29,7 @@ typedef struct entry_t{
     uint32_t source;
 } entry_t;
 
-
+//! \brief struct for holding table entries (NOT SURE HOW USFUL THIS IS NOW)
 typedef struct table_t{
 
     // Number of entries in the table
@@ -63,7 +39,93 @@ typedef struct table_t{
     entry_t *entries;
 } table_t;
 
+
+//! \brief Get a mask of the Xs in a key_mask
+//! \param[in] km: the key mask to get as xs
+//! \return ???????????
+static inline uint32_t key_mask_get_xs(key_mask_t km){
+    return ~km.key & ~km.mask;
+}
+
+
+//! \brief Get a count of the Xs in a key_mask
+//! \param[in] km: the key mask struct to count
+//! \return ???????
+static inline unsigned int key_mask_count_xs(key_mask_t km){
+    return __builtin_popcount(key_mask_get_xs(km));
+}
+
+
+//! \brief Determine if two key_masks would match any of the same keys
+//! \param[in] a: key mask struct a
+//! \param[in] b: key masp struct b
+//! \return bool that says if these key masks intersect
+static inline bool key_mask_intersect(key_mask_t a, key_mask_t b){
+    return (a.key & b.mask) == (b.key & a.mask);
+}
+
+
+//! \brief Generate a new key-mask which is a combination of two other key_masks
+//! \brief c := a | b
+//! \param[in] a: the key mask struct a
+//! \param[in] b: the key mask struct b
+//! \return a key mask struct when merged
+static inline key_mask_t key_mask_merge(key_mask_t a, key_mask_t b){
+    key_mask_t c;
+    uint32_t new_xs = ~(a.key ^ b.key);
+    c.mask = a.mask & b.mask & new_xs;
+    c.key = (a.key | b.key) & c.mask;
+
+    return c;
+}
+
+//! \brief gets a entry at a given position in the lists of tables in sdram
+//! \param[in] routing_tables: the addresses list
+//! \param[in] n_tables: how many in list
+//! \param[in] entry_id_to_find: the entry your looking for
+//! \param[out] entry_to_fill: the pointer to entry struct to fill in data
+//! \return the pointer in sdram to the entry
+entry_t* routing_table_sdram_stores_get_entry(
+        table_t** routing_tables, uint32_t n_tables, uint32_t entry_id_to_find){
+
+    uint32_t current_point_tracking = 0;
+    for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
+
+        // get how many entries are in this block
+        uint32_t entries_stored_here = routing_tables[rt_index]->size;
+
+        // determine if the entry is in this table
+        if (current_point_tracking + entries_stored_here > entry_id_to_find){
+            uint32_t entry_index = entry_id_to_find - current_point_tracking;
+            return &routing_tables[rt_index]->entries[entry_index];
+        }
+        else{
+            current_point_tracking += entries_stored_here;
+        }
+    }
+
+    log_error("should never get here. If so WTF!");
+    rt_error(RTE_SWERR);
+    return NULL;
+}
+
+//! \brief gets the length of the group of routing tables
+//! \param[in] routing_tables: the addresses list
+//! \param[in] n_tables: how many in list
+//! \return the total number of entries over all the tables.
+uint32_t routing_table_sdram_get_n_entries(
+        table_t** routing_tables, uint32_t n_tables){
+    uint32_t current_point_tracking = 0;
+    for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
+        // get how many entries are in this block
+        current_point_tracking += routing_tables[rt_index]->size;
+    }
+    return current_point_tracking;
+}
+
 //! \brief deduces sdram requirements for a given size of table
+//! \param[in] n_entries: the number of entries expected to be in the table.
+//! \return the number of bytes needed for this routing table
 uint32_t routing_table_sdram_size_of_table(uint32_t n_entries){
     return sizeof(uint32_t) + (sizeof(entry_t) * n_entries);
 }

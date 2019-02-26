@@ -22,19 +22,24 @@ static inline int merge_goodness(merge_t *m){
 // Get the index where the routing table entry resulting from a merge should be
 // inserted.
 static inline unsigned int oc_get_insertion_point(
-        table_t *table, const unsigned int generality){
+        table_t** routing_tables, uint32_t n_tables,
+        const unsigned int generality){
     // Perform a binary search of the table to find entries of generality - 1
     const unsigned int g_m_1 = generality - 1;
     unsigned int bottom = 0;
-    unsigned int top = table->size;
+    unsigned int top = routing_table_sdram_get_n_entries(
+        routing_tables, n_tables);
     unsigned int pos = top / 2;
 
-    while (bottom < pos && pos < top &&
-            key_mask_count_xs(table->entries[pos].key_mask) != g_m_1){
-        unsigned int entry_generality = key_mask_count_xs(
-            table->entries[pos].key_mask);
+    // get first entry
+    entry_t* entry = routing_table_sdram_stores_get_entry(
+        routing_tables, n_tables, pos);
+    unsigned int count_xs = key_mask_count_xs(entry->key_mask);
 
-        if (entry_generality < g_m_1){
+    // iterate till found something
+    while (bottom < pos && pos < top && count_xs != g_m_1){
+
+        if (count_xs < g_m_1){
             bottom = pos;
         }
         else{
@@ -43,13 +48,22 @@ static inline unsigned int oc_get_insertion_point(
 
         // Update the position
         pos = bottom + (top - bottom) / 2;
+
+        // update entry and count
+        entry = routing_table_sdram_stores_get_entry(
+            routing_tables, n_tables, pos);
+        count_xs = key_mask_count_xs(entry->key_mask);
     }
 
     // Iterate through the table until either the next generality or the end of
     // the table is found.
-    while (pos < table->size &&
-            key_mask_count_xs(table->entries[pos].key_mask) < generality){
+
+    while (pos < routing_table_sdram_get_n_entries(
+            routing_tables, n_tables) && count_xs < generality){
         pos++;
+        entry = routing_table_sdram_stores_get_entry(
+            routing_tables, n_tables, pos);
+        count_xs = key_mask_count_xs(entry->key_mask);
     }
 
     return pos;
@@ -58,7 +72,9 @@ static inline unsigned int oc_get_insertion_point(
 
 // Remove from a merge any entries which would be covered by being existing
 // entries if they were included in the given merge.
-static inline bool oc_up_check(merge_t *m, int min_goodness){
+static inline bool oc_up_check(
+        merge_t *m, int min_goodness, table_t** routing_tables,
+        uint32_t n_addresses){
     min_goodness = (min_goodness > 0) ? min_goodness : 0;
 
     // Track whether we remove any entries
@@ -66,11 +82,15 @@ static inline bool oc_up_check(merge_t *m, int min_goodness){
 
     // Get the point where the merge will be inserted into the table.
     unsigned int generality = key_mask_count_xs(m->key_mask);
-    unsigned int insertion_index = oc_get_insertion_point(m->table, generality);
+    unsigned int insertion_index = oc_get_insertion_point(
+        routing_tables, n_addresses, generality);
 
     // For every entry in the merge check that the entry would not be covered by
     // any existing entries if it were to be merged.
-    for (unsigned int _i = m->table->size, i = m->table->size - 1;
+    for (unsigned int _i = routing_table_sdram_get_n_entries(
+                routing_tables, n_addresses),
+            i = routing_table_sdram_get_n_entries(
+                routing_tables, n_addresses) - 1;
             _i > 0 && merge_goodness(m) > min_goodness;
             _i--, i--){
         if (!merge_contains(m, i)){
@@ -79,20 +99,27 @@ static inline bool oc_up_check(merge_t *m, int min_goodness){
         }
 
         // Get the key_mask for this entry
-        key_mask_t km = m->table->entries[i].key_mask;
+        key_mask_t km = routing_table_sdram_stores_get_entry(
+            routing_tables, n_addresses, i)->key_mask;
 
         // Otherwise look through the table from the insertion point to the
         // current entry position to ensure that nothing covers the merge.
         for (unsigned int j = i + 1; j < insertion_index; j++){
-            key_mask_t other_km = m->table->entries[j].key_mask;
+            key_mask_t other_km = routing_table_sdram_stores_get_entry(
+            routing_tables, n_addresses, j)->key_mask;
 
             // If the key masks intersect then remove this entry from the merge
             // and recalculate the insertion index.
             if (key_mask_intersect(km, other_km)){
-                changed = true;      // Indicate that the merge has changed
-                merge_remove(m, i);  // Remove from the merge
+
+                // Indicate the the merge has changed
+                changed = true;
+
+                // Remove from the merge
+                merge_remove(m, i, routing_tables, n_addresses);
                 generality = key_mask_count_xs(m->key_mask);
-                insertion_index = oc_get_insertion_point(m->table, generality);
+                insertion_index = oc_get_insertion_point(
+                    routing_tables, n_addresses, generality);
             }
         }
     }
@@ -141,7 +168,8 @@ static inline void _get_settable(
 //! \param[in] settable: Mask of bits to set
 //! \param[in] to_one:  True if setting to one, otherwise false
 static inline __sets_t _get_removables(
-        merge_t *m, uint32_t settable, bool to_one, __sets_t sets){
+        merge_t *m, uint32_t settable, bool to_one, __sets_t sets,
+        table_t** routing_tables, uint32_t n_addresses){
     // For each bit which we are trying to set while the best set doesn't
     // contain only one entry.
     for (uint32_t bit = (1 << 31); bit > 0 && sets.best->count != 1;
@@ -156,7 +184,9 @@ static inline __sets_t _get_removables(
         // either a X or a 0 or 1 (as specified by `to_one`) to the working set
         // of entries to remove.
         unsigned int entry = 0;
-        for (unsigned int i = 0; i < m->table->size; i++){
+        for (unsigned int i = 0; i <
+                routing_table_sdram_get_n_entries(routing_tables, n_addresses);
+                i++){
         
             // Skip if this isn't an entry
             if (!merge_contains(m, i)){
@@ -164,7 +194,8 @@ static inline __sets_t _get_removables(
             }
             
             // See if this entry should be removed
-            key_mask_t km = m->table->entries[i].key_mask;
+            key_mask_t km = routing_table_sdram_stores_get_entry(
+                routing_tables, n_addresses, i)->key_mask;
             
             // check entry has x or 1 or 0 in this position.
             if (bit & ~km.mask || (!to_one && bit & km.key) ||
@@ -195,11 +226,19 @@ static inline __sets_t _get_removables(
 }
 
 
-// Remove entries from a merge such that the merge would not cover existing
-// entries positioned below the merge.
-static inline void oc_down_check(merge_t *m, int min_goodness, aliases_t *a){
+//! \brief Remove entries from a merge such that the merge would not cover
+//! existing entries positioned below the merge.
+//! \param[in] m:
+//! \param[in] min_goodness:
+//! \param[in] a:
+//! \param[in] failed_to_malloc:
+//! \param[in] routing_tables:
+//! \param[in] n_addresses:
+//! \return bool that says if it was successful or not
+static inline bool oc_down_check(
+        merge_t *m, int min_goodness, aliases_t *a, bool* failed_to_malloc,
+        table_t** routing_tables, uint32_t n_addresses){
     min_goodness = (min_goodness > 0) ? min_goodness : 0;
-    table_t *table = m->table;  // Retrieve the table
 
     while (merge_goodness(m) > min_goodness){
         // Record if there were any covered entries
@@ -218,13 +257,15 @@ static inline void oc_down_check(merge_t *m, int min_goodness, aliases_t *a){
         // table to see if there are any entries which could be covered by the
         // entry resulting from the merge.
         unsigned int insertion_point = oc_get_insertion_point(
-            table, key_mask_count_xs(m->key_mask));
+            routing_tables, n_addresses, key_mask_count_xs(m->key_mask));
 
         for (unsigned int i = insertion_point;
-                i < table->size && stringency > 0;
+                i < routing_table_sdram_get_n_entries(
+                    routing_tables, n_addresses) && stringency > 0;
                 i++){
 
-            key_mask_t km = table->entries[i].key_mask;
+            key_mask_t km = routing_table_sdram_stores_get_entry(
+                routing_tables, n_addresses, i)->key_mask;
             if (key_mask_intersect(km, m->key_mask)){
                 if (!aliases_contains(a, km)) {
                     // The entry doesn't contain any aliases so we need to
@@ -259,32 +300,56 @@ static inline void oc_down_check(merge_t *m, int min_goodness, aliases_t *a){
 
         if (!covered_entries){
             // If there were no covered entries then we needn't do anything
-            return;
+            return true;
         }
 
         if (stringency == 0){
             // We can't avoid a covered entry at all so we need to empty the
             // merge entirely.
             merge_clear(m);
-            return;
+            return true;
         }
 
         // Determine which entries could be removed from the merge and then pick
         // the smallest number of entries to remove.
         __sets_t sets = {MALLOC(sizeof(bit_set_t)), MALLOC(sizeof(bit_set_t))};
-        bit_set_init(sets.best, m->entries.count);
-        bit_set_init(sets.working, m->entries.count);
+        if (sets.best == NULL){
+            log_error("failed to alloc sets best");
+            *failed_to_malloc = true;
+            return false;
+        }
+        if(sets.working == NULL){
+            log_error("failed to alloc sets working");
+            *failed_to_malloc = true;
+            return false;
+        }
 
-        sets = _get_removables(m, set_to_zero, false, sets);
-        sets = _get_removables(m, set_to_one, true, sets);
+        bool success = bit_set_init(sets.best, m->entries.count);
+        if (!success){
+            log_error("failed to init the bitfield best");
+            *failed_to_malloc = true;
+            return false;
+        }
+        bit_set_init(sets.working, m->entries.count);
+        if (!success){
+            log_error("failed to init the bitfield working.");
+            *failed_to_malloc = true;
+            return false;
+        }
+
+        sets = _get_removables(
+            m, set_to_zero, false, sets, routing_tables, n_addresses);
+        sets = _get_removables(
+            m, set_to_one, true, sets, routing_tables, n_addresses);
 
         // Remove the specified entries
         unsigned int entry = 0;
-        for (unsigned int i = 0; i < m->table->size; i++){
+        for (unsigned int i = 0; i <routing_table_sdram_get_n_entries(
+                routing_tables, n_addresses); i++){
             if (merge_contains(m, i)){
                 if (bit_set_contains(sets.best, entry)){
                     // Remove this entry from the merge
-                    merge_remove(m, i);
+                    merge_remove(m, i, routing_tables, n_addresses);
                 }
                 entry++;
             }
@@ -303,27 +368,51 @@ static inline void oc_down_check(merge_t *m, int min_goodness, aliases_t *a){
             merge_clear(m);
         }
     }
+    return true;
 }
 
 
 // Get the best merge which can be applied to a routing table
-static inline merge_t oc_get_best_merge(table_t* table, aliases_t *aliases){
+static inline bool oc_get_best_merge(
+        table_t** routing_tables, uint32_t n_addresses, aliases_t * aliases,
+        merge_t * best, bool* failed_by_malloc){
+
     // Keep track of which entries have been considered as part of merges.
     bit_set_t considered;
-    bool success = bit_set_init(&considered, table->size);
+    bool success = bit_set_init(
+        &considered,
+        routing_table_sdram_get_n_entries(routing_tables, n_addresses));
+
     if (!success){
-        log_info("failed to initialise the bit_set. shutting down");
-        spin1_exit(0);
+        log_info("failed to initialise the bit_set. throwing response malloc");
+        *failed_by_malloc = true;
+        return false;
     }
 
     // Keep track of the current best merge and also provide a working merge
-    merge_t best, working;
-    merge_init(&best, table);
-    merge_init(&working, table);
+    merge_t working;
+    success = merge_init(
+        best, routing_table_sdram_get_n_entries(routing_tables, n_addresses));
+    if (!success){
+        log_info("failed to init the merge best. throw response malloc");
+        *failed_by_malloc = true;
+        return false;
+    }
+
+    success = merge_init(
+        &working,
+        routing_table_sdram_get_n_entries(routing_tables, n_addresses));
+     if (!success){
+        log_info("failed to init the merge working. throw response malloc");
+        *failed_by_malloc = true;
+        return false;
+    }
 
     // For every entry in the table see with which other entries it could be
     // merged.
-    for (unsigned int i = 0; i < table->size; i++){
+    for (unsigned int i = 0;
+            i < routing_table_sdram_get_n_entries(routing_tables, n_addresses);
+            i++){
 
         // If this entry has already been considered then skip to the next
         if (bit_set_contains(&considered, i)){
@@ -335,56 +424,77 @@ static inline merge_t oc_get_best_merge(table_t* table, aliases_t *aliases){
         merge_clear(&working);
 
         // Add to the merge
-        merge_add(&working, i);
+        merge_add(&working, i, routing_tables, n_addresses);
 
         // Mark this entry as considered
         bit_set_add(&considered, i);
 
         // Get the entry
-        entry_t entry = table->entries[i];
+        entry_t* entry = routing_table_sdram_stores_get_entry(
+            routing_tables, n_addresses, i);
 
         // Try to merge with other entries
-        for (unsigned int j = i+1; j < table->size; j++){
+        for (unsigned int j = i+1;
+                j < routing_table_sdram_get_n_entries(
+                    routing_tables, n_addresses);
+                j++){
 
             // Get the other entry
-            entry_t other = table->entries[j];
-            if (entry.route == other.route){
+            entry_t* other = routing_table_sdram_stores_get_entry(
+                routing_tables, n_addresses, j);
+
+            // check if mergable
+            if (entry->route == other->route){
 
                 // If the routes are the same then the entries may be merged
                 // Add to the merge
-                merge_add(&working, j);
+                merge_add(&working, j, routing_tables, n_addresses);
 
                 // Mark the other entry as considered
                 bit_set_add(&considered, j);
             }
         }
 
-        if (merge_goodness(&working) <= merge_goodness(&best)){
+        if (merge_goodness(&working) <= merge_goodness(best)){
             continue;
         }
 
         // Perform the first down check
-        oc_down_check(&working, merge_goodness(&best), aliases);
+        success = oc_down_check(
+            &working, merge_goodness(best), aliases, failed_by_malloc,
+            routing_tables, n_addresses);
+        if (!success){
+            log_error("failed to down check. ");
+            return false;
+        }
 
-        if (merge_goodness(&working) <= merge_goodness(&best)){
+        if (merge_goodness(&working) <= merge_goodness(best)){
             continue;
         }
 
         // Perform the up check, seeing if this actually makes a change to the
         // size of the merge.
-        if (oc_up_check(&working, merge_goodness(&best))){
-            if (merge_goodness(&working) <= merge_goodness(&best)){
+        if (oc_up_check(
+                &working, merge_goodness(best), routing_tables, n_addresses)){
+            if (merge_goodness(&working) <= merge_goodness(best)){
                 continue;
             }
 
             // If the up check did make a change then the down check needs to
             // be run again.
-            oc_down_check(&working, merge_goodness(&best), aliases);
+            success = oc_down_check(
+                &working, merge_goodness(best), aliases, failed_by_malloc,
+                routing_tables, n_addresses);
+            if (!success){
+                log_error("failed to down check. ");
+                return false;
+            }
+
         }
 
         // If the merge is still better than the current best merge we swap the
         // current and best merges to record the new best merge.
-        if (merge_goodness(&best) < merge_goodness(&working)){
+        if (merge_goodness(best) < merge_goodness(&working)){
             merge_t other = working;
             working = best;
             best = other;
@@ -392,7 +502,7 @@ static inline merge_t oc_get_best_merge(table_t* table, aliases_t *aliases){
     }
 
     // Tidy up
-    merge_delete(&working);
+    merge_delete(working);
     bit_set_delete(&considered);
 
     // Return the best merge
@@ -401,7 +511,9 @@ static inline merge_t oc_get_best_merge(table_t* table, aliases_t *aliases){
 
 
 // Apply a merge to the table against which it is defined
-static inline void oc_merge_apply(merge_t *m, aliases_t *aliases){
+static inline void oc_merge_apply(
+        merge_t *m, aliases_t *aliases, table_t** routing_tables,
+        uint32_t n_addresses){
     // Get the new entry
     entry_t new_entry;
     new_entry.key_mask = m->key_mask;
@@ -410,7 +522,7 @@ static inline void oc_merge_apply(merge_t *m, aliases_t *aliases){
 
     // Get the insertion point for the new entry
     unsigned int insertion_point = oc_get_insertion_point(
-    m->table, key_mask_count_xs(m->key_mask));
+        routing_tables, n_addresses, key_mask_count_xs(m->key_mask));
 
     // Keep track of the size of the finished table
     table_t *table = m->table;
@@ -479,13 +591,51 @@ static inline void oc_merge_apply(merge_t *m, aliases_t *aliases){
 // Apply the ordered covering algorithm to a routing table
 // Minimise the table until either the table is shorter than the target length
 // or no more merges are possible.
-static inline void oc_minimise(
-        table_t *table, unsigned int target_length, aliases_t *aliases){
-    while (table->size > target_length){
+static inline bool oc_minimise(
+        table_t** routing_tables, uint32_t n_addresses, uint32_t target_length,
+        aliases_t* aliases, bool *failed_by_malloc, bool *finished_by_control,
+        bool *timer_for_compression_attempt, bool *finish_compression_flag,
+        bool compress_only_when_needed, bool compress_as_much_as_possible){
+
+    // check if any compression actually needed
+    if (compress_only_when_needed &&
+            (routing_table_sdram_get_n_entries(routing_tables, n_addresses)
+             < target_length)){
+        store_into_compressed_address(routing_tables, n_addresses);
+        return true;
+    }
+
+    // by setting target length to 0, it'll not finish till no other merges
+    // are available.
+    if (compress_as_much_as_possible){
+        target_length = 0;
+    }
+
+    // start the timer tick interrupt count down
+    spin1_resume(SYNC_NOWAIT);
+
+    // start the merger process
+    while ((routing_table_sdram_get_n_entries(
+            routing_tables, n_addresses) > target_length) &&
+            !timer_for_compression_attempt && !finished_by_control){
+        
+        if (*finish_compression_flag){
+            log_error("failed due to timing limitations");
+            *timer_for_compression_attempt = true;
+            return false;
+        }
+
         // Get the best possible merge, if this merge is empty then break out
         // of the loop.
-        merge_t merge = oc_get_best_merge(table, aliases);
-        unsigned int count = merge.entries.count;
+        merge_t merge;
+        bool success = oc_get_best_merge(
+            routing_tables, n_addresses, aliases, &merge, failed_by_malloc);
+        if (!success){
+            log_error("failed to do get best merge.");
+            return false;
+        }
+
+        unsigned int count = merge->entries.count;
 
         if (count > 1){
             // Apply the merge to the table if it would result in merging

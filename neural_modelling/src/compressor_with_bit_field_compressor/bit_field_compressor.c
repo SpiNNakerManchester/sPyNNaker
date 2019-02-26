@@ -6,6 +6,8 @@
 #include "../common/compressor_common/platform.h"
 #include "../common/compressor_common/routing_table.h"
 #include "../common/compressor_common/compression_sdp_formats.h"
+#include "../common/compressor_common/aliases.h"
+#include "../common/compressor_common/ordered_covering.h"
 /*****************************************************************************/
 /* SpiNNaker routing table minimisation with bitfield integration.
  *
@@ -31,26 +33,33 @@ typedef enum interrupt_priority{
 //! random port as 0 is in use by scamp/sark
 #define RANDOM_PORT 4
 
+//! max length of the router table entries
+#define TARGET_LENGTH 1023
+
 //! \brief the timer control logic.
-bool timer_for_compression_attempt = false;
+bool* timer_for_compression_attempt = false;
+
+//! \brief number of times a compression time slot has occurred
+bool* finish_compression_flag = false;
+
+//! \brief bool flag to say if i was forced to stop by the compressor control
+bool* finished_by_compressor_force = false;
+
+//! bool flag pointer to allow minimise to report if it failed due to malloc
+//! issues
+bool* failed_by_malloc = false;
+
+//! control flag for running compression only when needed
+bool compress_only_when_needed = false;
+
+//! control flag for compressing as much as possible
+bool compress_as_much_as_possible = false;
 
 //! \brief the sdram location to write the compressed router table into
 address_t sdram_loc_for_compressed_entries;
 
-//! \brief number of times a compression time slot has occurred
-bool finish_compression_flag = false;
-
-//! \brief bool flag to say if i was forced to stop by the compressor control
-bool finished_by_compressor_force = false;
-
 //! \brief store for addresses for routing entries in sdram
-address_t * routing_entries_addresses;
-
-//! control flag for running compression only when needed
-uint32_t compress_only_when_needed = 0;
-
-//! control flag for compressing as much as possible
-uint32_t compress_as_much_as_possible = 0;
+table_t** routing_entries_addresses;
 
 //! how many packets waiting for
 uint32_t number_of_packets_waiting_for = 0;
@@ -64,11 +73,7 @@ uint32_t control_core_id = 0;
 //! \brief sdp message to send acks to the control core with
 sdp_msg_pure_data my_msg;
 
-//! bool flag pointer to allow minimise to report if it failed due to malloc
-//! issues
-bool failed_by_malloc = false;
-
-//! \brief sends a sdp message back to the
+//! \brief sends a sdp message back to the control core
 void send_sdp_message_response(){
     my_msg.dest_port = control_core_id;
     // send sdp packet
@@ -77,6 +82,7 @@ void send_sdp_message_response(){
     }
 }
 
+//! \brief send a failed response due to a malloc issue
 void return_malloc_response_message(){
     // set message ack finished state to malloc fail
     my_msg.data[FINISHED_STATE] = FAILED_MALLOC;
@@ -85,6 +91,7 @@ void return_malloc_response_message(){
     send_sdp_message_response();
 }
 
+//! \brief send a success response message
 void return_success_response_message(){
     // set message ack finished state to malloc fail
     my_msg.data[FINISHED_STATE] = SUCCESSFUL_COMPRESSION;
@@ -93,6 +100,7 @@ void return_success_response_message(){
     send_sdp_message_response();
 }
 
+//! \brief send a failed response due to the control forcing it to stop
 void return_failed_by_force_response_message(){
        // set message ack finished state to malloc fail
     my_msg.data[FINISHED_STATE] = FORCED_BY_COMPRESSOR_CONTROL;
@@ -101,6 +109,7 @@ void return_failed_by_force_response_message(){
     send_sdp_message_response();
 }
 
+//! \brief sends a failed response due to running out of time
 void return_failed_by_time_response_message(){
        // set message ack finished state to malloc fail
     my_msg.data[FINISHED_STATE] = RAN_OUT_OF_TIME;
@@ -109,6 +118,8 @@ void return_failed_by_time_response_message(){
     send_sdp_message_response();
 }
 
+//! \brief send a failed response where finished compression but failed to
+//! fit into allocated size.
 void return_failed_by_space_response_message(){
        // set message ack finished state to malloc fail
     my_msg.data[FINISHED_STATE] = FAILED_TO_COMPRESS;
@@ -117,13 +128,19 @@ void return_failed_by_space_response_message(){
     send_sdp_message_response();
 }
 
+//! \brief starts the compression process
 void start_compression_process(){
     failed_by_malloc = false;
-    bool success = oc_minimise(table_t *table, unsigned int target_length, aliases_t *aliases)
+    aliases_t aliases = aliases_init();
+    bool success = oc_minimise(
+        routing_entries_addresses, routing_addresses_stored, TARGET_LENGTH,
+        aliases, &failed_by_malloc, &finished_by_compressor_force,
+        &timer_for_compression_attempt, &finish_compression_flag,
+        compress_only_when_needed, compress_as_much_as_possible);
     if (success){
         return_success_response_message();
     }
-    else{
+    else{  // if not a success, could be one of 4 states
         if (failed_by_malloc){  // malloc failed somewhere
             return_malloc_response_message();
         }
@@ -156,23 +173,28 @@ void _sdp_handler(uint mailbox, uint port) {
     // get command code
     if (msg->data[COMMAND_CODE] == START_OF_COMPRESSION_DATA_STREAM){
 
+        start_stream_sdp_packet first_command_packet =
+            msg->data[START_OF_SPECIFIC_MESSAGE_DATA];
+
         // location where to store the compressed (size
         sdram_loc_for_compressed_entries =
-            (address_t)  msg->data[ADDRESS_FOR_COMPRESSED];
+            first_command_packet.address_for_compressed;
 
         // set up fake heap
         log_info("setting up fake heap for sdram usage");
-        platform_new_heap_creation((address_t) msg->data[FAKE_HEAP_DATA]);
+        platform_new_heap_creation(first_command_packet.fake_heap_data);
         log_info("finished setting up fake heap for sdram usage");
 
         // set up packet tracker
         number_of_packets_waiting_for =
-            msg->data[N_SDP_PACKETS_TILL_DELIVERED];
+            first_command_packet.n_sdp_packets_till_delivered;
+
         number_of_packets_waiting_for -= 1;
 
         // set up addresses data holder
         routing_entries_addresses = MALLOC(
-            msg->data[TOTAL_N_ADDRESSES] * sizeof(address_t));
+            first_command_packet.total_n_addresses * sizeof(table_t**));
+
         if (routing_entries_addresses == NULL){
             log_error(
                 "failed to allocate memory for holding the addresses "
@@ -184,13 +206,16 @@ void _sdp_handler(uint mailbox, uint port) {
 
             // store this set into the store
             log_info("store routing table addresses into store");
-            sark_mem_cpy(
-                &my_msg.data[START_OF_ADDRESSES],
-                &routing_entries_addresses[routing_addresses_stored],
-                my_msg.data[N_ADDRESSES_IN_PACKET] * WORD_TO_BYTE_MULTIPLIER);
+            for(uint32_t rt_index = 0; rt_index <
+                    first_command_packet.n_addresses_in_packet;
+                    rt_index++){
+                routing_entries_addresses[rt_index] =
+                    first_command_packet.tables[rt_index];
+            }
 
             // keep tracker updated
-            routing_addresses_stored += msg->data[N_ADDRESSES_IN_PACKET];
+            routing_addresses_stored +=
+                first_command_packet.n_addresses_in_packet;
             log_info("finished storing routing table address into store");
 
             // if no more packets to locate, then start compression process
@@ -216,6 +241,7 @@ void _sdp_handler(uint mailbox, uint port) {
             // store this set into the store
             log_info("store extra routing table addresses into store");
             number_of_packets_waiting_for -= 1;
+
             sark_mem_cpy(
                 &my_msg.data[START_OF_ADDRESSES_EXTENSION],
                 &routing_entries_addresses[routing_addresses_stored],
@@ -264,10 +290,17 @@ void initialise() {
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
     timer_for_compression_attempt = sark_virtual_processor_info[
         spin1_get_core_id()].user1;
-    compress_only_when_needed = sark_virtual_processor_info[
-        spin1_get_core_id()].user2;
-    compress_as_much_as_possible = sark_virtual_processor_info[
-        spin1_get_core_id()].user3;
+
+    // bool from int conversion happening here
+    int int_value = sark_virtual_processor_info[spin1_get_core_id()].user2;
+    if (int_value == 0){
+        compress_only_when_needed = true;
+    }
+
+    int_value = sark_virtual_processor_info[spin1_get_core_id()].user3;
+    if (int_value == 0){
+        compress_as_much_as_possible = true;
+    }
 
     spin1_set_timer_tick(timer_for_compression_attempt);
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER_TICK_PRIORITY);

@@ -55,12 +55,6 @@ typedef enum uncompressed_routing_table_region_elements{
     APPLICATION_APP_ID = 0, N_ENTRIES = 1, START_OF_UNCOMPRESSED_ENTRIES = 2
 } uncompressed_routing_table_region_elements;
 
-//! enum covering human readable components of a entry in sdram
-typedef enum routing_table_entry_elements{
-    ROUTING_ENTRY_KEY = 0, ROUTING_ENTRY_MASK = 1, ROUTING_ENTRY_ROUTE = 2, 
-    ROUTING_ENTRY_SOURCE = 3, X_WORDS_USED_FOR_ROUTING_ENTRY = 4
-} routing_table_entry_elements;
-
 //! enum for the compressor cores data elements (used for programmer debug)
 typedef enum compressor_core_elements{
     N_COMPRESSOR_CORES = 0, START_OF_COMPRESSOR_CORE_IDS = 1
@@ -871,13 +865,14 @@ bool set_off_bit_field_compression(
 
     // deduce how many packets
     uint32_t total_packets = 1;
-    uint32_t n_addresses_for_start = ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES;
+    uint32_t n_addresses_for_start =
+        ITEMS_PER_DATA_PACKET - sizeof(start_stream_sdp_packet_t);
     if (n_addresses_for_start < n_bit_field_addresses){
         n_bit_field_addresses -= n_addresses_for_start;
         total_packets += n_bit_field_addresses / (
-            ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES_EXTENSION);
+            ITEMS_PER_DATA_PACKET - sizeof(extra_stream_sdp_packet_t));
         uint32_t left_over = n_bit_field_addresses % (
-            ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES_EXTENSION);
+            ITEMS_PER_DATA_PACKET - sizeof(extra_stream_sdp_packet_t));
         if (left_over != 0){
             total_packets += 1;
         }
@@ -890,58 +885,61 @@ bool set_off_bit_field_compression(
     for (uint32_t packet_id =0; packet_id < total_packets; packet_id++){
         // if just one packet worth, set to left over addresses
         if ((n_bit_field_addresses - addresses_sent) <=
-                ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES){
+                ITEMS_PER_DATA_PACKET - sizeof(start_stream_sdp_packet_t)){
             addresses_this_message =
                 n_bit_field_addresses - addresses_sent;
         } else{  // if more than 1 packet worth, max packet out
             if (packet_id == 0){  // first packet
                 addresses_this_message =
-                    ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES;
+                    ITEMS_PER_DATA_PACKET - sizeof(start_stream_sdp_packet_t);
             }
             else{  // extra packet
                  addresses_this_message =
-                    ITEMS_PER_DATA_PACKET - START_OF_ADDRESSES_EXTENSION;
+                    ITEMS_PER_DATA_PACKET - sizeof(extra_stream_sdp_packet_t);
             }
         }
 
         log_info("addresses this message = %d", addresses_this_message);
 
-        // set length
-        my_msg.length = (
-            LENGTH_OF_SDP_HEADER + (
-            (addresses_this_message + START_OF_ADDRESSES) *
-            WORD_TO_BYTE_MULTIPLIER));
-
-        log_info("message length = %d", my_msg.length);
-
         // set data components
         if (packet_id == 0){  // first packet
             my_msg.data[COMMAND_CODE] = START_OF_COMPRESSION_DATA_STREAM;
-            my_msg.data[N_SDP_PACKETS_TILL_DELIVERED] = total_packets;
-            my_msg.data[ADDRESS_FOR_COMPRESSED] =
-                (uint32_t) compressed_address;
-            my_msg.data[FAKE_HEAP_DATA] =
-                (uint32_t) user_register_content[USABLE_SDRAM_REGIONS];
-            my_msg.data[TOTAL_N_ADDRESSES] = n_bit_field_addresses;
-            my_msg.data[N_ADDRESSES_IN_PACKET] = addresses_this_message;
+            start_stream_sdp_packet_t *data =(start_stream_sdp_packet_t*)
+                my_msg.data[START_OF_SPECIFIC_MESSAGE_DATA];
+            data->n_sdp_packets_till_delivered = total_packets;
+            data->address_for_compressed = compressed_address;
+            data->fake_heap_data = user_register_content[USABLE_SDRAM_REGIONS];
+            data->total_n_tables = n_bit_field_addresses;
+            data->n_tables_in_packet = addresses_this_message;
             log_info(
                 "mem cpy dest = %d, source = %d, bytes = %d",
-                &my_msg.data[START_OF_ADDRESSES],
-                &bit_field_routing_tables[addresses_sent],
+                &data->tables, &bit_field_routing_tables[addresses_sent],
                 addresses_this_message * WORD_TO_BYTE_MULTIPLIER);
             sark_mem_cpy(
-                &my_msg.data[START_OF_ADDRESSES],
-                &bit_field_routing_tables[addresses_sent],
+                &data->tables, &bit_field_routing_tables[addresses_sent],
                 addresses_this_message * WORD_TO_BYTE_MULTIPLIER);
+            my_msg.length = (
+                LENGTH_OF_SDP_HEADER + (
+                    (addresses_this_message +
+                     sizeof(start_stream_sdp_packet_t)) *
+                    WORD_TO_BYTE_MULTIPLIER));
+            log_info("message length = %d", my_msg.length);
         }
         else{  // extra packets
             log_info("sending extra packet id = %d", packet_id);
             my_msg.data[COMMAND_CODE] = EXTRA_DATA_FOR_COMPRESSION_DATA_STREAM;
-            my_msg.data[EXTRA_STREAM_N_ADDRESSES] = addresses_this_message;
+            extra_stream_sdp_packet_t *data =(extra_stream_sdp_packet_t*)
+                my_msg.data[START_OF_SPECIFIC_MESSAGE_DATA];
+            data->n_addresses_in_packet = addresses_this_message;
             sark_mem_cpy(
-                &my_msg.data[START_OF_ADDRESSES_EXTENSION],
-                &bit_field_routing_tables[addresses_sent],
+                &data->tables, &bit_field_routing_tables[addresses_sent],
                 addresses_this_message * WORD_TO_BYTE_MULTIPLIER);
+            my_msg.length = (
+                LENGTH_OF_SDP_HEADER + (
+                    (addresses_this_message +
+                     sizeof(extra_stream_sdp_packet_t)) *
+                    WORD_TO_BYTE_MULTIPLIER));
+            log_info("message length = %d", my_msg.length);
         }
 
         // update location in addresses
@@ -960,7 +958,7 @@ bool set_off_bit_field_compression(
 bool set_off_no_bit_field_compression(){
     uint32_t x_entries = user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES];
     uint32_t sdram_used = (X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE + (
-        x_entries * X_WORDS_USED_FOR_ROUTING_ENTRY * WORD_TO_BYTE_MULTIPLIER));
+        x_entries * sizeof(entry_t) * WORD_TO_BYTE_MULTIPLIER));
 
     // allocate sdram for the clone
     address_t sdram_clone_of_routing_table = MALLOC_SDRAM(sdram_used);
