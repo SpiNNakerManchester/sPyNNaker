@@ -37,6 +37,12 @@ typedef enum interrupt_priority{
 //! max length of the router table entries
 #define TARGET_LENGTH 1023
 
+//! mask to get core from src
+#define CORE_MASK 0xFFFF
+
+//! random port as 0 is in use by scamp/sark
+#define RANDOM_PORT 4
+
 //! \brief the timer control logic.
 bool* timer_for_compression_attempt = false;
 
@@ -76,7 +82,7 @@ sdp_msg_pure_data my_msg;
 
 //! \brief sends a sdp message back to the control core
 void send_sdp_message_response(){
-    my_msg.dest_port = control_core_id;
+    my_msg.dest_port = (RANDOM_PORT << PORT_SHIFT) | control_core_id;
     // send sdp packet
     while (!spin1_send_sdp_msg((sdp_msg_t *) &my_msg, _SDP_TIMEOUT)) {
         // Empty body
@@ -139,6 +145,7 @@ bool store_into_compressed_address(){
 //! \brief starts the compression process
 void start_compression_process(){
     // reset fail state flags
+    log_info("in compression phase");
     *failed_by_malloc = false;
     *timer_for_compression_attempt = false;
     *finished_by_compressor_force = false;
@@ -154,29 +161,38 @@ void start_compression_process(){
         compress_as_much_as_possible);
 
     // check state
+    log_info("success was %d", success);
     if (success){
+        log_info("store into compressed");
         success = store_into_compressed_address();
         if (success){
+            log_info("success response");
             return_success_response_message();
         }
         else{
+            log_info("failed by space response");
             return_failed_by_space_response_message();
         }
     }
     else{  // if not a success, could be one of 4 states
         if (failed_by_malloc){  // malloc failed somewhere
+            log_info("failed malloc response");
             return_malloc_response_message();
         }
         else if (finished_by_compressor_force){  // control killed it
+            log_info("force fail response");
             return_failed_by_force_response_message();
         }
         else if (timer_for_compression_attempt){  // ran out of time
+            log_info("time fail response");
             return_failed_by_time_response_message();
         }
         else{  // after finishing compression, still could not fit into table.
+            log_info("failed by space response");
             return_failed_by_space_response_message();
         }
     }
+    log_info("exit compression phase");
 }
 
 //! \brief the sdp control entrance.
@@ -190,7 +206,7 @@ void _sdp_handler(uint mailbox, uint port) {
     sdp_msg_pure_data *msg = (sdp_msg_pure_data *) mailbox;
 
     // record control core.
-    control_core_id = msg->srce_port;
+    control_core_id = (msg->srce_port && 0xFFFF);
     log_info("control core is %d", control_core_id);
 
     log_info("command code is %d", msg->data[COMMAND_CODE]);
@@ -199,8 +215,8 @@ void _sdp_handler(uint mailbox, uint port) {
     if (msg->data[COMMAND_CODE] == START_OF_COMPRESSION_DATA_STREAM){
 
         start_stream_sdp_packet_t* first_command_packet =
-            (start_stream_sdp_packet_t*)
-            msg->data[START_OF_SPECIFIC_MESSAGE_DATA];
+            (start_stream_sdp_packet_t*) &msg->data[
+                START_OF_SPECIFIC_MESSAGE_DATA];
 
         // location where to store the compressed (size
         sdram_loc_for_compressed_entries =
@@ -303,6 +319,11 @@ void _sdp_handler(uint mailbox, uint port) {
     else if (msg->data[COMMAND_CODE] == STOP_COMPRESSION_ATTEMPT){
         *finished_by_compressor_force = true;
         sark_msg_free((sdp_msg_t*) msg);
+    }
+    else{
+        log_error(
+            "no idea what to do with command code %d. on port %d Ignoring",
+            msg->data[COMMAND_CODE], msg->srce_port >> PORT_SHIFT);
     }
 }
 
