@@ -903,16 +903,24 @@ bool set_off_bit_field_compression(
 
         // set data components
         if (packet_id == 0){  // first packet
+            log_info("addresses this message = %d", addresses_this_message);
             my_msg.data[COMMAND_CODE] = START_OF_COMPRESSION_DATA_STREAM;
-            start_stream_sdp_packet_t *data =(start_stream_sdp_packet_t*)
+
+            // create cast
+            start_stream_sdp_packet_t* data = (start_stream_sdp_packet_t*)
                 my_msg.data[START_OF_SPECIFIC_MESSAGE_DATA];
+
+            // fill in
             data->n_sdp_packets_till_delivered = total_packets;
             data->address_for_compressed = compressed_address;
             data->fake_heap_data = user_register_content[USABLE_SDRAM_REGIONS];
             data->total_n_tables = n_bit_field_addresses;
+            log_info("addresses this message = %d", addresses_this_message);
             data->n_tables_in_packet = addresses_this_message;
+            log_info("addresses this message = %d", addresses_this_message);
+            log_info("addresses this message = %d",  data->n_tables_in_packet);
             log_info(
-                "mem cpy dest = %d, source = %d, bytes = %d",
+                "mem cpy tables to dest = %d, from source = %d, bytes = %d",
                 &data->tables, &bit_field_routing_tables[addresses_sent],
                 addresses_this_message * WORD_TO_BYTE_MULTIPLIER);
             sark_mem_cpy(
@@ -923,14 +931,21 @@ bool set_off_bit_field_compression(
                     (addresses_this_message +
                      sizeof(start_stream_sdp_packet_t)) *
                     WORD_TO_BYTE_MULTIPLIER));
+            log_info(
+                "messgae contains command code %d, n sdp packets till "
+                "delivered %d, address for compressed %d, fake heap data "
+                "address %d total n tables %d, n tables in packet %d",
+                my_msg.data[COMMAND_CODE], data->n_sdp_packets_till_delivered,
+                data->address_for_compressed, data->fake_heap_data,
+                data->total_n_tables);
             log_info("message length = %d", my_msg.length);
         }
         else{  // extra packets
             log_info("sending extra packet id = %d", packet_id);
             my_msg.data[COMMAND_CODE] = EXTRA_DATA_FOR_COMPRESSION_DATA_STREAM;
-            extra_stream_sdp_packet_t *data =(extra_stream_sdp_packet_t*)
+            extra_stream_sdp_packet_t* data =(extra_stream_sdp_packet_t*)
                 my_msg.data[START_OF_SPECIFIC_MESSAGE_DATA];
-            data->n_addresses_in_packet = addresses_this_message;
+            data->n_tables_in_packet = addresses_this_message;
             sark_mem_cpy(
                 &data->tables, &bit_field_routing_tables[addresses_sent],
                 addresses_this_message * WORD_TO_BYTE_MULTIPLIER);

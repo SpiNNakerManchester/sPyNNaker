@@ -14,20 +14,17 @@ typedef struct start_stream_sdp_packet_t{
     table_t* tables[];
 } start_stream_sdp_packet_t;
 
-
-
-//! \brief the element in the sdp packet when extension control for a minimise
+//! \brief the elements in the sdp packet when extension control for a minimise
 //! attempt. Only used when x routing tables wont fit in first packet
 typedef struct extra_stream_sdp_packet_t{
-    uint32_t n_addresses_in_packet;
+    uint32_t n_tables_in_packet;
     table_t* tables[];
 } extra_stream_sdp_packet_t;
 
-//! \brief the elements in the sdp packet when responding to a compression
-//! attempt
-typedef enum data_elements_in_response_compression_sdp_packet{
-    FINISHED_STATE = 1, LENGTH_OF_ACK_PACKET = 2
-} data_elements_in_response_compression_sdp_packet;
+//! \brief the elements in the sdp packet when response to compression attempt.
+typedef struct response_sdp_packet_t{
+    uint32_t response_code;
+} response_sdp_packet_t;
 
 //! \brief the acceptable finish states
 typedef enum finish_states{

@@ -119,7 +119,10 @@ static inline aliases_t aliases_init(void){
     return aliases;
 }
 
-
+//! \brief ????????
+//! \param[in] node: ????????
+//! \param[in] key: ????????
+//! \return ???????????
 static inline node_t* _aliases_find_node(node_t *node, a_key_t key){
     while (node != NULL){
         if (key.as_int == node->key.as_int){
@@ -139,7 +142,10 @@ static inline node_t* _aliases_find_node(node_t *node, a_key_t key){
 }
 
 
-// Retrieve an element from an aliases container
+//! \brief Retrieve an element from an aliases container
+//! \param[in] a: ??????????
+//! \param[in] key: ????????????
+//! \return ?????????????
 static inline alias_list_t* aliases_find(aliases_t *a, key_mask_t key){
     // Search the tree
     node_t *node = _aliases_find_node(a->root, (a_key_t) key);
@@ -152,12 +158,17 @@ static inline alias_list_t* aliases_find(aliases_t *a, key_mask_t key){
 }
 
 
-// See if the aliases contain holds an element
+//! \brief See if the aliases contain holds an element
+//! \param[in] a: alias
+//! \param[in] key: the key mask struct
+//! \return bool saying if the alias has the key mask.
 static inline bool aliases_contains(aliases_t *a, key_mask_t key){
     return aliases_find(a, key) != NULL;
 }
 
-
+//! \brief ???????
+//! \param[in] n: ??????????
+//! \return ??????????
 static inline node_t* _aliases_skew(node_t *n){
     if (n == NULL){
         return NULL;
@@ -176,7 +187,9 @@ static inline node_t* _aliases_skew(node_t *n){
     }
 }
 
-
+//! \brief ??????????
+//! \param[in] n: ??????????
+//! \return ??????????
 static inline node_t* _aliases_split(node_t *n){
     if (n == NULL){
       return NULL;
@@ -196,7 +209,11 @@ static inline node_t* _aliases_split(node_t *n){
     }
 }
 
-
+//! \brief ??????????
+//! \param[in] n: ??????????
+//! \param[in] key: ????????
+//! \param[in] val: ?????????
+//! \return ??????????
 static inline node_t* _aliases_insert(
         node_t *n, a_key_t key, alias_list_t *val){
     if (n == NULL){
@@ -233,7 +250,10 @@ static inline node_t* _aliases_insert(
 }
 
 
-// Add/overwrite an element into an aliases tree
+//! \brief Add/overwrite an element into an aliases tree
+//! \param[in] a: ??????????
+//! \param[in] key: key mask struct
+//! \param[in] value: ????????
 static inline void aliases_insert(
         aliases_t *a, key_mask_t key, alias_list_t *value){
     // Insert into, and balance, the tree
@@ -241,7 +261,9 @@ static inline void aliases_insert(
 }
 
 
-// Remove an element from an aliases tree
+//! \brief Remove an element from an aliases tree
+//! \param[in] a: aliases
+//! \param[in] key: the key mask struct
 static inline void aliases_remove(aliases_t *a, key_mask_t key){
     // XXX This is a hack which removes the reference to the element in the
     // tree but doesn't remove the Node from the tree.
@@ -251,7 +273,8 @@ static inline void aliases_remove(aliases_t *a, key_mask_t key){
     }
 }
 
-
+//! \brief clears a node from the aliase tree
+//! \param[in] n: the note to clear from the alias tree
 static inline void _aliases_clear(node_t *n){
     if (n == NULL){
         return;
@@ -276,7 +299,9 @@ static inline void _aliases_clear(node_t *n){
 }
 
 
-// Remove all elements from an aliases container and free all sub-containers
+//! \brief Remove all elements from an aliases container and free all
+//! sub-containers
+//! \param[in] a: the aliases tree.
 static inline void aliases_clear(aliases_t *a){
     _aliases_clear(a->root);
 }

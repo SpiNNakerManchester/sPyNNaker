@@ -123,6 +123,32 @@ uint32_t routing_table_sdram_get_n_entries(
     return current_point_tracking;
 }
 
+//! \brief updates table stores accordingly.
+//! \param[in] routing_tables: the addresses list
+//! \param[in] n_tables: how many in list
+//! \param[in] size_to_remove: the amount of size to remove from the table sets
+void routing_table_remove_from_size(
+        table_t** routing_tables, uint32_t n_tables,
+        uint32_t size_to_remove){
+    int rt_index = n_tables;
+    while(size_to_remove != 0 || rt_index >= 0){
+        if (routing_tables[rt_index]->size >= size_to_remove){
+            uint32_t diff = routing_tables[rt_index]->size - size_to_remove;
+            routing_tables[rt_index]->size = diff;
+            size_to_remove = 0;
+        }
+        else{
+            size_to_remove -= routing_tables[rt_index]->size;
+            routing_tables[rt_index]->size = 0;
+        }
+        rt_index -= 1;
+    }
+    if (size_to_remove != 0){
+        log_error("deleted more than what was available. WTF");
+        rt_error(RTE_SWERR);
+    }
+}
+
 //! \brief deduces sdram requirements for a given size of table
 //! \param[in] n_entries: the number of entries expected to be in the table.
 //! \return the number of bytes needed for this routing table
