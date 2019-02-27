@@ -142,7 +142,6 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     io_printf(IO_BUF, "pre neuron init");
-    while(1);
 
 
     // Set up the neurons

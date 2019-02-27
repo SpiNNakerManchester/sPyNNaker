@@ -262,7 +262,7 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
         """
-        # pylint: disable=redefined-builtin
+        # pyl'gsyn_exc', 'gsyn_inh', 'spikes'int: disable=redefined-builtin
         if not numpy.iterable(id):
             if not self._first_id <= id <= self._last_id:
                 raise ValueError(

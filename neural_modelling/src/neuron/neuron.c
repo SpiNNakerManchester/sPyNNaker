@@ -118,8 +118,7 @@ static weight_t *synaptic_region;
 typedef enum parameters_in_neuron_parameter_data_region {
     RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT, N_RECORDED_VARIABLES,
-    START_OF_GLOBAL_PARAMETERS,
+    N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {
@@ -157,7 +156,9 @@ static void _reset_record_counter() {
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool _neuron_load_neuron_parameters(address_t address) {
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+
+    //cut off synaptic contribution left shift
+    uint32_t next = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
     log_debug("loading parameters");
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
@@ -209,7 +210,8 @@ bool neuron_reload_neuron_parameters(address_t address){
 //! \param[in] address: the address in SDRAM to start the store
 void neuron_store_neuron_parameters(address_t address){
 
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
+    //cut off synaptic contribution left shift
+    uint32_t next = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
     next += (n_words_for_n_neurons + 2) * (n_recorded_vars + 1);
@@ -273,10 +275,9 @@ bool neuron_do_timestep_update(timer_t time) {
 
         for (index_t synapse_type_index = 0 ; synapse_type_index < n_synapse_types; synapse_type_index++) {
 
-            //IS THE DELAY RIGHT IN THE INDEX COMPUTATION SINCE WE HAVE ONLY THE LAST TIMESTEP BUFFER IN SDRAM??
-            uint32_t buff_index = (((time & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
-            | (synapse_type_index << synapse_index_bits)
-            | neuron_index);
+            uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
+
+            io_printf(IO_BUF, "reading syn contr: %d\n", synaptic_contributions[buff_index]);
 
             neuron_impl_add_inputs(
                 synapse_type_index,
@@ -453,7 +454,7 @@ bool neuron_initialise(address_t address) {
         return false;
     }
     spin1_memcpy(
-        synaptic_contributions_to_input_left_shifts, address + SYNAPTIC_CONTRIBUTIONS_LEFT_SHIFT,
+        synaptic_contributions_to_input_left_shifts, address + START_OF_GLOBAL_PARAMETERS,
         n_synapse_types * sizeof(uint32_t));
 
     // Set up the out spikes array - this is always n_neurons in size to ensure
@@ -520,14 +521,14 @@ bool neuron_initialise(address_t address) {
         }
     }
 
-    io_printf(IO_BUF, "Allocated recording areas");
+    io_printf(IO_BUF, "Allocated recording areas!!!!!!\n");
 
     // load the data into the allocated DTCM spaces.
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
 
-    io_printf(IO_BUF, "GLOBAL PARAMS IS PROBLEM\n");
+    io_printf(IO_BUF, "Returned from neuron load parameters!!!\n");
 
     _reset_record_counter();
 

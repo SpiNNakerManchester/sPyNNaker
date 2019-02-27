@@ -42,6 +42,8 @@ static uint32_t synapse_type_mask;
 
 static weight_t *synaptic_region;
 
+static bool dirty;
+
 extern bool contribution_written;
 
 //! parameters that reside in the synapse_parameter_data_region in human
@@ -217,6 +219,8 @@ static inline void _process_fixed_synapses(
             saturation_count += 1;
         }
 
+        io_printf(IO_BUF, "Spike, buf index: %d, prev: %d, new val: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], accumulation);
+
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
     }
@@ -245,6 +249,8 @@ bool synapses_initialise(
         address_t *direct_synapses_address) {
 
     log_debug("synapses_initialise: starting");
+
+    dirty = false;
 
     // Neuron details
     *n_neurons_value = synapse_params_address[N_NEURONS_TO_SIMULATE];
@@ -335,7 +341,8 @@ bool synapses_initialise(
 
 void synapses_do_timestep_update(timer_t time) {
 
-    _print_ring_buffers(time);
+    //DOESN'T HAVE TO BE COMMENTED!!!!!!
+    //_print_ring_buffers(time);
 
     contribution_written = false;
 
@@ -362,24 +369,8 @@ void synapses_do_timestep_update(timer_t time) {
         0, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
 
-    // Clean the ring buffers, CHECK THIS IN CASE A SINLE SYN IS IMPLEMENTED
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            ring_buffer_index = synapses_get_ring_buffer_index(
-                time, synapse_type_index, neuron_index, synapse_type_index_bits,
-                synapse_index_bits);
-
-            // Clear ring buffer
-            ring_buffers[ring_buffer_index] = 0;
-        }
-    }
+    //Set flag for buffer cleaning
+    dirty = true;
 
     /*
     // Transfer the input from the ring buffers into the input buffers
@@ -419,6 +410,31 @@ void synapses_do_timestep_update(timer_t time) {
 
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id) {
+
+    uint32_t ring_buffer_index;
+
+    if(dirty) {
+        // Clean the ring buffers
+        for (uint32_t neuron_index = 0; neuron_index < n_neurons;
+                neuron_index++) {
+
+            // Loop through all synapse types
+            for (uint32_t synapse_type_index = 0;
+                    synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+                // Get index in the ring buffers for the current time slot for
+                // this synapse type and neuron
+                ring_buffer_index = synapses_get_ring_buffer_index(
+                    time, synapse_type_index, neuron_index, synapse_type_index_bits,
+                    synapse_index_bits);
+
+                //io_printf(IO_BUF, "Written: %d\n", ring_buffers[ring_buffer_index]);
+
+                // Clear ring buffer
+                ring_buffers[ring_buffer_index] = 0;
+            }
+        }
+    }
 
     _print_synaptic_row(row);
 
