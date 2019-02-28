@@ -89,8 +89,6 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 }
 
 static bool read_parameters(struct delay_parameters_t *params) {
-    struct delay_parameters_t *params = (struct delay_parameters_t *) address;
-
     log_debug("read_parameters: starting");
 
     key = params->key;
@@ -360,8 +358,7 @@ void timer_callback(uint timer_count, uint unused1) {
 
 // Entry point
 void c_main(void) {
-
-    if (!initialize(&timer_period)) {
+    if (!initialize()) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
