@@ -28,14 +28,13 @@ void *param_generator_exponential_initialize(address_t *region) {
 
     // Allocate memory for the data
     struct param_generator_exponential *params =
-        (struct param_generator_exponential *)
             spin1_malloc(sizeof(struct param_generator_exponential));
 
     // Copy the parameters in
     spin1_memcpy(
-        (&params->params), *region,
-        sizeof(struct param_generator_exponential_params));
-    *region += sizeof(struct param_generator_exponential_params) >> 2;
+            &params->params, *region,
+            sizeof(struct param_generator_exponential_params));
+    *region += sizeof(struct param_generator_exponential_params) / sizeof(uint32_t);
     log_debug("exponential beta = %k", params->params.beta);
 
     // Initialise the RNG for this generator
@@ -54,10 +53,9 @@ void param_generator_exponential_generate(
     use(indices);
 
     // For each index, generate an exponentially distributed value
-    struct param_generator_exponential *params =
-        (struct param_generator_exponential *) data;
+    struct param_generator_exponential *state = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        accum value = rng_exponential(params->rng);
-        values[i] = value * params->params.beta;
+        accum value = rng_exponential(state->rng);
+        values[i] = value * state->params.beta;
     }
 }

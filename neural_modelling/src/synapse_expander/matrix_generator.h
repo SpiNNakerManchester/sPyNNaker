@@ -13,11 +13,6 @@
 typedef struct matrix_generator* matrix_generator_t;
 
 /**
- *! \brief Register any matrix generators to be used in the remaining functions
- */
-void register_matrix_generators();
-
-/**
  *! \brief Initialise a specific matrix generator
  *! \param[in] hash The identifier of the generator to initialise
  *! \param[in/out] region The address to read data from - updated to position

@@ -13,111 +13,119 @@
 /**
  *! \brief The number of known generators
  */
-#define N_MATRIX_GENERATORS 2
-#define MATRIX_GENERATOR_STATIC_HASH 0
-#define MATRIX_GENERATOR_PLASTIC_HASH 1
+enum matrix_generator_hash {
+    // For now, hash is just an index agreed between Python and here
+    MATRIX_GENERATOR_STATIC_HASH,
+    MATRIX_GENERATOR_PLASTIC_HASH,
+    N_MATRIX_GENERATORS
+};
+
+struct matrix_generator_info;
 
 /**
  *! \brief The data for a matrix generator
  */
 struct matrix_generator {
-    uint32_t index;
+    struct matrix_generator_info *type_ptr;
     void *data;
 };
+
+/**
+ *! \brief Initialise the generator
+ *! \param[in/out] region Region to read parameters from.  Should be updated
+ *!                       to position just after parameters after calling.
+ *! \return A data item to be passed in to other functions later on
+ */
+typedef void* (matrix_generator_initialize_t)(address_t *region);
+
+/**
+ *! \brief Generate a matrix with a matrix generator
+ *! \param[in] data The data for the matrix generator, returned by the
+ *!                 initialise function
+ *! \param[in] synaptic_matrix The address of the synaptic matrix to
+ *!                            write to
+ *! \param[in] delayed_synaptic_matrix The address of the synaptic matrix to
+ *!                                    write delayed connections to
+ *! \param[in] max_row_n_words The maximum number of words in a normal row
+ *! \param[in] max_delayed_row_n_words The maximum number of words in a
+ *!                                     delayed row
+ *! \param[in] max_row_n_synapses The maximum number of synapses in a
+ *!                               normal row
+ *! \param[in] max_delayed_row_n_synapses The maximum number of synapses in
+ *!                                       a delayed row
+ *! \param[in] n_synapse_type_bits The number of bits used for the
+ *!                                synapse type
+ *! \param[in] n_synapse_index_bits The number of bits used for the
+ *!                                 neuron id
+ *! \param[in] synapse_type The synapse type of each connection
+ *! \param[in] weight_scales An array of weight scales, one for each synapse
+ *!                          type
+ *! \param[in] post_slice_start The start of the slice of the
+ *!                             post-population being generated
+ *! \param[in] post_slice_count The number of neurons in the slice of the
+ *!                             post-population being generated
+ *! \param[in] pre_slice_start The start of the slice of the pre-population
+ *!                            being generated
+ *! \param[in] pre_slice_count The number of neurons in the slice of the
+ *!                            pre-population being generated
+ *! \param[in] connection_generator The generator of connections
+ *! \param[in] delay_generator The generator of delay values
+ *! \param[in] weight_generator The generator of weight values
+ *! \param[in] max_stage The maximum delay stage to support
+ *! \param[in] timestep_per_delay The delay value multiplier to get to
+ *!                               timesteps
+ */
+typedef void (matrix_generator_write_row_t)(
+    void *data,
+    address_t synaptic_matrix, address_t delayed_synaptic_matrix,
+    uint32_t n_pre_neurons, uint32_t pre_neuron_index,
+    uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
+    uint32_t synapse_type_bits, uint32_t synapse_index_bits,
+    uint32_t synapse_type, uint32_t n_synapses,
+    uint16_t *indices, uint16_t *delays, uint16_t *weights,
+    uint32_t max_stage);
+
+/**
+ *! \brief Free any data for the generator
+ *! \param[in] data The data to free
+ */
+typedef void (matrix_generator_free_t)(void *data);
 
 /**
  *! \brief A "class" for matrix generators
  */
 struct matrix_generator_info {
-
     /**
      *! \brief The hash of the generator
      */
     uint32_t hash;
-
     /**
      *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
      */
-    void* (*initialize)(address_t *region);
-
+    matrix_generator_initialize_t *initialize_fun;
     /**
      *! \brief Generate a matrix with a matrix generator
-     *! \param[in] data The data for the matrix generator, returned by the
-     *!                 initialise function
-     *! \param[in] synaptic_matrix The address of the synaptic matrix to
-     *!                            write to
-     *! \param[in] delayed_synaptic_matrix The address of the synaptic matrix to
-     *!                                    write delayed connections to
-     *! \param[in] max_row_n_words The maximum number of words in a normal row
-     *! \param[in] max_delayed_row_n_words The maximum number of words in a
-     *!                                     delayed row
-     *! \param[in] max_row_n_synapses The maximum number of synapses in a
-     *!                               normal row
-     *! \param[in] max_delayed_row_n_synapses The maximum number of synapses in
-     *!                                       a delayed row
-     *! \param[in] n_synapse_type_bits The number of bits used for the
-     *!                                synapse type
-     *! \param[in] n_synapse_index_bits The number of bits used for the
-     *!                                 neuron id
-     *! \param[in] synapse_type The synapse type of each connection
-     *! \param[in] weight_scales An array of weight scales, one for each synapse
-     *!                          type
-     *! \param[in] post_slice_start The start of the slice of the
-     *!                             post-population being generated
-     *! \param[in] post_slice_count The number of neurons in the slice of the
-     *!                             post-population being generated
-     *! \param[in] pre_slice_start The start of the slice of the pre-population
-     *!                            being generated
-     *! \param[in] pre_slice_count The number of neurons in the slice of the
-     *!                            pre-population being generated
-     *! \param[in] connection_generator The generator of connections
-     *! \param[in] delay_generator The generator of delay values
-     *! \param[in] weight_generator The generator of weight values
-     *! \param[in] max_stage The maximum delay stage to support
-     *! \param[in] timestep_per_delay The delay value multiplier to get to
-     *!                               timesteps
      */
-    void (*write_row)(
-        void *data,
-        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-        uint32_t n_pre_neurons, uint32_t pre_neuron_index,
-        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
-        uint32_t synapse_type_bits, uint32_t synapse_index_bits,
-        uint32_t synapse_type, uint32_t n_synapses,
-        uint16_t *indices, uint16_t *delays, uint16_t *weights,
-        uint32_t max_stage);
-
+    matrix_generator_write_row_t *write_row_fun;
     /**
      *! \brief Free any data for the generator
-     *! \param[in] data The data to free
      */
-    void (*free)(void *data);
+    matrix_generator_free_t *free_fun;
 };
 
 /**
  *! \brief An Array of known generators
  */
-struct matrix_generator_info matrix_generators[N_MATRIX_GENERATORS];
-
-void register_matrix_generators() {
-    // Register each of the known matrix generators
-    // For now, hash is just an index agreed between Python and here
-
-    // Static matrix
-    matrix_generators[0].hash = MATRIX_GENERATOR_STATIC_HASH;
-    matrix_generators[0].initialize = matrix_generator_static_initialize;
-    matrix_generators[0].write_row = matrix_generator_static_write_row;
-    matrix_generators[0].free = matrix_generator_static_free;
-
-    // Plastic matrix
-    matrix_generators[1].hash = MATRIX_GENERATOR_PLASTIC_HASH;
-    matrix_generators[1].initialize = matrix_generator_stdp_initialize;
-    matrix_generators[1].write_row = matrix_generator_stdp_write_row;
-    matrix_generators[1].free = matrix_generator_stdp_free;
-}
+const struct matrix_generator_info matrix_generators[] = {
+    {MATRIX_GENERATOR_STATIC_HASH,
+            matrix_generator_static_initialize,
+            matrix_generator_static_write_row,
+            matrix_generator_static_free},
+    {MATRIX_GENERATOR_PLASTIC_HASH,
+            matrix_generator_stdp_initialize,
+            matrix_generator_stdp_write_row,
+            matrix_generator_stdp_free}
+};
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
 
@@ -135,11 +143,11 @@ matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
                 return NULL;
             }
 
-            // Store the index
-            generator->index = i;
+            // Store which type it is
+            generator->type_ptr = &matrix_generators[i];
 
             // Initialise the generator and store the data
-            generator->data = matrix_generators[i].initialize(in_region);
+            generator->data = generator->type_ptr->initialize_fun(in_region);
             return generator;
         }
     }
@@ -148,7 +156,7 @@ matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
 }
 
 void matrix_generator_free(matrix_generator_t generator) {
-    matrix_generators[generator->index].free(generator->data);
+    generator->type_ptr->free_fun(generator->data);
     sark_free(generator);
 }
 
@@ -217,7 +225,7 @@ bool matrix_generator_generate(
         }
 
         // Write row
-        matrix_generators[generator->index].write_row(
+        generator->type_ptr->write_row_fun(
             generator->data, synaptic_matrix, delayed_synaptic_matrix,
             pre_slice_count, pre_neuron_index - pre_slice_start,
             max_row_n_words, max_delayed_row_n_words,

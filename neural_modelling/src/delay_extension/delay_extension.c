@@ -9,18 +9,22 @@
 #include <spin1_api.h>
 
 //! values for the priority for each callback
-typedef enum callback_priorities {
-    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
-} callback_priorities;
+enum callback_priorities {
+    MC_PACKET = -1,
+    SDP = 0,
+    USER = 1,
+    DMA = 2,
+    TIMER = 3
+};
 
-typedef enum extra_provenance_data_region_entries{
-    N_PACKETS_RECEIVED = 0,
-    N_PACKETS_PROCESSED = 1,
-    N_PACKETS_ADDED = 2,
-    N_PACKETS_SENT = 3,
-    N_BUFFER_OVERFLOWS = 4,
-    N_DELAYS = 5
-} extra_provenance_data_region_entries;
+struct provenance_t {
+    uint32_t n_packets_received;
+    uint32_t n_packets_processed;
+    uint32_t n_packets_added;
+    uint32_t n_packets_sent;
+    uint32_t n_buffer_overflows;
+    uint32_t n_delays;
+};
 
 // Globals
 static uint32_t key = 0;
@@ -84,76 +88,69 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
     return v;
 }
 
-static bool read_parameters(address_t address) {
+static bool read_parameters(struct delay_parameters_t *params) {
+    struct delay_parameters_t *params = (struct delay_parameters_t *) address;
 
     log_debug("read_parameters: starting");
 
-    key = address[KEY];
-    incoming_key = address[INCOMING_KEY];
-    incoming_mask = address[INCOMING_MASK];
+    key = params->key;
+    incoming_key = params->incoming_key;
+    incoming_mask = params->incoming_mask;
     incoming_neuron_mask = ~incoming_mask;
-    log_debug(
-        "\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
-        "incoming key mask = 0x%08x",
-        key, incoming_key, incoming_mask, incoming_neuron_mask);
+    log_debug("\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
+            "incoming key mask = 0x%08x",
+            key, incoming_key, incoming_mask, incoming_neuron_mask);
 
-    num_neurons = address[N_ATOMS];
+    num_neurons = params->n_atoms;
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
-    num_delay_stages = address[N_DELAY_STAGES];
-    timer_offset = address[RANDOM_BACKOFF];
-    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
+    num_delay_stages = params->n_delay_stages;
+    timer_offset = params->random_backoff;
+    time_between_spikes = params->time_beween_spikes * sv->cpu_clk;
 
     uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
     num_delay_slots_mask = (num_delay_slots_pot - 1);
 
     log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
-              " num delay stages = %u, num delay slots = %u (pot = %u),"
-              " num delay slots mask = %08x",
-              num_neurons, neuron_bit_field_words,
-              num_delay_stages, num_delay_slots, num_delay_slots_pot,
-              num_delay_slots_mask);
+            " num delay stages = %u, num delay slots = %u (pot = %u),"
+            " num delay slots mask = %08x",
+            num_neurons, neuron_bit_field_words,
+            num_delay_stages, num_delay_slots, num_delay_slots_pot,
+            num_delay_slots_mask);
 
-    log_debug(
-        "\t random back off = %u, time_between_spikes = %u",
-        timer_offset, time_between_spikes);
+    log_debug("\t random back off = %u, time_between_spikes = %u",
+            timer_offset, time_between_spikes);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage
-    neuron_delay_stage_config = (bit_field_t*) spin1_malloc(
-        num_delay_stages * sizeof(bit_field_t));
+    neuron_delay_stage_config = spin1_malloc(num_delay_stages * sizeof(bit_field_t));
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
         log_debug("\t delay stage %u", d);
 
         // Allocate bit-field
-        neuron_delay_stage_config[d] = (bit_field_t) spin1_malloc(
-            neuron_bit_field_words * sizeof(uint32_t));
+        neuron_delay_stage_config[d] = spin1_malloc(
+                neuron_bit_field_words * sizeof(uint32_t));
 
         // Copy delay stage configuration bits into delay stage configuration bit-field
-        address_t neuron_delay_stage_config_data_address =
-            &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
         spin1_memcpy(neuron_delay_stage_config[d],
-               neuron_delay_stage_config_data_address,
-               neuron_bit_field_words * sizeof(uint32_t));
+                &params->delay_blocks[d * neuron_bit_field_words],
+                neuron_bit_field_words * sizeof(uint32_t));
 
         for (uint32_t w = 0; w < neuron_bit_field_words; w++) {
             log_debug("\t\t delay stage config word %u = %08x", w,
-                      neuron_delay_stage_config[d][w]);
+                    neuron_delay_stage_config[d][w]);
         }
     }
 
     // Allocate array of counters for each delay slot
-    spike_counters = (uint8_t**) spin1_malloc(
-        num_delay_slots_pot * sizeof(uint8_t*));
+    spike_counters = spin1_malloc(num_delay_slots_pot * sizeof(uint8_t *));
 
     for (uint32_t s = 0; s < num_delay_slots_pot; s++) {
-
         // Allocate an array of counters for each neuron and zero
-        spike_counters[s] = (uint8_t*) spin1_malloc(
-            num_neurons * sizeof(uint8_t));
+        spike_counters[s] = spin1_malloc(num_neurons * sizeof(uint8_t));
         zero_spike_counters(spike_counters[s], num_neurons);
     }
 
@@ -161,20 +158,22 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
-void _store_provenance_data(address_t provenance_region){
+void _store_provenance_data(address_t provenance_region) {
+    struct provenance_t *provenance = (struct provenance_t *) provenance_region;
     log_debug("writing other provenance data");
 
     // store the data into the provenance data region
-    provenance_region[N_PACKETS_RECEIVED] = n_in_spikes;
-    provenance_region[N_PACKETS_PROCESSED] = n_processed_spikes;
-    provenance_region[N_PACKETS_ADDED] = n_spikes_added;
-    provenance_region[N_PACKETS_SENT] = n_spikes_sent;
-    provenance_region[N_BUFFER_OVERFLOWS] = in_spikes_get_n_buffer_overflows();
-    provenance_region[N_DELAYS] = n_delays;
+    provenance->n_packets_received = n_in_spikes;
+    provenance->n_packets_processed = n_processed_spikes;
+    provenance->n_packets_added = n_spikes_added;
+    provenance->n_packets_sent = n_spikes_sent;
+    provenance->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
+    provenance->n_delays = n_delays;
+
     log_debug("finished other provenance data");
 }
 
-static bool initialize() {
+static bool initialize(void) {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -193,17 +192,16 @@ static bool initialize() {
         return false;
     }
     simulation_set_provenance_function(
-        _store_provenance_data,
-        data_specification_get_region(PROVENANCE_REGION, address));
+            _store_provenance_data,
+            data_specification_get_region(PROVENANCE_REGION, address));
 
     // Get the parameters
-    if (!read_parameters(data_specification_get_region(
-            DELAY_PARAMS, address))) {
+    if (!read_parameters((struct delay_parameters_t *)
+            data_specification_get_region(DELAY_PARAMS, address))) {
         return false;
     }
 
     log_info("initialise: completed successfully");
-
     return true;
 }
 
@@ -223,8 +221,7 @@ static inline key_t _key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
-static void spike_process() {
-
+static void spike_process(void) {
     // turn off interrupts as this function is critical for
     // keeping time in sync.
     uint state = spin1_int_disable();

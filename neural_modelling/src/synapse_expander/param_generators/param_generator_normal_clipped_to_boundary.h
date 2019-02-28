@@ -37,14 +37,14 @@ void *param_generator_normal_clipped_boundary_initialize(address_t *region) {
 
     // Copy the parameters in
     spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_normal_clipped_boundary_params));
+            &params->params, *region,
+            sizeof(struct param_generator_normal_clipped_boundary_params));
     *region +=
-        sizeof(struct param_generator_normal_clipped_boundary_params) >> 2;
-    log_debug(
-        "normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
-        params->params.mu, params->params.sigma, params->params.low,
-        params->params.high);
+            sizeof(struct param_generator_normal_clipped_boundary_params) /
+            sizeof(uint32_t);
+    log_debug("normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
+            params->params.mu, params->params.sigma, params->params.low,
+            params->params.high);
 
     // Initialise the RNG for this generator
     params->rng = rng_init(region);
@@ -63,16 +63,15 @@ void param_generator_normal_clipped_boundary_generate(
 
     // For each index, generate a normally distributed value, clipping
     // it to the given boundary
-    struct param_generator_normal_clipped_boundary *params =
-        (struct param_generator_normal_clipped_boundary *) data;
+    struct param_generator_normal_clipped_boundary *state = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        accum value = rng_normal(params->rng);
-        values[i] = params->params.mu + (value * params->params.sigma);
-        if (values[i] < params->params.low) {
-            values[i] = params->params.low;
+        accum value = rng_normal(state->rng);
+        values[i] = state->params.mu + (value * state->params.sigma);
+        if (values[i] < state->params.low) {
+            values[i] = state->params.low;
         }
-        if (values[i] > params->params.high) {
-            values[i] = params->params.high;
+        if (values[i] > state->params.high) {
+            values[i] = state->params.high;
         }
     }
 }

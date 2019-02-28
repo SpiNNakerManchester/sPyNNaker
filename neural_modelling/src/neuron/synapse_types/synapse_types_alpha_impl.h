@@ -26,23 +26,18 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-typedef struct alpha_params_t{
+typedef struct alpha_params_t {
     // buffer for linear term
     input_t lin_buff;
-
     // buffer for exponential term
     input_t exp_buff;
-
     // Inverse of tau pre-multiplied by dt
     input_t dt_divided_by_tau_sqr;
-
     // Exponential decay multiplier
     decay_t decay;
-
     // Temporary value of
     input_t q_buff;
-
-}alpha_params_t;
+} alpha_params_t;
 
 typedef struct synapse_param_t {
     alpha_params_t exc;
@@ -65,13 +60,12 @@ static inline void alpha_shaping(alpha_params_t* a_params){
 
     // Update exponential buffer
     a_params->exp_buff = decay_s1615(
-            a_params->exp_buff,
-            a_params->decay);
+            a_params->exp_buff, a_params->decay);
 }
 
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(
-		synapse_param_pointer_t parameter){
+		synapse_param_pointer_t parameter) {
     alpha_shaping(&parameter->exc);
     alpha_shaping(&parameter->inh);
 
@@ -101,14 +95,12 @@ static inline void add_input_alpha(alpha_params_t* a_params, input_t input){
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index,
         synapse_param_pointer_t parameter,
-        input_t input){
-
-    if (input > ZERO){
+        input_t input) {
+    if (input > ZERO) {
         if (synapse_type_index == EXCITATORY) {
-                add_input_alpha(&parameter->exc, input);
-
+            add_input_alpha(&parameter->exc, input);
         } else if (synapse_type_index == INHIBITORY) {
-                add_input_alpha(&parameter->inh, input);
+            add_input_alpha(&parameter->inh, input);
         }
     }
 }

@@ -29,16 +29,15 @@ void *param_generator_normal_initialize(address_t *region) {
 
     // Allocate memory for the data
     struct param_generator_normal *params =
-        (struct param_generator_normal *)
             spin1_malloc(sizeof(struct param_generator_normal));
 
     // Copy the parameters in
     spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_normal_params));
-    *region += sizeof(struct param_generator_normal_params) >> 2;
+            &params->params, *region,
+            sizeof(struct param_generator_normal_params));
+    *region += sizeof(struct param_generator_normal_params) / sizeof(uint32_t);
     log_debug("normal mu = %k, sigma = %k",
-        params->params.mu, params->params.sigma);
+            params->params.mu, params->params.sigma);
 
     // Initialise the RNG for this generator
     params->rng = rng_init(region);
@@ -56,10 +55,9 @@ void param_generator_normal_generate(
     use(indices);
 
     // For each index, generate a normally distributed random value
-    struct param_generator_normal *params =
-        (struct param_generator_normal *) data;
+    struct param_generator_normal *state = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        accum value = rng_normal(params->rng);
-        values[i] = params->params.mu + (value * params->params.sigma);
+        accum value = rng_normal(state->rng);
+        values[i] = state->params.mu + (value * state->params.sigma);
     }
 }

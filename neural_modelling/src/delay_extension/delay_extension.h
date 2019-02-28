@@ -5,13 +5,23 @@
 #define DELAY_STAGE_LENGTH  16
 
 //! region identifiers
-typedef enum region_identifiers{
-    SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2, EXPANDER_REGION = 3
-} region_identifiers;
+enum region_identifiers {
+    SYSTEM = 0,
+    DELAY_PARAMS = 1,
+    PROVENANCE_REGION = 2,
+    EXPANDER_REGION = 3
+};
 
-enum parameter_positions {
-    KEY, INCOMING_KEY, INCOMING_MASK, N_ATOMS, N_DELAY_STAGES,
-    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, N_OUTGOING_EDGES, DELAY_BLOCKS
+struct delay_parameters_t {
+    uint32_t key;
+    uint32_t incoming_key;
+    uint32_t incoming_mask;
+    uint32_t n_atoms;
+    uint32_t n_delay_stages;
+    uint32_t random_backoff;
+    uint32_t time_beween_spikes;
+    uint32_t n_outgoing_edges; // unused
+    uint32_t delay_blocks[];
 };
 
 #define pack_delay_index_stage(index, stage) \

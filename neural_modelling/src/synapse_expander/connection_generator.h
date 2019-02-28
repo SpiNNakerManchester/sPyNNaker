@@ -13,12 +13,6 @@
 typedef struct connection_generator* connection_generator_t;
 
 /**
- *! \brief Register any connection generators to be used in the remaining
- *!        functions
- */
-void register_connection_generators();
-
-/**
  *! \brief Initialise a specific connection generator
  *! \param[in] hash The identifier of the generator to initialise
  *! \param[in/out] region The address to read data from - updated to position

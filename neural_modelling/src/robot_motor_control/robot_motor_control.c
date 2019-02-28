@@ -31,9 +31,12 @@ static uint32_t infinite_run;
 
 
 //! values for the priority for each callback
-typedef enum callback_priorities{
-    MC = -1, SDP = 0, TIMER = 2, DMA = 1
-} callback_priorities;
+enum callback_priorities {
+    MC = -1,
+    SDP = 0,
+    DMA = 1,
+    TIMER = 2
+};
 
 static inline void send(uint32_t direction, uint32_t speed) {
     uint32_t direction_key = direction | key;
@@ -52,8 +55,8 @@ static inline void do_motion(
     int opposite_count = (int) counters[opposite_index - 1];
     int delta = direction_count - opposite_count;
     log_debug("%s = %d, %s = %d, delta = %d, threshold = %u", direction,
-              direction_count, opposite, opposite_count, delta,
-              delta_threshold);
+            direction_count, opposite, opposite_count, delta,
+            delta_threshold);
     if (delta >= delta_threshold) {
         log_debug("Moving %s", direction);
         last_speed[direction_index - 1] = speed;
@@ -66,7 +69,7 @@ static inline void do_motion(
         send(opposite_index, speed);
     } else if (continue_if_not_different == 0) {
         log_debug("Motion is indeterminate in %s-%s direction", direction,
-                  opposite);
+                opposite);
         last_speed[direction_index - 1] = 0;
         last_speed[opposite_index - 1] = 0;
         send(direction_index, 0);
@@ -87,7 +90,7 @@ static inline void do_update(
         send(opposite_index, opposite_speed);
     } else {
         log_debug("Resending No Motion in the %s-%s direction", direction,
-                  opposite);
+                opposite);
         send(direction_index, 0);
     }
 }
@@ -126,7 +129,7 @@ void timer_callback(uint unused0, uint unused1) {
         do_motion(MOTION_FORWARD, MOTION_BACK, "Forwards", "Backwards");
         do_motion(MOTION_LEFT, MOTION_RIGHT, "Left", "Right");
         do_motion(MOTION_CLOCKWISE, MOTION_C_CLOCKWISE, "Clockwise",
-                  "Anti-clockwise");
+                "Anti-clockwise");
 
         // Reset the counters
         for (uint32_t i = 0; i < N_COUNTERS; i++) {
@@ -138,7 +141,7 @@ void timer_callback(uint unused0, uint unused1) {
         do_update(MOTION_FORWARD, MOTION_BACK, "Forwards", "Backwards");
         do_update(MOTION_LEFT, MOTION_RIGHT, "Left", "Right");
         do_update(MOTION_CLOCKWISE, MOTION_C_CLOCKWISE, "Clockwise",
-                  "Anti-clockwise");
+                "Anti-clockwise");
     }
 }
 
@@ -153,8 +156,8 @@ void read_parameters(address_t region_address) {
     continue_if_not_different = region_address[6];
 
     // Allocate the space for the schedule
-    counters = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
-    last_speed = (uint32_t*) spin1_malloc(N_COUNTERS * sizeof(uint32_t));
+    counters = spin1_malloc(N_COUNTERS * sizeof(uint32_t));
+    last_speed = spin1_malloc(N_COUNTERS * sizeof(uint32_t));
 
     for (uint32_t i = 0; i < N_COUNTERS; i++) {
         counters[i] = 0;
@@ -162,10 +165,10 @@ void read_parameters(address_t region_address) {
     }
 
     log_info("Key = %d, speed = %d, sample_time = %d, update_time = %d,"
-             " delay_time = %d, delta_threshold = %d,"
-             " continue_if_not_different = %d",
-             key, speed, sample_time, update_time, delay_time, delta_threshold,
-             continue_if_not_different);
+            " delay_time = %d, delta_threshold = %d,"
+            " continue_if_not_different = %d",
+            key, speed, sample_time, update_time, delay_time, delta_threshold,
+            continue_if_not_different);
 }
 
 void incoming_spike_callback(uint key, uint payload) {

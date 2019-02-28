@@ -30,21 +30,19 @@ struct param_generator_normal_clipped {
 
 
 void *param_generator_normal_clipped_initialize(address_t *region) {
-
     // Allocate memory for the data
     struct param_generator_normal_clipped *params =
-        (struct param_generator_normal_clipped *)
             spin1_malloc(sizeof(struct param_generator_normal_clipped));
 
     // Copy the parameters in
     spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_normal_clipped_params));
-    *region += sizeof(struct param_generator_normal_clipped_params) >> 2;
-    log_debug(
-        "normal clipped mu = %k, sigma = %k, low = %k, high = %k",
-        params->params.mu, params->params.sigma, params->params.low,
-        params->params.high);
+            &params->params, *region,
+            sizeof(struct param_generator_normal_clipped_params));
+    *region += sizeof(struct param_generator_normal_clipped_params) /
+            sizeof(uint32_t);
+    log_debug("normal clipped mu = %k, sigma = %k, low = %k, high = %k",
+            params->params.mu, params->params.sigma, params->params.low,
+            params->params.high);
 
     // Initialise the RNG for this generator
     params->rng = rng_init(region);
@@ -63,13 +61,12 @@ void param_generator_normal_clipped_generate(
 
     // For each index, generate a normally distributed random value, redrawing
     // if outside the given range
-    struct param_generator_normal_clipped *params =
-        (struct param_generator_normal_clipped *) data;
+    struct param_generator_normal_clipped *state = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
         do {
-            accum value = rng_normal(params->rng);
-            values[i] = params->params.mu + (value * params->params.sigma);
-        } while (values[i] < params->params.low ||
-                values[i] > params->params.high);
+            accum value = rng_normal(state->rng);
+            values[i] = state->params.mu + (value * state->params.sigma);
+        } while (values[i] < state->params.low ||
+                values[i] > state->params.high);
     }
 }

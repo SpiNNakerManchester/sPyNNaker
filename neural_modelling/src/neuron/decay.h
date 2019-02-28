@@ -91,22 +91,17 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
  * issue seems to be in __builtin_types_compatible_p always returning False
  * or at least, that there's the impression that on some types it results in
  * the abort statement and therefore kills scripts dead on SpiNNaker.
+ *
+ * It might be fixed now that it uses _Generic()...
  * ---------------------------------
  */
-#define decay(x, d) ({ \
-    __typeof__(x) tmp = (x); \
-    if (__builtin_types_compatible_p(__typeof__(x), s1615)) {\
-    tmp = decay_s1615(x, d); \
-    } else if (__builtin_types_compatible_p(__typeof__(x), u1616)) {\
-    tmp = decay_u1616(x, d); \
-    } else if (__builtin_types_compatible_p(__typeof__(x), s015)) {\
-    tmp = decay_s015(x, d); \
-    } else if (__builtin_types_compatible_p(__typeof__(x), u016)) {\
-    tmp = decay_u016(x, d); \
-    } else {\
-    abort(1); \
-    }\
-    tmp; \
-})
+#define decay(x, d) \
+    _Generic((x),                       \
+	    s1615:   decay_s1615((x), (d)), \
+	    u1616:   decay_u1616((x), (d)), \
+	    s015:    decay_s015((x), (d)),  \
+	    u016:    decay_u016((x), (d)),  \
+	    default: abort(1)               \
+	)
 
 #endif // _DECAY_H_

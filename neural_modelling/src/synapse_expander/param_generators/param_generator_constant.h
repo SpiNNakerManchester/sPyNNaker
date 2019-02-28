@@ -13,10 +13,8 @@ struct param_generator_constant {
 };
 
 void *param_generator_constant_initialize(address_t *region) {
-
     // Allocate space for the parameters
     struct param_generator_constant *params =
-        (struct param_generator_constant *)
             spin1_malloc(sizeof(struct param_generator_constant));
 
     // Read parameters from SDRAM
@@ -37,8 +35,7 @@ void param_generator_constant_generate(
     use(indices);
 
     // Generate a constant for each index
-    struct param_generator_constant *params =
-        (struct param_generator_constant *) data;
+    struct param_generator_constant *params = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
         values[i] = params->value;
     }

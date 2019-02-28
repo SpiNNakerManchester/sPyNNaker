@@ -12,118 +12,111 @@
 #include "connection_generators/connection_generator_fixed_prob.h"
 #include "connection_generators/connection_generator_fixed_total.h"
 
-/**
- *! \brief The number of known generators
- */
-#define N_CONNECTION_GENERATORS 4
+// For now, hash is just an index agreed between Python and here
+enum connection_generator_hash {
+    ONE_TO_ONE_GENERATOR,
+    ALL_TO_ALL_GENERATOR,
+    FIXED_PROBABILITY_GENERATOR,
+    FIXED_TOTAL_NUMBER_GENERATOR,
+    N_CONNECTION_GENERATORS
+};
+
+struct connection_generator_info;
 
 /**
  *! \brief The data for a connection generator
  */
 struct connection_generator {
-    uint32_t index;
+    struct connection_generator_info *type_ptr;
     void *data;
 };
+
+/**
+ *! \brief Initialise the generator
+ *! \param[in/out] region Region to read parameters from.  Should be updated
+ *!                       to position just after parameters after calling.
+ *! \return A data item to be passed in to other functions later on
+ */
+typedef void* (connection_generator_initialize_t)(address_t *region);
+
+/**
+ *! \brief Generate connections
+ *! \param[in] data The data for the connection generator, returned by the
+ *!                 initialise function
+ *! \param[in] pre_slice_start The start of the slice of the pre-population
+ *!                            being generated
+ *! \param[in] pre_slice_count The number of neurons in the slice of the
+ *!                            pre-population being generated
+ *! \param[in] pre_neuron_index The index of the neuron in the
+ *!                             pre-population being generated
+ *! \param[in] post_slice_start The start of the slice of the
+ *!                             post-population being generated
+ *! \param[in] post_slice_count The number of neurons in the slice of the
+ *!                             post-population being generated
+ *! \param[in] max_row_length The maximum number of connections to generate
+ *! \param[in/out] indices An array into which the core-relative
+ *!                        post-indices should be placed.  This will be
+ *!                        initialised to be max_row_length in size
+ *! \return The number of connections generated
+ */
+typedef uint32_t (connection_generator_generate_t)(
+        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        uint32_t pre_neuron_index, uint32_t post_slice_start,
+        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
+
+/**
+ *! \brief Free any data for the generator
+ *! \param[in] data The data to free
+ */
+typedef void (connection_generator_free_t)(void *data);
 
 /**
  *! \brief A "class" for connection generators
  */
 struct connection_generator_info {
-
     /**
      *! \brief The hash of the generator
      */
     uint32_t hash;
-
     /**
      *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
      */
-    void* (*initialize)(address_t *region);
-
+    connection_generator_initialize_t *initialize_fun;
     /**
      *! \brief Generate connections
-     *! \param[in] data The data for the connection generator, returned by the
-     *!                 initialise function
-     *! \param[in] pre_slice_start The start of the slice of the pre-population
-     *!                            being generated
-     *! \param[in] pre_slice_count The number of neurons in the slice of the
-     *!                            pre-population being generated
-     *! \param[in] pre_neuron_index The index of the neuron in the
-     *!                             pre-population being generated
-     *! \param[in] post_slice_start The start of the slice of the
-     *!                             post-population being generated
-     *! \param[in] post_slice_count The number of neurons in the slice of the
-     *!                             post-population being generated
-     *! \param[in] max_row_length The maximum number of connections to generate
-     *! \param[in/out] indices An array into which the core-relative
-     *!                        post-indices should be placed.  This will be
-     *!                        initialised to be max_row_length in size
-     *! \return The number of connections generated
      */
-    uint32_t (*generate)(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
-        uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
+    connection_generator_generate_t *generate_fun;
 
     /**
      *! \brief Free any data for the generator
-     *! \param[in] data The data to free
      */
-    void (*free)(void *data);
+    connection_generator_free_t *free_fun;
 };
 
 /**
  *! \brief An Array of known generators
  */
-struct connection_generator_info connection_generators[N_CONNECTION_GENERATORS];
-
-void register_connection_generators() {
-    // Register each of the known connection generators
-    // For now, hash is just an index agreed between Python and here
-
-    // One To One Connector
-    connection_generators[0].hash = 0;
-    connection_generators[0].initialize =
-        connection_generator_one_to_one_initialise;
-    connection_generators[0].generate =
-        connection_generator_one_to_one_generate;
-    connection_generators[0].free =
-        connection_generator_one_to_one_free;
-
-    // All To All Connector
-    connection_generators[1].hash = 1;
-    connection_generators[1].initialize =
-        connection_generator_all_to_all_initialise;
-    connection_generators[1].generate =
-        connection_generator_all_to_all_generate;
-    connection_generators[1].free =
-        connection_generator_all_to_all_free;
-
-    // Fixed-Probability Connector
-    connection_generators[2].hash = 2;
-    connection_generators[2].initialize =
-        connection_generator_fixed_prob_initialise;
-    connection_generators[2].generate =
-        connection_generator_fixed_prob_generate;
-    connection_generators[2].free =
-        connection_generator_fixed_prob_free;
-
-    // Fixed Total Number (Multapse) Connector
-    connection_generators[3].hash = 3;
-    connection_generators[3].initialize =
-        connection_generator_fixed_total_initialise;
-    connection_generators[3].generate =
-        connection_generator_fixed_total_generate;
-    connection_generators[3].free =
-        connection_generator_fixed_total_free;
-}
+struct connection_generator_info connection_generators[] = {
+    {ONE_TO_ONE_GENERATOR,
+            connection_generator_one_to_one_initialise,
+            connection_generator_one_to_one_generate,
+            connection_generator_one_to_one_free},
+    {ALL_TO_ALL_GENERATOR,
+            connection_generator_all_to_all_initialise,
+            connection_generator_all_to_all_generate,
+            connection_generator_all_to_all_free},
+    {FIXED_PROBABILITY_GENERATOR,
+            connection_generator_fixed_prob_initialise,
+            connection_generator_fixed_prob_generate,
+            connection_generator_fixed_prob_free},
+    {FIXED_TOTAL_NUMBER_GENERATOR,
+            connection_generator_fixed_total_initialise,
+            connection_generator_fixed_total_generate,
+            connection_generator_fixed_total_free}
+};
 
 connection_generator_t connection_generator_init(
         uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
 
@@ -131,20 +124,18 @@ connection_generator_t connection_generator_init(
         if (hash == connection_generators[i].hash) {
 
             // Prepare a space for the data
-            address_t region = *in_region;
-            struct connection_generator *generator = spin1_malloc(
-                sizeof(struct connection_generator));
+            struct connection_generator *generator =
+                    spin1_malloc(sizeof(struct connection_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;
             }
 
-            // Store the index
-            generator->index = i;
+            // Store which type it is
+            generator->type_ptr = &connection_generators[i];
 
             // Initialise the generator and store the data
-            generator->data = connection_generators[i].initialize(&region);
-            *in_region = region;
+            generator->data = generator->type_ptr->initialize_fun(in_region);
             return generator;
         }
     }
@@ -157,13 +148,13 @@ uint32_t connection_generator_generate(
         uint32_t pre_slice_count, uint32_t pre_neuron_index,
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t max_row_length, uint16_t *indices) {
-    return connection_generators[generator->index].generate(
+    return generator->type_ptr->generate_fun(
         generator->data, pre_slice_start, pre_slice_count,
         pre_neuron_index, post_slice_start, post_slice_count,
         max_row_length, indices);
 }
 
 void connection_generator_free(connection_generator_t generator) {
-    connection_generators[generator->index].free(generator->data);
+    generator->type_ptr->free_fun(generator->data);
     sark_free(generator);
 }

@@ -73,18 +73,26 @@ typedef uint16_t control_t;
 //   ...
 //  M:   [ Last word of fixed region              ]
 
+typedef struct {
+    size_t plastic_size;
+    uint32_t data[];
+} synapse_row_data_t;
+
 static inline size_t synapse_row_plastic_size(address_t row) {
-    return (size_t) row[0];
+    synapse_row_data_t *data_ptr = (synapse_row_data_t *) row;
+    return data_ptr->plastic_size;
 }
 
 // Returns the address of the plastic region
 static inline address_t synapse_row_plastic_region(address_t row) {
-    return ((address_t) (&(row[1])));
+    synapse_row_data_t *data_ptr = (synapse_row_data_t *) row;
+    return data_ptr->data;
 }
 
 // Returns the address of the non-plastic (or fixed) region
 static inline address_t synapse_row_fixed_region(address_t row) {
-    return ((address_t) (&(row[synapse_row_plastic_size(row) + 1])));
+    synapse_row_data_t *data_ptr = (synapse_row_data_t *) row;
+    return &data_ptr->data[data_ptr->plastic_size];
 }
 
 // Within the fixed-region extracted using the above API, fixed[0]
@@ -100,20 +108,31 @@ static inline address_t synapse_row_fixed_region(address_t row) {
 // F+2:           [ 1st plastic synapse control word|2nd plastic control word ]
 //   ...
 // F+1+ceil(P/2): [ Last word of fixed region                                 ]
+
+typedef struct {
+    size_t num_fixed_synapses;
+    size_t num_plastic_controls;
+    uint32_t controls[];
+} synapse_row_fixed_t;
+
 static inline size_t synapse_row_num_fixed_synapses(address_t fixed) {
-    return ((size_t) (fixed[0]));
+    synapse_row_fixed_t *data_ptr = (synapse_row_fixed_t *) fixed;
+    return data_ptr->num_fixed_synapses;
 }
 
 static inline size_t synapse_row_num_plastic_controls(address_t fixed) {
-    return ((size_t) (fixed[1]));
+    synapse_row_fixed_t *data_ptr = (synapse_row_fixed_t *) fixed;
+    return data_ptr->num_plastic_controls;
 }
 
-static inline control_t* synapse_row_plastic_controls(address_t fixed) {
-    return (control_t*) (&fixed[2 + synapse_row_num_fixed_synapses(fixed)]);
+static inline control_t *synapse_row_plastic_controls(address_t fixed) {
+    synapse_row_fixed_t *data_ptr = (synapse_row_fixed_t *) fixed;
+    return (control_t *) &data_ptr->controls[data_ptr->num_fixed_synapses];
 }
 
 static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
-    return (&(fixed[2]));
+    synapse_row_fixed_t *data_ptr = (synapse_row_fixed_t *) fixed;
+    return data_ptr->controls;
 }
 
 // The following are offset calculations into the ring buffers

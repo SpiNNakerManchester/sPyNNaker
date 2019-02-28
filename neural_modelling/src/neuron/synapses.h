@@ -46,7 +46,7 @@ static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
     if (weight != 0) {
         io_printf(IO_BUF, "%12.6k", synapses_convert_weight_to_input(
-            weight, left_shift));
+                weight, left_shift));
     } else {
         io_printf(IO_BUF, "      ");
     }

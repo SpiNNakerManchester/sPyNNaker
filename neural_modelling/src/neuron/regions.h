@@ -1,6 +1,6 @@
 #pragma once
 
-typedef enum regions_e {
+enum regions_e {
     SYSTEM_REGION,            // 0
     NEURON_PARAMS_REGION,     // 1
     SYNAPSE_PARAMS_REGION,    // 2
@@ -12,4 +12,4 @@ typedef enum regions_e {
     PROFILER_REGION,          // 8
     CONNECTOR_BUILDER_REGION, // 9
     DIRECT_MATRIX_REGION      // 10
-} regions_e;
+};

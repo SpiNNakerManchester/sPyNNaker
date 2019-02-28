@@ -23,25 +23,25 @@ struct fixed_prob {
 };
 
 void *connection_generator_fixed_prob_initialise(address_t *region) {
+    struct fixed_prob_params *params_sdram = (struct fixed_prob_params *)
+            *region;
 
     // Allocate memory for the data
-    struct fixed_prob *params = (struct fixed_prob *)
-        spin1_malloc(sizeof(struct fixed_prob));
+    struct fixed_prob *state = spin1_malloc(sizeof(struct fixed_prob));
 
     // Copy the parameters in
-    address_t params_sdram = *region;
     spin1_memcpy(
-        &(params->params), params_sdram, sizeof(struct fixed_prob_params));
+            &state->params, params_sdram, sizeof(struct fixed_prob_params));
     params_sdram = &(params_sdram[sizeof(struct fixed_prob_params) >> 2]);
 
     // Initialise the RNG for the connector
-    params->rng = rng_init(&params_sdram);
-    *region = params_sdram;
+    *region = (address_t) (params_sdram + 1);
+    state->rng = rng_init(region);
     log_debug(
-        "Fixed Probability Connector, allow self connections = %u, "
-        "probability = %k", params->params.allow_self_connections,
-        (accum) params->params.probability);
-    return params;
+            "Fixed Probability Connector, allow self connections = %u, "
+            "probability = %k", state->params.allow_self_connections,
+            (accum) state->params.probability);
+    return state;
 }
 
 void connection_generator_fixed_prob_free(void *data) {
@@ -55,7 +55,7 @@ uint32_t connection_generator_fixed_prob_generate(
     use(pre_slice_start);
     use(pre_slice_count);
 
-    struct fixed_prob *params = (struct fixed_prob *) data;
+    struct fixed_prob *state = data;
 
     // If no space, generate nothing
     if (max_row_length < 1) {
@@ -67,16 +67,16 @@ uint32_t connection_generator_fixed_prob_generate(
     for (uint32_t i = 0; i < post_slice_count; i++) {
 
         // Disallow self connections if configured
-        if (!params->params.allow_self_connections &&
+        if (!state->params.allow_self_connections &&
                 (pre_neuron_index == (post_slice_start + i))) {
             continue;
         }
 
         // Generate a random number
-        unsigned long fract value = ulrbits(rng_generator(params->rng));
+        unsigned long fract value = ulrbits(rng_generator(state->rng));
 
         // If less than our probability, generate a connection if possible
-        if ((value <= params->params.probability) &&
+        if ((value <= state->params.probability) &&
                 (n_conns < max_row_length)) {
             indices[n_conns++] = i;
         } else if (n_conns >= max_row_length) {

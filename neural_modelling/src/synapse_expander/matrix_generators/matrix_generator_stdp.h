@@ -3,7 +3,6 @@
  *! \brief STDP synaptic matrix implementation
  */
 
-
 #include <stdbool.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -44,17 +43,14 @@
  *! \brief Data for the generator
  */
 struct matrix_generator_stdp {
-
     /**
      *! \brief The number of half-words in a plastic-plastic row header
      */
     uint32_t n_half_words_per_pp_row_header;
-
     /**
      *! \brief The number of half-words in each plastic-plastic synapse
      */
     uint32_t n_half_words_per_pp_synapse;
-
     /**
      *! \brief The index of the half-word that will contain the weight
      */
@@ -62,17 +58,16 @@ struct matrix_generator_stdp {
 };
 
 void *matrix_generator_stdp_initialize(address_t *region) {
+    struct matrix_generator_stdp *params_sdram = (struct matrix_generator_stdp *)
+            *region;
 
     // Allocate memory for the parameters
-    struct matrix_generator_stdp *params = (struct matrix_generator_stdp *)
-        spin1_malloc(sizeof(struct matrix_generator_stdp));
-
+    struct matrix_generator_stdp *params =
+            spin1_malloc(sizeof(struct matrix_generator_stdp));
     // Copy the parameters in
-    address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct matrix_generator_stdp));
-    params_sdram = &(params_sdram[sizeof(struct matrix_generator_stdp) >> 2]);
 
-    *region = params_sdram;
+    *region = (address_t) &params_sdram[1];
     return params;
 }
 
@@ -115,8 +110,7 @@ void matrix_generator_stdp_write_row(
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage) {
-    struct matrix_generator_stdp *params =
-        (struct matrix_generator_stdp *) data;
+    struct matrix_generator_stdp *params = data;
 
     // Row address for each possible delay stage (including no delay stage)
     address_t row_address[max_stage];
@@ -155,9 +149,9 @@ void matrix_generator_stdp_write_row(
     for (uint32_t i = 0; i < max_stage; i++) {
         if (row_address[i] != NULL) {
             row_address[i][STDP_PLASTIC_PLASTIC_SIZE] =
-                params->n_half_words_per_pp_row_header >> 1;
+                    params->n_half_words_per_pp_row_header >> 1;
             uint16_t *header = (uint16_t *)
-                &(row_address[i][STDP_PLASTIC_PLASTIC_OFFSET]);
+                    &row_address[i][STDP_PLASTIC_PLASTIC_OFFSET];
             for (uint32_t j = 0;
                     j < params->n_half_words_per_pp_row_header; j++) {
                 header[j] = 0;
@@ -173,9 +167,9 @@ void matrix_generator_stdp_write_row(
     for (uint32_t i = 0; i < max_stage; i++) {
         n_half_words_per_row[i] = 0;
         if (row_address[i] != NULL) {
-            pp_address[i] = (uint16_t *) &(row_address[i][
-                STDP_PLASTIC_PLASTIC_OFFSET +
-                (params->n_half_words_per_pp_row_header >> 1)]);
+            pp_address[i] = (uint16_t *) &row_address[i][
+                    STDP_PLASTIC_PLASTIC_OFFSET +
+                    (params->n_half_words_per_pp_row_header >> 1)];
         } else {
             pp_address[i] = NULL;
         }
@@ -183,7 +177,6 @@ void matrix_generator_stdp_write_row(
 
     // Write the plastic-plastic part of the row
     for (uint32_t synapse = 0; synapse < n_synapses; synapse++) {
-
         // Weight
         uint16_t weight = weights[synapse];
 
@@ -199,23 +192,22 @@ void matrix_generator_stdp_write_row(
         // Check there is enough space
         if (space_half_words[delay.stage] <
                 params->n_half_words_per_pp_synapse) {
-            log_warning(
-                "Row %u only has %u half words of %u free - not writing",
-                delay.stage, space_half_words[delay.stage],
-                params->n_half_words_per_pp_synapse);
+            log_warning("Row %u only has %u half words of %u free - not writing",
+                    delay.stage, space_half_words[delay.stage],
+                    params->n_half_words_per_pp_synapse);
             continue;
         }
 
         // Put the weight words in place
         uint16_t *weight_words = pp_address[delay.stage];
         pp_address[delay.stage] =
-            &(pp_address[delay.stage][params->n_half_words_per_pp_synapse]);
+                &pp_address[delay.stage][params->n_half_words_per_pp_synapse];
         for (uint32_t i = 0; i < params->n_half_words_per_pp_synapse; i++) {
             weight_words[i] = 0;
         }
         weight_words[params->weight_half_word] = weight;
         n_half_words_per_row[delay.stage] +=
-            params->n_half_words_per_pp_synapse;
+                params->n_half_words_per_pp_synapse;
         space_half_words[delay.stage] -= params->n_half_words_per_pp_synapse;
     }
 
@@ -229,7 +221,7 @@ void matrix_generator_stdp_write_row(
                 n_half_words_per_row[i] += 1;
             }
             row_address[i][STDP_PLASTIC_PLASTIC_SIZE] +=
-                n_half_words_per_row[i] >> 1;
+                    n_half_words_per_row[i] >> 1;
         }
     }
 
@@ -241,7 +233,7 @@ void matrix_generator_stdp_write_row(
         if (pp_address[i] != NULL) {
             fixed_address[i] = (uint32_t *) pp_address[i];
             fp_address[i] = (uint16_t *)
-                &(fixed_address[i][STDP_FIXED_PLASTIC_OFFSET]);
+                    &fixed_address[i][STDP_FIXED_PLASTIC_OFFSET];
             fixed_address[i][STDP_FIXED_FIXED_SIZE] = 0;
             fixed_address[i][STDP_FIXED_PLASTIC_SIZE] = 0;
         } else {
@@ -260,12 +252,12 @@ void matrix_generator_stdp_write_row(
 
         // Build synaptic word
         uint16_t fp_half_word = _build_fixed_plastic_half_word(
-            delay.delay, synapse_type, post_index, synapse_type_bits,
-            synapse_index_bits);
+                delay.delay, synapse_type, post_index, synapse_type_bits,
+                synapse_index_bits);
 
         // Write the half-word
         fp_address[delay.stage][0] = fp_half_word;
-        fp_address[delay.stage] = &(fp_address[delay.stage][1]);
+        fp_address[delay.stage] += 1;
 
         // Increment the size of the current row
         fixed_address[delay.stage][STDP_FIXED_PLASTIC_SIZE] += 1;

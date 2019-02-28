@@ -38,18 +38,22 @@
        constant
 #endif
 
-typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
-    INPUT_BUFFER_OVERFLOW_COUNT = 2,
-    CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
-} extra_provenance_data_region_entries;
+struct provenance_t {
+    uint32_t presynaptic_events;
+    uint32_t synaptic_weight_saturations;
+    uint32_t input_buffer_overflows;
+    uint32_t current_timer_tick;
+    uint32_t plastic_synaptic_weight_saturations;
+};
 
 //! values for the priority for each callback
-typedef enum callback_priorities{
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
-} callback_priorities;
+enum callback_priorities {
+    MC = -1,
+    DMA = 0,
+    USER = 0,
+    SDP = 1,
+    TIMER = 2
+};
 
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 4
@@ -95,18 +99,16 @@ static bool initialise_recording(address_t recording_address){
     return success;
 }
 
-void c_main_store_provenance_data(address_t provenance_region){
+void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
+    struct provenance_t *provenance = (struct provenance_t *) provenance_region;
 
     // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
-    provenance_region[CURRENT_TIMER_TICK] = time;
-    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+    provenance->presynaptic_events = synapses_get_pre_synaptic_events();
+    provenance->synaptic_weight_saturations = synapses_get_saturation_count();
+    provenance->input_buffer_overflows = spike_processing_get_buffer_overflows();
+    provenance->current_timer_tick = time;
+    provenance->plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
@@ -116,7 +118,7 @@ void c_main_store_provenance_data(address_t provenance_region){
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialise() {
+static bool initialise(void) {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -135,8 +137,8 @@ static bool initialise() {
         return false;
     }
     simulation_set_provenance_function(
-        c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, address));
+            c_main_store_provenance_data,
+            data_specification_get_region(PROVENANCE_DATA_REGION, address));
 
     // setup recording region
     if (!initialise_recording(
@@ -158,7 +160,7 @@ static bool initialise() {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, address);
+            SYNAPTIC_MATRIX_REGION, address);
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
@@ -179,7 +181,7 @@ static bool initialise() {
     }
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
-        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
@@ -190,7 +192,7 @@ static bool initialise() {
 
     // Set up structural plasticity dynamics
     if (synapse_dynamics_region_address &&
-        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
         return false;
     }
 
@@ -198,14 +200,12 @@ static bool initialise() {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER,
-            incoming_spike_buffer_size)) {
+            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
         return false;
     }
 
     // Setup profiler
-    profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+    profiler_init(data_specification_get_region(PROFILER_REGION, address));
 
     log_debug("Initialise: finished");
     return true;
@@ -213,14 +213,13 @@ static bool initialise() {
 
 //! \brief the function to call when resuming a simulation
 //! \return None
-void resume_callback() {
+void resume_callback(void) {
     recording_reset();
 
     // try reloading neuron parameters
     address_t address = data_specification_get_data_address();
     if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(
-                NEURON_PARAMS_REGION, address))) {
+            data_specification_get_region(NEURON_PARAMS_REGION, address))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -257,7 +256,7 @@ void timer_callback(uint timer_count, uint unused) {
         // rewrite neuron params to SDRAM for reading out if needed
         address_t address = data_specification_get_data_address();
         neuron_store_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, address));
+                data_specification_get_region(NEURON_PARAMS_REGION, address));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
@@ -283,7 +282,7 @@ void timer_callback(uint timer_count, uint unused) {
     uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
-        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+            ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
         update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
@@ -325,7 +324,7 @@ void timer_callback(uint timer_count, uint unused) {
 void c_main(void) {
 
     // initialise the model
-    if (!initialise()){
+    if (!initialise()) {
         rt_error(RTE_API);
     }
 
@@ -334,7 +333,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
-              timer_period);
+            timer_period);
     spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Set up the timer tick callback (others are handled elsewhere)

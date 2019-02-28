@@ -29,16 +29,15 @@ void *param_generator_uniform_initialize(address_t *region) {
 
     // Allocate memory for the data
     struct param_generator_uniform *params =
-        (struct param_generator_uniform *)
             spin1_malloc(sizeof(struct param_generator_uniform));
 
     // Copy the parameters in
     spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_uniform_params));
-    *region += sizeof(struct param_generator_uniform_params) >> 2;
+            &params->params, *region,
+            sizeof(struct param_generator_uniform_params));
+    *region += sizeof(struct param_generator_uniform_params) / sizeof(uint32_t);
     log_debug("Uniform low = %k, high = %k",
-        params->params.low, params->params.high);
+            params->params.low, params->params.high);
 
     // Initialise the RNG for this generator
     params->rng = rng_init(region);
@@ -56,11 +55,10 @@ void param_generator_uniform_generate(
     use(indices);
 
     // For each index, generate a uniformly distributed value
-    struct param_generator_uniform *params =
-        (struct param_generator_uniform *) data;
-    accum range = params->params.high - params->params.low;
+    struct param_generator_uniform *state = data;
+    accum range = state->params.high - state->params.low;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        values[i] =
-            params->params.low + (ulrbits(rng_generator(params->rng)) * range);
+        values[i] = state->params.low +
+                (ulrbits(rng_generator(state->rng)) * range);
     }
 }
