@@ -27,7 +27,7 @@ struct connection_generator_info;
  *! \brief The data for a connection generator
  */
 struct connection_generator {
-    struct connection_generator_info *type_ptr;
+    const struct connection_generator_info *type_ptr;
     void *data;
 };
 
@@ -96,7 +96,7 @@ struct connection_generator_info {
 /**
  *! \brief An Array of known generators
  */
-struct connection_generator_info connection_generators[] = {
+const struct connection_generator_info connection_generators[] = {
     {ONE_TO_ONE_GENERATOR,
             connection_generator_one_to_one_initialise,
             connection_generator_one_to_one_generate,
@@ -149,9 +149,9 @@ uint32_t connection_generator_generate(
         uint32_t post_slice_start, uint32_t post_slice_count,
         uint32_t max_row_length, uint16_t *indices) {
     return generator->type_ptr->generate_fun(
-        generator->data, pre_slice_start, pre_slice_count,
-        pre_neuron_index, post_slice_start, post_slice_count,
-        max_row_length, indices);
+            generator->data, pre_slice_start, pre_slice_count,
+            pre_neuron_index, post_slice_start, post_slice_count,
+            max_row_length, indices);
 }
 
 void connection_generator_free(connection_generator_t generator) {

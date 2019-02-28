@@ -33,7 +33,7 @@ struct param_generator_info;
  *! \brief The data for a parameter generator
  */
 struct param_generator {
-    struct param_generator_info *type_ptr;
+    const struct param_generator_info *type_ptr;
     void *data;
 };
 
@@ -91,7 +91,7 @@ struct param_generator_info {
 /**
  *! \brief An Array of known generators
  */
-struct param_generator_info param_generators[] = {
+const struct param_generator_info param_generators[] = {
     {CONSTANT_PARAM,    // Constant value
             param_generator_constant_initialize,
             param_generator_constant_generate,
@@ -121,7 +121,6 @@ struct param_generator_info param_generators[] = {
 };
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
 
@@ -152,7 +151,7 @@ void param_generator_generate(
         param_generator_t generator, uint32_t n_indices,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
     generator->type_ptr->generate_fun(
-        generator->data, n_indices, pre_neuron_index, indices, values);
+            generator->data, n_indices, pre_neuron_index, indices, values);
 }
 
 void param_generator_free(param_generator_t generator) {

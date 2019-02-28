@@ -26,7 +26,7 @@ struct matrix_generator_info;
  *! \brief The data for a matrix generator
  */
 struct matrix_generator {
-    struct matrix_generator_info *type_ptr;
+    const struct matrix_generator_info *type_ptr;
     void *data;
 };
 
@@ -128,7 +128,6 @@ const struct matrix_generator_info matrix_generators[] = {
 };
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_MATRIX_GENERATORS; i++) {
 
@@ -136,8 +135,8 @@ matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
         if (hash == matrix_generators[i].hash) {
 
             // Prepare a space for the data
-            struct matrix_generator *generator = spin1_malloc(
-                sizeof(struct matrix_generator));
+            struct matrix_generator *generator =
+                    spin1_malloc(sizeof(struct matrix_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;
@@ -181,19 +180,19 @@ bool matrix_generator_generate(
 
         // Get up to a maximum number of synapses
         uint32_t max_n_synapses =
-            max_row_n_synapses + max_delayed_row_n_synapses;
+                max_row_n_synapses + max_delayed_row_n_synapses;
         uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
-            connection_generator, pre_slice_start, pre_slice_count,
-            pre_neuron_index, post_slice_start, post_slice_count,
-            max_n_synapses, indices);
+                connection_generator, pre_slice_start, pre_slice_count,
+                pre_neuron_index, post_slice_start, post_slice_count,
+                max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
         // Generate delays for each index
         accum delay_params[n_indices];
         param_generator_generate(
-            delay_generator, n_indices, pre_neuron_index, indices,
-            delay_params);
+                delay_generator, n_indices, pre_neuron_index, indices,
+                delay_params);
         uint16_t delays[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
             accum delay = delay_params[i] * timestep_per_delay;
@@ -209,11 +208,12 @@ bool matrix_generator_generate(
         // Generate weights for each index
         accum weight_params[n_indices];
         param_generator_generate(
-            weight_generator, n_indices, pre_neuron_index, indices,
-            weight_params);
+                weight_generator, n_indices, pre_neuron_index, indices,
+                weight_params);
         uint16_t weights[n_indices];
         for (uint32_t i = 0; i < n_indices; i++) {
             accum weight = weight_params[i];
+
             if (weight < 0) {
                 weight = -weight;
             }
@@ -226,11 +226,11 @@ bool matrix_generator_generate(
 
         // Write row
         generator->type_ptr->write_row_fun(
-            generator->data, synaptic_matrix, delayed_synaptic_matrix,
-            pre_slice_count, pre_neuron_index - pre_slice_start,
-            max_row_n_words, max_delayed_row_n_words,
-            n_synapse_type_bits, n_synapse_index_bits,
-            synapse_type, n_indices, indices, delays, weights, max_stage);
+                generator->data, synaptic_matrix, delayed_synaptic_matrix,
+                pre_slice_count, pre_neuron_index - pre_slice_start,
+                max_row_n_words, max_delayed_row_n_words,
+                n_synapse_type_bits, n_synapse_index_bits,
+                synapse_type, n_indices, indices, delays, weights, max_stage);
 
         n_connections += n_indices;
     }
