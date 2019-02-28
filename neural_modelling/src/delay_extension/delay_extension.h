@@ -1,6 +1,8 @@
 #ifndef __DELAY_EXTENSION_H__
 #define __DELAY_EXTENSION_H__
 
+#include <common-typedefs.h>
+
 // Constants
 #define DELAY_STAGE_LENGTH  16
 
