@@ -1,9 +1,9 @@
 #include "aliases.h"
 #include "bit_set.h"
 #include "merge.h"
-#include "routing_table.h"
+#include "../common/compressor_common/routing_table.h"
 #include "remove_default_routes.h"
-#include "platform.h"
+#include "../common/compressor_common/platform.h"
 #include <debug.h>
 
 #ifndef __ORDERED_COVERING_H__

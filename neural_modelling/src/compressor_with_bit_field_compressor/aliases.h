@@ -1,8 +1,8 @@
 /* Aliases are built using a trie structure as this avoids the need for
  * rebalancing at the cost of more memory.
  */
-#include "platform.h"
-#include "routing_table.h"
+#include "../common/compressor_common/platform.h"
+#include "../common/compressor_common/routing_table.h"
 
 
 #ifndef __ALIASES_H__

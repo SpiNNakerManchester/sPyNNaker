@@ -1,6 +1,6 @@
-#include "platform.h"
+#include "../common/compressor_common/platform.h"
+#include "../common/compressor_common/routing_table.h"
 #include "bit_set.h"
-#include "routing_table.h"
 #include <stdbool.h>
 #include <stdint.h>
 

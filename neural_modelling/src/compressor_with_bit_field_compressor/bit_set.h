@@ -1,6 +1,6 @@
 #include <stdbool.h>
 #include <stdint.h>
-#include "platform.h"
+#include "../common/compressor_common/platform.h"
 
 #ifndef __BIT_SET_H__
 

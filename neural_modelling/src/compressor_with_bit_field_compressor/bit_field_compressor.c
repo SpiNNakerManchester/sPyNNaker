@@ -3,11 +3,14 @@
 #include <bit_field.h>
 #include <sdp_no_scp.h>
 #include "common-typedefs.h"
+
+#include "aliases.h"
+#include "ordered_covering.h"
+
 #include "../common/compressor_common/platform.h"
 #include "../common/compressor_common/routing_table.h"
 #include "../common/compressor_common/compression_sdp_formats.h"
-#include "../common/compressor_common/aliases.h"
-#include "../common/compressor_common/ordered_covering.h"
+#include "../common/compressor_common/constants.h"
 /*****************************************************************************/
 /* SpiNNaker routing table minimisation with bitfield integration.
  *
@@ -24,24 +27,6 @@
 typedef enum interrupt_priority{
     TIMER_TICK_PRIORITY = -1, SDP_PRIORITY = 1, COMPRESSION_START_PRIORITY = 2
 } interrupt_priority;
-
-//! word to byte multiplier
-#define WORD_TO_BYTE_MULTIPLIER 4
-
-//! timeout for sdp message attempt
-#define _SDP_TIMEOUT 100
-
-//! random port as 0 is in use by scamp/sark
-#define RANDOM_PORT 4
-
-//! max length of the router table entries
-#define TARGET_LENGTH 1023
-
-//! mask to get core from src
-#define CORE_MASK 0xFFFF
-
-//! random port as 0 is in use by scamp/sark
-#define RANDOM_PORT 4
 
 //! \brief the timer control logic.
 bool* timer_for_compression_attempt = false;
@@ -387,6 +372,7 @@ void initialise() {
     log_info("finished sdp interrupt");
 
     log_info("set up sdp message bits");
+    my_msg.flags = REPLY_NOT_EXPECTED;
     my_msg.srce_addr = spin1_get_chip_id();
     my_msg.dest_addr = spin1_get_chip_id();
     my_msg.srce_port = (RANDOM_PORT << PORT_SHIFT) | spin1_get_core_id();

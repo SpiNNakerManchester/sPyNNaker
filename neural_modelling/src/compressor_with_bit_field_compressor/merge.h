@@ -1,5 +1,5 @@
 #include "bit_set.h"
-#include "routing_table.h"
+#include "../common/compressor_common/routing_table.h"
 
 #ifndef __MERGE_H__
 

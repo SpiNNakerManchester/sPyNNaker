@@ -6,6 +6,7 @@
 #include "../common/compressor_common/platform.h"
 #include "../common/compressor_common/routing_table.h"
 #include "../common/compressor_common/compression_sdp_formats.h"
+#include "../common/compressor_common/constants.h"
 /*****************************************************************************/
 /* SpiNNaker routing table minimisation with bitfield integration control core.
  *
@@ -111,23 +112,11 @@ typedef enum priorities{
 //! flag for saying compression core doing nowt
 #define DOING_NOWT -1
 
-//! expected size to work to in router entries
-#define _MAX_SUPPORTED_LENGTH 1023
-
-//! \brief timeout on attempts to send sdp message
-#define _SDP_TIMEOUT 100
-
-//! flag for not requiring a reply
-#define REPLY_NOT_EXPECTED 0x07
-
 //! bits in a word
-#define _BITS_IN_A_WORD 32
+#define BITS_IN_A_WORD 32
 
 //! bit shift for the app id for the route
 #define ROUTE_APP_ID_BIT_SHIFT 24
-
-//! word to byte multiplier
-#define WORD_TO_BYTE_MULTIPLIER 4
 
 //! size of x routing entries in bytes
 #define X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE 4
@@ -136,13 +125,8 @@ typedef enum priorities{
 #define _NEURON_LEVEL_MASK 0xFFFFFFFF
 
 //! how many tables the uncompressed router table entries is
-#define _N_UNCOMPRESSED_TABLE = 1
+#define N_UNCOMPRESSED_TABLE 1
 
-//! random port as 0 is in use by scamp/sark
-#define RANDOM_PORT 4
-
-//! mask to get core from src
-#define CORE_MASK 0xFFFF
 
 //! time to take per compression iteration
 uint32_t time_per_iteration = 0;
@@ -467,7 +451,7 @@ bool set_off_bit_field_compression(
 
     // allocate space for the compressed routing entries
     address_t compressed_address = MALLOC_SDRAM(
-        routing_table_sdram_size_of_table(_MAX_SUPPORTED_LENGTH));
+        routing_table_sdram_size_of_table(TARGET_LENGTH));
     if (compressed_address == NULL){
         log_error("failed to allocate sdram for compressed routing entries");
         return false;
@@ -1098,7 +1082,7 @@ bool set_off_no_bit_field_compression(){
     bit_field_routing_tables[0] = sdram_clone_of_routing_table;
 
     // run the allocation and set off of a compressor core
-    return set_off_bit_field_compression(1, 0);
+    return set_off_bit_field_compression(N_UNCOMPRESSED_TABLE, 0);
 }
 
 //! \brief reads in bitfields, makes a few maps, sorts into most priority.
