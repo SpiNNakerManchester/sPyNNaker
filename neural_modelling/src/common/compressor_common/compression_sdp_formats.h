@@ -39,11 +39,13 @@ typedef enum points_in_sdp_message_top_level{
 
 //! \brief the command codes in human readable form
 typedef enum command_codes_for_sdp_packet{
-    START_OF_COMPRESSION_DATA_STREAM = 20,
-    EXTRA_DATA_FOR_COMPRESSION_DATA_STREAM = 21,
+    START_DATA_STREAM = 20,
+    EXTRA_DATA_STREAM = 21,
     COMPRESSION_RESPONSE = 22,
     STOP_COMPRESSION_ATTEMPT = 23
 } command_codes_for_sdp_packet;
+
+#define COMMAND_CODE_SIZE_IN_BYTES 4
 
 #define __COMPRESSION_SDP_FORMATS_H__
 #endif  // __COMPRESSION_SDP_FORMATS_H__

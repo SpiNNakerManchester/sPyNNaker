@@ -3,6 +3,7 @@
 #include "merge.h"
 #include "routing_table.h"
 #include "remove_default_routes.h"
+#include "platform.h"
 #include <debug.h>
 
 #ifndef __ORDERED_COVERING_H__
@@ -329,17 +330,27 @@ static inline bool oc_down_check(
             return true;
         }
 
-        // Determine which entries could be removed from the merge and then pick
-        // the smallest number of entries to remove.
-        __sets_t sets = {MALLOC(sizeof(bit_set_t)), MALLOC(sizeof(bit_set_t))};
+        // Determine which entries could be removed from the merge and then
+        //pick the smallest number of entries to remove.
+        __sets_t sets;
+
+        // allocate and free accordingly
+        sets.best = MALLOC(sizeof(bit_set_t));
+
+
         if (sets.best == NULL){
             log_error("failed to alloc sets best");
             *failed_to_malloc = true;
             return false;
         }
+
+        sets.working = MALLOC(sizeof(bit_set_t));
         if(sets.working == NULL){
             log_error("failed to alloc sets working");
             *failed_to_malloc = true;
+
+            // free stuff already malloc
+            FREE(&sets.best);
             return false;
         }
 
@@ -347,12 +358,20 @@ static inline bool oc_down_check(
         if (!success){
             log_error("failed to init the bitfield best");
             *failed_to_malloc = true;
+
+            // free stuff already malloc
+            FREE(&sets.best);
+            FREE(&sets.working);
             return false;
         }
         bit_set_init(sets.working, merge->entries.count);
         if (!success){
             log_error("failed to init the bitfield working.");
             *failed_to_malloc = true;
+
+            // free stuff already malloc
+            FREE(&sets.best);
+            FREE(&sets.working);
             return false;
         }
 
@@ -376,10 +395,10 @@ static inline bool oc_down_check(
 
         // Tidy up
         bit_set_delete(sets.best);
-        FREE(sets.best);
+        FREE(&sets.best);
         sets.best=NULL;
         bit_set_delete(sets.working);
-        FREE(sets.working);
+        FREE(&sets.working);
         sets.working=NULL;
 
         // If the merge only contains 1 entry empty it entirely
@@ -421,6 +440,11 @@ static inline bool oc_get_best_merge(
     if (!success){
         log_info("failed to init the merge best. throw response malloc");
         *failed_by_malloc = true;
+
+        // free bits we already done
+        FREE(&considered);
+
+        // return false
         return false;
     }
 
@@ -430,6 +454,12 @@ static inline bool oc_get_best_merge(
      if (!success){
         log_info("failed to init the merge working. throw response malloc");
         *failed_by_malloc = true;
+
+        // free bits we already done
+        FREE(&best);
+        FREE(&considered);
+
+        // return false
         return false;
     }
 
@@ -490,6 +520,11 @@ static inline bool oc_get_best_merge(
             routing_tables, n_tables);
         if (!success){
             log_error("failed to down check. ");
+
+            // free bits we already done
+            FREE(&best);
+            FREE(&considered);
+
             return false;
         }
 
@@ -512,6 +547,11 @@ static inline bool oc_get_best_merge(
                 routing_tables, n_tables);
             if (!success){
                 log_error("failed to down check. ");
+
+                // free bits we already done
+                FREE(&best);
+                FREE(&considered);
+
                 return false;
             }
 

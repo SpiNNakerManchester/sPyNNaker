@@ -123,6 +123,40 @@ uint32_t routing_table_sdram_get_n_entries(
     return current_point_tracking;
 }
 
+//! \brief stores the routing tables entries into sdram at a specific sdram
+//! address as one big router table
+//! \param[in] routing_tables: the addresses list
+//! \param[in] n_tables: how many in list
+//! \param[in] sdram_address: the location in sdram to write data to
+bool routing_table_sdram_store(
+        table_t** routing_tables, uint32_t n_tables,
+        address_t sdram_loc_for_compressed_entries){
+
+    // cast to table struct
+    table_t* table_format = (table_t*) &sdram_loc_for_compressed_entries;
+
+    // locate n entries overall and write to struct
+    uint32_t n_entries = routing_table_sdram_get_n_entries(
+        routing_tables, n_tables);
+    table_format->size = n_entries;
+    uint32_t main_entry_index = 0;
+
+    // iterate though the entries writing to the struct as we go
+    for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
+
+        // get how many entries are in this block
+        uint32_t entries_stored_here = routing_tables[rt_index]->size;
+        for (uint32_t entry_index =0; entry_index < entries_stored_here;
+                entry_index++){
+            // take entry and plonk in rigth sdram location
+            table_format->entries[main_entry_index] =
+                routing_tables[rt_index]->entries[entry_index];
+            main_entry_index ++;
+        }
+    }
+    return true;
+}
+
 //! \brief updates table stores accordingly.
 //! \param[in] routing_tables: the addresses list
 //! \param[in] n_tables: how many in list

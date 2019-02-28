@@ -139,6 +139,19 @@ void return_failed_by_space_response_message(){
 //! location
 //! \returns bool if was successful or now
 bool store_into_compressed_address(){
+    if (routing_table_sdram_get_n_entries(
+            routing_tables, n_tables) > TARGET_LENGTH){
+        log_error("not enough space in routing table");
+        return false;
+    }
+    else{
+        bool success = routing_table_sdram_store(
+            routing_tables, n_tables, sdram_loc_for_compressed_entries);
+        if (!success){
+            log_error("failed to store entries into sdram. ");
+            return false;
+        }
+    }
     return true;
 }
 
@@ -206,124 +219,133 @@ void _sdp_handler(uint mailbox, uint port) {
     sdp_msg_pure_data *msg = (sdp_msg_pure_data *) mailbox;
 
     // record control core.
-    control_core_id = (msg->srce_port && 0xFFFF);
+    control_core_id = (msg->srce_port && CORE_MASK);
     log_info("control core is %d", control_core_id);
 
     log_info("command code is %d", msg->data[COMMAND_CODE]);
 
     // get command code
-    if (msg->data[COMMAND_CODE] == START_OF_COMPRESSION_DATA_STREAM){
-
-        start_stream_sdp_packet_t* first_command_packet =
-            (start_stream_sdp_packet_t*) &msg->data[
-                START_OF_SPECIFIC_MESSAGE_DATA];
-
-        // location where to store the compressed (size
-        sdram_loc_for_compressed_entries =
-            first_command_packet->address_for_compressed;
-
-        // set up fake heap
-        log_info("setting up fake heap for sdram usage");
-        platform_new_heap_creation(first_command_packet->fake_heap_data);
-        log_info("finished setting up fake heap for sdram usage");
-
-        // set up packet tracker
-        number_of_packets_waiting_for =
-            first_command_packet->n_sdp_packets_till_delivered;
-
-        number_of_packets_waiting_for -= 1;
-
-        // set up addresses data holder
-        log_info(
-            "allocating %d bytes for %d total n tables",
-            first_command_packet->total_n_tables * sizeof(table_t**),
-            first_command_packet->total_n_tables);
-        routing_tables = MALLOC(
-            first_command_packet->total_n_tables * sizeof(table_t**));
-
-        if (routing_tables == NULL){
-            log_error(
-                "failed to allocate memory for holding the addresses "
-                "locations");
-            sark_msg_free((sdp_msg_t*) msg);
-            return_malloc_response_message();
+    if (msg->srce_port >> PORT_SHIFT == RANDOM_PORT){
+        if (msg->data[COMMAND_CODE] == START_DATA_STREAM){
+    
+            start_stream_sdp_packet_t* first_command_packet =
+                (start_stream_sdp_packet_t*) &msg->data[
+                    START_OF_SPECIFIC_MESSAGE_DATA];
+    
+            // location where to store the compressed (size
+            sdram_loc_for_compressed_entries =
+                first_command_packet->address_for_compressed;
+    
+            // set up fake heap
+            log_info("setting up fake heap for sdram usage");
+            platform_new_heap_creation(first_command_packet->fake_heap_data);
+            log_info("finished setting up fake heap for sdram usage");
+    
+            // set up packet tracker
+            number_of_packets_waiting_for =
+                first_command_packet->n_sdp_packets_till_delivered;
+    
+            number_of_packets_waiting_for -= 1;
+    
+            // set up addresses data holder
+            log_info(
+                "allocating %d bytes for %d total n tables",
+                first_command_packet->total_n_tables * sizeof(table_t**),
+                first_command_packet->total_n_tables);
+            routing_tables = MALLOC(
+                first_command_packet->total_n_tables * sizeof(table_t**));
+    
+            if (routing_tables == NULL){
+                log_error(
+                    "failed to allocate memory for holding the addresses "
+                    "locations");
+                sark_msg_free((sdp_msg_t*) msg);
+                return_malloc_response_message();
+            }
+            else{
+    
+                // store this set into the store
+                log_info("store routing table addresses into store");
+                for(uint32_t rt_index = 0; rt_index <
+                        first_command_packet->n_tables_in_packet; rt_index++){
+                    routing_tables[rt_index] =
+                        first_command_packet->tables[rt_index];
+                }
+    
+                // keep tracker updated
+                n_tables += first_command_packet->n_tables_in_packet;
+                log_info("finished storing routing table address into store");
+    
+                // if no more packets to locate, then start compression process
+                if (number_of_packets_waiting_for == 0){
+                    spin1_schedule_callback(
+                        start_compression_process, 0, 0,
+                        COMPRESSION_START_PRIORITY);
+                }
+    
+                // free message
+                sark_msg_free((sdp_msg_t*) msg);
+            }
         }
-        else{
-
-            // store this set into the store
-            log_info("store routing table addresses into store");
-            for(uint32_t rt_index = 0; rt_index <
-                    first_command_packet->n_tables_in_packet; rt_index++){
-                routing_tables[rt_index] =
-                    first_command_packet->tables[rt_index];
+        else if (msg->data[COMMAND_CODE] == EXTRA_DATA_STREAM){
+            if (routing_tables == NULL){
+                log_error(
+                    "ignoring extra routing table addresses packet, as"
+                    " cant store them");
             }
+            else{
+                // start the storing of the data
+                extra_stream_sdp_packet_t* extra_command_packet =
+                    (extra_stream_sdp_packet_t*) msg->data[
+                        START_OF_SPECIFIC_MESSAGE_DATA];
+    
+                // store this set into the store
+                log_info("store extra routing table addresses into store");
+                for(uint32_t rt_index = 0; rt_index <
+                        extra_command_packet->n_tables_in_packet;
+                        rt_index++){
+                    routing_tables[rt_index] =
+                        extra_command_packet->tables[rt_index];
+                }
+                log_info(
+                    "finished storing extra routing table address into store");
 
-            // keep tracker updated
-            n_tables += first_command_packet->n_tables_in_packet;
-            log_info("finished storing routing table address into store");
-
-            // if no more packets to locate, then start compression process
-            if (number_of_packets_waiting_for == 0){
-                spin1_schedule_callback(
-                    start_compression_process, 0, 0,
-                    COMPRESSION_START_PRIORITY);
+                // keep tracker updated
+                n_tables += extra_command_packet->n_tables_in_packet;
+                number_of_packets_waiting_for -= 1;
+    
+                // if no more packets to locate, then start compression process
+                if (number_of_packets_waiting_for == 0){
+                    spin1_schedule_callback(
+                        start_compression_process, 0, 0,
+                        COMPRESSION_START_PRIORITY);
+                }
             }
-
+    
             // free message
             sark_msg_free((sdp_msg_t*) msg);
         }
-
-    }
-    else if(msg->data[COMMAND_CODE] == EXTRA_DATA_FOR_COMPRESSION_DATA_STREAM){
-        if (routing_tables == NULL){
-            log_error(
-                "ignoring extra routing table addresses packet, as cant store"
-                " them");
+        else if(msg->data[COMMAND_CODE] == COMPRESSION_RESPONSE){
+            log_error("I really should not be receiving this!!! WTF");
+            sark_msg_free((sdp_msg_t*) msg);
+        }
+        else if (msg->data[COMMAND_CODE] == STOP_COMPRESSION_ATTEMPT){
+            log_info("been forced to stop by control");
+            *finished_by_compressor_force = true;
+            sark_msg_free((sdp_msg_t*) msg);
         }
         else{
-
-            extra_stream_sdp_packet_t* extra_command_packet =
-                (extra_stream_sdp_packet_t*) msg->data[
-                    START_OF_SPECIFIC_MESSAGE_DATA];
-
-            // store this set into the store
-            log_info("store extra routing table addresses into store");
-            for(uint32_t rt_index = 0; rt_index <
-                    extra_command_packet->n_tables_in_packet;
-                    rt_index++){
-                routing_tables[rt_index] =
-                    extra_command_packet->tables[rt_index];
-            }
-            log_info("finished storing extra routing table address into store");
-
-
-            // keep tracker updated
-            n_tables += extra_command_packet->n_tables_in_packet;
-            number_of_packets_waiting_for -= 1;
-
-            // if no more packets to locate, then start compression process
-            if (number_of_packets_waiting_for == 0){
-                spin1_schedule_callback(
-                    start_compression_process, 0, 0,
-                    COMPRESSION_START_PRIORITY);
-            }
+            log_error(
+                "no idea what to do with message with command code %d Ignoring",
+                msg->data[COMMAND_CODE]);
+            sark_msg_free((sdp_msg_t*) msg);
         }
-
-        // free message
-        sark_msg_free((sdp_msg_t*) msg);
-    }
-    else if(msg->data[COMMAND_CODE] == COMPRESSION_RESPONSE){
-        log_error("I really should not be receiving this!!! WTF");
-        sark_msg_free((sdp_msg_t*) msg);
-    }
-    else if (msg->data[COMMAND_CODE] == STOP_COMPRESSION_ATTEMPT){
-        *finished_by_compressor_force = true;
-        sark_msg_free((sdp_msg_t*) msg);
     }
     else{
         log_error(
-            "no idea what to do with command code %d. on port %d Ignoring",
-            msg->data[COMMAND_CODE], msg->srce_port >> PORT_SHIFT);
+            "no idea what to do with message. on port %d Ignoring",
+            msg->srce_port >> PORT_SHIFT);
+        sark_msg_free((sdp_msg_t*) msg);
     }
 }
 

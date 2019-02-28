@@ -255,3 +255,60 @@ void cleanup_and_exit(header_t *header, table_t table) {
 
     // read in for processing
     for
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// if the search ended on a failure, regenerate the best one
+    log_info("check the last search vs the best search");
+    if (last_search_point != best_search_point){
+        log_info("regenerating best combination");
+        binary_search();
+        log_info("finished regenerating best combination");
+    }
+
+    // load router entries into router
+    log_info("load the routing table entries into the router");
+    load_routing_table_entries_to_router();
+    log_info("finished loading the routing table");
+
+
+    // remove merged bitfields from the cores bitfields
+    log_info("start the removal of the bitfields from the chips cores "
+             "bitfield regions.");
+    remove_merged_bitfields_from_cores();
+    log_info("finished the removal of the bitfields from the chips cores "
+             "bitfields regions.");
+    return true;
