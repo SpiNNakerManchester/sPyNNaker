@@ -53,7 +53,17 @@ typedef struct _coverage{
     uint32_t* processor_ids;
     // list of addresses of bitfields with this x redundant packets
     address_t* bit_field_addresses;
-}_coverage;
+} _coverage;
+
+//! \brief struct holding keys and n bitfields with key
+typedef struct _master_pop_bit_field{
+    // the master pop key
+    uint32_t master_pop_key;
+    // the number of bitfields with this key
+    uint32_t n_bitfields_with_key;
+} _master_pop_bit_field;
+
+//=============================================================================
 
 //! enum for the different states to report through the user2 address.
 typedef enum exit_states_for_user_one{
@@ -109,6 +119,8 @@ typedef enum priorities{
     COMPRESSION_START_PRIORITY = 3, SDP_PRIORITY = -1
 }priorities;
 
+//============================================================================
+
 //! flag for saying compression core doing nowt
 #define DOING_NOWT -1
 
@@ -117,6 +129,12 @@ typedef enum priorities{
 
 //! bit shift for the app id for the route
 #define ROUTE_APP_ID_BIT_SHIFT 24
+
+//! max number of processors on chip used for app purposes
+#define MAX_PROCESSORS 18
+
+//! max number of links on a router
+#define MAX_LINKS_PER_ROUTER 6
 
 //! size of x routing entries in bytes
 #define X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE 4
@@ -127,6 +145,7 @@ typedef enum priorities{
 //! how many tables the uncompressed router table entries is
 #define N_UNCOMPRESSED_TABLE 1
 
+//============================================================================
 
 //! time to take per compression iteration
 uint32_t time_per_iteration = 0;
@@ -196,6 +215,8 @@ uint32_t sorted_bit_field_current_fill_loc = 0;
 //! \brief sdp message to send control messages to compressors cores
 sdp_msg_pure_data my_msg;
 
+//============================================================================
+
 //! \brief sends the sdp message. assumes all params have already been set
 void send_sdp_message(){
     log_info("sending message");
@@ -238,22 +259,269 @@ bool set_up_search_bitfields(){
     return true;
 }
 
+//! \brief gets data about the bitfields being considered
+//! \param[in/out] keys: the data holder to populate
+//! \param[in] mid_point: the point in the sorted bit fields to look for
+//! \return the number of unique keys founds.
+uint32_t population_master_pop_bit_fields(
+        _master_pop_bit_field * keys, uint32_t mid_point){
+
+    uint32_t n_keys = 1;
+    // how many in each key
+    for (uint32_t bit_field_index = 0; bit_field_index < mid_point;
+            bit_field_index++){
+        uint32_t key = sorted_bit_fields[bit_field_index][BIT_FIELD_BASE_KEY];
+        uint32_t keys_index = 0;
+        bool found = false;
+        while(!found || keys_index < n_keys){
+            if (keys[keys_index].master_pop_key == key){
+                found = true;
+                keys[keys_index].n_bitfields_with_key ++;
+            }
+            keys_index ++;
+        }
+        if (!found){
+            keys[n_keys].master_pop_key = key;
+            keys[n_keys].n_bitfields_with_key = 1;
+            n_keys ++;
+        }
+    }
+    return n_keys;
+}
+
+//! locates a entry within a routing table, extracts the data, then removes
+//! it from the table, updating locations and sizes
+//! \param[in] uncompressed_table_address:
+//! \param[in] master_pop_key: the key to locate the entry for
+//! \param[in/out] entry_to_store: entry to store the found entry in
+//! \return: None
+void extract_and_remove_entry_from_table(
+        address_t uncompressed_table_address, uint32_t master_pop_key,
+        entry_t* entry_to_store){
+
+    // cas the address to the struct for easier work
+    table_t* table_cast = (table_t*) &uncompressed_table_address;
+
+    // flag for when found. no point starting move till after
+    bool found = false;
+
+    // iterate through all entries
+    for(uint32_t entry_id=0; entry_id < table_cast->size; entry_id++){
+
+        // if key mathces, sotre entry (assumes only 1 entry, otherwise boomed)
+        if (table_cast->entries[entry_id].key_mask.key == master_pop_key){
+            entry_to_store->route = table_cast->entries[entry_id].route;
+            entry_to_store->source = table_cast->entries[entry_id].source;
+            entry_to_store->key_mask.key =
+                table_cast->entries[entry_id].key_mask.key;
+            entry_to_store->key_mask.mask =
+                table_cast->entries[entry_id].key_mask.mask;
+            found = true;
+        }
+        else{  // not found entry here. check if already found
+            if (found){  // if found, move entry up one. to sort out memory
+                table_cast->entries[entry_id - 1]->route =
+                    table_cast->entries[entry_id].route;
+                table_cast->entries[entry_id - 1]->source =
+                    table_cast->entries[entry_id].source;
+                table_cast->entries[entry_id - 1]->key_mask.key =
+                    table_cast->entries[entry_id].key_mask.key;
+                table_cast->entries[entry_id - 1]->key_mask.mask =
+                    table_cast->entries[entry_id].key_mask.mask;
+            }
+        }
+    }
+
+    // update size by the removal of 1 entry
+    table_cast->size -= 1;
+}
+
+//! \brief finds the processor id of a given bitfield address (search though
+//! the bit field by processor
+//! \param
+uint32_t locate_processor_id_from_bit_field_address(
+        address_t bit_field_address){
+
+    uint32_t n_pairs = user_register_content[REGION_ADDRESSES][N_PAIRS];
+    for(uint32_t bf_by_proc = 0; bf_by_proc < n_pairs; bf_by_proc++){
+
+    }
+    bit_field_by_processor
+}
+
+bool generate_entries_from_bitfields(
+        address_t* addresses, uint32_t n_bit_fields, entry_t original_entry,
+        address_t* rt_address){
+    uint32_t size = get_bit_field_size(MAX_PROCESSORS + MAX_LINKS_PER_ROUTER);
+
+    bit_field_t processors =
+        bit_field_alloc(MAX_PROCESSORS + MAX_LINKS_PER_ROUTER);
+    clear_bit_field(processors, size);
+
+    if (processors == NULL){
+        log_error(
+            "could not allocate memory for the processor tracker when "
+            "making entries from bitfields");
+        return false;
+    }
+
+    // cast original entry route to a bitfield for ease of use
+    bit_field* original_route = (bit_field_t) &original_entry.route;
+
+    for (uint32_t processor_id = 0; processor_id < MAX_PROCESSORS;
+            processor_id++){
+        if (bit_field_test(
+                original_route, processor_id + MAX_LINKS_PER_ROUTER)){
+            bool found = false;
+            for (uint32_t bit_field_index = 0; bit_field_index < n_bit_fields;
+                    bit_field_index++){
+                if(addresses[bit_field_index][])
+            }
+        }
+    }
+
+
+
+}
+
+//! generates the routing table entries from this set of bitfields
+//! \param[in] master_pop_key: the key to locate the bitfields for
+//! \param[in] uncompressed_table: the location for the uncompressed table
+//! \param[in] n_bit_fields: how many bitfields are needed for this key
+//! \param[in] mid_point: the point where the search though sorted bit fields
+//! ends.
+//! \param[in] rt_address: the location in sdram to store the routing table
+//! generated from the bitfields and original entry.
+//! \return bool saying if it was successful or not
+bool generate_rt_from_bit_field(
+        uint32_t master_pop_key, address_t uncompressed_table,
+        uint32_t n_bit_fields, uint32_t mid_point, address_t* rt_address){
+
+    // reduce future iterations, by finding the exact bitfield addresses
+    address_t* addresses = MALLOC(n_bit_fields * sizeof(address_t));
+    uint32_t index = 0;
+    for (uint32_t bit_field_index = 0; bit_field_index < mid_point;
+            bit_field_index++){
+        if (sorted_bit_fields[bit_field_index][BIT_FIELD_BASE_KEY] ==
+                master_pop_key){
+            addresses[index] = sorted_bit_fields[bit_field_index];
+        }
+    }
+
+    // extract original routing entry from uncompressed table
+    entry_t original_entry;
+    extract_and_remove_entry_from_table(uncompressed_table, master_pop_key);
+
+    // create table entries with bitfields
+    bool success = generate_entries_from_bitfields(
+        addresses, n_bit_fields, original_entry, rt_address);
+    if (!success){
+        log_error(
+            "can not create entries for key %d with %x bitfields.",
+            master_pop_key, n_bit_fields);
+        FREE(addresses);
+        return false;
+    }
+
+    FREE(addresses);
+    return true;
+}
+
+//! \brief clones the un compressed routing table, to another sdram location
+//! \param[in/out] where_was_cloned: the address where the cloned table is
+//! located.
+//! \return: bool saying if the cloning was successful or not
+bool clone_un_compressed_routing_table(address_t* where_was_cloned){
+    uint32_t x_entries = user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES];
+    uint32_t sdram_used = (X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE + (
+        x_entries * sizeof(entry_t) * WORD_TO_BYTE_MULTIPLIER));
+
+    // allocate sdram for the clone
+    address_t sdram_clone_of_routing_table = MALLOC_SDRAM(sdram_used);
+    if (sdram_clone_of_routing_table == NULL){
+        log_error("failed to allocate sdram for the cloned routing table for "
+                  "uncompressed compression attempt");
+        return false;
+    }
+
+    // copy over data
+    sark_mem_cpy(
+        sdram_clone_of_routing_table,
+        &user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES],
+        sdram_used);
+    return true;
+}
+
 //! takes a midpoint and reads the sorted bitfields up to that point generating
 //! bitfield routing tables and loading them into sdram for transfer to a
 //! compressor core
 //! \param[in] mid_point: where in the sorted bitfields to go to
-//! \param[out] n_bf_addresses: how many addresses are needed for the 
+//! \param[out] n_rt_addresses: how many addresses are needed for the
 //! tables
 //! \return bool saying if it successfully built them into sdram
 bool create_bit_field_router_tables(
-        uint32_t mid_point, uint32_t n_bf_addresses){
-    use(mid_point);
-    use(n_bf_addresses);
-    return false;
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        uint32_t mid_point, uint32_t* n_rt_addresses){
+    // sort out bitfields by key
+
+    // get n keys that exist
+    _master_pop_bit_field * keys = MALLOC(
+        mid_point * sizeof(_master_pop_bit_field));
+    if (keys == NULL){
+        log_error("cannot allocate memory for keys");
+        return false;
+    }
+
+    // populate the master pop bit field
+    n_rt_addresses = population_master_pop_bit_fields(keys, mid_point);
+
+    // add the uncompressed table, for allowing the bitfield table generator to
+    // edit accordingly.
+    n_rt_addresses += 1;
+    address_t* uncompressed_table;
+    bool suc = clone_un_compressed_routing_table(uncompressed_table);
+    if (!suc){
+        log_error(
+            "failed to clone uncompressed tables for attempt %d", mid_point);
+        FREE(keys);
+        return false;
+    }
+
+    // add clone to front of list, to ensure its easily accessible (plus its
+    // part of the expected logic)
+    bit_field_routing_tables[0] = uncompressed_table;
+
+    bit_field_routing_tables = MALLOC(n_rt_addresses * sizeof(address_t));
+    if (bit_field_routing_tables == NULL){
+        log_info("failed to allocate memory for bitfield routing tables");
+        FREE(keys);
+        return false;
+    }
+
+    // iterate through the keys, accumulating bitfields and turn into routing
+    // table entries.
+    for(uint32_t key_index = 1; keys_index < n_rt_addresses; key_index++){
+        address_t* rt_address;
+        bool success = generate_rt_from_bit_field(
+            keys[key_index -1]->master_pop_key, uncompressed_table,
+            keys[key_index - 1]->n_bitfields_with_key, mid_point, rt_address);
+
+        // if failed, free stuff and tell above it failed
+        if (!success){
+            log_info("failed to allocate memory for rt table");
+            FREE(keys);
+            FREE(bit_field_routing_tables);
+            return false;
+        }
+
+        // store the rt address for this master pop key
+        bit_field_routing_tables[key_index] = rt_address
+    }
+    return true;
 }
 
 //! \brief selects a compression core that's not doing anything yet
+//! \param[in] midpoint: the midpoint this compressor is going to explore
+//! \return the compressor core id for this attempt.
 uint32_t select_compressor_core(uint32_t midpoint){
     for(uint32_t comp_core_index = 0; comp_core_index < n_compression_cores;
             comp_core_index++){
@@ -297,11 +565,7 @@ bool record_address_data_for_response_functionality(
     // space for the routing tables.
     comp_cores_bf_tables[comp_core_id]->n_elements = n_rt_addresses;
     comp_cores_bf_tables[comp_core_id]->compressed_table = compressed_address;
-    for (uint32_t address_index = 0; address_index < n_rt_addresses;
-            address_index++){
-        comp_cores_bf_tables[comp_core_id]->elements[address_index] =
-            bit_field_routing_tables[address_index];
-    }
+    comp_cores_bf_tables[comp_core_id]->elements = &bit_field_routing_tables;
     return true;
 }
 
@@ -499,6 +763,7 @@ bool set_off_bit_field_compression(
         // send sdp packet
         send_sdp_message();
     }
+
     return true;
 }
 
@@ -519,14 +784,14 @@ bool start_binary_search(){
     while (n_available_compression_cores != 0 || !failed_to_malloc){
 
         // try to create bitfield tables for a given point in the search
-        uint32_t n_bf_addresses;
+        uint32_t* n_rt_addresses;
         bool success = create_bit_field_router_tables(
-            hops_between_compression_cores * multiplier, n_bf_addresses);
+            hops_between_compression_cores * multiplier, n_rt_addresses);
 
         // if successful, try setting off the bitfield compression
         if (success){
             success = set_off_bit_field_compression(
-                n_bf_addresses, hops_between_compression_cores * multiplier);
+                n_rt_addresses, hops_between_compression_cores * multiplier);
 
              // if successful, move to next search point.
              if (success){
@@ -1056,26 +1321,17 @@ void order_bit_fields_based_on_impact(
     }
 }
 
-
 //! \brief sets off the basic compression without any bitfields
 bool set_off_no_bit_field_compression(){
-    uint32_t x_entries = user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES];
-    uint32_t sdram_used = (X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE + (
-        x_entries * sizeof(entry_t) * WORD_TO_BYTE_MULTIPLIER));
 
-    // allocate sdram for the clone
-    address_t sdram_clone_of_routing_table = MALLOC_SDRAM(sdram_used);
-    if (sdram_clone_of_routing_table == NULL){
-        log_error("failed to allocate sdram for the cloned routing table for "
-                  "uncompressed compression attempt");
+    // allocate and clone uncompressed entry
+    address_t* sdram_clone_of_routing_table;
+    bool suc = clone_un_compressed_routing_table(sdram_clone_of_routing_table);
+    if (!suc){
+        log_error("could not allocate memory for uncompressed table for no "
+                  "bit field compression attempt.");
         return false;
     }
-
-    // copy over data
-    sark_mem_cpy(
-        sdram_clone_of_routing_table,
-        &user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES],
-        sdram_used);
 
     // set up the bitfield routing tables so that it'll map down below
     bit_field_routing_tables = MALLOC(sizeof(address_t*));
