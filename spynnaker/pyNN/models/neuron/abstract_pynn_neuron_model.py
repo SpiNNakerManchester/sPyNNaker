@@ -5,8 +5,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 from pacman.model.constraints.partitioner_constraints\
     import SameAtomsAsVertexConstraint
-from pacman.model.constraints.placer_constraints\
-    import SameChipAsConstraint
+
 
 DEFAULT_MAX_ATOMS_PER_CORE = 255
 
@@ -55,7 +54,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             syn_constraints = list()
         else:
             syn_constraints = constraints
-        #syn_constraints.append(SameChipAsConstraint(vertices[0]))
+
         syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
 
         for index in range(vertices[0].get_n_synapse_types()):
@@ -64,5 +63,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                                             self._model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second,
                                             incoming_spike_buffer_size))
+
+        for i in range(len(vertices)):
+            vertices[i].connected_app_vertices = (vertices[:i] + vertices[i+1:])
 
         return vertices

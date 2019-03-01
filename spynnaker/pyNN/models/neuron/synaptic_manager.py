@@ -15,6 +15,8 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from pacman.model.constraints.placer_constraints\
+    import SameChipAsConstraint
 
 from data_specification.enums import DataType
 
@@ -102,7 +104,9 @@ class SynapticManager(
         "_n_atoms",
         "_vertex",
         "_n_profile_samples",
-        "_incoming_spike_buffer_size"]
+        "_incoming_spike_buffer_size",
+        "_machine_vertices",
+        "_connected_app_vertices"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -121,6 +125,8 @@ class SynapticManager(
         self._spikes_per_second = spikes_per_second
         self._n_atoms = n_neurons
         self._weight_scale = weight_scale
+        self._machine_vertices = dict()
+        self._connected_app_vertices = None
 
         if self._n_synapse_types > 1:
             # Hard coded to ensure it's 0.
@@ -255,6 +261,14 @@ class SynapticManager(
     @property
     def vertex_executable_suffix(self):
         return self._synapse_dynamics.get_vertex_executable_suffix()
+
+    @property
+    def connected_app_vertices(self):
+        return self._connected_app_vertices
+
+    @connected_app_vertices.setter
+    def connected_app_vertices(self, connected_app_vertices):
+        self._connected_app_vertices = connected_app_vertices
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -1410,7 +1424,20 @@ class SynapticManager(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
+        self._machine_vertices[vertex_slice.hi_atom] = vertex
         SynapticManager._n_vertices += 1
+
+        for app_vertex in self._connected_app_vertices:
+            out_vertex =\
+                app_vertex.get_machine_vertex_at(vertex_slice.hi_atom)
+            if out_vertex is not None:
+                vertex.add_constraint(SameChipAsConstraint(out_vertex))
 
         # return machine vertex
         return vertex
+
+    def get_machine_vertex_at(self, index):
+
+        if index in self._machine_vertices:
+            return self._machine_vertices[index]
+        return None

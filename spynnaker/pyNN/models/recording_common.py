@@ -55,29 +55,21 @@ class RecordingCommon(object):
 
         get_simulator().verify_not_running()
         # tell vertex its recording
+        if isinstance(self._population._vertex, Iterable):
+            vertex = self._population._vertex[0]
+        else:
+            vertex = self._population.vertex
+
         if variable == "spikes":
-            if (isinstance(self._population._vertex, Iterable)):
-                for i in range(1, len(self._population._vertex)):
-                    if not isinstance(self._population._vertex[i],
-                                    AbstractSpikeRecordable):
-                        raise Exception("This population does not support the "
-                                        "recording of spikes!")
-                    self._population._vertex.set_recording_spikes(
-                        sampling_interval=sampling_interval, indexes=indexes)
-            else:
-                if not isinstance(self._population._vertex,
-                                AbstractSpikeRecordable):
-                    raise Exception("This population does not support the "
-                                    "recording of spikes!")
-                self._population._vertex.set_recording_spikes(
-                    sampling_interval=sampling_interval, indexes=indexes)
+            if not isinstance(vertex,
+                            AbstractSpikeRecordable):
+                raise Exception("This population does not support the "
+                                "recording of spikes!")
+            vertex.set_recording_spikes(
+                sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
             raise Exception("Illegal call with all")
         else:
-            if isinstance(self._population._vertex, Iterable):
-                vertex = self._population._vertex[0]
-            else:
-                vertex = self._population._vertex
             if not isinstance(vertex,
                               AbstractNeuronRecordable):
                 raise Exception("This population does not support the "

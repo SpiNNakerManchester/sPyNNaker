@@ -47,8 +47,8 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
-} callback_priorities; //LEFT THE SAME AS BEFORE!
+    MC = -1, TIMER = 0, DMA = 0, USER = 0, SDP = 1
+} callback_priorities;
 
 //! The number of regions that are to be used for recording
 #define NUMBER_OF_REGIONS_TO_RECORD 4
@@ -228,6 +228,10 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
     contribution_written = false;
+
+    synapses_flush_ring_buffer(time-1);
+
+    io_printf(IO_BUF, "Tick Tock\n");
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
 

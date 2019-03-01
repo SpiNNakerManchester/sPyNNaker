@@ -15,6 +15,8 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from pacman.model.constraints.placer_constraints\
+    import SameChipAsConstraint
 
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
@@ -90,7 +92,9 @@ class AbstractPopulationVertex(
         "_time_between_requests",
         "_units",
         "_using_auto_pause_and_resume",
-        "_ring_buffer_shifts"]
+        "_ring_buffer_shifts",
+        "_machine_vertices",
+        "_connected_app_vertices"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -124,6 +128,8 @@ class AbstractPopulationVertex(
         self._neuron_impl.add_parameters(self._parameters)
         self._neuron_impl.add_state_variables(self._state_variables)
         self._ring_buffer_shifts = None
+        self._machine_vertices = dict()
+        self._connected_app_vertices = None
 
         # Set up for recording
         recordables = ["spikes"]
@@ -209,6 +215,14 @@ class AbstractPopulationVertex(
     def requires_mapping(self):
         return self._change_requires_mapping
 
+    @property
+    def connected_app_vertices(self):
+        return self._connected_app_vertices
+
+    @connected_app_vertices.setter
+    def connected_app_vertices(self, connected_app_vertices):
+        self._connected_app_vertices = connected_app_vertices
+
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self._change_requires_mapping = False
@@ -253,6 +267,13 @@ class AbstractPopulationVertex(
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
         AbstractPopulationVertex._n_vertices += 1
+        self._machine_vertices[vertex_slice.hi_atom] = vertex
+
+        for app_vertex in self._connected_app_vertices:
+            out_vertex =\
+                app_vertex.get_machine_vertex_at(vertex_slice.hi_atom)
+            if out_vertex is not None:
+                vertex.add_constraint(SameChipAsConstraint(out_vertex))
 
         # return machine vertex
         return vertex
@@ -961,6 +982,12 @@ class AbstractPopulationVertex(
     #used to know how many synapse vertices we need
     def get_n_synapse_types(self):
         return self._neuron_impl.get_n_synapse_types()
+
+    def get_machine_vertex_at(self, index):
+
+        if index in self._machine_vertices:
+            return self._machine_vertices[index]
+        return None
 
     def __str__(self):
         return "{} with {} atoms".format(self.label, self.n_atoms)

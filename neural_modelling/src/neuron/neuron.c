@@ -409,6 +409,11 @@ bool neuron_initialise(address_t address) {
     // is not assigned yet. size is dma_size
     synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, 255, 0);
 
+    //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
+    for(uint32_t i = 0; i < n_neurons*n_synapse_types; i++) {
+        synaptic_region[i] = 0;
+    }
+
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 

@@ -42,8 +42,6 @@ static uint32_t synapse_type_mask;
 
 static weight_t *synaptic_region;
 
-static bool dirty;
-
 extern bool contribution_written;
 
 //! parameters that reside in the synapse_parameter_data_region in human
@@ -219,7 +217,7 @@ static inline void _process_fixed_synapses(
             saturation_count += 1;
         }
 
-        io_printf(IO_BUF, "Spike, buf index: %d, prev: %d, new val: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], accumulation);
+        //io_printf(IO_BUF, "Spike, buf index: %d, prev: %d, new val: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], accumulation);
 
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;
@@ -249,8 +247,6 @@ bool synapses_initialise(
         address_t *direct_synapses_address) {
 
     log_debug("synapses_initialise: starting");
-
-    dirty = false;
 
     // Neuron details
     *n_neurons_value = synapse_params_address[N_NEURONS_TO_SIMULATE];
@@ -364,13 +360,13 @@ void synapses_do_timestep_update(timer_t time) {
         synaptic_region += n_neurons * synapse_index;
     }
 
+    for(int i = ring_buffer_index; i < ring_buffer_index + n_neurons; i++)
+        io_printf(IO_BUF, "SDRAM written: %d\n", ring_buffers[ring_buffer_index]);
+
     // Start the transfer
     spin1_dma_transfer(
         0, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
-
-    //Set flag for buffer cleaning
-    dirty = true;
 
     /*
     // Transfer the input from the ring buffers into the input buffers
@@ -410,31 +406,6 @@ void synapses_do_timestep_update(timer_t time) {
 
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id) {
-
-    uint32_t ring_buffer_index;
-
-    if(dirty) {
-        // Clean the ring buffers
-        for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-                neuron_index++) {
-
-            // Loop through all synapse types
-            for (uint32_t synapse_type_index = 0;
-                    synapse_type_index < n_synapse_types; synapse_type_index++) {
-
-                // Get index in the ring buffers for the current time slot for
-                // this synapse type and neuron
-                ring_buffer_index = synapses_get_ring_buffer_index(
-                    time, synapse_type_index, neuron_index, synapse_type_index_bits,
-                    synapse_index_bits);
-
-                //io_printf(IO_BUF, "Written: %d\n", ring_buffers[ring_buffer_index]);
-
-                // Clear ring buffer
-                ring_buffers[ring_buffer_index] = 0;
-            }
-        }
-    }
 
     _print_synaptic_row(row);
 
@@ -594,4 +565,28 @@ bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
    // Increment FF
     fixed_region[0] = fixed_region[0] + 1;
     return true;
+}
+
+void synapses_flush_ring_buffer(uint32_t timestep) {
+
+    uint32_t ring_buffer_index;
+
+    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
+            neuron_index++) {
+
+        // Loop through all synapse types
+        for (uint32_t synapse_type_index = 0;
+                synapse_type_index < n_synapse_types; synapse_type_index++) {
+
+            // Get index in the ring buffers for the previous time slot for
+            // this synapse type and neuron
+            ring_buffer_index = synapses_get_ring_buffer_index(
+                timestep, synapse_type_index, neuron_index, synapse_type_index_bits,
+                synapse_index_bits);
+
+            // Clear ring buffer
+            ring_buffers[ring_buffer_index] = 0;
+        }
+    }
+
 }
