@@ -150,7 +150,7 @@ static bool run_expander(
     }
 
     // Go through each connector and generate
-    address_t params = &config->config_data[config->n_synapse_types];
+    void *params = &config->config_data[config->n_synapse_types];
     for (uint32_t edge = 0; edge < config->n_in_edges; edge++) {
         if (!run_connection_builder_region(
                 &params, synaptic_matrix_region,
