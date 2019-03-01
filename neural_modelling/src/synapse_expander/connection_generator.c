@@ -86,7 +86,6 @@ struct connection_generator_info {
      *! \brief Generate connections
      */
     connection_generator_generate_t *generate_fun;
-
     /**
      *! \brief Free any data for the generator
      */
