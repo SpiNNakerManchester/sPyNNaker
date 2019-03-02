@@ -24,10 +24,6 @@ class FromListConnector(AbstractConnector):
         "_delays",
         "_extra_parameters"]
 
-    CONN_LIST_DTYPE = numpy.dtype([
-        ("source", numpy.uint32), ("target", numpy.uint32),
-        ("weight", numpy.float64), ("delay", numpy.float64)])
-
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
         :param: conn_list:
@@ -84,7 +80,7 @@ class FromListConnector(AbstractConnector):
             sources = self._sources[mask]
         if sources.size == 0:
             return 0
-        max_targets = numpy.max(numpy.bincount(sources.view('int32')))
+        max_targets = numpy.max(numpy.bincount(sources.astype('int32')))
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
@@ -102,7 +98,7 @@ class FromListConnector(AbstractConnector):
         if not len(self._targets):
             return 0
         # pylint: disable=too-many-arguments
-        return numpy.max(numpy.bincount(self._targets))
+        return numpy.max(numpy.bincount(self._targets.astype('int32')))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
