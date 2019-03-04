@@ -86,10 +86,10 @@ static inline post_trace_t timing_add_post_spike(
     // If this is the 1st post-synaptic event, o2 trace is zero
     // (as it's sampled BEFORE the spike),
     // otherwise, add on energy caused by last spike and decay that
-    int32_t new_o2 = (last_time == 0)? 0:
-                     STDP_FIXED_MUL_16X16(
-                        last_trace.o2 + STDP_FIXED_POINT_ONE,
-                        DECAY_LOOKUP_TAU_Y(delta_time));
+    int32_t new_o2 = (last_time == 0) ? 0 :
+            STDP_FIXED_MUL_16X16(
+                    last_trace.o2 + STDP_FIXED_POINT_ONE,
+                    DECAY_LOOKUP_TAU_Y(delta_time));
 
     log_debug("\tdelta_time=%d, o1=%d, o2=%d\n", delta_time, new_o1, new_o2);
 
@@ -113,10 +113,10 @@ static inline pre_trace_t timing_add_pre_spike(
     // If this is the 1st pre-synaptic event, r2 trace is zero
     // (as it's sampled BEFORE the spike),
     // otherwise, add on energy caused by last spike  and decay that
-    int32_t new_r2 = (last_time == 0)? 0:
-                    STDP_FIXED_MUL_16X16(
-                        last_trace.r2 + STDP_FIXED_POINT_ONE,
-                        DECAY_LOOKUP_TAU_X(delta_time));
+    int32_t new_r2 = (last_time == 0) ? 0 :
+            STDP_FIXED_MUL_16X16(
+                    last_trace.r2 + STDP_FIXED_POINT_ONE,
+                    DECAY_LOOKUP_TAU_X(delta_time));
 
     log_debug("\tdelta_time=%u, r1=%d, r2=%d\n", delta_time, new_r1, new_r2);
 
@@ -135,23 +135,22 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1,
-            DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
-
-        // Calculate triplet term
-        int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
-
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d,"
-                  "decayed_o1_r2=%d\n", time_since_last_post, decayed_o1,
-                                        trace.r2, decayed_o1_r2);
-
-        // Apply depression to state (which is a weight_state)
-        return weight_two_term_apply_depression(previous_state, decayed_o1,
-                                                decayed_o1_r2);
-    } else {
+    if (time_since_last_post == 0) {
         return previous_state;
     }
+
+    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1,
+            DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+    // Calculate triplet term
+    int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
+
+    log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d,"
+            "decayed_o1_r2=%d\n", time_since_last_post, decayed_o1,
+            trace.r2, decayed_o1_r2);
+
+    // Apply depression to state (which is a weight_state)
+    return weight_two_term_apply_depression(
+            previous_state, decayed_o1, decayed_o1_r2);
 }
 
 //---------------------------------------
@@ -164,23 +163,22 @@ static inline update_state_t timing_apply_post_spike(
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
-    if (time_since_last_pre > 0) {
-        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1,
-            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
-
-        // Calculate triplet term
-        int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
-
-        log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d,"
-                  "decayed_r1_o2=%d\n", time_since_last_pre, decayed_r1,
-                                        trace.o2, decayed_r1_o2);
-
-        // Apply potentiation to state (which is a weight_state)
-        return weight_two_term_apply_potentiation(previous_state, decayed_r1,
-                                                  decayed_r1_o2);
-    } else {
+    if (time_since_last_pre == 0) {
         return previous_state;
     }
+
+    int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1,
+            DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+    // Calculate triplet term
+    int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);
+
+    log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d, o2=%d,"
+            "decayed_r1_o2=%d\n", time_since_last_pre, decayed_r1,
+            trace.o2, decayed_r1_o2);
+
+    // Apply potentiation to state (which is a weight_state)
+    return weight_two_term_apply_potentiation(
+            previous_state, decayed_r1, decayed_r1_o2);
 }
 
 #endif	// PFISTER_TRIPLET_IMPL_H

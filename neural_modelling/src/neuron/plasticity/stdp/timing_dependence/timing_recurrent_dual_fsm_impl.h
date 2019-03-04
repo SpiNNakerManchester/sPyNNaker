@@ -50,8 +50,8 @@ static inline post_trace_t timing_add_post_spike(
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
     uint16_t window_length = post_exp_dist_lookup[random];
-    log_debug("\t\tResetting post-window: random=%d, window_length=%u", random,
-              window_length);
+    log_debug("\t\tResetting post-window: random=%d, window_length=%u",
+            random, window_length);
 
     // Return window length
     return window_length;
@@ -67,8 +67,8 @@ static inline pre_trace_t timing_add_pre_spike(
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
     uint16_t window_length = pre_exp_dist_lookup[random];
-    log_debug("\t\tResetting pre-window: random=%d, window_length=%u", random,
-              window_length);
+    log_debug("\t\tResetting pre-window: random=%d, window_length=%u",
+            random, window_length);
 
     // Return window length
     return window_length;
@@ -87,7 +87,7 @@ static inline update_state_t timing_apply_pre_spike(
     uint32_t time_since_last_post = time - last_post_time;
 
     log_debug("\t\t\ttime_since_last_post:%u, post_window_length:%u",
-              time_since_last_post, last_post_trace);
+            time_since_last_post, last_post_trace);
 
     // If spikes don't coincide
     if (time_since_last_post > 0) {
@@ -96,14 +96,13 @@ static inline update_state_t timing_apply_pre_spike(
         if (time_since_last_post < last_post_trace) {
 
             if (previous_state.accumulator >
-                    plasticity_trace_region_data
-                    .accumulator_depression_plus_one) {
+                    plasticity_trace_region_data.accumulator_depression_plus_one) {
 
                 // If accumulator's not going to hit depression limit,
                 // decrement it
                 previous_state.accumulator--;
                 log_debug("\t\t\t\tDecrementing accumulator=%d",
-                          previous_state.accumulator);
+                        previous_state.accumulator);
             } else {
 
                 // Otherwise, reset accumulator and apply depression
@@ -111,7 +110,7 @@ static inline update_state_t timing_apply_pre_spike(
 
                 previous_state.accumulator = 0;
                 previous_state.weight_state = weight_one_term_apply_depression(
-                    previous_state.weight_state, STDP_FIXED_POINT_ONE);
+                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
             }
         }
     }
@@ -132,34 +131,26 @@ static inline update_state_t timing_apply_post_spike(
     uint32_t time_since_last_pre = time - last_pre_time;
 
     log_debug("\t\t\ttime_since_last_pre:%u, pre_window_length:%u",
-              time_since_last_pre, last_pre_trace);
+            time_since_last_pre, last_pre_trace);
 
-    // If spikes don't coincide
-    if (time_since_last_pre > 0) {
+    /*
+     * If spikes don't coincide and this post-spike has arrived within the
+     * last pre window.
+     */
+    if ((time_since_last_pre > 0) && (time_since_last_pre < last_pre_trace)) {
+        if (previous_state.accumulator <
+                plasticity_trace_region_data.accumulator_potentiation_minus_one) {
+            // If accumulator's not going to hit potentiation limit, increment it
+            previous_state.accumulator++;
+            log_debug("\t\t\t\tIncrementing accumulator=%d",
+                    previous_state.accumulator);
+        } else {
+            // Otherwise, reset accumulator and apply potentiation
+            log_debug("\t\t\t\tApplying potentiation");
 
-        // If this post-spike has arrived within the last pre window
-        if (time_since_last_pre < last_pre_trace) {
-
-
-            if (previous_state.accumulator
-                    < plasticity_trace_region_data
-                      .accumulator_potentiation_minus_one) {
-
-                // If accumulator's not going to hit potentiation limit,
-                // increment it
-                previous_state.accumulator++;
-                log_debug("\t\t\t\tIncrementing accumulator=%d",
-                          previous_state.accumulator);
-            } else {
-
-                // Otherwise, reset accumulator and apply potentiation
-                log_debug("\t\t\t\tApplying potentiation");
-
-                previous_state.accumulator = 0;
-                previous_state.weight_state =
-                    weight_one_term_apply_potentiation(
-                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
-            }
+            previous_state.accumulator = 0;
+            previous_state.weight_state = weight_one_term_apply_potentiation(
+                    previous_state.weight_state, STDP_FIXED_POINT_ONE);
         }
     }
 

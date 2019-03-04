@@ -268,7 +268,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
             subpopinfo->key_atom_info[j] = subpop_config->key_atom_info[j];
         }
         // Advance the config pointer past the inline data
-        sp_word = subpop_config->key_atom_info[subpop_config->n_pre_vertices];
+        sp_word = &subpop_config->key_atom_info[subpop_config->n_pre_vertices];
     }
 
     // Read the probability vs distance tables into DTCM

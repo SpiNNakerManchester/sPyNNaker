@@ -135,7 +135,7 @@ static inline plastic_synapse_t* _plastic_synapses(
                   "Size of pre_event_history_t structure should be a multiple"
                   " of 32-bit words");
 
-    return (plastic_synapse_t*)
+    return (plastic_synapse_t *)
             &plastic_region_address[pre_event_history_size_words];
 }
 
@@ -339,8 +339,8 @@ void synapse_dynamics_process_post_synaptic_event(
             timing_add_post_spike(time, last_post_time, last_post_trace));
 }
 
-input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
-                                            index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(
+        uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
     return 0.0k;
@@ -384,7 +384,7 @@ bool find_plastic_neuron_with_id(
 
         // Check if index is the one I'm looking for
         delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
-        if (synapse_row_sparse_index(control_word, synapse_index_mask)==id) {
+        if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
             sp_data->weight = weight;
             sp_data->offset =
                     synapse_row_num_plastic_controls(fixed_region)

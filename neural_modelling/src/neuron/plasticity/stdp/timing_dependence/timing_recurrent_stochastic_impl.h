@@ -29,10 +29,8 @@ extern int16_t post_cdf_lookup[STDP_TRACE_POST_CDF_SIZE];
 static inline bool _in_window(
         uint32_t time_since_last_event, const uint32_t cdf_lut_size,
         const int16_t *cdf_lut) {
+    // If time since last event is still within CDF LUT
     if (time_since_last_event < cdf_lut_size) {
-
-        // If time since last event is still within CDF LUT
-
         // Lookup distribution
         int32_t cdf = cdf_lut[time_since_last_event];
 

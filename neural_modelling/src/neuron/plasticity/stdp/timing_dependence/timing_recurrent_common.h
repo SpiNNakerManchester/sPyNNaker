@@ -76,7 +76,6 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
-
     use(&trace);
     use(&last_pre_trace);
     use(&last_post_trace);
@@ -86,8 +85,8 @@ static inline update_state_t timing_apply_pre_spike(
         // If we're idle, transition to pre-open state
         log_debug("\tOpening pre-window");
         previous_state.state = STATE_PRE_OPEN;
-        previous_state = timing_recurrent_calculate_pre_window(
-            previous_state);
+        previous_state =
+                timing_recurrent_calculate_pre_window(previous_state);
     } else if (previous_state.state == STATE_PRE_OPEN) {
 
         // If we're in pre-open state
@@ -130,7 +129,7 @@ static inline update_state_t timing_apply_pre_spike(
             // Otherwise, if post-window is still open
             if (previous_state.accumulator
                     > plasticity_trace_region_data
-                      .accumulator_depression_plus_one) {
+                            .accumulator_depression_plus_one) {
 
                 // If accumulator's not going to hit depression limit, decrement
                 // it
@@ -139,13 +138,12 @@ static inline update_state_t timing_apply_pre_spike(
                           previous_state.accumulator);
             } else {
 
-
                 // Otherwise, reset accumulator and apply depression
                 log_debug("\t\tApplying depression");
 
                 previous_state.accumulator = 0;
                 previous_state.weight_state = weight_one_term_apply_depression(
-                    previous_state.weight_state, STDP_FIXED_POINT_ONE);
+                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
             }
 
             // Transition back to idle
@@ -157,8 +155,8 @@ static inline update_state_t timing_apply_pre_spike(
             // straight to pre-open
             log_debug("\t\tPost-window closed - Opening pre-window");
             previous_state.state = STATE_PRE_OPEN;
-            previous_state = timing_recurrent_calculate_pre_window(
-                previous_state);
+            previous_state =
+                    timing_recurrent_calculate_pre_window(previous_state);
         }
     } else {
         log_debug("\tInvalid state %u", previous_state.state);
@@ -181,8 +179,8 @@ static inline update_state_t timing_apply_post_spike(
         // If we're idle, transition to post-open state
         log_debug("\tOpening post-window");
         previous_state.state = STATE_POST_OPEN;
-        previous_state = timing_recurrent_calculate_post_window(
-            previous_state);
+        previous_state =
+                timing_recurrent_calculate_post_window(previous_state);
     } else if (previous_state.state == STATE_POST_OPEN) {
 
         // If we're in post-open state
@@ -201,8 +199,8 @@ static inline update_state_t timing_apply_post_spike(
 
             // Otherwise, leave state alone (essentially re-opening window)
             log_debug("\t\tRe-opening post-window");
-            previous_state = timing_recurrent_calculate_post_window(
-                previous_state);
+            previous_state =
+                    timing_recurrent_calculate_post_window(previous_state);
         }
     } else if (previous_state.state == STATE_PRE_OPEN) {
 
@@ -241,7 +239,7 @@ static inline update_state_t timing_apply_post_spike(
                 previous_state.accumulator = 0;
                 previous_state.weight_state =
                     weight_one_term_apply_potentiation(
-                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
+                            previous_state.weight_state, STDP_FIXED_POINT_ONE);
             }
 
             // Transition back to idle
@@ -252,8 +250,8 @@ static inline update_state_t timing_apply_post_spike(
             // straight to pre-open
             log_debug("\t\tPre-window closed - Opening post-window");
             previous_state.state = STATE_POST_OPEN;
-            previous_state = timing_recurrent_calculate_post_window(
-                previous_state);
+            previous_state =
+                    timing_recurrent_calculate_post_window(previous_state);
         }
     } else {
         log_debug("\tInvalid state %u", previous_state.state);

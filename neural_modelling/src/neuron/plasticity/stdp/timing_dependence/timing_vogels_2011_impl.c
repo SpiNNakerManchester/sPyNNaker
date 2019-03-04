@@ -9,21 +9,27 @@ int16_t tau_lookup[TAU_SIZE];
 // Global plasticity parameter data
 plasticity_trace_region_data_t plasticity_trace_region_data;
 
+typedef struct {
+    int32_t alpha;
+    uint32_t lut[TAU_SIZE];
+} vogels_config_t;
+
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *timing_initialise(uint32_t* address)
+address_t timing_initialise(address_t address)
 {
     log_info("timing_initialise: starting");
     log_info("\tVogels 2011 timing rule");
 
-    // Copy parameters
-    plasticity_trace_region_data.alpha = (int32_t)address[0];
+    vogels_config_t *config = (vogels_config_t *) address;
 
+    // Copy parameters
+    plasticity_trace_region_data.alpha = config->alpha;
     // Copy LUTs from following memory
-    address_t lut_address = maths_copy_int16_lut(&address[1], TAU_SIZE, &tau_lookup[0]);
+    (void) maths_copy_int16_lut(config->lut, TAU_SIZE, tau_lookup);
 
     log_info("timing_initialise: completed successfully");
 
-    return lut_address;
+    return (address_t) &config[1];
 }

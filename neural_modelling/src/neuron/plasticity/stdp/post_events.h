@@ -37,20 +37,17 @@ typedef struct {
 static inline post_event_history_t *post_events_init_buffers(
         uint32_t n_neurons) {
     post_event_history_t *post_event_history =
-        (post_event_history_t*) spin1_malloc(
-            n_neurons * sizeof(post_event_history_t));
+            spin1_malloc(n_neurons * sizeof(post_event_history_t));
 
     // Check allocations succeeded
     if (post_event_history == NULL) {
-        log_error(
-            "Unable to allocate global STDP structures - Out of DTCM: Try "
-            "reducing the number of neurons per core to fix this problem ");
+        log_error("Unable to allocate global STDP structures - Out of DTCM: Try "
+                "reducing the number of neurons per core to fix this problem ");
         return NULL;
     }
 
     // Loop through neurons
     for (uint32_t n = 0; n < n_neurons; n++) {
-
         // Add initial placeholder entry to buffer
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
@@ -68,18 +65,16 @@ static inline post_event_window_t post_events_get_window(
     const uint32_t *end_event_time = events->times + count;
     const post_trace_t *end_event_trace = events->traces + count;
     const uint32_t *event_time = end_event_time;
+
     post_event_window_t window;
     do {
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
-    }
-
-    // Keep looping while event occurred after start
-    // Of window and we haven't hit beginning of array
-    while (*event_time > begin_time && event_time != events->times);
+        // Keep looping while event occurred after start
+        // of window and we haven't hit beginning of array
+    } while (*event_time > begin_time && event_time != events->times);
 
     // Deference event to use as previous
     window.prev_time = *event_time;
@@ -116,11 +111,9 @@ static inline post_event_window_t post_events_get_window_delayed(
         if (*event_time > end_time) {
             end_event_time = event_time;
         }
-    }
-
-    // Keep looping while event occurred after start
-    // Of window and we haven't hit beginning of array
-    while (*event_time > begin_time && event_time != events->times);
+        // Keep looping while event occurred after start
+        // of window and we haven't hit beginning of array
+    } while (*event_time > begin_time && event_time != events->times);
 
     // Deference event to use as previous
     window.prev_time = *event_time;
@@ -196,10 +189,7 @@ static inline void print_event_history(post_event_history_t *events){
 	log_debug("		##  printing entire post event history  ##");
 	for (uint i = 0; i <= events->count_minus_one; i++){
 		log_debug("post event: %u, time: %u, trace: %u",
-				i,
-				events->times[i],
-				events->traces[i]
-				);
+				i, events->times[i], events->traces[i]);
 	}
 }
 
@@ -210,8 +200,8 @@ static inline void print_delayed_window_events(post_event_history_t *post_event_
             post_event_history, begin_time, end_time);
 
     while (post_window.num_events > 0) {
-    	const uint32_t delayed_post_time = *post_window.next_time
-    	                                           + delay_dendritic;
+    	const uint32_t delayed_post_time =
+    	        *post_window.next_time + delay_dendritic;
     	log_debug("post spike: %u, time: %u, trace: %u",
     			post_window.num_events, delayed_post_time,
 				*post_window.next_trace);
