@@ -49,7 +49,7 @@ def test_connector(
     assert(numpy.array_equal(
         extra_param_names, expected_extra_parameter_names))
     if extra_params is not None:
-        assert(len(extra_params.shape), 2)
+        assert(len(extra_params.shape) == 2)
         assert(extra_params.shape[1] == len(extra_param_names))
         for i in range(len(extra_param_names)):
             assert(extra_params[:, i].shape == (len(clist), ))
