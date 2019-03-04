@@ -22,7 +22,8 @@ class FromListConnector(AbstractConnector):
         "_targets",
         "_weights",
         "_delays",
-        "_extra_parameters"]
+        "_extra_parameters",
+        "_extra_parameter_names"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
@@ -80,7 +81,8 @@ class FromListConnector(AbstractConnector):
             sources = self._sources[mask]
         if sources.size == 0:
             return 0
-        max_targets = numpy.max(numpy.bincount(sources.astype('int32')))
+        max_targets = numpy.max(numpy.bincount(
+            sources.astype('int64', copy=False)))
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
@@ -98,7 +100,8 @@ class FromListConnector(AbstractConnector):
         if not len(self._targets):
             return 0
         # pylint: disable=too-many-arguments
-        return numpy.max(numpy.bincount(self._targets.astype('int32')))
+        return numpy.max(numpy.bincount(
+            self._targets.astype('int64', copy=False)))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
@@ -224,7 +227,7 @@ class FromListConnector(AbstractConnector):
         extra_columns = list()
         for i, name in enumerate(column_names):
             if name not in ('weight', 'delay'):
-                self._extra_columns.append(i + _FIRST_PARAM)
+                extra_columns.append(i + _FIRST_PARAM)
 
         # Check any additional parameters have single values over the whole
         # set of connections (as other things aren't currently supported
@@ -239,8 +242,11 @@ class FromListConnector(AbstractConnector):
 
         # Store the extra data
         self._extra_parameters = None
+        self._extra_parameter_names = None
         if extra_columns:
             self._extra_parameters = self._conn_list[:, extra_columns]
+            self._extra_parameter_names = [
+                column_names[i - _FIRST_PARAM] for i in extra_columns]
 
     @property
     def column_names(self):
@@ -256,3 +262,8 @@ class FromListConnector(AbstractConnector):
         :return: The extra parameters
         """
         return self._extra_parameters
+
+    def get_extra_parameter_names(self):
+        """ Getter for the names of the extra parameters
+        """
+        return self._extra_parameter_names
