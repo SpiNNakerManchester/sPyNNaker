@@ -3,6 +3,7 @@
 
 // Standard includes
 #include <common/neuron-typedefs.h>
+#include <spin1_api.h>
 
 //---------------------------------------
 // Macros

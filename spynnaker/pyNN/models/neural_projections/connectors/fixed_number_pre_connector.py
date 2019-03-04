@@ -23,7 +23,7 @@ class FixedNumberPreConnector(AbstractConnector):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False):
+            safe=True, verbose=False, rng=None):
         """
         :param n: \
             number of random pre-synaptic neurons connected to output
@@ -47,7 +47,7 @@ class FixedNumberPreConnector(AbstractConnector):
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
         # :type space: pyNN.Space
-        super(FixedNumberPreConnector, self).__init__(safe, verbose)
+        super(FixedNumberPreConnector, self).__init__(safe, verbose, rng)
         self._n_pre = n
         self._allow_self_connections = allow_self_connections
         self._with_replacement = with_replacement
@@ -103,11 +103,11 @@ class FixedNumberPreConnector(AbstractConnector):
                         n for n in range(self._n_pre_neurons) if n != m]
 
                     # Now use this list in the random choice
-                    self._pre_neurons[m] = numpy.random.choice(
+                    self._pre_neurons[m] = self._rng.choice(
                         no_self_pre_neurons, self._n_pre,
                         self._with_replacement)
                 else:
-                    self._pre_neurons[m] = numpy.random.choice(
+                    self._pre_neurons[m] = self._rng.choice(
                         self._n_pre_neurons, self._n_pre,
                         self._with_replacement)
 

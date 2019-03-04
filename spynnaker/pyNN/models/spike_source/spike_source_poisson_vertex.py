@@ -76,7 +76,6 @@ class SpikeSourcePoissonVertex(
     """ A Poisson Spike source object
     """
 
-    _N_POPULATION_RECORDING_REGIONS = 1
     _DEFAULT_MALLOCS_USED = 2
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -155,8 +154,11 @@ class SpikeSourcePoissonVertex(
         if max_rate == 0:
             return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
+        chance_ts = n_machine_time_steps
+        if n_machine_time_steps is None:
+            chance_ts = 100000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
-            1.0 - (1.0 / float(n_machine_time_steps)),
+            1.0 - (1.0 / float(chance_ts)),
             float(max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
@@ -183,7 +185,7 @@ class SpikeSourcePoissonVertex(
             [self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step),
-                self._N_POPULATION_RECORDING_REGIONS) * n_machine_time_steps],
+                n_machine_time_steps)],
             self._minimum_buffer_sdram,
             self._maximum_sdram_for_buffering,
             self._using_auto_pause_and_resume)
@@ -213,12 +215,14 @@ class SpikeSourcePoissonVertex(
             self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
                     vertex_slice, n_machine_time_steps, machine_time_step), 1)
-        minimum_buffer_sdram = recording_utilities.get_minimum_buffer_sdram(
-            [buffered_sdram_per_timestep * n_machine_time_steps],
-            self._minimum_buffer_sdram)
+        minimum_buff_sdram = 0
+        if n_machine_time_steps is not None:
+            minimum_buff_sdram = recording_utilities.get_minimum_buffer_sdram(
+                [buffered_sdram_per_timestep * n_machine_time_steps],
+                self._minimum_buffer_sdram)[0]
         return SpikeSourcePoissonMachineVertex(
             resources_required, self._spike_recorder.record,
-            minimum_buffer_sdram[0], buffered_sdram_per_timestep,
+            minimum_buff_sdram, buffered_sdram_per_timestep,
             constraints, label)
 
     @property

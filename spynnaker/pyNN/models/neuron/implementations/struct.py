@@ -105,6 +105,9 @@ class Struct(object):
         :return:\
             a list of lists of data values, one list for each struct element
         """
+        if self.numpy_dtype.itemsize == 0:
+            return numpy.zeros(0, dtype=self.numpy_dtype)
+
         # Prepare items to return
         items_to_return = list()
 
