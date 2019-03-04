@@ -32,10 +32,10 @@ address_t timing_initialise(address_t address) {
             config->tau_minus_lookup, TAU_MINUS_SIZE, tau_minus_lookup);
     (void) maths_copy_int16_lut(
             config->tau_x_lookup, TAU_X_SIZE, tau_x_lookup);
-    address_t lut_address = maths_copy_int16_lut(
+    (void) maths_copy_int16_lut(
             config->tau_y_lookup, TAU_Y_SIZE, tau_y_lookup);
 
     log_info("timing_initialise: completed successfully");
 
-    return lut_address;
+    return (address_t) &config[1];
 }

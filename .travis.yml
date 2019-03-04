@@ -41,6 +41,7 @@ before_install:
   - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   - export SPINN_DIRS=$PWD/spinnaker_tools
   - export NEURAL_MODELLING_DIRS=$PWD/neural_modelling
+  - export GCC_COLORS='error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:quote=01:fixit-insert=32:fixit-delete=31:diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32'
 
 install:
   - pip install -r requirements-test.txt
