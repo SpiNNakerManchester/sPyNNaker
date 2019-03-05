@@ -354,7 +354,7 @@ class NeuronRecorder(object):
             self.check_indexes(indexes)
             if self._indexes[variable] is not None:
                 # merge the two indexes
-                self._indexes[variable] = self._indexes[variable] + indexes
+                indexes = self._indexes[variable] + indexes
             # Avoid duplicates and keep in numerical order
             self._indexes[variable] = list(set(indexes))
             self._indexes[variable].sort()
