@@ -195,24 +195,18 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_1.set_weights_and_delays(
-            [1.5 for _ in range(10)], 1.0)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_2.set_weights_and_delays(
-            [2.5 for _ in range(10)], 2.0)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector.set_weights_and_delays(
-            [4.5 for _ in range(10) for _ in range(10)], 4.0)
         direct_synapse_information_1 = SynapseInformation(
-            one_to_one_connector_1, SynapseDynamicsStatic(), 0)
+            one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(
-            one_to_one_connector_2, SynapseDynamicsStatic(), 1)
+            one_to_one_connector_2, SynapseDynamicsStatic(), 1, 2.5, 2.0)
         all_to_all_synapse_information = SynapseInformation(
-            all_to_all_connector, SynapseDynamicsStatic(), 0)
+            all_to_all_connector, SynapseDynamicsStatic(), 0, 4.5, 4.0)
         app_edge = ProjectionApplicationEdge(
             pre_app_vertex, post_app_vertex, direct_synapse_information_1)
         app_edge.add_synapse_information(direct_synapse_information_2)
