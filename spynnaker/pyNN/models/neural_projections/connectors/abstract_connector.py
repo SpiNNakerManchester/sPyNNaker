@@ -56,8 +56,6 @@ class AbstractConnector(object):
 
         self._n_clipped_delays = 0
         self._min_delay = 0
-#         self._weights = None
-#         self._delays = None
 
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
