@@ -600,7 +600,10 @@ class SynapticManager(object):
                             connector, AbstractGenerateConnectorOnMachine) and
                             connector.generate_on_machine and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
-                            dynamics.generate_on_machine):
+                            dynamics.generate_on_machine and
+                            not self.__is_direct(
+                                single_addr, connector, pre_vertex_slice,
+                                post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_idx, app_edge, rinfo))
