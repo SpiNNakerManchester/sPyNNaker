@@ -18,10 +18,8 @@
 #define GSYN_INHIBITORY_RECORDING_INDEX 2
 
 typedef struct input_type_current_semd_t {
-
     // multiplicator
     REAL multiplicator[NUM_INHIBITORY_RECEPTORS];
-
     // previous input value
     REAL inh_input_previous[NUM_INHIBITORY_RECEPTORS];
 } input_type_current_semd_t;
@@ -40,36 +38,34 @@ static threshold_type_pointer_t threshold_type_array;
 static synapse_param_t *neuron_synapse_shaping_params;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
-
     // Allocate DTCM for neuron array
-    neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
+    neuron_array = spin1_malloc(n_neurons * sizeof(neuron_t));
     if (neuron_array == NULL) {
         log_error("Unable to allocate neuron array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for input type array and copy block of data
-    input_type_array = (input_type_current_semd_t *) spin1_malloc(
-        n_neurons * sizeof(input_type_current_semd_t));
+    input_type_array =
+            spin1_malloc(n_neurons * sizeof(input_type_current_semd_t));
     if (input_type_array == NULL) {
         log_error("Unable to allocate input type array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for threshold type array and copy block of data
-    threshold_type_array = (threshold_type_t *) spin1_malloc(
-        n_neurons * sizeof(threshold_type_t));
+    threshold_type_array = spin1_malloc(n_neurons * sizeof(threshold_type_t));
     if (threshold_type_array == NULL) {
         log_error("Unable to allocate threshold type array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for synapse shaping parameters
-    neuron_synapse_shaping_params = (synapse_param_t *) spin1_malloc(
-        n_neurons * sizeof(synapse_param_t));
+    neuron_synapse_shaping_params =
+            spin1_malloc(n_neurons * sizeof(synapse_param_t));
     if (neuron_synapse_shaping_params == NULL) {
         log_error("Unable to allocate synapse parameters array"
-            " - Out of DTCM");
+                " - Out of DTCM");
         return false;
     }
 
@@ -112,7 +108,6 @@ static void neuron_impl_load_neuron_parameters(
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
-
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -121,9 +116,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get threshold synapse parameters for this neuron
     threshold_type_pointer_t threshold_type =
-        &threshold_type_array[neuron_index];
+            &threshold_type_array[neuron_index];
     synapse_param_pointer_t synapse_type =
-        &neuron_synapse_shaping_params[neuron_index];
+            &neuron_synapse_shaping_params[neuron_index];
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
@@ -219,11 +214,11 @@ static void neuron_impl_store_neuron_parameters(
 void neuron_impl_print_inputs(uint32_t n_neurons) {
 	bool empty = true;
 	for (index_t i = 0; i < n_neurons; i++) {
-		empty = empty
-				&& (bitsk(synapse_types_get_excitatory_input(
-						&(neuron_synapse_shaping_params[i]))
-					- synapse_types_get_inhibitory_input(
-						&(neuron_synapse_shaping_params[i]))) == 0);
+		empty = empty && (0 == bitsk(
+		        synapse_types_get_excitatory_input(
+						&neuron_synapse_shaping_params[i])
+				- synapse_types_get_inhibitory_input(
+						&neuron_synapse_shaping_params[i])));
 	}
 
 	if (!empty) {
@@ -231,10 +226,10 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 
 		for (index_t i = 0; i < n_neurons; i++) {
 			input_t input =
-				synapse_types_get_excitatory_input(
-					&(neuron_synapse_shaping_params[i]))
-				- synapse_types_get_inhibitory_input(
-					&(neuron_synapse_shaping_params[i]));
+			        synapse_types_get_excitatory_input(
+			                &neuron_synapse_shaping_params[i])
+					- synapse_types_get_inhibitory_input(
+					        &neuron_synapse_shaping_params[i]);
 			if (bitsk(input) != 0) {
 				log_debug("%3u: %12.6k (= ", i, input);
 				synapse_types_print_input(

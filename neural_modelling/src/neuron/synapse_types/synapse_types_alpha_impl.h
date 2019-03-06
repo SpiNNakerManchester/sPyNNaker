@@ -5,7 +5,6 @@
 #ifndef _ALPHA_SYNAPSE_H_
 #define _ALPHA_SYNAPSE_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -18,7 +17,6 @@
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
-
 
 //---------------------------------------
 // Synapse parameters
@@ -49,7 +47,6 @@ typedef struct synapse_param_t {
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
 } input_buffer_regions;
-
 
 //---------------------------------------
 // Synapse shaping inline implementation
@@ -82,10 +79,8 @@ static inline void synapse_types_shape_input(
 //! \return None
 static inline void add_input_alpha(alpha_params_t* a_params, input_t input){
     a_params->q_buff = input;
-
 	a_params->exp_buff =
 			decay_s1615(a_params->exp_buff, a_params->decay) + ONE;
-
     a_params->lin_buff = (a_params->lin_buff
             + (input * a_params->dt_divided_by_tau_sqr))
                     * (ONE - ONE/a_params->exp_buff);
@@ -136,10 +131,13 @@ static inline void synapse_types_print_input(
             parameter->inh.lin_buff * parameter->inh.exp_buff);
 }
 
-static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
+static inline void synapse_types_print_parameters(
+        synapse_param_pointer_t parameter) {
     log_debug("-------------------------------------\n");
-    log_debug("exc_response  = %11.4k\n", parameter->exc.lin_buff * parameter->exc.exp_buff);
-    log_debug("inh_response  = %11.4k\n", parameter->inh.lin_buff * parameter->inh.exp_buff);
+    log_debug("exc_response  = %11.4k\n",
+            parameter->exc.lin_buff * parameter->exc.exp_buff);
+    log_debug("inh_response  = %11.4k\n",
+            parameter->inh.lin_buff * parameter->inh.exp_buff);
 }
 
 #endif // _ALPHA_SYNAPSE_H_

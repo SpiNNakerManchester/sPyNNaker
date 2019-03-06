@@ -307,7 +307,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     }
 
     // Read the probability vs distance tables into DTCM
-    probabilities_t *prob_config = (probabilities_t *) sp_word;
+    probabilities_t *prob_config = sp_word;
 
     rewiring_data.size_ff_prob = prob_config->size;
     rewiring_data.ff_probabilities =

@@ -5,13 +5,13 @@
 // Structures
 //---------------------------------------
 typedef struct post_trace_t {
-  int16_t o1;
-  int16_t o2;
+    int16_t o1;
+    int16_t o2;
 } post_trace_t;
 
 typedef struct pre_trace_t {
-  int16_t r1;
-  int16_t r2;
+    int16_t r1;
+    int16_t r2;
 } pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>

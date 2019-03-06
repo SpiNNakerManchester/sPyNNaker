@@ -11,7 +11,6 @@
 #ifndef _SYNAPSE_TYPES_DUAL_EXCITATORY_EXPONENTIAL_IMPL_H_
 #define _SYNAPSE_TYPES_DUAL_EXCITATORY_EXPONENTIAL_IMPL_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -24,7 +23,6 @@
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
-
 
 //---------------------------------------
 // Synapse parameters
@@ -43,7 +41,6 @@ typedef struct synapse_param_t {
 	exp_params_t exc2;
 	exp_params_t inh;
 } synapse_param_t;
-
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.

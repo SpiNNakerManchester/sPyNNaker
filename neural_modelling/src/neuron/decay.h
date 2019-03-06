@@ -2,8 +2,6 @@
  *
  *  \brief utility method for decaying a value by a given amount
  *
- *
- *
  *    The API includes:
  *
  *     - decay_s1615 (x, decay)
@@ -17,9 +15,6 @@
  *     - decay(x, d)
  *         is suppose to deduce the x value's type and call one of the above
  *         methods to decay it by a given decay amount.
- *
- *
- *
  */
 
 #ifndef _DECAY_H_

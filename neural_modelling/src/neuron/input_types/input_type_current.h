@@ -18,12 +18,15 @@
 typedef struct input_type_t {
 } input_type_t;
 
+#define SCALING_FACTOR 1
+
 static inline input_t* input_type_get_input_value(
-        input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
+        input_t* value, input_type_pointer_t input_type,
+        uint16_t num_receptors) {
     use(input_type);
     for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i];  // NOTE: this will be edited in future to be
-                              //       multiplied by a scaling factor
+        value[i] = value[i] * SCALING_FACTOR;
+        // NOTE: this will be edited in future to use a better scaling factor
     }
     return &value[0];
 }

@@ -25,16 +25,16 @@
 #include <common/neuron-typedefs.h>
 #include "synapse_types.h"
 
-
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct delta_params_t {
 	input_t synaptic_input_value;
-}delta_params_t;
+} delta_params_t;
 
 typedef struct synapse_param_t {
 	delta_params_t exc;
@@ -44,7 +44,6 @@ typedef struct synapse_param_t {
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
 } input_buffer_regions;
-
 
 //---------------------------------------
 // Synapse shaping inline implementation
@@ -137,8 +136,7 @@ static inline const char *synapse_types_get_type_char(
 //! \return Nothing
 static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
-    io_printf(
-            IO_BUF, "%12.6k - %12.6k",
+    io_printf(IO_BUF, "%12.6k - %12.6k",
             parameter->exc.synaptic_input_value,
             parameter->inh.synaptic_input_value);
 }

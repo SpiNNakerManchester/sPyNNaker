@@ -37,7 +37,6 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
-
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -47,6 +46,7 @@ static const char *_get_type_char(uint32_t synapse_type) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
+    use(synaptic_row);
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
             (uint32_t) synaptic_row, synapse_row_plastic_size(synaptic_row));
@@ -92,8 +92,6 @@ static inline void _print_synaptic_row(synaptic_row_t synaptic_row) {
     }
 
     log_debug("----------------------------------------\n");
-#else
-    use(synaptic_row);
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -112,6 +110,7 @@ static inline bool have_nonempty_ring_buffer(uint32_t n, uint32_t t) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 static inline void _print_ring_buffers(uint32_t time) {
+    use(time);
 #if LOG_LEVEL >= LOG_DEBUG
     io_printf(IO_BUF, "Ring Buffer at %u\n", time);
     io_printf(IO_BUF, "----------------------------------------\n");
@@ -133,8 +132,6 @@ static inline void _print_ring_buffers(uint32_t time) {
         }
     }
     io_printf(IO_BUF, "----------------------------------------\n");
-#else
-    use(time);
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
@@ -144,7 +141,6 @@ static inline void _print_inputs(void) {
     neuron_print_inputs();
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
-
 
 // This is the "inner loop" of the neural simulation.
 // Every spike event could cause up to 256 different weights to
@@ -195,7 +191,7 @@ static inline void _process_fixed_synapses(
 }
 
 //! private method for doing output debug data on the synapses
-static inline void _print_synapse_parameters() {
+static inline void _print_synapse_parameters(void) {
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
 #if LOG_LEVEL >= LOG_DEBUG
@@ -204,14 +200,12 @@ static inline void _print_synapse_parameters() {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *direct_synapses_address) {
-
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -360,7 +354,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
 //! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count() {
+uint32_t synapses_get_saturation_count(void) {
     return saturation_count;
 }
 
@@ -368,11 +362,10 @@ uint32_t synapses_get_saturation_count() {
 //! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //! returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
-uint32_t synapses_get_pre_synaptic_events() {
+uint32_t synapses_get_pre_synaptic_events(void) {
     return num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events();
 }
-
 
 //! \brief  Searches the synaptic row for the the connection with the
 //!         specified post-synaptic ID
@@ -435,7 +428,7 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row) {
 
 //! packing all of the information into the required static control word
 static inline uint32_t _fixed_synapse_convert(
-        uint32_t id, uint32_t weight, uint32_t delay, uint32_t type){
+        uint32_t id, uint32_t weight, uint32_t delay, uint32_t type) {
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);
     new_synapse |= ((delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) <<
             synapse_type_index_bits);
@@ -453,7 +446,7 @@ static inline uint32_t _fixed_synapse_convert(
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return bool: was the addition successful?
 bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
-                               uint32_t delay, uint32_t type){
+                               uint32_t delay, uint32_t type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words =

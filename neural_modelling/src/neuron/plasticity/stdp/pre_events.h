@@ -82,7 +82,6 @@ static inline pre_event_window_t pre_events_get_window(
 //---------------------------------------
 static inline pre_event_window_t pre_events_next(
         pre_event_window_t window, uint32_t delayed_time) {
-
     // Update previous time
     window.prev_time = delayed_time;
     window.prev_trace = *window.next_trace++;
@@ -104,7 +103,6 @@ static inline void pre_events_add(
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t i = 2; i < MAX_PRE_SYNAPTIC_EVENTS; i++) {
             events->times[i - 1] = events->times[i];

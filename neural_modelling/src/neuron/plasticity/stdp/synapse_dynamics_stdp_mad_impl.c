@@ -71,7 +71,6 @@ static inline final_state_t _plasticity_update_synapse(
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history) {
-
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
@@ -142,7 +141,7 @@ static inline plastic_synapse_t* _plastic_synapses(
 //---------------------------------------
 static inline pre_event_history_t *_plastic_event_history(
         address_t plastic_region_address) {
-    return (pre_event_history_t*) (&plastic_region_address[0]);
+    return (pre_event_history_t*) &plastic_region_address[0];
 }
 
 void synapse_dynamics_print_plastic_synapses(
@@ -151,8 +150,8 @@ void synapse_dynamics_print_plastic_synapses(
     use(plastic_region_address);
     use(fixed_region_address);
     use(ring_buffer_to_input_buffer_left_shifts);
-#if LOG_LEVEL >= LOG_DEBUG
 
+#if LOG_LEVEL >= LOG_DEBUG
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     weight_t *plastic_words = _plastic_synapses(plastic_region_address);
@@ -167,7 +166,6 @@ void synapse_dynamics_print_plastic_synapses(
 
     // Loop through plastic synapses
     for (uint32_t i = 0; i < plastic_synapse; i++) {
-
         // Get next weight and control word (auto incrementing control word)
         uint32_t weight = *plastic_words++;
         uint32_t control_word = *control_words++;

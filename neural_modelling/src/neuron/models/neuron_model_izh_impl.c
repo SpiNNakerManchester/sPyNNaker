@@ -41,7 +41,6 @@ static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
  */
 static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
                                         REAL input_this_timestep) {
-
     // to match Mathematica names
     REAL lastV1 = neuron->V;
     REAL lastU1 = neuron->U;
@@ -50,14 +49,14 @@ static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
 
     REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
     REAL alpha = pre_alph
-                 + ( REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * lastV1) * lastV1;
+            + (REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * lastV1) * lastV1;
     REAL eta = lastV1 + REAL_HALF(h * alpha);
 
     // could be represented as a long fract?
     REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
 
     neuron->V += h * (pre_alph - beta
-                      + ( REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * eta) * eta);
+            + (REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * eta) * eta);
 
     neuron->U += a * h * (-lastU1 - beta + b * eta);
 }
@@ -71,19 +70,18 @@ state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
 		input_t external_bias, neuron_pointer_t neuron) {
+    REAL total_exc = 0;
+    REAL total_inh = 0;
 
-		REAL total_exc = 0;
-		REAL total_inh = 0;
-
-		for (int i =0; i<num_excitatory_inputs; i++){
-			total_exc += exc_input[i];
-		}
-		for (int i =0; i<num_inhibitory_inputs; i++){
-			total_inh += inh_input[i];
-		}
+    for (int i =0; i<num_excitatory_inputs; i++){
+        total_exc += exc_input[i];
+    }
+    for (int i =0; i<num_inhibitory_inputs; i++){
+        total_inh += inh_input[i];
+    }
 
     input_t input_this_timestep = total_exc - total_inh
-                                  + external_bias + neuron->I_offset;
+            + external_bias + neuron->I_offset;
 
     // the best AR update so far
     _rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
@@ -93,7 +91,6 @@ state_t neuron_model_state_update(
 }
 
 void neuron_model_has_spiked(neuron_pointer_t neuron) {
-
     // reset membrane voltage
     neuron->V = neuron->C;
 

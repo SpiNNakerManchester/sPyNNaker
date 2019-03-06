@@ -5,7 +5,6 @@
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
-
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
@@ -15,7 +14,6 @@ static inline void _lif_neuron_closed_form(
 void neuron_model_set_global_neuron_params(
         global_neuron_params_pointer_t params) {
     use(params);
-
     // Does Nothing - no params
 }
 
@@ -23,7 +21,6 @@ state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
 		input_t external_bias, neuron_pointer_t neuron) {
-
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
@@ -41,12 +38,11 @@ state_t neuron_model_state_update(
 		}
         // Get the input in nA
         input_t input_this_timestep =
-            total_exc - total_inh + external_bias + neuron->I_offset;
+                total_exc - total_inh + external_bias + neuron->I_offset;
 
         _lif_neuron_closed_form(
-            neuron, neuron->V_membrane, input_this_timestep);
+                neuron, neuron->V_membrane, input_this_timestep);
     } else {
-
         // countdown refractory timer
         neuron->refract_timer -= 1;
     }
@@ -54,7 +50,6 @@ state_t neuron_model_state_update(
 }
 
 void neuron_model_has_spiked(neuron_pointer_t neuron) {
-
     // reset membrane voltage
     neuron->V_membrane = neuron->V_reset;
 

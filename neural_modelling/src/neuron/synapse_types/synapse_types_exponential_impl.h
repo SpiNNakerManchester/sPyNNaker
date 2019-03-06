@@ -11,7 +11,6 @@
 #ifndef _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
 #define _SYNAPSE_TYPES_EXPONENTIAL_IMPL_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -24,7 +23,6 @@
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
-
 
 //---------------------------------------
 // Synapse parameters
@@ -46,7 +44,6 @@ typedef struct synapse_param_t {
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
 } input_buffer_regions;
-
 
 //---------------------------------------
 // Synapse shaping inline implementation

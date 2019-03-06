@@ -50,14 +50,15 @@ uint32_t *plasticity_region_trace_filled(uint32_t* address, uint32_t flags);
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline int16_t timing_add_spike(uint32_t time, uint32_t last_time, int16_t last_trace)
+static inline int16_t timing_add_spike(uint32_t time, uint32_t last_time,
+        int16_t last_trace)
 {
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
     // Decay previous trace
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
-        DECAY_LOOKUP_TAU(delta_time));
+            DECAY_LOOKUP_TAU(delta_time));
 
     // Add new spike to trace
     int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
@@ -69,13 +70,13 @@ static inline int16_t timing_add_spike(uint32_t time, uint32_t last_time, int16_
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace()
+static inline post_trace_t timing_get_initial_post_trace(void)
 {
     return 0;
 }
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
-    uint32_t time, uint32_t last_time, post_trace_t last_trace)
+        uint32_t time, uint32_t last_time, post_trace_t last_trace)
 {
     return timing_add_spike(time, last_time, last_trace);
 }
@@ -87,9 +88,9 @@ static inline pre_trace_t timing_add_pre_spike(
 }
 //---------------------------------------
 static inline update_state_t timing_apply_pre_spike(
-    uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
-    pre_trace_t last_pre_trace, uint32_t last_post_time,
-    post_trace_t last_post_trace, update_state_t previous_state)
+        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state)
 {
     use(&trace);
     use(last_pre_time);
@@ -102,7 +103,7 @@ static inline update_state_t timing_apply_pre_spike(
     - plasticity_trace_region_data.alpha;
 
     log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-        time_since_last_post, decayed_o1);
+            time_since_last_post, decayed_o1);
 
     // Apply potentiation to state (which is a weight_state)
     return weight_one_term_apply_potentiation(previous_state, decayed_o1);
@@ -110,9 +111,9 @@ static inline update_state_t timing_apply_pre_spike(
 }
 //---------------------------------------
 static inline update_state_t timing_apply_post_spike(
-    uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-    pre_trace_t last_pre_trace, uint32_t last_post_time,
-    post_trace_t last_post_trace, update_state_t previous_state)
+        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        post_trace_t last_post_trace, update_state_t previous_state)
 {
     use(&trace);
     use(last_post_time);
@@ -124,7 +125,7 @@ static inline update_state_t timing_apply_post_spike(
     int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace, exponential_decay);
 
     log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-        time_since_last_pre, decayed_r1);
+            time_since_last_pre, decayed_r1);
 
     // Apply potentiation to state (which is a weight_state)
     return weight_one_term_apply_potentiation(previous_state, decayed_r1);

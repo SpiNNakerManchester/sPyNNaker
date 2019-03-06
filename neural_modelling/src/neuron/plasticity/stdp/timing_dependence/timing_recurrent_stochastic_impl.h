@@ -29,22 +29,21 @@ extern int16_t post_cdf_lookup[STDP_TRACE_POST_CDF_SIZE];
 static inline bool _in_window(
         uint32_t time_since_last_event, const uint32_t cdf_lut_size,
         const int16_t *cdf_lut) {
-    // If time since last event is still within CDF LUT
-    if (time_since_last_event < cdf_lut_size) {
-        // Lookup distribution
-        int32_t cdf = cdf_lut[time_since_last_event];
-
-        // Pick random number
-        int32_t random = mars_kiss_fixed_point();
-        log_debug("\t\tCDF=%d, Random=%d", cdf, random);
-
-        // Return true if it's greater than CDF
-        return (random > cdf);
-    } else {
-
-        // Otherwise, window has definitely closed
+    // If time since last event is not still within CDF LUT...
+    if (time_since_last_event >= cdf_lut_size) {
+        // ... the window has definitely closed
         return false;
     }
+
+    // Lookup distribution
+    int32_t cdf = cdf_lut[time_since_last_event];
+
+    // Pick random number
+    int32_t random = mars_kiss_fixed_point();
+    log_debug("\t\tCDF=%d, Random=%d", cdf, random);
+
+    // Return true if it's greater than CDF
+    return (random > cdf);
 }
 
 static inline bool timing_recurrent_in_pre_window(

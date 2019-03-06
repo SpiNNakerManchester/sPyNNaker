@@ -7,7 +7,8 @@ typedef struct input_type_t {
 } input_type_t;
 
 static input_t* input_type_get_input_value(
-        input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
+        input_t* value, input_type_pointer_t input_type,
+        uint16_t num_receptors) {
     use(value);
     use(input_type);
     use(num_receptors);
