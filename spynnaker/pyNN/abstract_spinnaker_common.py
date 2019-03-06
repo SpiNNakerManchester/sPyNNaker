@@ -124,6 +124,14 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             target_length = int(target_length)
         extra_mapping_inputs[
             'RouterCompressorBitFieldTargetLength'] = target_length
+        extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_pre_alloced_sdram")
+        extra_mapping_inputs["RouterCompressorBitFieldPercentageThreshold"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_acceptance_threshold")
         extra_mapping_inputs["UseExpresso"] = self.config.getboolean(
             "Mapping", "use_expresso")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \

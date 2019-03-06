@@ -34,6 +34,9 @@ from spynnaker.pyNN.models.utility_models.synapse_expander.\
 
 logger = logging.getLogger(__name__)
 
+# sdram allocation for addresses
+SIZE_OF_SDRAM_ADDRESS_IN_BYTES = (17 * 2 * 4) + (3 * 4)
+
 
 class MachineBitFieldRouterCompressor(object):
 
@@ -88,7 +91,7 @@ class MachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             use_expresso, machine_time_step, time_scale_factor,
-            no_sync_changes,
+            no_sync_changes, threshold_percentage,
             compress_only_when_needed=True, use_rob_paul=False,
             compress_as_much_as_possible=False):
         """ entrance for routing table compression with bit field
@@ -101,6 +104,8 @@ class MachineBitFieldRouterCompressor(object):
         :param machine_graph: machine graph
         :param graph_mapper: mapping between graphs
         :param placements: placements on machine
+        :param threshold_percentage: the percentage of bitfields to do on chip\
+         before its considered a success
         :param executable_finder: where are binaries are located
         :param read_algorithm_iobuf: bool flag saying if read iobuf
         :param compress_only_when_needed: bool flag asking if compress only \
@@ -137,7 +142,7 @@ class MachineBitFieldRouterCompressor(object):
             compressor_with_bit_field_cores,
             matrix_addresses_and_size, time_to_try_for_each_iteration,
             bit_field_compressor_executable_path,
-            bit_field_sorter_executable_path)
+            bit_field_sorter_executable_path, threshold_percentage)
 
         # adjust cores to exclude the ones which are going to compress by
         # host processing for compression. but needed to be in the synaptic
@@ -393,7 +398,7 @@ class MachineBitFieldRouterCompressor(object):
             compress_as_much_as_possible, progress_bar, cores,
             matrix_addresses_and_size, time_per_iteration,
             bit_field_compressor_executable_path,
-            bit_field_sorter_executable_path):
+            bit_field_sorter_executable_path, threshold_percentage):
         """ load all data onto the chip
 
         :param addresses: the addresses for bitfields in sdram
@@ -434,7 +439,7 @@ class MachineBitFieldRouterCompressor(object):
                         routing_table_compressor_app_id,
                         cores, matrix_addresses_and_size[(table.x, table.y)],
                         bit_field_compressor_executable_path,
-                        bit_field_sorter_executable_path)
+                        bit_field_sorter_executable_path, threshold_percentage)
 
                     self._load_usable_sdram(
                         matrix_addresses_and_size[(table.x, table.y)], chip_x,
@@ -547,7 +552,7 @@ class MachineBitFieldRouterCompressor(object):
             self, addresses, chip_x, chip_y, transceiver,
             routing_table_compressor_app_id, cores, matrix_addresses_and_size,
             bit_field_compressor_executable_path,
-            bit_field_sorter_executable_path):
+            bit_field_sorter_executable_path, threshold_percentage):
         """ loads the bitfield addresses space
 
         :param addresses: the addresses to load
@@ -566,7 +571,8 @@ class MachineBitFieldRouterCompressor(object):
             addresses[(chip_x, chip_y)],
             cores.get_cores_for_binary(
                 bit_field_compressor_executable_path).get_core_subset_for_chip(
-                    chip_x, chip_y))
+                    chip_x, chip_y),
+            threshold_percentage)
 
         # get sdram address on chip
         try:
@@ -760,7 +766,7 @@ class MachineBitFieldRouterCompressor(object):
                 bit_field_compressor_executable_path,
                 synaptic_matrix_addresses_and_sizes)
 
-    def _generate_chip_data(self, address_list,  cores):
+    def _generate_chip_data(self, address_list, cores, threshold_percentage):
         """ generate byte array data for a list of sdram addresses and 
         finally the time to run per compression iteration
 
@@ -769,6 +775,7 @@ class MachineBitFieldRouterCompressor(object):
         :return: the byte array
         """
         data = b""
+        data += self._ONE_WORDS.pack(threshold_percentage)
         data += self._ONE_WORDS.pack(len(address_list))
         for (bit_field, key_to_atom, processor_id) in address_list:
             data += self._THREE_WORDS.pack(

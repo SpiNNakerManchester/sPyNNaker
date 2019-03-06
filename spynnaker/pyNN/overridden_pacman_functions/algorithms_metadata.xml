@@ -14,9 +14,14 @@
                 <param_name>pre_allocated_resources</param_name>
                 <param_type>MemoryPreAllocatedResources</param_type>
             </parameter>
+            <parameter>
+                <param_name>sdram_to_pre_alloc_for_bit_fields</param_name>
+                <param_type>RouterCompressorBitFieldPreAllocSize</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine</param_name>
+            <param_name>sdram_to_pre_alloc</param_name>
         </required_inputs>
         <optional_inputs>
             <param_name>pre_allocated_resources</param_name>
@@ -130,6 +135,10 @@
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
             <parameter>
+                <param_name>threshold_percentage</param_name>
+                <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
+            </parameter>
+            <parameter>
                 <param_name>transceiver</param_name>
                 <param_type>MemoryTransceiver</param_type>
             </parameter>
@@ -234,6 +243,7 @@
             <param_name>default_report_folder</param_name>
             <param_name>target_length</param_name>
             <param_name>routing_infos</param_name>
+            <param_name>threshold_percentage</param_name>
             <param_name>time_to_try_for_each_iteration</param_name>
             <param_name>use_timer_cut_off</param_name>
             <param_name>use_expresso</param_name>
