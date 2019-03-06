@@ -30,10 +30,45 @@
 //-----------------------------------------------------------------------------
 // External functions                                                         |
 //-----------------------------------------------------------------------------
-bool (*search_for_neuron)(uint32_t, address_t, structural_plasticity_data_t *);
-bool (*remove_neuron)(uint32_t, address_t);
-bool (*add_neuron)(uint32_t, address_t, uint32_t, uint32_t, uint32_t);
-size_t (*number_of_connections_in_row)(address_t);
+
+//! How to find a neuron to affect
+typedef bool (search_for_neuron_t)(
+        uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
+
+//! How to remove a neuron from the network
+typedef bool (remove_neuron_t)(
+        uint32_t offset, address_t row);
+
+//! How to add a neuron to the network
+typedef bool (add_neuron_t)(
+        uint32_t id, address_t row, uint32_t weight, uint32_t delay,
+        uint32_t type);
+
+//! How to get the size of a particular synaptic matrix row
+typedef size_t (number_of_connections_in_row_t)(
+        address_t row);
+
+//! The profile of functions
+struct access_functions_t {
+    search_for_neuron_t *search_for_neuron;
+    remove_neuron_t *remove_neuron;
+    add_neuron_t *add_neuron;
+    number_of_connections_in_row_t *number_of_connections_in_row;
+};
+
+static const struct access_functions_t funcs = {
+#if STDP_ENABLED == 1
+    &find_plastic_neuron_with_id,
+    &remove_plastic_neuron_at_offset,
+    &add_plastic_neuron_with_id,
+    &synapse_row_num_plastic_controls
+#else
+    &find_static_neuron_with_id,
+    &remove_static_neuron_at_offset,
+    &add_static_neuron_with_id,
+    &synapse_row_num_fixed_synapses
+#endif
+};
 
 //-----------------------------------------------------------------------------
 // Structures and global data                                                 |
@@ -51,19 +86,6 @@ typedef struct {
     uint32_t lo_atom;
     uint32_t mask;
 } key_atom_info_t;
-
-//! individual pre-synaptic sub-population information
-typedef struct {
-    int16_t no_pre_vertices, sp_control;
-    int32_t total_no_atoms;
-    key_atom_info_t *key_atom_info;
-} subpopulation_info_t;
-
-//! table of individual pre-synaptic information
-typedef struct {
-    uint32_t no_pre_pops;
-    subpopulation_info_t *subpop_info;
-} pre_pop_info_table_t;
 
 // Configuration data
 typedef struct {
@@ -100,6 +122,19 @@ typedef struct {
     uint16_t data[];
 } probabilities_t;
 
+//! individual pre-synaptic sub-population information
+typedef struct {
+    int16_t no_pre_vertices, sp_control;
+    int32_t total_no_atoms;
+    key_atom_info_t *key_atom_info;
+} subpopulation_info_t;
+
+//! table of individual pre-synaptic information
+typedef struct {
+    uint32_t no_pre_pops;
+    subpopulation_info_t *subpop_info;
+} pre_pop_info_table_t;
+
 //! parameters of the synaptic rewiring model
 typedef struct {
     uint32_t p_rew, fast, weight[2], delay, s_max, app_no_atoms,
@@ -118,11 +153,11 @@ typedef struct {
     int32_t lateral_inhibition, random_partner;
 } rewiring_data_t;
 
-// the instantiation of the previous truct
-rewiring_data_t rewiring_data;
+// the instantiation of the previous struct
+static rewiring_data_t rewiring_data;
 
 // dma_buffer defined in spike_processing.h
-dma_buffer rewiring_dma_buffer;
+static dma_buffer rewiring_dma_buffer;
 
 //! struct representing the current state of rewiring
 typedef struct {
@@ -152,7 +187,7 @@ typedef struct {
 } current_state_t;
 
 // instantiation of the previous struct
-current_state_t current_state;
+static current_state_t state;
 
 #define ANY_SPIKE ((spike_t) -1)
 
@@ -161,10 +196,10 @@ static int my_abs(int a) {
     return a < 0 ? -a : a;
 }
 
-//! function to unpack elment from post ot pre table into constituent bits
+//! function to unpack element from post-to-pre table into constituent bits
 static inline bool unpack_post_to_pre(
-    int32_t value, uint* pop_index,
-    uint* subpop_index, uint* neuron_index)
+    int32_t value, uint *pop_index,
+    uint *subpop_index, uint *neuron_index)
 {
     if (value == -1) {
         return false;
@@ -176,7 +211,7 @@ static inline bool unpack_post_to_pre(
 }
 
 //! opposite function of unpack. packs up different bits into a word to be
-//! placed into the post to pre table
+//! placed into the post-to-pre table
 static inline int pack(
     uint32_t pop_index, uint32_t subpop_index, uint32_t neuron_index)
 {
@@ -317,18 +352,6 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         rt_error(RTE_SWERR);
     }
 
-#if STDP_ENABLED == 1
-    search_for_neuron = &find_plastic_neuron_with_id;
-    remove_neuron = &remove_plastic_neuron_at_offset;
-    add_neuron = &add_plastic_neuron_with_id;
-    number_of_connections_in_row = &synapse_row_num_plastic_controls;
-#else
-    search_for_neuron = &find_static_neuron_with_id;
-    remove_neuron = &remove_static_neuron_at_offset;
-    add_neuron = &add_static_neuron_with_id;
-    number_of_connections_in_row = &synapse_row_num_fixed_synapses;
-#endif
-
     log_debug("SR init complete.");
     return (address_t) sp_word;
 }
@@ -340,32 +363,75 @@ void update_goal_posts(uint32_t time) {
     if (!received_any_spike()) {
         return;
     }
-    current_state.cb = get_circular_buffer();
-    current_state.cb_total_size = circular_buffer_real_size(current_state.cb);
+    state.cb = get_circular_buffer();
+    state.cb_total_size = circular_buffer_real_size(state.cb);
 
-    current_state.my_cb_output = current_state.my_cb_input;
-    current_state.my_cb_input =
-            circular_buffer_input(current_state.cb)
-            & current_state.cb_total_size;
+    state.my_cb_output = state.my_cb_input;
+    state.my_cb_input = circular_buffer_input(state.cb) & state.cb_total_size;
 
-    current_state.no_spike_in_interval =
-            current_state.my_cb_input >= current_state.my_cb_output
-            ? current_state.my_cb_input - current_state.my_cb_output
-            : (current_state.my_cb_input + current_state.cb_total_size + 1) -
-              current_state.my_cb_output;
+    state.no_spike_in_interval =
+            state.my_cb_input >= state.my_cb_output ?
+            state.my_cb_input - state.my_cb_output :
+            (state.my_cb_input + state.cb_total_size + 1) - state.my_cb_output;
 }
 
 //! randomly (with uniform probability) select one of the last received spikes
 static inline spike_t select_last_spike(void) {
-    if (current_state.no_spike_in_interval == 0) {
+    if (state.no_spike_in_interval == 0) {
         return ANY_SPIKE;
     }
 
     uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            current_state.no_spike_in_interval;
+            state.no_spike_in_interval;
     return circular_buffer_value_at_index(
-            current_state.cb,
-            (current_state.my_cb_output + offset) & current_state.cb_total_size);
+            state.cb, (state.my_cb_output + offset) & state.cb_total_size);
+}
+
+//! Compute distances (strictly, the square of the distance)
+static inline void compute_distance(uint pre_app_pop, uint pre_sub_pop) {
+    // To do this I need to take the DIV and MOD of the postsyn neuron ID,
+    // and of the presyn neuron ID. Then I compute the distance with these 2
+    // measures
+
+    int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
+
+    // Pre computation requires querying the table with global information
+    pre_global_id = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
+            .key_atom_info[pre_sub_pop].lo_atom + state.pre_syn_id;
+    post_global_id = state.post_syn_id + rewiring_data.low_atom;
+
+    if (rewiring_data.grid_x > 1) {
+        pre_x = pre_global_id / rewiring_data.grid_x;
+        post_x = post_global_id / rewiring_data.grid_x;
+    } else {
+        pre_x = 0;
+        post_x = 0;
+    }
+
+    if (rewiring_data.grid_y > 1) {
+        pre_y = pre_global_id % rewiring_data.grid_y;
+        post_y = post_global_id % rewiring_data.grid_y;
+    } else {
+        pre_y = 0;
+        post_y = 0;
+    }
+
+    // With periodic boundary conditions
+    uint delta_x = my_abs(pre_x - post_x);
+    uint delta_y = my_abs(pre_y - post_y);
+
+    if (delta_x > rewiring_data.grid_x >> 1 && rewiring_data.grid_x > 1) {
+        delta_x -= rewiring_data.grid_x;
+    }
+
+    if (delta_y > rewiring_data.grid_y >> 1 && rewiring_data.grid_y > 1) {
+        delta_y -= rewiring_data.grid_y;
+    }
+
+    // Update the state with what we've found
+    state.distance = delta_x * delta_x + delta_y * delta_y;
+    state.global_pre_syn_id = pre_global_id;
+    state.global_post_syn_id = post_global_id;
 }
 
 //! \brief Function called (usually on a timer from c_main) to
@@ -374,7 +440,7 @@ static inline spike_t select_last_spike(void) {
 //! \return None
 void synaptogenesis_dynamics_rewire(uint32_t time)
 {
-    current_state.current_time = time;
+    state.current_time = time;
 
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id;
@@ -389,22 +455,20 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     }
     post_id -= rewiring_data.low_atom;
 
-    uint pre_app_pop = 0, pre_sub_pop = 0, choice = 0;
-    bool element_exists = false;
-
     // Select an arbitrary synaptic element for the neurons
-    uint row_offset, column_offset;
-    row_offset = post_id * rewiring_data.s_max;
-    column_offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+    uint row_offset = post_id * rewiring_data.s_max;
+    uint column_offset =
+            ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
             rewiring_data.s_max;
     uint total_offset = row_offset + column_offset;
     int value = rewiring_data.post_to_pre_table[total_offset];
-    current_state.offset_in_table = total_offset;
+    state.offset_in_table = total_offset;
 
-    element_exists = unpack_post_to_pre(value, &pre_app_pop,
-            &pre_sub_pop, &choice);
+    uint pre_app_pop = 0, pre_sub_pop = 0, choice = 0;
+    bool element_exists =
+            unpack_post_to_pre(value, &pre_app_pop, &pre_sub_pop, &choice);
 
-    current_state.element_exists = element_exists;
+    state.element_exists = element_exists;
     spike_t _spike = ANY_SPIKE;
     if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
@@ -421,7 +485,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         // Identify pop, subpop and lo and hi atoms
         // Amazing linear search inc.
         // Loop over all populations
-        for (uint i=0; i< rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
+        for (uint i=0; i < rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
             subpopulation_info_t *preapppop_info =
                     &rewiring_data.pre_pop_info_table.subpop_info[i];
 
@@ -476,57 +540,17 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     }
 
     // Saving current state
-    current_state.pop_index = pre_app_pop;
-    current_state.subpop_index = pre_sub_pop;
-    current_state.neuron_index = choice;
-    current_state.sdram_synaptic_row = synaptic_row_address;
-    current_state.pre_syn_id = choice;
-    current_state.post_syn_id = post_id;
-    current_state.current_controls = rewiring_data.pre_pop_info_table
+    state.pop_index = pre_app_pop;
+    state.subpop_index = pre_sub_pop;
+    state.neuron_index = choice;
+    state.sdram_synaptic_row = synaptic_row_address;
+    state.pre_syn_id = choice;
+    state.post_syn_id = post_id;
+    state.current_controls = rewiring_data.pre_pop_info_table
             .subpop_info[pre_app_pop].sp_control;
 
-    // Compute distances
-    // To do this I need to take the DIV and MOD of the
-    // postsyn neuron ID, of the presyn neuron ID
-    // Compute the distance of these 2 measures
-    int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
-    // Pre computation requires querying the table with global information
-    pre_global_id = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
-            .key_atom_info[pre_sub_pop].lo_atom + current_state.pre_syn_id;
-    post_global_id = current_state.post_syn_id + rewiring_data.low_atom;
-
-    if (rewiring_data.grid_x > 1) {
-        pre_x = pre_global_id / rewiring_data.grid_x;
-        post_x = post_global_id / rewiring_data.grid_x;
-    } else {
-        pre_x = 0;
-        post_x = 0;
-    }
-
-    if (rewiring_data.grid_y > 1) {
-        pre_y = pre_global_id % rewiring_data.grid_y;
-        post_y = post_global_id % rewiring_data.grid_y;
-    } else {
-        pre_y = 0;
-        post_y = 0;
-    }
-
-    // With periodic boundary conditions
-    uint delta_x, delta_y;
-    delta_x = my_abs(pre_x - post_x);
-    delta_y = my_abs(pre_y - post_y);
-
-    if (delta_x > rewiring_data.grid_x >> 1 && rewiring_data.grid_x > 1) {
-        delta_x -= rewiring_data.grid_x;
-    }
-
-    if (delta_y > rewiring_data.grid_y >> 1 && rewiring_data.grid_y > 1) {
-        delta_y -= rewiring_data.grid_y;
-    }
-
-    current_state.distance = delta_x * delta_x + delta_y * delta_y;
-    current_state.global_pre_syn_id = pre_global_id;
-    current_state.global_post_syn_id = post_global_id;
+    // Compute distances; updates state fields
+    compute_distance(pre_app_pop, pre_sub_pop);
 
     while (!spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW_FOR_REWIRING, synaptic_row_address,
@@ -544,16 +568,15 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
 void synaptic_row_restructure(uint dma_id, uint dma_tag)
 {
     // the synaptic row is in rewiring_dma_buffer, while
-    // the selected pre- and postsynaptic IDs are in current_state
+    // the selected pre- and postsynaptic IDs are in state
     use(dma_id);
     use(dma_tag);
 
     // find the offset of the neuron in the current row
-    bool search_hit = search_for_neuron(
-            current_state.post_syn_id, rewiring_dma_buffer.row,
-            &current_state.sp_data);
+    bool search_hit = funcs.search_for_neuron(
+            state.post_syn_id, rewiring_dma_buffer.row, &state.sp_data);
 
-    if (current_state.element_exists && search_hit) {
+    if (state.element_exists && search_hit) {
         synaptogenesis_dynamics_elimination_rule();
     } else {
         synaptogenesis_dynamics_formation_rule();
@@ -589,24 +612,24 @@ bool synaptogenesis_dynamics_elimination_rule(void)
     // Is synaptic weight <.5 g_max? (i.e. synapse is depressed)
     uint32_t r = mars_kiss64_seed(rewiring_data.local_seed);
     int appr_scaled_weight = rewiring_data.lateral_inhibition ?
-            rewiring_data.weight[current_state.current_controls] :
+            rewiring_data.weight[state.current_controls] :
             rewiring_data.weight[0];
-    if (current_state.sp_data.weight < (appr_scaled_weight / 2) &&
+    if (state.sp_data.weight < (appr_scaled_weight / 2) &&
             r > rewiring_data.p_elim_dep) {
         return false;
     }
 
     // otherwise, if synapse is potentiated, use probability 2
-    if (current_state.sp_data.weight >= (appr_scaled_weight / 2) &&
+    if (state.sp_data.weight >= (appr_scaled_weight / 2) &&
             r > rewiring_data.p_elim_pot) {
         return false;
     }
-    if (!remove_neuron(current_state.sp_data.offset,
+    if (!funcs.remove_neuron(state.sp_data.offset,
             rewiring_dma_buffer.row)) {
         return false;
     }
     DMA_WRITEBACK("DMA queue full-removal");
-    rewiring_data.post_to_pre_table[current_state.offset_in_table] = -1;
+    rewiring_data.post_to_pre_table[state.offset_in_table] = -1;
     return true;
 }
 
@@ -624,24 +647,24 @@ bool synaptogenesis_dynamics_formation_rule(void)
 {
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint no_elems = number_of_connections_in_row(
+    uint no_elems = funcs.number_of_connections_in_row(
             synapse_row_fixed_region(rewiring_dma_buffer.row));
     if (no_elems >= rewiring_data.s_max) {
         log_error("row is full");
         return false;
     }
 
-    if ((current_state.current_controls == 0 &&
-        current_state.distance > rewiring_data.size_ff_prob)
-        || (current_state.current_controls == 1 &&
-            current_state.distance > rewiring_data.size_lat_prob)) {
+    if ((state.current_controls == 0 &&
+            state.distance > rewiring_data.size_ff_prob)
+            || (state.current_controls == 1 &&
+            state.distance > rewiring_data.size_lat_prob)) {
         return false;
     }
 
-    if (current_state.current_controls == 0) {
-        probability = rewiring_data.ff_probabilities[current_state.distance];
+    if (state.current_controls == 0) {
+        probability = rewiring_data.ff_probabilities[state.distance];
     } else {
-        probability = rewiring_data.lat_probabilities[current_state.distance];
+        probability = rewiring_data.lat_probabilities[state.distance];
     }
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
             MAX_SHORT;
@@ -649,20 +672,18 @@ bool synaptogenesis_dynamics_formation_rule(void)
         return false;
     }
     int appr_scaled_weight = rewiring_data.weight[
-            rewiring_data.lateral_inhibition ? current_state.current_controls : 0];
+            rewiring_data.lateral_inhibition ? state.current_controls : 0];
 
-    if (!add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
+    if (!funcs.add_neuron(state.post_syn_id, rewiring_dma_buffer.row,
             appr_scaled_weight, rewiring_data.delay,
-            rewiring_data.lateral_inhibition ?
-            current_state.current_controls : 0)) {
+            rewiring_data.lateral_inhibition ? state.current_controls : 0)) {
         return false;
     }
     DMA_WRITEBACK("DMA queue full-formation");
 
-    int the_pack = pack(current_state.pop_index,
-            current_state.subpop_index,
-            current_state.neuron_index);
-    rewiring_data.post_to_pre_table[current_state.offset_in_table] = the_pack;
+    int the_pack =
+            pack(state.pop_index, state.subpop_index, state.neuron_index);
+    rewiring_data.post_to_pre_table[state.offset_in_table] = the_pack;
     return true;
 }
 

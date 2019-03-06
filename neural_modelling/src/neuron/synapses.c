@@ -383,7 +383,7 @@ uint32_t synapses_get_pre_synaptic_events() {
 //! weight, delay information
 //! \return bool: was the search successful?
 bool find_static_neuron_with_id(uint32_t id, address_t row,
-                                structural_plasticity_data_t *sp_data){
+                                structural_plasticity_data_t *sp_data) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words =

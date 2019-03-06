@@ -16,7 +16,7 @@ static const char* sp_error_message = "Non-structurally plastic impl.";
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(
-	address_t sdram_sp_address){
+        address_t sdram_sp_address) {
 	use(sdram_sp_address);
 	log_debug("%s", sp_error_message);
     return sdram_sp_address;
@@ -26,7 +26,7 @@ address_t synaptogenesis_dynamics_initialise(
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
 //! \return None
-void synaptogenesis_dynamics_rewire(uint32_t time){
+void synaptogenesis_dynamics_rewire(uint32_t time) {
     use(time);
     log_error("%s", sp_error_message);
 }
@@ -35,7 +35,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time){
 //! \param[in] dma_id: the ID of the DMA
 //! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
-void synaptic_row_restructure(){
+void synaptic_row_restructure(void) {
     log_error("%s", sp_error_message);
 }
 
@@ -50,7 +50,7 @@ void synaptic_row_restructure(){
 //!   The formation rule calls the add neuron function in the appropriate
 //!   module (STDP or static).
 //!
-bool synaptogenesis_dynamics_formation_rule(){
+bool synaptogenesis_dynamics_formation_rule(void) {
     return false;
 }
 
@@ -65,20 +65,20 @@ bool synaptogenesis_dynamics_formation_rule(){
 //!   The elimination rule calls the remove neuron function in the appropriate
 //!   module (STDP or static).
 //!
-bool synaptogenesis_dynamics_elimination_rule(){
+bool synaptogenesis_dynamics_elimination_rule(void) {
     return false;
 }
 
 //! retrieve the period of rewiring
 //! based on is_fast(), this can either mean how many times rewiring happens
 //! in a timestep, or how many timesteps have to pass until rewiring happens.
-int32_t get_p_rew() {
+int32_t get_p_rew(void) {
     return -1;
 }
 
 //! controls whether rewiring is attempted multiple times per timstep
 //! or after a number of timesteps.
-bool is_fast() {
+bool is_fast(void) {
     return false;
 }
 
