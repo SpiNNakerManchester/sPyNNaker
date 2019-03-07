@@ -33,12 +33,14 @@ state_t neuron_model_state_update(
 		REAL total_exc = 0;
 		REAL total_inh = 0;
 
-		for (int i=0; i < num_excitatory_inputs; i++){
-			total_exc += exc_input[i];
-		}
-		for (int i=0; i< num_inhibitory_inputs; i++){
-			total_inh += inh_input[i];
-		}
+		total_exc += exc_input[0];
+		total_inh += inh_input[0];
+//		for (int i=0; i < num_excitatory_inputs; i++){
+//			total_exc += exc_input[i];
+//		}
+//		for (int i=0; i< num_inhibitory_inputs; i++){
+//			total_inh += inh_input[i];
+//		}
         // Get the input in nA
         input_t input_this_timestep =
             total_exc - total_inh + external_bias + neuron->I_offset;

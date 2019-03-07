@@ -227,7 +227,7 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 //                rate *
 ////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
 //				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
-    		global_parameters->ticks_per_second / rate * 2.0k  ; // shouldn't this be ticks_per_second/rate?
+    		global_parameters->ticks_per_second / rate; // shouldn't this be ticks_per_second/rate?
 
 //    io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
 //        		rate, neuron->mean_isi_ticks);
