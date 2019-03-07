@@ -21,9 +21,14 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
 
+// Masks for extracting info from an address_and_row_length
+#define SINGLE_MASK  (0x80000000)
+#define ADDRESS_MASK (0x7FFFFF00)
+#define LENGTH_MASK  (0x000000FF)
+
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
     // Direct row address is just the direct address bit
-    return (entry & 0x7FFFFF00) >> 8;
+    return (entry & ADDRESS_MASK) >> 8;
 }
 
 static inline uint32_t _get_address(address_and_row_length entry) {
@@ -32,15 +37,15 @@ static inline uint32_t _get_address(address_and_row_length entry) {
     // by 4 with the given mask 0x7FFFFF00 to fully remove the row length.
     // NOTE: The mask can be removed given the machine spec says it
     // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 4;
+    return (entry & ADDRESS_MASK) >> 4;
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
-    return entry & 0xFF;
+    return entry & LENGTH_MASK;
 }
 
 static inline uint32_t _is_single(address_and_row_length entry) {
-    return entry & 0x80000000;
+    return entry & SINGLE_MASK;
 }
 
 static inline uint32_t _get_neuron_id(
