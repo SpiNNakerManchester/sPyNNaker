@@ -40,14 +40,21 @@ static inline uint32_t _get_table_index(key_t x, key_t y, key_t p) {
     return (((x << 3) + y) * 18 + p);
 }
 
+typedef struct pop_table_config_t {
+    uint16_t master_population_table[MASTER_POPULATION_MAX];
+    uint32_t row_size_table[ROW_SIZE_TABLE_MAX];
+} *pop_table_config_t;
+
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
+    pop_table_config_t config = (pop_table_config_t) table_address;
     // Copy the master population table
-    log_debug("reading master pop table from address 0x%.8x", table_address);
-    spin1_memcpy(master_population_table, table_address,
-            MASTER_POPULATION_MAX * sizeof(uint16_t));
+    log_debug("reading master pop table from address 0x%.8x",
+            config->master_population_table);
+    spin1_memcpy(master_population_table, config->master_population_table,
+            sizeof(master_population_table));
 
     // Store the base address
     log_debug("the stored synaptic matrix base address is located at: 0x%.8x",
@@ -56,11 +63,9 @@ bool population_table_initialise(
 
     // Copy the row size table
     log_debug("reading row length table of %d bytes from mem address 0x%.8x",
-            ROW_SIZE_TABLE_MAX * sizeof(uint32_t),
-            table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4));
-    spin1_memcpy(row_size_table,
-            table_address + ((MASTER_POPULATION_MAX * sizeof(uint16_t)) / 4),
-            ROW_SIZE_TABLE_MAX * sizeof(uint32_t));
+            sizeof(row_size_table), config->row_size_table);
+    spin1_memcpy(row_size_table, config->row_size_table,
+            sizeof(row_size_table));
 
     // The the maximum number of words to be the entry at the end of the
     // row size table
@@ -155,18 +160,18 @@ bool population_table_get_first_address(
 
     // Extra 3 words for the synaptic row header
     uint32_t stride = (num_synaptic_words + N_SYNAPSE_ROW_HEADER_WORDS);
-    uint32_t neuron_offset = neuron_id * stride * sizeof(uint32_t);
+    uint32_t neuron_offset = neuron_id * stride;
 
     // **NOTE** 1024 converts from kilobyte offset to byte offset
-    uint32_t population_offset = address_offset * 1024;
+    uint32_t population_offset = address_offset * 1024 / sizeof(uint32_t);
 
     log_debug("stride = %u, neuron offset = %u, population offset = %u,"
-            " base = %08x, size = %u", stride, neuron_offset,
-            population_offset, synaptic_rows_base_address,
+            " base = %08x, size = %u", stride, neuron_offset * sizeof(uint32_t),
+            population_offset * sizeof(uint32_t), synaptic_rows_base_address,
             *n_bytes_to_transfer);
 
-    *row_address = (uint32_t *) ((uint32_t) synaptic_rows_base_address
-            + population_offset  + neuron_offset);
+    *row_address =
+            &synaptic_rows_base_address[population_offset + neuron_offset];
     return true;
 }
 

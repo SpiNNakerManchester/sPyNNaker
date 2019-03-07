@@ -75,12 +75,19 @@ static inline void _print_master_population_table() {
     log_info("------------------------------------------\n");
 }
 
+typedef struct {
+    uint32_t table_length;
+    uint32_t address_list_length;
+    uint32_t data[];
+} pop_table_config_t;
+
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
 
-    master_population_table_length = table_address[0];
+    master_population_table_length = config->table_length;
     log_debug("master pop table length is %d\n", master_population_table_length);
     log_debug("master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
@@ -91,22 +98,20 @@ bool population_table_initialise(
 
     // only try to malloc if there's stuff to malloc.
     if (n_master_pop_bytes != 0){
-        master_population_table = (master_population_table_entry *)
-            spin1_malloc(n_master_pop_bytes);
+        master_population_table = spin1_malloc(n_master_pop_bytes);
         if (master_population_table == NULL) {
             log_error("Could not allocate master population table");
             return false;
         }
     }
 
-    uint32_t address_list_length = table_address[1];
+    uint32_t address_list_length = config->address_list_length;
     uint32_t n_address_list_bytes =
         address_list_length * sizeof(address_and_row_length);
 
     // only try to malloc if there's stuff to malloc.
     if (n_address_list_bytes != 0){
-        address_list = (address_and_row_length *)
-            spin1_malloc(n_address_list_bytes);
+        address_list = spin1_malloc(n_address_list_bytes);
         if (address_list == NULL) {
             log_error("Could not allocate master population address list");
             return false;
@@ -119,11 +124,9 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &(table_address[2]),
-            n_master_pop_bytes);
-    spin1_memcpy(
-        address_list, &(table_address[2 + n_master_pop_words]),
-        n_address_list_bytes);
+    spin1_memcpy(master_population_table, config->data, n_master_pop_bytes);
+    spin1_memcpy(address_list, &config->data[n_master_pop_words],
+            n_address_list_bytes);
 
     // Store the base address
     log_info("the stored synaptic matrix base address is located at: 0x%08x",
@@ -183,9 +186,10 @@ bool population_table_get_next_address(
         return false;
     }
 
-    bool is_valid = false;
     do {
         address_and_row_length item = address_list[next_item];
+        next_item += 1;
+        items_to_go -= 1;
 
         // If the row is a direct row, indicate this by specifying the
         // n_bytes_to_transfer is 0
@@ -195,29 +199,26 @@ bool population_table_get_next_address(
                     (uint32_t) direct_rows_base_address +
                     (last_neuron_id * sizeof(uint32_t)));
             *n_bytes_to_transfer = 0;
-            is_valid = true;
-        } else {
-            uint32_t row_length = _get_row_length(item);
-            if (row_length > 0) {
-                uint32_t block_address =
-                        _get_address(item) + (uint32_t) synaptic_rows_base_address;
-                uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
-                uint32_t neuron_offset =
-                        last_neuron_id * stride * sizeof(uint32_t);
-
-                *row_address = (address_t) (block_address + neuron_offset);
-                *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_debug("neuron_id = %u, block_address = 0x%.8x,"
-                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                        last_neuron_id, block_address, row_length, *row_address,
-                        *n_bytes_to_transfer);
-                is_valid = true;
-            }
+            return true;
         }
 
-        next_item += 1;
-        items_to_go -= 1;
-    } while (!is_valid && (items_to_go > 0));
+        // Indirect row... but might be zero-length row
+        uint32_t row_length = _get_row_length(item);
+        if (row_length > 0) {
+            uint32_t block_address =
+                    _get_address(item) + (uint32_t) synaptic_rows_base_address;
+            uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
+            uint32_t neuron_offset =
+                    last_neuron_id * stride * sizeof(uint32_t);
 
-    return is_valid;
+            *row_address = (address_t) (block_address + neuron_offset);
+            *n_bytes_to_transfer = stride * sizeof(uint32_t);
+            log_debug("neuron_id = %u, block_address = 0x%.8x,"
+                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                    last_neuron_id, block_address, row_length, *row_address,
+                    *n_bytes_to_transfer);
+            return true;
+        }
+    } while (items_to_go > 0);
+    return false;
 }
