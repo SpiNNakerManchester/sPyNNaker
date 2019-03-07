@@ -69,7 +69,7 @@ script:
   # XML
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
-  - make -C neural_modelling
+  - make -C neural_modelling CFLAGS=-fdiagnostics-color
   - support/run-vera.sh neural_modelling/src
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
