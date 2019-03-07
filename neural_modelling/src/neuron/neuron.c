@@ -233,25 +233,15 @@ bool neuron_do_timestep_update(timer_t time) {
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region, synaptic_contributions,
         DMA_READ, dma_size);
 
-    // Busy wait until DMA transfer is finished
-    while(dma[DMA_STAT] & 1) {
-
-        // Do nothing
-    }
-
-    //DMA Failed, NECESSARY?? (YES IF NOT DONE INTERNALLY)
-    if(dma[DMA_STAT] & 2) {
-
-        log_error("Failed reading synaptic contributions from memory");
-        return false;
-    }
-
-    // Wait a random number of clock cycles
+    // Wait a random number of clock cycles (and ensure DMA transfer is finished)
     uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
-    while (tc[T1_COUNT] > random_backoff_time) {
+    while (tc[T1_COUNT] > random_backoff_time || !(dma[DMA_STAT] & 1024)) {
 
         // Do Nothing
     }
+
+    //Tell DMA controller to clear status bit
+    dma[DMA_CTRL] |= 8;
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
@@ -269,6 +259,8 @@ bool neuron_do_timestep_update(timer_t time) {
 
     // Set up an array for storing the recorded variable values
     state_t recorded_variable_values[n_recorded_vars];
+
+    io_printf(IO_BUF, "Timestep: %d", time);
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -436,6 +428,8 @@ bool neuron_initialise(address_t address) {
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_index_bits = log_n_neurons;
+
+    io_printf(IO_BUF, "Syn index bits = %d\n", synapse_index_bits);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {

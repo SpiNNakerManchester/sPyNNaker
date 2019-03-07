@@ -332,6 +332,9 @@ bool synapses_initialise(
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    io_printf(IO_BUF, "Syn_index_bits: %d  SYNAPSE_DELAY_MASK: %d synapse_type_index_bits:%d\n", synapse_index_bits, SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+
     return true;
 }
 
@@ -357,8 +360,10 @@ void synapses_do_timestep_update(timer_t time) {
     if(time == 0) {
 
         synaptic_region = sark_tag_ptr(255, 0);
-        synaptic_region += n_neurons * synapse_index;
+        synaptic_region += (n_neurons * synapse_index);
     }
+
+    io_printf(IO_BUF, "Timestep: %d", time);
 
     for(int i = ring_buffer_index; i < ring_buffer_index + n_neurons; i++)
         io_printf(IO_BUF, "SDRAM written: %d\n", ring_buffers[ring_buffer_index]);
