@@ -15,6 +15,9 @@ from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
+import spynnaker.pyNN.models.neural_projections.connectors.\
+    abstract_generate_connector_on_machine as \
+    abstract_generate_connector_on_machine
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
@@ -250,6 +253,8 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
+        # UGLY but the mock transceiver NEED generate_on_machine be False
+        abstract_generate_connector_on_machine.IS_PYNN_8 = False
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
