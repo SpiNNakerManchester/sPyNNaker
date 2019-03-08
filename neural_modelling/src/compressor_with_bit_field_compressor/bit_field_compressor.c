@@ -130,8 +130,10 @@ bool store_into_compressed_address(){
         return false;
     }
     else{
+        log_info("starting store of %d tables", n_tables);
         bool success = routing_table_sdram_store(
             routing_tables, n_tables, sdram_loc_for_compressed_entries);
+        log_info("finished store");
         if (!success){
             log_error("failed to store entries into sdram. ");
             return false;
@@ -351,15 +353,19 @@ void initialise() {
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
     uint32_t time_for_compression_attempt = sark_virtual_processor_info[
         spin1_get_core_id()].user1;
+    log_info("user 1 = %d", time_for_compression_attempt);
 
     // bool from int conversion happening here
-    int int_value = sark_virtual_processor_info[spin1_get_core_id()].user2;
-    if (int_value == 0){
+    uint32_t int_value =
+        (uint32_t) sark_virtual_processor_info[spin1_get_core_id()].user2;
+    log_info("user 2 = %d", int_value);
+    if (int_value == 1){
         compress_only_when_needed = true;
     }
 
     int_value = sark_virtual_processor_info[spin1_get_core_id()].user3;
-    if (int_value == 0){
+    log_info("user 3 = %d", int_value);
+    if (int_value == 1){
         compress_as_much_as_possible = true;
     }
 

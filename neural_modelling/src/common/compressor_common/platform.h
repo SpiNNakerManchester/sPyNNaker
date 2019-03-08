@@ -74,7 +74,7 @@
     //! \return: the address of the block of memory to utilise.
     static inline void * safe_sdram_malloc(uint bytes){
         // try SDRAM stolen from the cores synaptic matrix areas.
-        void * p = sark_xalloc(stolen_sdram_heap, bytes, 0, ALLOC_LOCK);
+        void * p = sark_xalloc(sv->sdram_heap, bytes, 0, ALLOC_LOCK);
 
         if (p == NULL){
             //log_error("Failed to malloc %u bytes.\n", bytes);

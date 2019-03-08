@@ -89,7 +89,7 @@ typedef enum uncompressed_routing_table_region_elements{
 
 //! enum for the compressor cores data elements (used for programmer debug)
 typedef enum compressor_core_elements{
-    N_COMPRESSOR_CORES = 0, START_OF_comp_core_idS = 1
+    N_COMPRESSOR_CORES = 0, START_OF_COMP_CORE_IDS = 1
 } compressor_core_elements;
 
 //! enum mapping user register to data that's in there (only used by
@@ -148,9 +148,6 @@ typedef enum priorities{
 //! max number of links on a router
 #define MAX_LINKS_PER_ROUTER 6
 
-//! size of x routing entries in bytes
-#define X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE 4
-
 //! neuron level mask
 #define NEURON_LEVEL_MASK 0xFFFFFFFF
 
@@ -185,7 +182,7 @@ table_t* last_compressed_table;
 uint32_t app_id = 0;
 
 // how many bitfields there are
-uint n_bf_addresses = 0;
+uint32_t n_bf_addresses = 0;
 
 //! how many entries are in the uncompressed version
 uint32_t total_entries_in_uncompressed_router_table = 0;
@@ -315,10 +312,10 @@ uint32_t locate_key_atom_map(uint32_t key){
     uint32_t position_in_address_region = 0;
     uint32_t n_address_pairs =
         user_register_content[REGION_ADDRESSES][
-            position_in_address_region];
+            position_in_address_region + N_PAIRS];
 
     // cycle through key to atom regions to locate key
-    position_in_address_region += 1;
+    position_in_address_region += START_OF_ADDRESSES_DATA;
     for (uint32_t region_id = 0; region_id < n_address_pairs; region_id++){
         // get key address region
         address_t key_atom_sdram_address =
@@ -328,7 +325,7 @@ uint32_t locate_key_atom_map(uint32_t key){
         // read how many keys atom pairs there are
         uint32_t position_ka_pair = 0;
         uint32_t n_key_atom_pairs = key_atom_sdram_address[position_ka_pair];
-        log_debug("n key pairs to check are %d", n_key_atom_pairs);
+        log_info("n key pairs to check are %d", n_key_atom_pairs);
         position_ka_pair += 1;
 
         // cycle through keys in this region looking for the key find atoms of
@@ -336,11 +333,11 @@ uint32_t locate_key_atom_map(uint32_t key){
                 n_key_atom_pairs; key_atom_pair_id++){
             uint32_t key_to_check =
                 key_atom_sdram_address[position_ka_pair + SRC_BASE_KEY];
-            log_debug("key to check = %d", key_to_check);
+            log_info("key to check = %d", key_to_check);
 
             // if key is correct, return atoms
             if (key_to_check == key){
-                log_debug(
+                log_info(
                     "found key, returning n atoms of %d",
                      key_atom_sdram_address[position_ka_pair + SRC_N_ATOMS]);
                 return key_atom_sdram_address[
@@ -368,26 +365,37 @@ uint32_t locate_key_atom_map(uint32_t key){
 uint32_t population_master_pop_bit_field_ts(
         master_pop_bit_field_t * keys, uint32_t mid_point){
 
-    uint32_t n_keys = 1;
-    // how many in each key
+    uint32_t n_keys = 0;
+    // check each bitfield to see if the key been recorded already
     for (uint32_t bit_field_index = 0; bit_field_index < mid_point;
             bit_field_index++){
+
+        // get key
         uint32_t key = sorted_bit_fields[bit_field_index][BIT_FIELD_BASE_KEY];
+        log_info("key is %d", key);
+
+        // start cycle looking for a clone
         uint32_t keys_index = 0;
         bool found = false;
-        while(!found || keys_index < n_keys){
+        while(!found && keys_index < n_keys){
             if (keys[keys_index].master_pop_key == key){
+                log_info("found key");
                 found = true;
                 keys[keys_index].n_bitfields_with_key ++;
             }
             keys_index ++;
+            log_info("next key index is %d", keys_index);
         }
+        log_info("found is %d", found);
         if (!found){
+            log_info("adding to list. n_keys = %d", n_keys);
             keys[n_keys].master_pop_key = key;
             keys[n_keys].n_bitfields_with_key = 1;
             n_keys ++;
         }
+        log_info("next cycle");
     }
+    log_info("done");
     return n_keys;
 }
 
@@ -654,29 +662,31 @@ bool generate_rt_from_bit_field(
 }
 
 //! \brief clones the un compressed routing table, to another sdram location
-//! \param[in/out] where_was_cloned: the address where the cloned table is
-//! located.
-//! \return: bool saying if the cloning was successful or not
-bool clone_un_compressed_routing_table(address_t* where_was_cloned){
+//! \return: address of new clone, or null if it failed to clone
+address_t clone_un_compressed_routing_table(){
 
     uint32_t x_entries = user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES];
-    uint32_t sdram_used = (X_ROUTING_TABLE_ENTRIES_SDRAM_SIZE + (
-        x_entries * sizeof(entry_t) * WORD_TO_BYTE_MULTIPLIER));
+    uint32_t sdram_used = routing_table_sdram_size_of_table(x_entries);
+    log_info("sdram requirement is %d", sdram_used);
 
     // allocate sdram for the clone
-    where_was_cloned = MALLOC_SDRAM(sdram_used);
+    address_t where_was_cloned = MALLOC_SDRAM(sdram_used);
     if (where_was_cloned == NULL){
         log_error("failed to allocate sdram for the cloned routing table for "
                   "uncompressed compression attempt");
-        return false;
+        return NULL;
     }
 
+    log_info("sdram address is %d", where_was_cloned);
     // copy over data
     sark_mem_cpy(
-        &where_was_cloned,
+        where_was_cloned,
         &user_register_content[UNCOMP_ROUTER_TABLE][N_ENTRIES],
         sdram_used);
-    return true;
+
+    log_info("old n entries is %d", x_entries);
+    log_info("new n entries is %d", where_was_cloned[0]);
+    return where_was_cloned;
 }
 
 //! takes a midpoint and reads the sorted bitfields up to that point generating
@@ -691,49 +701,57 @@ bool create_bit_field_router_tables(
     // sort out bitfields by key
 
     // get n keys that exist
+    log_info("try keys alloc");
     master_pop_bit_field_t * keys = MALLOC(
         mid_point * sizeof(master_pop_bit_field_t));
     if (keys == NULL){
         log_error("cannot allocate memory for keys");
         return false;
     }
+    log_info("finished key alloc");
 
     // populate the master pop bit field
+    log_info("try populating keys");
     *n_rt_addresses = population_master_pop_bit_field_ts(keys, mid_point);
+    log_info("finished populating keys");
 
     // add the uncompressed table, for allowing the bitfield table generator to
     // edit accordingly.
+    log_info("try cloning uncompressed table");
     n_rt_addresses += 1;
-    address_t* uncompressed_table = NULL;
-    bool suc = clone_un_compressed_routing_table(uncompressed_table);
-    if (!suc){
+    address_t uncompressed_table = clone_un_compressed_routing_table();
+    if (uncompressed_table == NULL){
         log_error(
             "failed to clone uncompressed tables for attempt %d", mid_point);
         FREE(keys);
         return false;
     }
+    log_info("finished cloning uncompressed table");
 
+    log_info("try malloc for rt addresses");
     bit_field_routing_tables = MALLOC(*n_rt_addresses * sizeof(address_t));
     if (bit_field_routing_tables == NULL){
         log_info("failed to allocate memory for bitfield routing tables");
         FREE(keys);
         return false;
     }
+    log_info("completed malloc for rt addresses");
 
     // add clone to front of list, to ensure its easily accessible (plus its
     // part of the expected logic)
-    bit_field_routing_tables[0] = *uncompressed_table;
+
+    bit_field_routing_tables[0] = uncompressed_table;
 
     // iterate through the keys, accumulating bitfields and turn into routing
     // table entries.
     for(uint32_t key_index = 1; key_index < *n_rt_addresses; key_index++){
         // holder for the rt address
-        address_t* rt_address;
+        address_t rt_address;
 
         // create the routing table from the bitfield
         bool success = generate_rt_from_bit_field(
-            keys[key_index -1].master_pop_key, *uncompressed_table,
-            keys[key_index - 1].n_bitfields_with_key, mid_point, rt_address);
+            keys[key_index -1].master_pop_key, uncompressed_table,
+            keys[key_index - 1].n_bitfields_with_key, mid_point, &rt_address);
 
         // if failed, free stuff and tell above it failed
         if (!success){
@@ -744,7 +762,19 @@ bool create_bit_field_router_tables(
         }
 
         // store the rt address for this master pop key
-        bit_field_routing_tables[key_index] = *rt_address;
+        bit_field_routing_tables[key_index] = rt_address;
+    }
+    return true;
+}
+
+//! \brief frees sdram from the compressor core.
+//! \param[in] the compressor core to clear sdram usage from
+//! \return bool stating that it was successful in clearing sdram
+bool free_sdram_from_compression_attempt(uint32_t comp_core_id){
+    uint32_t elements = comp_cores_bf_tables[comp_core_id].n_elements;
+    for (uint32_t core_bit_field_id = 0; core_bit_field_id < elements;
+            core_bit_field_id++){
+        FREE(comp_cores_bf_tables[comp_core_id].elements[core_bit_field_id]);
     }
     return true;
 }
@@ -777,27 +807,43 @@ bool record_address_data_for_response_functionality(
         address_t compressed_address, uint32_t mid_point){
 
     //free previous if there is any
+    log_info("check if need to free old elements if needed");
+    log_info("element array = %d", comp_cores_bf_tables[comp_core_id].elements);
     if (comp_cores_bf_tables[comp_core_id].elements != NULL){
+        log_info("attempting to free individual elements");
+        bool success = free_sdram_from_compression_attempt(comp_core_id);
+        if (!success){
+            log_error("failed to free compressor core elements.");
+            return false;
+        }
+        log_info("attempting to free array element");
         FREE(comp_cores_bf_tables[comp_core_id].elements);
+        log_info("finished free");
     }
 
     // allocate memory for the elements
+    log_info("allocate for elements");
     comp_cores_bf_tables[comp_core_id].elements = MALLOC(
         n_rt_addresses * sizeof(address_t));
     if (comp_cores_bf_tables[comp_core_id].elements == NULL){
         log_error("cannot allocate memory for sdram tracker of addresses");
         return false;
     }
+    log_info("allocated elements");
 
     // store the elements. note need to copy over, as this is a central malloc
     // space for the routing tables.
+    log_info("populate store for comp core bf tables");
     comp_cores_bf_tables[comp_core_id].n_elements = n_rt_addresses;
     comp_cores_bf_tables[comp_core_id].n_bit_fields = mid_point;
     comp_cores_bf_tables[comp_core_id].compressed_table = compressed_address;
+    log_info("storing %d rt addresses", n_rt_addresses);
     for (uint32_t rt_index =0; rt_index < n_rt_addresses; rt_index++){
         comp_cores_bf_tables[comp_core_id].elements[rt_index] =
             bit_field_routing_tables[rt_index];
+        log_info("stored rt address %d", rt_index);
     }
+    log_info("populated store for comp core bf tables");
     return true;
 }
 
@@ -946,9 +992,12 @@ bool set_off_bit_field_compression(
         uint32_t n_rt_addresses, uint32_t mid_point){
 
     // select compressor core to execute this
+    log_info("select a compressor core");
     uint32_t comp_core_id = select_compressor_core(mid_point);
+    log_info("selectED a compressor core");
 
     // allocate space for the compressed routing entries if required
+    log_info("allocate memory for compressed table");
     address_t compressed_address =
         comp_cores_bf_tables[comp_core_id].compressed_table;
     if (comp_cores_bf_tables[comp_core_id].compressed_table == NULL){
@@ -963,20 +1012,24 @@ bool set_off_bit_field_compression(
         }
         log_info("address for compressed data is %d", compressed_address);
     }
+    log_info("allocated memory for compressed table");
 
     // record addresses for response processing code
+    log_info("record data for response");
     bool suc = record_address_data_for_response_functionality(
         n_rt_addresses, comp_core_id, compressed_address, mid_point);
     if (!suc){
         log_error("failed to store the addresses for response functionality");
         return false;
     }
+    log_info("recorded data for response");
 
     // update sdp to right destination
     update_mc_message(comp_core_id);
 
     // deduce how many packets
     uint32_t total_packets = deduce_total_packets(n_rt_addresses);
+    log_info("total packets = %d", total_packets);
 
     // generate the packets and fire them to the compressor core
     uint32_t addresses_sent = 0;
@@ -984,12 +1037,14 @@ bool set_off_bit_field_compression(
         // if just one packet worth, set to left over addresses
         uint32_t n_addresses_this_message = deduce_elements_this_packet(
             packet_id, n_rt_addresses, addresses_sent);
+        log_info("sending %d addresses this message", n_addresses_this_message);
 
         // set data components
         if (packet_id == 0){  // first packet
             set_up_first_packet(
                 total_packets, compressed_address, n_rt_addresses,
                 n_addresses_this_message);
+            log_info("finished setting up first packet");
         }
         else{  // extra packets
             log_info("sending extra packet id = %d", packet_id);
@@ -1010,12 +1065,14 @@ bool set_off_bit_field_compression(
 //! \param[in] mid_point: the mid point to start at
 //! \return bool fag if it fails for memory issues
 bool create_tables_and_set_off_bit_compressor(uint32_t mid_point){
-    uint32_t* n_rt_addresses = 0;
-    bool success = create_bit_field_router_tables(mid_point, n_rt_addresses);
+    uint32_t n_rt_addresses = 0;
+    log_info("started create bit field router tables");
+    bool success = create_bit_field_router_tables(mid_point, &n_rt_addresses);
+    log_info("finished creating bit field router tables");
 
     // if successful, try setting off the bitfield compression
     if (success){
-        success = set_off_bit_field_compression(*n_rt_addresses, mid_point);
+        success = set_off_bit_field_compression(n_rt_addresses, mid_point);
 
          // if successful, move to next search point.
          if (!success){
@@ -1038,21 +1095,43 @@ bool start_binary_search(){
         n_bf_addresses / n_available_compression_cores;
     uint32_t multiplier = 1;
 
+    // safety check for floored to 0.
+    if (hops_between_compression_cores == 0){
+        hops_between_compression_cores = 1;
+    }
+
     bool failed_to_malloc = false;
+    uint32_t new_mid_point = hops_between_compression_cores * multiplier;
+    log_info("new mid point = %d", new_mid_point);
+    log_info("n bf addresses = %d", n_bf_addresses);
 
     // iterate till either ran out of cores, or failed to malloc sdram during
-    // the setup of a core
-    while (n_available_compression_cores != 0 || !failed_to_malloc){
-        bool success = create_tables_and_set_off_bit_compressor(
-            hops_between_compression_cores * multiplier);
+    // the setup of a core or when gone too far
+    while (n_available_compression_cores != 0 && !failed_to_malloc &&
+            new_mid_point < n_bf_addresses){
+
+        log_info("attempt new create tables and set off");
+        bool success = create_tables_and_set_off_bit_compressor(new_mid_point);
         if(success){
             multiplier ++;
         }
         else{
             failed_to_malloc = true;
+        }
 
+        //update to next new mid point
+        uint32_t new_mid_point = hops_between_compression_cores * multiplier;
+        log_info("new mid point = %d", new_mid_point);
+
+        log_info("condition1 = %d", n_available_compression_cores != 0);
+        log_info("condition2 = %d", !failed_to_malloc);
+        log_info("condition3 = %d", new_mid_point < n_bf_addresses);
+        if (new_mid_point >= n_bf_addresses){
+            rt_error(RTE_SWERR);
         }
     }
+    rt_error(RTE_SWERR);
+    log_info("finished the start of compression core allocation");
     
     // if it did not set off 1 compression. fail fully. coz it wont ever get
     // anything done. host will pick up the slack
@@ -1066,6 +1145,9 @@ bool start_binary_search(){
     if (failed_to_malloc){
         n_available_compression_cores = 0;
     }
+
+    // return success for reading in and sorting bitfields
+    reading_bit_fields = false;
     
     // say we've started
     return true;
@@ -1428,17 +1510,19 @@ uint32_t count_many_on_going_compression_attempts_are_running(){
 void carry_on_binary_search(){
 
     bool failed_to_malloc = false;
-    bool* found_best = false;
+    bool found_best = false;
 
     // iterate till either ran out of cores, or failed to malloc sdram during
     // the setup of a core or found best or no other mid points need to be
     // tested
-    while (n_available_compression_cores != 0 || !failed_to_malloc ||
+    while (n_available_compression_cores != 0 && !failed_to_malloc &&
             !found_best){
 
         // locate next midpoint to test
-        uint32_t* mid_point = 0;
-        bool success = locate_next_mid_point(found_best, mid_point);
+        uint32_t mid_point = 0;
+        bool success = locate_next_mid_point(&found_best, &mid_point);
+
+        log_info("trying with midpoint %d", mid_point);
 
         // if finished search, do last bit
         if (found_best){
@@ -1453,7 +1537,7 @@ void carry_on_binary_search(){
             }
             else{  // try a compression run
                 bool success =
-                    create_tables_and_set_off_bit_compressor(*mid_point);
+                    create_tables_and_set_off_bit_compressor(mid_point);
                 if (!success){  // failed to set off the run for a memory reason
                     failed_to_malloc = true;
                 }
@@ -1473,7 +1557,7 @@ void carry_on_binary_search(){
             // check if current reach is enough to count as a success
             if ((n_bf_addresses / best_mid_point_tested) >=
                     user_register_content[REGION_ADDRESSES][THRESHOLD]){
-                *found_best = true;
+                found_best = true;
                 best_search_point = best_mid_point_tested;
                 log_info("finished search by end user QoS");
                 load_routing_table_into_router();
@@ -1485,18 +1569,6 @@ void carry_on_binary_search(){
             }
         }
     }
-}
-
-//! \brief frees sdram from the compressor core.
-//! \param[in] the compressor core to clear sdram usage from
-//! \return bool stating that it was successful in clearing sdram
-bool free_sdram_from_compression_attempt(uint32_t comp_core_id){
-    uint32_t elements = comp_cores_bf_tables[comp_core_id].n_elements;
-    for (uint32_t core_bit_field_id = 0; core_bit_field_id < elements;
-            core_bit_field_id++){
-        FREE(comp_cores_bf_tables[comp_core_id].elements[core_bit_field_id]);
-    }
-    return true;
 }
 
 //! \brief processes the response from the compressor attempt
@@ -1615,6 +1687,9 @@ void process_compressor_response(
     if (n_available_compression_cores > 0 && !reading_bit_fields){
         carry_on_binary_search();
     }
+    else{
+        log_info("not ready to carry on yet");
+    }
 }
 
 //! \brief the sdp control entrance.
@@ -1679,8 +1754,8 @@ void sdp_handler(uint mailbox, uint port) {
 //! \param[in] bit_field_struct: the location of the bitfield
 //! \return how many redundant packets there are
 uint32_t detect_redundant_packet_count(address_t bit_field_struct){
-    log_debug("address's location is %d", bit_field_struct);
-    log_debug(" key is %d", bit_field_struct[BIT_FIELD_BASE_KEY]);
+    log_info("address's location is %d", bit_field_struct);
+    log_info(" key is %d", bit_field_struct[BIT_FIELD_BASE_KEY]);
     uint32_t n_filtered_packets = 0;
     uint32_t n_neurons =
         locate_key_atom_map(bit_field_struct[BIT_FIELD_BASE_KEY]);
@@ -1691,7 +1766,7 @@ uint32_t detect_redundant_packet_count(address_t bit_field_struct){
             n_filtered_packets += 1;
         }
     }
-    log_debug("n filtered packets = %d", n_filtered_packets);
+    log_info("n filtered packets = %d", n_filtered_packets);
     return n_filtered_packets;
 }
 
@@ -1909,17 +1984,29 @@ void order_bit_fields_based_on_impact(
 bool set_off_no_bit_field_compression(){
 
     // allocate and clone uncompressed entry
-    address_t* sdram_clone_of_routing_table = NULL;
-    bool suc = clone_un_compressed_routing_table(sdram_clone_of_routing_table);
-    if (!suc){
+    log_info("start cloning of uncompressed table");
+    address_t sdram_clone_of_routing_table =
+        clone_un_compressed_routing_table();
+    if (sdram_clone_of_routing_table == NULL){
         log_error("could not allocate memory for uncompressed table for no "
                   "bit field compression attempt.");
         return false;
     }
+    log_info("finished cloning of uncompressed table");
 
     // set up the bitfield routing tables so that it'll map down below
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("allocating bf routing tables");
     bit_field_routing_tables = MALLOC(sizeof(address_t*));
-    bit_field_routing_tables[0] = *sdram_clone_of_routing_table;
+    log_info("malloc finished");
+    if (bit_field_routing_tables == NULL){
+        log_error(
+            "failed to allocate memory for the bit_field_routing tables");
+        return false;
+    }
+    log_info("allocate to array");
+    bit_field_routing_tables[0] = sdram_clone_of_routing_table;
+    log_info("allocated bf routing tables");
 
     // run the allocation and set off of a compressor core
     return set_off_bit_field_compression(N_UNCOMPRESSED_TABLE, 0);
@@ -1935,10 +2022,10 @@ bool read_in_bit_fields(){
     uint32_t n_pairs_of_addresses =
         user_register_content[REGION_ADDRESSES][N_PAIRS];
     position_in_region_data = START_OF_ADDRESSES_DATA;
-    //log_info("n pairs of addresses = %d", n_pairs_of_addresses);
+    log_info("n pairs of addresses = %d", n_pairs_of_addresses);
 
     // malloc the bt fields by processor
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     bit_field_by_processor = MALLOC(
         n_pairs_of_addresses * sizeof(_bit_field_by_processor_t));
     if (bit_field_by_processor == NULL){
@@ -1948,7 +2035,7 @@ bool read_in_bit_fields(){
     }
     
     // build processor coverage by bitfield
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     _proc_cov_by_bitfield_t** proc_cov_by_bitfield = MALLOC(
         n_pairs_of_addresses * sizeof(_proc_cov_by_bitfield_t*));
     if (proc_cov_by_bitfield == NULL){
@@ -1956,12 +2043,13 @@ bool read_in_bit_fields(){
                   "bitfield, if it fails here. might as well give up");
         return false;
     }
+    log_info("finished malloc proc_cov_by_bitfield");
 
     // iterate through a processors bitfield region and get n bitfields
     for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
         
         // malloc for n redundant packets
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
         proc_cov_by_bitfield[region_id] = MALLOC(sizeof(
             _proc_cov_by_bitfield_t));
         if (proc_cov_by_bitfield[region_id] == NULL){
@@ -1977,26 +2065,30 @@ bool read_in_bit_fields(){
         proc_cov_by_bitfield[region_id]->processor_id =
             user_register_content[REGION_ADDRESSES][
                 position_in_region_data + PROCESSOR_ID];
-        //log_info("bit_field_by_processor in region %d processor id = %d",
-        //         region_id, bit_field_by_processor[region_id].processor_id);
+        log_info("bit_field_by_processor in region %d processor id = %d",
+                 region_id, bit_field_by_processor[region_id].processor_id);
 
         // locate data for malloc memory calcs
         address_t bit_field_address = (address_t) user_register_content[
             REGION_ADDRESSES][position_in_region_data + BITFIELD_REGION];
         position_in_region_data += ADDRESS_PAIR_LENGTH;
+
+        log_info("safety check. bit_field key is %d",
+                 bit_field_address[BIT_FIELD_BASE_KEY]);
         uint32_t pos_in_bitfield_region = N_BIT_FIELDS;
         uint32_t core_n_bit_fields = bit_field_address[pos_in_bitfield_region];
+        log_info("there are %d core bit fields", core_n_bit_fields);
         pos_in_bitfield_region = START_OF_BIT_FIELD_TOP_DATA;
         n_bf_addresses += core_n_bit_fields;
         
         // track lengths
         proc_cov_by_bitfield[region_id]->length_of_list = core_n_bit_fields;
         bit_field_by_processor[region_id].length_of_list = core_n_bit_fields;
-        //log_info("bit field by processor with region %d, has length of %d",
-        //         region_id, core_n_bit_fields);
+        log_info("bit field by processor with region %d, has length of %d",
+                 region_id, core_n_bit_fields);
         
         // malloc for bitfield region addresses
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
         bit_field_by_processor[region_id].bit_field_addresses = MALLOC(
             core_n_bit_fields * sizeof(address_t));
         if (bit_field_by_processor[region_id].bit_field_addresses == NULL){
@@ -2006,7 +2098,7 @@ bool read_in_bit_fields(){
         }
         
         // malloc for n redundant packets
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
         proc_cov_by_bitfield[region_id]->redundant_packets = MALLOC(
             core_n_bit_fields * sizeof(uint));
         if (proc_cov_by_bitfield[region_id]->redundant_packets == NULL){
@@ -2028,9 +2120,9 @@ bool read_in_bit_fields(){
                     (address_t) &bit_field_address[pos_in_bitfield_region]);
             proc_cov_by_bitfield[region_id]->redundant_packets[bit_field_id] =
                 n_redundant_packets;
-            //log_info("prov cov by bitfield for region %d, redundant packets "
-            //         "at index %d, has n redundant packets of %d",
-            //         region_id, bit_field_id, n_redundant_packets);
+            log_info("prov cov by bitfield for region %d, redundant packets "
+                     "at index %d, has n redundant packets of %d",
+                     region_id, bit_field_id, n_redundant_packets);
             
             pos_in_bitfield_region += 
                 START_OF_BIT_FIELD_DATA + bit_field_address[
@@ -2041,25 +2133,27 @@ bool read_in_bit_fields(){
     // sort out teh searcher bitfields. as now first time where can do so
     // NOTE: by doing it here, the response from the uncompressed can be
     // handled correctly.
+    log_info("setting up search bitfields");
     bool success = set_up_search_bitfields();
     if (!success){
         log_error("can not allocate memory for search fields.");
         return false;
     }
+    log_info("finish setting up search bitfields");
 
     // set off a none bitfield compression attempt, to pipe line work
     log_info("sets off the uncompressed version of the search");
     set_off_no_bit_field_compression();
 
     // populate the bitfield by coverage
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     sorted_bit_fields = MALLOC(n_bf_addresses * sizeof(address_t));
     if(sorted_bit_fields == NULL){
         log_error("cannot allocate memory for the sorted bitfield addresses");
         return false;
     }
 
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     sorted_bit_fields_processor_ids =
         MALLOC(n_bf_addresses * sizeof(uint32_t));
     if (sorted_bit_fields_processor_ids == NULL){
@@ -2069,7 +2163,7 @@ bool read_in_bit_fields(){
     }
 
     uint length_n_redundant_packets = 0;
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     uint * redundant_packets = MALLOC(n_bf_addresses * sizeof(uint));
 
     // filter out duplicates in the n redundant packets
@@ -2102,11 +2196,11 @@ bool read_in_bit_fields(){
             }
         }
     }
-    //log_info("length of n redundant packets = %d",
-    //         length_n_redundant_packets);
+    log_info("length of n redundant packets = %d",
+             length_n_redundant_packets);
 
     // malloc space for the bitfield by coverage map
-    //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+    log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     coverage_t** coverage = MALLOC(
         length_n_redundant_packets * sizeof(coverage_t*));
     if (coverage == NULL){
@@ -2120,9 +2214,9 @@ bool read_in_bit_fields(){
     for (uint32_t r_packet_index = 0; 
             r_packet_index < length_n_redundant_packets; r_packet_index++){
         // malloc a redundant packet entry
-        //log_info("try to allocate memory of size %d for coverage at index %d",
-        //         sizeof(coverage_t), r_packet_index);
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("try to allocate memory of size %d for coverage at index %d",
+                 sizeof(coverage_t), r_packet_index);
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
         coverage[r_packet_index] = MALLOC(sizeof(coverage_t));
         if (coverage[r_packet_index] == NULL){
             log_error("failed to malloc memory for the bitfields by coverage "
@@ -2153,7 +2247,7 @@ bool read_in_bit_fields(){
         
         // malloc list size for these addresses of bitfields with same 
         // redundant packet counts.
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
         coverage[r_packet_index]->bit_field_addresses = MALLOC(
             n_bit_fields_with_same_x_r_packets * sizeof(address_t));
         if(coverage[r_packet_index]->bit_field_addresses == NULL){
@@ -2164,11 +2258,11 @@ bool read_in_bit_fields(){
         
         // malloc list size for the corresponding processors ids for the 
         // bitfields
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
-        //log_info(
-        //    "trying to allocate %d bytes, for x bitfields same xr packets %d",
-        //    n_bit_fields_with_same_x_r_packets * sizeof(uint32_t),
-         //   n_bit_fields_with_same_x_r_packets);
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info(
+            "trying to allocate %d bytes, for x bitfields same xr packets %d",
+            n_bit_fields_with_same_x_r_packets * sizeof(uint32_t),
+            n_bit_fields_with_same_x_r_packets);
         coverage[r_packet_index]->processor_ids = MALLOC(
             n_bit_fields_with_same_x_r_packets * sizeof(uint32_t));
         if(coverage[r_packet_index]->processor_ids == NULL){
@@ -2179,12 +2273,12 @@ bool read_in_bit_fields(){
             
         // populate list of bitfields addresses which have same redundant 
         //packet count.
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
-        //log_info(
-        //    "populating list of bitfield addresses with same packet count");
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info(
+            "populating list of bitfield addresses with same packet count");
         for (uint region_id = 0; region_id < n_pairs_of_addresses; region_id++){
-            //log_info("prov cov for region id %d has length %d", region_id,
-            //         proc_cov_by_bitfield[region_id]->length_of_list);
+            log_info("prov cov for region id %d has length %d", region_id,
+                     proc_cov_by_bitfield[region_id]->length_of_list);
             uint32_t length = proc_cov_by_bitfield[region_id]->length_of_list;
             uint32_t processor_id_index = 0;
             for(uint red_packet_index = 0; red_packet_index < length;
@@ -2201,7 +2295,7 @@ bool read_in_bit_fields(){
                 }
             }
         }
-        //log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
+        log_info("%u bytes of free DTCM", sark_heap_max(sark.heap, 0));
     }
 
     // free the redundant packet tracker, as now tailored ones are in the dict
@@ -2228,8 +2322,6 @@ bool read_in_bit_fields(){
     FREE(coverage);
     FREE(proc_cov_by_bitfield);
 
-    // return success for reading in and sorting bitfields
-    reading_bit_fields = false;
     return true; 
 }
 
@@ -2238,9 +2330,10 @@ bool start_process(){
     // will use this many palces. so exrtact at top
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
 
-    //log_info("read in bitfields");
+    log_info("read in bitfields");
     bool success_reading_in_bit_fields = read_in_bit_fields();
-    //log_info("finished reading in bitfields");
+    log_info("finished reading in bitfields");
+
     if (! success_reading_in_bit_fields){
         log_error("failed to read in bitfields, failing");
         sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_MALLOC;
@@ -2261,8 +2354,10 @@ bool start_process(){
 }
 
 void start_compression_process(){
+    log_info("starting compression process");
     bool success = start_process();
     if (!success){
+        log_error("failed to start up. fail");
         rt_error(RTE_SWERR);
     }
 }
@@ -2294,22 +2389,28 @@ void initialise_routing_control_flags(){
         user_register_content[UNCOMP_ROUTER_TABLE];
     app_id = addresses_region[APPLICATION_APP_ID];
     total_entries_in_uncompressed_router_table = addresses_region[N_ENTRIES];
+    log_info(
+        "app id %d, uncompress total entries %d",
+        app_id, total_entries_in_uncompressed_router_table);
 }
 
 //! \brief get compressor cores
 bool initialise_compressor_cores(){
     // locate the data point for compressor cores
     uint32_t n_region_pairs = user_register_content[REGION_ADDRESSES][N_PAIRS];
-    uint32_t hop = 1 + (n_region_pairs * ADDRESS_PAIR_LENGTH);
+    uint32_t hop = START_OF_ADDRESSES_DATA + (
+        n_region_pairs * ADDRESS_PAIR_LENGTH);
+
+    log_info(" n region pairs = %d, hop = %d", n_region_pairs, hop);
 
     // get n compression cores and update trackers
     n_compression_cores =
         user_register_content[REGION_ADDRESSES][hop + N_COMPRESSOR_CORES];
     n_available_compression_cores = n_compression_cores;
+    log_info("%d comps cores available", n_available_compression_cores);
 
     // malloc dtcm for this
     compressor_cores = MALLOC(n_compression_cores * sizeof(uint32_t));
-
     // verify malloc worked
     if (compressor_cores == NULL){
         log_error("failed to allocate memory for the compressor cores");
@@ -2317,10 +2418,12 @@ bool initialise_compressor_cores(){
     }
 
     // populate with compressor cores
+    log_info("start populate compression cores");
     for (uint32_t core=0; core < n_compression_cores; core++){
         compressor_cores[core] = user_register_content[REGION_ADDRESSES][
-            hop + N_COMPRESSOR_CORES + START_OF_comp_core_idS + core];
+            hop + N_COMPRESSOR_CORES + START_OF_COMP_CORE_IDS + core];
     }
+    log_info("finished populate compression cores");
 
     // allocate memory for the trackers
     comp_core_mid_point = MALLOC(n_compression_cores * sizeof(int));
@@ -2368,6 +2471,7 @@ bool initialise() {
     initialise_routing_control_flags();
 
     // get the compressor cores stored in a array
+    log_info("start init of compressor cores");
     bool success_compressor_cores = initialise_compressor_cores();
     if(!success_compressor_cores){
         log_error("failed to init the compressor cores.");
@@ -2405,6 +2509,7 @@ void c_main(void) {
     spin1_callback_on(SDP_PACKET_RX, sdp_handler, SDP_PRIORITY);
 
     // go
+    log_info("waiting for sycn");
     spin1_start(SYNC_WAIT);
     //spin1_pause
     //spin1_resume

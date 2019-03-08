@@ -38,8 +38,10 @@ from spinn_front_end_common.interface.profiling import profile_utils
 
 # spynnaker imports
 from spynnaker.pyNN.models.abstract_models.\
-    abstract_supports_bit_field_generation import AbstractSupportsBitFieldGeneration
-from spynnaker.pyNN.models.abstract_models.abstract_supports_bit_field_routing_compression import \
+    abstract_supports_bit_field_generation \
+    import AbstractSupportsBitFieldGeneration
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_supports_bit_field_routing_compression import \
     AbstractSupportsBitFieldRoutingCompression
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager

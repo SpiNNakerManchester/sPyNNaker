@@ -705,13 +705,20 @@ static inline bool oc_minimise(
         bool compress_only_when_needed, bool compress_as_much_as_possible){
 
     // check if any compression actually needed
+    log_info("check if need to compress");
+    log_info("target length is %d", target_length);
+    log_info("compress only when needed is %d", compress_only_when_needed);
+    log_info("n entries is %d",
+             routing_table_sdram_get_n_entries(routing_tables, n_tables));
     if (compress_only_when_needed &&
             (routing_table_sdram_get_n_entries(routing_tables, n_tables)
              < target_length)){
+        log_info("does not need compression.");
         return true;
     }
 
     // remove default routes and check lengths again
+    log_info("try removing default routes");
     bool success = remove_default_routes_minimise(routing_tables, n_tables);
     if (!success){
         log_error("failed to remove default routes due to malloc. failing");
@@ -719,9 +726,12 @@ static inline bool oc_minimise(
         return false;
     }
 
+    log_info(
+        "check if without default routes, if that makes compression needed");
     if (compress_only_when_needed &&
             (routing_table_sdram_get_n_entries(routing_tables, n_tables)
              < target_length)){
+        log_info("does not need compression.");
         return true;
     }
 
@@ -732,9 +742,11 @@ static inline bool oc_minimise(
     }
 
     // start the timer tick interrupt count down
+    log_info("set off timer tracker");
     spin1_resume(SYNC_NOWAIT);
 
     // start the merger process
+    log_info("start compression true attempt");
     while ((routing_table_sdram_get_n_entries(
             routing_tables, n_tables) > target_length) &&
             !timer_for_compression_attempt && !finished_by_control){
@@ -773,6 +785,7 @@ static inline bool oc_minimise(
             break;
         }
     }
+    log_info("compressed!!!");
     return true;
 }
 

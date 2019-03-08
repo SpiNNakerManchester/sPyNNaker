@@ -172,9 +172,9 @@ class MachineBitFieldRouterCompressor(object):
                 executable_finder, on_host_chips)
 
         # just rerun the synaptic expander for safety purposes
-        self._rerun_synaptic_cores(
-            expander_chip_cores, transceiver, provenance_file_path,
-            executable_finder)
+        #self._rerun_synaptic_cores(
+        #    expander_chip_cores, transceiver, provenance_file_path,
+        #    executable_finder, True, no_sync_changes)
 
         # update progress bar to reflect chip compression complete
         progress_bar.update()
@@ -277,7 +277,8 @@ class MachineBitFieldRouterCompressor(object):
 
     def _rerun_synaptic_cores(
             self, synaptic_expander_rerun_cores, transceiver,
-            provenance_file_path, executable_finder):
+            provenance_file_path, executable_finder, needs_sync_barrier,
+            no_sync_changes):
         """ reruns the synaptic expander
 
         :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
@@ -294,7 +295,7 @@ class MachineBitFieldRouterCompressor(object):
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
                 provenance_file_path, executable_finder, True, None,
                 self._handle_failure_for_synaptic_expander_rerun,
-                [CPUState.FINISHED])
+                [CPUState.FINISHED], needs_sync_barrier, no_sync_changes)
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
@@ -486,14 +487,16 @@ class MachineBitFieldRouterCompressor(object):
             user3_base_address = \
                 transceiver.get_user_3_register_address_from_core(processor_id)
             transceiver.write_memory(
-                chip_x, chip_y, user1_base_address, self._USER_BYTES,
-                self._ONE_WORDS.pack(time_per_iteration))
+                chip_x, chip_y, user1_base_address,
+                self._ONE_WORDS.pack(time_per_iteration), self._USER_BYTES)
             transceiver.write_memory(
-                chip_x, chip_y, user2_base_address, self._USER_BYTES,
-                self._ONE_WORDS.pack(compress_only_when_needed))
+                chip_x, chip_y, user2_base_address,
+                self._ONE_WORDS.pack(compress_only_when_needed),
+                self._USER_BYTES)
             transceiver.write_memory(
-                chip_x, chip_y, user3_base_address, self._USER_BYTES,
-                self._ONE_WORDS.pack(compress_as_much_as_possible))
+                chip_x, chip_y, user3_base_address,
+                self._ONE_WORDS.pack(compress_as_much_as_possible),
+                self._USER_BYTES)
 
     def _load_usable_sdram(
             self, matrix_addresses_and_size, chip_x, chip_y, transceiver,
