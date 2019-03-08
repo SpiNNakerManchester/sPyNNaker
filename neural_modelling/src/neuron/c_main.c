@@ -93,7 +93,7 @@ uint32_t count_rewires = 0;
 //! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(address_t recording_address){
+static bool initialise_recording(address_t recording_address) {
     bool success = recording_initialize(recording_address, &recording_flags);
     log_debug("Recording flags = 0x%08x", recording_flags);
     return success;
@@ -142,7 +142,7 @@ static bool initialise(void) {
 
     // setup recording region
     if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))){
+            data_specification_get_region(RECORDING_REGION, address))) {
         return false;
     }
 

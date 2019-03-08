@@ -145,10 +145,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL total_exc = 0;
     REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
         total_exc += exc_input_values[i];
     }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
         total_inh += inh_input_values[i];
     }
 
@@ -157,7 +157,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
     // This changes inhibitory to excitatory input
-    for (int i=0; i<NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i=0; i<NUM_INHIBITORY_RECEPTORS; i++) {
         inh_input_values[i] = -inh_input_values[i] * SCALING_FACTOR
                 * input_type->multiplicator[i];
     }

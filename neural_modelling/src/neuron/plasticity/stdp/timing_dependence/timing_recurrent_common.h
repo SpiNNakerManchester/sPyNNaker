@@ -41,8 +41,8 @@ extern plasticity_trace_region_data_t plasticity_trace_region_data;
 //---------------------------------------
 // Timing dependence functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace() {
-    return (post_trace_t){};
+static inline post_trace_t timing_get_initial_post_trace(void) {
+    return (post_trace_t) {};
 }
 
 //---------------------------------------
@@ -68,7 +68,7 @@ static inline pre_trace_t timing_add_pre_spike(
 
     log_debug("\tdelta_time=%u", time - last_time);
 
-    return (pre_trace_t){};
+    return (pre_trace_t) {};
 }
 
 //---------------------------------------

@@ -155,7 +155,7 @@ static bool _neuron_load_neuron_parameters(address_t address) {
     return true;
 }
 
-bool neuron_reload_neuron_parameters(address_t address){
+bool neuron_reload_neuron_parameters(address_t address) {
     log_debug("neuron_reloading_neuron_parameters: starting");
     return _neuron_load_neuron_parameters(address);
 }

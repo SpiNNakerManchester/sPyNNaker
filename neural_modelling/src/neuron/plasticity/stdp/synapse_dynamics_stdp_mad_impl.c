@@ -309,7 +309,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_final_weight(final_state);
 
         uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test){
+        if (sat_test) {
             accumulation = sat_test - 1;
             plastic_saturation_count += 1;
         }
@@ -344,11 +344,11 @@ input_t synapse_dynamics_get_intrinsic_bias(
     return 0.0k;
 }
 
-uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(){
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
     return num_plastic_pre_synaptic_events;
 }
 
-uint32_t synapse_dynamics_get_plastic_saturation_count(){
+uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
     return plastic_saturation_count;
 }
 

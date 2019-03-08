@@ -71,7 +71,8 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void add_input_delta(delta_params_t* delta_params, input_t input){
+static inline void add_input_delta(
+        delta_params_t *delta_params, input_t input) {
 	delta_params->synaptic_input_value += input;
 }
 

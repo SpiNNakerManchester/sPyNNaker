@@ -51,7 +51,7 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
-static inline void alpha_shaping(alpha_params_t* a_params){
+static inline void alpha_shaping(alpha_params_t *a_params) {
     a_params->lin_buff = a_params->lin_buff + (
     		a_params->q_buff * a_params->dt_divided_by_tau_sqr);
 
@@ -77,7 +77,7 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void add_input_alpha(alpha_params_t* a_params, input_t input){
+static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
     a_params->q_buff = input;
 	a_params->exp_buff =
 			decay_s1615(a_params->exp_buff, a_params->decay) + ONE;

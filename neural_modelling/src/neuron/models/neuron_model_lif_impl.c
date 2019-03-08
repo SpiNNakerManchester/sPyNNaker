@@ -30,10 +30,10 @@ state_t neuron_model_state_update(
 		REAL total_exc = 0;
 		REAL total_inh = 0;
 
-		for (int i=0; i < num_excitatory_inputs; i++){
+		for (int i=0; i < num_excitatory_inputs; i++) {
 			total_exc += exc_input[i];
 		}
-		for (int i=0; i< num_inhibitory_inputs; i++){
+		for (int i=0; i< num_inhibitory_inputs; i++) {
 			total_inh += inh_input[i];
 		}
         // Get the input in nA

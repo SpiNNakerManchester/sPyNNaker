@@ -102,7 +102,7 @@ bool population_table_initialise(
     log_debug("pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
-    if (n_master_pop_bytes != 0){
+    if (n_master_pop_bytes != 0) {
         master_population_table = spin1_malloc(n_master_pop_bytes);
         if (master_population_table == NULL) {
             log_error("Could not allocate master population table");
@@ -115,7 +115,7 @@ bool population_table_initialise(
         address_list_length * sizeof(address_and_row_length);
 
     // only try to malloc if there's stuff to malloc.
-    if (n_address_list_bytes != 0){
+    if (n_address_list_bytes != 0) {
         address_list = spin1_malloc(n_address_list_bytes);
         if (address_list == NULL) {
             log_error("Could not allocate master population address list");

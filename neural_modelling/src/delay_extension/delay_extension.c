@@ -275,12 +275,10 @@ void timer_callback(uint timer_count, uint unused1) {
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
 
-        log_debug(
-            "Delay extension finished at time %u, %u received spikes, "
-            "%u processed spikes, %u sent spikes, %u added spikes",
-            time, n_in_spikes, n_processed_spikes, n_spikes_sent,
-            n_spikes_added);
-
+        log_debug("Delay extension finished at time %u, %u received spikes, "
+                "%u processed spikes, %u sent spikes, %u added spikes",
+                time, n_in_spikes, n_processed_spikes, n_spikes_sent,
+                n_spikes_added);
         log_debug("Delayed %u times", n_delays);
 
         // Subtract 1 from the time so this tick gets done again on the next
@@ -304,12 +302,12 @@ void timer_callback(uint timer_count, uint unused1) {
             // Get key mask for this delay stage and it's time slot
             uint32_t delay_stage_delay = (d + 1) * DELAY_STAGE_LENGTH;
             uint32_t delay_stage_time_slot =
-                ((time - delay_stage_delay) & num_delay_slots_mask);
+                    ((time - delay_stage_delay) & num_delay_slots_mask);
             uint8_t *delay_stage_spike_counters =
-                spike_counters[delay_stage_time_slot];
+                    spike_counters[delay_stage_time_slot];
 
             log_debug("%u: Checking time slot %u for delay stage %u",
-                      time, delay_stage_time_slot, d);
+                    time, delay_stage_time_slot, d);
 
             // Loop through neurons
             for (uint32_t n = 0; n < num_neurons; n++) {
@@ -323,26 +321,22 @@ void timer_callback(uint timer_count, uint unused1) {
 
                     if (delay_stage_spike_counters[n] > 0) {
                         log_debug("Neuron %u sending %u spikes after delay"
-                                  "stage %u with key %x",
-                                  n, delay_stage_spike_counters[n], d,
-                                  spike_key);
+                                "stage %u with key %x",
+                                n, delay_stage_spike_counters[n], d,
+                                spike_key);
                     }
 
                     // Loop through counted spikes and send
-                    for (uint32_t s = 0; s < delay_stage_spike_counters[n];
-                            s++) {
-                        while (!spin1_send_mc_packet(spike_key, 0,
-                                                     NO_PAYLOAD)) {
+                    for (uint32_t s = 0; s < delay_stage_spike_counters[n]; s++) {
+                        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
                             spin1_delay_us(1);
                         }
                         n_spikes_sent += 1;
-
                     }
                 }
 
                 // Wait until the expected time to send
                 while ((ticks == timer_count) && tc[T1_COUNT] > expected_time) {
-
                     // Do Nothing
                     n_delays += 1;
                 }

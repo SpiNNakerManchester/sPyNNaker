@@ -123,7 +123,7 @@ static inline update_state_t timing_apply_post_spike(
     log_debug("\t\t\ttime_since_last_post=%u, decayed_r1=%d\n",
             time_since_last_post, decayed_r1);
 
-    if (time_since_last_post < time_since_last_pre){
+    if (time_since_last_post < time_since_last_pre) {
         log_debug("\t\t\tSetting trace to zero as not first pre-post pairing");
         decayed_r1 = 0;
     }
