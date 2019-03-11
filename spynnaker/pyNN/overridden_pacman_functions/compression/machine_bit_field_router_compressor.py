@@ -118,6 +118,8 @@ class MachineBitFieldRouterCompressor(object):
         # new app id for this simulation
         routing_table_compressor_app_id = \
             transceiver.app_id_tracker.get_new_id()
+        print "comp app id is {}".format(routing_table_compressor_app_id)
+        print "app app id is {}".format(app_id)
 
         progress_bar = ProgressBar(
             total_number_of_things_to_do=(
@@ -632,6 +634,7 @@ class MachineBitFieldRouterCompressor(object):
             base_address = self._steal_from_matrix_addresses(
                 matrix_addresses_and_size, len(routing_table_data))
 
+        print "user 1 should point at {}".format(base_address)
         # write SDRAM requirements per chip
         transceiver.write_memory(
             table.x, table.y, base_address, routing_table_data)
@@ -718,6 +721,7 @@ class MachineBitFieldRouterCompressor(object):
                 # store the region sdram address's
                 bit_field_sdram_address = app_vertex.bit_field_base_address(
                     transceiver, placement)
+                print bit_field_sdram_address
                 key_to_atom_map = \
                     app_vertex.key_to_atom_map_region_base_address(
                         transceiver, placement)

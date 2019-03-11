@@ -36,7 +36,7 @@ typedef struct table_t{
     uint32_t size;
 
     // Entries in the table
-    entry_t *entries;
+    entry_t entries[];
 } table_t;
 
 
