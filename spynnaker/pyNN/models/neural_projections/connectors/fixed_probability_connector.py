@@ -131,7 +131,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         params = [
-            self.allow_self_connections,
+            self._allow_self_connections,
             round(decimal.Decimal(
                 str(self._p_connect)) * DataType.U032.scale)]
         params.extend(self._get_connector_seed(
