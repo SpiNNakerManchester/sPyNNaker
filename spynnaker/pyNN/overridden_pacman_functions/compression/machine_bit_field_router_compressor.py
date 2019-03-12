@@ -790,4 +790,7 @@ class MachineBitFieldRouterCompressor(object):
         data += self._ONE_WORDS.pack(len(cores))
         compression_cores = list(cores.processor_ids)
         data += struct.pack("<{}I".format(len(cores)), *compression_cores)
+        #compression_cores = list(cores.processor_ids)[0:1]
+        #data += self._ONE_WORDS.pack(len(compression_cores))
+        #data += struct.pack("<{}I".format(len(compression_cores)), *compression_cores)
         return data

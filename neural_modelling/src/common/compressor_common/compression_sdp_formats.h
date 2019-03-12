@@ -11,14 +11,14 @@ typedef struct start_stream_sdp_packet_t{
     uint32_t n_sdp_packets_till_delivered;
     uint32_t total_n_tables;
     uint32_t n_tables_in_packet;
-    table_t* tables[];
+    address_t tables[];
 } start_stream_sdp_packet_t;
 
 //! \brief the elements in the sdp packet when extension control for a minimise
 //! attempt. Only used when x routing tables wont fit in first packet
 typedef struct extra_stream_sdp_packet_t{
     uint32_t n_tables_in_packet;
-    table_t* tables[];
+    address_t tables[];
 } extra_stream_sdp_packet_t;
 
 //! \brief the elements in the sdp packet when response to compression attempt.

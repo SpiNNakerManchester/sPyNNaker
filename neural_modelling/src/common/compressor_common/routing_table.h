@@ -118,6 +118,9 @@ uint32_t routing_table_sdram_get_n_entries(
     uint32_t current_point_tracking = 0;
     for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
         // get how many entries are in this block
+        log_info(
+            "size of routing table at index %d is %d",
+            rt_index, routing_tables[rt_index]->size);
         current_point_tracking += routing_tables[rt_index]->size;
     }
     return current_point_tracking;
@@ -172,6 +175,9 @@ bool routing_table_sdram_store(
 void routing_table_remove_from_size(
         table_t** routing_tables, uint32_t n_tables,
         uint32_t size_to_remove){
+
+    // iterate backwards, as you removing from the bottom, which is the last
+    // table upwards
     int rt_index = n_tables;
     while(size_to_remove != 0 || rt_index >= 0){
         if (routing_tables[rt_index]->size >= size_to_remove){

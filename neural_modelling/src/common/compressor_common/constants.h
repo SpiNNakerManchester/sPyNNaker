@@ -12,9 +12,6 @@
 //! word to byte multiplier
 #define WORD_TO_BYTE_MULTIPLIER 4
 
-//! mask to get core from src
-#define CORE_MASK 0xFFFF
-
 //! flag for not requiring a reply
 #define REPLY_NOT_EXPECTED 0x07
 

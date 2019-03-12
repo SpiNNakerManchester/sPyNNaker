@@ -34,6 +34,8 @@ bool* timer_for_compression_attempt = false;
 //! \brief number of times a compression time slot has occurred
 bool* finish_compression_flag = false;
 
+bool sent_force_ack = false;
+
 //! \brief bool flag to say if i was forced to stop by the compressor control
 bool* finished_by_compressor_force = false;
 
@@ -70,6 +72,7 @@ void send_sdp_message_response(){
     my_msg.dest_port = (RANDOM_PORT << PORT_SHIFT) | control_core_id;
     // send sdp packet
     while (!spin1_send_sdp_msg((sdp_msg_t *) &my_msg, _SDP_TIMEOUT)) {
+        log_info("failed to send. trying again");
         // Empty body
     }
 }
@@ -90,6 +93,7 @@ void return_success_response_message(){
 
     // send message
     send_sdp_message_response();
+    log_info("send success ack");
 }
 
 //! \brief send a failed response due to the control forcing it to stop
@@ -181,7 +185,14 @@ void start_compression_process(){
         }
         else if (finished_by_compressor_force){  // control killed it
             log_info("force fail response");
-            return_failed_by_force_response_message();
+            if (!sent_force_ack){
+                return_failed_by_force_response_message();
+                sent_force_ack = true;
+                log_info("send ack");
+            }
+            else{
+                log_info("ignoring as already sent ack");
+            }
         }
         else if (timer_for_compression_attempt){  // ran out of time
             log_info("time fail response");
@@ -206,7 +217,7 @@ void _sdp_handler(uint mailbox, uint port) {
     sdp_msg_pure_data *msg = (sdp_msg_pure_data *) mailbox;
 
     // record control core.
-    control_core_id = (msg->srce_port && CORE_MASK);
+    control_core_id = (msg->srce_port && CPU_MASK);
     log_info("control core is %d", control_core_id);
 
     log_info("command code is %d", msg->data[COMMAND_CODE]);
@@ -214,7 +225,11 @@ void _sdp_handler(uint mailbox, uint port) {
     // get command code
     if (msg->srce_port >> PORT_SHIFT == RANDOM_PORT){
         if (msg->data[COMMAND_CODE] == START_DATA_STREAM){
-    
+            // update response tracker
+            sent_force_ack = false;
+            n_tables = 0;
+
+            // process packet
             start_stream_sdp_packet_t* first_command_packet =
                 (start_stream_sdp_packet_t*) &msg->data[
                     START_OF_SPECIFIC_MESSAGE_DATA];
@@ -253,10 +268,13 @@ void _sdp_handler(uint mailbox, uint port) {
     
                 // store this set into the store
                 log_info("store routing table addresses into store");
+                log_info(
+                    "there are %d addresses in packet",
+                    first_command_packet->n_tables_in_packet);
                 for(uint32_t rt_index = 0; rt_index <
                         first_command_packet->n_tables_in_packet; rt_index++){
                     routing_tables[rt_index] =
-                        first_command_packet->tables[rt_index];
+                        (table_t*) first_command_packet->tables[rt_index];
                 }
     
                 // keep tracker updated
@@ -292,7 +310,7 @@ void _sdp_handler(uint mailbox, uint port) {
                         extra_command_packet->n_tables_in_packet;
                         rt_index++){
                     routing_tables[rt_index] =
-                        extra_command_packet->tables[rt_index];
+                        (table_t*) extra_command_packet->tables[rt_index];
                 }
                 log_info(
                     "finished storing extra routing table address into store");
@@ -386,6 +404,10 @@ void initialise() {
     my_msg.length = LENGTH_OF_SDP_HEADER + (
         sizeof(response_sdp_packet_t) * WORD_TO_BYTE_MULTIPLIER);
     log_info("finished sdp message bits");
+    log_info("my core id is %d", spin1_get_core_id());
+    log_info(
+        "srce_port = %d the core id is %d",
+        my_msg.srce_port, my_msg.srce_port & CPU_MASK);
 }
 
 //! \brief the main entrance.

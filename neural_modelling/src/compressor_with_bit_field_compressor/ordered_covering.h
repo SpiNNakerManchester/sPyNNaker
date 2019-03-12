@@ -707,6 +707,7 @@ static inline bool oc_minimise(
     // check if any compression actually needed
     log_info("check if need to compress");
     log_info("target length is %d", target_length);
+    log_info("n tables is %d", n_tables);
     log_info("compress only when needed is %d", compress_only_when_needed);
     log_info("n entries is %d",
              routing_table_sdram_get_n_entries(routing_tables, n_tables));
