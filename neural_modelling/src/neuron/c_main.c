@@ -266,6 +266,11 @@ void timer_callback(uint timer_count, uint unused) {
         }
         profiler_finalise();
 
+        uint32_t pop_count = population_table_print_empty_row_count();
+        uint32_t empty_row_count = synapses_print_row_counts();
+        accum empty_frac = (long accum)empty_row_count/(long accum)pop_count;
+        log_info("empty fraction = %k",empty_frac);
+
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time -= 1;

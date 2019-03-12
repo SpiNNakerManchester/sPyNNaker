@@ -15,6 +15,9 @@
 // Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 
+uint32_t empty_row_count = 0;
+uint32_t row_count = 0;
+
 // The number of neurons
 static uint32_t n_neurons;
 
@@ -36,7 +39,6 @@ static uint32_t synapse_index_bits;
 static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
-
 
 /* PRIVATE FUNCTIONS */
 
@@ -171,6 +173,10 @@ static inline void _process_fixed_synapses(
         fixed_region_address);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
+    if (fixed_synapse==0){
+        empty_row_count++;
+    }
+    else row_count++;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
 
@@ -382,6 +388,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
+
     _process_fixed_synapses(fixed_region_address, time);
     //}
     return true;
@@ -403,6 +410,11 @@ uint32_t synapses_get_pre_synaptic_events() {
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
+uint32_t synapses_print_row_counts(void){
+    log_info("empty row count = %d",empty_row_count);
+    log_info("row count = %d",row_count);
+    return empty_row_count;
+}
 
 //! \brief  Searches the synaptic row for the the connection with the
 //!         specified post-synaptic ID

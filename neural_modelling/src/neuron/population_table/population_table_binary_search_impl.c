@@ -20,6 +20,8 @@ static address_t direct_rows_base_address;
 static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
+static uint32_t empty_pop_count = 0;
+static uint32_t pop_count = 0;
 
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
 
@@ -171,9 +173,11 @@ bool population_table_get_first_address(
             log_debug(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
                 spike, imid, next_item, items_to_go);
-
-            return population_table_get_next_address(
+            bool get_next = population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
+            if(!get_next)empty_pop_count++;
+            else pop_count++;
+            return get_next;
         } else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
@@ -214,6 +218,7 @@ bool population_table_get_next_address(
         } else {
 
             uint32_t row_length = _get_row_length(item);
+
             if (row_length > 0) {
 
                 uint32_t block_address =
@@ -238,4 +243,11 @@ bool population_table_get_next_address(
     } while (!is_valid && (items_to_go > 0));
 
     return is_valid;
+}
+
+uint32_t population_table_print_empty_row_count(void){
+
+    log_info("empty pop count = %d",empty_pop_count);
+    log_info("pop count = %d",pop_count);
+    return pop_count;
 }

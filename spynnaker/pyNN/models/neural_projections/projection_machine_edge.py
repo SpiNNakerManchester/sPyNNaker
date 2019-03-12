@@ -5,6 +5,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_utilities.overrides import overrides
 from spinnak_ear.DRNL_vertex import DRNLVertex
 from spinnak_ear.IHCAN_vertex import IHCANVertex
+from spinnak_ear.AN_group_vertex import ANGroupVertex
 from spynnaker.pyNN.models.abstract_models \
     import AbstractWeightUpdatable, AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections.connectors.from_list_connector \

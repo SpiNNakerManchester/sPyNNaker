@@ -6,6 +6,13 @@
 #include <simulation.h>
 #include <debug.h>
 
+
+//! if using profiler import profiler tags
+#ifdef PROFILER_ENABLED
+    #include "profile_tags.h"
+    #include <profiler.h>
+#endif
+
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
 
@@ -159,7 +166,6 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
-
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
