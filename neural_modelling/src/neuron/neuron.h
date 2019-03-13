@@ -54,5 +54,4 @@ void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
-
 #endif // _NEURON_H_

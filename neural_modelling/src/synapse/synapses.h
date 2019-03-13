@@ -81,6 +81,10 @@ uint32_t synapses_get_saturation_count();
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events();
 
+void synapses_flush_ring_buffer(uint32_t timestep);
+
+void synapses_set_contribution_region();
+
 
 //------------------------------------------------------------------------------
 // Synaptic rewiring functions

@@ -59,4 +59,8 @@ void _setup_synaptic_dma_read();
 //! \return bool
 bool received_any_spike();
 
+//! \brief flush input buffer
+//! \return number of flushed spikes
+uint32_t spike_processing_flush_in_buffer();
+
 #endif // _SPIKE_PROCESSING_H_

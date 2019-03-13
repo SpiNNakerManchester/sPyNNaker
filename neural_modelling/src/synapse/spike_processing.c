@@ -36,7 +36,7 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
-extern bool contribution_written;
+//extern bool contribution_written;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -110,7 +110,7 @@ void _setup_synaptic_dma_read() {
 
                     // In case the end of the timer tick is approaching and spikes are in DTCM
                     // Kicks the DMA write of synaptic contributions
-                    if(tc[T1_COUNT] < 6657 && !contribution_written) {
+                    /*if(tc[T1_COUNT] < 6657 && !contribution_written) {
 
                         uint cpsr = spin1_int_disable();
                         uint32_t spikes_remaining = in_spikes_flush_buffer();
@@ -122,7 +122,7 @@ void _setup_synaptic_dma_read() {
                         contribution_written = true;
 
                         return;
-                    }
+                    }*/
                 } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
@@ -177,6 +177,8 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
+
+        io_printf(IO_BUF, "RECEIVED SPIKE, time: %d\n", time);
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
@@ -243,7 +245,7 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // if too close to the end of the timer tick or all the spikes
     // have been processed write in memory the synaptic contribution
-    if((tc[T1_COUNT] < 6657 || in_spikes_buffer_empty()) && !contribution_written) {
+    /*if((tc[T1_COUNT] < 6657 || in_spikes_buffer_empty()) && !contribution_written) {
 
         uint cpsr = spin1_int_disable();
         uint32_t spikes_remaining = in_spikes_flush_buffer();
@@ -255,7 +257,7 @@ void _dma_complete_callback(uint unused, uint tag) {
         contribution_written = true;
 
         return;
-    }
+    }*/
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
@@ -346,4 +348,9 @@ bool do_rewiring(int number_of_rew) {
 //! \return bool
 bool received_any_spike() {
     return any_spike;
+}
+
+uint32_t spike_processing_flush_in_buffer() {
+
+    return in_spikes_flush_buffer();
 }

@@ -81,7 +81,7 @@ bool rewiring = false;
 uint32_t count_rewires = 0;
 
 //! Flag for synaptic contribution writing in SDRAM
-bool contribution_written;
+//bool contribution_written;
 
 
 
@@ -110,6 +110,17 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
             synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
+}
+
+void write_contributions(uint unused1, uint unused2) {
+
+        use(unused1);
+        use(unused2);
+
+        uint32_t spikes_remaining = spike_processing_flush_in_buffer();
+
+        //Start DMA Writing procedure for the contribution of this timestep
+        synapses_do_timestep_update(time);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -199,13 +210,16 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    contribution_written = false;
+    //contribution_written = false;
 
     // Setup profiler
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
 
     log_debug("Initialise: finished");
+
+    // Register timer2 for periodic events
+    event_register_timer(SLOT_8);
 
     return true;
 }
@@ -226,12 +240,26 @@ void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
 
+    //Schedule event in 800 micro-sec from now
+    if(!timer_schedule_proc(write_contributions, 0, 0, 800)) {
+
+        rt_error(RTE_API);
+    }
+
     time++;
-    contribution_written = false;
 
-    synapses_flush_ring_buffer(time-1);
+    io_printf(IO_BUF, "Time %d\n", time);
 
-    io_printf(IO_BUF, "Tick Tock\n");
+    //If first timer tick retrieve the address of the buffer for synaptic contribution
+    if(time == 0) {
+
+        synapses_set_contribution_region();
+    }
+    else {
+
+        //Flush the buffer containing the written contribution
+        synapses_flush_ring_buffer(time-1);
+    }
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
 

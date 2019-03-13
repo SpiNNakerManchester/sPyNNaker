@@ -16,7 +16,7 @@
 void spin1_wfi();
 
 #define SPIKE_RECORDING_CHANNEL 0
-#define DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 0
+#define DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 1
 
 //! how many bits the synapse delay will take
 #ifndef SYNAPSE_DELAY_BITS
@@ -235,13 +235,13 @@ bool neuron_do_timestep_update(timer_t time) {
 
     // Wait a random number of clock cycles (and ensure DMA transfer is finished)
     uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
-    while (tc[T1_COUNT] > random_backoff_time || !(dma[DMA_STAT] & 1024)) {
+    while (tc[T1_COUNT] > random_backoff_time) { //|| ((dma[DMA_STAT] & 0x400) == 0)
 
         // Do Nothing
     }
 
     //Tell DMA controller to clear status bit
-    dma[DMA_CTRL] |= 8;
+    //dma[DMA_CTRL] |= 0x8;
 
     // Set the next expected time to wait for between spike sending
     expected_time = tc[T1_COUNT] - time_between_spikes;
@@ -269,8 +269,6 @@ bool neuron_do_timestep_update(timer_t time) {
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
-            io_printf(IO_BUF, "reading syn contr: %d\n", synaptic_contributions[buff_index]);
-
             neuron_impl_add_inputs(
                 synapse_type_index,
                 neuron_index,
@@ -297,6 +295,9 @@ bool neuron_do_timestep_update(timer_t time) {
 
         // If the neuron has spiked
         if (spike) {
+
+            io_printf(IO_BUF, "neuron %u spiked at time %u", neuron_index, time);
+
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
@@ -394,18 +395,6 @@ bool neuron_initialise(address_t address) {
 
     io_printf(IO_BUF, "\nneurons: %d syn types: %d\n", n_neurons, n_synapse_types);
 
-    //Size of the DMA region. Number of neurons multiplied by synapse types
-    dma_size = n_neurons * n_synapse_types * sizeof(weight_t);
-
-    //Allocate the region in SDRAM for synaptic contribution. TAG 255 is to be sure
-    // is not assigned yet. size is dma_size
-    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, 255, 0);
-
-    //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
-    for(uint32_t i = 0; i < n_neurons*n_synapse_types; i++) {
-        synaptic_region[i] = 0;
-    }
-
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
@@ -429,6 +418,22 @@ bool neuron_initialise(address_t address) {
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_index_bits = log_n_neurons;
 
+    uint32_t contribution_bits =
+        log_n_neurons + log_n_synapse_types;
+    uint32_t contribution_size = 1 << (contribution_bits);
+
+    dma_size = contribution_size *sizeof(weight_t);
+
+
+    //Allocate the region in SDRAM for synaptic contribution. TAG 255 is to be sure
+    // is not assigned yet. size is dma_size
+    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, 255, 0);
+
+    //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
+    for(index_t i = 0; i < contribution_size; i++) {
+        synaptic_region[i] = 0;
+    }
+
     io_printf(IO_BUF, "Syn index bits = %d\n", synapse_index_bits);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
@@ -439,8 +444,7 @@ bool neuron_initialise(address_t address) {
     io_printf(IO_BUF, "Returned from neuron impl initialise");
 
     // Allocate space for the synaptic contribution buffer
-    synaptic_contributions = (weight_t *) spin1_malloc(n_neurons *
-        n_synapse_types * sizeof(weight_t));
+    synaptic_contributions = (weight_t *) spin1_malloc(dma_size);
     if (synaptic_contributions == NULL) {
         log_error("Unable to allocate Synaptic contribution buffers");
         return false;
