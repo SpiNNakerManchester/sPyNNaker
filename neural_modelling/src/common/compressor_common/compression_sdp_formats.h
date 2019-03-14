@@ -23,13 +23,14 @@ typedef struct extra_stream_sdp_packet_t{
 
 //! \brief the elements in the sdp packet when response to compression attempt.
 typedef struct response_sdp_packet_t{
+    uint32_t command_code;
     uint32_t response_code;
 } response_sdp_packet_t;
 
 //! \brief the acceptable finish states
 typedef enum finish_states{
     SUCCESSFUL_COMPRESSION = 30, FAILED_MALLOC = 31, FAILED_TO_COMPRESS = 32,
-    RAN_OUT_OF_TIME = 33, FORCED_BY_COMPRESSOR_CONTROL = 34
+    RAN_OUT_OF_TIME = 33, FORCED_BY_COMPRESSOR_CONTROL = 34, SHUT_DOWN = 35
 } finish_states;
 
 //! location where the blasted command code is

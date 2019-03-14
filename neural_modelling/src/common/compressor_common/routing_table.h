@@ -158,13 +158,38 @@ bool routing_table_sdram_store(
             sark_mem_cpy(
                 &table_format->entries[main_entry_index],
                 routing_tables[rt_index]->entries,
-                sizeof(entry_t));
+                entries_stored_here * sizeof(entry_t));
             log_info("finished sark copy");
             main_entry_index += entries_stored_here;
             log_info("updated the main index to %d", main_entry_index);
         }
     }
     log_info("finished copy");
+
+    // print out content of sdram, for sanity purposes
+    int n_entries_sdram = sdram_loc_for_compressed_entries[0];
+    int position = 1;
+    for (int entry_index = 0; entry_index < n_entries_sdram;
+            entry_index++){
+        log_info(
+            "entry %d key is %x",
+            entry_index,
+            sdram_loc_for_compressed_entries[position]);
+        log_info(
+            "entry %d mask is %x",
+            entry_index,
+            sdram_loc_for_compressed_entries[position + 1]);
+        log_info(
+            "entry %d route is %x",
+            entry_index,
+            sdram_loc_for_compressed_entries[position + 2]);
+        log_info(
+            "entry %d source is %x",
+            entry_index,
+            sdram_loc_for_compressed_entries[position + 3]);
+        position += 4;
+    }
+
     return true;
 }
 

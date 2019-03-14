@@ -25,7 +25,7 @@
 
 //! interrupt priorities
 typedef enum interrupt_priority{
-    TIMER_TICK_PRIORITY = -1, SDP_PRIORITY = 1, COMPRESSION_START_PRIORITY = 2
+    TIMER_TICK_PRIORITY = -1, SDP_PRIORITY = 0, COMPRESSION_START_PRIORITY = 2
 } interrupt_priority;
 
 //! \brief the timer control logic.
@@ -62,7 +62,7 @@ uint32_t number_of_packets_waiting_for = 0;
 uint32_t n_tables = 0;
 
 //! \brief the control core id for sending responses to
-uint32_t control_core_id = 0;
+uint32_t control_core_id = 1;
 
 //! \brief sdp message to send acks to the control core with
 sdp_msg_pure_data my_msg;
@@ -147,7 +147,11 @@ bool store_into_compressed_address(){
 }
 
 //! \brief starts the compression process
-void start_compression_process(){
+void start_compression_process(uint unused0, uint unused1){
+    // api requirement
+    use(unused0);
+    use(unused1);
+
     // reset fail state flags
     log_info("in compression phase");
     *failed_by_malloc = false;
@@ -339,6 +343,16 @@ void _sdp_handler(uint mailbox, uint port) {
             *finished_by_compressor_force = true;
             sark_msg_free((sdp_msg_t*) msg);
         }
+        else if (msg->data[COMMAND_CODE] == SHUT_DOWN){
+            log_info(
+                "been told to exit by control. So obviously found the "
+                "best compression");
+            sark_msg_free((sdp_msg_t*) msg);
+            vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+            sark_virtual_processor_info[spin1_get_core_id()].user1 =
+                EXITED_CLEANLY;
+            spin1_exit(0);
+        }
         else{
             log_error(
                 "no idea what to do with message with command code %d Ignoring",
@@ -401,8 +415,7 @@ void initialise() {
     my_msg.dest_addr = spin1_get_chip_id();
     my_msg.srce_port = (RANDOM_PORT << PORT_SHIFT) | spin1_get_core_id();
     my_msg.data[COMMAND_CODE] = COMPRESSION_RESPONSE;
-    my_msg.length = LENGTH_OF_SDP_HEADER + (
-        sizeof(response_sdp_packet_t) * WORD_TO_BYTE_MULTIPLIER);
+    my_msg.length = LENGTH_OF_SDP_HEADER + (sizeof(response_sdp_packet_t));
     log_info("finished sdp message bits");
     log_info("my core id is %d", spin1_get_core_id());
     log_info(

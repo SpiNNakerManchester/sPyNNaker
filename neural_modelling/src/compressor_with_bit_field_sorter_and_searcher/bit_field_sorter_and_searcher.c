@@ -18,11 +18,6 @@
 
 //=============================================================================
 
-//! enum for the different states to report through the user2 address.
-typedef enum exit_states_for_user_one{
-    EXITED_CLEANLY = 0, EXIT_FAIL = 1, EXIT_MALLOC = 2
-} exit_states_for_user_two;
-
 //! enum mapping for elements in uncompressed routing table region
 typedef enum uncompressed_routing_table_region_elements{
     APPLICATION_APP_ID = 0, N_ENTRIES = 1, START_OF_UNCOMPRESSED_ENTRIES = 2
@@ -126,7 +121,7 @@ table_t* last_compressed_table;
 uint32_t app_id = 0;
 
 // how many bitfields there are
-uint32_t n_bf_addresses = 0;
+int n_bf_addresses = 0;
 
 //! how many entries are in the uncompressed version
 uint32_t total_entries_in_uncompressed_router_table = 0;
@@ -181,8 +176,9 @@ void send_sdp_message(){
     while (!spin1_send_sdp_msg((sdp_msg_t *) &my_msg, _SDP_TIMEOUT)) {
         attempt +=1 ;
         log_info("failed to send. trying again");
-        if (attempt >= 50){
+        if (attempt >= 30){
             rt_error(RTE_SWERR);
+
         }
     }
     log_info("sent message");
@@ -205,6 +201,7 @@ bool load_routing_table_into_router() {
     // Note that although the allocation included the specified
     // application ID we also need to include it as the most significant
     // byte in the route (see `sark_hw.c`).
+    log_info("loading %d entries into router", last_compressed_table->size);
     for (uint32_t entry_id = 0; entry_id < last_compressed_table->size;
             entry_id++) {
         entry_t entry = last_compressed_table->entries[entry_id];
@@ -230,7 +227,19 @@ void send_sdp_force_stop_message(uint32_t processor_id){
     
     // send sdp packet
     send_sdp_message();
-    log_info("sent stop to processor %d", processor_id);
+}
+
+//! \brief sends a sdp message forcing the processor to shutdown
+//! \param[in] processor_id: the processor to shutdown
+//! \return bool saying successfully sent the message
+void send_sdp_shutdown_message(uint32_t processor_id){
+    // set message params
+    my_msg.dest_port = (RANDOM_PORT << PORT_SHIFT) | processor_id;
+    my_msg.data[COMMAND_CODE] = SHUT_DOWN;
+    my_msg.length = LENGTH_OF_SDP_HEADER + COMMAND_CODE_SIZE_IN_BYTES;
+
+    // send sdp packet
+    send_sdp_message();
 }
 
 //! \brief sets up the search bitfields.
@@ -256,6 +265,12 @@ bool set_up_search_bitfields(){
     return true;
 }
 
+//! \brief shuts down all compressor cores
+void shut_down_all_compressor_cores(){
+    for(uint32_t c_core = 0; c_core < n_compression_cores; c_core++){
+        send_sdp_shutdown_message(compressor_cores[c_core]);
+    }
+}
 
 //! \brief reads in the addresses region and from there reads in the key atom
 // map and from there searches for a given key. when found, returns the n atoms
@@ -304,7 +319,8 @@ uint32_t locate_key_atom_map(uint32_t key){
     log_error("cannot find the key %d at all?! WTF", key);
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
     sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
-    rt_error(RTE_SWERR);
+    shut_down_all_compressor_cores();
+    spin1_exit(0);
     return 0;
 }
 
@@ -409,7 +425,10 @@ uint32_t locate_processor_id_from_bit_field_address(
     }
     log_error(
         "failed to find the bitfield address %x anywhere.", bit_field_address);
-    rt_error(RTE_SWERR);
+    vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+    sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
+    shut_down_all_compressor_cores();
+    spin1_exit(0);
     return 0;
 }
 
@@ -486,7 +505,6 @@ bool generate_entries_from_bitfields(
     uint32_t n_atoms = locate_key_atom_map(original_entry->key_mask.key);
     *rt_address_ptr = MALLOC_SDRAM(
         (uint) routing_table_sdram_size_of_table(n_atoms));
-    log_info("rt address is %x", *rt_address_ptr);
 
     if (*rt_address_ptr == NULL){
         FREE(bit_field_processors);
@@ -537,11 +555,12 @@ bool generate_entries_from_bitfields(
         }
 
         // get the entry and fill in details.
-        entry_t new_entry = sdram_table->entries[atom];
-        new_entry.key_mask.key = original_entry->key_mask.key + atom;
-        new_entry.key_mask.mask = NEURON_LEVEL_MASK;
-        new_entry.source = original_entry->source;
-        sark_mem_cpy(&new_entry.route, &original_entry->route, size);
+        entry_t* new_entry = &sdram_table->entries[atom];
+        new_entry->key_mask.key = original_entry->key_mask.key + atom;
+        new_entry->key_mask.mask = NEURON_LEVEL_MASK;
+        new_entry->source = original_entry->source;
+        sark_mem_cpy(
+            &new_entry->route, &original_entry->route, sizeof(uint32_t));
     }
 
     FREE(bit_field_processors);
@@ -549,6 +568,19 @@ bool generate_entries_from_bitfields(
     // do not remove sdram store, as that's critical to how this stuff works
     return true;
 
+}
+
+//! \brief counts how many cores are actually doing something.
+//! \return the number of compressor cores doing something at the moment.
+uint32_t count_many_on_going_compression_attempts_are_running(){
+    uint32_t count = 0;
+    for(uint32_t c_core_index = 0; c_core_index < n_compression_cores;
+            c_core_index++){
+        if (comp_core_mid_point[c_core_index] != DOING_NOWT){
+            count ++;
+        }
+    }
+    return count;
 }
 
 //! generates the routing table entries from this set of bitfields
@@ -571,7 +603,6 @@ bool generate_rt_from_bit_field(
     //}
 
     // reduce future iterations, by finding the exact bitfield addresses
-    log_info("allocating n_bitfields of %d", n_bfs_for_key);
     address_t* addresses = MALLOC(n_bfs_for_key * sizeof(address_t));
     uint32_t index = 0;
     for (uint32_t bit_field_index = 0; bit_field_index < mid_point;
@@ -583,7 +614,6 @@ bool generate_rt_from_bit_field(
         }
     }
 
-    log_info("malloc entry");
     // extract original routing entry from uncompressed table
     entry_t* original_entry = MALLOC(sizeof(entry_t));
     if (original_entry == NULL){
@@ -592,16 +622,12 @@ bool generate_rt_from_bit_field(
         return false;
     }
 
-    log_info("start extract and remove");
     extract_and_remove_entry_from_table(
         uncompressed_table, master_pop_key, original_entry);
-    log_info("finish extract and remove");
 
     // create table entries with bitfields
-    log_info("start table gen from bitfields");
     bool success = generate_entries_from_bitfields(
         addresses, n_bfs_for_key, original_entry, rt_address_ptr);
-    log_info("end table gen from bitfields");
     if (!success){
         log_error(
             "can not create entries for key %d with %x bitfields.",
@@ -718,11 +744,13 @@ bool create_bit_field_router_tables(
 //! \return bool stating that it was successful in clearing sdram
 bool free_sdram_from_compression_attempt(uint32_t comp_core_index){
     uint32_t elements = comp_cores_bf_tables[comp_core_index].n_elements;
-    log_info("removing %d elements", elements);
+    log_debug("removing %d elements from index %d", elements, comp_core_index);
     for (uint32_t core_bit_field_id = 0; core_bit_field_id < elements;
             core_bit_field_id++){
         FREE(comp_cores_bf_tables[comp_core_index].elements[core_bit_field_id]);
     }
+    FREE(comp_cores_bf_tables[comp_core_index].elements);
+    comp_cores_bf_tables[comp_core_index].elements = NULL;
     return true;
 }
 
@@ -736,14 +764,17 @@ uint32_t get_core_index_from_id(uint32_t processor_id){
             return comp_core_index;
         }
     }
-    rt_error(RTE_SWERR);
+    vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+    sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
+    shut_down_all_compressor_cores();
+    spin1_exit(0);
     return 0;
 }
 
-//! \brief selects a compression core that's not doing anything yet
+//! \brief selects a compression core's index that's not doing anything yet
 //! \param[in] midpoint: the midpoint this compressor is going to explore
 //! \return the compressor core index for this attempt.
-uint32_t select_compressor_core(uint32_t midpoint){
+uint32_t select_compressor_core_index(uint32_t midpoint){
     for(uint32_t comp_core_index = 0; comp_core_index < n_compression_cores;
             comp_core_index++){
         if (comp_core_mid_point[comp_core_index] == DOING_NOWT){
@@ -754,7 +785,10 @@ uint32_t select_compressor_core(uint32_t midpoint){
         }
     }
     log_error("cant find a core to allocate to you");
-    rt_error(RTE_SWERR);
+    vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+    sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
+    shut_down_all_compressor_cores();
+    spin1_exit(0);
     return 0;  // needed for compiler warning to shut up
 }
 
@@ -769,6 +803,7 @@ bool record_address_data_for_response_functionality(
         address_t compressed_address, uint32_t mid_point){
 
     //free previous if there is any
+    log_debug("n rt a = %d index = %d", n_rt_addresses, comp_core_index);
     if (comp_cores_bf_tables[comp_core_index].elements != NULL){
         bool success = free_sdram_from_compression_attempt(comp_core_index);
         if (!success){
@@ -802,13 +837,13 @@ bool record_address_data_for_response_functionality(
 //! \brief update the mc message to point at right direction
 //! \param[in] comp_core_index: the compressor core id.
 void update_mc_message(uint32_t comp_core_index){
-    log_info("chip id = %d", spin1_get_chip_id());
+    log_debug("chip id = %d", spin1_get_chip_id());
     my_msg.srce_addr = spin1_get_chip_id();
     my_msg.dest_addr = spin1_get_chip_id();
     my_msg.flags = REPLY_NOT_EXPECTED;
-    log_info("core id =  %d", spin1_get_id());
+    log_debug("core id =  %d", spin1_get_id());
     my_msg.srce_port = (RANDOM_PORT << PORT_SHIFT) | spin1_get_core_id();
-    log_info("compressor core = %d", compressor_cores[comp_core_index]);
+    log_debug("compressor core = %d", compressor_cores[comp_core_index]);
     my_msg.dest_port =
         (RANDOM_PORT << PORT_SHIFT) | compressor_cores[comp_core_index];
 }
@@ -830,7 +865,7 @@ uint32_t deduce_total_packets(uint32_t n_rt_addresses){
             total_packets += 1;
         }
     }
-    log_info("n packets = %d", total_packets);
+    log_debug("n packets = %d", total_packets);
     return total_packets;
 }
 
@@ -890,7 +925,7 @@ void set_up_first_packet(
     data->fake_heap_data = user_register_content[USABLE_SDRAM_REGIONS];
     data->total_n_tables = n_rt_addresses;
     data->n_tables_in_packet = n_addresses_this_message;
-    log_info(
+    log_debug(
         "mem cpy tables to dest = %d, from source = %d, bytes = %d",
         &data->tables[0], &bit_field_routing_tables[0],
         n_addresses_this_message * WORD_TO_BYTE_MULTIPLIER);
@@ -904,7 +939,7 @@ void set_up_first_packet(
             (n_addresses_this_message + sizeof(start_stream_sdp_packet_t)) *
             WORD_TO_BYTE_MULTIPLIER));
 
-    log_info(
+    log_debug(
         "message contains command code %d, n sdp packets till "
         "delivered %d, address for compressed %d, fake heap data "
         "address %d total n tables %d, n tables in packet %d",
@@ -912,9 +947,9 @@ void set_up_first_packet(
         data->address_for_compressed, data->fake_heap_data,
         data->total_n_tables);
     for(uint32_t rt_id = 0; rt_id < n_addresses_this_message; rt_id++){
-        log_info("table address is %x", data->tables[rt_id]);
+        log_debug("table address is %x", data->tables[rt_id]);
     }
-    log_info("message length = %d", my_msg.length);
+    log_debug("message length = %d", my_msg.length);
 }
 
 //! \brief sets up the extra packet format
@@ -933,7 +968,7 @@ void setup_extra_packet(
         LENGTH_OF_SDP_HEADER + (
             (n_addresses_this_message + sizeof(extra_stream_sdp_packet_t)) *
             WORD_TO_BYTE_MULTIPLIER));
-    log_info("message length = %d", my_msg.length);
+    log_debug("message length = %d", my_msg.length);
 }
 
 
@@ -946,7 +981,7 @@ bool set_off_bit_field_compression(
         uint32_t n_rt_addresses, uint32_t mid_point){
 
     // select compressor core to execute this
-    uint32_t comp_core_index = select_compressor_core(mid_point);
+    uint32_t comp_core_index = select_compressor_core_index(mid_point);
 
     // allocate space for the compressed routing entries if required
     address_t compressed_address =
@@ -976,7 +1011,7 @@ bool set_off_bit_field_compression(
 
     // deduce how many packets
     uint32_t total_packets = deduce_total_packets(n_rt_addresses);
-    log_info("total packets = %d", total_packets);
+    log_debug("total packets = %d", total_packets);
 
     // generate the packets and fire them to the compressor core
     uint32_t addresses_sent = 0;
@@ -984,17 +1019,18 @@ bool set_off_bit_field_compression(
         // if just one packet worth, set to left over addresses
         uint32_t n_addresses_this_message = deduce_elements_this_packet(
             packet_id, n_rt_addresses, addresses_sent);
-        log_info("sending %d addresses this message", n_addresses_this_message);
+        log_debug(
+            "sending %d addresses this message", n_addresses_this_message);
 
         // set data components
         if (packet_id == 0){  // first packet
             set_up_first_packet(
                 total_packets, compressed_address, n_rt_addresses,
                 n_addresses_this_message);
-            log_info("finished setting up first packet");
+            log_debug("finished setting up first packet");
         }
         else{  // extra packets
-            log_info("sending extra packet id = %d", packet_id);
+            log_debug("sending extra packet id = %d", packet_id);
             setup_extra_packet(n_addresses_this_message, addresses_sent);
         }
 
@@ -1013,9 +1049,9 @@ bool set_off_bit_field_compression(
 //! \return bool fag if it fails for memory issues
 bool create_tables_and_set_off_bit_compressor(uint32_t mid_point){
     uint32_t n_rt_addresses = 0;
-    log_info("started create bit field router tables");
+    log_debug("started create bit field router tables");
     bool success = create_bit_field_router_tables(mid_point, &n_rt_addresses);
-    log_info("finished creating bit field router tables");
+    log_debug("finished creating bit field router tables");
 
     // if successful, try setting off the bitfield compression
     if (success){
@@ -1023,7 +1059,7 @@ bool create_tables_and_set_off_bit_compressor(uint32_t mid_point){
 
          // if successful, move to next search point.
          if (!success){
-            log_info("failed to set off bitfield compression");
+            log_debug("failed to set off bitfield compression");
             return false;
          }
          else{
@@ -1031,7 +1067,7 @@ bool create_tables_and_set_off_bit_compressor(uint32_t mid_point){
          }
     }
 
-    log_info("failed to create bitfield tables for midpoint %d", mid_point);
+    log_debug("failed to create bitfield tables for midpoint %d", mid_point);
     return false;
 }
 
@@ -1039,6 +1075,17 @@ bool create_tables_and_set_off_bit_compressor(uint32_t mid_point){
 //!     that without bitfields compression will work).
 //! \return bool saying success or failure of the compression
 bool start_binary_search(){
+
+    // if there's only there's no available, but cores still attempting. just
+    // return. it'll bounce back when a response is received
+    if (n_available_compression_cores == 0 &&
+            count_many_on_going_compression_attempts_are_running() > 0){
+        log_debug(
+            "not got any extra cores, but cores are running. so waiting "
+            "for their responses");
+        reading_bit_fields = false;
+        return true;
+    }
 
     // deduce how far to space these testers
     uint32_t hops_between_compression_cores =
@@ -1050,18 +1097,18 @@ bool start_binary_search(){
         hops_between_compression_cores = 1;
     }
 
-    log_info("n_bf_addresses is %d", n_bf_addresses);
-    log_info("n available compression cores is %d",
+    log_debug("n_bf_addresses is %d", n_bf_addresses);
+    log_debug("n available compression cores is %d",
     n_available_compression_cores);
-    log_info("hops between attempts is %d", hops_between_compression_cores);
+    log_debug("hops between attempts is %d", hops_between_compression_cores);
 
     bool failed_to_malloc = false;
-    uint32_t new_mid_point = hops_between_compression_cores * multiplier;
-    log_info("new mid point = %d", new_mid_point);
-    log_info("n bf addresses = %d", n_bf_addresses);
+    int new_mid_point = hops_between_compression_cores * multiplier;
+    log_debug("new mid point = %d", new_mid_point);
+    log_debug("n bf addresses = %d", n_bf_addresses);
 
-    for (uint32_t index = 0; index < n_bf_addresses; index++){
-        log_info(
+    for (int index = 0; index < n_bf_addresses; index++){
+        log_debug(
             "sorted bitfields address at index %d is %x",
             index, sorted_bit_fields[index]);
     }
@@ -1071,15 +1118,15 @@ bool start_binary_search(){
     while (n_available_compression_cores != 0 && !failed_to_malloc &&
             new_mid_point <= n_bf_addresses){
 
-        log_info("attempt new create tables and set off");
+        log_debug("attempt new create tables and set off");
         bool success = create_tables_and_set_off_bit_compressor(new_mid_point);
-        log_info("success is %d", success);
+        log_debug("success is %d", success);
 
         if(success){
             multiplier ++;
         }
         else{
-            log_info(
+            log_debug(
                 "failed to malloc when setting up compressor with multiplier"
                 " %d", multiplier);
             failed_to_malloc = true;
@@ -1087,14 +1134,14 @@ bool start_binary_search(){
 
         //update to next new mid point
         new_mid_point = hops_between_compression_cores * multiplier;
-        log_info("next mid point to consider = %d", new_mid_point);
+        log_debug("next mid point to consider = %d", new_mid_point);
     }
-    log_info("finished the start of compression core allocation");
+    log_debug("finished the start of compression core allocation");
     
     // if it did not set off 1 compression. fail fully. coz it wont ever get
     // anything done. host will pick up the slack
     if (multiplier == 1){
-        log_info("failed at first bitfield");
+        log_debug("failed at first bitfield");
         return false;
     }
     
@@ -1199,7 +1246,9 @@ address_t find_processor_bit_field_region(uint32_t processor_id){
 
     // if not found
     log_error("failed to find the right region. WTF");
-    rt_error(RTE_SWERR);
+    vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+    sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_SWERR;
+    spin1_exit(0);
     return NULL;
 }
 
@@ -1310,9 +1359,9 @@ bool remove_merged_bitfields_from_cores(){
 //! \brief tells ya if a compressor is already doing a mid point
 //! \param[in] mid_point: the mid point to look for
 //! \return bool saying true if there is a compressor running this right now
-bool already_being_processed(uint32_t mid_point){
+bool already_being_processed(int mid_point){
     for(uint32_t c_index = 0; c_index < n_compression_cores; c_index++){
-        if (comp_core_mid_point[c_index] == (int) mid_point){
+        if (comp_core_mid_point[c_index] == mid_point){
             return true;
         }
     }
@@ -1322,11 +1371,12 @@ bool already_being_processed(uint32_t mid_point){
 //! \brief returns the best mid point tested to date. NOTE its only safe to call
 //! this after the first attempt finished. which is acceptable
 //! \return the best bf midpoint tested and success
-uint32_t best_mid_point_to_date(){
+int best_mid_point_to_date(){
 
     // go backwards to find the first passed value
     for (int n_bf = n_bf_addresses; n_bf >= 0; n_bf --){
         if (bit_field_test(mid_points_successes, n_bf)){
+            log_debug("returning %d", n_bf);
             return n_bf;
         }
     }
@@ -1339,21 +1389,13 @@ uint32_t best_mid_point_to_date(){
 //! \brief returns the next midpoint which has been tested
 //! \return the next tested bf midpoint from midpoint
 uint32_t next_tested_mid_point_from(uint32_t mid_point){
-     for (uint32_t n_bf = mid_point; n_bf < n_bf_addresses ; n_bf ++){
+     for (int n_bf = mid_point + 1; n_bf < n_bf_addresses ; n_bf ++){
         if (bit_field_test(tested_mid_points, n_bf)){
+            log_debug("returns %d", n_bf);
             return n_bf;
         }
     }
     return n_bf_addresses;
-}
-
-//! \brief shuts down all compressor cores
-void shut_down_all_compressor_cores(){
-    for(uint32_t c_core = 0; c_core < n_compression_cores; c_core++){
-        if (comp_core_mid_point[c_core] != DOING_NOWT){
-            send_sdp_force_stop_message(compressor_cores[c_core]);
-        }
-    }
 }
 
 //! \brief return the spaces higher than me which could be tested
@@ -1363,31 +1405,35 @@ void shut_down_all_compressor_cores(){
 //! \param[out] found_best: bool flag saying if found the best point overall
 //! \return bool stating if it was successful or not in memory alloc
 bool find_spaces_high_than_point(
-        uint32_t point, uint32_t* testing_cores, uint32_t* length,
-        bool* found_best){
+        int point, uint32_t* testing_cores, int* length,
+        int next_tested_point, bool* found_best){
 
-    // find the next point which has been tested
-    uint32_t next_tested_point = next_tested_mid_point_from(point);
-    log_info("next tested point from %d is %d", point, next_tested_point);
+    log_debug("found best is %d", *found_best);
 
     // if the diff between the best tested and next tested is 1, then the
     // best is the overall best
-    if (next_tested_point - point == 1){
+    if (next_tested_point - point == 1 && bit_field_test(
+            tested_mid_points, next_tested_point)){
         *found_best = true;
         return true;
     }
 
-    // find how many values are being tested between best tested and next tested
+    // find how many values are being tested between best tested and next
+    // tested
     *length = 1;
-    for (uint32_t n_bf = next_tested_point; n_bf >= point; n_bf--){
+
+    log_debug("locate already tested");
+    for (int n_bf = next_tested_point; n_bf >= point; n_bf--){
         if (already_being_processed(n_bf)){
             *length += 1;
         }
     }
-    log_info("length is %d", *length);
+    log_debug("length is %d", *length);
 
     // malloc the spaces
+    log_debug("size is %d", *length * sizeof(uint32_t));
     testing_cores = MALLOC(*length * sizeof(uint32_t));
+    log_debug("malloc-ed");
     if (testing_cores == NULL){
         log_error(
             "failed to allocate memory for the locate next midpoint searcher");
@@ -1395,9 +1441,11 @@ bool find_spaces_high_than_point(
     }
 
     // populate list
+    log_debug("populate list");
     testing_cores[0] = point;
     uint32_t testing_core_index = 1;
-    for (uint32_t n_bf = n_bf_addresses; n_bf >= point; n_bf --){
+    for (int n_bf = n_bf_addresses; n_bf > point; n_bf --){
+
         if (already_being_processed(n_bf)){
             testing_cores[testing_core_index] = n_bf;
             testing_core_index += 1;
@@ -1413,27 +1461,40 @@ bool find_spaces_high_than_point(
 //! tested and has a chance of working/ improving the space
 //! \param[out] bool flag to say found best
 //! \return midpoint to search
-bool locate_next_mid_point(bool* found_best, uint32_t* new_mid_point){
+bool locate_next_mid_point(bool* found_best, int* new_mid_point){
     // get base line to start searching for new locations to test
-    uint32_t best_mp_to_date = best_mid_point_to_date();
+    int best_mp_to_date = best_mid_point_to_date();
+    int next_tested_point = next_tested_mid_point_from(best_mp_to_date);
     uint32_t* higher_testers = NULL;
-    uint32_t* length = 0;
+    int length = 0;
 
-    if (best_mp_to_date == n_bf_addresses){
+    log_debug(
+        "next tested point from %d is %d",
+        best_mp_to_date, next_tested_point);
+
+    if (best_mp_to_date == next_tested_point){
         *found_best = true;
         best_search_point = best_mp_to_date;
+        *new_mid_point = DOING_NOWT;
+        log_debug("best search point is %d", best_mp_to_date);
         return true;
     }
 
-    // fill in the locations bigher than best that are being tested
+    // fill in the locations bigger than best that are being tested
+    log_debug("find spaces");
     bool success = find_spaces_high_than_point(
-        best_mp_to_date, higher_testers, length, found_best);
+        best_mp_to_date, higher_testers, &length, next_tested_point,
+        found_best);
+    log_debug("populated higher testers");
 
     // exit if best found
-    if (found_best){
+    if (*found_best){
+        log_debug("found best");
         best_search_point = best_mp_to_date;
         return true;
     }
+    log_debug("passed test");
+
 
     // failed to find next point due to memory
     if (!success){
@@ -1442,8 +1503,9 @@ bool locate_next_mid_point(bool* found_best, uint32_t* new_mid_point){
     }
 
     // got spaces, find one with the biggest difference
-    uint32_t biggest_dif = 1;
-    for (uint32_t test_base_index = 0; test_base_index < *length - 1;
+    log_debug("looking for biggest dif");
+    uint32_t biggest_dif = 0;
+    for (int test_base_index = 0; test_base_index < length - 1;
             test_base_index++){
         uint32_t diff = higher_testers[test_base_index + 1] -
             higher_testers[test_base_index];
@@ -1451,22 +1513,48 @@ bool locate_next_mid_point(bool* found_best, uint32_t* new_mid_point){
             biggest_dif = diff;
         }
     }
+    log_debug("best dif is %d", biggest_dif);
+
+    // handle case of no split between best and last tested
+    if (length == 1){
+        int hop = (next_tested_point - best_mp_to_date) / 2;
+        if (hop == 0){
+            hop = 1;
+        }
+        *new_mid_point = best_mp_to_date + hop;
+        log_debug("new midpoint is %d", *new_mid_point);
+        return true;
+    }
 
     // locate the first with biggest dif, split in middle and return that as
     // new mid point to test
-    for (uint32_t test_base_index = 0; test_base_index < *length - 1;
-            test_base_index++){
+    log_debug("cycling");
+    for (int test_base_index = 0; test_base_index < length; test_base_index++){
+        log_debug("entered");
+
         uint32_t diff = higher_testers[test_base_index + 1] -
             higher_testers[test_base_index];
         if (diff == biggest_dif){
-            *new_mid_point =
-                higher_testers[test_base_index] + (biggest_dif / 2);
+            // deduce hop
+            int hop = (biggest_dif / 2);
+            log_debug("hop is %d", hop);
+            if (hop == 0){
+                hop = 1;
+            }
+
+            // deduce new mid point
+            *new_mid_point = higher_testers[test_base_index] + hop;
+
+            // if hitting the bottom. check that uncompressed worked or not
             if (*new_mid_point == 0){
+                // check that it worked (it might not have finished, in some
+                // odd flow
                 if (bit_field_test(mid_points_successes, *new_mid_point)){
                     best_search_point = *new_mid_point;
                     *found_best = true;
                     return true;
                 }
+                // if we got here its odd. but put this here for completeness
                 if(bit_field_test(tested_mid_points, *new_mid_point)){
                     log_error(
                         "got to the point of searching for mid point 0."
@@ -1477,49 +1565,54 @@ bool locate_next_mid_point(bool* found_best, uint32_t* new_mid_point){
             }
         }
     }
-
     FREE(higher_testers);
     return true;
 }
 
-//! \brief counts how many cores are actually doing something.
-//! \return the number of compressor cores doing something at the moment.
-uint32_t count_many_on_going_compression_attempts_are_running(){
-    uint32_t count = 0;
-    for(uint32_t c_core_index = 0; c_core_index < n_compression_cores;
-            c_core_index++){
-        if (comp_core_mid_point[c_core_index] != DOING_NOWT){
-            count ++;
-        }
-    }
-    return count;
-}
-
 //! \brief compress the bitfields from the best location
-void carry_on_binary_search(){
+void carry_on_binary_search(uint unused0, uint unused1){
+    // api requirement
+    use(unused0);
+    use(unused1);
+    log_debug("started carry on");
 
     bool failed_to_malloc = false;
     bool found_best = false;
 
+    log_debug("found best is %d", found_best);
+
     // iterate till either ran out of cores, or failed to malloc sdram during
     // the setup of a core or found best or no other mid points need to be
     // tested
+    log_debug("start while");
     while (n_available_compression_cores != 0 && !failed_to_malloc &&
             !found_best){
 
+        log_debug("try a carry on core");
+
         // locate next midpoint to test
-        uint32_t mid_point;
+        int mid_point;
         bool success = locate_next_mid_point(&found_best, &mid_point);
+
+        if (mid_point != DOING_NOWT){
+            log_debug("new mid point is %d", mid_point);
+        }
 
         // if finished search, do last bit
         if (found_best){
-            log_info("finished search successfully");
+            log_debug("finished search successfully");
             shut_down_all_compressor_cores();
+            log_debug("finished shut down of compressor cores");
             load_routing_table_into_router();
+            log_debug("finished loading table");
+            vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+            sark_virtual_processor_info[spin1_get_core_id()].user1 =
+                EXITED_CLEANLY;
+            spin1_exit(0);
             return;
         }
         else{  // not found best, so try to set off compression if memory done
-            log_info("trying with midpoint %d", mid_point);
+            log_debug("trying with midpoint %d", mid_point);
             if (!success){
                 failed_to_malloc = true;
             }
@@ -1531,6 +1624,8 @@ void carry_on_binary_search(){
             }
         }
     }
+
+    log_debug("checking state");
 
     // if failed to malloc, limit exploration to the number of cores running.
     if (failed_to_malloc){
@@ -1546,13 +1641,17 @@ void carry_on_binary_search(){
                     user_register_content[REGION_ADDRESSES][THRESHOLD]){
                 found_best = true;
                 best_search_point = best_mid_point_tested;
-                log_info("finished search by end user QoS");
+                log_debug("finished search by end user QoS");
                 load_routing_table_into_router();
             }
             else{
                 log_error(
                     "failed to compress enough bitfields for threshold.");
-                rt_error(RTE_SWERR);
+                vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+                sark_virtual_processor_info[spin1_get_core_id()].user1 =
+                    EXIT_FAIL;
+                shut_down_all_compressor_cores();
+                spin1_exit(0);
             }
         }
     }
@@ -1568,23 +1667,22 @@ void process_compressor_response(
     
     // filter off finished state
     if (finished_state == SUCCESSFUL_COMPRESSION){
-        log_info(
+        log_debug(
             "successful from core %d doing mid point %d",
-            compressor_cores[comp_core_index], comp_core_mid_point[comp_core_index]);
+            compressor_cores[comp_core_index],
+            comp_core_mid_point[comp_core_index]);
         bit_field_set(tested_mid_points, comp_core_mid_point[comp_core_index]);
         bit_field_set(
             mid_points_successes, comp_core_mid_point[comp_core_index]);
-        log_info("a");
 
         // set tracker if its the best seen so far
-        if ((int)best_mid_point_to_date() == comp_core_mid_point[comp_core_index]){
+        if (best_mid_point_to_date() == comp_core_mid_point[comp_core_index]){
             best_search_point = comp_core_mid_point[comp_core_index];
             sark_mem_cpy(
-                &last_compressed_table,
+                last_compressed_table,
                 comp_cores_bf_tables[comp_core_index].compressed_table,
                 routing_table_sdram_size_of_table(TARGET_LENGTH));
         }
-        log_info("b");
 
         // release for next set
         comp_core_mid_point[comp_core_index] = DOING_NOWT;
@@ -1594,17 +1692,15 @@ void process_compressor_response(
         // was / redundant as this is a better search.
 
         // free the sdram associated with this compressor core.
-        log_info("c");
         bool success = free_sdram_from_compression_attempt(comp_core_index);
-        log_info("d");
         if (!success){
             log_error("failed to free sdram for compressor core %d. WTF",
                       comp_core_index);
         }
-        log_info("finished process of successful compression");
+        log_debug("finished process of successful compression");
     }
     else if (finished_state == FAILED_MALLOC){
-        log_info(
+        log_debug(
             "failed to malloc from core %d doing mid point %d",
             comp_core_index, comp_core_mid_point[comp_core_index]);
         // this will threshold the number of compressor cores that
@@ -1618,7 +1714,7 @@ void process_compressor_response(
         }
     }
     else if (finished_state == FAILED_TO_COMPRESS){
-        log_info(
+        log_debug(
             "failed to compress from core %d doing mid point %d",
             comp_core_index, comp_core_mid_point[comp_core_index]);
 
@@ -1631,7 +1727,7 @@ void process_compressor_response(
         n_available_compression_cores ++;
     
         // set all indices above this one to false, as this one failed
-        for(uint32_t test_index = compression_mid_point;
+        for(int test_index = compression_mid_point;
                 test_index < n_bf_addresses; test_index++){
             bit_field_set(tested_mid_points, test_index);
         }
@@ -1653,7 +1749,7 @@ void process_compressor_response(
         }
     }
     else if (finished_state == RAN_OUT_OF_TIME){
-        log_info(
+        log_debug(
             "failed by time from core %d doing mid point %d",
             comp_core_index, comp_core_mid_point[comp_core_index]);
 
@@ -1672,7 +1768,7 @@ void process_compressor_response(
         }
     }
     else if (finished_state == FORCED_BY_COMPRESSOR_CONTROL){
-        log_info(
+        log_debug(
             "ack from forced from core %d doing mid point %d",
             comp_core_index, comp_core_mid_point[comp_core_index]);
         // this gives no context of why the control killed it. just
@@ -1695,6 +1791,9 @@ void process_compressor_response(
     // having processed the packet, and there are spare cores for compression
     // attempts, try to set off another search.  (this encapsulates the
     // finish state as well.
+    log_info(
+        "n av cores = %d, bool of reading is %d",
+        n_available_compression_cores, reading_bit_fields);
     if (n_available_compression_cores > 0 && !reading_bit_fields){
         if (!still_trying_to_carry_on){
             log_info("setting off carry on");
@@ -1715,15 +1814,17 @@ void process_compressor_response(
 //! \param[in] port: don't care.
 void sdp_handler(uint mailbox, uint port) {
     use(port);
+
+    log_info("received response");
+
     // get data from the sdp message
     sdp_msg_pure_data *msg = (sdp_msg_pure_data *) mailbox;
-    log_info("received response");
     log_info("command code is %d", msg->data[COMMAND_CODE]);
     log_info("response code was %d", msg->data[START_OF_SPECIFIC_MESSAGE_DATA]);
 
     // filter off the port we've decided to use for this
     if (msg->srce_port >> PORT_SHIFT == RANDOM_PORT){
-
+        log_info("correct port");
         // filter based off the command code. Anything thats not a response is
         // a error
         if (msg->data[COMMAND_CODE] == START_DATA_STREAM){
@@ -1738,6 +1839,7 @@ void sdp_handler(uint mailbox, uint port) {
         }
         else if(msg->data[COMMAND_CODE] == COMPRESSION_RESPONSE){
             // locate the compressor core id that responded
+            log_info("response packet");
             uint32_t comp_core_index = get_core_index_from_id(
                 (msg->srce_port & CPU_MASK));
 
@@ -1767,14 +1869,16 @@ void sdp_handler(uint mailbox, uint port) {
             msg->srce_port >> PORT_SHIFT);
         sark_msg_free((sdp_msg_t*) msg);
     }
+
+    log_info("finish sdp process");
 }
 
 //! \brief reads a bitfield and deduces how many bits are not set
 //! \param[in] bit_field_struct: the location of the bitfield
 //! \return how many redundant packets there are
 uint32_t detect_redundant_packet_count(address_t bit_field_struct){
-    log_info("address's location is %d", bit_field_struct);
-    log_info(" key is %d", bit_field_struct[BIT_FIELD_BASE_KEY]);
+    //log_info("address's location is %d", bit_field_struct);
+    //log_info(" key is %d", bit_field_struct[BIT_FIELD_BASE_KEY]);
     uint32_t n_filtered_packets = 0;
     uint32_t n_neurons =
         locate_key_atom_map(bit_field_struct[BIT_FIELD_BASE_KEY]);
@@ -1785,7 +1889,7 @@ uint32_t detect_redundant_packet_count(address_t bit_field_struct){
             n_filtered_packets += 1;
         }
     }
-    log_info("n filtered packets = %d", n_filtered_packets);
+    //log_info("n filtered packets = %d", n_filtered_packets);
     return n_filtered_packets;
 }
 
@@ -1898,7 +2002,7 @@ void order_bit_fields_based_on_impact(
             proc_cov_by_bit_field, n_pairs, worst_core_id);
 
         // print for sanity
-        for(uint32_t r_packet_index = 0;
+        /**for(uint32_t r_packet_index = 0;
                 r_packet_index < proc_cov_by_bit_field[
                     worst_core_id]->length_of_list;
                 r_packet_index ++){
@@ -1934,7 +2038,7 @@ void order_bit_fields_based_on_impact(
                      "%d is %x", coverage_index, bit_field_index,
                      coverage[coverage_index]->processor_ids[bit_field_index]);
             }
-        }
+        }*/
 
         // cycle through the list of a cores redundant packet counts and locate
         // the bitfields which match up
@@ -1964,18 +2068,18 @@ void order_bit_fields_based_on_impact(
             }
 
             // print all coverage for sanity purposes
-            for (uint32_t coverage_index = 0;
+            /**for (uint32_t coverage_index = 0;
                     coverage_index < n_unique_redundant_packet_counts;
                     coverage_index++){
                 for(uint32_t bit_field_index = 0;
                         bit_field_index < coverage[
                             coverage_index]->length_of_list;
                         bit_field_index ++){
-                    //log_info(
-                    //    "bitfield address in coverage at index %d in array "
-                    //    "index %d is %x", coverage_index, bit_field_index,
-                    //     coverage[coverage_index]->bit_field_addresses[
-                    //        bit_field_index]);
+                    log_info(
+                        "bitfield address in coverage at index %d in array "
+                        "index %d is %x", coverage_index, bit_field_index,
+                         coverage[coverage_index]->bit_field_addresses[
+                            bit_field_index]);
                 }
             }
 
@@ -1994,7 +2098,7 @@ void order_bit_fields_based_on_impact(
                             bit_field_index]);
                 }
             }
-            log_info("next cycle of moving to sorted");
+            log_info("next cycle of moving to sorted");*/
         }
     }
 
@@ -2015,11 +2119,11 @@ void order_bit_fields_based_on_impact(
                 sorted_bit_fields[sorted_bit_field_current_fill_loc] =
                         coverage[index]->bit_field_addresses[bit_field_index];
 
-                log_info(
-                    "dumping into sorted at index %d address %x and is %x",
-                    sorted_bit_field_current_fill_loc,
-                    coverage[index]->bit_field_addresses[bit_field_index],
-                    sorted_bit_fields[sorted_bit_field_current_fill_loc]);
+                //log_info(
+                //    "dumping into sorted at index %d address %x and is %x",
+                //    sorted_bit_field_current_fill_loc,
+                //    coverage[index]->bit_field_addresses[bit_field_index],
+                //    sorted_bit_fields[sorted_bit_field_current_fill_loc]);
 
                 sorted_bit_fields_processor_ids[
                     sorted_bit_field_current_fill_loc] = coverage[
@@ -2161,19 +2265,19 @@ bool read_in_bit_fields(){
             bit_field_by_processor[r_id].bit_field_addresses[
                 bit_field_id] =
                     (address_t) &bit_field_address[pos_in_bitfield_region];
-            log_info("bitfield at region %d at index %d is at address %x",
-                r_id, bit_field_id,
-                bit_field_by_processor[r_id].bit_field_addresses[
-                    bit_field_id]);
+            //log_info("bitfield at region %d at index %d is at address %x",
+            //    r_id, bit_field_id,
+            //    bit_field_by_processor[r_id].bit_field_addresses[
+            //        bit_field_id]);
 
             uint32_t n_redundant_packets =
                 detect_redundant_packet_count(
                     (address_t) &bit_field_address[pos_in_bitfield_region]);
             proc_cov_by_bf[r_id]->redundant_packets[bit_field_id] =
                 n_redundant_packets;
-            log_info("prov cov by bitfield for region %d, redundant packets "
-                     "at index %d, has n redundant packets of %d",
-                     r_id, bit_field_id, n_redundant_packets);
+            //log_info("prov cov by bitfield for region %d, redundant packets "
+            //         "at index %d, has n redundant packets of %d",
+            //         r_id, bit_field_id, n_redundant_packets);
             
             pos_in_bitfield_region += 
                 START_OF_BIT_FIELD_DATA + bit_field_address[
@@ -2326,10 +2430,10 @@ bool read_in_bit_fields(){
                     red_packet_index ++){
                 if(proc_cov_by_bf[r_id]->redundant_packets[red_packet_index] ==
                         redundant_packets[r_packet_index]){
-                    log_info(
-                        "found! at %x",
-                        bit_field_by_processor[ r_id].bit_field_addresses[
-                            red_packet_index]);
+                    //log_info(
+                    //    "found! at %x",
+                    //    bit_field_by_processor[ r_id].bit_field_addresses[
+                    //        red_packet_index]);
 
                     coverage[r_packet_index]->bit_field_addresses[
                         processor_id_index] = bit_field_by_processor[
@@ -2342,9 +2446,9 @@ bool read_in_bit_fields(){
                 }
             }
         }
-        log_info(
-            "processor id index = %d and need to fill in %d elements",
-            processor_id_index, n_bf_with_same_r_packets);
+        //log_info(
+        //    "processor id index = %d and need to fill in %d elements",
+        //    processor_id_index, n_bf_with_same_r_packets);
     }
 
     // free the redundant packet tracker, as now tailored ones are in the dict
@@ -2371,17 +2475,21 @@ bool read_in_bit_fields(){
     FREE(coverage);
     FREE(proc_cov_by_bf);
 
-    for(uint32_t bf_index = 0; bf_index < n_bf_addresses; bf_index++){
-        log_info(
-            "bitfield address for sorted in index %d is %x",
-            bf_index, sorted_bit_fields[bf_index]);
-    }
+    //for(uint32_t bf_index = 0; bf_index < n_bf_addresses; bf_index++){
+    //    log_info(
+    //        "bitfield address for sorted in index %d is %x",
+    //        bf_index, sorted_bit_fields[bf_index]);
+    //}
 
     return true; 
 }
 
 //! \brief starts the work for the compression search
-void start_compression_process(){
+void start_compression_process(uint unused0, uint unused1){
+    //api requirements
+    use(unused0);
+    use(unused1);
+
     // will use this many palces. so exrtact at top
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
 
@@ -2392,7 +2500,7 @@ void start_compression_process(){
     if (! success_reading_in_bit_fields){
         log_error("failed to read in bitfields, failing");
         sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_MALLOC;
-        rt_error(RTE_SWERR);
+        spin1_exit(0);
     }
 
     log_info("starting the binary search");
@@ -2402,10 +2510,9 @@ void start_compression_process(){
     if (!success_start_binary_search){
         log_error("failed to compress the routing table at all. Failing");
         sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
-        rt_error(RTE_SWERR);
+        shut_down_all_compressor_cores();
+        spin1_exit(0);
     }
-
-    sark_virtual_processor_info[spin1_get_core_id()].user1 = EXITED_CLEANLY;
 }
 
 //! \brief sets up a tracker for the user registers so that its easier to use
@@ -2455,7 +2562,8 @@ bool initialise_compressor_cores(){
     // get n compression cores and update trackers
     n_compression_cores =
         user_register_content[REGION_ADDRESSES][hop + N_COMPRESSOR_CORES];
-    n_available_compression_cores = n_compression_cores;
+
+    n_available_compression_cores = 1;
     log_info("%d comps cores available", n_available_compression_cores);
 
     // malloc dtcm for this
@@ -2556,13 +2664,17 @@ void c_main(void) {
     bool success_init = initialise();
     if (!success_init){
         log_error("failed to init");
-        rt_error(RTE_SWERR);
+        vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
+        sark_virtual_processor_info[spin1_get_core_id()].user1 = EXIT_FAIL;
+        shut_down_all_compressor_cores();
+        spin1_exit(0);
     }
+
+    spin1_callback_on(SDP_PACKET_RX, sdp_handler, SDP_PRIORITY);
 
     // kick-start the process
     spin1_schedule_callback(
         start_compression_process, 0, 0, COMPRESSION_START_PRIORITY);
-    spin1_callback_on(SDP_PACKET_RX, sdp_handler, SDP_PRIORITY);
 
     // go
     log_info("waiting for sycn");

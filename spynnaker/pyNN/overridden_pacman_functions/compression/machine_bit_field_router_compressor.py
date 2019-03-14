@@ -301,7 +301,7 @@ class MachineBitFieldRouterCompressor(object):
 
     def _check_for_success(
             self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder, host_cores):
+            compressor_app_id, executable_finder, host_chips):
         """ Goes through the cores checking for cores that have failed to\
             generate the compressed routing tables with bitfield
 
@@ -310,7 +310,7 @@ class MachineBitFieldRouterCompressor(object):
         :param transceiver: SpiNNMan instance
         :param provenance_file_path: path to provenance folder
         :param compressor_app_id: the app id for the compressor c code
-        :param host_cores: the chips which need to be ran on host. 
+        :param host_chips: the chips which need to be ran on host. 
         :param executable_finder: executable path finder
         :rtype: None
         """
@@ -330,8 +330,8 @@ class MachineBitFieldRouterCompressor(object):
                     self._call_iobuf_and_clean_up(
                         executable_targets, transceiver, provenance_file_path,
                         compressor_app_id, executable_finder)
-                    if (x, y) not in host_cores:
-                        host_cores.append((x, y))
+                    if (x, y) not in host_chips:
+                        host_chips.append((x, y))
                     raise SpinnFrontEndException(
                         self._ON_CHIP_ERROR_MESSAGE.format(x, y))
 
