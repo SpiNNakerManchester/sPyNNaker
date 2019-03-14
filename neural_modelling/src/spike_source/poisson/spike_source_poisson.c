@@ -171,7 +171,7 @@ static inline uint32_t fast_spike_source_get_num_spikes(
             global_parameters.spike_source_seed, exp_minus_lambda);
 }
 
-void print_spike_sources(void) {
+static void print_spike_sources(void) {
     for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
         log_info("atom %d", s);
         log_info("scaled_start = %u", poisson_parameters[s].start_ticks);
@@ -191,7 +191,7 @@ void print_spike_sources(void) {
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-bool read_global_parameters(address_t address) {
+static bool read_global_parameters(address_t address) {
     log_info("read global_parameters: starting");
 
     spin1_memcpy(&global_parameters, address, sizeof(global_parameters));
@@ -333,7 +333,7 @@ static bool initialize(void) {
 
 //! \brief runs any functions needed at resume time.
 //! \return None
-void resume_callback(void) {
+static void resume_callback(void) {
     recording_reset();
 
     address_t address = data_specification_get_data_address();
@@ -363,7 +363,7 @@ void resume_callback(void) {
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
 //! host when needed
 //! \return None
-bool store_poisson_parameters(void) {
+static bool store_poisson_parameters(void) {
     log_info("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -390,7 +390,7 @@ bool store_poisson_parameters(void) {
 //! destination
 //! \param[in] spike_key: the key to transmit
 //! \return None
-void _send_spike(uint spike_key, uint timer_count) {
+static void _send_spike(uint spike_key, uint timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
         // Do Nothing
@@ -404,6 +404,35 @@ void _send_spike(uint spike_key, uint timer_count) {
     }
 }
 
+//! \brief expand the space for storing spikes
+//! \param[in] n_spikes: the number of times a neuron has spiked
+//!
+static void _expand_spike_buffer(uint32_t n_spikes) {
+    uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
+
+    timed_out_spikes *new_spikes = spin1_malloc(new_size);
+    if (new_spikes == NULL) {
+        log_error("Cannot reallocate spike buffer");
+        rt_error(RTE_SWERR);
+    }
+
+    uint32_t *data = (uint32_t *) new_spikes;
+    for (uint32_t n = new_size >> 2; n > 0; n--) {
+        data[n - 1] = 0;
+    }
+
+    if (spikes != NULL) {
+        uint32_t old_size =
+                8 + (n_spike_buffers_allocated * spike_buffer_size);
+
+        spin1_memcpy(new_spikes, spikes, old_size);
+        sark_free(spikes);
+    }
+
+    spikes = new_spikes;
+    n_spike_buffers_allocated = n_spikes;
+}
+
 //! \brief records spikes as needed
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
@@ -411,24 +440,7 @@ void _send_spike(uint spike_key, uint timer_count) {
 static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     if (recording_flags > 0) {
         if (n_spike_buffers_allocated < n_spikes) {
-            uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
-            timed_out_spikes *new_spikes = spin1_malloc(new_size);
-            if (new_spikes == NULL) {
-                log_error("Cannot reallocate spike buffer");
-                rt_error(RTE_SWERR);
-            }
-            uint32_t *data = (uint32_t *) new_spikes;
-            for (uint32_t n = new_size >> 2; n > 0; n--) {
-                data[n - 1] = 0;
-            }
-            if (spikes != NULL) {
-                uint32_t old_size =
-                        8 + (n_spike_buffers_allocated * spike_buffer_size);
-                spin1_memcpy(new_spikes, spikes, old_size);
-                sark_free(spikes);
-            }
-            spikes = new_spikes;
-            n_spike_buffers_allocated = n_spikes;
+            _expand_spike_buffer(n_spikes);
         }
         if (spikes->n_buffers < n_spikes) {
             spikes->n_buffers = n_spikes;
@@ -439,7 +451,7 @@ static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
-void recording_complete_callback(void) {
+static void recording_complete_callback(void) {
     recording_in_progress = false;
 }
 
@@ -522,7 +534,7 @@ static inline void handle_slow_source(
 //!            parameters, this parameter has no semantics currently and thus
 //!            is set to 0
 //! \return None
-void timer_callback(uint timer_count, uint unused) {
+static void timer_callback(uint timer_count, uint unused) {
     use(unused);
     time++;
 
@@ -579,7 +591,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 }
 
-void set_spike_source_rate(uint32_t id, REAL rate) {
+static void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id >= global_parameters.first_source_id) &&
             ((id - global_parameters.first_source_id) <
              global_parameters.n_spike_sources)) {
@@ -613,7 +625,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
     spin1_msg_free(msg);
 }
 
-void multicast_packet_callback(uint key, uint payload) {
+static void multicast_packet_callback(uint key, uint payload) {
     uint32_t id = key & global_parameters.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);
     set_spike_source_rate(id, rate);
