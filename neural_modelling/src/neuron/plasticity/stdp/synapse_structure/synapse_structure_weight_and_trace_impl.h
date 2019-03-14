@@ -18,6 +18,7 @@ typedef struct update_state_t {
     weight_state_t weight_state;
 
     int16_t trace;
+    uint32_t type;
 } update_state_t;
 
 typedef plastic_synapse_t final_state_t;
@@ -34,7 +35,7 @@ static inline update_state_t synapse_structure_get_update_state(
     update_state.weight_state = weight_get_initial(synaptic_word.weight,
                                                    synapse_type);
     update_state.trace = synaptic_word.trace;
-
+    update_state.type = synapse_type;
     return update_state;
 }
 

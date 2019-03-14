@@ -81,9 +81,9 @@ static inline pre_trace_t timing_add_pre_spike(
 		neuron_pointer_t neuron) {
 
 	REAL mem_potential = neuron->V_membrane;
-	REAL threshold_potential = -50k;
+	REAL threshold_potential = 30k;
 	REAL gamma = 0.3;
-	REAL m = 0.02; // this factor already includes gamma
+	REAL m = 0.01; // this factor already includes gamma
 	REAL p_j;
 	REAL limit = threshold_potential - neuron->V_rest;
 
@@ -227,11 +227,32 @@ static inline update_state_t timing_apply_post_spike(
     	}
 
         if (trace < 0){
+        	// We got an inhibitory error spike - need to depress excitatory
+        	// connections, and potentiate inhibitory connections
+
+        	if (previous_state.type == 0) { // excitatory synapse
+
         	previous_state.weight_state = weight_one_term_apply_depression(
         			previous_state.weight_state, error_by_trace);
-        } else {
-        	// Apply potentiation to state (which is a weight_state)
-        	previous_state.weight_state = weight_one_term_apply_potentiation(previous_state.weight_state, error_by_trace);
+
+        	} else if (previous_state.type == 2){ // inhibitory synapse
+            	previous_state.weight_state = weight_one_term_apply_potentiation(
+            			previous_state.weight_state, error_by_trace);
+        	}
+
+        } else { // We got an excitatory error spike
+
+        	// Apply potentiation to excitatory  synaptic state (which is a
+        	// weight_state), and depress inhibitory synapses
+
+        	if (previous_state.type == 0) { // excitatory synapse
+        	previous_state.weight_state = weight_one_term_apply_potentiation(
+        			previous_state.weight_state, error_by_trace);
+
+        	} else if (previous_state.type == 2){ // inhibitory synapse
+            	previous_state.weight_state = weight_one_term_apply_depression(
+            			previous_state.weight_state, error_by_trace);
+        	}
         }
 
     }
