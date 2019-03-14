@@ -457,13 +457,13 @@ static void recording_complete_callback(void) {
 
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
-static inline void _record_spikes(uint32_t time) {
+static inline void _record_spikes(uint32_t timestamp) {
     while (recording_in_progress) {
         spin1_wfi();
     }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
         recording_in_progress = true;
-        spikes->time = time;
+        spikes->time = timestamp;
         recording_record_and_notify(
                 0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
                 recording_complete_callback);
@@ -472,7 +472,7 @@ static inline void _record_spikes(uint32_t time) {
 }
 
 static inline void handle_fast_source(
-        spike_source_t *spike_source, uint timer_count) {
+        spike_source_t *spike_source, index_t s, uint timer_count) {
     if (time >= spike_source->start_ticks
             && time < spike_source->end_ticks) {
         // Get number of spikes to send this tick
@@ -574,7 +574,7 @@ static void timer_callback(uint timer_count, uint unused) {
 
         if (spike_source->is_fast_source) {
             // handle fast spike sources
-            handle_fast_source(spike_source, timer_count);
+            handle_fast_source(spike_source, s, timer_count);
         } else {
             // handle slow sources
             handle_slow_source(spike_source, s, timer_count);
