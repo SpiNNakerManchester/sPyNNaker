@@ -52,6 +52,20 @@ void connection_generator_fixed_total_free(void *data) {
 }
 
 /**
+ *! \brief Pick a random value in a ratio and determine if it is in the
+ *! successful part.
+ *! \param[in] rng The uniform random number generator
+ *! \param[in] K The number of items that are valid
+ *! \param[in] not_K The number of items that are invalid
+ *! \return Whether the number from 0 to K+not_K-1 was in 0 to K-1
+ */
+static inline bool random_in_ratio(rng_t rng, uint32_t K, uint32_t not_K) {
+    unsigned long fract value = ulrbits(rng_generator(rng));
+
+    return K > (uint32_t) (value * (K + not_K));
+}
+
+/**
  *! \brief Draw from a binomial distribution i.e. with replacement
  *! \param[in] n The number of times the experiment is run
  *! \param[in] N The number of items in the bag
@@ -63,10 +77,7 @@ static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t count = 0;
     uint32_t not_K = N - K;
     for (uint32_t i = 0; i < n; i++) {
-        unsigned long fract value = ulrbits(rng_generator(rng));
-        uint32_t pos = (uint32_t) (value * (K + not_K));
-
-        if (pos < K) {
+        if (random_in_ratio(rng, K, not_K)) {
             count++;
         }
     }
@@ -86,10 +97,7 @@ static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t K_remaining = K;
     uint32_t not_K_remaining = N - K;
     for (uint32_t i = 0; i < n; i++) {
-        unsigned long fract value = ulrbits(rng_generator(rng));
-        uint32_t pos = (uint32_t) (value * (K_remaining + not_K_remaining));
-
-        if (pos < K_remaining) {
+        if (random_in_ratio(rng, K_remaining, not_K_remaining)) {
             count += 1;
             K_remaining -= 1;
         } else {
