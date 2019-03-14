@@ -10,7 +10,7 @@
 #define TOP_BIT_IN_WORD 31
 
 // the flag for when a spike isnt in the master pop table (so shouldnt happen)
-#define NOT_IN_MASTER_POP_TABLE_FLAG -1
+#define NOT_IN_MASTER_POP_TABLE_FLAG  (-1)
 
 
 typedef struct master_population_table_entry {
@@ -183,74 +183,67 @@ bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
     // locate the position in the binary search / array
-    log_debug("searching for key %d", spike);
+    log_debug("searching for key %08x", spike);
     int position = population_table_position_in_the_master_pop_array(spike);
     log_debug("position = %d", position);
 
     // check we don't have a complete miss
-    if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
-        master_population_table_entry entry = master_population_table[position];
-        if (entry.count == 0) {
-            log_debug(
-                "spike %u (= %x): population found in master population"
-                "table but count is 0");
+    if (position == NOT_IN_MASTER_POP_TABLE_FLAG) {
+        invalid_master_pop_hits++;
+        log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
+        log_info("spike %08x: population not found in master population table",
+                spike);
+        return false;
+    }
+
+    // Something actually there
+    master_population_table_entry entry = master_population_table[position];
+    if (entry.count == 0) {
+        log_debug("spike %08x: population found in master population"
+                "table but count is 0", spike);
+    }
+
+    log_debug("about to try to find neuron id");
+    last_neuron_id = _get_neuron_id(entry, spike);
+    log_debug("found neuron id of %d", last_neuron_id);
+
+    // check we have a entry in the bit field for this (possible not to due
+    // to dtcm limitations or router table compression). If not, go to
+    // DMA check.
+    log_debug("checking bit field");
+    if (connectivity_bit_field[position] != NULL) {
+        log_debug("can be checked, bitfield isnt not allocated");
+        // check that the bit flagged for this neuron id does hit a
+        // neuron here. If not return false and avoid the DMA check.
+        if (!bit_field_test(
+                connectivity_bit_field[position], last_neuron_id)) {
+            log_debug("tested and was not set");
+            bit_field_filtered_packets += 1;
+            return false;
         }
+        log_debug("was set, carrying on");
+    } else {
+        log_debug("wasnt set up. likely lack of dtcm");
+    }
 
-        log_debug("about to try to find neuron id");
-        last_neuron_id = _get_neuron_id(entry, spike);
-        log_debug("found neuron id of %d", last_neuron_id);
+    // going to do a DMA to read the matrix and see if there's a hit.
+    log_debug("about to set items");
+    next_item = entry.start;
+    items_to_go = entry.count;
 
-        // check we have a entry in the bit field for this (possible not to due
-        // to dtcm limitations or router table compression). If not, go to
-        // DMA check.
-        log_debug("checking bit field");
-        if (connectivity_bit_field[position] != NULL){
-            log_debug("can be checked, bitfield isnt not allocated");
-            // check that the bit flagged for this neuron id does hit a
-            // neuron here. If not return false and avoid the DMA check.
-            if (!bit_field_test(
-                    connectivity_bit_field[position],  last_neuron_id)){
-                log_debug("tested and was not set");
-                bit_field_filtered_packets += 1;
-                return false;
-            }
-            log_debug("was set, carrying on");
-        }
-        else{
-            log_debug("wasnt set up. likely lack of dtcm");
-        }
-
-        // going to do a DMA to read the matrix and see if there's a hit.
-        log_debug("about to set items");
-        next_item = entry.start;
-        items_to_go = entry.count;
-
-        log_debug("about to do some other print");
-
-        log_debug(
-            "spike = %08x, entry_index = %u, start = %u, count = %u",
+    log_debug("spike = %08x, entry_index = %u, start = %u, count = %u",
             spike, position, next_item, items_to_go);
 
-        bool get_next = population_table_get_next_address(
+    bool get_next = population_table_get_next_address(
             row_address, n_bytes_to_transfer);
 
-        // tracks surplus dmas
-        if (!get_next){
-            log_debug(
-                "found a entry which has a ghost entry for key %d", spike);
-            ghost_pop_table_searches ++;
-        }
-        return get_next;
+    // tracks surplus dmas
+    if (!get_next) {
+        log_info("found a entry which has a ghost entry for key %08x",
+                spike);
+        ghost_pop_table_searches++;
     }
-    else{
-        invalid_master_pop_hits ++;
-    }
-
-    log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-    log_debug(
-        "spike %u (= %x): population not found in master population table",
-        spike, spike);
-    return false;
+    return get_next;
 }
 
 //! \brief get the position in the master pop table
