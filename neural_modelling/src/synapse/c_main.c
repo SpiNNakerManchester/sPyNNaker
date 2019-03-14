@@ -248,7 +248,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
 
-    io_printf(IO_BUF, "Time %d\n", time);
+    io_printf(IO_BUF, "\nTime %d\n", time);
 
     //If first timer tick retrieve the address of the buffer for synaptic contribution
     if(time == 0) {

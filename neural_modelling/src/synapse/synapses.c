@@ -44,6 +44,9 @@ static uint32_t synapse_type_mask;
 
 static weight_t *synaptic_region;
 
+// Size of the memory chunk containing this timestep's ring buffers
+static size_t size_to_be_transferred;
+
 //extern bool contribution_written;
 
 //! parameters that reside in the synapse_parameter_data_region in human
@@ -223,8 +226,8 @@ static inline void _process_fixed_synapses(
 
         // Store saturated value back in ring-buffer
 
-        io_printf(IO_BUF, "writing at index: %d value:%d\n", ring_buffer_index, ring_buffers[ring_buffer_index]);
         ring_buffers[ring_buffer_index] = accumulation;
+        io_printf(IO_BUF, "writing at index: %d value:%d, timestep: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], time);
     }
 }
 
@@ -330,6 +333,11 @@ bool synapses_initialise(
         ring_buffers[i] = 0;
     }
 
+    size_to_be_transferred =
+        (1 << (log_n_neurons + log_n_synapse_types)) * sizeof(weight_t);
+
+    io_printf(IO_BUF, "size_to_be_transferred: %d\n", size_to_be_transferred);
+
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
     synapse_index_bits = log_n_neurons;
@@ -352,13 +360,15 @@ void synapses_do_timestep_update(timer_t time) {
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
-    // Size of the memory chunk containing this timestep's ring buffers, CHECK THIS IN CASE IMPLEMENTING A SINGLE SYN!!!!
-    size_t size_to_be_transferred = n_neurons * n_synapse_types * sizeof(weight_t);
-
     // Starting position of the memory chunk
     uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
                 time, 0, 0, synapse_type_index_bits,
                 synapse_index_bits);
+
+    uint32_t j = 0;
+
+    for(index_t i = ring_buffer_index; i < ring_buffer_index + (size_to_be_transferred/sizeof(weight_t)); i++)
+        io_printf(IO_BUF, "SDRAM writing: %d addr: %x\n", ring_buffers[i], synaptic_region+(j++));
 
     // Start the transfer
     spin1_dma_transfer(
@@ -591,7 +601,7 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
 void synapses_set_contribution_region() {
 
     synaptic_region = sark_tag_ptr(255, 0);
-    synaptic_region += synapse_index << synapse_index_bits;
+    synaptic_region += (synapse_index << synapse_index_bits);
 
     io_printf(IO_BUF, "index %d\n", synapse_index << synapse_index_bits);
 }

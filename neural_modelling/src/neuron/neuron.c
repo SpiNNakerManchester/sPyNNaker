@@ -260,7 +260,7 @@ bool neuron_do_timestep_update(timer_t time) {
     // Set up an array for storing the recorded variable values
     state_t recorded_variable_values[n_recorded_vars];
 
-    io_printf(IO_BUF, "Timestep: %d", time);
+    io_printf(IO_BUF, "Timestep: %d, dma_size = %d\n", time, dma_size);
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -275,6 +275,8 @@ bool neuron_do_timestep_update(timer_t time) {
                 convert_weight_to_input(
                     synaptic_contributions[buff_index],
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
+
+            io_printf(IO_BUF, "read: %d, neuron %d, syn %d, buff_index: %d addr: %x\n", synaptic_contributions[buff_index], neuron_index, synapse_type_index, buff_index, synaptic_region+buff_index);
         }
 
         //SHOULD NOT BE USED AT THE MOMENT! SO DON'T WORRY! (ANDREW SAID SO)
@@ -422,7 +424,9 @@ bool neuron_initialise(address_t address) {
         log_n_neurons + log_n_synapse_types;
     uint32_t contribution_size = 1 << (contribution_bits);
 
-    dma_size = contribution_size *sizeof(weight_t);
+    dma_size = contribution_size * sizeof(weight_t);
+
+    io_printf(IO_BUF, "dma_size:%d\n", dma_size);
 
 
     //Allocate the region in SDRAM for synaptic contribution. TAG 255 is to be sure
