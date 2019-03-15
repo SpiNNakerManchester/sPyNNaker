@@ -46,7 +46,7 @@ typedef enum extra_provenance_data_region_entries{
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
-    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
+    MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 0
 } callback_priorities;
 
 //! The number of regions that are to be used for recording

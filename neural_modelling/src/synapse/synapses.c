@@ -364,7 +364,7 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Starting position of the memory chunk
     uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                time, 0, 0, synapse_index_bits,
+                time+1, 0, 0, synapse_index_bits,
                 synapse_index_bits);
 
     // Start the transfer

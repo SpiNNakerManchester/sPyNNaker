@@ -258,7 +258,7 @@ void timer_callback(uint timer_count, uint unused) {
     else {
 
         //Flush the buffer containing the written contribution
-        synapses_flush_ring_buffer(time-1);
+        synapses_flush_ring_buffer(time);
     }
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
