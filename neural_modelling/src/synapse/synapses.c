@@ -130,7 +130,7 @@ static inline void _print_ring_buffers(uint32_t time) {
                     log_debug(" ");
                     uint32_t ring_buffer_index =
                         synapses_get_ring_buffer_index(d + time, t, n,
-                           synapse_type_index_bits, synapse_index_bits);
+                           synapse_index_bits, synapse_index_bits);
                     synapses_print_weight(ring_buffers[ring_buffer_index],
                                           ring_buffer_to_input_left_shifts[t]);
                 }
@@ -207,7 +207,9 @@ static inline void _process_fixed_synapses(
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
             delay + time, combined_synapse_neuron_index,
-            synapse_type_index_bits);
+            synapse_index_bits); //GIUSTO????????????????????????????
+
+        io_printf(IO_BUF, "delay: %d combined syn neu index %x\n", delay, combined_synapse_neuron_index);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
@@ -338,7 +340,7 @@ bool synapses_initialise(
 
     io_printf(IO_BUF, "size_to_be_transferred: %d\n", size_to_be_transferred);
 
-    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
+    synapse_type_index_bits = log_n_neurons + 1;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
@@ -362,13 +364,8 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Starting position of the memory chunk
     uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                time, 0, 0, synapse_type_index_bits,
+                time, 0, 0, synapse_index_bits,
                 synapse_index_bits);
-
-    uint32_t j = 0;
-
-    for(index_t i = ring_buffer_index; i < ring_buffer_index + (size_to_be_transferred/sizeof(weight_t)); i++)
-        io_printf(IO_BUF, "SDRAM writing: %d addr: %x\n", ring_buffers[i], synaptic_region+(j++));
 
     // Start the transfer
     spin1_dma_transfer(
@@ -588,7 +585,7 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
             // Get index in the ring buffers for the previous time slot for
             // this synapse type and neuron
             ring_buffer_index = synapses_get_ring_buffer_index(
-                timestep, synapse_type_index, neuron_index, synapse_type_index_bits,
+                timestep, synapse_type_index, neuron_index, synapse_index_bits,
                 synapse_index_bits);
 
             // Clear ring buffer
@@ -602,6 +599,4 @@ void synapses_set_contribution_region() {
 
     synaptic_region = sark_tag_ptr(255, 0);
     synaptic_region += (synapse_index << synapse_index_bits);
-
-    io_printf(IO_BUF, "index %d\n", synapse_index << synapse_index_bits);
 }

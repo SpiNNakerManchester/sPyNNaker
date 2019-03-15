@@ -260,8 +260,6 @@ bool neuron_do_timestep_update(timer_t time) {
     // Set up an array for storing the recorded variable values
     state_t recorded_variable_values[n_recorded_vars];
 
-    io_printf(IO_BUF, "Timestep: %d, dma_size = %d\n", time, dma_size);
-
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
@@ -269,14 +267,15 @@ bool neuron_do_timestep_update(timer_t time) {
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
+            if(synaptic_contributions[buff_index])
+                io_printf(IO_BUF, "adding neuron input %d to neuron %d syn %d time %d\n", synaptic_contributions[buff_index], neuron_index, synapse_type_index, time);
+
             neuron_impl_add_inputs(
                 synapse_type_index,
                 neuron_index,
                 convert_weight_to_input(
                     synaptic_contributions[buff_index],
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
-
-            io_printf(IO_BUF, "read: %d, neuron %d, syn %d, buff_index: %d addr: %x\n", synaptic_contributions[buff_index], neuron_index, synapse_type_index, buff_index, synaptic_region+buff_index);
         }
 
         //SHOULD NOT BE USED AT THE MOMENT! SO DON'T WORRY! (ANDREW SAID SO)
@@ -298,7 +297,7 @@ bool neuron_do_timestep_update(timer_t time) {
         // If the neuron has spiked
         if (spike) {
 
-            io_printf(IO_BUF, "neuron %u spiked at time %u", neuron_index, time);
+            io_printf(IO_BUF, "neuron %u spiked at time %u\n", neuron_index, time);
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
