@@ -80,10 +80,6 @@ bool rewiring = false;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
-//! Flag for synaptic contribution writing in SDRAM
-//bool contribution_written;
-
-
 
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
@@ -210,8 +206,6 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    //contribution_written = false;
-
     // Setup profiler
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
@@ -240,8 +234,8 @@ void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
 
-    //Schedule event in 800 micro-sec from now
-    if(!timer_schedule_proc(write_contributions, 0, 0, 800)) {
+    //Schedule event in 80 micro-sec from now. THIS NEEDS TO BE MORE GENERIC!!
+    if(!timer_schedule_proc(write_contributions, 0, 0, 80)) {
 
         rt_error(RTE_API);
     }

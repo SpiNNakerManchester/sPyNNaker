@@ -47,8 +47,6 @@ static weight_t *synaptic_region;
 // Size of the memory chunk containing this timestep's ring buffers
 static size_t size_to_be_transferred;
 
-//extern bool contribution_written;
-
 //! parameters that reside in the synapse_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_synapse_parameter_data_region {
@@ -354,10 +352,7 @@ bool synapses_initialise(
 
 void synapses_do_timestep_update(timer_t time) {
 
-    //DOESN'T HAVE TO BE COMMENTED!!!!!!
-    //_print_ring_buffers(time);
-
-    //contribution_written = false;
+    _print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
@@ -371,36 +366,6 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
-
-    /*
-    // Transfer the input from the ring buffers into the input buffers
-    for (uint32_t neuron_index = 0; neuron_index < n_neurons;
-            neuron_index++) {
-
-        // Loop through all synapse types
-        for (uint32_t synapse_type_index = 0;
-                synapse_type_index < n_synapse_types; synapse_type_index++) {
-
-            // Get index in the ring buffers for the current time slot for
-            // this synapse type and neuron
-            ring_buffer_index = synapses_get_ring_buffer_index(
-                time, synapse_type_index, neuron_index, synapse_type_index_bits,
-                synapse_index_bits);
-
-            // Convert ring-buffer entry to input and add on to correct
-            // input for this synapse type and neuron
-            neuron_add_inputs(
-                synapse_type_index,
-                neuron_index,
-                synapses_convert_weight_to_input(
-                    ring_buffers[ring_buffer_index],
-                    ring_buffer_to_input_left_shifts[synapse_type_index]));
-
-            // Clear ring buffer
-            ring_buffers[ring_buffer_index] = 0;
-        }
-    }
-    */
 
     _print_inputs();
 

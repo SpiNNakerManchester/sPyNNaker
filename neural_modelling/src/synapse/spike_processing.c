@@ -36,8 +36,6 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
-//extern bool contribution_written;
-
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -107,22 +105,6 @@ void _setup_synaptic_dma_read() {
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
                     _do_direct_row(row_address);
-
-                    // In case the end of the timer tick is approaching and spikes are in DTCM
-                    // Kicks the DMA write of synaptic contributions
-                    /*if(tc[T1_COUNT] < 6657 && !contribution_written) {
-
-                        uint cpsr = spin1_int_disable();
-                        uint32_t spikes_remaining = in_spikes_flush_buffer();
-
-                        //Start DMA Writing procedure for the contribution of this timestep
-                        synapses_do_timestep_update(time);
-                        spin1_mode_restore(cpsr);
-
-                        contribution_written = true;
-
-                        return;
-                    }*/
                 } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
@@ -242,22 +224,6 @@ void _dma_complete_callback(uint unused, uint tag) {
             rt_error(RTE_SWERR);
         }
     } while (subsequent_spikes);
-
-    // if too close to the end of the timer tick or all the spikes
-    // have been processed write in memory the synaptic contribution
-    /*if((tc[T1_COUNT] < 6657 || in_spikes_buffer_empty()) && !contribution_written) {
-
-        uint cpsr = spin1_int_disable();
-        uint32_t spikes_remaining = in_spikes_flush_buffer();
-
-        //Start DMA Writing procedure for the contribution of this timestep
-        synapses_do_timestep_update(time);
-        spin1_mode_restore(cpsr);
-
-        contribution_written = true;
-
-        return;
-    }*/
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
