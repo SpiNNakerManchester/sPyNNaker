@@ -627,7 +627,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
     uint32_t n_items = payload->n_items;
     for (uint32_t item = 0; item < n_items; item++) {
         set_spike_source_rate(payload->data[item].id,
-                kbits(data[payload->data[item].rate));
+                kbits(payload->data[item].rate));
     }
     spin1_msg_free(msg);
 }
