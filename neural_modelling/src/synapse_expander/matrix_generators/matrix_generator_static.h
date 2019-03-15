@@ -165,9 +165,9 @@ void matrix_generator_static_write_row(
             synapse_index_bits);
 
         // Write the word
-        log_debug("Writing word to 0x%08x", &(write_address[delay.stage][0]));
+        log_debug("Writing word to 0x%08x", &write_address[delay.stage][0]);
         write_address[delay.stage][0] = word;
-        write_address[delay.stage] = &(write_address[delay.stage][1]);
+        write_address[delay.stage] = &write_address[delay.stage][1];
 
         // Increment the size of the current row
         row_address[delay.stage][STATIC_FIXED_FIXED_SIZE] += 1;

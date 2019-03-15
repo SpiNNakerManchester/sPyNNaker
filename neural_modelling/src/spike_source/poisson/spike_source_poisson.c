@@ -610,17 +610,24 @@ static void set_spike_source_rate(uint32_t id, REAL rate) {
     }
 }
 
+typedef struct spike_source_poisson_sdp_pkt_t {
+    uint32_t n_items;
+    struct {
+        uint32_t id;
+        REAL rate;
+    } data[];
+} spike_source_poisson_sdp_pkt_t;
+
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint32_t *data = (uint32_t *) &msg->cmd_rc;
+    spike_source_poisson_sdp_pkt_t *payload =
+	    (spike_source_poisson_sdp_pkt_t *) &msg->cmd_rc;
 
-    uint32_t n_items = data[0];
-    data = &(data[1]);
+    uint32_t n_items = payload->n_items;
     for (uint32_t item = 0; item < n_items; item++) {
-        uint32_t id = data[item * 2];
-        REAL rate = kbits(data[item * 2 + 1]);
-        set_spike_source_rate(id, rate);
+        set_spike_source_rate(payload->data[item].id,
+                kbits(data[payload->data[item].rate));
     }
     spin1_msg_free(msg);
 }

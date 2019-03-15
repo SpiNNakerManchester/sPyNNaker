@@ -233,8 +233,7 @@ bool synapses_initialise(
         }
         log_debug("Copying %u bytes of direct synapses to 0x%08x",
                 direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(
-                *direct_synapses_address, &(direct_matrix_address[1]),
+        spin1_memcpy(*direct_synapses_address, &direct_matrix_address[1],
                 direct_matrix_size);
     }
 

@@ -217,7 +217,7 @@ void matrix_generator_stdp_write_row(
         if (row_address[i] != NULL) {
             if (n_half_words_per_row[i] & 0x1) {
                 pp_address[i][0] = 0;
-                pp_address[i] = &(pp_address[i][1]);
+                pp_address[i] = &pp_address[i][1];
                 n_half_words_per_row[i] += 1;
             }
             row_address[i][STDP_PLASTIC_PLASTIC_SIZE] +=

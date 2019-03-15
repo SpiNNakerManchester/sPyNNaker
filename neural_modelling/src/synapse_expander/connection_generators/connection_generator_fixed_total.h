@@ -60,9 +60,7 @@ void connection_generator_fixed_total_free(void *data) {
  *! \return Whether the number from 0 to K+not_K-1 was in 0 to K-1
  */
 static inline bool random_in_ratio(rng_t rng, uint32_t K, uint32_t not_K) {
-    unsigned long fract value = ulrbits(rng_generator(rng));
-
-    return K > (uint32_t) (value * (K + not_K));
+    return K > (uint32_t) (ulrbits(rng_generator(rng)) * (K + not_K));
 }
 
 /**
