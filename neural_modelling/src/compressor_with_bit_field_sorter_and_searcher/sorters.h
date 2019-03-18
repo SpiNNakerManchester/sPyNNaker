@@ -5,7 +5,7 @@
 //! \param[in] length_of_internal_array: length of internal array
 //! \param[in] worst_core_id: the core id to sort
 void sort_by_redundant_packet_count(
-        _proc_cov_by_bitfield_t** proc_cov_by_bit_field, 
+        proc_cov_by_bitfield_t** proc_cov_by_bit_field,
         uint32_t length_of_internal_array, uint32_t worst_core_id){
 
     // sort by bubble sort so that the most redundant packet count
@@ -49,19 +49,19 @@ void sort_by_redundant_packet_count(
 //! \param[in/out] proc_cov_by_bit_field: the array of structs to sort
 //! \param[in] length_of_array: length of the array of structs
 void sort_by_n_bit_fields(
-        _proc_cov_by_bitfield_t** proc_cov_by_bit_field,
+        proc_cov_by_bitfield_t** proc_cov_by_bit_field,
         uint32_t length_of_array){
     bool moved = true;
     while (moved){
         moved = false;
-        _proc_cov_by_bitfield_t* element = proc_cov_by_bit_field[0];
+        proc_cov_by_bitfield_t* element = proc_cov_by_bit_field[0];
         for (uint index = 1; index < length_of_array; index ++){
-            _proc_cov_by_bitfield_t* compare_element =
+            proc_cov_by_bitfield_t* compare_element =
                 proc_cov_by_bit_field[index];
             if (element->length_of_list < compare_element->length_of_list){
 
                 // create temp holder for moving objects
-                _proc_cov_by_bitfield_t* temp_pointer;
+                proc_cov_by_bitfield_t* temp_pointer;
 
                 // move to temp
                 temp_pointer = element;

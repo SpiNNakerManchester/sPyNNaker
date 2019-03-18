@@ -118,7 +118,7 @@ uint32_t routing_table_sdram_get_n_entries(
     uint32_t current_point_tracking = 0;
     for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
         // get how many entries are in this block
-        log_info(
+        log_debug(
             "size of routing table at index %d is %d",
             rt_index, routing_tables[rt_index]->size);
         current_point_tracking += routing_tables[rt_index]->size;
@@ -130,65 +130,38 @@ uint32_t routing_table_sdram_get_n_entries(
 //! address as one big router table
 //! \param[in] routing_tables: the addresses list
 //! \param[in] n_tables: how many in list
-//! \param[in] sdram_address: the location in sdram to write data to
+//! \param[in] compression_table: the location in sdram to write data to
 bool routing_table_sdram_store(
         table_t** routing_tables, uint32_t n_tables,
-        address_t sdram_loc_for_compressed_entries){
-
-    // cast to table struct
-    table_t* table_format = (table_t*) sdram_loc_for_compressed_entries;
+        table_t* compression_table){
 
     // locate n entries overall and write to struct
     uint32_t n_entries = routing_table_sdram_get_n_entries(
         routing_tables, n_tables);
-    log_info("compressed entries = %d", n_entries);
-    table_format->size = n_entries;
+    log_debug("compressed entries = %d", n_entries);
+    compression_table->size = n_entries;
     uint32_t main_entry_index = 0;
 
     // iterate though the entries writing to the struct as we go
-    log_info("start copy over");
+    log_debug("start copy over");
     for (uint32_t rt_index = 0; rt_index < n_tables; rt_index++){
 
         // get how many entries are in this block
         uint32_t entries_stored_here = routing_tables[rt_index]->size;
-        log_info("copying over %d entries", entries_stored_here);
+        log_debug("copying over %d entries", entries_stored_here);
         if(entries_stored_here != 0){
             // take entry and plonk data in right sdram location
-            log_info("doing sark copy");
+            log_debug("doing sark copy");
             sark_mem_cpy(
-                &table_format->entries[main_entry_index],
+                &compression_table->entries[main_entry_index],
                 routing_tables[rt_index]->entries,
                 entries_stored_here * sizeof(entry_t));
-            log_info("finished sark copy");
+            log_debug("finished sark copy");
             main_entry_index += entries_stored_here;
-            log_info("updated the main index to %d", main_entry_index);
+            log_debug("updated the main index to %d", main_entry_index);
         }
     }
-    log_info("finished copy");
-
-    // print out content of sdram, for sanity purposes
-    int n_entries_sdram = sdram_loc_for_compressed_entries[0];
-    int position = 1;
-    for (int entry_index = 0; entry_index < n_entries_sdram;
-            entry_index++){
-        log_info(
-            "entry %d key is %x",
-            entry_index,
-            sdram_loc_for_compressed_entries[position]);
-        log_info(
-            "entry %d mask is %x",
-            entry_index,
-            sdram_loc_for_compressed_entries[position + 1]);
-        log_info(
-            "entry %d route is %x",
-            entry_index,
-            sdram_loc_for_compressed_entries[position + 2]);
-        log_info(
-            "entry %d source is %x",
-            entry_index,
-            sdram_loc_for_compressed_entries[position + 3]);
-        position += 4;
-    }
+    log_debug("finished copy");
 
     return true;
 }
@@ -225,7 +198,7 @@ void routing_table_remove_from_size(
 //! \brief deduces sdram requirements for a given size of table
 //! \param[in] n_entries: the number of entries expected to be in the table.
 //! \return the number of bytes needed for this routing table
-uint32_t routing_table_sdram_size_of_table(uint32_t n_entries){
+uint routing_table_sdram_size_of_table(uint32_t n_entries){
     return sizeof(uint32_t) + (sizeof(entry_t) * n_entries);
 }
 

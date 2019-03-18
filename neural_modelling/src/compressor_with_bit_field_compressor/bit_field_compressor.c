@@ -34,6 +34,7 @@ bool* timer_for_compression_attempt = false;
 //! \brief number of times a compression time slot has occurred
 bool* finish_compression_flag = false;
 
+//! \brief bool saying its already sent a force ack packet to the controller
 bool sent_force_ack = false;
 
 //! \brief bool flag to say if i was forced to stop by the compressor control
@@ -50,7 +51,7 @@ bool compress_only_when_needed = false;
 bool compress_as_much_as_possible = false;
 
 //! \brief the sdram location to write the compressed router table into
-address_t sdram_loc_for_compressed_entries;
+table_t* sdram_loc_for_compressed_entries;
 
 //! \brief store for addresses for routing entries in sdram
 table_t** routing_tables;
@@ -162,6 +163,7 @@ void start_compression_process(uint unused0, uint unused1){
     aliases_t aliases = aliases_init();
 
     // run compression
+    log_info("about to go into oc minimise");
     bool success = oc_minimise(
         routing_tables, n_tables, TARGET_LENGTH, &aliases, failed_by_malloc,
         finished_by_compressor_force, timer_for_compression_attempt,

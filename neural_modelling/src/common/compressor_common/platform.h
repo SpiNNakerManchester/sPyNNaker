@@ -1,5 +1,4 @@
 #include "common-typedefs.h"
-#include <common/maths-util.h>
 
 #ifndef __PLATFORM_H__
 

@@ -6,12 +6,12 @@
 //! \brief the elements in the sdp packet (control for setting off a minimise
 //! attempt)
 typedef struct start_stream_sdp_packet_t{
-    address_t address_for_compressed;
+    table_t* address_for_compressed;
     address_t fake_heap_data;
     uint32_t n_sdp_packets_till_delivered;
     uint32_t total_n_tables;
     uint32_t n_tables_in_packet;
-    address_t tables[];
+    table_t** tables;
 } start_stream_sdp_packet_t;
 
 //! \brief the elements in the sdp packet when extension control for a minimise

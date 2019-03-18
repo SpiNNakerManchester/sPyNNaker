@@ -127,11 +127,11 @@ class AbstractPopulationVertex(
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
 
     # number of elements
-    ELEMENTS_USED_IN_EACH_BIT_FIELD = 2  # n words, key
+    ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to the bitfield
 
-    ELEMENTS_USED_IN_BIT_FIELD_HEADER = 1  # n bitfields
+    ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2  # n bitfields,  pointer for array
 
-    # n elements in each key to n atoms map for bitfield
+    # n elements in each key to n atoms map for bitfield (key, n atoms)
     _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
 
     # n key to n neurons maps size in words
