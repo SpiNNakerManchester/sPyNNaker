@@ -1,8 +1,0 @@
-#ifndef __COMPRESSION_SEARCHER_H__
-
-
-
-
-
-#define __COMPRESSION_SEARCHER_H__
-#endif  // __COMPRESSION_SEARCHER_H__

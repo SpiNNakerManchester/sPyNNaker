@@ -1,70 +1,65 @@
 from __future__ import division
+
+import logging
+import math
+import os
+import random
 import sys
 
-import math
-
-from spinn_utilities.overrides import overrides
-
 # pacman imports
+from pacman.executor.injection_decorator import inject_items
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints \
     import ContiguousKeyRangeContraint
-from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
 from pacman.model.resources import ResourceContainer, SDRAMResource
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
-
 # front end common imports
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.abstract_models \
+    import AbstractGeneratesDataSpecification
+from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
 from spinn_front_end_common.abstract_models import \
     AbstractProvidesIncomingPartitionConstraints
 from spinn_front_end_common.abstract_models import \
     AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models\
-    import AbstractRewritesDataSpecification
 from spinn_front_end_common.abstract_models \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management\
-    import recording_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
-
-# spynnaker imports
-from spynnaker.pyNN.models.abstract_models.\
+    import AbstractRewritesDataSpecification
+from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation \
     import AbstractSupportsBitFieldGeneration
-from spynnaker.pyNN.models.abstract_models.\
+from spinn_front_end_common.abstract_models. \
     abstract_supports_bit_field_routing_compression import \
     AbstractSupportsBitFieldRoutingCompression
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron.population_machine_vertex \
-    import PopulationMachineVertex
+from spinn_front_end_common.abstract_models.impl \
+    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.interface.buffer_management \
+    import recording_utilities
+from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities import constants as common_constants
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
+from spinn_utilities.overrides import overrides
+# spynnaker imports
+from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationSettable, AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS, \
-    WORD_TO_BYTE_MULTIPLIER
+from spynnaker.pyNN.models.common import AbstractNeuronRecordable
+from spynnaker.pyNN.models.common import AbstractSpikeRecordable
+from spynnaker.pyNN.models.common import NeuronRecorder
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron.population_machine_vertex \
+    import PopulationMachineVertex
+from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-
-
-import logging
-import os
-import random
 
 logger = logging.getLogger(__name__)
 
@@ -411,7 +406,7 @@ class AbstractPopulationVertex(
                 sdram += (
                     (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + (
                         n_words_for_atoms * n_machine_vertices)) *
-                    constants.WORD_TO_BYTE_MULTIPLIER)
+                    WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
     def _exact_sdram_for_bit_field_region(
@@ -426,7 +421,7 @@ class AbstractPopulationVertex(
         :return: sdram in bytes
         """
         sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
-                 constants.WORD_TO_BYTE_MULTIPLIER)
+                 WORD_TO_BYTE_MULTIPLIER)
         for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
             atoms_of_source_vertex = \
                 graph_mapper.get_slice(incoming_edge.pre_vertex).n_atoms
@@ -435,7 +430,7 @@ class AbstractPopulationVertex(
 
             sdram += (
                 (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-                constants.WORD_TO_BYTE_MULTIPLIER)
+                WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
     def _get_number_of_mallocs_used_by_dsg(self):
@@ -1008,9 +1003,9 @@ class AbstractPopulationVertex(
             placement=placement, transceiver=transceiver,
             region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
 
-    @overrides(AbstractSupportsBitFieldGeneration.
-               synaptic_expander_base_address_and_size)
-    def synaptic_expander_base_address_and_size(
+    @overrides(AbstractSupportsBitFieldRoutingCompression.
+               regeneratable_sdram_blocks_and_sizes)
+    def regeneratable_sdram_blocks_and_sizes(
             self, transceiver, placement):
         synaptic_matrix_base_address = \
             helpful_functions.locate_memory_region_for_placement(
@@ -1019,8 +1014,8 @@ class AbstractPopulationVertex(
         on_chip_begins_at = (
             synaptic_matrix_base_address +
             self._synapse_manager.host_written_matrix_size)
-        return (on_chip_begins_at,
-                self._synapse_manager.on_chip_written_matrix_size)
+        return [(on_chip_begins_at,
+                self._synapse_manager.on_chip_written_matrix_size)]
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                key_to_atom_map_region_base_address)

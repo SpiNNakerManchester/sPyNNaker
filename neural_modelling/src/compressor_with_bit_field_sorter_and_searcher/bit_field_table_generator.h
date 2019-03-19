@@ -1,8 +1,0 @@
-#ifndef __BIT_FIELD_TABLE_GENERATOR_H__
-
-
-
-
-
-#define __BIT_FIELD_TABLE_GENERATOR_H__
-#endif  // __BIT_FIELD_TABLE_GENERATOR_H__

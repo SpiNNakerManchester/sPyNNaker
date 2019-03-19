@@ -4,6 +4,8 @@ import math
 from spinn_front_end_common.interface.interface_functions import \
     ChipIOBufExtractor
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
+from spinn_front_end_common.utilities import system_control_logic
+from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -15,8 +17,6 @@ import logging
 import os
 
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.utilities import constants, utility_calls
-
 logger = logging.getLogger(__name__)
 
 
@@ -92,7 +92,7 @@ class OnChipBitFieldGenerator(object):
         progress.update(1)
 
         # run app
-        utility_calls.run_system_application(
+        system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
@@ -176,11 +176,9 @@ class OnChipBitFieldGenerator(object):
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(
                                 placement.x, placement.y, reading_address,
-                                n_words_to_read *
-                                constants.WORD_TO_BYTE_MULTIPLIER))
+                                n_words_to_read * WORD_TO_BYTE_MULTIPLIER))
                         reading_address += (
-                            n_words_to_read *
-                            constants.WORD_TO_BYTE_MULTIPLIER)
+                            n_words_to_read * WORD_TO_BYTE_MULTIPLIER)
 
                         # put into report
                         n_neurons = n_words_to_read * self._BITS_IN_A_WORD
