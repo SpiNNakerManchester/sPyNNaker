@@ -27,12 +27,12 @@ void synapse_dynamics_print_plastic_synapses(
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0
 //! \return counters for plastic pre synaptic events or 0
-uint32_t synapse_dynamics_get_plastic_pre_synaptic_events();
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void);
 
 //! \brief returns the number of ring buffer saturation events due to adding
 //! plastic weights.
 //! \return counter for saturation events or 0
-uint32_t synapse_dynamics_get_plastic_saturation_count();
+uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 
 //-----------------------------------------------------------------------------
 // Synaptic rewiring functions

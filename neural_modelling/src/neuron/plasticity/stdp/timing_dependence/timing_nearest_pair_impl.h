@@ -47,7 +47,7 @@ extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace() {
+static inline post_trace_t timing_get_initial_post_trace(void) {
     return (post_trace_t) {};
 }
 

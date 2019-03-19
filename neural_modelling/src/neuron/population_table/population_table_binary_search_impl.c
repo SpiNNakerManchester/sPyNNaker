@@ -53,7 +53,7 @@ static inline uint32_t _get_neuron_id(
     return spike & ~entry.mask;
 }
 
-static inline void _print_master_population_table() {
+static inline void _print_master_population_table(void) {
     log_info("master_population\n");
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {

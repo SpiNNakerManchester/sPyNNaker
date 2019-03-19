@@ -19,7 +19,7 @@ bit_field_t out_spikes;
 static size_t out_spikes_size;
 
 //! \brief clears the currently recorded spikes
-void out_spikes_reset() {
+void out_spikes_reset(void) {
     clear_bit_field(out_spikes, out_spikes_size);
 }
 

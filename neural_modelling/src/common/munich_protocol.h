@@ -189,7 +189,7 @@ static inline multicast_packet munich_protocol_get_configure_master_key_command(
     };
 }
 
-static inline multicast_packet munich_protocol_get_set_mode_command() {
+static inline multicast_packet munich_protocol_get_set_mode_command(void) {
     return (multicast_packet) {
         .key = _CHANGE_MODE | _instance_key,
         .payload = (uint32_t) _mode,
@@ -470,7 +470,7 @@ static inline multicast_packet
     };
 }
 
-static inline multicast_packet munich_protocol_query_state_of_io_lines() {
+static inline multicast_packet munich_protocol_query_state_of_io_lines(void) {
     return (multicast_packet) {
         .key = _QUERY_STATES_LINES_KEY | _instance_key,
         .payload = 0,

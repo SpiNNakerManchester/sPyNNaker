@@ -5,7 +5,7 @@
 
 address_t timing_initialise(address_t address);
 
-static post_trace_t timing_get_initial_post_trace();
+static post_trace_t timing_get_initial_post_trace(void);
 
 static post_trace_t timing_add_post_spike(uint32_t time, uint32_t last_time,
                                           post_trace_t last_trace);

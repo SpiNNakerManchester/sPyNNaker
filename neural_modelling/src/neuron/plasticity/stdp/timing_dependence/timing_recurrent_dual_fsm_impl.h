@@ -36,7 +36,7 @@ extern plasticity_trace_region_data_t plasticity_trace_region_data;
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace() {
+static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
 }
 

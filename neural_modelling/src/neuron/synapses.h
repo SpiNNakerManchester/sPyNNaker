@@ -72,13 +72,13 @@ bool synapses_process_synaptic_row(
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
 //! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count();
+uint32_t synapses_get_saturation_count(void);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
-uint32_t synapses_get_pre_synaptic_events();
+uint32_t synapses_get_pre_synaptic_events(void);
 
 
 //------------------------------------------------------------------------------

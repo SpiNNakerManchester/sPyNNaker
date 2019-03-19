@@ -11,7 +11,7 @@
 #include <debug.h>
 
 // declare spin1_wfi
-void spin1_wfi();
+void spin1_wfi(void);
 
 // Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
@@ -90,7 +90,7 @@ struct basic_parameters_t {
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct basic_parameters_t) / sizeof(uint32_t))
 
-static void _reset_record_counter() {
+static void _reset_record_counter(void) {
     if (spike_recording_rate == 0) {
         // Setting increment to zero means spike_index will never equal
         // spike_rate
@@ -286,7 +286,7 @@ void neuron_store_neuron_parameters(address_t address) {
     neuron_impl_store_neuron_parameters(address, next, n_neurons);
 }
 
-void recording_done_callback() {
+void recording_done_callback(void) {
     n_recordings_outstanding -= 1;
 }
 

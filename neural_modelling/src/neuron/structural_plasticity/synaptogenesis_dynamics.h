@@ -38,7 +38,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time);
 //!  The formation rule calls the add neuron function in the appropriate
 //!  module (STDP or static).
 //!  \return true if formation was successful
-bool synaptogenesis_dynamics_formation_rule();
+bool synaptogenesis_dynamics_formation_rule(void);
 
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
@@ -51,22 +51,22 @@ bool synaptogenesis_dynamics_formation_rule();
 //!  The elimination rule calls the remove neuron function in the appropriate
 //!  module (STDP or static).
 //!  \return true if elimination was successful
-bool synaptogenesis_dynamics_elimination_rule();
+bool synaptogenesis_dynamics_elimination_rule(void);
 
 //! \brief This function is a rewiring DMA callback
 //! \param[in] dma_id: the ID of the DMA
 //! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
-void synaptic_row_restructure();
+void synaptic_row_restructure(void);
 
 //! retrieve the period of rewiring
 //! based on is_fast(), this can either mean how many times rewiring happens
 //! in a timestep, or how many timesteps have to pass until rewiring happens.
-int32_t get_p_rew();
+int32_t get_p_rew(void);
 
 //! controls whether rewiring is attempted multiple times per timstep
 //! or after a number of timesteps.
-bool is_fast();
+bool is_fast(void);
 
 //! after a set of rewiring attempts, update the indices in the circular buffer
 //! between which we will be looking at the next batch of attempts

@@ -34,30 +34,30 @@ static inline bool in_spikes_is_next_spike_equal(spike_t spike) {
     return circular_buffer_advance_if_next_equals(buffer, spike);
 }
 
-static inline counter_t in_spikes_get_n_buffer_overflows() {
+static inline counter_t in_spikes_get_n_buffer_overflows(void) {
     return circular_buffer_get_n_buffer_overflows(buffer);
 }
 
-static inline counter_t in_spikes_get_n_buffer_underflows() {
+static inline counter_t in_spikes_get_n_buffer_underflows(void) {
     return 0;
 }
 
-static inline void in_spikes_print_buffer() {
+static inline void in_spikes_print_buffer(void) {
     circular_buffer_print_buffer(buffer);
 }
 
 //---------------------------------------
 // Synaptic rewiring functions
 //---------------------------------------
-static inline uint32_t in_spikes_input_index() {
+static inline uint32_t in_spikes_input_index(void) {
     return circular_buffer_input(buffer);
 }
 
-static inline uint32_t in_spikes_output_index() {
+static inline uint32_t in_spikes_output_index(void) {
     return circular_buffer_output(buffer);
 }
 
-static inline uint32_t in_spikes_real_size() {
+static inline uint32_t in_spikes_real_size(void) {
     return circular_buffer_real_size(buffer);
 }
 

@@ -16,7 +16,7 @@
 #include <bit_field.h>
 
 // Declare spin1_wfi
-extern void spin1_wfi();
+extern void spin1_wfi(void);
 
 // Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
