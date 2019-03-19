@@ -293,7 +293,6 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
-
         :param vertex_slice: the slice of atoms.
         :return: The SDRAM required for the neuron region
         """
@@ -350,7 +349,6 @@ class AbstractPopulationVertex(
 
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
         """ Reserve the neuron parameter data region.
-
         :param spec: the spec to write the DSG region to
         :param vertex_slice: the slice of atoms from the application vertex
         :return: None
@@ -367,15 +365,11 @@ class AbstractPopulationVertex(
             machine_timestep, n_synapses_in, sigma):
         """ Provides expected upper bound on accumulated values in a ring\
             buffer element.
-
         Requires an assessment of maximum Poisson input rate.
-
         Assumes knowledge of mean and SD of weight distribution, fan-in\
         and timestep.
-
         All arguments should be assumed real values except n_synapses_in\
         which will be an integer.
-
         :param weight_mean: Mean of weight distribution (in either nA or\
             microSiemens as required)
         :param weight_std_dev: SD of weight distribution
@@ -704,6 +698,19 @@ class AbstractPopulationVertex(
             recorded_region_sizes, self._time_between_requests,
             self._buffer_size_before_receive, ip_tags))
 
+        # Set index for SDRAM area allocation
+        if vertex.vertex_index is None:
+            indexes = dict()
+            for p in placements.placements:
+                if isinstance(p.vertex, PopulationMachineVertex):
+                    x = p.x #QUI SI SPACCA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    y = p.y
+                    if (x, y) not in indexes.keys():
+                        indexes[(x, y)] = 0
+                    p.vertex.vertex_index = indexes[(x, y)]
+                    indexes[(x, y)] += 1
+
+
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
@@ -905,7 +912,6 @@ class AbstractPopulationVertex(
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         """ Gets the constraints for partitions going out of this vertex.
-
         :param partition: the partition that leaves this vertex
         :return: list of constraints
         """
@@ -932,7 +938,6 @@ class AbstractPopulationVertex(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):
         """ Clear a recorded data region from the buffer manager.
-
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
@@ -956,11 +961,9 @@ class AbstractPopulationVertex(
 
     def describe(self):
         """ Get a human-readable description of the cell or synapse type.
-
         The output may be customised by specifying a different template\
         together with an associated template engine\
         (see ``pyNN.descriptions``).
-
         If template is None, then a dictionary containing the template context\
         will be returned.
         """

@@ -17,6 +17,7 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
+from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -293,6 +294,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self.reset_number_of_neurons_per_core()
         globals_variables.unset_simulator()
 
+
     def run(self, run_time):
         """ Run the model created.
 
@@ -304,6 +306,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
+
         super(AbstractSpiNNakerCommon, self).run(run_time)
 
     @property

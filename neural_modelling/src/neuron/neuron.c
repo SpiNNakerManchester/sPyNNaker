@@ -106,10 +106,14 @@ static uint32_t *synaptic_contributions_to_input_left_shifts;
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
 
+static uint32_t memory_index;
+
 static timer_t current_time;
 
 //! Size of DMA read for synaptic contributions
 static size_t dma_size;
+
+static volatile bool dma_finished;
 
 static weight_t *synaptic_region;
 
@@ -118,7 +122,7 @@ static weight_t *synaptic_region;
 typedef enum parameters_in_neuron_parameter_data_region {
     RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
+    MEM_INDEX, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {
@@ -235,10 +239,12 @@ bool neuron_do_timestep_update(timer_t time) {
 
     // Wait a random number of clock cycles (and ensure DMA transfer is finished)
     uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
-    while (tc[T1_COUNT] > random_backoff_time) { //|| ((dma[DMA_STAT] & 0x400) == 0)
+    while ((tc[T1_COUNT] > random_backoff_time) || (!dma_finished)) { //|| ((dma[DMA_STAT] & 0x400) == 0)
 
         // Do Nothing
     }
+
+    dma_finished = false;
 
     //Tell DMA controller to clear status bit
     //dma[DMA_CTRL] |= 0x8;
@@ -367,6 +373,14 @@ bool neuron_do_timestep_update(timer_t time) {
     return true;
 }
 
+void _dma_done_callback(uint arg1, uint arg2) {
+
+    use(arg1);
+    use(arg2);
+
+    dma_finished = true;
+}
+
 bool neuron_initialise(address_t address) {
 
     log_debug("neuron_initialise: starting");
@@ -393,6 +407,8 @@ bool neuron_initialise(address_t address) {
     // Read the neuron details
     n_neurons = address[N_NEURONS_TO_SIMULATE];
     n_synapse_types = address[N_SYNAPSE_TYPES];
+
+    memory_index = address[MEM_INDEX];
 
     io_printf(IO_BUF, "\nneurons: %d syn types: %d\n", n_neurons, n_synapse_types);
 
@@ -425,12 +441,14 @@ bool neuron_initialise(address_t address) {
 
     dma_size = contribution_size * sizeof(weight_t);
 
+    dma_finished = false;
+
     io_printf(IO_BUF, "dma_size:%d\n", dma_size);
 
 
-    //Allocate the region in SDRAM for synaptic contribution. TAG 255 is to be sure
-    // is not assigned yet. size is dma_size
-    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, 255, 0);
+    //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
+    //Flag = 1 is to allocate with lock in order to avoid multiple accesses
+    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, mem_index, 1);
 
     //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
     for(index_t i = 0; i < contribution_size; i++) {
@@ -537,6 +555,9 @@ bool neuron_initialise(address_t address) {
     io_printf(IO_BUF, "Returned from neuron load parameters!!!\n");
 
     _reset_record_counter();
+
+    simulation_dma_transfer_done_callback_on(
+        DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, _dma_done_callback);
 
     return true;
 }
