@@ -1,3 +1,4 @@
+import functools
 import math
 
 from spinn_front_end_common.interface.interface_functions import \
@@ -19,7 +20,7 @@ from spynnaker.pyNN.utilities import constants, utility_calls
 logger = logging.getLogger(__name__)
 
 
-class SpynnakerAtomBasedRoutingDataGenerator(object):
+class OnChipBitFieldGenerator(object):
     """ Executes bitfield and routing table entries for atom based routing
     """
 
@@ -95,7 +96,12 @@ class SpynnakerAtomBasedRoutingDataGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
-            self._handle_failure, [CPUState.FINISHED], False, 0)
+            functools.partial(
+                self._handle_failure, transceiver=transceiver,
+                provenance_file_path=provenance_file_path,
+                compressor_app_id=bit_field_app_id,
+                executable_finder=executable_finder),
+            [CPUState.FINISHED], False, 0)
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:

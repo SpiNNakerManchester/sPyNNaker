@@ -30,7 +30,7 @@ typedef struct response_sdp_packet_t{
 //! \brief the acceptable finish states
 typedef enum finish_states{
     SUCCESSFUL_COMPRESSION = 30, FAILED_MALLOC = 31, FAILED_TO_COMPRESS = 32,
-    RAN_OUT_OF_TIME = 33, FORCED_BY_COMPRESSOR_CONTROL = 34, SHUT_DOWN = 35
+    RAN_OUT_OF_TIME = 33, FORCED_BY_COMPRESSOR_CONTROL = 34
 } finish_states;
 
 //! location where the blasted command code is

@@ -118,8 +118,6 @@ class MachineBitFieldRouterCompressor(object):
         # new app id for this simulation
         routing_table_compressor_app_id = \
             transceiver.app_id_tracker.get_new_id()
-        print "comp app id is {}".format(routing_table_compressor_app_id)
-        print "app app id is {}".format(app_id)
 
         progress_bar = ProgressBar(
             total_number_of_things_to_do=(
@@ -128,20 +126,19 @@ class MachineBitFieldRouterCompressor(object):
             string_describing_what_being_progressed=self._PROGRESS_BAR_TEXT)
 
         # locate data and on_chip_cores to load binary on
-        (addresses,
-         compressor_with_bit_field_cores,
-         bit_field_sorter_executable_path,
-         bit_field_compressor_executable_path,
-         matrix_addresses_and_size) = self._generate_addresses(
-            machine_graph, placements, transceiver, machine, executable_finder,
-            progress_bar, graph_mapper)
+        (addresses, compressor_executable_targets,
+         bit_field_sorter_executable_path, bit_field_compressor_executable_path,
+         matrix_addresses_and_size) = \
+            self._generate_addresses(
+                machine_graph, placements, transceiver, machine,
+                executable_finder, progress_bar, graph_mapper)
 
         # load data into sdram
         on_host_chips = self._load_data(
             addresses, transceiver, routing_table_compressor_app_id,
             routing_tables, app_id, compress_only_when_needed, machine,
             compress_as_much_as_possible, progress_bar,
-            compressor_with_bit_field_cores,
+            compressor_executable_targets,
             matrix_addresses_and_size, time_to_try_for_each_iteration,
             bit_field_compressor_executable_path,
             bit_field_sorter_executable_path, threshold_percentage)
@@ -151,32 +148,35 @@ class MachineBitFieldRouterCompressor(object):
         # cores, as it might have overwritten sdram whilst attempting to load
         #  all 3 data blocks.
         expander_chip_cores = self._locate_synaptic_expander_cores(
-            compressor_with_bit_field_cores, on_host_chips, executable_finder,
+            compressor_executable_targets, on_host_chips, executable_finder,
             placements, graph_mapper, bit_field_sorter_executable_path, machine)
 
         # load and run binaries
         try:
             utility_calls.run_system_application(
-                compressor_with_bit_field_cores,
+                compressor_executable_targets,
                 routing_table_compressor_app_id, transceiver,
                 provenance_file_path, executable_finder,
                 read_algorithm_iobuf,
                 functools.partial(
-                    self._check_for_success, host_chips=on_host_chips),
+                    self._check_bit_field_router_compressor_for_success,
+                    host_chips=on_host_chips,
+                    sorter_binary_path=bit_field_sorter_executable_path),
                 functools.partial(
                     self._handle_failure_for_bit_field_router_compressor,
                     host_chips=on_host_chips),
-                [CPUState.FINISHED], True, no_sync_changes)
+                [CPUState.FINISHED], True, no_sync_changes,
+                [bit_field_sorter_executable_path])
         except SpinnmanException:
             self._handle_failure_for_bit_field_router_compressor(
-                compressor_with_bit_field_cores, transceiver,
+                compressor_executable_targets, transceiver,
                 provenance_file_path, routing_table_compressor_app_id,
                 executable_finder, on_host_chips)
 
         # just rerun the synaptic expander for safety purposes
-        #self._rerun_synaptic_cores(
-        #    expander_chip_cores, transceiver, provenance_file_path,
-        #    executable_finder, True, no_sync_changes)
+        self._rerun_synaptic_cores(
+            expander_chip_cores, transceiver, provenance_file_path,
+            executable_finder, True, no_sync_changes)
 
         # update progress bar to reflect chip compression complete
         progress_bar.update()
@@ -299,9 +299,10 @@ class MachineBitFieldRouterCompressor(object):
                 self._handle_failure_for_synaptic_expander_rerun,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes)
 
-    def _check_for_success(
+    def _check_bit_field_router_compressor_for_success(
             self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder, host_chips):
+            compressor_app_id, executable_finder, host_chips,
+            sorter_binary_path):
         """ Goes through the cores checking for cores that have failed to\
             generate the compressed routing tables with bitfield
 
@@ -312,9 +313,13 @@ class MachineBitFieldRouterCompressor(object):
         :param compressor_app_id: the app id for the compressor c code
         :param host_chips: the chips which need to be ran on host. 
         :param executable_finder: executable path finder
+        :param sorter_binary_path: the path to the sorter binary
         :rtype: None
         """
-        for core_subset in executable_targets.all_core_subsets:
+
+        sorter_cores = executable_targets.get_cores_for_binary(
+            sorter_binary_path)
+        for core_subset in sorter_cores:
             x = core_subset.x
             y = core_subset.y
             for p in core_subset.processor_ids:
@@ -335,16 +340,13 @@ class MachineBitFieldRouterCompressor(object):
                     raise SpinnFrontEndException(
                         self._ON_CHIP_ERROR_MESSAGE.format(x, y))
 
+    @staticmethod
     def _handle_failure_for_bit_field_router_compressor(
-            self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder, host_chips):
+            self, executable_targets, host_chips):
         """handles the state where some cores have failed.
 
         :param executable_targets: cores which are running the router \
         compressor with bitfield.
-        :param transceiver: SpiNNMan instance
-        :param provenance_file_path: provenance file path
-        :param executable_finder: executable finder
         :param host_chips: chips which need host based compression
         :rtype: None
         """
@@ -634,7 +636,6 @@ class MachineBitFieldRouterCompressor(object):
             base_address = self._steal_from_matrix_addresses(
                 matrix_addresses_and_size, len(routing_table_data))
 
-        print "user 1 should point at {}".format(base_address)
         # write SDRAM requirements per chip
         transceiver.write_memory(
             table.x, table.y, base_address, routing_table_data)
@@ -721,7 +722,6 @@ class MachineBitFieldRouterCompressor(object):
                 # store the region sdram address's
                 bit_field_sdram_address = app_vertex.bit_field_base_address(
                     transceiver, placement)
-                print bit_field_sdram_address
                 key_to_atom_map = \
                     app_vertex.key_to_atom_map_region_base_address(
                         transceiver, placement)
@@ -755,12 +755,16 @@ class MachineBitFieldRouterCompressor(object):
 
         # convert core subsets into executable targets
         executable_targets = ExecutableTargets()
-        # bit field expander executable file path
+
+        # bit field executable paths
         bit_field_sorter_executable_path = \
             executable_finder.get_executable_path(
                 self._BIT_FIELD_SORTER_AND_SEARCH_EXECUTOR_APLX)
+
         bit_field_compressor_executable_path = \
             executable_finder.get_executable_path(self._COMPRESSOR_APLX)
+
+        # add the sets
         executable_targets.add_subsets(
             binary=bit_field_sorter_executable_path,
             subsets=bit_field_sorter_cores)

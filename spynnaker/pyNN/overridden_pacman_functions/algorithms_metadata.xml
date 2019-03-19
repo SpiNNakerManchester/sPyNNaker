@@ -260,9 +260,9 @@
             <token part="MulticastRoutesLoaded">DataLoaded</token>
         </outputs>
     </algorithm>
-    <algorithm name="SpynnakerAtomBasedRoutingDataGenerator">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.atom_based_routing_data_generator</python_module>
-        <python_class>SpynnakerAtomBasedRoutingDataGenerator</python_class>
+    <algorithm name="OnChipBitFieldGenerator">
+        <python_module>spynnaker.pyNN.overridden_pacman_functions.on_chip_bit_field_generator</python_module>
+        <python_class>OnChipBitFieldGenerator</python_class>
         <input_definitions>
             <parameter>
                 <param_name>app_graph</param_name>

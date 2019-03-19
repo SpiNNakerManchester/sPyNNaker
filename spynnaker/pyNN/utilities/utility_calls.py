@@ -17,6 +17,7 @@ from decimal import Decimal
 
 from spinnman.exceptions import SpinnmanTimeoutException, SpinnmanException
 from spinnman.messages.scp.enums import Signal
+from spinnman.model import ExecutableTargets
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -294,7 +295,7 @@ def run_system_application(
         executable_cores, app_id, transceiver, provenance_file_path,
         executable_finder, read_algorithm_iobuf, check_for_success_function,
         handle_failure_function, cpu_end_states, needs_sync_barrier,
-        no_sync_changes):
+        no_sync_changes, binaries_to_track=None):
     """ executes the app
 
     :param executable_cores: the cores to run the executable on
@@ -312,6 +313,8 @@ def run_system_application(
     app_id, executable_finder as inputs
     :param needs_sync_barrier: bool flag for if needing sync barrier
     :param no_sync_changes: the number of times sync signal been sent
+    :param binaries_to_track: a list of binary names to check for exit state.\
+     Or None for all binaries
     :rtype: None
     """
 
@@ -332,20 +335,24 @@ def run_system_application(
 
     # Wait for the executable to finish
     succeeded = False
+    check_targets = None
+    if binaries_to_track is None:
+        check_targets = executable_cores
+    else:
+        check_targets = ExecutableTargets()
+        for binary_name in binaries_to_track:
+            check_targets.add_subsets(
+                binary_name, executable_cores.get_cores_for_binary(binary_name))
     try:
         transceiver.wait_for_cores_to_be_in_state(
-            executable_cores.all_core_subsets, app_id, cpu_end_states)
+            check_targets.all_core_subsets, app_id, cpu_end_states)
         succeeded = True
     except (SpinnmanTimeoutException, SpinnmanException):
-        handle_failure_function(
-            executable_cores, transceiver, provenance_file_path,
-            app_id, executable_finder)
+        handle_failure_function(executable_cores)
     finally:
         # get the debug data
         if not succeeded:
-            handle_failure_function(
-                executable_cores, transceiver, provenance_file_path,
-                app_id, executable_finder)
+            handle_failure_function(executable_cores)
 
     # Check if any cores have not completed successfully
     if succeeded and check_for_success_function is not None:

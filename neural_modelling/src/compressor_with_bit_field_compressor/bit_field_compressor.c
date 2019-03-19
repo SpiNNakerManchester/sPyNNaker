@@ -343,16 +343,6 @@ void _sdp_handler(uint mailbox, uint port) {
             *finished_by_compressor_force = true;
             sark_msg_free((sdp_msg_t*) msg);
         }
-        else if (msg->data[COMMAND_CODE] == SHUT_DOWN){
-            log_info(
-                "been told to exit by control. So obviously found the "
-                "best compression");
-            sark_msg_free((sdp_msg_t*) msg);
-            vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
-            sark_virtual_processor_info[spin1_get_core_id()].user1 =
-                EXITED_CLEANLY;
-            spin1_exit(0);
-        }
         else{
             log_error(
                 "no idea what to do with message with command code %d Ignoring",
