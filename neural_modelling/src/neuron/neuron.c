@@ -410,7 +410,7 @@ bool neuron_initialise(address_t address) {
 
     memory_index = address[MEM_INDEX];
 
-    io_printf(IO_BUF, "\nneurons: %d syn types: %d\n", n_neurons, n_synapse_types);
+    io_printf(IO_BUF, "\nneurons: %d syn types: %d mem index: %d\n", n_neurons, n_synapse_types, memory_index);
 
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
@@ -448,7 +448,7 @@ bool neuron_initialise(address_t address) {
 
     //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
     //Flag = 1 is to allocate with lock in order to avoid multiple accesses
-    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, mem_index, 1);
+    synaptic_region = (weight_t *) sark_xalloc(sv->sdram_heap, dma_size, memory_index, 1);
 
     //set the region to 0 (necessary for the first timestep and for syn cores that never receive spikes)
     for(index_t i = 0; i < contribution_size; i++) {

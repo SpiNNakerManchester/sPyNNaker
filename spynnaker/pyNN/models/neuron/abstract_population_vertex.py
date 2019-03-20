@@ -104,8 +104,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 8 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+    # 9 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 36
 
     _n_vertices = 0
 
@@ -543,7 +543,7 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph):
+            time_scale_factor, application_graph, index):
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -576,6 +576,9 @@ class AbstractPopulationVertex(
 
         # Write the number of synapse types
         spec.write_value(data=self._neuron_impl.get_n_synapse_types())
+
+        # Wrtie the SDRAM tag for the contribution area
+        spec.write_value(data=index)
 
         # Get the weight_scale value from the appropriate location
         #weight_scale = self._neuron_impl.get_global_weight_scale()
@@ -626,7 +629,8 @@ class AbstractPopulationVertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
-            vertex_slice=vertex_slice)
+            vertex_slice=vertex_slice,
+            index = placement.vertex.vertex_index)
 
         # close spec
         spec.end_specification()
@@ -698,23 +702,18 @@ class AbstractPopulationVertex(
             recorded_region_sizes, self._time_between_requests,
             self._buffer_size_before_receive, ip_tags))
 
-        # Set index for SDRAM area allocation
-        if vertex.vertex_index is None:
-            indexes = dict()
-            for p in placements.placements:
-                if isinstance(p.vertex, PopulationMachineVertex):
-                    x = p.x #QUI SI SPACCA!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    y = p.y
-                    if (x, y) not in indexes.keys():
-                        indexes[(x, y)] = 0
-                    p.vertex.vertex_index = indexes[(x, y)]
-                    indexes[(x, y)] += 1
+        # writing of data spec for neuron vertices is forced to
+        # happen before synapse ones
+        vertex.vertex_index = placement.p
 
+        for c in vertex.constraints:
+            if isinstance(c, SameChipAsConstraint):
+                c.vertex.vertex_index = placement.p
 
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, application_graph)
+            time_scale_factor, application_graph, vertex.vertex_index)
 
         # write profile data
         profile_utils.write_profile_region_data(

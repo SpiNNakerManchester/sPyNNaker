@@ -40,6 +40,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
+from spynnaker.pyNN.models.neuron import PopulationMachineVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine)
@@ -110,8 +111,8 @@ class SynapticManager(
 
     BASIC_MALLOC_USAGE = 2
 
-    #4 ELEMENTS
-    BYTES_FOR_SYNAPSE_PARAMS = 16
+    #5 ELEMENTS
+    BYTES_FOR_SYNAPSE_PARAMS = 24
 
     _n_vertices = 0
 
@@ -501,7 +502,6 @@ class SynapticManager(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self._n_profile_samples)
 
-        #Necessary? got from abstract_population_vertex
         machine_vertex.reserve_provenance_data_region(spec)
 
     def get_number_of_mallocs_used_by_dsg(self):
@@ -1038,10 +1038,10 @@ class SynapticManager(
         return self._ring_buffer_shifts
 
     def _write_synapse_parameters(
-            self, spec, vertex_slice, application_graph, machine_time_step):
+            self, spec, vertex_slice, application_graph, machine_time_step, index):
 
         n_atoms = vertex_slice.n_atoms
-        spec.comment("\nWriting Neuron Parameters for {} Synapses:\n".format(
+        spec.comment("\nWriting Synapse Parameters for {} Neurons:\n".format(
             n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
@@ -1059,6 +1059,9 @@ class SynapticManager(
 
         # Write the synapse index for SDRAM offset for synaptic contributions
         spec.write_value(data=self._synapse_index)
+
+        # Write the SDRAM tag for the contribution area
+        spec.write_value(data=index)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             self, application_graph, machine_time_step)
@@ -1123,6 +1126,13 @@ class SynapticManager(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
+        if vertex.vertex_index is None:
+            for c in vertex.constraints:
+                if isinstance(c, SameChipAsConstraint) and isinstance(c.vertex, PopulationMachineVertex):
+                    vertex.vertex_index = c.vertex.vertex_index
+
+
+
         # Write the recording region
         #spec.switch_write_focus(
         #    constants.POPULATION_BASED_REGIONS.RECORDING.value)
@@ -1135,7 +1145,8 @@ class SynapticManager(
         #    self._buffer_size_before_receive, ip_tags))
 
         ring_buffer_shifts = self._write_synapse_parameters(
-            spec, vertex_slice, application_graph, machine_time_step)
+            spec, vertex_slice, application_graph, machine_time_step,
+            vertex.vertex_index)
 
         scales = numpy.array([
             self._get_weight_scale(r) * self._weight_scale
