@@ -70,7 +70,7 @@ class FromListConnector(AbstractConnector):
         if min_delay is None or max_delay is None or self._delays is None:
             mask = ((self._targets >= post_vertex_slice.lo_atom) &
                     (self._targets <= post_vertex_slice.hi_atom))
-        elif self._delays is None:
+        elif self._delays is not None:
             mask = ((self._targets >= post_vertex_slice.lo_atom) &
                     (self._targets <= post_vertex_slice.hi_atom) &
                     (self._delays >= min_delay) &
