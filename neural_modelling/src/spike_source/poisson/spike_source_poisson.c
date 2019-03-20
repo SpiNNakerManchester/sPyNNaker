@@ -133,7 +133,7 @@ static uint32_t timer_period;
 
 //! \brief Helper that makes getting a region easier
 static inline void *get_region(enum region region_id) {
-    static address_t address = data_specification_get_data_address();
+    address_t address = data_specification_get_data_address();
 
     return data_specification_get_region(region_id, address);
 }
