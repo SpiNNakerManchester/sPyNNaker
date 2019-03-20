@@ -113,19 +113,19 @@ static inline bool _is_something_to_do(
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
     // Get pointer to current buffer
-    dma_buffer *buffer = &dma_buffers[dma_buffer_index];
+    dma_buffer *buff = &dma_buffers[dma_buffer_index];
     // Get the number of plastic bytes and the write back address from the
     // synaptic row
     size_t n_plastic_region_bytes =
-            synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
+            synapse_row_plastic_size(buff->row) * sizeof(uint32_t);
 
     log_debug("Writing back %u bytes of plastic region to %08x",
-            n_plastic_region_bytes, buffer->sdram_writeback_address + 1);
+            n_plastic_region_bytes, buff->sdram_writeback_address + 1);
 
     // Start transfer
     spin1_dma_transfer(
-            DMA_TAG_WRITE_PLASTIC_REGION, buffer->sdram_writeback_address + 1,
-            synapse_row_plastic_region(buffer->row),
+            DMA_TAG_WRITE_PLASTIC_REGION, buff->sdram_writeback_address + 1,
+            synapse_row_plastic_region(buff->row),
             DMA_WRITE, n_plastic_region_bytes);
 }
 
