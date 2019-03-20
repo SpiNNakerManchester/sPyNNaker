@@ -35,7 +35,9 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
 //! \param[in] dma_id: the ID of the DMA
 //! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
-void synaptic_row_restructure(void) {
+void synaptic_row_restructure(uint dma_id, uint dma_tag) {
+    use(dma_id);
+    use(dma_tag);
     log_error("%s", sp_error_message);
 }
 

@@ -57,7 +57,7 @@ bool synaptogenesis_dynamics_elimination_rule(void);
 //! \param[in] dma_id: the ID of the DMA
 //! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
-void synaptic_row_restructure(void);
+void synaptic_row_restructure(uint, uint);
 
 //! retrieve the period of rewiring
 //! based on is_fast(), this can either mean how many times rewiring happens

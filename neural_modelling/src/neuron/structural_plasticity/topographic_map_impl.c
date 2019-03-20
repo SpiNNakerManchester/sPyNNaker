@@ -469,13 +469,42 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
             unpack_post_to_pre(value, &pre_app_pop, &pre_sub_pop, &choice);
 
     state.element_exists = element_exists;
-    spike_t _spike = ANY_SPIKE;
-    if (!element_exists && !rewiring_data.random_partner) {
-        // Retrieve the last spike
-        if (received_any_spike()) {
-            _spike = select_last_spike();
+    spike_t _spike;
+    if (element_exists) {
+        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
+                .key_atom_info[pre_sub_pop].key | choice;
+    } else if (rewiring_data.random_partner) {
+        pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
+                * rewiring_data.pre_pop_info_table.no_pre_pops;
+        subpopulation_info_t *preapppop_info =
+                &rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop];
+
+        // Select presynaptic subpopulation
+        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
+                * preapppop_info->total_no_atoms;
+        uint32_t sum = 0;
+        int i;
+        for (i=0; i < preapppop_info->no_pre_vertices; i++) {
+            sum += preapppop_info->key_atom_info[i].n_atoms;
+            if (sum >= choice) {
+                break;
+            }
         }
+        pre_sub_pop = i;
+
+        // Select a presynaptic neuron ID
+        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+                preapppop_info->key_atom_info[pre_sub_pop].n_atoms;
+
+        _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
+    } else {
+        // Retrieve the last spike
+        if (!received_any_spike()) {
+            goto no_spike;
+        }
+        _spike = select_last_spike();
         if (_spike == ANY_SPIKE) {
+        no_spike:
             log_debug("No previous spikes");
             _setup_synaptic_dma_read();
             return;
@@ -501,33 +530,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
                 }
             }
         }
-    } else if (!element_exists && rewiring_data.random_partner) {
-        pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * rewiring_data.pre_pop_info_table.no_pre_pops;
-        subpopulation_info_t *preapppop_info =
-                &rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop];
-
-        // Select presynaptic subpopulation
-        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * preapppop_info->total_no_atoms;
-        uint32_t sum = 0;
-        int i;
-        for (i=0; i < preapppop_info->no_pre_vertices; i++) {
-            sum += preapppop_info->key_atom_info[i].n_atoms;
-            if (sum >= choice) {
-                break;
-            }
-        }
-        pre_sub_pop = i;
-
-        // Select a presynaptic neuron ID
-        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-                preapppop_info->key_atom_info[pre_sub_pop].n_atoms;
-
-        _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
-    } else {
-        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
-                .key_atom_info[pre_sub_pop].key | choice;
     }
 
     address_t synaptic_row_address;
