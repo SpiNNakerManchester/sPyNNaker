@@ -12,7 +12,7 @@ struct param_generator_constant {
     accum value;
 };
 
-void *param_generator_constant_initialize(address_t *region) {
+static void *param_generator_constant_initialize(address_t *region) {
     // Allocate space for the parameters
     struct param_generator_constant *params =
             spin1_malloc(sizeof(struct param_generator_constant));
@@ -24,11 +24,11 @@ void *param_generator_constant_initialize(address_t *region) {
     return params;
 }
 
-void param_generator_constant_free(void *data) {
+static void param_generator_constant_free(void *data) {
     sark_free(data);
 }
 
-void param_generator_constant_generate(
+static void param_generator_constant_generate(
         void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);

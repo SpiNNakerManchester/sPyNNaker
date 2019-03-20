@@ -28,8 +28,8 @@ struct param_generator_normal_clipped_boundary {
     rng_t rng;
 };
 
-void *param_generator_normal_clipped_boundary_initialize(address_t *region) {
-
+static void *param_generator_normal_clipped_boundary_initialize(
+        address_t *region) {
     // Allocate memory for the data
     struct param_generator_normal_clipped_boundary *params =
         (struct param_generator_normal_clipped_boundary *) spin1_malloc(
@@ -51,11 +51,11 @@ void *param_generator_normal_clipped_boundary_initialize(address_t *region) {
     return params;
 }
 
-void param_generator_normal_clipped_boundary_free(void *data) {
+static void param_generator_normal_clipped_boundary_free(void *data) {
     sark_free(data);
 }
 
-void param_generator_normal_clipped_boundary_generate(
+static void param_generator_normal_clipped_boundary_generate(
         void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);

@@ -57,7 +57,7 @@ struct matrix_generator_stdp {
     uint32_t weight_half_word;
 };
 
-void *matrix_generator_stdp_initialize(address_t *region) {
+static void *matrix_generator_stdp_initialize(address_t *region) {
     struct matrix_generator_stdp *params_sdram = (struct matrix_generator_stdp *)
             *region;
 
@@ -71,7 +71,7 @@ void *matrix_generator_stdp_initialize(address_t *region) {
     return params;
 }
 
-void matrix_generator_stdp_free(void *data) {
+static void matrix_generator_stdp_free(void *data) {
     sark_free(data);
 }
 
@@ -101,7 +101,7 @@ static uint16_t _build_fixed_plastic_half_word(
     return wrd;
 }
 
-void matrix_generator_stdp_write_row(
+static void matrix_generator_stdp_write_row(
         void *data,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
@@ -126,16 +126,16 @@ void matrix_generator_stdp_write_row(
     row_address[0] = NULL;
     space_half_words[0] = max_row_n_words * 2;
     if (synaptic_matrix != NULL) {
-        row_address[0] = &(synaptic_matrix[pre_neuron_index * n_row_words]);
+        row_address[0] = &synaptic_matrix[pre_neuron_index * n_row_words];
     }
 
     // The delayed row positions and space available
     if (delayed_synaptic_matrix != NULL) {
         address_t delayed_address =
-            &(delayed_synaptic_matrix[pre_neuron_index * n_delay_row_words]);
+                &delayed_synaptic_matrix[pre_neuron_index * n_delay_row_words];
         uint32_t single_matrix_size = n_pre_neurons * n_delay_row_words;
         for (uint32_t i = 1; i < max_stage; i++) {
-            row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
+            row_address[i] = &delayed_address[single_matrix_size * (i - 1)];
             space_half_words[i] = max_delayed_row_n_words * 2;
         }
     } else {

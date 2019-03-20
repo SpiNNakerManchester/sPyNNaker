@@ -43,7 +43,7 @@ struct param_generator {
  *!                       to position just after parameters after calling.
  *! \return A data item to be passed in to other functions later on
  */
-typedef void* (param_generator_initialize_t)(address_t *region);
+typedef void *(param_generator_initialize_t)(address_t *region);
 
 /**
  *! \brief Generate values with a parameter generator

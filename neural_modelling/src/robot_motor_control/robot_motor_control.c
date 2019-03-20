@@ -161,7 +161,7 @@ static void timer_callback(uint unused0, uint unused1) {
 
 static void read_parameters(address_t region_address) {
     log_debug("Reading parameters from 0x%.8x", region_address);
-    memcpy(&config, region_address, sizeof(motor_control_parameters_t));
+    spin1_memcpy(&config, region_address, sizeof(motor_control_parameters_t));
 
     // Allocate the space for the schedule
     counters = spin1_malloc(N_COUNTERS * sizeof(uint32_t));

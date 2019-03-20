@@ -7,7 +7,7 @@
 /**
  *! \brief Parameter generator "object"
  */
-typedef struct param_generator* param_generator_t;
+typedef struct param_generator *param_generator_t;
 
 /**
  *! \brief Initialise a specific parameter generator

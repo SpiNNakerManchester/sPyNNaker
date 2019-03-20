@@ -22,7 +22,7 @@ struct fixed_prob {
     rng_t rng;
 };
 
-void *connection_generator_fixed_prob_initialise(address_t *region) {
+static void *connection_generator_fixed_prob_initialise(address_t *region) {
     struct fixed_prob_params *params_sdram = (struct fixed_prob_params *)
             *region;
 
@@ -35,7 +35,7 @@ void *connection_generator_fixed_prob_initialise(address_t *region) {
     params_sdram = &(params_sdram[sizeof(struct fixed_prob_params) >> 2]);
 
     // Initialise the RNG for the connector
-    *region = (address_t) (params_sdram + 1);
+    *region = (address_t) &params_sdram[1];
     state->rng = rng_init(region);
     log_debug(
             "Fixed Probability Connector, allow self connections = %u, "
@@ -44,11 +44,11 @@ void *connection_generator_fixed_prob_initialise(address_t *region) {
     return state;
 }
 
-void connection_generator_fixed_prob_free(void *data) {
+static void connection_generator_fixed_prob_free(void *data) {
     sark_free(data);
 }
 
-uint32_t connection_generator_fixed_prob_generate(
+static uint32_t connection_generator_fixed_prob_generate(
         void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {

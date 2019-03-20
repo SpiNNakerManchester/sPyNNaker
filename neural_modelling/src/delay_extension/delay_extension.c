@@ -75,12 +75,10 @@ static inline void *get_region(enum region_identifiers region_id) {
 }
 
 // Because we don't want to include string.h or strings.h for memset
-static inline void zero_spike_counters(void *location, uint32_t num_items)
+static inline void zero_spike_counters(uint8_t *location, uint32_t num_items)
 {
-    uint32_t i;
-
-    for (i = 0 ; i < num_items ; i++) {
-        ((uint8_t *) location)[i] = 0;
+    for (uint32_t i = 0 ; i < num_items ; i++) {
+        location[i] = 0;
     }
 }
 

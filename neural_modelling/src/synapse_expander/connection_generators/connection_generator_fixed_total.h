@@ -25,7 +25,7 @@ struct fixed_total {
     rng_t rng;
 };
 
-void *connection_generator_fixed_total_initialise(address_t *region) {
+static void *connection_generator_fixed_total_initialise(address_t *region) {
     struct fixed_total_params *params_sdram = (struct fixed_total_params *)
             *region;
 
@@ -47,7 +47,7 @@ void *connection_generator_fixed_total_initialise(address_t *region) {
     return state;
 }
 
-void connection_generator_fixed_total_free(void *data) {
+static void connection_generator_fixed_total_free(void *data) {
     sark_free(data);
 }
 
@@ -105,7 +105,7 @@ static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     return count;
 }
 
-uint32_t connection_generator_fixed_total_generate(
+static uint32_t connection_generator_fixed_total_generate(
         void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {

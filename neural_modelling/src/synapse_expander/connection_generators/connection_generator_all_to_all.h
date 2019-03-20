@@ -12,7 +12,7 @@ struct all_to_all {
     uint32_t allow_self_connections;
 };
 
-void *connection_generator_all_to_all_initialise(address_t *region) {
+static void *connection_generator_all_to_all_initialise(address_t *region) {
     struct all_to_all *params_sdram = (struct all_to_all *) *region;
 
     // Allocate the data structure for parameters
@@ -23,16 +23,16 @@ void *connection_generator_all_to_all_initialise(address_t *region) {
     log_debug("All to all connector, allow self connections = %u",
             params->allow_self_connections);
 
-    *region = (address_t) (params_sdram + 1);
+    *region = (address_t) &params_sdram[1];
     return params;
 }
 
-void connection_generator_all_to_all_free(void *data) {
+static void connection_generator_all_to_all_free(void *data) {
     sark_free(data);
 }
 
-uint32_t connection_generator_all_to_all_generate(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
+static uint32_t connection_generator_all_to_all_generate(
+        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
