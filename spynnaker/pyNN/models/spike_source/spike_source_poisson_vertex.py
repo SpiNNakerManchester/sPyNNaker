@@ -29,7 +29,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.utilities import constants, utility_calls
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.models.neuron.implementations import Struct
@@ -649,9 +649,8 @@ class SpikeSourcePoissonVertex(
 
             # Get the time to spike value
             time_to_spike = self._data["time_to_spike"][i]
-            changed_rates = (
-                    self._rate_change[vertex_slice.as_slice].astype("bool") & elements)
-            time_to_spike[changed_rates] = 0.0
+            if self._rate_change[i]:
+                time_to_spike = 0.0
 
             # Merge the arrays as parameters per atom
             data = numpy.dstack((
