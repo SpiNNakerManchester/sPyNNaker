@@ -53,14 +53,23 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         # build machine compressor
         machine_bit_field_router_compressor = MachineBitFieldRouterCompressor()
         compressor_executable_targets = machine_bit_field_router_compressor(
-            routing_tables, transceiver, machine, app_id,
-            provenance_file_path, machine_graph, graph_mapper,
-            placements, executable_finder, read_algorithm_iobuf,
-            produce_report, default_report_folder, target_length,
-            routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            machine_time_step, time_scale_factor,
-            no_sync_changes, threshold_percentage,
-            compress_only_when_needed, compress_as_much_as_possible)
+            routing_tables=routing_tables, transceiver=transceiver,
+            machine=machine, app_id=app_id,
+            provenance_file_path=provenance_file_path,
+            machine_graph=machine_graph, graph_mapper=graph_mapper,
+            placements=placements, executable_finder=executable_finder,
+            read_algorithm_iobuf=read_algorithm_iobuf,
+            produce_report=produce_report,
+            default_report_folder=default_report_folder,
+            target_length=target_length, routing_infos=routing_infos,
+            time_to_try_for_each_iteration=time_to_try_for_each_iteration,
+            use_timer_cut_off=use_timer_cut_off,
+            machine_time_step=machine_time_step,
+            time_scale_factor=time_scale_factor,
+            no_sync_changes=no_sync_changes,
+            threshold_percentage=threshold_percentage,
+            compress_only_when_needed=compress_only_when_needed,
+            compress_as_much_as_possible=compress_as_much_as_possible)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_synaptic_expander_cores(
