@@ -1,8 +1,8 @@
+import numpy
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
-from data_specification.enums import DataType
-import numpy
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
@@ -36,12 +36,12 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         super(SynapseTypeDualExponential, self).__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
+             DataType.S1615,   # isyn_exc
              DataType.U032,    # decay_E2
              DataType.U032,    # init_E2
+             DataType.S1615,   # isyn_exc2
              DataType.U032,    # decay_I
              DataType.U032,    # init_I
-             DataType.S1615,   # isyn_exc
-             DataType.S1615,   # isyn_exc2
              DataType.S1615])  # isyn_inh
         self._tau_syn_E = tau_syn_E
         self._tau_syn_E2 = tau_syn_E2
@@ -85,19 +85,20 @@ class SynapseTypeDualExponential(AbstractSynapseType):
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),
                 parameters[TAU_SYN_E].apply_operation(init),
+                state_variables[ISYN_EXC],
                 parameters[TAU_SYN_E2].apply_operation(decay),
                 parameters[TAU_SYN_E2].apply_operation(init),
+                state_variables[ISYN_EXC2],
                 parameters[TAU_SYN_I].apply_operation(decay),
                 parameters[TAU_SYN_I].apply_operation(init),
-                state_variables[ISYN_EXC], state_variables[ISYN_EXC2],
                 state_variables[ISYN_INH]]
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_decay_E, _init_E, _decay_E2, _init_E2, _decay_I, _init_I,
-         isyn_exc, isyn_exc2, isyn_inh) = values
+        (_decay_E, _init_E, isyn_exc, _decay_E2, _init_E2, isyn_exc2,
+         _decay_I, _init_I, isyn_inh) = values
 
         state_variables[ISYN_EXC] = isyn_exc
         state_variables[ISYN_EXC2] = isyn_exc2

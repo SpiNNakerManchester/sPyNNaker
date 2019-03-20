@@ -1,55 +1,37 @@
-from spinn_utilities.overrides import overrides
-
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.application import ApplicationVertex
-from pacman.model.resources import CPUCyclesPerTickResource, DTCMResource
-from pacman.model.resources import ResourceContainer, SDRAMResource
-
-# front end common imports
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesIncomingPartitionConstraints
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models\
-    import AbstractRewritesDataSpecification
-from spinn_front_end_common.abstract_models \
-    import AbstractGeneratesDataSpecification
-from spinn_front_end_common.abstract_models import AbstractHasAssociatedBinary
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.utilities import constants as common_constants
-from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management\
-    import recording_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
-
-# spynnaker imports
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import AbstractNeuronRecordable
-from spynnaker.pyNN.models.common import NeuronRecorder
-from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.models.neuron.population_machine_vertex \
-    import PopulationMachineVertex
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractPopulationSettable, AbstractReadParametersBeforeSet
-from spynnaker.pyNN.models.abstract_models import AbstractContainsUnits
-from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-
-
 import logging
 import os
-import random
+import math
+from spinn_utilities.overrides import overrides
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from pacman.executor.injection_decorator import inject_items
+from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.resources import (
+    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+from spinn_front_end_common.abstract_models import (
+    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
+    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
+from spinn_front_end_common.utilities import (
+    constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.interface.profiling import profile_utils
+from .synaptic_manager import SynapticManager
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+from spynnaker.pyNN.utilities import constants
+from .population_machine_vertex import PopulationMachineVertex
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
+    AbstractPopulationSettable, AbstractReadParametersBeforeSet,
+    AbstractContainsUnits)
+from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +45,9 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
+
+# The microseconds per timestep will be divided by this to get the max offset
+_MAX_OFFSET_DENOMINATOR = 10
 
 
 class AbstractPopulationVertex(
@@ -96,7 +81,9 @@ class AbstractPopulationVertex(
         "_synapse_manager",
         "_time_between_requests",
         "_units",
-        "_using_auto_pause_and_resume"]
+        "_using_auto_pause_and_resume",
+        "_n_subvertices",
+        "_n_data_specs"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -120,6 +107,8 @@ class AbstractPopulationVertex(
             label, constraints, max_atoms_per_core)
 
         self._n_atoms = n_neurons
+        self._n_subvertices = 0
+        self._n_data_specs = 0
 
         # buffer data
         self._incoming_spike_buffer_size = incoming_spike_buffer_size
@@ -270,7 +259,7 @@ class AbstractPopulationVertex(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
-        AbstractPopulationVertex._n_vertices += 1
+        self._n_subvertices += 1
 
         # return machine vertex
         return vertex
@@ -376,8 +365,12 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
-        spec.write_value(random.randint(
-            0, AbstractPopulationVertex._n_vertices))
+        max_offset = (
+            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        spec.write_value(
+            int(math.ceil(max_offset / self._n_subvertices)) *
+            self._n_data_specs)
+        self._n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
