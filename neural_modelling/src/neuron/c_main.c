@@ -89,6 +89,13 @@ bool rewiring = false;
 uint32_t count_rewires = 0;
 
 
+//! \brief Helper that makes getting a region easier
+static inline void *get_region(enum regions_e region_id) {
+    address_t address = data_specification_get_data_address();
+
+    return data_specification_get_region(region_id, address);
+}
+
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
@@ -99,7 +106,7 @@ static bool initialise_recording(address_t recording_address) {
     return success;
 }
 
-void c_main_store_provenance_data(address_t provenance_region) {
+static void store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
     struct provenance_t *provenance = (struct provenance_t *) provenance_region;
 
@@ -121,28 +128,23 @@ void c_main_store_provenance_data(address_t provenance_region) {
 static bool initialise(void) {
     log_debug("Initialise: started");
 
-    // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
-
-    // Read the header
-    if (!data_specification_read_header(address)) {
+    // Read the Data Spec header from SDRAM
+    if (!data_specification_read_header(
+            data_specification_get_data_address())) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, address),
-            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            get_region(SYSTEM_REGION), APPLICATION_NAME_HASH,
+            &timer_period, &simulation_ticks, &infinite_run, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
-            c_main_store_provenance_data,
-            data_specification_get_region(PROVENANCE_DATA_REGION, address));
+            store_provenance_data, get_region(PROVENANCE_DATA_REGION));
 
     // setup recording region
-    if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))) {
+    if (!initialise_recording(get_region(RECORDING_REGION))) {
         return false;
     }
 
@@ -151,7 +153,7 @@ static bool initialise(void) {
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, address),
+            get_region(NEURON_PARAMS_REGION),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &timer_offset)) {
         return false;
@@ -159,12 +161,11 @@ static bool initialise(void) {
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address = data_specification_get_region(
-            SYNAPTIC_MATRIX_REGION, address);
+    address_t indirect_synapses_address = get_region(SYNAPTIC_MATRIX_REGION);
     address_t direct_synapses_address;
     if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            get_region(SYNAPSE_PARAMS_REGION),
+            get_region(DIRECT_MATRIX_REGION),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
             &direct_synapses_address)) {
@@ -174,14 +175,14 @@ static bool initialise(void) {
     // Set up the population table
     uint32_t row_max_n_words;
     if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, address),
+            get_region(POPULATION_TABLE_REGION),
             indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+            get_region(SYNAPSE_DYNAMICS_REGION);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
@@ -205,7 +206,7 @@ static bool initialise(void) {
     }
 
     // Setup profiler
-    profiler_init(data_specification_get_region(PROFILER_REGION, address));
+    profiler_init(get_region(PROFILER_REGION));
 
     log_debug("Initialise: finished");
     return true;
@@ -213,13 +214,11 @@ static bool initialise(void) {
 
 //! \brief the function to call when resuming a simulation
 //! \return None
-void resume_callback(void) {
+static void resume_callback(void) {
     recording_reset();
 
     // try reloading neuron parameters
-    address_t address = data_specification_get_data_address();
-    if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, address))) {
+    if (!neuron_reload_neuron_parameters(get_region(NEURON_PARAMS_REGION))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -230,7 +229,7 @@ void resume_callback(void) {
 //!            executed since start of simulation
 //! \param[in] unused unused parameter kept for API consistency
 //! \return None
-void timer_callback(uint timer_count, uint unused) {
+static void timer_callback(uint timer_count, uint unused) {
     use(unused);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
@@ -254,9 +253,7 @@ void timer_callback(uint timer_count, uint unused) {
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
-        address_t address = data_specification_get_data_address();
-        neuron_store_neuron_parameters(
-                data_specification_get_region(NEURON_PARAMS_REGION, address));
+        neuron_store_neuron_parameters(get_region(NEURON_PARAMS_REGION));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
@@ -281,12 +278,13 @@ void timer_callback(uint timer_count, uint unused) {
 
     uint cpsr = 0;
     // Do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+    if (rewiring && (is_fast() || last_rewiring_time >= rewiring_period)) {
         update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
-//        synaptogenesis_dynamics_rewire(time);
+#if 0
+        synaptogenesis_dynamics_rewire(time);
+#endif
         if (is_fast()) {
             do_rewiring(rewiring_period);
         } else {
@@ -294,8 +292,8 @@ void timer_callback(uint timer_count, uint unused) {
         }
         // disable interrupts
         cpsr = spin1_int_disable();
-//       // If we're not already processing synaptic DMAs,
-//        // flag pipeline as busy and trigger a feed event
+        // If we're not already processing synaptic DMAs,
+        // flag pipeline as busy and trigger a feed event
         if (!get_dma_busy()) {
             log_debug("Sending user event for new spike");
             if (spin1_trigger_user_event(0, 0)) {
@@ -322,7 +320,6 @@ void timer_callback(uint timer_count, uint unused) {
 
 //! \brief The entry point for this model.
 void c_main(void) {
-
     // initialise the model
     if (!initialise()) {
         rt_error(RTE_API);

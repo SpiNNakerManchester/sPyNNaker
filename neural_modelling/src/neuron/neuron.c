@@ -286,7 +286,7 @@ void neuron_store_neuron_parameters(address_t address) {
     neuron_impl_store_neuron_parameters(address, next, n_neurons);
 }
 
-void recording_done_callback(void) {
+static void recording_done_callback(void) {
     n_recordings_outstanding -= 1;
 }
 

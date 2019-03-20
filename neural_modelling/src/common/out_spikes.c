@@ -81,6 +81,7 @@ void out_spikes_print(void) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
 void out_spike_info_print(void) {
     log_debug("-----------\n");
     for (index_t i = 0; i < out_spikes_size; i++) {
@@ -88,3 +89,4 @@ void out_spike_info_print(void) {
     }
     log_debug("-----------\n");
 }
+#endif // LOG_LEVEL >= LOG_DEBUG
