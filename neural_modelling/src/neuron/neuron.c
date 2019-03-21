@@ -314,7 +314,6 @@ void neuron_do_timestep_update(
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
-
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
@@ -330,34 +329,31 @@ void neuron_do_timestep_update(
                     recorded_variable_values[i];
         }
 
-        // If the neuron has spiked
-        if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
+        if (!spike) {
+            log_debug("the neuron %u has been determined to not spike",
+                    neuron_index);
+            continue;
+        }
+        log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            // Record the spike
-            out_spikes_set_spike(spike_recording_indexes[neuron_index]);
+        // Record the spike
+        out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
-            // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+        // Do any required synapse processing
+        synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
-            if (use_key) {
-                // Wait until the expected time to send
-                while ((ticks == timer_count) &&
-                        (tc[T1_COUNT] > expected_time)) {
-                    // Do Nothing
-                }
-                expected_time -= time_between_spikes;
-
-                // Send the spike
-                while (!spin1_send_mc_packet(
-                        key | neuron_index, 0, NO_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
+        if (use_key) {
+            // Wait until the expected time to send
+            while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
+                // Do Nothing
             }
-        } else {
-            log_debug("the neuron %d has been determined to not spike",
-                      neuron_index);
-         }
+            expected_time -= time_between_spikes;
+
+            // Send the spike
+            while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
+                spin1_delay_us(1);
+            }
+        }
     }
 
     // Disable interrupts to avoid possible concurrent access

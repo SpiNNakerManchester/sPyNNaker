@@ -32,7 +32,6 @@ static inline bool timing_recurrent_in_post_window(
 
 static inline update_state_t timing_recurrent_calculate_pre_window(
         update_state_t previous_state) {
-
     // Pick random number and use to draw from exponential distribution
     int32_t random = mars_kiss_fixed_point();
     previous_state.window_length = pre_exp_dist_lookup[random];
@@ -44,7 +43,6 @@ static inline update_state_t timing_recurrent_calculate_pre_window(
 
 static inline update_state_t timing_recurrent_calculate_post_window(
         update_state_t previous_state) {
-
     // Pick random number and use to draw from exponential distribution
     int32_t random = mars_kiss_fixed_point();
     previous_state.window_length = post_exp_dist_lookup[random];

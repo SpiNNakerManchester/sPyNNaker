@@ -16,7 +16,6 @@ typedef struct {
 // Functions
 //---------------------------------------
 address_t timing_initialise(address_t address) {
-
     log_debug("timing_initialise: starting");
     log_debug("\tSTDP pair rule");
 

@@ -111,7 +111,7 @@ static inline final_state_t plasticity_update_synapse(
 
     const uint32_t delayed_pre_time = time + delay_axonal;
     log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
-              delayed_pre_time, post_window.prev_time);
+            delayed_pre_time, post_window.prev_time);
 
     // Apply spike to state
     // **NOTE** dendritic delay is subtracted
@@ -371,22 +371,19 @@ bool find_plastic_neuron_with_id(
             plastic_synapses(plastic_region_address);
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
-    plastic_synapse_t weight;
-    uint32_t delay;
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
-
         // Get next control word (auto incrementing)
-        weight = *plastic_words++;
+        plastic_synapse_t weight = *plastic_words++;
         uint32_t control_word = *control_words++;
 
         // Check if index is the one I'm looking for
-        delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
+        uint32_t delay =
+                synapse_row_sparse_delay(control_word, synapse_type_index_bits);
         if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
             sp_data->weight = weight;
-            sp_data->offset =
-                    synapse_row_num_plastic_controls(fixed_region)
+            sp_data->offset = synapse_row_num_plastic_controls(fixed_region)
                     - plastic_synapse;
             sp_data->delay = delay;
             return true;
@@ -411,11 +408,11 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row) {
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     // Delete weight at offset
-    plastic_words[offset] =  plastic_words[plastic_synapse-1];
+    plastic_words[offset] = plastic_words[plastic_synapse - 1];
     plastic_words[plastic_synapse-1] = 0;
 
-   // Delete control word at offset
-    control_words[offset] = control_words[plastic_synapse-1];
+    // Delete control word at offset
+    control_words[offset] = control_words[plastic_synapse - 1];
     control_words[plastic_synapse-1] = 0;
 
     // Decrement FP
@@ -429,13 +426,17 @@ static inline plastic_synapse_t weight_conversion(uint32_t weight) {
     return (plastic_synapse_t) (0xFFFF & weight);
 }
 
+static inline uint32_t mask_bits(uint32_t value, uint32_t bits) {
+    return value & ((1 << bits) - 1);
+}
+
 //! packing all of the information into the required plastic control word
 static inline control_t control_conversion(
         uint32_t id, uint32_t delay, uint32_t type) {
     control_t new_control =
-            ((delay & ((1<<SYNAPSE_DELAY_BITS) - 1)) << synapse_type_index_bits);
-    new_control |= (type & ((1<<synapse_type_index_bits) - 1)) << synapse_index_bits;
-    new_control |= (id & ((1<<synapse_index_bits) - 1));
+            mask_bits(delay, SYNAPSE_DELAY_BITS) << synapse_type_index_bits;
+    new_control |= mask_bits(type, synapse_type_index_bits) << synapse_index_bits;
+    new_control |= mask_bits(id, synapse_index_bits);
     return new_control;
 }
 

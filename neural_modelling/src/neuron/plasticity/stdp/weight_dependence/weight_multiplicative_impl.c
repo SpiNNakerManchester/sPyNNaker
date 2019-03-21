@@ -5,7 +5,7 @@
 //---------------------------------------
 // Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
-uint32_t *weight_multiply_right_shift;
+uint32_t *weight_multiply_right_shifts;
 
 //---------------------------------------
 // Functions
@@ -26,14 +26,15 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         log_error("Could not initialise weight region data");
         return NULL;
     }
-    weight_multiply_right_shift =
+    weight_multiply_right_shifts =
             spin1_malloc(sizeof(uint32_t) * n_synapse_types);
-    if (weight_multiply_right_shift == NULL) {
+    if (weight_multiply_right_shifts == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
-    uint32_t s;
-    for (s = 0; s < n_synapse_types; s++) {
+
+    uint32_t s = 0;
+    for (; s < n_synapse_types; s++) {
         // Copy parameters
         plasticity_weight_region_data[s].min_weight = config[s].min_weight;
         plasticity_weight_region_data[s].max_weight = config[s].max_weight;
@@ -41,17 +42,16 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         plasticity_weight_region_data[s].a2_minus = config[s].a2_minus;
 
         // Calculate the right shift required to fixed-point multiply weights
-        weight_multiply_right_shift[s] =
+        weight_multiply_right_shifts[s] =
                 16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
 
-        log_debug(
-                "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
-                " Weight multiply right shift:%u",
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, "
+                "A2+:%d, A2-:%d, Weight multiply right shift:%u",
                 s, plasticity_weight_region_data[s].min_weight,
                 plasticity_weight_region_data[s].max_weight,
                 plasticity_weight_region_data[s].a2_plus,
                 plasticity_weight_region_data[s].a2_minus,
-                weight_multiply_right_shift[s]);
+                weight_multiply_right_shifts[s]);
     }
 
     log_debug("weight_initialise: completed successfully");

@@ -7,7 +7,7 @@
 static uint32_t time_between_spikes;
 static uint32_t expected_time;
 
-typedef struct threshold_type_t {
+struct threshold_type_t {
     // The key to send to update the value
     uint32_t key;
     // A scaling factor (>0) if the value is to be sent as payload, False (0) if just the key
@@ -22,7 +22,7 @@ typedef struct threshold_type_t {
     uint32_t timesteps_between_sending;
     // The time until the next sending of the value (initially 0)
     uint32_t time_until_next_send;
-} threshold_type_t;
+};
 
 typedef union int_bits_union {
     int int_value;
@@ -60,7 +60,7 @@ static inline void send_packet(
 }
 
 static bool threshold_type_is_above_threshold(
-        state_t value, threshold_type_pointer_t threshold_type) {
+        state_t value, threshold_type_t *threshold_type) {
     if (threshold_type->time_until_next_send == 0) {
         if (threshold_type->value_as_payload) {
             accum value_to_send = value;

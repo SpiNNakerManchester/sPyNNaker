@@ -124,7 +124,8 @@ typedef struct {
 
 //! individual pre-synaptic sub-population information
 typedef struct {
-    int16_t no_pre_vertices, sp_control;
+    uint16_t no_pre_vertices;
+    int16_t sp_control;
     int32_t total_no_atoms;
     key_atom_info_t *key_atom_info;
 } subpopulation_info_t;
@@ -190,6 +191,15 @@ typedef struct {
 static current_state_t state;
 
 #define ANY_SPIKE ((spike_t) -1)
+
+// easy access to the two RNGs
+static inline uint32_t random_from_shared(uint32_t limit) {
+    return ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) * limit;
+}
+
+static inline uint32_t random_from_local(uint32_t limit) {
+    return ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * limit;
+}
 
 //! abs function
 static int my_abs(int a) {
@@ -299,7 +309,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         subpopinfo->total_no_atoms = subpop_config->n_atoms;
         subpopinfo->key_atom_info =
                 sark_alloc(subpopinfo->no_pre_vertices, sizeof(key_atom_info_t));
-        for (int32_t j = 0; j < subpopinfo->no_pre_vertices; j++) {
+        for (uint32_t j = 0; j < subpopinfo->no_pre_vertices; j++) {
             subpopinfo->key_atom_info[j] = subpop_config->key_atom_info[j];
         }
         // Advance the config pointer past the inline data
@@ -381,8 +391,7 @@ static inline spike_t select_last_spike(void) {
         return ANY_SPIKE;
     }
 
-    uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            state.no_spike_in_interval;
+    uint32_t offset = random_from_local(state.no_spike_in_interval);
     return circular_buffer_value_at_index(
             state.cb, (state.my_cb_output + offset) & state.cb_total_size);
 }
@@ -434,6 +443,49 @@ static inline void compute_distance(uint pre_app_pop, uint pre_sub_pop) {
     state.global_post_syn_id = post_global_id;
 }
 
+static inline uint32_t find_index(
+        uint choice, subpopulation_info_t *preapppop_info) {
+    uint32_t sum = 0;
+    uint32_t i = 0;
+    for (; i < preapppop_info->no_pre_vertices; i++) {
+        sum += preapppop_info->key_atom_info[i].n_atoms;
+        if (sum >= choice) {
+            break;
+        }
+    }
+    return i;
+}
+
+// \brief Unpack a spike into key and identifying information for the neuron.
+// \param[in] spike: the spike to be unpacked
+// \param[out] pre_app_pop: the unpacked population index
+// \param[out] pre_sub_pop: the unpacked index within the population
+// \param[out] choice: the remaining masked bits
+static inline void unpack_spike_to_neuron(
+        spike_t spike, uint *pre_app_pop, uint *pre_sub_pop, uint *choice)
+{
+    // Identify pop, subpop and lo and hi atoms
+    // Amazing linear search inc.
+    // Loop over all populations
+    for (uint i = 0; i < rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
+        subpopulation_info_t *pre_info =
+                &rewiring_data.pre_pop_info_table.subpop_info[i];
+
+        // Loop over all subpopulations and check if the KEY matches
+        // (with neuron ID masked out)
+        for (uint32_t j = 0; j < pre_info->no_pre_vertices; j++) {
+            key_atom_info_t *kai = &pre_info->key_atom_info[j];
+
+            if ((spike & kai->mask) == kai->key) {
+                *pre_app_pop = i;
+                *pre_sub_pop = j;
+                *choice = spike & ~kai->mask;
+                // return; // TODO: Should we stop at the first match?
+            }
+        }
+    }
+}
+
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
@@ -443,23 +495,19 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     state.current_time = time;
 
     // Randomly choose a postsynaptic (application neuron)
-    uint32_t post_id;
-    post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) *
-            rewiring_data.app_no_atoms;
+    uint32_t post_id = random_from_shared(rewiring_data.app_no_atoms);
 
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom ||
             post_id > rewiring_data.high_atom) {
-        _setup_synaptic_dma_read();
+        setup_synaptic_dma_read();
         return;
     }
     post_id -= rewiring_data.low_atom;
 
     // Select an arbitrary synaptic element for the neurons
     uint row_offset = post_id * rewiring_data.s_max;
-    uint column_offset =
-            ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            rewiring_data.s_max;
+    uint column_offset = random_from_local(rewiring_data.s_max);
     uint total_offset = row_offset + column_offset;
     int value = rewiring_data.post_to_pre_table[total_offset];
     state.offset_in_table = total_offset;
@@ -474,28 +522,19 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
                 .key_atom_info[pre_sub_pop].key | choice;
     } else if (rewiring_data.random_partner) {
-        pre_app_pop = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * rewiring_data.pre_pop_info_table.no_pre_pops;
+        pre_app_pop = random_from_local(
+                rewiring_data.pre_pop_info_table.no_pre_pops);
         subpopulation_info_t *preapppop_info =
                 &rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop];
 
         // Select presynaptic subpopulation
-        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
-                * preapppop_info->total_no_atoms;
-        uint32_t sum = 0;
-        int i;
-        for (i=0; i < preapppop_info->no_pre_vertices; i++) {
-            sum += preapppop_info->key_atom_info[i].n_atoms;
-            if (sum >= choice) {
-                break;
-            }
-        }
-        pre_sub_pop = i;
+        pre_sub_pop = find_index(
+                random_from_local(preapppop_info->total_no_atoms),
+                preapppop_info);
 
         // Select a presynaptic neuron ID
-        choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-                preapppop_info->key_atom_info[pre_sub_pop].n_atoms;
-
+        choice = random_from_local(
+                preapppop_info->key_atom_info[pre_sub_pop].n_atoms);
         _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
     } else {
         // Retrieve the last spike
@@ -506,30 +545,12 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         if (_spike == ANY_SPIKE) {
         no_spike:
             log_debug("No previous spikes");
-            _setup_synaptic_dma_read();
+            setup_synaptic_dma_read();
             return;
         }
 
         // unpack the spike into key and identifying information for the neuron
-        // Identify pop, subpop and lo and hi atoms
-        // Amazing linear search inc.
-        // Loop over all populations
-        for (uint i=0; i < rewiring_data.pre_pop_info_table.no_pre_pops; i++) {
-            subpopulation_info_t *preapppop_info =
-                    &rewiring_data.pre_pop_info_table.subpop_info[i];
-
-            // Loop over all subpopulations and check if the KEY matches
-            // (with neuron ID masked out)
-            for (int j = 0; j < preapppop_info->no_pre_vertices; j++) {
-                key_atom_info_t *kai = &preapppop_info->key_atom_info[j];
-
-                if ((_spike & kai->mask) == kai->key) {
-                    pre_app_pop = i;
-                    pre_sub_pop = j;
-                    choice = _spike & ~kai->mask;
-                }
-            }
-        }
+        unpack_spike_to_neuron(_spike, &pre_app_pop, &pre_sub_pop, &choice);
     }
 
     address_t synaptic_row_address;
@@ -584,7 +605,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
         synaptogenesis_dynamics_formation_rule();
     }
     // service the next event (either rewiring or synaptic)
-    _setup_synaptic_dma_read();
+    setup_synaptic_dma_read();
 }
 
 // Trivial helper; has to be macro because uses log_error()
@@ -668,8 +689,7 @@ bool synaptogenesis_dynamics_formation_rule(void)
     } else {
         probability = rewiring_data.lat_probabilities[state.distance];
     }
-    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            MAX_SHORT;
+    uint16_t r = random_from_local(MAX_SHORT);
     if (r > probability) {
         return false;
     }

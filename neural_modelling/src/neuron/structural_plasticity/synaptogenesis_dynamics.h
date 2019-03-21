@@ -3,13 +3,10 @@
  * SUMMARY
  *  \brief This file contains the main interface for structural plasticity
  *
- *
  * Author: Petrut Bogdan
- *
  */
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
-
 
 #include <neuron/spike_processing.h>
 
@@ -19,14 +16,13 @@
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address);
+        address_t sdram_sp_address);
 
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
 //! \return None
 void synaptogenesis_dynamics_rewire(uint32_t time);
-
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.
@@ -39,7 +35,6 @@ void synaptogenesis_dynamics_rewire(uint32_t time);
 //!  module (STDP or static).
 //!  \return true if formation was successful
 bool synaptogenesis_dynamics_formation_rule(void);
-
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.

@@ -143,21 +143,21 @@ static inline index_t synapse_row_sparse_index(
 
 static inline index_t synapse_row_sparse_type(
         uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
-    return ((x >> synapse_index_bits) & synapse_type_mask);
+    return (x >> synapse_index_bits) & synapse_type_mask;
 }
 
 static inline index_t synapse_row_sparse_type_index(
         uint32_t x, uint32_t synapse_type_index_mask) {
-    return (x & synapse_type_index_mask);
+    return x & synapse_type_index_mask;
 }
 
 static inline index_t synapse_row_sparse_delay(
         uint32_t x, uint32_t synapse_type_index_bits) {
-    return ((x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK);
+    return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
 }
 
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
-    return (x >> (32 - SYNAPSE_WEIGHT_BITS));
+    return x >> (32 - SYNAPSE_WEIGHT_BITS);
 }
 
 #endif  // SYNAPSE_ROW_H

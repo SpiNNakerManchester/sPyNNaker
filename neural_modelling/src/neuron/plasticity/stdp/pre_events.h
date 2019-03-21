@@ -68,12 +68,12 @@ static inline pre_event_window_t pre_events_get_window(
     window.prev_time = delayed_event_time;
 
     // Calculate number of events
-    window.num_events = (end_event_time - window.next_time);
+    window.num_events = end_event_time - window.next_time;
 
     // Using num_events, find next and previous traces
     const pre_trace_t *end_event_trace = events->traces + count;
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
+    window.next_trace = end_event_trace - window.num_events;
+    window.prev_trace = window.next_trace[-1];
 
     // Return window
     return window;

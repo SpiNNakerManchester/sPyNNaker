@@ -27,7 +27,6 @@ typedef plastic_synapse_t final_state_t;
 
 static inline update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type) {
-
     // Create update state, using weight dependance to initialise the weight
     // state and copying other parameters from the synaptic word into 32-bit
     // form
@@ -43,7 +42,6 @@ static inline update_state_t synapse_structure_get_update_state(
 //---------------------------------------
 static inline final_state_t synapse_structure_get_final_state(
         update_state_t state) {
-
     // Get weight from state
     weight_t weight = weight_get_final(state.weight_state);
 

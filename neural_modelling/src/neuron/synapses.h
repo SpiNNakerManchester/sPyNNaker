@@ -38,7 +38,6 @@ static inline input_t synapses_convert_weight_to_input(
     } converter;
 
     converter.input_type = (int_k_t) (weight) << left_shift;
-
     return converter.output_type;
 }
 
@@ -53,10 +52,10 @@ static inline void synapses_print_weight(
 }
 
 bool synapses_initialise(
-    address_t synapse_params_address, address_t direct_matrix_address,
-    uint32_t n_neurons, uint32_t n_synapse_types,
-    uint32_t **ring_buffer_to_input_buffer_left_shifts,
-    address_t *direct_synapses_address);
+        address_t synapse_params_address, address_t direct_matrix_address,
+        uint32_t n_neurons, uint32_t n_synapse_types,
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 
@@ -67,7 +66,7 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] process_id: ??????????????????
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-    uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
@@ -79,7 +78,6 @@ uint32_t synapses_get_saturation_count(void);
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
-
 
 //------------------------------------------------------------------------------
 // Synaptic rewiring functions
@@ -93,8 +91,8 @@ uint32_t synapses_get_pre_synaptic_events(void);
 //! \param[out] sp_data: the address of a struct through which to return
 //! weight, delay information
 //! \return bool: was the search successful?
-bool find_static_neuron_with_id(uint32_t id, address_t row,
-                                structural_plasticity_data_t *sp_data);
+bool find_static_neuron_with_id(
+        uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
@@ -109,7 +107,8 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 //! \param[in] delay: the delay associated with the connection
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return bool: was the addition successful?
-bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
-                               uint32_t delay, uint32_t type);
+bool add_static_neuron_with_id(
+        uint32_t id, address_t row, uint32_t weight, uint32_t delay,
+        uint32_t type);
 
 #endif // _SYNAPSES_H_

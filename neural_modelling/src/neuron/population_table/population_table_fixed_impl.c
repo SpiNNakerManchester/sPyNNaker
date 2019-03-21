@@ -145,21 +145,17 @@ bool population_table_get_first_address(
 
     // If the row size is 0, there is no entry
     if (row_size_index == 0) {
-        log_debug(
-                "spike %u (= %x): population not found in master population table",
-                spike, spike);
+        log_debug("spike %u (= %x): population not found in master "
+                "population table", spike, spike);
         return false;
     }
 
-    // Convert row size to bytes
+    // Convert row size to bytes, with extra 3 words for the synaptic row header
     // **THINK** this is dependent on synaptic row format so could be
     // dependent on implementation
     uint32_t num_synaptic_words = row_size_table[row_size_index];
-    *n_bytes_to_transfer = (num_synaptic_words + N_SYNAPSE_ROW_HEADER_WORDS)
-            * sizeof(uint32_t);
-
-    // Extra 3 words for the synaptic row header
     uint32_t stride = (num_synaptic_words + N_SYNAPSE_ROW_HEADER_WORDS);
+    *n_bytes_to_transfer = stride * sizeof(uint32_t);
     uint32_t neuron_offset = neuron_id * stride;
 
     // **NOTE** 1024 converts from kilobyte offset to byte offset

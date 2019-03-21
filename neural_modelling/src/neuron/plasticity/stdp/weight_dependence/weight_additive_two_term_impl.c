@@ -26,8 +26,8 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types,
         log_error("Could not initialise weight region data");
         return NULL;
     }
-    uint32_t s;
-    for (s = 0; s < n_synapse_types; s++) {
+    uint32_t s = 0;
+    for (; s < n_synapse_types; s++) {
         plasticity_weight_region_data[s].min_weight = config[s].min_weight;
         plasticity_weight_region_data[s].max_weight = config[s].max_weight;
         plasticity_weight_region_data[s].a2_plus = config[s].a2_plus;

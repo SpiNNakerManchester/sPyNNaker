@@ -282,7 +282,7 @@ static inline void process_delay_stage(uint timer_count, uint32_t d) {
                 uint32_t spike_key = (d * num_neurons) + n + key_base;
 
                 if (delay_stage_spike_counters[n] > 0) {
-                    log_debug("Neuron %u sending %u spikes after delay"
+                    log_debug("Neuron %u sending %u spikes after delay "
                             "stage %u with key %x",
                             n, delay_stage_spike_counters[n], d,
                             spike_key);

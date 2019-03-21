@@ -15,14 +15,13 @@
 
 #include "input_type.h"
 
-typedef struct input_type_t {
-} input_type_t;
+struct input_type_t {
+};
 
 #define SCALING_FACTOR 1
 
-static inline input_t* input_type_get_input_value(
-        input_t* value, input_type_pointer_t input_type,
-        uint16_t num_receptors) {
+static inline input_t *input_type_get_input_value(
+        input_t *value, input_type_t *input_type, uint16_t num_receptors) {
     use(input_type);
     for (int i = 0; i < num_receptors; i++) {
         value[i] = value[i] * SCALING_FACTOR;
@@ -32,7 +31,7 @@ static inline input_t* input_type_get_input_value(
 }
 
 static inline void input_type_convert_excitatory_input_to_current(
-        input_t* exc_input, input_type_pointer_t input_type,
+        input_t *exc_input, input_type_t *input_type,
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);
@@ -40,7 +39,7 @@ static inline void input_type_convert_excitatory_input_to_current(
 }
 
 static inline void input_type_convert_inhibitory_input_to_current(
-        input_t* inh_input, input_type_pointer_t input_type,
+        input_t *inh_input, input_type_t *input_type,
         state_t membrane_voltage) {
     use(input_type);
     use(membrane_voltage);

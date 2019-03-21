@@ -74,7 +74,6 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
@@ -101,7 +100,6 @@ static inline post_trace_t timing_add_post_spike(
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 

@@ -33,8 +33,7 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types,
         plasticity_weight_region_data[s].a2_plus = config[s].a2_plus;
         plasticity_weight_region_data[s].a2_minus = config[s].a2_minus;
 
-        log_debug(
-                "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
                 s, plasticity_weight_region_data[s].min_weight,
                 plasticity_weight_region_data[s].max_weight,
                 plasticity_weight_region_data[s].a2_plus,

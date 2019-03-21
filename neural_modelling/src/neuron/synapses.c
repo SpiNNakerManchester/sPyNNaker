@@ -213,6 +213,10 @@ bool synapses_initialise(
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts =
             spin1_malloc(n_synapse_types * sizeof(uint32_t));
+    if (ring_buffer_to_input_left_shifts == NULL) {
+        log_error("Not enough memory to allocate shift map");
+        return false;
+    }
     spin1_memcpy(
             ring_buffer_to_input_left_shifts, synapse_params_address,
             n_synapse_types * sizeof(uint32_t));
@@ -226,11 +230,11 @@ bool synapses_initialise(
 
     if (direct_matrix_size != 0) {
         *direct_synapses_address = spin1_malloc(direct_matrix_size);
-
         if (*direct_synapses_address == NULL) {
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
+
         log_debug("Copying %u bytes of direct synapses to 0x%08x",
                 direct_matrix_size, *direct_synapses_address);
         spin1_memcpy(*direct_synapses_address, &direct_matrix_address[1],
@@ -263,6 +267,7 @@ bool synapses_initialise(
     if (ring_buffers == NULL) {
         log_error("Could not allocate %u entries for ring buffers",
                 ring_buffer_size);
+        return false;
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
@@ -321,7 +326,6 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     //if (plastic_tag(row) == 0) {
     // If this row has a plastic region
     if (synapse_row_plastic_size(row) > 0) {
-
         // Get region's address
         address_t plastic_region_address = synapse_row_plastic_region(row);
 
@@ -390,20 +394,18 @@ bool find_static_neuron_with_id(uint32_t id, address_t row,
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
         if (synapse_row_sparse_index(synaptic_word, synapse_index_mask) == id) {
-            uint32_t weight = synapse_row_sparse_weight(synaptic_word);
-            uint32_t delay =
-                    synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
-            sp_data -> weight = weight;
-            sp_data -> offset =
+            sp_data->weight = synapse_row_sparse_weight(synaptic_word);
+            sp_data->offset =
                     synapse_row_num_fixed_synapses(fixed_region) - fixed_synapse;
-            sp_data -> delay  = delay;
+            sp_data->delay = synapse_row_sparse_delay(
+                    synaptic_word, synapse_type_index_bits);
             return true;
         }
     }
 
-    sp_data -> weight = -1;
-    sp_data -> offset = -1;
-    sp_data -> delay  = -1;
+    sp_data->weight = -1;
+    sp_data->offset = -1;
+    sp_data->delay = -1;
     return false;
 }
 

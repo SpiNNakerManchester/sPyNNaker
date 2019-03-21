@@ -9,21 +9,17 @@
 // Computational Neuroscience, 10(1), 25-45. doi:10.1023/A:1008916026143
 //----------------------------------------------------------------------------
 
-typedef struct additional_input_t {
-
+struct additional_input_t {
     // exp ( -(machine time step in ms)/(TauCa) )
     REAL    exp_TauCa;
-
     // Calcium current
     REAL    I_Ca2;
-
     // Influx of CA2 caused by each spike
     REAL    I_alpha;
-
-} additional_input_t;
+};
 
 static input_t additional_input_get_input_value_as_current(
-        additional_input_pointer_t additional_input,
+        additional_input_t *additional_input,
         state_t membrane_voltage) {
 	use(membrane_voltage);
 
@@ -35,7 +31,7 @@ static input_t additional_input_get_input_value_as_current(
 }
 
 static void additional_input_has_spiked(
-        additional_input_pointer_t additional_input) {
+        additional_input_t *additional_input) {
     // Apply influx of calcium to trace
     additional_input->I_Ca2 += additional_input->I_alpha;
 }

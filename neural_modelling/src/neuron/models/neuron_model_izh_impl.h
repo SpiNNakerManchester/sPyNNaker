@@ -4,7 +4,6 @@
 #include "neuron_model.h"
 
 typedef struct neuron_t {
-
     // nominally 'fixed' parameters
     REAL A;
     REAL B;
@@ -20,7 +19,6 @@ typedef struct neuron_t {
 
     // current timestep - simple correction for threshold
     REAL this_h;
-
 } neuron_t;
 
 typedef struct global_neuron_params_t {

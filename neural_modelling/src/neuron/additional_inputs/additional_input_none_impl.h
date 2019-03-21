@@ -3,11 +3,11 @@
 
 #include "additional_input.h"
 
-typedef struct additional_input_t {
-} additional_input_t;
+struct additional_input_t {
+};
 
 static input_t additional_input_get_input_value_as_current(
-        additional_input_pointer_t additional_input,
+        additional_input_t *additional_input,
         state_t membrane_voltage) {
     use(additional_input);
     use(membrane_voltage);
@@ -15,7 +15,7 @@ static input_t additional_input_get_input_value_as_current(
 }
 
 static void additional_input_has_spiked(
-        additional_input_pointer_t additional_input) {
+        additional_input_t *additional_input) {
     use(additional_input);
 }
 

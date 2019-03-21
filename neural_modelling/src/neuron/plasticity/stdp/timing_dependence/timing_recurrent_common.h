@@ -14,24 +14,26 @@
 #include "random_util.h"
 
 static bool timing_recurrent_in_pre_window(
-    uint32_t time_since_last_event, update_state_t previous_state);
+        uint32_t time_since_last_event, update_state_t previous_state);
 
 static bool timing_recurrent_in_post_window(
-    uint32_t time_since_last_event, update_state_t previous_state);
+        uint32_t time_since_last_event, update_state_t previous_state);
 
 static update_state_t timing_recurrent_calculate_pre_window(
-    update_state_t previous_state);
+        update_state_t previous_state);
 
 static update_state_t timing_recurrent_calculate_post_window(
-    update_state_t previous_state);
+        update_state_t previous_state);
 
 //---------------------------------------
 // Macros
 //---------------------------------------
 // Synapse states
-#define STATE_IDLE      0
-#define STATE_PRE_OPEN  1
-#define STATE_POST_OPEN 2
+enum synapse_states_t {
+    STATE_IDLE,
+    STATE_PRE_OPEN,
+    STATE_POST_OPEN
+};
 
 //---------------------------------------
 // Externals
@@ -80,64 +82,60 @@ static inline update_state_t timing_apply_pre_spike(
     use(&last_pre_trace);
     use(&last_post_trace);
 
-    if (previous_state.state == STATE_IDLE) {
-
+    switch (previous_state.state) {
+    case STATE_IDLE:
         // If we're idle, transition to pre-open state
         log_debug("\tOpening pre-window");
         previous_state.state = STATE_PRE_OPEN;
-        previous_state =
-                timing_recurrent_calculate_pre_window(previous_state);
-    } else if (previous_state.state == STATE_PRE_OPEN) {
+        return timing_recurrent_calculate_pre_window(previous_state);
 
+    case STATE_PRE_OPEN:
         // If we're in pre-open state
+    {
         // Get time of event relative to last pre-synaptic event
         uint32_t time_since_last_pre = time - last_pre_time;
-
         log_debug("\tTime_since_last_pre_event=%u", time_since_last_pre);
 
         if (timing_recurrent_in_pre_window(
                 time_since_last_pre, previous_state)) {
-
             // If pre-window is still open
             log_debug("\t\tClosing pre-window");
             previous_state.state = STATE_IDLE;
-        } else {
-
-            // Otherwise, leave state alone (essentially re-opening window)
-            log_debug("\t\tRe-opening pre-window");
-            previous_state = timing_recurrent_calculate_pre_window(
-                previous_state);
+            return previous_state;
         }
-    } else if (previous_state.state == STATE_POST_OPEN) {
 
+        // Otherwise, leave state alone (essentially re-opening window)
+        log_debug("\t\tRe-opening pre-window");
+        return timing_recurrent_calculate_pre_window(previous_state);
+    }
+    case STATE_POST_OPEN:
         // Otherwise, if we're in post-open
+    {
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
-
         log_debug("\tTime_since_last_post_event=%u", time_since_last_post);
 
         if (time_since_last_post == 0) {
-
             // If pre-synaptic spike occured at the same time, ignore it
             log_debug("\t\tIgnoring coinciding spikes");
 
             // Transition back to idle
             previous_state.state = STATE_IDLE;
-        } else if (timing_recurrent_in_post_window(
-                time_since_last_post, previous_state)) {
+            return previous_state;
+        }
 
+        if (timing_recurrent_in_post_window(
+                time_since_last_post, previous_state)) {
             // Otherwise, if post-window is still open
             if (previous_state.accumulator
                     > plasticity_trace_region_data
                             .accumulator_depression_plus_one) {
-
                 // If accumulator's not going to hit depression limit, decrement
                 // it
                 previous_state.accumulator--;
                 log_debug("\t\tDecrementing accumulator=%d",
                           previous_state.accumulator);
             } else {
-
                 // Otherwise, reset accumulator and apply depression
                 log_debug("\t\tApplying depression");
 
@@ -148,21 +146,19 @@ static inline update_state_t timing_apply_pre_spike(
 
             // Transition back to idle
             previous_state.state = STATE_IDLE;
-        } else {
-
-
-            // Otherwise, if post-window has closed, skip idle state and go
-            // straight to pre-open
-            log_debug("\t\tPost-window closed - Opening pre-window");
-            previous_state.state = STATE_PRE_OPEN;
-            previous_state =
-                    timing_recurrent_calculate_pre_window(previous_state);
+            return previous_state;
         }
-    } else {
-        log_debug("\tInvalid state %u", previous_state.state);
-    }
 
-    return previous_state;
+        // Otherwise, if post-window has closed, skip idle state and go
+        // straight to pre-open
+        log_debug("\t\tPost-window closed - Opening pre-window");
+        previous_state.state = STATE_PRE_OPEN;
+        return timing_recurrent_calculate_pre_window(previous_state);
+    }
+    default:
+        log_debug("\tInvalid state %u", previous_state.state);
+        return previous_state;
+    }
 }
 
 //---------------------------------------
@@ -174,90 +170,81 @@ static inline update_state_t timing_apply_post_spike(
     use(&last_pre_trace);
     use(&last_post_trace);
 
-    if (previous_state.state == STATE_IDLE) {
-
+    switch (previous_state.state) {
+    case STATE_IDLE:
         // If we're idle, transition to post-open state
         log_debug("\tOpening post-window");
         previous_state.state = STATE_POST_OPEN;
-        previous_state =
-                timing_recurrent_calculate_post_window(previous_state);
-    } else if (previous_state.state == STATE_POST_OPEN) {
-
+        return timing_recurrent_calculate_post_window(previous_state);
+    case STATE_POST_OPEN:
         // If we're in post-open state
+    {
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
-
         log_debug("\tTime_since_last_post_event=%u", time_since_last_post);
 
         if (timing_recurrent_in_post_window(
                 time_since_last_post, previous_state)) {
-
             // If post window's still open
             log_debug("\t\tClosing post-window");
             previous_state.state = STATE_IDLE;
-        } else {
-
-            // Otherwise, leave state alone (essentially re-opening window)
-            log_debug("\t\tRe-opening post-window");
-            previous_state =
-                    timing_recurrent_calculate_post_window(previous_state);
+            return previous_state;
         }
-    } else if (previous_state.state == STATE_PRE_OPEN) {
 
+        // Otherwise, leave state alone (essentially re-opening window)
+        log_debug("\t\tRe-opening post-window");
+        return timing_recurrent_calculate_post_window(previous_state);
+    }
+    case STATE_PRE_OPEN:
         // Otherwise, if we're in pre-open
+    {
         // Get time of event relative to last pre-synaptic event
         uint32_t time_since_last_pre = time - last_pre_time;
-
-        log_debug("\tTime_since_last_pre_event=%u",
-                  time_since_last_pre);
+        log_debug("\tTime_since_last_pre_event=%u", time_since_last_pre);
 
         if (time_since_last_pre == 0) {
-
             // If post-synaptic spike occured at the same time, ignore it
             log_debug("\t\tIgnoring coinciding spikes");
 
             // Transition back to idle
             previous_state.state = STATE_IDLE;
-        } else if (timing_recurrent_in_pre_window(
+            return previous_state;
+        }
+        if (timing_recurrent_in_pre_window(
                 time_since_last_pre, previous_state)) {
-
             // Otherwise, if pre-window's still open
             if (previous_state.accumulator
                     < plasticity_trace_region_data
-                      .accumulator_potentiation_minus_one) {
-
+                            .accumulator_potentiation_minus_one) {
                 // If accumulator's not going to hit potentiation limit,
                 // increment it
                 previous_state.accumulator++;
                 log_debug("\t\tIncrementing accumulator=%d",
-                          previous_state.accumulator);
+                        previous_state.accumulator);
             } else {
-
                 // Otherwise, reset accumulator and apply potentiation
                 log_debug("\t\tApplying potentiation");
 
                 previous_state.accumulator = 0;
-                previous_state.weight_state =
-                    weight_one_term_apply_potentiation(
-                            previous_state.weight_state, STDP_FIXED_POINT_ONE);
+                previous_state.weight_state = weight_one_term_apply_potentiation(
+                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
             }
 
             // Transition back to idle
             previous_state.state = STATE_IDLE;
-        } else {
-
-            // Otherwise, if post-window has closed, skip idle state and go
-            // straight to pre-open
-            log_debug("\t\tPre-window closed - Opening post-window");
-            previous_state.state = STATE_POST_OPEN;
-            previous_state =
-                    timing_recurrent_calculate_post_window(previous_state);
+            return previous_state;
         }
-    } else {
-        log_debug("\tInvalid state %u", previous_state.state);
-    }
 
-    return previous_state;
+        // Otherwise, if post-window has closed, skip idle state and go
+        // straight to pre-open
+        log_debug("\t\tPre-window closed - Opening post-window");
+        previous_state.state = STATE_POST_OPEN;
+        return timing_recurrent_calculate_post_window(previous_state);
+    }
+    default:
+        log_debug("\tInvalid state %u", previous_state.state);
+        return previous_state;
+    }
 }
 
 #endif// _TIMING_RECURRENT_COMMON_H_

@@ -94,7 +94,6 @@ static inline post_event_window_t post_events_get_window(
 static inline post_event_window_t post_events_get_window_delayed(
         const post_event_history_t *events, uint32_t begin_time,
         uint32_t end_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -119,12 +118,12 @@ static inline post_event_window_t post_events_get_window_delayed(
     window.prev_time = *event_time;
 
     // Calculate number of events
-    window.num_events = (end_event_time - window.next_time);
+    window.num_events = end_event_time - window.next_time;
 
     // Using num_events, find next and previous traces
-    const post_trace_t *end_event_trace = events->traces + count;
-    window.next_trace = (end_event_trace - window.num_events);
-    window.prev_trace = *(window.next_trace - 1);
+    const post_trace_t *end_event_trace = &events->traces[count];
+    window.next_trace = end_event_trace - window.num_events;
+    window.prev_trace = window.next_trace[-1];
 
     // Return window
     return window;
@@ -132,7 +131,6 @@ static inline post_event_window_t post_events_get_window_delayed(
 
 //---------------------------------------
 static inline post_event_window_t post_events_next(post_event_window_t window) {
-
     // Update previous time and increment next time
     window.prev_time = *window.next_time++;
     window.prev_trace = *window.next_trace++;
@@ -145,7 +143,6 @@ static inline post_event_window_t post_events_next(post_event_window_t window) {
 //---------------------------------------
 static inline post_event_window_t post_events_next_delayed(
         post_event_window_t window, uint32_t delayed_time) {
-
     // Update previous time and increment next time
     window.prev_time = delayed_time;
     window.prev_trace = *window.next_trace++;
@@ -161,9 +158,7 @@ static inline post_event_window_t post_events_next_delayed(
 //---------------------------------------
 static inline void post_events_add(uint32_t time, post_event_history_t *events,
                                    post_trace_t trace) {
-
     if (events->count_minus_one < (MAX_POST_SYNAPTIC_EVENTS - 1)) {
-
         // If there's still space, store time at current end
         // and increment count minus 1
         const uint32_t new_index = ++events->count_minus_one;

@@ -6,8 +6,8 @@
 #include <spin1_api.h>
 
 bool spike_processing_initialise(
-    size_t row_max_n_bytes, uint mc_packet_callback_priority,
-    uint user_event_priority, uint incoming_spike_buffer_size);
+        size_t row_max_n_bytes, uint mc_packet_callback_priority,
+        uint user_event_priority, uint incoming_spike_buffer_size);
 
 void spike_processing_finish_write(uint32_t process_id);
 
@@ -49,9 +49,8 @@ bool get_dma_busy(void);
 //! \return bool: currently, always true
 bool do_rewiring(int number_of_rew);
 
-
 //! exposing this so that other classes can call it
-void _setup_synaptic_dma_read(void);
+void setup_synaptic_dma_read(void);
 
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool

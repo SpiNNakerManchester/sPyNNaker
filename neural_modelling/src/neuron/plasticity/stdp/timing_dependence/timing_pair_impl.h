@@ -52,7 +52,6 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
@@ -74,13 +73,12 @@ static inline post_trace_t timing_add_post_spike(
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
     // Decay previous r1 and r2 traces
     int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(
-        last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
+            last_trace, DECAY_LOOKUP_TAU_PLUS(delta_time));
 
     // Add energy caused by new spike to trace
     int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;

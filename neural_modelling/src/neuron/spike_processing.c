@@ -10,8 +10,10 @@
 #define N_DMA_BUFFERS 2
 
 // DMA tags
-#define DMA_TAG_READ_SYNAPTIC_ROW 0
-#define DMA_TAG_WRITE_PLASTIC_REGION 1
+enum dma_tags_t {
+    DMA_TAG_READ_SYNAPTIC_ROW,
+    DMA_TAG_WRITE_PLASTIC_REGION
+};
 
 extern uint32_t time;
 
@@ -29,11 +31,11 @@ static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
 
-static spike_t spike=-1;
+static spike_t spike = -1;
 
 static uint32_t single_fixed_synapse[4];
 
-uint32_t number_of_rewires=0;
+uint32_t number_of_rewires = 0;
 bool any_spike = false;
 
 #ifndef NO_INLINE
@@ -42,7 +44,7 @@ bool any_spike = false;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
-static inline void _do_dma_read(
+static inline void do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
@@ -61,13 +63,13 @@ static inline void _do_dma_read(
 }
 
 
-static inline void _do_direct_row(address_t row_address) {
+static inline void do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
     synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
 // Check if there is anything to do - if not, DMA is not busy
-static inline bool _is_something_to_do(
+static inline bool is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer) {
     // Disable interrupts here as check and dma_busy modification is a
     // critical section
@@ -111,7 +113,7 @@ static inline bool _is_something_to_do(
     return something_to_do;
 }
 
-static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
+static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
     // Get pointer to current buffer
     dma_buffer *buff = &dma_buffers[dma_buffer_index];
     // Get the number of plastic bytes and the write back address from the
@@ -133,7 +135,7 @@ static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 /* CALLBACK FUNCTIONS — static, but not inline */
 
 // Called when a multicast packet is received
-static NO_INLINE void _multicast_packet_received_callback(
+static NO_INLINE void mc_packet_received_callback(
         uint key, uint payload) {
     use(payload);
     any_spike = true;
@@ -157,14 +159,14 @@ static NO_INLINE void _multicast_packet_received_callback(
 }
 
 // Called when a user event is received
-static NO_INLINE void _user_event_callback(uint unused0, uint unused1) {
+static NO_INLINE void user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
-    _setup_synaptic_dma_read();
+    setup_synaptic_dma_read();
 }
 
 // Called when a DMA completes
-static NO_INLINE void _dma_complete_callback(uint unused, uint tag) {
+static NO_INLINE void dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
@@ -186,7 +188,7 @@ static NO_INLINE void _dma_complete_callback(uint unused, uint tag) {
         if (!synapses_process_synaptic_row(time, current_buffer->row,
                 !subsequent_spikes, current_buffer_index)) {
             log_error("Error processing spike 0x%.8x for address 0x%.8x"
-                    "(local=0x%.8x)",
+                    " (local=0x%.8x)",
                     current_buffer->originating_spike,
                     current_buffer->sdram_writeback_address,
                     current_buffer->row);
@@ -202,7 +204,7 @@ static NO_INLINE void _dma_complete_callback(uint unused, uint tag) {
     } while (subsequent_spikes);
 
     // Start the next DMA transfer, so it is complete when we are finished
-    _setup_synaptic_dma_read();
+    setup_synaptic_dma_read();
 }
 
 
@@ -237,37 +239,37 @@ bool spike_processing_initialise(
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
-            _multicast_packet_received_callback, mc_packet_callback_priority);
+            mc_packet_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
-            DMA_TAG_READ_SYNAPTIC_ROW, _dma_complete_callback);
-    spin1_callback_on(USER_EVENT, _user_event_callback, user_event_priority);
+            DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
+    spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
 
     return true;
 }
 
-void _setup_synaptic_dma_read(void) {
+void setup_synaptic_dma_read(void) {
     // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;
     bool setup_done = false;
 
-    while (!setup_done && _is_something_to_do(
+    while (!setup_done && is_something_to_do(
             &row_address, &n_bytes_to_transfer)) {
         if (number_of_rewires) {
             number_of_rewires--;
             synaptogenesis_dynamics_rewire(time);
             setup_done = true;
         } else if (n_bytes_to_transfer == 0) {
-            _do_direct_row(row_address);
+            do_direct_row(row_address);
         } else {
-            _do_dma_read(row_address, n_bytes_to_transfer);
+            do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
         }
     }
 }
 
 void spike_processing_finish_write(uint32_t process_id) {
-    _setup_synaptic_dma_write(process_id);
+    setup_synaptic_dma_write(process_id);
 }
 
 //! \brief returns the number of times the input buffer has overflowed

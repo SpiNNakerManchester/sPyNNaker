@@ -16,7 +16,6 @@
 //---------------------------------------
 static inline address_t maths_copy_int16_lut(
        void *start_address, uint32_t num_entries, int16_t *lut) {
-
     // Pad to number of words
     const uint32_t num_words = (num_entries >> 1) + (num_entries & 1);
 
@@ -57,7 +56,6 @@ static inline int32_t maths_lut_exponential_decay(
 //---------------------------------------
 static inline int32_t maths_fixed_mul16(
         int32_t a, int32_t b, const int32_t fixed_point_position) {
-
     // Multiply lower 16-bits of a and b together
     int32_t mul = __smulbb(a, b);
 

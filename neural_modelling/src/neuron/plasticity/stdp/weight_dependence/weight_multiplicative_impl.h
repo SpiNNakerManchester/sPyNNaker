@@ -32,7 +32,7 @@ typedef struct {
 // Externals
 //---------------------------------------
 extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-extern uint32_t *weight_multiply_right_shift;
+extern uint32_t *weight_multiply_right_shifts;
 
 //---------------------------------------
 // Weight dependance functions
@@ -42,7 +42,7 @@ static inline weight_state_t weight_get_initial(weight_t weight,
     return (weight_state_t ) {
         .weight = (int32_t) weight,
         .weight_multiply_right_shift =
-            weight_multiply_right_shift[synapse_type],
+            weight_multiply_right_shifts[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
