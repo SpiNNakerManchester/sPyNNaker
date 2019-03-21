@@ -77,6 +77,9 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
+// Load DTCM data
+static uint32_t timer_period;
+
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
@@ -113,10 +116,10 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
-        uint32_t spikes_remaining = spike_processing_flush_in_buffer();
-
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
+
+        uint32_t spikes_remaining = spike_processing_flush_in_buffer();
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -234,15 +237,15 @@ void timer_callback(uint timer_count, uint unused) {
     use(timer_count);
     use(unused);
 
-    //Schedule event in 80 micro-sec from now. THIS NEEDS TO BE MORE GENERIC!!
-    if(!timer_schedule_proc(write_contributions, 0, 0, 80)) {
+    //Schedule event 20 microseconds before the end of the timer period
+    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-20)) {
 
         rt_error(RTE_API);
     }
 
     time++;
 
-    io_printf(IO_BUF, "\nTime %d\n", time);
+    io_printf(IO_BUF, "Time %d\n", time);
 
     //If first timer tick retrieve the address of the buffer for synaptic contribution
     if(time == 0) {
@@ -274,9 +277,6 @@ void timer_callback(uint timer_count, uint unused) {
 
 //! \brief The entry point for this model.
 void c_main(void) {
-
-    // Load DTCM data
-    uint32_t timer_period;
 
     // initialise the model
     if (!initialise(&timer_period)){

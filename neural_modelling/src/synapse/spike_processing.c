@@ -86,10 +86,8 @@ void _setup_synaptic_dma_read() {
 
             // This is a direct row to process
             if (n_bytes_to_transfer == 0) {
-               // io_printf(IO_BUF, "Direct row\n");
                 _do_direct_row(row_address);
             } else {
-                //io_printf(IO_BUF, "Start DMA\n");
                 _do_dma_read(row_address, n_bytes_to_transfer);
                 setup_done = true;
             }
@@ -101,15 +99,14 @@ void _setup_synaptic_dma_read() {
             spin1_mode_restore(cpsr);
             log_debug("Checking for row for spike 0x%.8x\n", spike);
 
+
             // Decode spike to get address of destination synaptic row
             if (population_table_get_first_address(
                     spike, &row_address, &n_bytes_to_transfer)) {
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
-                   // io_printf(IO_BUF, "Direct row\n");
                     _do_direct_row(row_address);
                 } else {
-                    //io_printf(IO_BUF, "Start DMA\n");
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
                 }
@@ -164,7 +161,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
 
-        io_printf(IO_BUF, "RECEIVED SPIKE, time: %d\n", time);
+        io_printf(IO_BUF, "RECEIVED SPIKE, time: %d, key %d\n", time, key);
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
@@ -187,7 +184,6 @@ void _user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
 
-    //io_printf(IO_BUF, "user event \n");
     _setup_synaptic_dma_read();
 }
 
@@ -197,7 +193,6 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     log_debug("DMA transfer complete with tag %u", tag);
 
-    //io_printf(IO_BUF, "DMA complete cb\n");
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;

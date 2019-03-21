@@ -191,8 +191,6 @@ static inline void _process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
-    io_printf(IO_BUF, "processing fixed synapses\n");
-
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
