@@ -191,6 +191,8 @@ static inline void _process_fixed_synapses(
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
+    io_printf(IO_BUF, "processing fixed synapses\n");
+
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
@@ -370,6 +372,10 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
+
+    //for (uint i = ring_buffer_index; i < ring_buffer_index + (size_to_be_transferred / sizeof(weight_t)) ; i++)
+    //    if(ring_buffers[i] != 0)
+    //        io_printf(IO_BUF, "written: %d\n", ring_buffers[i]);
 
     _print_inputs();
 

@@ -86,8 +86,10 @@ void _setup_synaptic_dma_read() {
 
             // This is a direct row to process
             if (n_bytes_to_transfer == 0) {
+               // io_printf(IO_BUF, "Direct row\n");
                 _do_direct_row(row_address);
             } else {
+                //io_printf(IO_BUF, "Start DMA\n");
                 _do_dma_read(row_address, n_bytes_to_transfer);
                 setup_done = true;
             }
@@ -104,8 +106,10 @@ void _setup_synaptic_dma_read() {
                     spike, &row_address, &n_bytes_to_transfer)) {
                 // This is a direct row to process
                 if (n_bytes_to_transfer == 0) {
+                   // io_printf(IO_BUF, "Direct row\n");
                     _do_direct_row(row_address);
                 } else {
+                    //io_printf(IO_BUF, "Start DMA\n");
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
                 }
@@ -182,6 +186,8 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 void _user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
+
+    //io_printf(IO_BUF, "user event \n");
     _setup_synaptic_dma_read();
 }
 
@@ -190,6 +196,8 @@ void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
     log_debug("DMA transfer complete with tag %u", tag);
+
+    //io_printf(IO_BUF, "DMA complete cb\n");
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;

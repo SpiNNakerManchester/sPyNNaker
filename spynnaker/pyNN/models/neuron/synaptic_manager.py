@@ -1114,7 +1114,7 @@ class SynapticManager(
         all_syn_block_sz = self._get_synaptic_blocks_size(
             vertex_slice, in_edges, machine_time_step)
 
-       # Reserve memory regions
+        # Reserve memory regions
         self._reserve_memory_regions(
             spec, vertex, vertex_slice, machine_graph,
             all_syn_block_sz, graph_mapper)
