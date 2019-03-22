@@ -21,6 +21,3 @@ void update_goal_posts(uint32_t time) {
         : (cb_info.my_cb_input + cb_info.cb_total_size + 1) -
             cb_info.my_cb_output);
 }
-
-
-

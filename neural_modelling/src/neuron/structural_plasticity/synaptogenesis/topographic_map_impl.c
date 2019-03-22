@@ -318,8 +318,6 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     return (address_t) sp_word;
 }
 
-
-
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
