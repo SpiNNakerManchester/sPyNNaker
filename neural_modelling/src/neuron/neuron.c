@@ -284,10 +284,9 @@ bool neuron_do_timestep_update(timer_t time) {
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
         }
 
-        //SHOULD NOT BE USED AT THE MOMENT! SO DON'T WORRY! (ANDREW SAID SO)
         // Get external bias from any source of intrinsic plasticity
         input_t external_bias =
-            synapse_dynamics_get_intrinsic_bias(time, neuron_index); // 0 in case of non plastic synapses!!!!
+            synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
@@ -310,7 +309,7 @@ bool neuron_do_timestep_update(timer_t time) {
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
-            // Do any required synapse processing, FOR STATIC SYNAPSES IT DOES NOTHING!!
+            // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {

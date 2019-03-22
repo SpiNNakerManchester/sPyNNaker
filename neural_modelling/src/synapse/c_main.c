@@ -66,33 +66,13 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! The recording flags
-static uint32_t recording_flags = 0;
-
-//! Timer callbacks since last rewiring
-int32_t last_rewiring_time = 0;
-
-//! Rewiring period represented as an integer
-int32_t rewiring_period = 0;
-
-//! Flag representing whether rewiring is enabled
-bool rewiring = false;
+//static uint32_t recording_flags = 0;
 
 // Load DTCM data
 static uint32_t timer_period;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
-
-
-//! \brief Initialises the recording parts of the model
-//! \param[in] recording_address: the address in SDRAM where to store
-//! recordings
-//! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(address_t recording_address){
-    bool success = recording_initialize(recording_address, &recording_flags);
-    log_debug("Recording flags = 0x%08x", recording_flags);
-    return success;
-}
 
 
 void c_main_store_provenance_data(address_t provenance_region){
@@ -153,12 +133,6 @@ static bool initialise(uint32_t *timer_period) {
         c_main_store_provenance_data,
         data_specification_get_region(PROVENANCE_DATA_REGION, address));
 
-    // setup recording region
-    //if (!initialise_recording(
-    //        data_specification_get_region(RECORDING_REGION, address))){
-    //    return false;
-    //}
-
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address = data_specification_get_region(
@@ -200,9 +174,6 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
-    rewiring_period = get_p_rew();
-    rewiring = rewiring_period != -1;
-
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER,
             incoming_spike_buffer_size)) {
@@ -215,15 +186,13 @@ static bool initialise(uint32_t *timer_period) {
 
     log_debug("Initialise: finished");
 
-    // Register timer2 for periodic events
+    // Register timer2 for periodic events(used to write contributions in SDRAM)
     event_register_timer(SLOT_8);
 
     return true;
 }
 
 void resume_callback() {
-
-    //FILL THIS!!!!!
 
 }
 
@@ -242,6 +211,8 @@ void timer_callback(uint timer_count, uint unused) {
 
         rt_error(RTE_API);
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
 
@@ -265,6 +236,10 @@ void timer_callback(uint timer_count, uint unused) {
 
         log_debug("Completed a run");
 
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
+        profiler_finalise();
+
         // Subtract 1 from the time so this tick gets done again on the next
         // run
         time--;
@@ -273,6 +248,8 @@ void timer_callback(uint timer_count, uint unused) {
 
         return;
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 //! \brief The entry point for this model.

@@ -22,6 +22,7 @@
 #include "synapse/synapses.h"
 #include "synapse/spike_processing.h"
 #include "synapse/plasticity/synapse_dynamics.h"
+#include "synapse/structural_plasticity/synaptogenesis_dynamics.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -78,8 +79,6 @@ bool rewiring = false;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
-//DELETE AT THE END!!!!!
-bool contribution_written;
 
 
 //! \brief Initialises the recording parts of the model
@@ -95,16 +94,7 @@ static bool initialise_recording(address_t recording_address){
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
 
-    // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
     provenance_region[CURRENT_TIMER_TICK] = time;
-    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-            synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
 
@@ -148,6 +138,9 @@ static bool initialise(uint32_t *timer_period) {
         return false;
     }
 
+    rewiring_period = get_p_rew();
+    rewiring = rewiring_period != -1;
+
     // Setup profiler
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
@@ -184,7 +177,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     time++;
     last_rewiring_time++;
-    io_printf(IO_BUF, "Tick Tock time %d\n", time);
+    io_printf(IO_BUF, "Time %d\n", time);
 
     // This is the part where I save the input and output indices
     //   from the circular buffer
@@ -227,7 +220,7 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    /*
+
     uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
@@ -256,10 +249,10 @@ void timer_callback(uint timer_count, uint unused) {
         // enable interrupts
         spin1_mode_restore(cpsr);
         count_rewires++;
-    }*/
+    }
     // otherwise do neuron time step update
     if(!neuron_do_timestep_update(time)) {
-        rt_error(RTE_SWERR); //Maybe a bit too extreme?
+        rt_error(RTE_SWERR);
     }
 
     // trigger buffering_out_mechanism

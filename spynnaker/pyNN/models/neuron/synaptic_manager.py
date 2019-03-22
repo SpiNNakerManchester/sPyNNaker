@@ -103,6 +103,7 @@ class SynapticManager(
         "_gen_on_machine",
         "_max_row_info",
         "_n_atoms",
+        "_n_profile_samples",
         "_vertex",
         "_n_profile_samples",
         "_incoming_spike_buffer_size",
@@ -312,7 +313,8 @@ class SynapticManager(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=SDRAMResource(self.get_sdram_usage_in_bytes(vertex_slice, graph, machine_time_step)),
+            sdram=SDRAMResource(self.get_sdram_usage_in_bytes(
+                vertex_slice, graph, machine_time_step)),
             dtcm=DTCMResource(self.get_dtcm_usage_in_bytes()),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_n_cpu_cycles(vertex_slice)))
@@ -1184,6 +1186,11 @@ class SynapticManager(
 
         self._write_on_machine_data_spec(
             spec, vertex_slice, scales, gen_data)
+
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            self._n_profile_samples)
 
         # End the writing of this specification
         spec.end_specification()
