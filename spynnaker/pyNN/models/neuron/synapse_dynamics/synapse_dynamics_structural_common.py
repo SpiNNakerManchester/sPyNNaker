@@ -8,6 +8,7 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants
 
+
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     """ Common class that enables synaptic rewiring. It acts as a wrapper
         around SynapseDynamicsStatic or SynapseDynamicsSTDP.
@@ -118,9 +119,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     OFFSET_MASKED_POP = 32 - 8
     OFFSET_MASKED_SUB_POP = 16
 
-
-
-
     def __init__(self,
                  stdp_model=default_parameters['stdp_model'],
                  f_rew=default_parameters['f_rew'],
@@ -136,7 +134,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  grid=default_parameters['grid'],
                  lateral_inhibition=default_parameters['lateral_inhibition'],
                  random_partner=default_parameters['random_partner'],
-                 is_distance_dependent=default_parameters['is_distance_dependent'],
+                 is_distance_dependent=default_parameters[
+                     'is_distance_dependent'],
                  seed=None):
         self._f_rew = f_rew
         self._p_rew = 1. / self._f_rew
@@ -242,7 +241,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 else:
                     pre = (0, row % self._grid[1])
                     post = (0, column % self._grid[1])
-
 
                 # TODO Make distance metric "type" controllable
                 euclidian_distances[row, column] = \
@@ -378,7 +376,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # of the cores that have perform structural updates.
         # NOTE: it should be different between application vertices
         if app_vertex not in self._seeds.keys():
-            self._seeds[app_vertex] = [self._rng.randint(0x7FFFFFFF) for _ in range(4)]
+            self._seeds[app_vertex] = \
+                [self._rng.randint(0x7FFFFFFF) for _ in range(4)]
         spec.write_value(data=int(self._s_max))
         spec.write_value(data=int(self._lateral_inhibition),
                          data_type=DataType.INT32)
@@ -460,7 +459,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     if synapse_info.synapse_dynamics is self._weight_dynamics:
                         exception_case = None
                         for mek in self._manager.keys():
-                            if app_edge == mek._projection_edge :
+                            if app_edge == mek._projection_edge:
                                 exception_case = self._manager[mek]
                                 break
                         structural_application_edges.append(app_edge)
@@ -567,7 +566,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(data=len(subpopulation_list),
                              data_type=DataType.UINT16)
 
-
             # Custom header for commands / controls
             # currently, controls = True if the subvertex
             # is part of this population
@@ -577,11 +575,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             controls = current_key in np.asarray(subpopulation_list)[:0]
             spec.write_value(data=int(controls), data_type=DataType.UINT16)
 
-
             # write the weight to be used from this pre-synaptic population
             # scale the excitatory weight appropriately
-            if exceptions and self.connectivity_exception_param.delay in exceptions.keys():
-                # does the current connection have have an exceptional delay distribution?
+            if (exceptions and self.connectivity_exception_param.delay
+                    in exceptions.keys()):
+                # does the current connection have have an
+                # exceptional delay distribution?
                 delays = exceptions[self.connectivity_exception_param.delay]
                 if isinstance(delays, collections.Iterable):
                     delay_lo, delay_hi = delays
@@ -592,28 +591,34 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             else:
                 # the current connection has the default delay distribution
                 if isinstance(self._initial_delay, collections.Iterable):
-                    spec.write_value(data=int(self._initial_delay[0]), data_type=DataType.UINT16)
-                    spec.write_value(data=int(self._initial_delay[1]), data_type=DataType.UINT16)
+                    spec.write_value(data=int(self._initial_delay[0]),
+                                     data_type=DataType.UINT16)
+                    spec.write_value(data=int(self._initial_delay[1]),
+                                     data_type=DataType.UINT16)
                 else:
-                    spec.write_value(data=self._initial_delay, data_type=DataType.UINT16)
-                    spec.write_value(data=self._initial_delay, data_type=DataType.UINT16)
+                    spec.write_value(data=self._initial_delay,
+                                     data_type=DataType.UINT16)
+                    spec.write_value(data=self._initial_delay,
+                                     data_type=DataType.UINT16)
 
-            if exceptions and self.connectivity_exception_param.weight in exceptions.keys():
-                exceptional_weight = exceptions[self.connectivity_exception_param.weight]
-                # scale the exception weight according to the appropriate weight scale
-                spec.write_value(data=int(round(exceptional_weight * weight_scales[int(syn_type)])))
+            if (exceptions and self.connectivity_exception_param.weight
+                    in exceptions.keys()):
+                exceptional_weight = exceptions[
+                    self.connectivity_exception_param.weight]
+                # scale the exception weight according to the
+                # appropriate weight scale
+                spec.write_value(
+                    data=int(round(exceptional_weight *
+                                   weight_scales[int(syn_type)])))
             else:
-                # scale the exception weight according to the appropriate weight scale
-                spec.write_value(data=int(round(self._initial_weight * weight_scales[int(syn_type)])))
-
-
-
-
+                # scale the exception weight according to the
+                # appropriate weight scale
+                spec.write_value(
+                    data=int(round(self._initial_weight *
+                                   weight_scales[int(syn_type)])))
 
             # Write connection type
             spec.write_value(data=int(syn_type), data_type=DataType.UINT32)
-
-
             spec.write_value(
                 data=np.sum(np.asarray(subpopulation_list)[:, 1]) if len(
                     subpopulation_list) > 0 else 0)
@@ -831,7 +836,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if post_vertex_slice.lo_atom not in self._connections.keys():
             self._connections[post_vertex_slice.lo_atom] = []
         self._connections[post_vertex_slice.lo_atom].append(
-            (connections, app_edge, machine_edge))  # TODO extract weight and delay from here
+            (connections, app_edge, machine_edge))
+        # TODO extract weight and delay from here
 
     def n_words_for_plastic_connections(self, value):
         """ Get size of plastic connections in words

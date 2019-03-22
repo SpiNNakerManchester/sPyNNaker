@@ -88,7 +88,8 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                  lateral_inhibition=CommonSP.default_parameters[
                      'lateral_inhibition'],
                  random_partner=CommonSP.default_parameters['random_partner'],
-                 is_distance_dependent=CommonSP.default_parameters['is_distance_dependent'],
+                 is_distance_dependent=CommonSP.default_parameters[
+                     'is_distance_dependent'],
                  seed=None):
         if (stdp_model is not None and not isinstance(stdp_model,
                                                       SynapseDynamicsSTDP)):
@@ -132,7 +133,6 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
             spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
             machine_vertex, graph_mapper, routing_info)
-
 
     def set_projection_parameter(self, projection, param, value):
         self._common_sp.set_projection_parameter(projection, param, value)
