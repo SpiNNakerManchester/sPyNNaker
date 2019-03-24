@@ -50,8 +50,7 @@ static global_neuron_params_pointer_t global_parameters;
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
-static REAL next_spike_time;
-static REAL rate_at_last_time_calc;
+static REAL next_spike_time = 0;
 static uint32_t timer = 0;
 static uint32_t target_ind = 0;
 
@@ -208,7 +207,6 @@ static inline REAL slow_spike_source_get_time_to_spike(
 			global_parameters->spike_source_seed
 			)
         * mean_inter_spike_interval_in_ticks;
-    rate_at_last_time_calc = neuron->V_membrane;
 }
 
 
@@ -223,40 +221,31 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 		rate = threshold_type->threshold_value;
 	}
 
-    neuron->mean_isi_ticks =
-//                rate *
-////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
-//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
-    		global_parameters->ticks_per_second / rate; // shouldn't this be ticks_per_second/rate?
+	REAL rate_diff = neuron->rate_at_last_setting - rate;
 
-//    io_printf(IO_BUF, "New rate: %k, New mean ISI ticks: %k\n",
-//        		rate, neuron->mean_isi_ticks);
+	// ensure rate_diff is absolute
+	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0)) {
+		rate_diff = -rate_diff;
+	}
 
-    if (neuron->mean_isi_ticks < neuron->time_to_spike_ticks) {
-    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks;
-    }
+	// Has rate changed by more than a predefined threshold since it was last
+	// used to update the mean isi ticks?
+	if ((rate_diff) > neuron->rate_update_threshold){
+		// then update the rate
+		neuron->rate_at_last_setting = rate;
 
-////
-//    // This ensures we update to reduced time_to_next_spike, even without spiking
-//    if (next_spike_time > neuron->mean_isi_ticks << 3){
-//    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks; // update to the new mean
-//    } else if (next_spike_time < neuron->mean_isi_ticks >> 3) {
-//    	neuron->time_to_spike_ticks = neuron->mean_isi_ticks; // update to the new mean
-//    }
+		// Update isi ticks based on new rate
+		neuron->mean_isi_ticks =
+		//                rate *
+		////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
+		//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
+		    		(global_parameters->ticks_per_second / rate); // shouldn't this be ticks_per_second/rate?
 
-//    REAL mod_rate_diff = (rate_at_last_time_calc - rate);
-//
-//    if (mod_rate_diff > 5) {
-//    	neuron->time_to_spike_ticks = slow_spike_source_get_time_to_spike(
-//                neuron->mean_isi_ticks, neuron);
-//    } else if (mod_rate_diff < -5) {
-//    	neuron->time_to_spike_ticks = slow_spike_source_get_time_to_spike(
-//                neuron->mean_isi_ticks, neuron);
-//    }
+		// Account for time that's already passed since previous spike
+	    neuron->time_to_spike_ticks = neuron->mean_isi_ticks
+	    		- neuron->time_since_last_spike;
+	} // else stick with existing rate and isi ticks - they're within threshold
 }
-
-
-
 
 
 bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
@@ -266,6 +255,12 @@ bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
 
 	bool has_spiked = false;
 
+	// Advance by one timestep
+	// Subtract tick
+    neuron->time_to_spike_ticks -= REAL_CONST(1.0);
+
+    // Add tick to time since last spike (to enable for dynamic rate change)
+    neuron->time_since_last_spike += 1.0k;
 
 //	io_printf(IO_BUF, " 				Time to next spike: %k\n",
 //			neuron->time_to_spike_ticks);
@@ -279,16 +274,12 @@ bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
                 neuron->mean_isi_ticks, neuron);
 
         neuron->time_to_spike_ticks += next_spike_time;
-//        neuron->time_to_spike_ticks +=slow_spike_source_get_time_to_spike(
-//                neuron->mean_isi_ticks, neuron);
 
+        // Set time since last spike to zero, so we start counting from here
+        neuron->time_since_last_spike = 0;
 
         has_spiked = true;
     }
-
-    // Subtract tick
-    neuron->time_to_spike_ticks -= REAL_CONST(1.0);
-
 
     return has_spiked;
 }
@@ -303,10 +294,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     neuron_pointer_t neuron = &neuron_array[neuron_index];
     bool spike = false;
 
-    target_ind = timer & 0x3ff;
+    target_ind = timer & 0x3ff; // repeats on a cycle of 1024 entries in array
 
 //    io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
-//    io_printf(IO_BUF, "Target: %k\n\n", global_parameters->target_V[target_ind]);
+//    io_printf(IO_BUF, "Target: %k\n\n",
+//    		global_parameters->target_V[target_ind]);
 
     // Get the input_type parameters and voltage for this neuron
     input_type_pointer_t input_type = &input_type_array[neuron_index];
@@ -377,13 +369,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     			global_parameters->target_V[target_ind];
 
     	// Update Poisson neuron rate based on updated V
-        REAL rate =  global_parameters->target_V[target_ind] - global_parameters->readout_V; // calc difference to
+        REAL rate = (global_parameters->target_V[target_ind]
+							 - global_parameters->readout_V); // calc difference to
 //        io_printf(IO_BUF, "New Rate: %k", rate);
+//        rate = rate * 10;
 
-        if (rate > 0) { // error is negative, so set rate = 0;
+        if (rate > 0) { // readout is below target, so set rate = diff.
+        	// This will cause potentiation of excitatory synapses,
+        	// and depression of inhibitory synapses
         	set_spike_source_rate(neuron, rate,
         			threshold_type);
-        } else {
+        } else { // readout is above target, so set rate = zero
         	set_spike_source_rate(neuron, 0,
         			threshold_type);
         }
@@ -393,16 +389,19 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     } else if (neuron_index == 2){
     	// Update Poisson neuron rate based on updated V
-        REAL rate = global_parameters->target_V[target_ind] - global_parameters->readout_V; // calc difference to
+        REAL rate = (global_parameters->target_V[target_ind]
+							- global_parameters->readout_V); // calc difference to
 //        io_printf(IO_BUF, "New Rate: %k", rate);
 
         recorded_variable_values[V_RECORDING_INDEX] = rate;
+//        rate = rate * 10;
 
-
-        if (rate < 0) { // error is negative, so set rate = 0;
+        if (rate < 0) {
+        	// readout is above target, send spikes from inhibitory neuron with rate = -diff:
+        	// this will depress excitatory synapses, and potenitate inhibitory synapses
         	set_spike_source_rate(neuron, -rate,
         			threshold_type);
-        } else {
+        } else { // readout is below target, so set rate = 0;
         	set_spike_source_rate(neuron, 0,
         			threshold_type);
         }

@@ -38,6 +38,11 @@ typedef struct neuron_t {
     REAL mean_isi_ticks;
     REAL time_to_spike_ticks;
 
+    int32_t time_since_last_spike;
+    REAL rate_at_last_setting;
+    REAL rate_update_threshold;
+
+
 //    // Should be in global params
 //    mars_kiss64_seed_t spike_source_seed; // array of 4 values
 ////    UFRACT seconds_per_tick;
