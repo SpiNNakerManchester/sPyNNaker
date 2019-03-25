@@ -43,8 +43,10 @@ class GeneratorData(object):
         return sum((self.BASE_SIZE,
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
-                    connector.gen_weight_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes))
+                    connector.gen_weight_params_size_in_bytes(
+                        self._synapse_information.weight),
+                    connector.gen_delay_params_size_in_bytes(
+                        self._synapse_information.delay)))
 
     @property
     def gen_data(self):
@@ -70,8 +72,8 @@ class GeneratorData(object):
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
-            connector.gen_weights_id,
-            connector.gen_delays_id],
+            connector.gen_weights_id(self._synapse_information.weight),
+            connector.gen_delays_id(self._synapse_information.delay)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
@@ -79,7 +81,9 @@ class GeneratorData(object):
             self._post_slice_index, self._pre_vertex_slice,
             self._post_vertex_slice, self._synapse_information.synapse_type))
         items.append(connector.gen_weights_params(
-            self._pre_vertex_slice, self._post_vertex_slice))
+            self._synapse_information.weight, self._pre_vertex_slice,
+            self._post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self._pre_vertex_slice, self._post_vertex_slice))
+            self._synapse_information.delay, self._pre_vertex_slice,
+            self._post_vertex_slice))
         return numpy.concatenate(items)

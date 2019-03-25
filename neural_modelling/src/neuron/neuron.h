@@ -25,13 +25,14 @@
 //!            NEURON_PARAMS data region in SDRAM
 //! \return boolean which is True if the translation was successful
 //!         otherwise False
-bool neuron_initialise(address_t address);
+bool neuron_initialise(address_t address, uint32_t *timer_offset);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.
 //! \param[in] time the timer tick value currently being executed
-//! \return boolean which is True if the update succeded otherwise False
-bool neuron_do_timestep_update(uint32_t time);
+//! \return nothing
+void neuron_do_timestep_update(
+        uint32_t time, uint timer_count, uint timer_period);
 
 //! \brief interface for reloading neuron parameters as needed
 //! \param[in] address: the address where the neuron parameters are stored
@@ -53,5 +54,11 @@ void neuron_store_neuron_parameters(address_t address);
 void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
+
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_print_inputs();
+
+const char *neuron_get_synapse_type_char(uint32_t synapse_type);
+#endif
 
 #endif // _NEURON_H_

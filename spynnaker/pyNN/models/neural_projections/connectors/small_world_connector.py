@@ -54,12 +54,12 @@ class SmallWorldConnector(AbstractConnector):
         self._n_connections = numpy.sum(self._mask)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._n_connections)
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, self._n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         n_connections = numpy.amax([
             numpy.sum(self._mask[i, post_vertex_slice.as_slice])
@@ -69,7 +69,7 @@ class SmallWorldConnector(AbstractConnector):
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_connections, n_connections, min_delay, max_delay)
+            delays, self._n_connections, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -78,13 +78,13 @@ class SmallWorldConnector(AbstractConnector):
             numpy.sum(self._mask[:, i]) for i in range(self._n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
-        return self._get_weight_maximum(self._n_connections)
+        return self._get_weight_maximum(weights, self._n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -98,9 +98,9 @@ class SmallWorldConnector(AbstractConnector):
         block["target"] = (
             (ids[1] % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, None)
+            weights, n_connections, None)
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, None)
+            delays, n_connections, None)
         block["synapse_type"] = synapse_type
 
         # Re-wire some connections

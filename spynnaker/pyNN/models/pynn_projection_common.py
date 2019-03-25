@@ -65,15 +65,19 @@ class PyNNProjectionCommon(object):
         #  when needed)
         post_vertex.set_synapse_dynamics(synapse_dynamics_stdp)
 
-        # Set and store information for future processing
+        # Set and store synapse information for future processing
         self._synapse_information = SynapseInformation(
-            connector, synapse_dynamics_stdp, synapse_type)
+            connector, synapse_dynamics_stdp, synapse_type,
+            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
+
+        # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
             machine_time_step)
 
         # handle max delay
-        max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
+        max_delay = synapse_dynamics_stdp.get_delay_maximum(
+            connector, self._synapse_information.delay)
         if max_delay is None:
             max_delay = user_max_delay
 

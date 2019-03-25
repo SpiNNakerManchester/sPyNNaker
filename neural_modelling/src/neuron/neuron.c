@@ -15,6 +15,9 @@
 // declare spin1_wfi
 void spin1_wfi();
 
+// Spin1 API ticks - to know when the timer wraps
+extern uint ticks;
+
 #define SPIKE_RECORDING_CHANNEL 0
 #define DMA_TAG_READ_SYNAPTIC_CONTRIBUTION 1
 
@@ -85,10 +88,6 @@ static timed_state_t **var_recording_values;
 //! The size of the recorded variables in bytes for a timestep
 static uint32_t *var_recording_size;
 
-//! The number of clock ticks to back off before starting the timer, in an
-//! attempt to avoid overloading the network
-static uint32_t random_backoff;
-
 //! The number of clock ticks between sending each spike
 static uint32_t time_between_spikes;
 
@@ -120,7 +119,7 @@ static weight_t *synaptic_region;
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
-    RANDOM_BACKOFF, TIME_BETWEEN_SPIKES, HAS_KEY,
+    TIMER_START_OFFSET, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
     MEM_INDEX, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
@@ -228,7 +227,8 @@ void recording_done_callback() {
     n_recordings_outstanding -= 1;
 }
 
-bool neuron_do_timestep_update(timer_t time) {
+void neuron_do_timestep_update(
+        timer_t time, uint timer_count, uint timer_period) {
 
     current_time = time;
 
@@ -237,9 +237,7 @@ bool neuron_do_timestep_update(timer_t time) {
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region, synaptic_contributions,
         DMA_READ, dma_size);
 
-    // Wait a random number of clock cycles (and ensure DMA transfer is finished)
-    uint32_t random_backoff_time = tc[T1_COUNT] - random_backoff;
-    while ((tc[T1_COUNT] > random_backoff_time) || (!dma_finished)) { //|| ((dma[DMA_STAT] & 0x400) == 0)
+    while (!dma_finished) {
 
         // Do Nothing
     }
@@ -250,7 +248,7 @@ bool neuron_do_timestep_update(timer_t time) {
     //dma[DMA_CTRL] |= 0x8;
 
     // Set the next expected time to wait for between spike sending
-    expected_time = tc[T1_COUNT] - time_between_spikes;
+    expected_time = sv->cpu_clk * timer_period;
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
@@ -315,7 +313,8 @@ bool neuron_do_timestep_update(timer_t time) {
             if (use_key) {
 
                 // Wait until the expected time to send
-                while (tc[T1_COUNT] > expected_time) {
+                while ((ticks == timer_count) &&
+                        (tc[T1_COUNT] > expected_time)) {
 
                     // Do Nothing
                 }
@@ -380,15 +379,15 @@ void _dma_done_callback(uint arg1, uint arg2) {
     dma_finished = true;
 }
 
-bool neuron_initialise(address_t address) {
+bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     log_debug("neuron_initialise: starting");
 
-    random_backoff = address[RANDOM_BACKOFF];
+    *timer_offset = address[TIMER_START_OFFSET];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
     log_debug(
         "\t back off = %u, time between spikes %u",
-        random_backoff, time_between_spikes);
+        *timer_offset, time_between_spikes);
 
     // Check if there is a key to use
     use_key = address[HAS_KEY];
@@ -560,3 +559,13 @@ bool neuron_initialise(address_t address) {
 
     return true;
 }
+
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_print_inputs() {
+	neuron_impl_print_inputs(n_neurons);
+}
+
+const char *neuron_get_synapse_type_char(uint32_t synapse_type) {
+	return neuron_impl_get_synapse_type_char(synapse_type);
+}
+#endif // LOG_LEVEL >= LOG_DEBUG
