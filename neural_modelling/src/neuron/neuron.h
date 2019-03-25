@@ -31,7 +31,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset);
 //!        period has occurred.
 //! \param[in] time the timer tick value currently being executed
 //! \return nothing
-void neuron_do_timestep_update(
+bool neuron_do_timestep_update(
         uint32_t time, uint timer_count, uint timer_period);
 
 //! \brief interface for reloading neuron parameters as needed

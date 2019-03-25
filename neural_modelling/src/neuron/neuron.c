@@ -227,7 +227,7 @@ void recording_done_callback() {
     n_recordings_outstanding -= 1;
 }
 
-void neuron_do_timestep_update(
+bool neuron_do_timestep_update(
         timer_t time, uint timer_count, uint timer_period) {
 
     current_time = time;
@@ -271,9 +271,6 @@ void neuron_do_timestep_update(
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
-            if(synaptic_contributions[buff_index])
-                io_printf(IO_BUF, "adding neuron input %d to neuron %d syn %d time %d\n", synaptic_contributions[buff_index], neuron_index, synapse_type_index, time);
-
             neuron_impl_add_inputs(
                 synapse_type_index,
                 neuron_index,
@@ -299,8 +296,6 @@ void neuron_do_timestep_update(
 
         // If the neuron has spiked
         if (spike) {
-
-            io_printf(IO_BUF, "neuron %u spiked at time %u\n", neuron_index, time);
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
@@ -408,12 +403,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     memory_index = address[MEM_INDEX];
 
-    io_printf(IO_BUF, "\nneurons: %d syn types: %d mem index: %d\n", n_neurons, n_synapse_types, memory_index);
-
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
-
-    io_printf(IO_BUF, "RECORDED VARS: %d\n", n_recorded_vars);
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
@@ -441,8 +432,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     dma_finished = false;
 
-    io_printf(IO_BUF, "dma_size:%d\n", dma_size);
-
 
     //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
     //Flag = 1 is to allocate with lock in order to avoid multiple accesses
@@ -453,14 +442,10 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         synaptic_region[i] = 0;
     }
 
-    io_printf(IO_BUF, "Syn index bits = %d\n", synapse_index_bits);
-
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
         return false;
     }
-
-    io_printf(IO_BUF, "Returned from neuron impl initialise");
 
     // Allocate space for the synaptic contribution buffer
     synaptic_contributions = (weight_t *) spin1_malloc(dma_size);
@@ -485,8 +470,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     if (!out_spikes_initialize(n_neurons)) {
         return false;
     }
-
-    io_printf(IO_BUF, "returned from out spikes initialise\n");
 
     // Allocate recording space
     spike_recording_indexes = (uint8_t *) spin1_malloc(
@@ -543,14 +526,10 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         }
     }
 
-    io_printf(IO_BUF, "Allocated recording areas!!!!!!\n");
-
     // load the data into the allocated DTCM spaces.
     if (!_neuron_load_neuron_parameters(address)){
         return false;
     }
-
-    io_printf(IO_BUF, "Returned from neuron load parameters!!!\n");
 
     _reset_record_counter();
 

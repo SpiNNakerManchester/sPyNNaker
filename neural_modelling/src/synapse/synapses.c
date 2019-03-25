@@ -207,9 +207,7 @@ static inline void _process_fixed_synapses(
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
             delay + time, combined_synapse_neuron_index,
-            synapse_index_bits); //GIUSTO????????????????????????????
-
-        io_printf(IO_BUF, "delay: %d combined syn neu index %x\n", delay, combined_synapse_neuron_index);
+            synapse_index_bits);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
@@ -224,12 +222,9 @@ static inline void _process_fixed_synapses(
             saturation_count += 1;
         }
 
-        //io_printf(IO_BUF, "Spike, buf index: %d, prev: %d, new val: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], accumulation);
-
         // Store saturated value back in ring-buffer
 
         ring_buffers[ring_buffer_index] = accumulation;
-        io_printf(IO_BUF, "writing at index: %d value:%d, timestep: %d\n", ring_buffer_index, ring_buffers[ring_buffer_index], time);
     }
 }
 
@@ -264,16 +259,12 @@ bool synapses_initialise(
     *n_synapse_types_value = synapse_params_address[N_SYNAPSE_TYPES];
     n_synapse_types = *n_synapse_types_value;
 
-    io_printf(IO_BUF, "n_neurons: %d, syn types: %d\n", n_neurons, n_synapse_types);
-
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = synapse_params_address[INCOMING_SPIKE_BUFFER_SIZE];
 
     synapse_index = synapse_params_address[SYNAPSE_INDEX];
 
     memory_index = synapse_params_address[MEM_INDEX];
-
-    io_printf(IO_BUF, "syn index %d, mem index %d\n", synapse_index, memory_index);
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
@@ -340,16 +331,12 @@ bool synapses_initialise(
     size_to_be_transferred =
         (1 << (log_n_neurons + log_n_synapse_types)) * sizeof(weight_t);
 
-    io_printf(IO_BUF, "size_to_be_transferred: %d\n", size_to_be_transferred);
-
     synapse_type_index_bits = log_n_neurons + 1;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-
-    io_printf(IO_BUF, "Syn_index_bits: %d  SYNAPSE_DELAY_MASK: %d synapse_type_index_bits:%d\n", synapse_index_bits, SYNAPSE_DELAY_MASK, synapse_type_index_bits);
 
     return true;
 }
@@ -370,10 +357,6 @@ void synapses_do_timestep_update(timer_t time) {
     spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
-
-    //for (uint i = ring_buffer_index; i < ring_buffer_index + (size_to_be_transferred / sizeof(weight_t)) ; i++)
-    //    if(ring_buffers[i] != 0)
-    //        io_printf(IO_BUF, "written: %d\n", ring_buffers[i]);
 
     _print_inputs();
 

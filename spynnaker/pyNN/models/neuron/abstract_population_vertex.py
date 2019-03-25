@@ -458,22 +458,22 @@ class AbstractPopulationVertex(
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
                     weight_mean = (
-                        synapse_dynamics.get_weight_mean(connector) *
+                        synapse_dynamics.get_weight_mean(connector, synapse_info.weight) *
                         application_vertex.weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum()
                     weight_variance = synapse_dynamics.get_weight_variance(
-                        connector) * weight_scale_squared
+                        connector, synapse_info.weight) * weight_scale_squared
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector)
+                        connector, synapse_info.delay)
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector) * application_vertex.weight_scale)
+                        connector, synapse_info.weight) * application_vertex.weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
