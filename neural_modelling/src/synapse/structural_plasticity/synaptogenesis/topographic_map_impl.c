@@ -7,8 +7,8 @@
  * Author: Petrut Bogdan
  *
  */
-#include <neuron/structural_plasticity/synaptogenesis_dynamics.h>
-#include <neuron/population_table/population_table.h>
+#include <synapse/structural_plasticity/synaptogenesis_dynamics.h>
+#include <synapse/population_table/population_table.h>
 
 
 #include <random.h>
@@ -16,13 +16,13 @@
 #include <debug.h>
 #include <stdfix-full-iso.h>
 
-#include <neuron/synapse_row.h>
+#include <synapse/synapse_row.h>
 
-#include <neuron/synapses.h>
-#include <neuron/plasticity/synapse_dynamics.h>
+#include <synapse/synapses.h>
+#include <synapse/plasticity/synapse_dynamics.h>
 
 #include <common/maths-util.h>
-#include <neuron/structural_plasticity/sp_structs.h>
+#include <synapse/structural_plasticity/sp_structs.h>
 #include <simulation.h>
 
 // For last spike selection
