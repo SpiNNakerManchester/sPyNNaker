@@ -139,6 +139,11 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):
+        # Is the stdp_model that I wrap around (am) the same as a different one
+        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and not
+                isinstance(synapse_dynamics,
+                           AbstractSynapseDynamicsStructural)):
+            return synapse_dynamics.is_same_as(self)
         if not isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP):
             return False
         return self._common_sp.is_same_as(synapse_dynamics)
