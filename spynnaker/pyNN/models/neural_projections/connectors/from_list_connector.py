@@ -147,7 +147,7 @@ class FromListConnector(AbstractConnector):
                 connection_slices = [
                     slice(n, n+1) for n in range(mask.size) if mask[n]]
                 block["weight"] = self._generate_weights(
-                    weights, sources.size, connection_slices) # None)
+                    weights, sources.size, connection_slices)
             else:
                 block["weight"] = 0
         else:
@@ -159,7 +159,7 @@ class FromListConnector(AbstractConnector):
                 connection_slices = [
                     slice(n, n+1) for n in range(mask.size) if mask[n]]
                 block["delay"] = self._generate_delays(
-                    delays, sources.size, connection_slices) # None)
+                    delays, sources.size, connection_slices)
             else:
                 block["delay"] = 0
         else:
