@@ -142,14 +142,26 @@ class FromListConnector(AbstractConnector):
         block["target"] = self._targets[mask]
         # check that conn_list has weights, if not then use the value passed in
         if self._weights is None:
-            block["weight"] = self._generate_weights(
-                weights, sources.size, None)
+            if sources.size:
+                # create connection slices for this pre+post based on the mask
+                connection_slices = [
+                    slice(n, n+1) for n in range(mask.size) if mask[n]]
+                block["weight"] = self._generate_weights(
+                    weights, sources.size, connection_slices) # None)
+            else:
+                block["weight"] = 0
         else:
             block["weight"] = self._weights[mask]
         # check that conn_list has delays, if not then use the value passed in
         if self._delays is None:
-            block["delay"] = self._generate_delays(
-                delays, sources.size, None)
+            if sources.size:
+                # create connection slices for this pre+post based on the mask
+                connection_slices = [
+                    slice(n, n+1) for n in range(mask.size) if mask[n]]
+                block["delay"] = self._generate_delays(
+                    delays, sources.size, connection_slices) # None)
+            else:
+                block["delay"] = 0
         else:
             block["delay"] = self._clip_delays(self._delays[mask])
         block["synapse_type"] = synapse_type
