@@ -221,8 +221,6 @@ void timer_callback(uint timer_count, uint unused) {
     //If first timer tick retrieve the address of the buffer for synaptic contribution
     if(time == 0) {
 
-        io_printf(IO_BUF, "Timer \n");
-
         synapses_set_contribution_region();
     }
     else {
