@@ -1,23 +1,20 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models \
-    import AbstractSupportsDatabaseInjection
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
 from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.abstract_models import AbstractRecordable
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models \
-    import AbstractReceiveBuffersToHost
-from spinn_front_end_common.interface.buffer_management \
-    import recording_utilities
-
-from spynnaker.pyNN.utilities.constants \
-    import LIVE_POISSON_CONTROL_PARTITION_ID
-
-from enum import Enum
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsDatabaseInjection, AbstractRecordable)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID)
 
 
 class SpikeSourcePoissonMachineVertex(

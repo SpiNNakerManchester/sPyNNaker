@@ -1,5 +1,4 @@
 import os
-
 import spynnaker.pyNN.utilities.utility_calls as utility_calls
 
 

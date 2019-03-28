@@ -1,12 +1,13 @@
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
-from spinn_front_end_common.abstract_models.impl import \
-    ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .push_bot_ethernet_device import PushBotEthernetDevice
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotSpeaker
+    import (
+        PushBotSpeaker)
 
 
 class PushBotEthernetSpeakerDevice(
