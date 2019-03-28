@@ -11,28 +11,40 @@
 #ifndef _SYNAPSE_TYPES_DELTA_IMPL_H_
 #define _SYNAPSE_TYPES_DELTA_IMPL_H_
 
+
 //---------------------------------------
 // Macros
 //---------------------------------------
 #define SYNAPSE_TYPE_BITS 1
 #define SYNAPSE_TYPE_COUNT 2
 
+#define NUM_EXCITATORY_RECEPTORS 1
+#define NUM_INHIBITORY_RECEPTORS 1
+
 #include <debug.h>
-#include "../../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
+#include "synapse_types.h"
+
 
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-typedef struct synapse_param_t {
-    input_t input_buffer_excitatory_value;
-    input_t input_buffer_inhibitory_value;
-} synapse_param_t;
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-#include "synapse_types.h"
+typedef struct delta_params_t{
+	input_t synaptic_input_value;
+}delta_params_t;
+
+typedef struct synapse_param_t {
+	delta_params_t exc;
+	delta_params_t inh;
+} synapse_param_t;
 
 typedef enum input_buffer_regions {
     EXCITATORY, INHIBITORY,
 } input_buffer_regions;
+
 
 //---------------------------------------
 // Synapse shaping inline implementation
@@ -45,10 +57,24 @@ typedef enum input_buffer_regions {
 //! to the neuron.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
+static inline void delta_shaping(delta_params_t* delta_params){
+	delta_params->synaptic_input_value = 0;
+}
+
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
-    parameter->input_buffer_excitatory_value = 0;
-    parameter->input_buffer_inhibitory_value = 0;
+
+	delta_shaping(&parameter->exc);
+	delta_shaping(&parameter->inh);
+}
+
+//! \brief helper function to add input for a given timer period to a given
+//! neuron
+//! \param[in]  parameter: the pointer to the parameters to use
+//! \param[in] input the inputs to add.
+//! \return None
+static inline void add_input_delta(delta_params_t* delta_params, input_t input){
+	delta_params->synaptic_input_value += input;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -63,29 +89,32 @@ static inline void synapse_types_add_neuron_input(
         input_t input) {
 
     if (synapse_type_index == EXCITATORY) {
-        parameter->input_buffer_excitatory_value += input;
+    	add_input_delta(&parameter->exc, input);
 
     } else if (synapse_type_index == INHIBITORY) {
-        parameter->input_buffer_inhibitory_value += input;
+    	add_input_delta(&parameter->inh, input);
+
     }
 }
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //! for a given parameter set
 //! \param[in]  parameter: the pointer to the parameters to use
-//! \return the excitatory input buffers for a given neuron id.
-static inline input_t synapse_types_get_excitatory_input(
+//! \return the excitatory input buffers for a given neuron ID.
+static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
-    return parameter->input_buffer_excitatory_value;
+    excitatory_response[0] = parameter->exc.synaptic_input_value;
+    return &excitatory_response[0];
 }
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given parameter set
 //! \param[in]  parameter: the pointer to the parameters to use
-//! \return the inhibitory input buffers for a given neuron id.
-static inline input_t synapse_types_get_inhibitory_input(
+//! \return the inhibitory input buffers for a given neuron ID.
+static inline input_t* synapse_types_get_inhibitory_input(
         synapse_param_pointer_t parameter) {
-    return parameter->input_buffer_inhibitory_value;
+    inhibitory_response[0] = parameter->inh.synaptic_input_value;
+    return &inhibitory_response[0];
 }
 
 //! \brief returns a human readable character for the type of synapse.
@@ -105,7 +134,7 @@ static inline const char *synapse_types_get_type_char(
     }
 }
 
-//! \brief prints the input for a neuron id given the available inputs
+//! \brief prints the input for a neuron ID given the available inputs
 //! currently only executed when the models are in debug mode, as the prints
 //! are controlled from the synapses.c _print_inputs method.
 //! \param[in]  parameter: the pointer to the parameters to use
@@ -114,8 +143,9 @@ static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
     io_printf(
         IO_BUF, "%12.6k - %12.6k",
-        parameter->input_buffer_excitatory_value,
-        parameter->input_buffer_inhibitory_value);
+        parameter->exc.synaptic_input_value,
+        parameter->inh.synaptic_input_value
+		);
 }
 
 //! \brief printer call

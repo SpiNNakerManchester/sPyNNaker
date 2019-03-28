@@ -1,12 +1,14 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
-    import plasticity_helpers
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
-
 import logging
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    plasticity_helpers)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
+    import (
+        AbstractTimingDependence)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
+    import (
+        SynapseStructureWeightOnly)
+
 logger = logging.getLogger(__name__)
 
 LOOKUP_TAU_PLUS_SIZE = 256
@@ -20,11 +22,19 @@ LOOKUP_TAU_Y_SHIFT = 2
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    __slots__ = [
+        "_synapse_structure",
+        "_tau_minus",
+        "_tau_minus_last_entry",
+        "_tau_plus",
+        "_tau_plus_last_entry",
+        "_tau_x",
+        "_tau_x_last_entry",
+        "_tau_y",
+        "_tau_y_last_entry"]
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
-        AbstractTimingDependence.__init__(self)
-
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
         self._tau_x = tau_x
@@ -54,6 +64,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def tau_y(self):
         return self._tau_y
 
+    @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         if not isinstance(
                 timing_dependence, TimingDependencePfisterSpikeTriplet):
@@ -74,6 +85,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return 4
 
+    @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         return (2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE +
                      LOOKUP_TAU_X_SIZE + LOOKUP_TAU_Y_SIZE))
@@ -82,6 +94,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def n_weight_terms(self):
         return 2
 
+    @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Check timestep is valid
@@ -105,6 +118,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def synaptic_structure(self):
         return self._synapse_structure
 
+    @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(

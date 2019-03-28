@@ -1,20 +1,14 @@
 import unittest
-
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotLaser
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotMotor
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotSpeaker
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotLED
+    import (
+        PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
 
 
 class Test(unittest.TestCase):
 
     def _test_device_enum(self, enum_class):
         for item in enum_class:
-            print item
+            print(item)
             item.value
             item.protocol_property
             item.min_value

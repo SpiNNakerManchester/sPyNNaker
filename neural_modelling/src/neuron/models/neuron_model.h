@@ -6,7 +6,7 @@
 #ifndef _NEURON_MODEL_H_
 #define _NEURON_MODEL_H_
 
-#include "../../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
 
 //! Forward declaration of neuron type (creates a definition for a pointer to a
 //   Neuron parameter struct
@@ -21,10 +21,14 @@ void neuron_model_set_global_neuron_params(
     global_neuron_params_pointer_t params);
 
 //! \brief primary function called in timer loop after synaptic updates
-//! \param[in] exc_input The inputs received this timer tick that produces
-//!     a positive reaction within the neuron in terms of stimulation.
-//! \param[in] inh_input The inputs received this timer tick that produces
-//!     a negative reaction within the neuron in terms of stimulation.
+//! \param[in] num_excitatory_inputs Number of excitatory receptor types.
+//! \param[in] exc_input Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a positive reaction within the neuron in
+//!     terms of stimulation.
+//! \param[in] num_inhibitory_inputs Number of inhibitory receptor types.
+//! \param[in] inh_input Pointer to array of inputs per receptor type received
+//!     this timer tick that produce a negative reaction within the neuron in
+//!     terms of stimulation.
 //! \param[in] external_bias This is the intrinsic plasticity which could be
 //!     used for ac, noisy input etc etc. (general purpose input)
 //! \param[in] neuron the pointer to a neuron parameter struct which contains
@@ -32,8 +36,9 @@ void neuron_model_set_global_neuron_params(
 //! \return state_t which is the value to be compared with a threshold value
 //!     to determine if the neuron has spiked
 state_t neuron_model_state_update(
-    input_t exc_input, input_t inh_input, input_t external_bias,
-    neuron_pointer_t neuron);
+        uint16_t num_excitatory_inputs, input_t* exc_input,
+        uint16_t num_inhibitory_inputs, input_t* inh_input,
+        input_t external_bias, neuron_pointer_t neuron);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in] neuron pointer to a neuron parameter struct which contains all

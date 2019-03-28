@@ -1,131 +1,66 @@
-from .abstract_connector import AbstractConnector
-from spynnaker.pyNN import exceptions
-from spynnaker.pyNN.utilities import utility_calls
 import logging
 import numpy
+from spinn_utilities.overrides import overrides
+from .abstract_connector import AbstractConnector
+from spynnaker.pyNN.exceptions import InvalidParameterType
 
 logger = logging.getLogger(__name__)
+
+# Indices of the source and target in the connection list array
+_SOURCE = 0
+_TARGET = 1
+_FIRST_PARAM = 2
 
 
 class FromListConnector(AbstractConnector):
     """ Make connections according to a list.
-
-    :param: conn_list:
-        a list of tuples, one tuple for each connection. Each
-        tuple should contain::
-
-         (pre_idx, post_idx, weight, delay)
-
-        where pre_idx is the index (i.e. order in the Population,
-        not the ID) of the presynaptic neuron, and post_idx is
-        the index of the postsynaptic neuron.
     """
+    __slots__ = [
+        "_conn_list",
+        "_column_names",
+        "_sources",
+        "_targets",
+        "_weights",
+        "_delays",
+        "_extra_parameters",
+        "_extra_parameter_names"]
 
-    CONN_LIST_DTYPE = numpy.dtype([
-        ("source", numpy.uint32), ("target", numpy.uint32),
-        ("weight", numpy.float64), ("delay", numpy.float64)])
-
-    def __init__(self, conn_list, safe=True, verbose=False):
+    def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
-        Creates a new FromListConnector.
+        :param: conn_list:
+            a list of tuples, one tuple for each connection. Each\
+            tuple should contain at least::
+
+                (pre_idx, post_idx)
+
+            where pre_idx is the index (i.e. order in the Population,\
+            not the ID) of the presynaptic neuron, and post_idx is\
+            the index of the postsynaptic neuron.
+
+            Additional items per synapse are acceptable but all synapses\
+            should have the same number of items.
         """
-        AbstractConnector.__init__(self, safe, verbose)
-        if conn_list is None or len(conn_list) == 0:
-            raise exceptions.InvalidParameterType(
-                "The connection list for the FromListConnector must contain"
-                " at least a list of tuples, each of which should contain:"
-                " (pre_idx, post_idx)")
-        self._conn_list = conn_list
+        super(FromListConnector, self).__init__(safe, verbose)
 
-        # supports setting these at different times
-        self._weights = None
-        self._delays = None
-        self._converted_weights_and_delays = False
+        # Need to set column names first, as setter uses this
+        self._column_names = column_names
 
-    @staticmethod
-    def _split_conn_list(conn_list, column_names):
-        """ takes the conn list and separates them into the blocks needed
+        # Call the conn_list setter, as this sets the internal values
+        self.conn_list = conn_list
 
-        :param conn_list: the original conn list
-        :param column_names: the column names if exist
-        :return: source dest list, weights list, delays list, extra list
-        """
-
-        # weights and delay index
-        weight_index = None
-        delay_index = None
-
-        # conn lists
-        weights = None
-        delays = None
-
-        # locate weights and delay index in the listings
-        if "weight" in column_names:
-            weight_index = column_names.index("weight")
-        if "delay" in column_names:
-            delay_index = column_names.index("delay")
-        element_index = range(2, len(column_names))
-
-        # figure out where other stuff is
-        conn_list = numpy.array(conn_list)
-        source_destination_conn_list = conn_list[:, [0, 1]]
-
-        if weight_index is not None:
-            element_index.remove(weight_index)
-            weights = conn_list[:, weight_index]
-        if delay_index is not None:
-            element_index.remove(delay_index)
-            delays = conn_list[:, delay_index]
-
-        # build other data element conn list (with source and destination)
-        other_conn_list = None
-        other_element_column_names = list()
-        for element in element_index:
-            other_element_column_names.append(column_names[element])
-        if len(element_index) != 0:
-            other_conn_list = conn_list[:, element_index]
-            other_conn_list.dtype.names = other_element_column_names
-
-        # hand over splitted data
-        return source_destination_conn_list, weights, delays, other_conn_list
-
-    def set_weights_and_delays(self, weights, delays):
-        """ allows setting of the weights and delays at seperate times to the
-        init, also sets the dtypes correctly.....
-
-        :param weights:
-        :param delays:
-        :return:
-        """
-        # set the data if not already set (supports none overriding via
-        # synapse data)
-        if self._weights is None:
-            self._weights = utility_calls.convert_param_to_numpy(
-                weights, len(self._conn_list))
+    @overrides(AbstractConnector.get_delay_maximum)
+    def get_delay_maximum(self, delays):
         if self._delays is None:
-            self._delays = utility_calls.convert_param_to_numpy(
-                delays, len(self._conn_list))
+            return numpy.max(delays)
+        else:
+            return numpy.max(self._delays)
 
-        # if got data, build connlist with correct dtypes
-        if (self._weights is not None and self._delays is not None and not
-                self._converted_weights_and_delays):
-            # add weights and delays to the conn list
-            temp_conn_list = numpy.dstack(
-                (self._conn_list[:, 0], self._conn_list[:, 1],
-                 self._weights, self._delays))[0]
-
-            self._conn_list = list()
-            for element in temp_conn_list:
-                self._conn_list.append((element[0], element[1], element[2],
-                                        element[3]))
-
-            # set dtypes (cant we just set them within the array?)
-            self._conn_list = numpy.asarray(self._conn_list,
-                                            dtype=self.CONN_LIST_DTYPE)
-            self._converted_weights_and_delays = True
-
-    def get_delay_maximum(self):
-        return numpy.max(self._conn_list["delay"])
+    @overrides(AbstractConnector.get_delay_variance)
+    def get_delay_variance(self, delays):
+        if self._delays is None:
+            return numpy.var(delays)
+        else:
+            return numpy.var(self._delays)
 
     def _get_filtered_connections(
             self, pre_vertex_slice, post_vertex_slice, min_delay=None,
@@ -139,93 +74,208 @@ class FromListConnector(AbstractConnector):
             mask &= self._conn_list["delay"] <= max_delay
         return self._conn_list[numpy.where(mask)[0]]
 
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        delays = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)["delay"]
-        if delays.size == 0:
-            return 0
-        return numpy.var(delays)
-
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        sources = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice, min_delay,
-            max_delay)["source"]
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+
+        mask = None
+        if min_delay is None or max_delay is None or self._delays is None:
+            mask = ((self._targets >= post_vertex_slice.lo_atom) &
+                    (self._targets <= post_vertex_slice.hi_atom))
+        elif self._delays is not None:
+            mask = ((self._targets >= post_vertex_slice.lo_atom) &
+                    (self._targets <= post_vertex_slice.hi_atom) &
+                    (self._delays >= min_delay) &
+                    (self._delays <= max_delay))
+        if mask is None:
+            sources = self._sources
+        else:
+            sources = self._sources[mask]
         if sources.size == 0:
             return 0
-        return numpy.max(numpy.bincount(sources.view('int32')))
+        max_targets = numpy.max(numpy.bincount(
+            sources.astype('int64', copy=False)))
 
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        targets = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)["target"]
-        if targets.size == 0:
+        # If no delays just return max targets as this is for all delays
+        # If there are delays in the list, this was also handled above
+        if min_delay is None or max_delay is None or self._delays is not None:
+            return max_targets
+
+        # If here, there must be no delays in the list, so use the passed in
+        # ones
+        return self._get_n_connections_from_pre_vertex_with_delay_maximum(
+            delays, self._n_pre_neurons * self._n_post_neurons,
+            max_targets, min_delay, max_delay)
+
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
+    def get_n_connections_to_post_vertex_maximum(self):
+        if not len(self._targets):
             return 0
-        return numpy.max(numpy.bincount(targets.view('int32')))
+        # pylint: disable=too-many-arguments
+        return numpy.max(numpy.bincount(
+            self._targets.astype('int64', copy=False)))
 
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        weights = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)["weight"]
-        if weights.size == 0:
-            return 0
-        return numpy.mean(weights)
+    @overrides(AbstractConnector.get_weight_mean)
+    def get_weight_mean(self, weights):
+        if self._weights is None:
+            return numpy.mean(weights)
+        else:
+            return numpy.mean(numpy.abs(self._weights))
 
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        weights = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)["weight"]
-        if weights.size == 0:
-            return 0
-        return numpy.max(weights)
+    @overrides(AbstractConnector.get_weight_maximum)
+    def get_weight_maximum(self, weights):
+        # pylint: disable=too-many-arguments
+        if self._weights is None:
+            return numpy.amax(weights)
+        else:
+            return numpy.amax(numpy.abs(self._weights))
 
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        weights = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)["weight"]
-        if weights.size == 0:
-            return 0
-        return numpy.var(weights)
+    @overrides(AbstractConnector.get_weight_variance)
+    def get_weight_variance(self, weights):
+        # pylint: disable=too-many-arguments
+        if self._weights is None:
+            return numpy.var(weights)
+        else:
+            return numpy.var(numpy.abs(self._weights))
 
-    def generate_on_machine(self):
-        return False
-
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        items = self._get_filtered_connections(
-            pre_vertex_slice, post_vertex_slice)
-        block = numpy.zeros(
-            items.size, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = items["source"]
-        block["target"] = items["target"]
-        block["weight"] = items["weight"]
-        block["delay"] = self._clip_delays(items["delay"])
+        # pylint: disable=too-many-arguments
+        mask = ((self._sources >= pre_vertex_slice.lo_atom) &
+                (self._sources <= pre_vertex_slice.hi_atom) &
+                (self._targets >= post_vertex_slice.lo_atom) &
+                (self._targets <= post_vertex_slice.hi_atom))
+        sources = self._sources[mask]
+        block = numpy.zeros(sources.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        block["source"] = sources
+        block["target"] = self._targets[mask]
+        # check that conn_list has weights, if not then use the value passed in
+        if self._weights is None:
+            block["weight"] = self._generate_weights(
+                weights, sources.size, None)
+        else:
+            block["weight"] = self._weights[mask]
+        # check that conn_list has delays, if not then use the value passed in
+        if self._delays is None:
+            block["delay"] = self._generate_delays(
+                delays, sources.size, None)
+        else:
+            block["delay"] = self._clip_delays(self._delays[mask])
         block["synapse_type"] = synapse_type
         return block
 
     def __repr__(self):
         return "FromListConnector(n_connections={})".format(
-            len(self._conn_list))
+            len(self._sources))
 
     @property
     def conn_list(self):
         return self._conn_list
 
     @conn_list.setter
-    def conn_list(self, new_value):
-        self._conn_list = new_value
+    def conn_list(self, conn_list):
+        if conn_list is None or not len(conn_list):
+            self._conn_list = numpy.zeros((0, 2), dtype="uint32")
+        else:
+            self._conn_list = numpy.array(conn_list)
 
-    def _set_data(self, new_value, name):
-        for index in self._conn_list:
-            for (source, dest) in self._conn_list[index]:  # @UnusedVariable
-                pass
+        # If the shape of the conn_list is 2D, numpy has been able to create
+        # a 2D array which means every entry has the same number of values.
+        # If this was not possible, raise an exception!
+        if len(self._conn_list.shape) != 2:
+            raise InvalidParameterType(
+                "Each tuple in the connection list for the"
+                " FromListConnector must have the same number of elements")
+
+        # This tells us how many columns are in the list
+        n_columns = self._conn_list.shape[1]
+        if n_columns < 2:
+            raise InvalidParameterType(
+                "Each tuple in the connection list for the"
+                " FromListConnector must have at least 2 elements")
+        if (self._column_names is not None and
+                n_columns != len(self._column_names) + _FIRST_PARAM):
+            raise InvalidParameterType(
+                "The number of column names must match the number of"
+                " additional elements in each tuple in the connection list,"
+                " not including the pre_idx or post_idx")
+
+        # Get the column names if not specified
+        column_names = self._column_names
+        if self._column_names is None:
+            if n_columns == 4:
+                column_names = ('weight', 'delay')
+            elif n_columns == 2:
+                column_names = ()
+            else:
+                raise TypeError(
+                    "Need to set 'column_names' for n_columns={}".format(
+                        n_columns))
+
+        # Set the source and targets
+        self._sources = self._conn_list[:, _SOURCE]
+        self._targets = self._conn_list[:, _TARGET]
+
+        # Find any weights
+        self._weights = None
+        try:
+            weight_column = column_names.index('weight') + _FIRST_PARAM
+            self._weights = self._conn_list[:, weight_column]
+        except ValueError:
+            pass
+
+        # Find any delays
+        self._delays = None
+        try:
+            delay_column = column_names.index('delay') + _FIRST_PARAM
+            self._delays = self._conn_list[:, delay_column]
+        except ValueError:
+            pass
+
+        # Find extra columns
+        extra_columns = list()
+        for i, name in enumerate(column_names):
+            if name not in ('weight', 'delay'):
+                extra_columns.append(i + _FIRST_PARAM)
+
+        # Check any additional parameters have single values over the whole
+        # set of connections (as other things aren't currently supported
+        for i in extra_columns:
+            # numpy.ptp gives the difference between the maximum and
+            # minimum values of an array, so if 0, all values are equal
+            if numpy.ptp(self._conn_list[:, i]):
+                raise ValueError(
+                    "All values in column {} ({}) of a FromListConnector must"
+                    " have the same value".format(
+                        i, column_names[i - _FIRST_PARAM]))
+
+        # Store the extra data
+        self._extra_parameters = None
+        self._extra_parameter_names = None
+        if extra_columns:
+            self._extra_parameters = self._conn_list[:, extra_columns]
+            self._extra_parameter_names = [
+                column_names[i - _FIRST_PARAM] for i in extra_columns]
+
+    @property
+    def column_names(self):
+        return self._column_names
+
+    @column_names.setter
+    def column_names(self, column_names):
+        self._column_names = column_names
+
+    def get_extra_parameters(self):
+        """ Getter for the extra parameters.
+
+        :return: The extra parameters
+        """
+        return self._extra_parameters
+
+    def get_extra_parameter_names(self):
+        """ Getter for the names of the extra parameters
+        """
+        return self._extra_parameter_names

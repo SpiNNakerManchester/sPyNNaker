@@ -14,7 +14,8 @@ typedef struct {
     uint32_t post_window_length;
 } plasticity_trace_region_data_t;
 
-#include "../synapse_structure/synapse_structure_weight_state_accumulator_impl.h"
+#define STRUCTURE_PATH(file) <neuron/plasticity/stdp/synapse_structure/file>
+#include STRUCTURE_PATH(synapse_structure_weight_state_accumulator_impl.h)
 #include "timing_recurrent_common.h"
 
 static inline bool timing_recurrent_in_pre_window(

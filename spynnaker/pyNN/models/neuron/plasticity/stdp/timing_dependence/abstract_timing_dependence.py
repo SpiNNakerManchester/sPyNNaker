@@ -1,7 +1,6 @@
 from six import add_metaclass
-
-from spinn_utilities.abstract_base import \
-    AbstractBase, abstractmethod, abstractproperty
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -46,9 +45,10 @@ class AbstractTimingDependence(object):
 
     @abstractmethod
     def get_parameter_names(self):
-        """ get the params from the timing dependencies
+        """ Return the names of the parameters supported by this timing\
+            dependency model.
 
-        :return: iterable of basestring
+        :rtype: iterable(str)
         """
 
     def get_provenance_data(self, pre_population_label, post_population_label):

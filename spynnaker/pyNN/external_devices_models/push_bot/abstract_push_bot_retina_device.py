@@ -1,23 +1,19 @@
-from spinn_front_end_common.abstract_models.impl \
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
-
-from pacman.model.decorators import overrides
+from spinn_utilities.overrides import overrides
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
 
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl):
-
     def __init__(self, protocol, resolution):
-        ProvidesKeyToAtomMappingImpl.__init__(self)
         self._protocol = protocol
         self._resolution = resolution
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
     def start_resume_commands(self):
-
         commands = list()
 
         # add mode command if not done already
@@ -34,9 +30,7 @@ class AbstractPushBotRetinaDevice(
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        commands = list()
-        commands.append(self._protocol.disable_retina())
-        return commands
+        return [self._protocol.disable_retina()]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

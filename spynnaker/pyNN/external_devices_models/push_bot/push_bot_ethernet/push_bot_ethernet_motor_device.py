@@ -1,17 +1,18 @@
-from pacman.model.decorators import overrides
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
-from spinn_front_end_common.abstract_models.impl import \
-    ProvidesKeyToAtomMappingImpl
+from spinn_utilities.overrides import overrides
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .push_bot_ethernet_device import PushBotEthernetDevice
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotMotor
+    import (
+        PushBotMotor)
 
 
 class PushBotEthernetMotorDevice(
-        AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl,
-        PushBotEthernetDevice):
+        PushBotEthernetDevice, AbstractSendMeMulticastCommandsVertex,
+        ProvidesKeyToAtomMappingImpl):
     """ The motor of a PushBot
     """
 
@@ -29,9 +30,8 @@ class PushBotEthernetMotorDevice(
             raise ConfigurationException(
                 "motor parameter must be a PushBotMotor value")
 
-        ProvidesKeyToAtomMappingImpl.__init__(self)
-        PushBotEthernetDevice.__init__(
-            self, protocol, motor, True, timesteps_between_send)
+        super(PushBotEthernetMotorDevice, self).__init__(
+            protocol, motor, True, timesteps_between_send)
         self._command_protocol = protocol
 
     def set_command_protocol(self, command_protocol):

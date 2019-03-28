@@ -1,12 +1,13 @@
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
-    import PushBotEthernetMotorDevice
+from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet import (
+    PushBotEthernetMotorDevice)
 
 
 class PushBotSpiNNakerLinkMotorDevice(
         PushBotEthernetMotorDevice, ApplicationSpiNNakerLinkVertex):
     """ The motor of a PushBot
     """
+    __slots__ = []
 
     default_parameters = {
         'n_neurons': 1,
@@ -28,7 +29,7 @@ class PushBotSpiNNakerLinkMotorDevice(
         :param board_address:\
             The IP address of the board that the device is connected to
         """
-
+        # pylint: disable=too-many-arguments
         PushBotEthernetMotorDevice.__init__(self, motor, protocol)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id, n_atoms=n_neurons,

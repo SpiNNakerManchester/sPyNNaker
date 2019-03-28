@@ -62,6 +62,7 @@ class ConnectionHolder(object):
             This should accept a single parameter, which will contain the\
             data requested
         """
+        # pylint: disable=too-many-arguments
         self._data_items_to_return = data_items_to_return
         self._as_list = as_list
         self._n_pre_atoms = n_pre_atoms
@@ -102,20 +103,29 @@ class ConnectionHolder(object):
         if self._data_items is not None:
             return self._data_items
 
-        # If there are no connections added, raise an exception
-        if self._connections is None:
-            raise Exception(
-                "Connections are only set after run has been called, even if"
-                " you are trying to see the data before changes have been"
-                " made.  Try examining the {} after the call to run.".format(
-                    self._data_items_to_return))
+        if not self._connections:
+            # If there are no connections added, raise an exception
+            if self._connections is None:
+                raise Exception(
+                    "Connections are only set after run has been called, "
+                    "even if you are trying to see the data before changes "
+                    "have been made.  "
+                    "Try examining the {} after the call to run.".format(
+                        self._data_items_to_return))
+            # If the list is empty assume on a virtual machine
+            # with generation on machine
+            if len(self._connections) == 0:
+                raise Exception(
+                    "Connections list is empty. "
+                    "This may be because you are using a virtual machine. "
+                    "This projection creates connections on machine.")
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
         connections = numpy.concatenate(self._connections)
 
         # If there are additional fixed values, merge them in
-        if self._fixed_values is not None and len(self._fixed_values) > 0:
+        if self._fixed_values is not None and self._fixed_values:
 
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
@@ -144,7 +154,7 @@ class ConnectionHolder(object):
             # There are no specific items to return, so just get
             # all the data
             if (self._data_items_to_return is None or
-                    len(self._data_items_to_return) == 0):
+                    not self._data_items_to_return):
                 self._data_items = connections[order]
 
             # There is more than one item to return, so let numpy do its magic

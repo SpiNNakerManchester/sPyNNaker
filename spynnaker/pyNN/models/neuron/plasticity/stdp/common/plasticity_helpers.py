@@ -1,12 +1,9 @@
 import math
 import logging
-
 from data_specification.enums import DataType
-
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 logger = logging.getLogger(__name__)
-
 # Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
 
@@ -42,6 +39,7 @@ def write_exp_lut(spec, time_constant, size, shift,
 def get_lut_provenance(
         pre_population_label, post_population_label, rule_name, entry_name,
         param_name, last_entry):
+    # pylint: disable=too-many-arguments
     top_level_name = "{}_{}_STDP_{}".format(
         pre_population_label, post_population_label, rule_name)
     return ProvenanceDataItem(

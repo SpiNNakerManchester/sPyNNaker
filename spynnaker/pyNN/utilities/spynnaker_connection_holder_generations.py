@@ -7,14 +7,13 @@ logger = logging.getLogger(__name__)
 
 
 class SpYNNakerConnectionHolderGenerator(object):
-    """
-    method that sets up connection holders for reports to use.
+    """ Sets up connection holders for reports to use.
     """
 
     def __call__(self, application_graph):
         """
         :param application_graph: app graph
-        :return: the set of connection holders for after dsg generation
+        :return: the set of connection holders for after DSG generation
         """
 
         progress = ProgressBar(
@@ -22,24 +21,26 @@ class SpYNNakerConnectionHolderGenerator(object):
             "Generating connection holders for reporting connection data.")
 
         data_holders = dict()
-        for partition in \
-                progress.over(application_graph.outgoing_edge_partitions):
+        for partition in progress.over(
+                application_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 # add pre run generators so that reports can extract without
                 # going to machine.
                 if isinstance(edge, ProjectionApplicationEdge):
                     # build connection holders
-                    connection_holder = ConnectionHolder(
-                        None, True, edge.pre_vertex.n_atoms,
-                        edge.post_vertex.n_atoms)
-
-                    for synapse_information in edge.synapse_information:
-                        edge.post_vertex.add_pre_run_connection_holder(
-                            connection_holder, edge, synapse_information)
-
-                        # store for the report generations
-                        data_holders[(edge, synapse_information)] = \
-                            connection_holder
+                    self._generate_holder_for_edge(edge, data_holders)
 
         # return the two holders
         return data_holders
+
+    @staticmethod
+    def _generate_holder_for_edge(edge, data_holders):
+        # build connection holders
+        connection_holder = ConnectionHolder(
+            None, True, edge.pre_vertex.n_atoms, edge.post_vertex.n_atoms)
+
+        for synapse_information in edge.synapse_information:
+            edge.post_vertex.add_pre_run_connection_holder(
+                connection_holder, edge, synapse_information)
+            # store for the report generations
+            data_holders[edge, synapse_information] = connection_holder

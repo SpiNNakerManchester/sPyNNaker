@@ -25,7 +25,7 @@
 #ifndef _SYNAPSE_ROW_H_
 #define _SYNAPSE_ROW_H_
 
-#include "../common/neuron-typedefs.h"
+#include <common/neuron-typedefs.h>
 
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
@@ -37,39 +37,9 @@
 #define SYNAPSE_DELAY_BITS 4
 #endif
 
-#ifndef SYNAPSE_TYPE_BITS
-//! how many bits the synapse type will take
-//! (is expected to be done by implementations of synapse shapers)
-#define SYNAPSE_TYPE_BITS 1
-#error SYNAPSE_TYPE_BITS was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
-#ifndef SYNAPSE_TYPE_COUNT
-//! how many types of synapses will be supported
-//! (is expected to be done by implementations of synapse shapers)
-#define SYNAPSE_TYPE_COUNT 2
-#error SYNAPSE_TYPE_COUNT was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
-//! how many bits the synapse can support to represent the neuron id.
-#ifndef SYNAPSE_INDEX_BITS
-#define SYNAPSE_INDEX_BITS 8
-#endif
-
-//! how many bits the synapse type will need (includes the neuron id size)
-#define SYNAPSE_TYPE_INDEX_BITS (SYNAPSE_TYPE_BITS + SYNAPSE_INDEX_BITS)
-
 // Create some masks based on the number of bits
 //! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
-//! the mask for the synapse type in the row
-#define SYNAPSE_TYPE_MASK       ((1 << SYNAPSE_TYPE_BITS) - 1)
-//! the mask for the synapse index in the row
-#define SYNAPSE_INDEX_MASK      ((1 << SYNAPSE_INDEX_BITS) - 1)
-//! the mask for the synapse type index in the row
-#define SYNAPSE_TYPE_INDEX_MASK ((1 << SYNAPSE_TYPE_INDEX_BITS) - 1)
 
 // Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
@@ -86,7 +56,7 @@ typedef uint16_t control_t;
 // mixed plastic and fixed synapse rows.
 //
 // The data structure is treated as an array of 32-bit words.
-// Special meanings are ascribed to the 0-th and 1-st elements
+// Special meanings are ascribed to the 0th and 1st elements
 // of the array.
 //
 // We are expecting the original source address in SDRAM to be
@@ -112,24 +82,24 @@ static inline address_t synapse_row_plastic_region(address_t row) {
     return ((address_t) (&(row[1])));
 }
 
-// Returns the address of the nonplastic (or fixed) region
+// Returns the address of the non-plastic (or fixed) region
 static inline address_t synapse_row_fixed_region(address_t row) {
     return ((address_t) (&(row[synapse_row_plastic_size(row) + 1])));
 }
 
 // Within the fixed-region extracted using the above API, fixed[0]
 // Contains the number of 32-bit fixed synaptic words, fixed[1]
-// Contains the number of 16-buit plastic synapse control words
+// Contains the number of 16-bit plastic synapse control words
 // (The weights for the plastic synapses are assumed to be stored
 // In some learning-rule-specific format in the plastic region)
-//   0:            [ F = Num fixed synapses                                   ]
-//   1:           [ P = Size of plastic region in words                       ]
+//   0:           [ F = Num fixed synapses                                    ]
+//   1:           [ P = Size of plastic region in WORDS                       ]
 //   2:           [ First fixed synaptic word                                 ]
 //   ...
 // F+1:           [ Last fixed synaptic word                                  ]
 // F+2:           [ 1st plastic synapse control word|2nd plastic control word ]
 //   ...
-// F+1+ceil(P/2): [ Last word of fixed region              ]
+// F+1+ceil(P/2): [ Last word of fixed region                                 ]
 static inline size_t synapse_row_num_fixed_synapses(address_t fixed) {
     return ((size_t) (fixed[0]));
 }
@@ -139,7 +109,7 @@ static inline size_t synapse_row_num_plastic_controls(address_t fixed) {
 }
 
 static inline control_t* synapse_row_plastic_controls(address_t fixed) {
-    return ((control_t*) (&(fixed[2 + synapse_row_num_fixed_synapses(fixed)])));
+    return (control_t*) (&fixed[2 + synapse_row_num_fixed_synapses(fixed)]);
 }
 
 static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
@@ -147,20 +117,24 @@ static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
 }
 
 // The following are offset calculations into the ring buffers
-static inline index_t synapse_row_sparse_index(uint32_t x) {
-    return (x & SYNAPSE_INDEX_MASK);
+static inline index_t synapse_row_sparse_index(
+        uint32_t x, uint32_t synapse_index_mask) {
+    return (x & synapse_index_mask);
 }
 
-static inline index_t synapse_row_sparse_type(uint32_t x) {
-    return ((x >> SYNAPSE_INDEX_BITS) & SYNAPSE_TYPE_MASK);
+static inline index_t synapse_row_sparse_type(
+        uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
+    return ((x >> synapse_index_bits) & synapse_type_mask);
 }
 
-static inline index_t synapse_row_sparse_type_index(uint32_t x) {
-    return (x & SYNAPSE_TYPE_INDEX_MASK);
+static inline index_t synapse_row_sparse_type_index(
+        uint32_t x, uint32_t synapse_type_index_mask) {
+    return (x & synapse_type_index_mask);
 }
 
-static inline index_t synapse_row_sparse_delay(uint32_t x) {
-    return ((x >> SYNAPSE_TYPE_INDEX_BITS) & SYNAPSE_DELAY_MASK);
+static inline index_t synapse_row_sparse_delay(
+        uint32_t x, uint32_t synapse_type_index_bits) {
+    return ((x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK);
 }
 
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {

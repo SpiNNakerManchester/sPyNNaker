@@ -1,7 +1,7 @@
 #ifndef _TIMING_H_
 #define _TIMING_H_
 
-#include "../synapse_structure/synapse_structure.h"
+#include <neuron/plasticity/stdp/synapse_structure/synapse_structure.h>
 
 address_t timing_initialise(address_t address);
 
