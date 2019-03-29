@@ -102,15 +102,14 @@ class OnChipBitFieldGenerator(object):
                 compressor_app_id=bit_field_app_id,
                 executable_finder=executable_finder),
             [CPUState.FINISHED], False, 0)
+        # update progress bar
+        progress.end()
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:
             self._read_back_bit_fields(
                 app_graph, graph_mapper, transceiver, placements,
                 default_report_folder)
-
-        # update progress bar
-        progress.end()
 
     def _read_back_bit_fields(
             self, app_graph, graph_mapper, transceiver, placements,
@@ -126,12 +125,15 @@ class OnChipBitFieldGenerator(object):
         """
 
         # generate file
+        progress = ProgressBar(
+            len(app_graph.vertices), "reading back bitfields from chip")
+
         file_path = os.path.join(
             default_report_folder, self._BIT_FIELD_REPORT_FILENAME)
         output = open(file_path, "w")
 
         # read in for each app vertex that would have a bitfield
-        for app_vertex in app_graph.vertices:
+        for app_vertex in progress.over(app_graph.vertices):
             if isinstance(app_vertex, AbstractPopulationVertex):
                 machine_verts = graph_mapper.get_machine_vertices(app_vertex)
 

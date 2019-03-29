@@ -1,3 +1,5 @@
+from types import NoneType
+
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
@@ -32,7 +34,6 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-        import numpy as np
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
         n_filtered = 0
@@ -44,23 +45,25 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
+                return (n_filtered == len(self._synapse_information))
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                # run through connection list and return false if we find any connections between the pre and post vertices
+                #run through connection list and return false if we find any connections between the pre and post vertices
                 try:
-                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1,
-                       post_lo:post_hi + 1].max() > 0:
+                   if synapse_info.connector._conn_matrix is None:
+                       return False
+                   if synapse_info.connector._conn_matrix[pre_lo:pre_hi+1,post_lo:post_hi+1].max()>0:
                         return False
-                except ValueError:
+                except (ValueError, NoneType, TypeError):
                     print "Value error"
                 # for (pre,post,w,d) in synapse_info.connector.conn_list:
                 #     if (pre >= pre_lo and pre<=pre_hi) and (post>=post_lo and post<=post_hi):
                 #         return False
                 return True
-        return (n_filtered == len(self._synapse_information))
+        return False
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):

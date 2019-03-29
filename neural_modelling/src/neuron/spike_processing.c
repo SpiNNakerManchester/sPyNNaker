@@ -62,12 +62,6 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
-
-static inline void _do_direct_row(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
-}
-
 // Check if there is anything to do - if not, DMA is not busy
 static inline bool _is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer) {
@@ -128,7 +122,7 @@ void _setup_synaptic_dma_read() {
             synaptogenesis_dynamics_rewire(time);
             setup_done = true;
         } else if (n_bytes_to_transfer == 0) {
-            _do_direct_row(row_address);
+            direct_synapses_get_direct_synapse(row_address);
         } else {
             _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
@@ -198,7 +192,7 @@ void _dma_complete_callback(uint unused, uint tag) {
     // increment the dma complete count for provenance generation
     dma_complete_count++;
 
-    log_debug("DMA transfer complete at time %u with tag %u",time tag);
+    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;

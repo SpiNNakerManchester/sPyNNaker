@@ -1,6 +1,10 @@
 import logging
 import os
 import math
+import sys
+
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
+from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -23,6 +27,8 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
