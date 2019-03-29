@@ -1,7 +1,7 @@
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineEdge
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector\
-    import OneToOneConnector
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector)
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 

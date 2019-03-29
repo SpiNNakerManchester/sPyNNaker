@@ -1,7 +1,7 @@
+import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
-import logging
 logger = logging.getLogger(__name__)
 
 

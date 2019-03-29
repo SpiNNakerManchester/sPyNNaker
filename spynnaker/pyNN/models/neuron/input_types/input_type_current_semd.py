@@ -1,7 +1,6 @@
-from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
+from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
-
 
 MULTIPLICATOR = "multiplicator"
 INH_INPUT_PREVIOUS = "inh_input_previous"

@@ -1,8 +1,8 @@
 import configparser
 import numpy
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+from spynnaker.pyNN.utilities.spynnaker_failed_state import (
+    SpynnakerFailedState)
 
 
 class MockPopulation(object):
@@ -25,8 +25,14 @@ class MockPopulation(object):
 
 class MockRNG(object):
 
+    def __init__(self):
+        self._rng = numpy.random.RandomState()
+
     def next(self, n):
-        return numpy.random.uniform(size=n)
+        return self._rng.uniform(size=n)
+
+    def __getattr__(self, name):
+        return getattr(self._rng, name)
 
 
 class MockSimulator(object):
