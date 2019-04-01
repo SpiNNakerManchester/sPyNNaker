@@ -19,7 +19,7 @@ typedef struct {
     int32_t a2_minus;
 
     uint32_t weight_shift;
-
+    uint32_t syn_type;
 
 } plasticity_weight_region_data_t;
 
@@ -68,7 +68,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 }
 
 //---------------------------------------
-static inline weight_t weight_get_final(weight_state_t new_state) {
+static inline weight_t weight_get_final(weight_state_t new_state, REAL diff_to_target) {
 
     // Scale potentiation and depression
     // **NOTE** A2+ and A2- are pre-scaled into weight format
@@ -83,6 +83,34 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     int32_t new_weight = new_state.initial_weight + scaled_a2_plus
                          - scaled_a2_minus;
 
+    uint32_t type = new_state.weight_region->syn_type;
+//    io_printf(IO_BUF, "Diff to tar:%k \n", diff_to_target);
+    // do rate based regularisation
+
+//    REAL up_fact = diff_to_target * 0.1; // normalised by rate (1/10hz)
+
+    if (diff_to_target > 2.0k){
+//		io_printf(IO_BUF, "Reg up \n");
+		if (type == 0) {
+//			new_weight = new_weight * (1.0k);
+			new_weight = new_weight + (new_weight * diff_to_target * 0.001);
+		} else if (type == 2){
+			new_weight = new_weight - (new_weight * diff_to_target * 0.001);
+//			new_weight = new_weight * 0.9k;
+		}
+
+	} else if (diff_to_target < -2.0k){
+//		io_printf(IO_BUF, "Reg down \n");
+		if (type == 0) {
+//			new_weight = new_weight * 0.9k;
+			new_weight = new_weight + (new_weight * diff_to_target * 0.001);
+		} else if (type == 2){
+			new_weight = new_weight - (new_weight * diff_to_target * 0.001);
+//			new_weight = new_weight * (1.0k);
+		}
+	}
+
+
     // Clamp new weight
     new_weight = MIN(new_state.weight_region->max_weight,
                      MAX(new_weight, new_state.weight_region->min_weight));
@@ -96,5 +124,24 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
 
     return (weight_t) new_weight;
 }
+
+
+//static inline weight_t weight_regularisation(weight_state_t new_state,
+//		REAL diff_to_target) {
+//
+//	int32_t new_weight;
+//
+//
+//
+//    // Clamp new weight
+//    new_weight = MIN(new_state.weight_region->max_weight,
+//                     MAX(new_weight, new_state.weight_region->min_weight));
+//
+//
+//
+//    return (weight_t) new_weight;
+//
+//}
+
 
 #endif // _WEIGHT_ERBP_IMPL_H_

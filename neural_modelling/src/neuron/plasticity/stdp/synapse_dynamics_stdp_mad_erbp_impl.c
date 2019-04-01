@@ -77,7 +77,8 @@ static inline final_state_t _plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_history,
+		neuron_pointer_t post_synaptic_neuron) {
 
 	use(&new_pre_trace);
 
@@ -134,8 +135,28 @@ static inline final_state_t _plasticity_update_synapse(
 //        delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
 //        post_window.prev_time, post_window.prev_trace, current_state);
 
+
+//    // Now apply regularisation
+//    if (regularisation=true){
+//
+//    	// calculate difference to target rate
+//    	REAL diff_to_target = post_synaptic_neuron->target_rate -
+//    			post_synaptic_neuron->local_err;
+//
+//    	if (diff_to_target > 0){ // rate is below target
+//    		// potentiate by fixed factor
+//    	} else if (diff_to_target <= 0){ // rate is above target
+//    		// depress by fixed factor
+//    	}
+//
+//    }
+    // calculate difference to target rate
+    REAL diff_to_target = post_synaptic_neuron->target_rate -
+        			post_synaptic_neuron->local_err;
+
+
     // Return final synaptic word and weight
-    return synapse_structure_get_final_state(current_state);
+    return synapse_structure_get_final_state(current_state, diff_to_target);
 }
 
 //---------------------------------------
@@ -318,14 +339,14 @@ bool synapse_dynamics_process_plastic_synapses(
         current_state.trace = timing_add_pre_spike(time, last_pre_time,
         		last_pre_trace, post_synaptic_neuron);
 
-
-
-
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
             time, last_pre_time, last_pre_trace, event_history->prev_trace,
             delay_dendritic, delay_axonal, current_state,
-            &post_event_history[index]);
+            &post_event_history[index], post_synaptic_neuron);
+
+
+//        final_state =
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -335,7 +356,6 @@ bool synapse_dynamics_process_plastic_synapses(
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
-
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 

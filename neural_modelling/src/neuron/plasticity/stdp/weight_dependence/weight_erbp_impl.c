@@ -44,7 +44,7 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
         plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
         plasticity_weight_region_data[s].weight_shift = ring_buffer_to_input_buffer_left_shifts[s];
-
+        plasticity_weight_region_data[s].syn_type = s;
 
 
         io_printf(IO_BUF,

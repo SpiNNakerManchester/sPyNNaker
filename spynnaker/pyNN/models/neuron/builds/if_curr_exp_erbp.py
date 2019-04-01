@@ -12,7 +12,8 @@ class IFCurrExpERBP(AbstractPyNNNeuronModelStandard):
         current input, and error compartment
     """
 
-    @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh", "isyn_inh2", "local_err"})
+    @default_initial_values({"v", "isyn_exc", "isyn_exc2",
+                             "isyn_inh", "isyn_inh2", "local_err"})
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
@@ -20,14 +21,16 @@ class IFCurrExpERBP(AbstractPyNNNeuronModelStandard):
             tau_refrac=0.1,
             i_offset=0.0, v=-65.0,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
-            local_err=0, tau_err=20):
+            local_err=10, tau_err=20, target_rate=10):
         # pylint: disable=too-many-arguments, too-many-locals
 
         neuron_model = NeuronModelLeakyIntegrateAndFireERBP(
-            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, local_err, tau_err)
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, local_err,
+            tau_err, target_rate)
 
         synapse_type = SynapseTypeERBP(
-            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2, isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
+            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2, isyn_exc, isyn_exc2,
+            isyn_inh, isyn_inh2)
 
         input_type = InputTypeCurrent()
 

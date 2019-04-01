@@ -62,7 +62,7 @@ state_t neuron_model_state_update(
     REAL total_exc_err = exc_input[1];
     REAL total_inh_err = inh_input[1];
 
-    neuron->local_err += (total_exc_err - total_inh_err);
+//    neuron->local_err += (total_exc_err - total_inh_err);
     neuron->local_err = neuron->local_err * neuron->exp_TC_err;
 
     return neuron->V_membrane;
@@ -75,6 +75,8 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset refractory timer
     neuron->refract_timer  = neuron->T_refract;
+
+    neuron->local_err += 1.0k;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {

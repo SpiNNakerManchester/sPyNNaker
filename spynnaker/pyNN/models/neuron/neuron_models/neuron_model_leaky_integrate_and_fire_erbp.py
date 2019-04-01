@@ -15,6 +15,7 @@ TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
 LOCAL_ERR = "local_err"
 TAU_ERR = "tau_err"
+TARGET_RATE = "target_rate"
 
 UNITS = {
     V: 'mV',
@@ -37,11 +38,12 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
         "_v_reset",
         "_tau_refrac",
         "_local_err",
-        "_tau_err"]
+        "_tau_err",
+        "_target_rate"]
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            local_err, tau_err):
+            local_err, tau_err, target_rate):
         super(NeuronModelLeakyIntegrateAndFireERBP, self).__init__(
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
@@ -52,7 +54,9 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
              DataType.S1615,   # v_reset
              DataType.INT32,   # tau_refrac
              DataType.S1615,   # local_err
-             DataType.S1615])  # exp_tc_err
+             DataType.S1615,   # exp_tc_err
+             DataType.S1615    # target rate
+             ])
 
         if v_init is None:
             v_init = v_rest
@@ -67,6 +71,7 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
 
         self._local_err = local_err
         self._tau_err = tau_err
+        self._target_rate = target_rate
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -83,12 +88,13 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
         parameters[TAU_REFRAC] = self._tau_refrac
 
         parameters[TAU_ERR] = self._tau_err
+        parameters[TARGET_RATE] = self._target_rate
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self._v_init
         state_variables[COUNT_REFRAC] = 0
-        state_variables[LOCAL_ERR] = 0
+        state_variables[LOCAL_ERR] = self._local_err
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -113,14 +119,16 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
                 state_variables[LOCAL_ERR],
                 parameters[TAU_ERR].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x)))]
+                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                parameters[TARGET_RATE]
+                ]
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac, local_err, _exp_tc_err) = values
+         _v_reset, _tau_refrac, local_err, _exp_tc_err, _target_rate) = values
 
         # Copy the changed data only
         state_variables[V] = v
@@ -190,3 +198,11 @@ class NeuronModelLeakyIntegrateAndFireERBP(AbstractNeuronModel):
     @tau_err.setter
     def tau_err(self, new_tau_err):
         self._tau_err = new_tau_err
+
+    @property
+    def target_rate(self):
+        return self._target_rate
+
+    @target_rate.setter
+    def target_rate(self, new_target_rate):
+        self._target_rate = new_target_rate

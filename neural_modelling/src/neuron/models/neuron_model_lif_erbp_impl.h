@@ -36,6 +36,7 @@ typedef struct neuron_t {
     // Error accumulation compartment
     REAL local_err;
     REAL exp_TC_err;
+    REAL target_rate;
 
 
 } neuron_t;

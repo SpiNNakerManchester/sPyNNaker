@@ -37,6 +37,6 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types,
  */
 static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
 
-static weight_t weight_get_final(weight_state_t new_state);
+static weight_t weight_get_final(weight_state_t new_state, REAL diff_to_target);
 
 #endif // _WEIGHT_H_

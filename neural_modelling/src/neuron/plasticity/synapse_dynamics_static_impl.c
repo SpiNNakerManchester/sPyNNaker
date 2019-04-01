@@ -11,6 +11,9 @@
 #include "synapse_dynamics.h"
 #include <debug.h>
 
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
@@ -64,6 +67,12 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
 uint32_t synapse_dynamics_get_plastic_saturation_count(){
     return 0;
 }
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
+	neuron_array_plasticity = neuron_array;
+}
+
+
 
 //! \brief  Don't search the synaptic row for the the connection with the
 //!         specified post-synaptic ID -- no rewiring here

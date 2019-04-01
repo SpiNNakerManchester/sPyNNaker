@@ -227,8 +227,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
 
     // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->target_rate;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->local_err;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
