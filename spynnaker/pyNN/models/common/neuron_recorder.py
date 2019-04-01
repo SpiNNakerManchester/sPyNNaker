@@ -1,5 +1,8 @@
 from __future__ import division
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
 import math
 import numpy
