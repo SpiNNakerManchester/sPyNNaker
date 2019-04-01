@@ -454,7 +454,10 @@ class AbstractPopulationVertex(
                 application_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
-                    synapse_type = synapse_info.synapse_type
+                    if n_synapse_types > 1:
+                        synapse_type = synapse_info.synapse_type
+                    else:
+                        synapse_type = 0
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
                     weight_mean = (

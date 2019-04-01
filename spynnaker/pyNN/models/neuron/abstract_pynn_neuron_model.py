@@ -62,7 +62,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                                             label+"_syn_vertex_"+str(index), max_atoms,
                                             self._model.get_global_weight_scale(),
                                             ring_buffer_sigma, spikes_per_second,
-                                            incoming_spike_buffer_size))
+                                            incoming_spike_buffer_size,
+                                            self._model.get_n_synapse_types()))
 
         for i in range(len(vertices)):
             vertices[i].connected_app_vertices = (vertices[:i] + vertices[i+1:])

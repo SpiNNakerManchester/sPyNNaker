@@ -108,18 +108,18 @@ class SynapticManager(
         "_n_profile_samples",
         "_incoming_spike_buffer_size",
         "_machine_vertices",
-        "_connected_app_vertices"]
+        "_connected_app_vertices",
+        "_model_synapse_types"]
 
     BASIC_MALLOC_USAGE = 2
 
-    #5 ELEMENTS
     BYTES_FOR_SYNAPSE_PARAMS = 24
 
     _n_vertices = 0
 
     def __init__(self, n_synapse_types, synapse_index, n_neurons, constraints, label,
                  max_atoms_per_core, weight_scale, ring_buffer_sigma,
-                 spikes_per_second, incoming_spike_buffer_size,
+                 spikes_per_second, incoming_spike_buffer_size, model_syn_types,
                  population_table_type=None, synapse_io=None):
 
         self._n_synapse_types = n_synapse_types
@@ -129,6 +129,7 @@ class SynapticManager(
         self._weight_scale = weight_scale
         self._machine_vertices = dict()
         self._connected_app_vertices = None
+        self._model_synapse_types = model_syn_types
 
         if self._n_synapse_types > 1:
             # Hard coded to ensure it's 0.
@@ -590,7 +591,7 @@ class SynapticManager(
             possible without too much overflow
         """
         weight_scale_squared = self._weight_scale * self._weight_scale
-        n_synapse_types = self._n_synapse_types
+        n_synapse_types = self._model_synapse_types
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)

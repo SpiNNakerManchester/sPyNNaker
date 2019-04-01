@@ -84,7 +84,7 @@ class PyNNPopulationCommon(object):
                 self._spinnaker_control.add_application_vertex(self._vertex[index])
                 self._spinnaker_control.add_application_edge(ApplicationEdge(
                     self._vertex[index], self._vertex[0],
-                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)), constants.SPIKE_PARTITION_ID) #CHECK PARTITION!!!!
+                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)), constants.SPIKE_PARTITION_ID)
                 self._spinnaker_control.increment_none_labelled_edge_count()
 
 
