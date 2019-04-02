@@ -4,6 +4,8 @@ import numpy
 import pytest
 from pacman.model.graphs.common.slice import Slice
 from unittests.mocks import MockSimulator
+from six import reraise
+import sys
 
 
 @pytest.mark.parametrize(
@@ -55,7 +57,68 @@ def test_connector(
             assert(extra_params[:, i].shape == (len(clist), ))
 
     # Check weights and delays are used or ignored as expected
+    pre_slice = Slice(0, 10)
+    post_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
-        weights, delays, [], 0, [], 0, Slice(0, 10), Slice(0, 10), 1)
+        weights, delays, [pre_slice], 0, [post_slice], 0,
+        pre_slice, post_slice, 1)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
+
+
+class MockFromListConnector(FromListConnector):
+    # Use to check that the split is done only once
+
+    def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
+        FromListConnector.__init__(
+            self, conn_list, safe=safe, verbose=verbose,
+            column_names=column_names)
+        self._split_count = 0
+
+    def _split_connections(self, pre_slices, post_slices):
+        split = FromListConnector._split_connections(
+            self, pre_slices, post_slices)
+        if split:
+            self._split_count += 1
+
+
+def test_connector_split():
+    MockSimulator.setup()
+    n_sources = 1000
+    n_targets = 1000
+    n_connections = 10000
+    pre_neurons_per_core = 57
+    post_neurons_per_core = 59
+    sources = numpy.random.randint(0, n_sources, n_connections)
+    targets = numpy.random.randint(0, n_targets, n_connections)
+    pre_slices = [Slice(i, i + pre_neurons_per_core - 1)
+                  for i in range(0, n_sources, pre_neurons_per_core)]
+    post_slices = [Slice(i, i + post_neurons_per_core - 1)
+                   for i in range(0, n_targets, post_neurons_per_core)]
+
+    connection_list = numpy.dstack((sources, targets))[0]
+    connector = MockFromListConnector(connection_list)
+    has_block = set()
+    try:
+        # Check each connection is in the right place
+        for i, pre_slice in enumerate(pre_slices):
+            for j, post_slice in enumerate(post_slices):
+                block = connector.create_synaptic_block(
+                    1.0, 1.0, pre_slices, i, post_slices, j,
+                    pre_slice, post_slice, 1)
+                for source in block["source"]:
+                    assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
+                for target in block["target"]:
+                    assert(post_slice.lo_atom <= target <= post_slice.hi_atom)
+                for item in block:
+                    has_block.add((item["source"], item["target"]))
+
+        # Check each connection has a place
+        for source, target in zip(sources, targets):
+            assert (source, target) in has_block
+
+        # Check the split only happens once
+        assert connector._split_count == 1
+    except AssertionError:
+        print(connection_list)
+        reraise(*sys.exc_info())
