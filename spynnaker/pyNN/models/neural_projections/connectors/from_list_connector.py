@@ -141,6 +141,7 @@ class FromListConnector(AbstractConnector):
         block["source"] = sources
         block["target"] = self._targets[mask]
         # check that conn_list has weights, if not then use the value passed in
+        connection_slices = None
         if self._weights is None:
             if sources.size:
                 # create connection slices for this pre+post based on the mask
@@ -156,8 +157,9 @@ class FromListConnector(AbstractConnector):
         if self._delays is None:
             if sources.size:
                 # create connection slices for this pre+post based on the mask
-                connection_slices = [
-                    slice(n, n+1) for n in range(mask.size) if mask[n]]
+                if connection_slices is None:
+                    connection_slices = [
+                        slice(n, n+1) for n in range(mask.size) if mask[n]]
                 block["delay"] = self._generate_delays(
                     delays, sources.size, connection_slices)
             else:
