@@ -1,11 +1,11 @@
 from __future__ import print_function
+import logging
+import math
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
-import numpy
-import logging
-import math
 
 logger = logging.getLogger(__file__)
 
@@ -24,7 +24,7 @@ class FixedNumberPostConnector(AbstractConnector):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False):
+            safe=True, verbose=False, rng=None):
         """
         :param n: \
             number of random post-synaptic neurons connected to pre-neurons.
@@ -43,7 +43,7 @@ class FixedNumberPostConnector(AbstractConnector):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose, rng)
         self._n_post = n
         self._allow_self_connections = allow_self_connections
         self._with_replacement = with_replacement
@@ -68,9 +68,9 @@ class FixedNumberPostConnector(AbstractConnector):
                 "and n = n_post_neurons")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         n_connections = self._n_pre_neurons * self._n_post
-        return self._get_delay_maximum(n_connections)
+        return self._get_delay_maximum(delays, n_connections)
 
     def _get_post_neurons(self):
         # If we haven't set the array up yet, do it now
@@ -104,11 +104,11 @@ class FixedNumberPostConnector(AbstractConnector):
                              numpy.arange(m + 1, self._n_post_neurons)])
 
                         # Now use this list in the random choice
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             no_self_post_neurons, self._n_post,
                             self._with_replacement)
                     else:
-                        self._post_neurons[m] = numpy.random.choice(
+                        self._post_neurons[m] = self._rng.choice(
                             self._n_post_neurons, self._n_post,
                             self._with_replacement)
 
@@ -134,20 +134,20 @@ class FixedNumberPostConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         prob_in_slice = (
             post_vertex_slice.n_atoms / float(self._n_post_neurons))
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_pre_neurons,
-            self._n_post, prob_in_slice)
+            self._n_post, prob_in_slice, chance=1.0/10000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_post_neurons * self._n_pre_neurons, n_connections,
-            min_delay, max_delay)
+            delays, self._n_post_neurons * self._n_pre_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -156,17 +156,17 @@ class FixedNumberPostConnector(AbstractConnector):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_post_neurons * self._n_pre_neurons,
             self._n_post * self._n_pre_neurons, selection_prob,
-            chance=1.0/10000.0)
+            chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         n_connections = self._n_pre_neurons * self._n_post
-        return self._get_weight_maximum(n_connections)
+        return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -197,11 +197,10 @@ class FixedNumberPostConnector(AbstractConnector):
 
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
-
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, None)
+            weights, n_connections, None)
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, None)
+            delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
 

@@ -1,20 +1,16 @@
 import logging
 import sys
-
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities.constants \
-    import MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP
-from spinn_front_end_common.utilities import exceptions
-from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import (
+    MAX_SIZE_OF_BUFFERED_REGION_ON_CHIP)
+from spinn_front_end_common.utilities import exceptions, helpful_functions
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import globals_variables
-
-from spynnaker.pyNN.models.common import AbstractSpikeRecordable
-from spynnaker.pyNN.models.common import EIEIOSpikeRecorder
-from spynnaker.pyNN.models.common import SimplePopulationSettable
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
 
 logger = logging.getLogger(__name__)

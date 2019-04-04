@@ -54,7 +54,8 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         return [parameters[DEVICE].apply_operation(
                     lambda x: x.device_control_key),
                 parameters[DEVICE].apply_operation(
-                    lambda x: int(x.device_control_uses_payload)),
+                    lambda x: x.device_control_scaling_factor
+                    if x.device_control_uses_payload else 0),
                 parameters[DEVICE].apply_operation(
                     lambda x: x.device_control_min_value),
                 parameters[DEVICE].apply_operation(

@@ -1,32 +1,22 @@
-# utils imports
+import logging
+import math
+import os
+from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from spynnaker.pyNN.models.utility_models import synapse_expander
-
-# common front end imports
-from spinn_front_end_common.interface.abstract_spinnaker_base \
-    import AbstractSpinnakerBase
+from spinn_front_end_common.interface.abstract_spinnaker_base import (
+    AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
-
-# local front end imports
-from spynnaker.pyNN import overridden_pacman_functions
-from spynnaker.pyNN import model_binaries
+from spynnaker.pyNN.models.utility_models import synapse_expander
+from spynnaker.pyNN import overridden_pacman_functions, model_binaries
 from spynnaker.pyNN.utilities import constants
-from spynnaker.pyNN.spynnaker_simulator_interface \
-    import SpynnakerSimulatorInterface
-from spynnaker import __version__ as version
-
-# general imports
-from six import add_metaclass
-import logging
-import math
-import os
-
-# global objects
+from spynnaker.pyNN.spynnaker_simulator_interface import (
+    SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
+from spynnaker import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

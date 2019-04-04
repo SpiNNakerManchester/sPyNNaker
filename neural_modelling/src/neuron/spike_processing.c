@@ -62,6 +62,57 @@ static inline void _do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
+static inline void _do_direct_row(address_t row_address) {
+    single_fixed_synapse[3] = (uint32_t) row_address[0];
+    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
+}
+
+// Check if there is anything to do - if not, DMA is not busy
+static inline bool _is_something_to_do(
+        address_t *row_address, size_t *n_bytes_to_transfer) {
+
+    // Disable interrupts here as check and dma_busy modification is a
+    // critical section
+    uint cpsr = spin1_int_disable();
+    bool something_to_do = false;
+
+    // Synaptic rewiring needs to be done?
+    if (number_of_rewires) {
+        something_to_do = true;
+
+    // Is there another address in the population table?
+    // Note, this is fairly quick to check, so leave interrupts disabled
+    } else if (population_table_get_next_address(
+            row_address, n_bytes_to_transfer)) {
+        something_to_do = true;
+    } else {
+
+        // Are there any more spikes to process?
+        while (!something_to_do && in_spikes_get_next_spike(&spike)) {
+
+            // Enable interrupts while looking up in the master pop table,
+            // as this can be slow
+            spin1_mode_restore(cpsr);
+            if (population_table_get_first_address(
+                    spike, row_address, n_bytes_to_transfer)) {
+                something_to_do = true;
+            }
+
+            // Disable interrupts before checking if there is another spike
+            cpsr = spin1_int_disable();
+        }
+    }
+
+    // If nothing to do, the DMA is not busy
+    if (!something_to_do) {
+        dma_busy = false;
+    }
+
+    // Restore interrupts
+    spin1_mode_restore(cpsr);
+    return something_to_do;
+}
+
 void _setup_synaptic_dma_read() {
 
     // Set up to store the DMA location and size to read
@@ -69,12 +120,16 @@ void _setup_synaptic_dma_read() {
     size_t n_bytes_to_transfer;
 
     bool setup_done = false;
-    bool finished = false;
-    uint cpsr = 0;
-    while (!setup_done && !finished) {
+    while (!setup_done && _is_something_to_do(
+            &row_address, &n_bytes_to_transfer)) {
         if (number_of_rewires) {
             number_of_rewires--;
             synaptogenesis_dynamics_rewire(time);
+            setup_done = true;
+        } else if (n_bytes_to_transfer == 0) {
+            _do_direct_row(row_address);
+        } else {
+            _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
         }
 
@@ -198,7 +253,7 @@ void _dma_complete_callback(uint unused, uint tag) {
     // increment the dma complete count for provenance generation
     dma_complete_count++;
 
-    log_debug("DMA transfer complete with tag %u", tag);
+    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
