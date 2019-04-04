@@ -1,6 +1,6 @@
 from spinn_utilities.overrides import overrides
-from .delayed_machine_edge import DelayedMachineEdge
 from pacman.model.graphs.application import ApplicationEdge
+from .delayed_machine_edge import DelayedMachineEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):

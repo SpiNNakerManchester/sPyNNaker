@@ -1,16 +1,15 @@
+import logging
+import math
+import numpy.random
+from six import raise_from
+from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
-from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_utilities.abstract_base import abstractmethod
+from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 
-import numpy.random
-import math
-from six import raise_from
-
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -50,8 +49,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         """
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._num_synapses)
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, self._num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self._synapses_per_edge is None or
@@ -60,6 +59,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             n_pre_atoms = sum([pre.n_atoms for pre in pre_slices])
             n_post_atoms = sum([post.n_atoms for post in post_slices])
             n_connections = n_pre_atoms * n_post_atoms
+            if (not self._with_replacement and
+                    n_connections < self._num_synapses):
+                raise SpynnakerException(
+                    "FixedNumberTotalConnector will not work correctly when "
+                    "with_replacement=False & num_synapses > n_pre * n_post")
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
                 for pre in pre_slices for post in post_slices]
@@ -85,7 +89,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         prob_in_slice = (
             float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
         max_in_slice = utility_calls.get_probable_maximum_selected(
@@ -98,8 +102,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons, n_connections,
-            min_delay, max_delay)
+            delays, self._n_pre_neurons * self._n_post_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -108,12 +112,12 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             self._num_synapses, self._num_synapses, prob_of_choosing_post_atom)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
-        return self._get_weight_maximum(self._num_synapses)
+    def get_weight_maximum(self, weights):
+        return self._get_weight_maximum(weights, self._num_synapses)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -156,9 +160,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = pairs[chosen, 0]
         block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, [connection_slice])
+            weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, [connection_slice])
+            delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
 

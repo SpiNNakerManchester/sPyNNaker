@@ -1,13 +1,12 @@
 # Imports
-import numpy as np
 import sys
-# pylint: disable=consider-using-enumerate
-
+import numpy as np
 try:
     import matplotlib.pyplot as plt
     matplotlib_missing = False
 except ImportError:
     matplotlib_missing = True
+# pylint: disable=consider-using-enumerate
 
 
 def _precheck(data, title):

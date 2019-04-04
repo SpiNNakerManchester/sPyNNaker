@@ -1,6 +1,6 @@
 from spinn_utilities.abstract_base import abstractmethod
-from spynnaker.pyNN.models.neuron.implementations \
-    import AbstractStandardNeuronComponent
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 
 class AbstractSynapseType(AbstractStandardNeuronComponent):

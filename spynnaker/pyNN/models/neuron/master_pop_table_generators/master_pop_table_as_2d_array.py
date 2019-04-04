@@ -1,20 +1,12 @@
 from spinn_utilities.overrides import overrides
-
-# pacman imports
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyFieldConstraint, FixedMaskConstraint
-from pacman.utilities.utility_objs import Field
-
-# spynnaker imports
-from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
-from spynnaker.pyNN.exceptions import SynapticBlockGenerationException,\
-    SynapseRowTooBigException
-
-# spinn front end common imports
-from spinn_front_end_common.utilities import helpful_functions
-
-# dsg imports
 from data_specification.enums import DataType
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyFieldConstraint, FixedMaskConstraint)
+from pacman.utilities.utility_objs import Field
+from spinn_front_end_common.utilities import helpful_functions
+from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
+from spynnaker.pyNN.exceptions import (
+    SynapticBlockGenerationException, SynapseRowTooBigException)
 
 # Fixed row sizes allowed in this table
 ROW_LEN_TABLE_ENTRIES = [0, 1, 8, 16, 32, 64, 128, 256]

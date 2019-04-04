@@ -1,27 +1,20 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
-
-# pacman imports
 from pacman.model.graphs.machine import MachineVertex
-
-# spinn front end common imports
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models \
-    import AbstractReceiveBuffersToHost
-from spinn_front_end_common.interface.buffer_management\
-    import recording_utilities
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import AbstractRecordable
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
-from spinn_front_end_common.interface.profiling.profile_utils \
-    import get_profiling_data
-
-# spynnaker imports
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data)
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
-
-from enum import Enum
 
 
 class PopulationMachineVertex(

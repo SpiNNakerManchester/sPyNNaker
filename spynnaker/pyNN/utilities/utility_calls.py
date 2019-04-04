@@ -1,22 +1,16 @@
 """
 utility class containing simple helper methods
 """
-import numpy
+from decimal import Decimal
 import os
 import logging
 import math
-
-from spinn_front_end_common.interface.interface_functions import \
-    ChipIOBufExtractor
-from spinn_utilities.safe_eval import SafeEval
-
+import numpy
 from scipy.stats import binom
+from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from decimal import Decimal
 
-from spinnman.exceptions import SpinnmanTimeoutException, SpinnmanException
-from spinnman.messages.scp.enums import Signal
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -288,78 +282,3 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log(n_values, 2)))
-
-
-def run_system_application(
-        executable_cores, app_id, transceiver, provenance_file_path,
-        executable_finder, read_algorithm_iobuf, check_for_success_function,
-        handle_failure_function, cpu_end_states, needs_sync_barrier,
-        no_sync_changes):
-    """ executes the app
-
-    :param executable_cores: the cores to run the executable on
-    :param app_id: the appid for the executable
-    :param transceiver: the SpiNNMan instance
-    :param provenance_file_path: the path for where provenance data is\
-    stored
-    :param read_algorithm_iobuf: bool flag for report
-    :param executable_finder: finder for executable paths
-    :param check_for_success_function: function used to check success: \
-    expects executable_cores, transceiver, provenance_file_path,\
-    app_id, executable_finder as inputs
-    :param handle_failure_function: function used to deal with failures\
-    expects executable_cores, transceiver, provenance_file_path,\
-    app_id, executable_finder as inputs
-    :param needs_sync_barrier: bool flag for if needing sync barrier
-    :param no_sync_changes: the number of times sync signal been sent
-    :rtype: None
-    """
-
-    # load the executable
-    transceiver.execute_application(executable_cores, app_id)
-
-    if needs_sync_barrier:
-        if no_sync_changes % 2 == 0:
-            sync_signal = Signal.SYNC0
-        else:
-            sync_signal = Signal.SYNC1
-        # when it falls out of the running, it'll be in a next sync \
-        # state, thus update needed
-        no_sync_changes += 1
-
-        # fire all signals as required
-        transceiver.send_signal(app_id, sync_signal)
-
-    # Wait for the executable to finish
-    succeeded = False
-    try:
-        transceiver.wait_for_cores_to_be_in_state(
-            executable_cores.all_core_subsets, app_id, cpu_end_states)
-        succeeded = True
-    except (SpinnmanTimeoutException, SpinnmanException):
-        handle_failure_function(
-            executable_cores, transceiver, provenance_file_path,
-            app_id, executable_finder)
-    finally:
-        # get the debug data
-        if not succeeded:
-            handle_failure_function(
-                executable_cores, transceiver, provenance_file_path,
-                app_id, executable_finder)
-
-    # Check if any cores have not completed successfully
-    if succeeded and check_for_success_function is not None:
-        check_for_success_function(
-            executable_cores, transceiver, provenance_file_path,
-            app_id, executable_finder)
-
-    # if doing iobuf, read iobuf
-    if read_algorithm_iobuf:
-        iobuf_reader = ChipIOBufExtractor()
-        iobuf_reader(
-            transceiver, executable_cores, executable_finder,
-            provenance_file_path)
-
-    # stop anything that's associated with the compressor binary
-    transceiver.stop_application(app_id)
-    transceiver.app_id_tracker.free_id(app_id)

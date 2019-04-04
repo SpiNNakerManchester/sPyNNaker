@@ -48,10 +48,6 @@ class InvalidParameterType(SpynnakerException):
     """ Raised when a parameter is not recognised.
     """
 
-class CantFindSDRAMToUseException(SpynnakerException):
-    """ Raised when malloc and sdram stealing cannot occur.
-    """
-
 
 class SynapseRowTooBigException(SpynnakerException):
     """ Raised when a synapse row is bigger than is allowed.PyNN
