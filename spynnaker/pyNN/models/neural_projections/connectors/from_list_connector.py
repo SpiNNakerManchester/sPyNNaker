@@ -55,22 +55,17 @@ class FromListConnector(AbstractConnector):
         self._set_weights_and_delays()
 
     def _set_weights_and_delays(self):
-        # set the data if not already set (supports none overriding via
-        # synapse data)
-        weights = len(self._conn_list[3])
-        delays = len(self._conn_list[4])
-
         # if got data, build connlist with correct dtypes
-        if weights is not None and delays is not None:
-            try:
-                self._conn_matrix = numpy.zeros(
-                    (int(self._conn_list[:, 0].max() + 1),
-                     int(self._conn_list[:, 1].max() + 1)), dtype=bool)
-            except IndexError:
-                print "too many indices for array"
+        try:
+            self._conn_matrix = numpy.zeros(
+                (int(self._conn_list[:, 0].max() + 1),
+                 int(self._conn_list[:, 1].max() + 1)), dtype=bool)
+        except IndexError:
+            print "too many indices for array"
 
-            for [pre, post, _, __] in self._conn_list:
-                self._conn_matrix[int(pre)][int(post)] = 1
+        for (pre, post) in zip(
+                self._conn_list[:, _SOURCE], self._conn_list[:, _TARGET]):
+            self._conn_matrix[int(pre)][int(post)] = 1
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
