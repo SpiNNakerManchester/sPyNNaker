@@ -1,5 +1,4 @@
 from six import add_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase, abstractproperty
 from enum import Enum
 
@@ -69,7 +68,14 @@ class AbstractMulticastControllableDevice(object):
 
     @abstractproperty
     def device_control_send_type(self):
-        """ The type of data to be sent
+        """ The type of data to be sent.
 
         :rtype: :py:class:`.SendType`
         """
+
+    @property
+    def device_control_scaling_factor(self):  # pragma: no cover
+        """The scaling factor used to send the payload to this device.
+
+        :rtype: int"""
+        return 1

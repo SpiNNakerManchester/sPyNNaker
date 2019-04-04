@@ -9,7 +9,7 @@ static uint32_t time_between_spikes;
 static uint32_t expected_time;
 
 enum send_type {
-    SEND_TYPE_INT=0,
+    SEND_TYPE_INT = 0,
     SEND_TYPE_UINT,
     SEND_TYPE_ACCUM,
     SEND_TYPE_UACCUM,
@@ -18,30 +18,22 @@ enum send_type {
 };
 
 typedef struct threshold_type_t {
-
     // The key to send to update the value
     uint32_t key;
-
-    // True (1) if the value is to be sent as payload, False (0) if just the key
+    // A scaling factor (>0) if the value is to be sent as payload, False (0) if just the key
     uint32_t value_as_payload;
-
     // The minimum allowed value to send as the payload.
     // Values below are clipped to this value
     accum min_value;
-
     // The maximum allowed value to send as the payload.
     // Values above are clipped to this value
     accum max_value;
-
     // The time between sending the value
     uint32_t timesteps_between_sending;
-
     // The time until the next sending of the value (initially 0)
     uint32_t time_until_next_send;
-
     // Send type
     enum send_type type;
-
 } threshold_type_t;
 
 typedef union int_bits_union {
@@ -117,7 +109,8 @@ static bool threshold_type_is_above_threshold(
                 value_to_send = threshold_type->min_value;
             }
 
-            uint payload = get_payload(threshold_type->type, value_to_send);
+            uint payload = get_payload(threshold_type->type,
+                    value_to_send * threshold_type->value_as_payload);
 
             log_debug("Sending key=0x%08x payload=0x%08x",
                     threshold_type->key, payload);

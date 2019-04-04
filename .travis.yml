@@ -2,7 +2,11 @@ language: python
 python:
   - 2.7
   - 3.6
-dist: trusty
+dist: xenial
+matrix:
+  include:
+    - python: 3.7
+      sudo: true
 cache: pip
 
 addons:
@@ -63,7 +67,7 @@ script:
   # XML
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
-  - make -C neural_modelling
+  - CFLAGS=-fdiagnostics-color make -C neural_modelling
   - support/run-vera.sh neural_modelling/src
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
