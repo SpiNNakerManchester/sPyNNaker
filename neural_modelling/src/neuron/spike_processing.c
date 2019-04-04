@@ -32,6 +32,8 @@ static uint32_t max_n_words;
 
 static spike_t spike=-1;
 
+static uint32_t single_fixed_synapse[4];
+
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
@@ -150,7 +152,7 @@ void _setup_synaptic_dma_read() {
         }
 
         // If there's more incoming spikes
-        cpsr = spin1_int_disable();
+        uint cpsr = spin1_int_disable();
         while (!setup_done && in_spikes_get_next_spike(&spike)) {
             spin1_mode_restore(cpsr);
             log_debug("Checking for row for spike 0x%.8x\n", spike);
@@ -173,10 +175,7 @@ void _setup_synaptic_dma_read() {
             cpsr = spin1_int_disable();
         }
 
-        if (!setup_done) {
-            finished = true;
-        }
-        cpsr = spin1_int_disable();
+        spin1_mode_restore(cpsr);
     }
 
     // If the setup was not done, and there are no more spikes,
@@ -185,7 +184,6 @@ void _setup_synaptic_dma_read() {
         log_debug("DMA not busy");
         dma_busy = false;
     }
-    spin1_mode_restore(cpsr);
 
     // increment the spike count for provenance generation
     spike_processing_count++;
