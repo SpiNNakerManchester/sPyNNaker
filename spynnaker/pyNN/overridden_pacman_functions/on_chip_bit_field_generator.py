@@ -160,27 +160,19 @@ class OnChipBitFieldGenerator(object):
                     for bit_field_index in range(0, n_bit_field_entries):
 
                         # master pop key
-                        master_pop_key = struct.unpack(
-                            "<I", transceiver.read_memory(
+                        (master_pop_key, n_words_to_read, read_pointer) = \
+                            struct.unpack(
+                            "<III", transceiver.read_memory(
                                 placement.x, placement.y, reading_address,
-                                self._BYTES_PER_WORD))[0]
-                        reading_address += self._BYTES_PER_WORD
-
-                        # how many words the bitfield uses
-                        n_words_to_read = struct.unpack(
-                            "<I", transceiver.read_memory(
-                                placement.x, placement.y, reading_address,
-                                self._BYTES_PER_WORD))[0]
-                        reading_address += self._BYTES_PER_WORD
+                                self._BYTES_PER_WORD * 3))
+                        reading_address += self._BYTES_PER_WORD * 3
 
                         # get bitfield words
                         bit_field = struct.unpack(
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(
-                                placement.x, placement.y, reading_address,
+                                placement.x, placement.y, read_pointer,
                                 n_words_to_read * WORD_TO_BYTE_MULTIPLIER))
-                        reading_address += (
-                            n_words_to_read * WORD_TO_BYTE_MULTIPLIER)
 
                         # put into report
                         n_neurons = n_words_to_read * self._BITS_IN_A_WORD

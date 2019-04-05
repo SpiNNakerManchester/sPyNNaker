@@ -8,8 +8,8 @@
 #include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
 
-#include "../common/filter_info.h"
-#include "../common/key_atom_map.h"
+#include <filter_info.h>
+#include <key_atom_map.h>
 
 // byte to word conversion
 #define BYTE_TO_WORD_CONVERSION 4
@@ -27,7 +27,7 @@ address_t master_pop_base_address;
 address_t synaptic_matrix_base_address;
 
 // bitfield base address
-bit_field_region_t* bit_field_base_address;
+filter_region_t* bit_field_base_address;
 
 // direct matrix base address
 address_t direct_matrix_region_base_address;
@@ -70,7 +70,7 @@ void read_in_addresses(){
         POPULATION_TABLE_REGION, core_address);
     synaptic_matrix_base_address = data_specification_get_region(
         SYNAPTIC_MATRIX_REGION, core_address);
-    bit_field_base_address = (bit_field_region_t*)
+    bit_field_base_address = (filter_region_t*)
         data_specification_get_region(BIT_FIELD_FILTER_REGION, core_address);
     direct_matrix_region_base_address = data_specification_get_region(
         DIRECT_MATRIX_REGION, core_address);
@@ -94,18 +94,18 @@ void _read_in_the_key_to_max_atom_map(){
     // malloc the dtcm
     keys_to_max_atoms = (key_atom_data_t*) bit_field_builder_base_address;
 
-    log_info("n items is %d", keys_to_max_atoms->n_maps);
+    log_info("n items is %d", keys_to_max_atoms->n_pairs);
 
     // put map into dtcm
     for (uint32_t key_to_max_atom_index = 0;
-            key_to_max_atom_index < keys_to_max_atoms->n_maps;
+            key_to_max_atom_index < keys_to_max_atoms->n_pairs;
             key_to_max_atom_index++){
 
         // print
         log_info("entry %d has key %x and n_atoms of %d",
             key_to_max_atom_index,
-            keys_to_max_atoms->maps[key_to_max_atom_index].key,
-            keys_to_max_atoms->maps[key_to_max_atom_index].n_atoms);
+            keys_to_max_atoms->pairs[key_to_max_atom_index].key,
+            keys_to_max_atoms->pairs[key_to_max_atom_index].n_atoms);
     }
 
     // put map into dtcm
@@ -131,8 +131,8 @@ void _read_in_the_key_to_max_atom_map(){
 //! \return the number of neurons from the key map based off this key
 uint32_t _n_neurons_from_key(uint32_t key){
     uint32_t key_index = 0;
-    while (key_index < keys_to_max_atoms->n_maps){
-        key_atom_entry_t entry = keys_to_max_atoms->maps[key_index];
+    while (key_index < keys_to_max_atoms->n_pairs){
+        key_atom_entry_t entry = keys_to_max_atoms->pairs[key_index];
         if (entry.key == key){
             return entry.n_atoms;
         }
@@ -301,12 +301,13 @@ bool generate_bit_field(){
 
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
-    bit_field_base_address->n_filter_infos = population_table_length();
+    bit_field_base_address->n_filters = population_table_length();
 
-    // location where to dump the bitfields into
+    // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location =
         (address_t) &bit_field_base_address->filters[
-            bit_field_base_address->n_filter_infos];
+            bit_field_base_address->n_filters];
+    log_info("words location is %x", bit_field_words_location);
     int position = 0;
 
     // iterate through the master pop entries
@@ -336,14 +337,12 @@ bool generate_bit_field(){
         log_debug("cleared bit field");
 
         // update sdram with size of this bitfield
-        bit_field_base_address->filters[
-            master_pop_entry].bit_field_base_key = key;
+        bit_field_base_address->filters[master_pop_entry].key = key;
         log_debug(
             "putting master pop key %d in entry %d",
             key, master_pop_entry);
-        bit_field_base_address->filters[
-            master_pop_entry].bit_field_n_words = n_words;
-        log_debug("putting n words %d in entry %d", n_words, master_pop_entry);
+        bit_field_base_address->filters[master_pop_entry].n_words = n_words;
+        log_info("putting n words %d in entry %d", n_words, master_pop_entry);
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("searching neuron ids");
@@ -389,15 +388,15 @@ bool generate_bit_field(){
 
         // write bitfield to sdram.
         log_debug("writing bitfield to sdram for core use");
-        log_debug("writing to address %0x, %d words to write",
+        log_info("writing to address %0x, %d words to write",
                   &bit_field_words_location[position], n_words);
         spin1_memcpy(
             &bit_field_words_location[position], bit_field,
             n_words * BYTE_TO_WORD_CONVERSION);
 
         // update pointer to correct place
-        bit_field_base_address->filters[master_pop_entry].bit_field =
-            (bit_field_t) &bit_field_words_location[position];
+        bit_field_base_address->filters[master_pop_entry].data =
+            (bit_field_t*) &bit_field_words_location[position];
 
         // update tracker
         position += n_words;

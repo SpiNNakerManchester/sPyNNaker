@@ -31,6 +31,7 @@
 #include <profiler.h>
 #include <debug.h>
 #include <bit_field.h>
+#include <filter_info.h>
 
 /* validates that the model being compiled does indeed contain a application
    magic number*/
@@ -139,10 +140,10 @@ void c_main_store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
-static bool bit_field_filter_initialise(address_t bitfield_region){
+static bool bit_field_filter_initialise(address_t bitfield_region_address){
 
-    uint32_t position = 0;
-    uint32_t n_bit_fields = bitfield_region[position];
+    filter_region_t* filter_region = (filter_region_t*) bitfield_region_address;
+    uint32_t n_bit_fields = filter_region->n_filters;
 
     log_info("n bitfields = %d", n_bit_fields);
 
@@ -162,15 +163,12 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
          connectivity_bit_field[cur_bit_field] = NULL;
     }
 
-    position += 1;
-
     // try allocating dtcm for each bit field
     for (uint32_t cur_bit_field = 0; cur_bit_field < n_bit_fields;
             cur_bit_field++){
         // get the key associated with this bitfield
-        uint32_t key = bitfield_region[position];
-        uint32_t n_words_for_bit_field = bitfield_region[position + 1];
-        position += 2;
+        uint32_t key = filter_region->filters[cur_bit_field].key;
+        uint32_t n_words = filter_region->filters[cur_bit_field].n_words;
 
         // locate the position in the array to match the master pop element.
         int position_in_array =
@@ -178,7 +176,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
 
         // alloc sdram into right region
         connectivity_bit_field[position_in_array] = spin1_malloc(
-            sizeof(bit_field_t) * n_words_for_bit_field);
+            sizeof(bit_field_t) * n_words);
         if (connectivity_bit_field[position_in_array] == NULL){
             log_warning(
                 "could not initialise bit field for key %d, packets with"
@@ -191,19 +189,19 @@ static bool bit_field_filter_initialise(address_t bitfield_region){
             // read in the bits for the bitfield (think this avoids a for loop)
             spin1_memcpy(
                 connectivity_bit_field[position_in_array],
-                &bitfield_region[position],
-                sizeof(uint32_t) * n_words_for_bit_field);
+                filter_region->filters[cur_bit_field].data,
+                sizeof(uint32_t) * n_words);
 
             // print out the bit field for debug purposes
             log_debug("bit field for key %d is :", key);
             for (uint32_t bit_field_word_index = 0;
-                    bit_field_word_index < n_words_for_bit_field;
+                    bit_field_word_index < n_words;
                     bit_field_word_index++){
-                log_debug("%x", connectivity_bit_field[position_in_array]
-                                                   [bit_field_word_index]);
+                log_debug(
+                    "%x", connectivity_bit_field[position_in_array][
+                        bit_field_word_index]);
             }
         }
-        position += n_words_for_bit_field;
     }
     population_table_set_connectivity_bit_field(connectivity_bit_field);
     return true;
