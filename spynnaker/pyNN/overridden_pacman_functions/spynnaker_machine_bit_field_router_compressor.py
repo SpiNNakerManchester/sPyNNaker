@@ -85,7 +85,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
     def _locate_synaptic_expander_cores(
             cores, executable_finder, placements, graph_mapper, machine):
         """ removes host based cores for synaptic matrix regeneration
-    
+
         :param cores: the cores for everything
         :param executable_finder: way to get binary path
         :param graph_mapper: mapping between graphs
@@ -122,7 +122,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             provenance_file_path, executable_finder, needs_sync_barrier,
             no_sync_changes):
         """ reruns the synaptic expander
-    
+
         :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
         matrix generator for
         :param transceiver: spinnman instance

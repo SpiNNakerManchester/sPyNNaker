@@ -3,7 +3,6 @@ import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.utility_calls import convert_param_to_numpy
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +52,10 @@ class FromListConnector(AbstractConnector):
         self._conn_matrix = None
 
         self._set_weights_and_delays()
+
+    @property
+    def conn_matrix(self):
+        return self._conn_matrix
 
     def _set_weights_and_delays(self):
         # if got data, build connlist with correct dtypes
