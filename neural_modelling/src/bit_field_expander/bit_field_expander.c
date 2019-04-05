@@ -97,7 +97,7 @@ void _read_in_the_key_to_max_atom_map(){
     log_info("n items is %d", keys_to_max_atoms->n_pairs);
 
     // put map into dtcm
-    for (uint32_t key_to_max_atom_index = 0;
+    for (int key_to_max_atom_index = 0;
             key_to_max_atom_index < keys_to_max_atoms->n_pairs;
             key_to_max_atom_index++){
 
@@ -130,9 +130,9 @@ void _read_in_the_key_to_max_atom_map(){
 //! \param[in] mask: the key to convert to n_neurons
 //! \return the number of neurons from the key map based off this key
 uint32_t _n_neurons_from_key(uint32_t key){
-    uint32_t key_index = 0;
+    int key_index = 0;
     while (key_index < keys_to_max_atoms->n_pairs){
-        key_atom_entry_t entry = keys_to_max_atoms->pairs[key_index];
+        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
         if (entry.key == key){
             return entry.n_atoms;
         }
