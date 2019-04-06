@@ -1,4 +1,7 @@
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
