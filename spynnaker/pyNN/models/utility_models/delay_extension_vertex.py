@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import logging
 import math
 import sys
@@ -321,13 +324,15 @@ class DelayExtensionVertex(
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
             connector, AbstractGenerateConnectorOnMachine) and \
-            connector.generate_on_machine
+            connector.generate_on_machine(
+                synapse_info.weight, synapse_info.delay)
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes,
+                connector.gen_delay_params_size_in_bytes(
+                    synapse_info.delay),
                 connector.gen_connector_params_size_in_bytes,
             ))
         return 0
