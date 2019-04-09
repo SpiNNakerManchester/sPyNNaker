@@ -1,7 +1,7 @@
-from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model \
-    import DEFAULT_MAX_ATOMS_PER_CORE, AbstractPyNNNeuronModel
 import sys
+from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    DEFAULT_MAX_ATOMS_PER_CORE, AbstractPyNNNeuronModel)
 
 
 class _MyPyNNModelImpl(AbstractPyNNModel):

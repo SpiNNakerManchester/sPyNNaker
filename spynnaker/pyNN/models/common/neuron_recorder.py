@@ -1,20 +1,21 @@
 from __future__ import division
-from collections import OrderedDict
+try:
+    from collections.abc import OrderedDict
+except ImportError:
+    from collections import OrderedDict
 import logging
 import math
 import numpy
 from six import iteritems, raise_from
 from six.moves import range, xrange
-
+from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.progress_bar import ProgressBar
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
-from spinn_utilities.index_is_value import IndexIsValue
-from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = logging.getLogger(__name__)
-
 SPIKES = "spikes"
 
 

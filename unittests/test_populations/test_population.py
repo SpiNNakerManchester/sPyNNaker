@@ -1,6 +1,6 @@
-from unittests.mocks import MockSimulator
+from spynnaker.pyNN.models.neuron.builds import IFCurrExpBase
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
-from spynnaker.pyNN.models.neuron.builds.if_curr_exp_base import IFCurrExpBase
+from unittests.mocks import MockSimulator
 
 
 def test_selector():

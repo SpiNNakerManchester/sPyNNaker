@@ -1,6 +1,6 @@
 import unittest
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.protocols import RetinaKey
+from spynnaker.pyNN.protocols import (
+    MunichIoSpiNNakerLinkProtocol, RetinaKey)
 
 
 class TestMunichIOSpinnakerLinkProtocol(unittest.TestCase):

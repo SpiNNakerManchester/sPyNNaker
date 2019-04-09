@@ -1,7 +1,7 @@
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from .abstract_threshold_type import AbstractThresholdType
 from pacman.executor.injection_decorator import inject_items
+from .abstract_threshold_type import AbstractThresholdType
 
 DU_TH = "du_th"
 TAU_TH = "tau_th"
