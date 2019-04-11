@@ -110,28 +110,14 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
         # print("matching ids = %d"%nids)
         return nids
 
-    def get_delay_maximum(self):
+    @overrides(AbstractConnector.get_delay_maximum)
+    def get_delay_maximum(self, delays):
         return self._get_delay_maximum(
-            self._delays, max((self._n_pre_neurons, self._n_post_neurons)))
+            delays, max((self._n_pre_neurons, self._n_post_neurons)))
 
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
-        if self._nconns(pre_vertex_slice, post_vertex_slice) == 0:
-            return 0
-
-        max_lo_atom = max(
-            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
-        min_hi_atom = min(
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-        connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        return self._get_delay_variance(self._delays, [connection_slice])
-
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         n_conns = int(self._nconns(pre_vertex_slice, post_vertex_slice) > 0)
 
         # print("in get_n_connections_from_pre_vertex_maximum")
@@ -160,9 +146,8 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
                 return n_conns
             return 0
 
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
+    def get_n_connections_to_post_vertex_maximum(self):
 
         # return min(self._nconns(pre_vertex_slice, post_vertex_slice),
         #            post_vertex_slice.n_atoms)
@@ -171,24 +156,8 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
         else:
             return 0
 
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
-        if self._nconns(pre_vertex_slice, post_vertex_slice) == 0:
-            return 0
-
-        max_lo_atom = max(
-            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
-        min_hi_atom = min(
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-
-        connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        return self._get_weight_mean(self._weights, [connection_slice])
-
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    @overrides(AbstractConnector.get_weight_maximum)
+    def get_weight_maximum(self, weights):
         n_connections = self._nconns(pre_vertex_slice, post_vertex_slice)
         if n_connections == 0:
             return 0
@@ -200,30 +169,16 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
 
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
         return self._get_weight_maximum(
-            self._weights, n_connections, [connection_slice])
-
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
-        if self._nconns(pre_vertex_slice, post_vertex_slice) == 0:
-            return 0
-
-        max_lo_atom = max(
-            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
-        min_hi_atom = min(
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-
-        connection_slice = slice(max_lo_atom, min_hi_atom + 1)
-        return self._get_weight_variance(self._weights, [connection_slice])
+            weights, n_connections, [connection_slice])
 
     def generate_on_machine(self):
         return (self._gen_on_spinn and
                 self._generate_lists_on_machine(self._weights) and
                 self._generate_lists_on_machine(self._delays))
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
 
@@ -258,9 +213,9 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = pre_indices
         block["target"] = post_indices
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, [connection_slice])
+            weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, [connection_slice])
+            delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
 

@@ -113,7 +113,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
         return post // self._shape_post[WIDTH], post % self._shape_post[WIDTH]
 
-    def map_to_pre_coords(self, (post_r, post_c)):
+    def map_to_pre_coords(self, post_r, post_c):
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
@@ -265,26 +265,20 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return self._all_pre_in_range_delays[
             str(pre_vertex_slice)][str(post_vertex_slice)]
 
-    def get_delay_maximum(self):
+    @overrides(AbstractConnector.get_delay_maximum)
+    def get_delay_maximum(self, delays):
         # way over-estimated
         n_conns = (
             self._n_pre_neurons * self._n_post_neurons * self._kernel_w *
             self._kernel_h)
-        return self._get_delay_maximum(self._delays, n_conns)
+        return self._get_delay_maximum(delays, n_conns)
 
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
-        slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
-        return self._get_delay_variance(self._delays, slices)
-
+    @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # max outgoing from pre connections with min_delay <= delay <=
         # max_delay
+        # need to get the size of the pre vertex slice from somewhere here
 
         if isinstance(self._weights, ConvolutionKernel):
             if self._weights.size > pre_vertex_slice.n_atoms:
@@ -296,9 +290,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
         return numpy.clip(self._kernel_h*self._kernel_w, 0, 255)
 
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
+    def get_n_connections_to_post_vertex_maximum(self):
+        # need to get the size of the pre vertex slice from somewhere here
 
         if isinstance(self._weights, ConvolutionKernel):
             if self._weights.size > pre_vertex_slice.n_atoms:
@@ -310,20 +304,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
         return numpy.clip(self._kernel_h * self._kernel_w, 0, 255)
 
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    @overrides(AbstractConnector.get_weight_maximum)
+    def get_weight_maximum(self, weights):
 
-        if isinstance(self._weights, ConvolutionKernel):
-            return numpy.mean(numpy.abs(self._weights[self._weights != 0]))
-
-        slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
-        return self._get_weight_mean(self._weights, slices)
-
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
+        # use the ConvolutionKernel if it exists
         if isinstance(self._weights, ConvolutionKernel):
             return numpy.max(numpy.abs(self._weights[self._weights != 0]))
 
@@ -331,23 +315,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         n_conns = (
             self._n_pre_neurons * self._n_post_neurons * self._kernel_w *
             self._kernel_h)
-        return self._get_weight_maximum(self._weights, n_conns, slices)
-
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-
-        if isinstance(self._weights, ConvolutionKernel):
-            return numpy.var(numpy.abs(self._weights[self._weights != 0]))
-
-        slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
-        return self._get_weight_variance(self._weights, slices)
+        return self._get_weight_maximum(weights, n_conns)
 
     def __repr__(self):
         return "KernelConnector"
 
+    @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         n_connections = self.get_num_conns(pre_vertex_slice, post_vertex_slice)
