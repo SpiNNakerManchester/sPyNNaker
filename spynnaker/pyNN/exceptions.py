@@ -2,64 +2,55 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 
 
 class SpynnakerException(Exception):
-    """ Superclass of all exceptions from the pynn module
+    """ Superclass of all exceptions from the PyNN module.
     """
-    pass
 
 
 class MemReadException(SpynnakerException):
-    """ Raised when the pynn front end fails to read a certain memory region
+    """ Raised when the PyNN front end fails to read a certain memory region.
     """
-    pass
 
 
 class FilterableException(SpynnakerException):
     """ Raised when it is not possible to determine if an edge should be\
-        filtered
+        filtered.
     """
-    pass
 
 
 class SynapticConfigurationException(ConfigurationException):
-    """ Raised when the synaptic manager fails for some reason
+    """ Raised when the synaptic manager fails for some reason.
     """
-    pass
 
 
 class SynapticBlockGenerationException(ConfigurationException):
-    """ Raised when the synaptic manager fails to generate a synaptic block
+    """ Raised when the synaptic manager fails to generate a synaptic block.
     """
-    pass
 
 
 class SynapticBlockReadException(ConfigurationException):
     """ Raised when the synaptic manager fails to read a synaptic block or\
-        convert it into readable values
+        convert it into readable values.
     """
-    pass
 
 
 class SynapticMaxIncomingAtomsSupportException(ConfigurationException):
     """ Raised when a synaptic sublist exceeds the max atoms possible to be\
-        supported
+        supported.
     """
-    pass
 
 
 class DelayExtensionException(ConfigurationException):
-    """ Raised when a delay extension vertex fails
+    """ Raised when a delay extension vertex fails.
     """
-    pass
 
 
 class InvalidParameterType(SpynnakerException):
-    """ Raised when a parameter is not recognised
+    """ Raised when a parameter is not recognised.
     """
-    pass
 
 
 class SynapseRowTooBigException(SpynnakerException):
-    """ Raised when a synapse row is bigger than is allowed
+    """ Raised when a synapse row is bigger than is allowed.PyNN
     """
     def __init__(self, max_size, message):
         super(SynapseRowTooBigException, self).__init__(message)
@@ -67,6 +58,6 @@ class SynapseRowTooBigException(SpynnakerException):
 
     @property
     def max_size(self):
-        """ The maximum size allowed
+        """ The maximum size allowed.
         """
         return self._max_size

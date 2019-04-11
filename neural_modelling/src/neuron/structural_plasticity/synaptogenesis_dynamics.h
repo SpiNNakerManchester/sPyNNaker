@@ -54,8 +54,8 @@ bool synaptogenesis_dynamics_formation_rule();
 bool synaptogenesis_dynamics_elimination_rule();
 
 //! \brief This function is a rewiring DMA callback
-//! \param[in] dma_id: the id of the dma
-//! \param[in] dma_tag: the dma tag, i.e. the tag used for reading row for rew.
+//! \param[in] dma_id: the ID of the DMA
+//! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
 //! \return nothing
 void synaptic_row_restructure();
 

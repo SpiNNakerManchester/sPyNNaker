@@ -1,23 +1,18 @@
-from pacman.model.constraints.partitioner_constraints \
-    import SameAtomsAsVertexConstraint
+import logging
+import math
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.partitioner_constraints import (
+    SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
-
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.neural_projections \
-    import DelayedApplicationEdge, SynapseInformation
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, DelayAfferentApplicationEdge
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses)
+from spynnaker.pyNN.models.neural_projections import (
+    DelayedApplicationEdge, SynapseInformation,
+    ProjectionApplicationEdge, DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-from spinn_utilities.progress_bar import ProgressBar
-
-import logging
-import math
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
@@ -55,8 +50,8 @@ class PyNNProjectionCommon(object):
                 " synaptic projections")
 
         # sort out synapse type
-        synapse_type = post_synaptic_population._get_vertex \
-            .synapse_type.get_synapse_id_by_target(target)
+        synapse_type = post_synaptic_population._get_vertex\
+            .get_synapse_id_by_target(target)
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
@@ -67,15 +62,19 @@ class PyNNProjectionCommon(object):
         post_synaptic_population._get_vertex.set_synapse_dynamics(
             synapse_dynamics_stdp)
 
-        # Set and store information for future processing
+        # Set and store synapse information for future processing
         self._synapse_information = SynapseInformation(
-            connector, synapse_dynamics_stdp, synapse_type)
+            connector, synapse_dynamics_stdp, synapse_type,
+            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
+
+        # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
             machine_time_step)
 
         # handle max delay
-        max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
+        max_delay = synapse_dynamics_stdp.get_delay_maximum(
+            connector, self._synapse_information.delay)
         if max_delay is None:
             max_delay = user_max_delay
 
@@ -130,7 +129,7 @@ class PyNNProjectionCommon(object):
                 time_scale_factor)
             self._projection_edge.delay_edge = delay_edge
 
-        # add projection to the spinnaker control system
+        # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
         # If there is a virtual board, we need to hold the data in case the
@@ -330,8 +329,9 @@ class PyNNProjectionCommon(object):
 
     def size(self, gather=True):
         """ Return the total number of connections.
-         - only local connections, if gather is False,
-         - all connections, if gather is True (default)
+
+        :param gather: If False, only get the number of connections locally.\
+            Which means nothing on SpiNNaker...
         """
         # TODO
         raise NotImplementedError

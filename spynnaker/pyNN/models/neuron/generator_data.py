@@ -1,5 +1,5 @@
-import numpy
 import decimal
+import numpy
 from data_specification.enums.data_type import DataType
 
 
@@ -14,8 +14,7 @@ class GeneratorData(object):
             max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
             max_delayed_row_n_synapses, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            delay_placement, synapse_information, max_stage,
-            machine_time_step):
+            synapse_information, max_stage, machine_time_step):
         self._synaptic_matrix_offset = synaptic_matrix_offset
         self._delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self._max_row_n_words = max_row_n_words
@@ -28,7 +27,6 @@ class GeneratorData(object):
         self._post_slice_index = post_slice_index
         self._pre_vertex_slice = pre_vertex_slice
         self._post_vertex_slice = post_vertex_slice
-        self._delay_placement = delay_placement
         self._synapse_information = synapse_information
         self._max_stage = max_stage
         self._machine_time_step = machine_time_step
@@ -45,9 +43,10 @@ class GeneratorData(object):
         return sum((self.BASE_SIZE,
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
-                    connector.gen_weight_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes,
-                    connector.gen_rng_params_size_in_bytes))
+                    connector.gen_weight_params_size_in_bytes(
+                        self._synapse_information.weight),
+                    connector.gen_delay_params_size_in_bytes(
+                        self._synapse_information.delay)))
 
     @property
     def gen_data(self):
@@ -57,12 +56,6 @@ class GeneratorData(object):
         """
         connector = self._synapse_information.connector
         synapse_dynamics = self._synapse_information.synapse_dynamics
-        delay_chip = 0xFFFFFFFF
-        delay_core = 0xFFFFFFFF
-        if self._delay_placement is not None:
-            delay_chip = (
-                (self._delay_placement.y << 8) | self._delay_placement.x)
-            delay_core = self._delay_placement.p
         items = list()
         items.append(numpy.array([
             self._synaptic_matrix_offset,
@@ -73,14 +66,14 @@ class GeneratorData(object):
             self._max_delayed_row_n_synapses,
             self._pre_vertex_slice.lo_atom,
             self._pre_vertex_slice.n_atoms,
-            delay_chip, delay_core, self._max_stage,
-            (decimal.Decimal(str(float(self._machine_time_step) / 1000.0)) *
+            self._max_stage,
+            (decimal.Decimal(str(1000.0 / float(self._machine_time_step))) *
              DataType.S1615.scale),
             self._synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
-            connector.gen_weights_id,
-            connector.gen_delays_id],
+            connector.gen_weights_id(self._synapse_information.weight),
+            connector.gen_delays_id(self._synapse_information.delay)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
@@ -88,8 +81,9 @@ class GeneratorData(object):
             self._post_slice_index, self._pre_vertex_slice,
             self._post_vertex_slice, self._synapse_information.synapse_type))
         items.append(connector.gen_weights_params(
-            self._pre_vertex_slice, self._post_vertex_slice))
+            self._synapse_information.weight, self._pre_vertex_slice,
+            self._post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self._pre_vertex_slice, self._post_vertex_slice))
-        items.append(connector.gen_rng_params)
+            self._synapse_information.delay, self._pre_vertex_slice,
+            self._post_vertex_slice))
         return numpy.concatenate(items)

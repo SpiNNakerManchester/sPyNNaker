@@ -7,6 +7,7 @@ def _active_time_for_frequency(frequency):
 class MunichIoEthernetProtocol(object):
 
     def __init__(self):
+        # Nothing to do here
         pass
 
     @staticmethod

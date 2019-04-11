@@ -1,6 +1,5 @@
-from spinn_front_end_common.interface.interface_functions import \
-    GraphDataSpecificationWriter
-
+from spinn_front_end_common.interface.interface_functions import (
+    GraphDataSpecificationWriter)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 
 

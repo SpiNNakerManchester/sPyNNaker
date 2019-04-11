@@ -1,20 +1,18 @@
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints \
-    import FixedKeyAndMaskConstraint
+from pacman.model.constraints.key_allocator_constraints import (
+    FixedKeyAndMaskConstraint)
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.model.routing_info import BaseKeyAndMask
-# front end common imports
-from spinn_front_end_common.abstract_models import \
-    AbstractProvidesOutgoingPartitionConstraints
-from spinn_front_end_common.abstract_models.impl\
-    import ProvidesKeyToAtomMappingImpl
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints,
+    AbstractSendMeMulticastCommandsVertex)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
 
-
 # robot with 7 7 1
+
 
 def get_x_from_robot_retina(key):
     return (key >> 7) & 0x7f
@@ -63,7 +61,7 @@ class MunichRetinaDevice(
 
     def __init__(
             self, retina_key, spinnaker_link_id, position,
-            label=default_parameters['label'], n_neurons=None,
+            label=None,
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
         # pylint: disable=too-many-arguments
@@ -94,10 +92,6 @@ class MunichRetinaDevice(
         if self._position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this _position")
-
-        if n_neurons != fixed_n_neurons and n_neurons is not None:
-            print("Warning, the retina will have {} neurons".format(
-                fixed_n_neurons))
 
     def get_outgoing_partition_constraints(self, partition):
         return [FixedKeyAndMaskConstraint([

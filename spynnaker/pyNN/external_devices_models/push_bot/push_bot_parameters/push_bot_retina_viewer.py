@@ -1,14 +1,12 @@
+import math
+import socket
 from threading import Thread
 import numpy
-import socket
-import math
 
 # Value of brightest pixel to show
 _DISPLAY_MAX = 33.0
-
 # How regularity to display frames
 _FRAME_TIME_MS = 10
-
 # Time constant of pixel decay
 _DECAY_TIME_CONSTANT_MS = 100
 
@@ -47,7 +45,8 @@ class PushBotRetinaViewer(Thread):
             -float(self._frame_time_ms) / float(decay_time_constant_ms))
 
     def _init_socket(self, port):
-        """Open socket to receive UDP."""
+        """ Open socket to receive UDP.
+        """
         self._spike_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._spike_socket.bind(("0.0.0.0", port))
         self._spike_socket.setblocking(False)

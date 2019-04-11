@@ -1,13 +1,13 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.interface.provenance \
-    import AbstractProvidesLocalProvenanceData
-from spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector \
-    import OneToOneConnector
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractWeightUpdatable, AbstractFilterableEdge
 from pacman.model.graphs.machine import MachineEdge
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.interface.provenance import (
+    AbstractProvidesLocalProvenanceData)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector)
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractWeightUpdatable, AbstractFilterableEdge)
 
 
 class ProjectionMachineEdge(
@@ -33,6 +33,8 @@ class ProjectionMachineEdge(
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         # Filter one-to-one connections that are out of range
+        # Note: there may be other connectors stored on the same edge!
+        n_filtered = 0
         for synapse_info in self._synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
@@ -40,32 +42,21 @@ class ProjectionMachineEdge(
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
-                    return True
-        return False
+                    n_filtered += 1
+
+        return (n_filtered == len(self._synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
         pre_vertex = graph_mapper.get_application_vertex(
             self.pre_vertex)
-        pre_slice_index = graph_mapper.get_machine_vertex_index(
-            self.pre_vertex)
         pre_vertex_slice = graph_mapper.get_slice(
             self.pre_vertex)
-        pre_slices = graph_mapper.get_slices(pre_vertex)
-        post_vertex = graph_mapper.get_application_vertex(
-            self.post_vertex)
-        post_slice_index = graph_mapper.get_machine_vertex_index(
-            self.post_vertex)
-        post_vertex_slice = graph_mapper.get_slice(
-            self.post_vertex)
-        post_slices = graph_mapper.get_slices(post_vertex)
 
         weight = 0
         for synapse_info in self._synapse_information:
             new_weight = synapse_info.connector.\
-                get_n_connections_to_post_vertex_maximum(
-                    pre_slices, pre_slice_index, post_slices,
-                    post_slice_index, pre_vertex_slice, post_vertex_slice)
+                get_n_connections_to_post_vertex_maximum()
             new_weight *= pre_vertex_slice.n_atoms
             if hasattr(pre_vertex, "rate"):
                 rate = pre_vertex.rate

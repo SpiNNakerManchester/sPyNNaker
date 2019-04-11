@@ -37,27 +37,9 @@
 #define SYNAPSE_DELAY_BITS 4
 #endif
 
-#ifndef SYNAPSE_TYPE_BITS
-//! how many bits the synapse type will take
-//! (is expected to be done by implementations of synapse shapers)
-#define SYNAPSE_TYPE_BITS 1
-#error SYNAPSE_TYPE_BITS was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
-#ifndef SYNAPSE_TYPE_COUNT
-//! how many types of synapses will be supported
-//! (is expected to be done by implementations of synapse shapers)
-#define SYNAPSE_TYPE_COUNT 2
-#error SYNAPSE_TYPE_COUNT was undefined.  It should be defined by a synapse\
-       shaping include
-#endif
-
 // Create some masks based on the number of bits
 //! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
-//! the mask for the synapse type in the row
-#define SYNAPSE_TYPE_MASK       ((1 << SYNAPSE_TYPE_BITS) - 1)
 
 // Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
@@ -74,7 +56,7 @@ typedef uint16_t control_t;
 // mixed plastic and fixed synapse rows.
 //
 // The data structure is treated as an array of 32-bit words.
-// Special meanings are ascribed to the 0-th and 1-st elements
+// Special meanings are ascribed to the 0th and 1st elements
 // of the array.
 //
 // We are expecting the original source address in SDRAM to be
@@ -100,7 +82,7 @@ static inline address_t synapse_row_plastic_region(address_t row) {
     return ((address_t) (&(row[1])));
 }
 
-// Returns the address of the nonplastic (or fixed) region
+// Returns the address of the non-plastic (or fixed) region
 static inline address_t synapse_row_fixed_region(address_t row) {
     return ((address_t) (&(row[synapse_row_plastic_size(row) + 1])));
 }
@@ -141,8 +123,8 @@ static inline index_t synapse_row_sparse_index(
 }
 
 static inline index_t synapse_row_sparse_type(
-        uint32_t x, uint32_t synapse_index_bits) {
-    return ((x >> synapse_index_bits) & SYNAPSE_TYPE_MASK);
+        uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
+    return ((x >> synapse_index_bits) & synapse_type_mask);
 }
 
 static inline index_t synapse_row_sparse_type_index(

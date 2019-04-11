@@ -9,7 +9,7 @@ class AbstractContainsUnits(object):
 
     @abstractmethod
     def get_units(self, variable):
-        """ get units for a given variable
+        """ Get units for a given variable
 
         :param variable: the variable to find units from
         :return: the units as a string.

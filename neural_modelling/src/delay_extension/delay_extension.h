@@ -6,7 +6,7 @@
 
 //! region identifiers
 typedef enum region_identifiers{
-    SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2
+    SYSTEM = 0, DELAY_PARAMS = 1, PROVENANCE_REGION = 2, EXPANDER_REGION = 3
 } region_identifiers;
 
 enum parameter_positions {

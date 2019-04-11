@@ -1,6 +1,0 @@
-*.txt
-*.aplx
-*.elf
-*.nm
-/build_profiled/
-*.o

@@ -1,15 +1,13 @@
 import logging
 from threading import RLock
-
 import numpy
-
 from spinnman.connections import ConnectionListener
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotRetinaResolution
+    import (
+        PushBotRetinaResolution)
 
 logger = logging.getLogger(__name__)
-
 _RETINA_PACKET_SIZE = 2
 
 
@@ -51,7 +49,7 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         self._lock = RLock()
 
     def _receive_retina_data(self, data):
-        """ Receive retina packets from the pushbot and converts them into\
+        """ Receive retina packets from the PushBot and converts them into\
             neuron spikes within the spike injector system.
 
         :param data: Data to be processed

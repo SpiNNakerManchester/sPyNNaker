@@ -1,10 +1,10 @@
+import logging
+from time import sleep
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from time import sleep
-import logging
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
-from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
-from spynnaker.pyNN.protocols import munich_io_spinnaker_link_protocol
+from spynnaker.pyNN.protocols import (
+    MunichIoEthernetProtocol, munich_io_spinnaker_link_protocol)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -17,7 +17,7 @@ def _signed_int(uint_value):
 
 class PushBotTranslator(AbstractEthernetTranslator):
     """ Translates packets between PushBot Multicast packets and PushBot\
-        WiFi Commands
+        Wi-Fi Commands
     """
     __slots__ = [
         "_protocol",
@@ -26,7 +26,7 @@ class PushBotTranslator(AbstractEthernetTranslator):
     def __init__(self, protocol, pushbot_wifi_connection):
         """
         :param protocol: The instance of the PushBot protocol to get keys from
-        :param pushbot_wifi_connection: A WiFi connection to the PushBot
+        :param pushbot_wifi_connection: A Wi-Fi connection to the PushBot
         """
         self._protocol = protocol
         self._pushbot_wifi_connection = pushbot_wifi_connection
@@ -171,4 +171,4 @@ class PushBotTranslator(AbstractEthernetTranslator):
 
         # otherwise no idea what command is, so raise warning and ignore
         else:
-            logger.warning("Unknown Pushbot command: {}", multicast_packet)
+            logger.warning("Unknown PushBot command: {}", multicast_packet)

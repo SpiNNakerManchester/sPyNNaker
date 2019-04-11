@@ -1,16 +1,28 @@
+/**
+ *! \file
+ *! \brief All-to-All connection generator implementation
+ */
+
 #include <stdbool.h>
 
+/**
+ *! \brief The parameters to be passed around for this connector
+ */
 struct all_to_all {
     uint32_t allow_self_connections;
 };
 
 void *connection_generator_all_to_all_initialise(address_t *region) {
+
+    // Allocate the data structure for parameters
     struct all_to_all *params = (struct all_to_all *)
         spin1_malloc(sizeof(struct all_to_all));
+
+    // Copy the parameters into the data structure
     address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct all_to_all));
     params_sdram = &(params_sdram[sizeof(struct all_to_all) >> 2]);
-    log_info("All to all connector, allow self connections = %u",
+    log_debug("All to all connector, allow self connections = %u",
             params->allow_self_connections);
 
     *region = params_sdram;
@@ -24,13 +36,11 @@ void connection_generator_all_to_all_free(void *data) {
 uint32_t connection_generator_all_to_all_generate(
         void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, rng_t rng,
-        uint16_t *indices) {
+        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
     use(pre_slice_count);
-    use(rng);
 
-    log_info("Generating for %u", pre_neuron_index);
+    log_debug("Generating for %u", pre_neuron_index);
 
     struct all_to_all *params = (struct all_to_all *) data;
 
@@ -46,7 +56,7 @@ uint32_t connection_generator_all_to_all_generate(
         // ... unless this is a self connection and these are disallowed
         if (!params->allow_self_connections &&
                 (pre_neuron_index == (post_slice_start + i))) {
-            log_info("Not generating for post %u", post_slice_start + i);
+            log_debug("Not generating for post %u", post_slice_start + i);
             continue;
         }
         indices[n_conns++] = i;

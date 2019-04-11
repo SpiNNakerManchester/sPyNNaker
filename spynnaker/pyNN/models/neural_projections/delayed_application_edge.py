@@ -1,6 +1,6 @@
 from spinn_utilities.overrides import overrides
-from .delayed_machine_edge import DelayedMachineEdge
 from pacman.model.graphs.application import ApplicationEdge
+from .delayed_machine_edge import DelayedMachineEdge
 
 
 class DelayedApplicationEdge(ApplicationEdge):
@@ -12,6 +12,10 @@ class DelayedApplicationEdge(ApplicationEdge):
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
         self._synapse_information = [synapse_information]
+
+    @property
+    def synapse_information(self):
+        return self._synapse_information
 
     def add_synapse_information(self, synapse_information):
         self._synapse_information.append(synapse_information)

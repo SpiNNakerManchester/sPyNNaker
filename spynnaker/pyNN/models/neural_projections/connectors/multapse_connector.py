@@ -1,28 +1,29 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.utilities import utility_calls
-from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
-from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_utilities.abstract_base import abstractmethod
-
+import logging
+import math
 import numpy.random
 from six import raise_from
+from spinn_utilities.abstract_base import abstractmethod
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
+
+logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine):
-    """
-    Create a multapse connector. The size of the source and destination\
-    populations are obtained when the projection is connected. The number of\
-    synapses is specified. when instantiated, the required number of synapses\
-    is created by selecting at random from the source and target populations\
-    with replacement. Uniform selection probability is assumed.
+    """ Create a multapse connector. The size of the source and destination\
+        populations are obtained when the projection is connected. The number\
+        of synapses is specified. when instantiated, the required number of\
+        synapses is created by selecting at random from the source and target\
+        populations with replacement. Uniform selection probability is assumed.
     """
     def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, verbose=False):
+                 with_replacement=True, safe=True, verbose=False,
+                 rng=None):
         """
-        Creates a new connector.
-
         :param num_synapses:
             This is the total number of synapses in the connection.
         :type num_synapses: int
@@ -40,43 +41,16 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         self._pre_slices = None
         self._post_slices = None
         self._synapses_per_edge = None
+        self._rng = rng
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
-        """ Get the required rngs
+        """ Get the required RNGs
         """
-
-    @overrides(AbstractConnector.set_weights_and_delays)
-    def set_weights_and_delays(self, weights, delays):
-        """ sets the weights and delays as needed
-
-        :param `float` weights:
-            may either be a float, a !RandomDistribution object, a list \
-            1D array with at least as many items as connections to be \
-            created, or a distance dependence as per a d_expression. Units nA.
-        :param `float` delays:  -- as `weights`. If `None`, all synaptic \
-            delays will be set to the global minimum delay.
-        :raises Exception: when not a standard interface of list, scaler, \
-            or random number generator
-        :raises NotImplementedError: when lists are not supported and entered
-        """
-        self._weights = weights
-        self._delays = delays
-        self._check_parameters(weights, delays, allow_lists=True)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
-        return self._get_delay_maximum(self._delays, self._num_synapses)
-
-    @overrides(AbstractConnector.get_delay_variance)
-    def get_delay_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-        connection_slice = self._get_connection_slice(
-            pre_slice_index, post_slice_index)
-        return self._get_delay_variance(self._delays, [connection_slice])
+    def get_delay_maximum(self, delays):
+        return self._get_delay_maximum(delays, self._num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self._synapses_per_edge is None or
@@ -85,6 +59,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             n_pre_atoms = sum([pre.n_atoms for pre in pre_slices])
             n_post_atoms = sum([post.n_atoms for post in post_slices])
             n_connections = n_pre_atoms * n_post_atoms
+            if (not self._with_replacement and
+                    n_connections < self._num_synapses):
+                raise SpynnakerException(
+                    "FixedNumberTotalConnector will not work correctly when "
+                    "with_replacement=False & num_synapses > n_pre * n_post")
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
                 for pre in pre_slices for post in post_slices]
@@ -110,92 +89,35 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            min_delay=None, max_delay=None):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-
-        n_total_connections = self._get_n_connections(
-            pre_slice_index, post_slice_index)
-        if n_total_connections == 0:
-            return 0
-        prob_of_choosing_pre_atom = 1.0 / float(pre_vertex_slice.n_atoms)
-        n_connections_per_pre_atom = \
-            utility_calls.get_probable_maximum_selected(
-                self._n_pre_neurons * self._n_post_neurons,
-                n_total_connections, prob_of_choosing_pre_atom)
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+        prob_in_slice = (
+            float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
+        max_in_slice = utility_calls.get_probable_maximum_selected(
+            self._num_synapses, self._num_synapses, prob_in_slice)
+        prob_in_row = 1.0 / float(self._n_pre_neurons)
+        n_connections = utility_calls.get_probable_maximum_selected(
+            self._num_synapses, max_in_slice, prob_in_row)
 
         if min_delay is None or max_delay is None:
-            return n_connections_per_pre_atom
+            return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._delays, self._n_pre_neurons * self._n_post_neurons,
-            n_connections_per_pre_atom,
-            [self._get_connection_slice(pre_slice_index, post_slice_index)],
-            min_delay, max_delay)
+            delays, self._n_pre_neurons * self._n_post_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-        n_total_connections = self._get_n_connections(
-            pre_slice_index, post_slice_index)
-        if n_total_connections == 0:
-            return 0
-        n_total_connections = self._get_n_connections(
-            pre_slice_index, post_slice_index)
-        if n_total_connections == 0:
-            return 0
-        prob_of_choosing_post_atom = 1.0 / float(post_vertex_slice.n_atoms)
+    def get_n_connections_to_post_vertex_maximum(self):
+        prob_of_choosing_post_atom = 1.0 / float(self._n_post_neurons)
         return utility_calls.get_probable_maximum_selected(
-                self._n_pre_neurons * self._n_post_neurons,
-                n_total_connections, prob_of_choosing_post_atom)
-
-    @overrides(AbstractConnector.get_weight_mean)
-    def get_weight_mean(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-        n_connections = self._get_n_connections(
-            pre_slice_index, post_slice_index)
-        if n_connections == 0:
-            return 0
-        connection_slice = self._get_connection_slice(
-            pre_slice_index, post_slice_index)
-        return self._get_weight_mean(self._weights, [connection_slice])
+            self._num_synapses, self._num_synapses, prob_of_choosing_post_atom)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-        n_connections = self._get_n_connections(
-            pre_slice_index, post_slice_index)
-        if n_connections == 0:
-            return 0
-        connection_slice = self._get_connection_slice(
-            pre_slice_index, post_slice_index)
-        return self._get_weight_maximum(
-            self._weights, n_connections, [connection_slice])
-
-    @overrides(AbstractConnector.get_weight_variance)
-    def get_weight_variance(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
-        # pylint: disable=too-many-arguments
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
-        connection_slice = self._get_connection_slice(
-            pre_slice_index, post_slice_index)
-        return self._get_weight_variance(self._weights, [connection_slice])
+    def get_weight_maximum(self, weights):
+        return self._get_weight_maximum(weights, self._num_synapses)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -238,9 +160,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = pairs[chosen, 0]
         block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, [connection_slice])
+            weights, n_connections, [connection_slice])
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, [connection_slice])
+            delays, n_connections, [connection_slice])
         block["synapse_type"] = synapse_type
         return block
 
@@ -258,17 +180,20 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
-        return numpy.array([
+        params = [
             self._allow_self_connections,
             self._with_replacement,
             n_connections,
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms],
-            dtype="uint32")
+            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms]
+        params.extend(self._get_connector_seed(
+            pre_vertex_slice, post_vertex_slice, self._rng))
+        return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16
+        return 16 + 16

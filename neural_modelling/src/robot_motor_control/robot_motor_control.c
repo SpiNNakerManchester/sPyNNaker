@@ -4,7 +4,6 @@
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>
-#include <string.h>
 
 // Counters
 #define N_COUNTERS         6
@@ -102,8 +101,9 @@ void timer_callback(uint unused0, uint unused1) {
     log_debug("Timer tick %d", time);
 
     if ((infinite_run != TRUE) && (time == simulation_ticks)) {
-        log_info("Simulation complete.\n");
         simulation_handle_pause_resume(NULL);
+        log_info("Simulation complete.\n");
+        simulation_ready_to_read();
     }
 
     // Process the incoming spikes

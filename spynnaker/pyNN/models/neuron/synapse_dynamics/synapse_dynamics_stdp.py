@@ -1,24 +1,22 @@
 import math
 import numpy
-
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models import AbstractPopulationSettable
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    MatrixGeneratorID
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-
 # When not using the MAD scheme, how many pre-synaptic events are buffered
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
-        AbstractPlasticSynapseDynamics, AbstractPopulationSettable,
+        AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????????
@@ -36,9 +34,6 @@ class SynapseDynamicsSTDP(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             pad_to_length=None):
-        AbstractPlasticSynapseDynamics.__init__(self)
-        AbstractPopulationSettable.__init__(self)
-        AbstractChangableAfterRun.__init__(self)
         self._timing_dependence = timing_dependence
         self._weight_dependence = weight_dependence
         self._dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -74,7 +69,7 @@ class SynapseDynamicsSTDP(
         """
         self._change_requires_mapping = False
 
-    @overrides(AbstractPopulationSettable.get_value)
+    @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
@@ -84,7 +79,7 @@ class SynapseDynamicsSTDP(
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
-    @overrides(AbstractPopulationSettable.set_value)
+    @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
         """ Set a property
 
@@ -184,6 +179,7 @@ class SynapseDynamicsSTDP(
 
         return fp_size_words + pp_size_words
 
+    @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
             post_vertex_slice, n_synapse_types):
@@ -202,7 +198,7 @@ class SynapseDynamicsSTDP(
             ((dendritic_delays.astype("uint16") & 0xF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
-             (12 + n_synapse_type_bits)) |
+             (4 + n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype("uint16")
              << n_neuron_id_bits) |
             ((connections["target"].astype("uint16") -
@@ -310,32 +306,26 @@ class SynapseDynamicsSTDP(
         connections["target"] = (
             (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = pp_half_words
-        connections["delay"] = (data_fixed >> (n_neuron_id_bits
-                                               + n_synapse_type_bits)) & 0xF
+        connections["delay"] = (data_fixed >> (
+            n_neuron_id_bits + n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
-    def get_weight_mean(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_mean(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
         return self._weight_dependence.weight_maximum
 
-    def get_weight_variance(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_variance(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
-    def get_weight_maximum(
-            self, connector, n_pre_slices, pre_slice_index, n_post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice):
+    def get_weight_maximum(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # The maximum weight is the largest that it could be set to from
