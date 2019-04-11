@@ -24,13 +24,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     Where the pre- and postsynaptic populations are thought-of as a 2D array.\
     Connect every post(row, col) neuron to many pre(row, col, kernel) through\
     the same set of weights and delays.
+
+    NOTE: shouldn't these include allow_self_connections and with_replacement?
     """
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel,
-            shape_common=None, pre_sample_steps=None, pre_start_coords=None,
-            post_sample_steps=None, post_start_coords=None,
-            safe=True, space=None, verbose=False):
+            shape_common, pre_sample_steps, pre_start_coords,
+            post_sample_steps, post_start_coords, safe, space, verbose):
         """
         :param shape_common:\
             2D shape of common coordinate system (for both pre and post, \
@@ -49,7 +50,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             Starting row/col for sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
-        super(KernelConnector, self).__init__(self, safe=safe, verbose=verbose)
+        super(KernelConnector, self).__init__(safe=safe, verbose=verbose)
 
         self._kernel_w = shape_kernel[WIDTH]
         self._kernel_h = shape_kernel[HEIGHT]
@@ -84,8 +85,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._post_step_w = post_sample_steps[WIDTH]
             self._post_step_h = post_sample_steps[HEIGHT]
 
-        self._krn_weights = self.get_kernel_vals(self._weights)
-        self._krn_delays = self.get_kernel_vals(self._delays)
+#         self._krn_weights = self.get_kernel_vals(self._weights)
+#         self._krn_delays = self.get_kernel_vals(self._delays)
 
         self._shape_common = \
             shape_pre if shape_common is None else shape_common
@@ -161,8 +162,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if pre_vertex_slice_str not in self._all_pre_in_range_weights:
             self._all_pre_in_range_weights[pre_vertex_slice_str] = {}
 
-    def compute_statistics(self, pre_vertex_slice, post_vertex_slice):
+    def compute_statistics(
+            self, weights, delays, pre_vertex_slice, post_vertex_slice):
         print("In kernel connector, compute_statistics")
+
+        # probably only need to call these once?
+        self._krn_weights = self.get_kernel_vals(self._weights)
+        self._krn_delays = self.get_kernel_vals(self._delays)
+
         prevs = str(pre_vertex_slice)
         postvs = str(post_vertex_slice)
         self.init_pre_entries(prevs)
@@ -248,11 +255,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_key(self, pre_vertex_slice, post_vertex_slice):
         return '%s->%s' % (pre_vertex_slice, post_vertex_slice)
 
-    def get_num_conns(self, pre_vertex_slice, post_vertex_slice):
+    def get_num_conns(
+            self, weights, delays, pre_vertex_slice, post_vertex_slice):
         if (str(pre_vertex_slice) not in self._num_conns or
                 str(post_vertex_slice) not in
                 self._num_conns[str(pre_vertex_slice)]):
-            self.compute_statistics(pre_vertex_slice, post_vertex_slice)
+            self.compute_statistics(weights, delays,
+                                    pre_vertex_slice, post_vertex_slice)
 
         return self._num_conns[str(pre_vertex_slice)][str(post_vertex_slice)]
 
@@ -260,7 +269,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if (str(pre_vertex_slice) not in self._all_pre_in_range_delays or
                 str(post_vertex_slice) not in
                 self._all_pre_in_range_delays[str(pre_vertex_slice)]):
-            self.compute_statistics(pre_vertex_slice, post_vertex_slice)
+            self.compute_statistics(weights, delays,
+                                    pre_vertex_slice, post_vertex_slice)
 
         return self._all_pre_in_range_delays[
             str(pre_vertex_slice)][str(post_vertex_slice)]
@@ -280,7 +290,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # max_delay
         # need to get the size of the pre vertex slice from somewhere here
 
-        if isinstance(self._weights, ConvolutionKernel):
+        if isinstance(delays, ConvolutionKernel):
             if self._weights.size > pre_vertex_slice.n_atoms:
                 return pre_vertex_slice.n_atoms
             elif self._weights.size > 255:
@@ -294,13 +304,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def get_n_connections_to_post_vertex_maximum(self):
         # need to get the size of the pre vertex slice from somewhere here
 
-        if isinstance(self._weights, ConvolutionKernel):
-            if self._weights.size > pre_vertex_slice.n_atoms:
-                return pre_vertex_slice.n_atoms
-            elif self._weights.size > 255:
-                return 255
-            else:
-                return (self._weights[self._weights != 0]).size
+#         if isinstance(self._krn_weights, ConvolutionKernel):
+#             if self._krn_weights.size > pre_vertex_slice.n_atoms:
+#                 return pre_vertex_slice.n_atoms
+#             elif self._krn_weights.size > 255:
+#                 return 255
+#             else:
+#                 return (self._weights[self._weights != 0]).size
 
         return numpy.clip(self._kernel_h * self._kernel_w, 0, 255)
 
@@ -308,8 +318,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def get_weight_maximum(self, weights):
 
         # use the ConvolutionKernel if it exists
-        if isinstance(self._weights, ConvolutionKernel):
-            return numpy.max(numpy.abs(self._weights[self._weights != 0]))
+#         if isinstance(self._weights, ConvolutionKernel):
+#             return numpy.max(numpy.abs(self._weights[self._weights != 0]))
 
         slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
         n_conns = (
@@ -325,7 +335,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        n_connections = self.get_num_conns(pre_vertex_slice, post_vertex_slice)
+        n_connections = self.get_num_conns(weights, delays,
+                                           pre_vertex_slice, post_vertex_slice)
 
         syn_dtypes = AbstractConnector.NUMPY_SYNAPSES_DTYPE
 
@@ -346,13 +357,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         block["synapse_type"] = syn_type.astype('uint8')
         return block
 
-    @property
-    def generate_on_machine(self):
-        super_generate = super(KernelConnector, self).generate_on_machine
-
-        # This connector can also cope with listed weights and delays
-        return super_generate or (isinstance(self._delays, numpy.ndarray) and
-                                  isinstance(self._weights, numpy.ndarray))
+#     @property
+#     def generate_on_machine(self):
+#         super_generate = super(KernelConnector, self).generate_on_machine
+#
+#         # This connector can also cope with listed weights and delays
+#         return super_generate or (isinstance(self._delays, numpy.ndarray) and
+#                                   isinstance(self._weights, numpy.ndarray))
 
     @property
     def _kernel_properties(self):
@@ -366,51 +377,53 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             shape2word(self._post_step_w, self._post_step_h),
             shape2word(self._kernel_w, self._kernel_h)]
 
-    @property
-    def gen_delays_id(self):
-        if isinstance(self._delays, numpy.ndarray):
-            return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_delays_id
-
-    @property
-    def gen_delay_params_size_in_bytes(self):
-        if isinstance(self._delays, numpy.ndarray):
-            return (N_KERNEL_PARAMS + 1 + self._delays.size) * 4
-        return super(KernelConnector, self).gen_delay_params_size_in_bytes()
-
-    def gen_delay_params(self, pre_vertex_slice, post_vertex_slice):
-        if isinstance(self._delays, numpy.ndarray):
-            properties = self._kernel_properties
-            properties.append(post_vertex_slice.lo_atom)
-            data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(
-                self._delays * float(DataType.S1615.scale)).astype("uint32")
-            return numpy.concatenate(data, values)
-        return super(KernelConnector, self).gen_delay_params(
-            self, pre_vertex_slice, post_vertex_slice)
-
-    @property
-    def gen_weights_id(self):
-        if isinstance(self._weights, numpy.ndarray):
-            return PARAM_TYPE_KERNEL
-        return super(KernelConnector, self).gen_weights_id
-
-    @property
-    def gen_weight_params_size_in_bytes(self):
-        if isinstance(self._weights, numpy.ndarray):
-            return (N_KERNEL_PARAMS + 1 + self._weights.size) * 4
-        return super(KernelConnector, self).gen_weight_params_size_in_bytes()
-
-    def gen_weights_params(self, pre_vertex_slice, post_vertex_slice):
-        if isinstance(self._weights, numpy.ndarray):
-            properties = self._kernel_properties
-            properties.append(post_vertex_slice.lo_atom)
-            data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(
-                self._weights * float(DataType.S1615.scale)).astype("uint32")
-            return numpy.concatenate(data, values)
-        return super(KernelConnector, self).gen_weights_params(
-            self, pre_vertex_slice, post_vertex_slice)
+# #     @property
+#     def gen_delays_id(self, delays):
+#         if isinstance(delays, numpy.ndarray):
+#             return PARAM_TYPE_KERNEL
+#         return super(KernelConnector, self).gen_delays_id(delays)
+#
+# #     @property
+#     def gen_delay_params_size_in_bytes(self, delays):
+#         if isinstance(delays, numpy.ndarray):
+#             return (N_KERNEL_PARAMS + 1 + delays.size) * 4
+#         return super(KernelConnector, self).gen_delay_params_size_in_bytes(
+#             delays)
+#
+#     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
+#         if isinstance(delays, numpy.ndarray):
+#             properties = self._kernel_properties
+#             properties.append(post_vertex_slice.lo_atom)
+#             data = numpy.array(properties, dtype="uint32")
+#             values = numpy.round(
+#                 delays * float(DataType.S1615.scale)).astype("uint32")
+#             return numpy.concatenate(data, values)
+#         return super(KernelConnector, self).gen_delay_params(
+#             delays, pre_vertex_slice, post_vertex_slice)
+#
+# #     @property
+#     def gen_weights_id(self, weights):
+#         if isinstance(weights, numpy.ndarray):
+#             return PARAM_TYPE_KERNEL
+#         return super(KernelConnector, self).gen_weights_id(weights)
+#
+# #     @property
+#     def gen_weight_params_size_in_bytes(self, weights):
+#         if isinstance(weights, numpy.ndarray):
+#             return (N_KERNEL_PARAMS + 1 + weights.size) * 4
+#         return super(KernelConnector, self).gen_weight_params_size_in_bytes(
+#             weights)
+#
+#     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
+#         if isinstance(weights, numpy.ndarray):
+#             properties = self._kernel_properties
+#             properties.append(post_vertex_slice.lo_atom)
+#             data = numpy.array(properties, dtype="uint32")
+#             values = numpy.round(
+#                 weights * float(DataType.S1615.scale)).astype("uint32")
+#             return numpy.concatenate(data, values)
+#         return super(KernelConnector, self).gen_weights_params(
+#             weights, pre_vertex_slice, post_vertex_slice)
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

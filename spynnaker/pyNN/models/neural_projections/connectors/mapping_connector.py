@@ -10,6 +10,8 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
     Where the pre- and postsynaptic populations have the same size, connect
     cell i in the presynaptic pynn_population.py to cell i in the postsynaptic
     pynn_population.py for all i.
+
+    NOTE: shouldn't these include allow_self_connections and with_replacement?
     """
 
     def __init__(
@@ -17,7 +19,7 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
             event_bits=0, safe=True, verbose=False):
         """
         """
-        super(MappingConnector, self).__init__(self, safe, verbose)
+        super(MappingConnector, self).__init__(safe, verbose)
         self._width = numpy.uint32(width)
         self._height = numpy.uint32(height)
 

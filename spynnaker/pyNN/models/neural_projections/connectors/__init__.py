@@ -14,10 +14,13 @@ from .index_based_probability_connector import IndexBasedProbabilityConnector
 from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
+from .kernel_connector import KernelConnector
+from .mapping_connector import MappingConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AllToAllConnector", "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
-           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector", ]
+           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector",
+           "KernelConnector", "MappingConnector"]
