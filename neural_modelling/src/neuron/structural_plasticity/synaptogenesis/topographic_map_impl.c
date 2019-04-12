@@ -10,7 +10,6 @@
 #include <neuron/structural_plasticity/synaptogenesis_dynamics.h>
 #include <neuron/population_table/population_table.h>
 
-
 #include <random.h>
 #include <spin1_api.h>
 #include <debug.h>
@@ -27,32 +26,6 @@
 
 // (Potential) Presynaptic partner selection
 #include "partner_selection/partner.h"
-
-//-----------------------------------------------------------------------------
-// Static functions                                                           |
-//-----------------------------------------------------------------------------
-typedef bool (*search_for_neuron_t)
-    (uint32_t, address_t, structural_plasticity_data_t *);
-typedef bool (*remove_neuron_t)(uint32_t, address_t);
-typedef bool (*add_neuron_t)
-    (uint32_t, address_t, uint32_t, uint32_t, uint32_t);
-typedef size_t (*number_of_connections_in_row_t)(address_t);
-
-#if STDP_ENABLED == 1
-static const search_for_neuron_t search_for_neuron =
-    &find_plastic_neuron_with_id;
-static const remove_neuron_t remove_neuron = &remove_plastic_neuron_at_offset;
-static const add_neuron_t add_neuron = &add_plastic_neuron_with_id;
-static const number_of_connections_in_row_t number_of_connections_in_row =
-    &synapse_row_num_plastic_controls;
-#else
-static const search_for_neuron_t search_for_neuron =
-    &find_static_neuron_with_id;
-static const remove_neuron_t remove_neuron = &remove_static_neuron_at_offset;
-static const add_neuron_t add_neuron = &add_static_neuron_with_id;
-static const number_of_connections_in_row_t number_of_connections_in_row =
-    &synapse_row_num_fixed_synapses;
-#endif
 
 //-----------------------------------------------------------------------------
 // Structures and global data                                                 |
@@ -505,9 +478,11 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
     use(dma_tag);
 
     // find the offset of the neuron in the current row
-    bool search_hit = search_for_neuron(
+    bool search_hit = synapse_dynamics_find_neuron_with_id(
         current_state.post_syn_id, rewiring_dma_buffer.row,
-        &(current_state.sp_data));
+        synapse_type_index_bits, synapse_index_mask,
+        &(current_state.sp_data.weight), &(current_state.sp_data.delay),
+        &(current_state.sp_data.offset));
 
     if (current_state.element_exists && search_hit) {
         synaptogenesis_dynamics_elimination_rule();
@@ -558,7 +533,7 @@ bool synaptogenesis_dynamics_elimination_rule(void)
             r > rewiring_data.p_elim_pot) {
         return false;
     }
-    if (!remove_neuron(current_state.sp_data.offset,
+    if (!synapse_dynamics_remove_neuron(current_state.sp_data.offset,
             rewiring_dma_buffer.row)) {
         return false;
     }
@@ -581,7 +556,7 @@ bool synaptogenesis_dynamics_formation_rule(void)
 {
     // Distance based probability extracted from the appropriate LUT
     uint16_t probability;
-    uint no_elems = number_of_connections_in_row(
+    uint no_elems = synapse_dynamics_n_connections_in_row(
         synapse_row_fixed_region(rewiring_dma_buffer.row));
     if (no_elems >= rewiring_data.s_max) {
         log_debug("row is full");
@@ -616,10 +591,11 @@ bool synaptogenesis_dynamics_formation_rule(void)
             rewiring_data.pre_pop_info_table
             .subpop_info[current_state.pop_index].delay_lo;
     actual_delay = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-	    offset + rewiring_data.pre_pop_info_table
+        offset + rewiring_data.pre_pop_info_table
             .subpop_info[current_state.pop_index].delay_lo;
 
-    if (!add_neuron(current_state.post_syn_id, rewiring_dma_buffer.row,
+    if (!synapse_dynamics_add_neuron(
+            current_state.post_syn_id, rewiring_dma_buffer.row,
             appr_scaled_weight, actual_delay,
             current_state.connection_type)) {
         return false;
