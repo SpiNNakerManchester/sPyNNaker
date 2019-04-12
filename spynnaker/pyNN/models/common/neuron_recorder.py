@@ -366,14 +366,12 @@ class NeuronRecorder(object):
             # make sure indexes is not a generator like range
             indexes = list(indexes)
             self.check_indexes(indexes)
-            if self._indexes[variable] is None:
-                # just use the new indexes
-                self._indexes[variable] = indexes
-            else:
+            if self._indexes[variable] is not None:
                 # merge the two indexes
-                self._indexes[variable] = \
-                    list(set(self._indexes[variable] + indexes))
-                self._indexes[variable].sort()
+                self._indexes[variable] = self._indexes[variable] + indexes
+            # Avoid duplicates and keep in numerical order
+            self._indexes[variable] = list(set(indexes))
+            self._indexes[variable].sort()
 
     def set_recording(self, variable, new_state, sampling_interval=None,
                       indexes=None):
