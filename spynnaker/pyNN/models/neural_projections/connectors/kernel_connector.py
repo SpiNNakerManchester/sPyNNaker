@@ -19,7 +19,7 @@ def shape2word(sw, sh):
             (numpy.uint32(sh) & 0xFFFF))
 
 
-class KernelConnector(AbstractGenerateConnectorOnMachine):
+class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and postsynaptic populations are thought-of as a 2D array.\
     Connect every post(row, col) neuron to many pre(row, col, kernel) through\
@@ -120,8 +120,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def post_as_pre(self, post_vertex_slice):
         if str(post_vertex_slice) not in self._post_as_pre:
+            post_r, post_c = self.to_post_coords(post_vertex_slice)
             self._post_as_pre[str(post_vertex_slice)] = self.map_to_pre_coords(
-                self.to_post_coords(post_vertex_slice))
+                post_r, post_c)
         return self._post_as_pre[str(post_vertex_slice)]
 
     def pre_as_post(self, coords):
@@ -132,10 +133,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def get_kernel_vals(self, vals):
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if isinstance(self._delays, RandomDistribution):
-            return numpy.array(self._delays.next(krn_size)).reshape(krn_shape)
-        elif numpy.isscalar(self._delays):
-            return self._delays*numpy.ones(krn_shape)
+        if isinstance(vals, RandomDistribution):
+            return numpy.array(vals.next(krn_size)).reshape(krn_shape)
+        elif numpy.isscalar(vals):
+            return vals*numpy.ones(krn_shape)
         elif ((isinstance(vals, numpy.ndarray) or
                 isinstance(vals, ConvolutionKernel)) and
                 vals.shape[HEIGHT] == self._kernel_h and
@@ -167,8 +168,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         print("In kernel connector, compute_statistics")
 
         # probably only need to call these once?
-        self._krn_weights = self.get_kernel_vals(self._weights)
-        self._krn_delays = self.get_kernel_vals(self._delays)
+        self._krn_weights = self.get_kernel_vals(weights)
+        self._krn_delays = self.get_kernel_vals(delays)
+
+        print('weights: ', self._krn_weights)
 
         prevs = str(pre_vertex_slice)
         postvs = str(post_vertex_slice)
@@ -177,6 +180,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         post_as_pre_r, post_as_pre_c = self.post_as_pre(post_vertex_slice)
         coords = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
+        print('hh, hw', hh, hw)
+        print('post_as: ', post_as_pre_r, post_as_pre_c)
         unique_pre_ids = []
         all_pre_ids = []
         all_post_ids = []
@@ -189,6 +194,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r = pre_idx // self._shape_pre[WIDTH]
             pre_c = pre_idx % self._shape_pre[WIDTH]
+            print('pre_idx, pre_r, pre_c: ', pre_idx, pre_r, pre_c)
             coords[pre_idx] = []
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
@@ -215,10 +221,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
                     coords[pre_idx].append(post_idx)
 
-                    dr = r - pre_r
+                    dr = abs(r - pre_r)  # absolute?
                     kr = hh - dr
-                    dc = c - pre_c
+                    dc = abs(c - pre_c)  # absolute?
                     kc = hw - dc
+
+                    print('dr, dc: ', dr, dc)
 
                     w = self._krn_weights[kr, kc]
                     d = self._krn_delays[kr, kc]

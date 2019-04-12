@@ -7,9 +7,7 @@ from .abstract_generate_connector_on_machine import \
 
 class MappingConnector(AbstractGenerateConnectorOnMachine):
     """
-    Where the pre- and postsynaptic populations have the same size, connect
-    cell i in the presynaptic pynn_population.py to cell i in the postsynaptic
-    pynn_population.py for all i.
+    OK this connector needs a descriptor; what's it actually doing?
 
     NOTE: shouldn't these include allow_self_connections and with_replacement?
     """
@@ -120,6 +118,7 @@ class MappingConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+        # can't pass pre_vertex_slice in here any more
         n_conns = int(self._nconns(pre_vertex_slice, post_vertex_slice) > 0)
 
         # print("in get_n_connections_from_pre_vertex_maximum")
