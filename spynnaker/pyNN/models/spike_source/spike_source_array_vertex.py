@@ -132,10 +132,6 @@ class SpikeSourceArrayVertex(
     def set_model_max_atoms_per_core(new_value=sys.maxsize):
         SpikeSourceArrayVertex._model_based_max_atoms_per_core = new_value
 
-    @staticmethod
-    def get_max_atoms_per_core():
-        return SpikeSourceArrayVertex._model_based_max_atoms_per_core
-
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
 

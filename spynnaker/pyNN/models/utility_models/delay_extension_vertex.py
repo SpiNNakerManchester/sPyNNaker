@@ -7,7 +7,6 @@ import math
 import sys
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
@@ -350,7 +349,7 @@ class DelayExtensionVertex(
                     max_atoms = sys.maxsize
                     edge_post_vertex = out_edge.post_vertex
                     if (isinstance(
-                            edge_post_vertex, AbstractHasGlobalMaxAtoms)):
+                            edge_post_vertex, ApplicationVertex)):
                         max_atoms = edge_post_vertex.get_max_atoms_per_core()
                     if out_edge.post_vertex.n_atoms < max_atoms:
                         max_atoms = edge_post_vertex.n_atoms
