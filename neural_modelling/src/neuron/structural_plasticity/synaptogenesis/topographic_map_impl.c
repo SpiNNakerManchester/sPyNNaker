@@ -584,7 +584,7 @@ bool synaptogenesis_dynamics_formation_rule(void)
     uint no_elems = number_of_connections_in_row(
         synapse_row_fixed_region(rewiring_dma_buffer.row));
     if (no_elems >= rewiring_data.s_max) {
-        log_error("row is full");
+        log_debug("row is full");
         return false;
     }
 
