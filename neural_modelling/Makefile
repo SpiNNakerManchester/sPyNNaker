@@ -1,9 +1,9 @@
-BUILDS = spike_source/poisson \
+BUILDS = synapse_expander \
+         bit_field_expander \
+         spike_source/poisson \
          delay_extension \
          neuron \
-         robot_motor_control \
-         synapse_expander \
-         bit_field_expander
+         robot_motor_control
 DIRS = $(BUILDS:%=makefiles/%)
 
 all: $(DIRS)

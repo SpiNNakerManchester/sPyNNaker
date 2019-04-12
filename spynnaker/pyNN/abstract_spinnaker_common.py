@@ -122,8 +122,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self.config.getint(
                 "Mapping",
                 "router_table_compression_with_bit_field_acceptance_threshold")
-        extra_mapping_inputs["UseExpresso"] = self.config.getboolean(
-            "Mapping", "use_expresso")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")

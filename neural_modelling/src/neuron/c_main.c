@@ -174,6 +174,8 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
         int position_in_array =
             population_table_position_in_the_master_pop_array(key);
 
+        log_info("putting key %d in position %d", key, position_in_array);
+
         // alloc sdram into right region
         connectivity_bit_field[position_in_array] = spin1_malloc(
             sizeof(bit_field_t) * n_words);
@@ -193,11 +195,11 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
                 sizeof(uint32_t) * n_words);
 
             // print out the bit field for debug purposes
-            log_debug("bit field for key %d is :", key);
+            log_info("bit field for key %d is :", key);
             for (uint32_t bit_field_word_index = 0;
                     bit_field_word_index < n_words;
                     bit_field_word_index++){
-                log_debug(
+                log_info(
                     "%x", connectivity_bit_field[position_in_array][
                         bit_field_word_index]);
             }
