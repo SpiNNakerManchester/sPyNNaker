@@ -142,22 +142,22 @@ class SpikeSourcePoissonVertex(
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
     @inject_items({
-        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "plan_n_time_steps": "PlanNTimeSteps",
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
         ApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={"n_machine_time_steps", "machine_time_step"}
+        additional_arguments={"plan_n_time_steps", "machine_time_step"}
     )
     def get_resources_used_by_atoms(
-            self, vertex_slice, n_machine_time_steps, machine_time_step):
+            self, vertex_slice, plan_n_time_steps, machine_time_step):
         # pylint: disable=arguments-differ
 
         constant_sdram = ConstantSDRAM(
             self.get_sdram_usage_for_atoms(vertex_slice))
         variable_sdram = self._spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._max_spikes_per_ts(
-                vertex_slice, n_machine_time_steps, machine_time_step))
+                vertex_slice, plan_n_time_steps, machine_time_step))
 
         # build resources as i currently know
         container = ResourceContainer(
@@ -592,19 +592,19 @@ class SpikeSourcePoissonVertex(
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
-        "n_machine_time_steps": "TotalMachineTimeSteps",
+        "plan_n_time_steps": "PlanNTimeSteps",
         "graph": "MemoryMachineGraph"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "n_machine_time_steps", "graph"
+            "routing_info", "plan_n_time_steps", "graph"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, n_machine_time_steps, graph):
+            graph_mapper, routing_info, plan_n_time_steps, graph):
         # pylint: disable=too-many-arguments, arguments-differ
         self._machine_time_step = machine_time_step
         vertex = placement.vertex
@@ -625,8 +625,8 @@ class SpikeSourcePoissonVertex(
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self._spike_recorder.get_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._max_spikes_per_ts(
-                    vertex_slice, n_machine_time_steps, machine_time_step))
-        recorded_region_sizes = [sdram.get_total_sdram(n_machine_time_steps)]
+                    vertex_slice, plan_n_time_steps, machine_time_step))
+        recorded_region_sizes = [sdram.get_total_sdram(plan_n_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
