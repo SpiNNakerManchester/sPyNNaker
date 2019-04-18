@@ -102,10 +102,11 @@ class SpikeSourcePoissonVertex(
         self._change_requires_mapping = True
         self._change_requires_neuron_parameters_reload = False
 
+        # Prepare for recording, and to get spikes
+        self._spike_recorder = MultiSpikeRecorder()
+
         # Store the parameters
         self._max_rate = max_rate
-        self._current_max_rate = None
-        self._dsg_max_rate = None
         self._rate = self.convert_rate(rate)
         self._rate_change = numpy.zeros(self._rate.size)
         self._start = utility_calls.convert_param_to_numpy(start, n_neurons)
@@ -135,7 +136,7 @@ class SpikeSourcePoissonVertex(
     def _max_spikes_per_ts(self, machine_time_step):
 
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
-        if float(self._current_max_rate) / ts_per_second <= \
+        if float(self._max_rate) / ts_per_second <= \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
@@ -143,7 +144,7 @@ class SpikeSourcePoissonVertex(
         chance_ts = 1000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
-            float(self._current_max_rate) / ts_per_second)
+            float(self._max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
@@ -163,11 +164,6 @@ class SpikeSourcePoissonVertex(
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
         # pylint: disable=arguments-differ
-
-        self._current_max_rate = max(self._rate)
-        if self._max_rate is not None:
-            self._current_max_rate = max(
-                self._max_rate, self._current_max_rate)
 
         poisson_params_sz = self.get_params_bytes(vertex_slice)
         other = ConstantSDRAM(
@@ -209,16 +205,15 @@ class SpikeSourcePoissonVertex(
     def convert_rate(self, rate):
         new_rates = utility_calls.convert_param_to_numpy(rate, self._n_atoms)
         new_max = max(new_rates)
-        if self._max_rate is not None and new_max > self._max_rate:
-            raise SpynnakerException(
-                'Illegal attempt to set rate higher than declared in '
-                'additional_parameters={"max_rate": ....}')
-        if self._current_max_rate is not None and self._spike_recorder.record \
-                and new_max > self._current_max_rate:
+        if self._max_rate is None:
+            self._max_rate = new_max
+        # Setting record forces reset so ok to go over if not recording
+        elif self._spike_recorder.record and new_max > self._max_rate:
             logger.info('Increasing spike rate while recording requires a '
                         '"reset unless additional_parameters "max_rate" is '
                         'set')
             self._change_requires_mapping = True
+            self._max_rate = new_max
         return new_rates
 
     @rate.setter
@@ -651,8 +646,6 @@ class SpikeSourcePoissonVertex(
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
-        # Next time this is needed is after a reset so set it to None
-        self._current_max_rate == None
 
         # write parameters
         self._write_poisson_parameters(
