@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants, utility_calls
@@ -82,8 +81,8 @@ class SpikeSourcePoissonVertex(
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, constraints, label, rate, max_rate, start, duration, seed,
-            max_atoms_per_core, model):
+            self, n_neurons, constraints, label, rate, max_rate, start,
+            duration, seed, max_atoms_per_core, model):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -154,7 +153,6 @@ class SpikeSourcePoissonVertex(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
 
-
     @inject_items({
         "machine_time_step": "MachineTimeStep"
     })
@@ -171,8 +169,8 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
-            self._get_number_of_mallocs_used_by_dsg() * \
-                SARK_PER_MALLOC_SDRAM_USAGE)
+            self._get_number_of_mallocs_used_by_dsg() *
+            SARK_PER_MALLOC_SDRAM_USAGE)
 
         recording = self.get_recording_sdram_usage(
             vertex_slice,  machine_time_step)
@@ -486,7 +484,6 @@ class SpikeSourcePoissonVertex(
         if new_state and not self._spike_recorder.record:
             self._change_requires_mapping = True
         self._spike_recorder.record = new_state
-
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):

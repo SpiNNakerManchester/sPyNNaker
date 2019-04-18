@@ -1,7 +1,7 @@
 from .spike_source_poisson_vertex import SpikeSourcePoissonVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
-_population_parameters = {"seed": None,  "max_rate":None}
+_population_parameters = {"seed": None,  "max_rate": None}
 
 # Technically, this is ~2900 in terms of DTCM, but is timescale dependent
 # in terms of CPU (2900 at 10 times slow down is fine, but not at
