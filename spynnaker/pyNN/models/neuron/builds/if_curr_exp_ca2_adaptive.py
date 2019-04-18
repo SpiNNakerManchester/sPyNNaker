@@ -1,3 +1,6 @@
+import logging
+from spinn_utilities import logger_utils
+from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
@@ -7,6 +10,8 @@ from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.additional_inputs import (
     AdditionalInputCa2Adaptive)
+
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
@@ -20,9 +25,25 @@ class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
     def __init__(
             self, tau_m=20.0, cm=1.0, v_rest=-65.0, v_reset=-65.0,
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_I=5.0, tau_refrac=0.1,
-            i_offset=0.0, tau_ca2=50.0, i_ca2=0.0, i_alpha=0.1, v=-65.0,
-            isyn_exc=0.0, isyn_inh=0.0):
+            i_offset=0.0, tau_ca2=50.0, i_ca2=0.0, i_alpha=0.1, v=None,
+            isyn_exc=None, isyn_inh=None):
         # pylint: disable=too-many-arguments, too-many-locals
+        if v is not None:
+            logger_utils.warn_once(
+                logger, "Formal Pynn specifies that 'v' shoud be set "
+                        "using initial_values = not cellparams")
+        if isyn_exc is not None:
+            logger_utils.warn_once(
+                logger, "Formal Pynn specifies that 'isyn_exc' shoud be set "
+                        "using initial_values = not cellparams")
+        if isyn_inh is not None:
+            logger_utils.warn_once(
+                logger, "Formal Pynn specifies that 'isyn_inh' shoud be set "
+                        "using initial_values = not cellparams")
+        if i_ca2 is not None:
+            logger_utils.warn_once(
+                logger, "Formal Pynn specifies that 'i_ca2' shoud be set "
+                        "using initial_values = not cellparams")
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(

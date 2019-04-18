@@ -45,8 +45,14 @@ class NeuronModelIzh(AbstractNeuronModel):
         self._c = c
         self._d = d
         self._i_offset = i_offset
-        self._v_init = v_init
-        self._u_init = u_init
+        if v_init is None:
+            v_init = -70.0
+        else:
+            self._v_init = v_init
+        if u_init is None:
+            self._u_init = -14.0
+        else:
+            self._u_init = u_init
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
