@@ -52,6 +52,7 @@ class MockSimulator(object):
                                   "enable_buffered_recording": "False"}
         self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
+        self.config["Machine"] = {"machine_time_step": 1000}
 
     def is_a_pynn_random(self, values):
         return isinstance(values, MockRNG)
