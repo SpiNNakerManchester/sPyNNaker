@@ -21,6 +21,8 @@ typedef struct {
     uint32_t weight_shift;
     uint32_t syn_type;
 
+    REAL reg_rate;
+
 } plasticity_weight_region_data_t;
 
 typedef struct {
@@ -88,28 +90,33 @@ static inline weight_t weight_get_final(weight_state_t new_state, REAL diff_to_t
     // do rate based regularisation
 
 //    REAL up_fact = diff_to_target * 0.1; // normalised by rate (1/10hz)
-
-    if (diff_to_target > 2.0k){
+    if (new_state.weight_region->reg_rate > 0.0k){
+				if (diff_to_target > 0.1k) {
 //		io_printf(IO_BUF, "Reg up \n");
-		if (type == 0) {
+					if (type == 0) {
 //			new_weight = new_weight * (1.0k);
-			new_weight = new_weight + (new_weight * diff_to_target * 0.001);
-		} else if (type == 2){
-			new_weight = new_weight - (new_weight * diff_to_target * 0.001);
+						new_weight = new_weight
+								+ (new_weight * diff_to_target * new_state.weight_region->reg_rate);
+					} else if (type == 2) {
+						new_weight = new_weight
+								- (new_weight * diff_to_target * new_state.weight_region->reg_rate);
 //			new_weight = new_weight * 0.9k;
-		}
+					}
 
-	} else if (diff_to_target < -2.0k){
+				} else if (diff_to_target < 0.1k) {
 //		io_printf(IO_BUF, "Reg down \n");
-		if (type == 0) {
+					if (type == 0) {
 //			new_weight = new_weight * 0.9k;
-			new_weight = new_weight + (new_weight * diff_to_target * 0.001);
-		} else if (type == 2){
-			new_weight = new_weight - (new_weight * diff_to_target * 0.001);
+						new_weight = new_weight
+								+ (new_weight * diff_to_target * new_state.weight_region->reg_rate);
+					} else if (type == 2) {
+						new_weight = new_weight
+								- (new_weight * diff_to_target * new_state.weight_region->reg_rate);
 //			new_weight = new_weight * (1.0k);
-		}
-	}
+					}
+				}
 
+    }
 
     // Clamp new weight
     new_weight = MIN(new_state.weight_region->max_weight,

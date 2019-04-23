@@ -8,13 +8,17 @@ class WeightDependenceERBP(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
         "_w_max",
-        "_w_min"]
+        "_w_min",
+        "_do_reg",
+        "_reg_rate"
+        ]
 
     # noinspection PyPep8Naming
-    def __init__(self, w_min=0.0, w_max=1.0):
+    def __init__(self, w_min=0.0, w_max=1.0, reg_rate=0.0):
         super(WeightDependenceERBP, self).__init__()
         self._w_min = w_min
         self._w_max = w_max
+        self._reg_rate = reg_rate
 
     @property
     def w_min(self):
@@ -23,6 +27,10 @@ class WeightDependenceERBP(
     @property
     def w_max(self):
         return self._w_max
+
+    @property
+    def reg_rate(self):
+        return self._reg_rate
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
@@ -44,7 +52,7 @@ class WeightDependenceERBP(
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "erbp weight dependence only supports one term")
-        return (4 * 4) * n_synapse_types
+        return (4 * 5) * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
@@ -58,8 +66,6 @@ class WeightDependenceERBP(
             spec.write_value(
                 data=int(round(self._w_max * w)), data_type=DataType.INT32)
 
-            # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
-            #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
                 data=int(round(self._a_plus * self._w_max * w)),
@@ -67,6 +73,8 @@ class WeightDependenceERBP(
             spec.write_value(
                 data=int(round(self._a_minus * self._w_max * w)),
                 data_type=DataType.INT32)
+
+            spec.write_value(self._reg_rate, data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):

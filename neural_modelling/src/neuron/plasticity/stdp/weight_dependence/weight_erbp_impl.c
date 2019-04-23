@@ -1,5 +1,6 @@
 #include "weight_erbp_impl.h"
 
+
 //---------------------------------------
 // Globals
 //---------------------------------------
@@ -45,16 +46,19 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
         plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
         plasticity_weight_region_data[s].weight_shift = ring_buffer_to_input_buffer_left_shifts[s];
         plasticity_weight_region_data[s].syn_type = s;
+        plasticity_weight_region_data[s].reg_rate = kbits(*plasticity_word++);
+
 
 
         io_printf(IO_BUF,
-            "\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
-            " Weight multiply right shift:%u\n",
+            "\t Synapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,\n"
+            "\t Weight multiply right shift:%u, reg_rate: %k \n\n",
             s, plasticity_weight_region_data[s].min_weight,
             plasticity_weight_region_data[s].max_weight,
             plasticity_weight_region_data[s].a2_plus,
             plasticity_weight_region_data[s].a2_minus,
-			weight_multiply_right_shift[s]
+			weight_multiply_right_shift[s],
+			plasticity_weight_region_data[s].reg_rate
             );
     }
 
