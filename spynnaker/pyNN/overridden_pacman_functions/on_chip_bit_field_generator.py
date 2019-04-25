@@ -109,11 +109,11 @@ class OnChipBitFieldGenerator(object):
         if generating_bitfield_report:
             self._read_back_bit_fields(
                 app_graph, graph_mapper, transceiver, placements,
-                default_report_folder)
+                default_report_folder, self._BIT_FIELD_REPORT_FILENAME)
 
     def _read_back_bit_fields(
             self, app_graph, graph_mapper, transceiver, placements,
-            default_report_folder):
+            default_report_folder, name):
         """ report of the bitfields that were generated
 
         :param app_graph: app graph
@@ -128,8 +128,7 @@ class OnChipBitFieldGenerator(object):
         progress = ProgressBar(
             len(app_graph.vertices), "reading back bitfields from chip")
 
-        file_path = os.path.join(
-            default_report_folder, self._BIT_FIELD_REPORT_FILENAME)
+        file_path = os.path.join(default_report_folder, name)
         output = open(file_path, "w")
 
         # read in for each app vertex that would have a bitfield
@@ -159,7 +158,7 @@ class OnChipBitFieldGenerator(object):
                     # read in each bitfield
                     for bit_field_index in range(0, n_bit_field_entries):
 
-                        # master pop key
+                        # master pop key, n words and read pointer
                         (master_pop_key, n_words_to_read, read_pointer) = \
                             struct.unpack(
                             "<III", transceiver.read_memory(
@@ -168,6 +167,9 @@ class OnChipBitFieldGenerator(object):
                         reading_address += self._BYTES_PER_WORD * 3
 
                         # get bitfield words
+                        #logger.info(
+                        #    "address for field {} is {:02X}".format(
+                        #        bit_field_index, read_pointer))
                         bit_field = struct.unpack(
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(

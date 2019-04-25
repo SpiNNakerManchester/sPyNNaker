@@ -183,9 +183,9 @@ bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
     // locate the position in the binary search / array
-    log_info("searching for key %d", spike);
+    log_debug("searching for key %d", spike);
     int position = population_table_position_in_the_master_pop_array(spike);
-    log_info("position = %d", position);
+    log_debug("position = %d", position);
 
     // check we don't have a complete miss
     if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
@@ -203,21 +203,21 @@ bool population_table_get_first_address(
         // check we have a entry in the bit field for this (possible not to due
         // to dtcm limitations or router table compression). If not, go to
         // DMA check.
-        log_info("checking bit field");
+        log_debug("checking bit field");
         if (connectivity_bit_field[position] != NULL){
-            log_info("can be checked, bitfield is allocated");
+            log_debug("can be checked, bitfield is allocated");
             // check that the bit flagged for this neuron id does hit a
             // neuron here. If not return false and avoid the DMA check.
             if (!bit_field_test(
                     connectivity_bit_field[position],  last_neuron_id)){
-                log_info("tested and was not set");
+                log_debug("tested and was not set");
                 bit_field_filtered_packets += 1;
                 return false;
             }
-            log_info("was set, carrying on");
+            log_debug("was set, carrying on");
         }
         else{
-            log_info(
+            log_debug(
                 "bit_field was not set up. either its due to a lack of dtcm, "
                 "or because the bitfield was merged into the routing table");
         }
