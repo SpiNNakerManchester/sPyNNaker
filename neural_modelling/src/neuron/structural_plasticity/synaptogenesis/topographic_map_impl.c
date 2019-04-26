@@ -570,16 +570,17 @@ bool synaptogenesis_dynamics_formation_rule(void)
             return false;
         }
 
-        if (!(current_state.current_controls & IS_CONNECTION_LAT)) {
-            probability = rewiring_data.ff_probabilities[current_state.distance];
-        } else {
-            probability = rewiring_data.lat_probabilities[current_state.distance];
-        }
-        uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
-        if (r > probability) {
-            return false;
-        }
     } // if the rewiring is distance dependent
+
+    if (!(current_state.current_controls & IS_CONNECTION_LAT)) {
+        probability = rewiring_data.ff_probabilities[current_state.distance];
+    } else {
+        probability = rewiring_data.lat_probabilities[current_state.distance];
+    }
+    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
+    if (r > probability) {
+        return false;
+    }
     // else, skip
     int appr_scaled_weight = rewiring_data.pre_pop_info_table
             .subpop_info[current_state.pop_index].weight;
