@@ -4,6 +4,8 @@ from .neuron_model_leaky_integrate_and_fire \
     import NeuronModelLeakyIntegrateAndFire
 from .neuron_model_leaky_integrate_and_fire_erbp \
     import NeuronModelLeakyIntegrateAndFireERBP
+from .neuron_model_leaky_integrate_and_fire_erbp_error_neuron \
+    import NeuronModelLeakyIntegrateAndFireERBPErrorNeuron
 from .neuron_model_leaky_integrate_and_fire_poisson import (
     NeuronModelLeakyIntegrateAndFirePoisson)
 from .neuron_model_leaky_integrate_and_fire_poisson_readout import (
@@ -12,6 +14,7 @@ from .neuron_model_leaky_integrate_and_fire_poisson_readout import (
 __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
            "NeuronModelLeakyIntegrateAndFire",
            "NeuronModelLeakyIntegrateAndFireERBP",
+           "NeuronModelLeakyIntegrateAndFireERBPErrorNeuron",
            "NeuronModelLeakyIntegrateAndFirePoisson"
            "NeuronModelLeakyIntegrateAndFirePoissonReadout"
            ]

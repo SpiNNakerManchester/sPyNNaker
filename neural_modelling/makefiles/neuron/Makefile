@@ -1,5 +1,6 @@
 MODELS = LIF_current_erbp_stdp_mad_timing_weight \
-		 IF_curr_exp 
+		 IF_curr_exp \
+		 error_neuron
          #IF_cond_exp \
          IZK_curr_exp \
          IZK_cond_exp \
