@@ -355,8 +355,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(){
 }
 
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_mask, weight_t *weight, uint32_t *delay,
+        uint32_t id, address_t row, weight_t *weight, uint32_t *delay,
         uint32_t *offset) {
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
@@ -393,12 +392,11 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     // Delete weight at offset
-    plastic_words[offset] =  plastic_words[plastic_synapse-1];
-    plastic_words[plastic_synapse-1] = 0;
+    plastic_words[offset] =  plastic_words[plastic_synapse - 1];
 
-   // Delete control word at offset
-    control_words[offset] = control_words[plastic_synapse-1];
-    control_words[plastic_synapse-1] = 0;
+    // Delete control word at offset
+    control_words[offset] = control_words[plastic_synapse - 1];
+    control_words[plastic_synapse - 1] = 0;
 
     // Decrement FP
     fixed_region[1] = fixed_region[1] - 1;

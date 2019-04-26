@@ -26,7 +26,7 @@ typedef struct {
 circular_buffer_info_t cb_info;
 
 //! randomly (with uniform probability) select one of the last received spikes
-static spike_t potential_presynaptic_partner(mars_kiss64_seed_t seed) {
+static inline spike_t potential_presynaptic_partner(mars_kiss64_seed_t seed) {
     if (!received_any_spike() || cb_info.no_spike_in_interval == 0) {
         return INVALID_SELECTION;
     }

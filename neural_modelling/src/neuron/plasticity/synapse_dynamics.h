@@ -43,15 +43,12 @@ uint32_t synapse_dynamics_get_plastic_saturation_count();
 //! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
-//! \param[in] synapse_type_index_bits: The number of bits in the synapse type
-//! \param[in] synapse_index_mask: The mask of the synapse index
 //! \param[out] weight: address to contain the weight of the connection
 //! \param[out] delay: address to contain the delay of the connection
 //! \param[out] offset: address to contain the offset of the connection
 //! \return bool: was the search successful?
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_mask, weight_t *weight, uint32_t *delay,
+        uint32_t id, address_t row, weight_t *weight, uint32_t *delay,
         uint32_t *offset);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row
@@ -60,7 +57,7 @@ bool synapse_dynamics_find_neuron(
 //! \return bool: was the removal successful?
 bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row);
 
-//! \brief  Add a plastic entry in the synaptic row
+//! \brief  Add an entry in the synaptic row
 //! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
