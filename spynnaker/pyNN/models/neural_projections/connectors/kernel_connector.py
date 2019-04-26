@@ -29,8 +29,8 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
     """
 
     def __init__(
-            self, shape_pre, shape_post, shape_kernel,
-            shape_common, pre_sample_steps, pre_start_coords,
+            self, shape_pre, shape_post, shape_kernel, weight_kernel,
+            delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
             post_sample_steps, post_start_coords, safe, space, verbose):
         """
         :param shape_common:\
@@ -51,6 +51,9 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
             None or 2-item array
         """
         super(KernelConnector, self).__init__(safe=safe, verbose=verbose)
+
+        # there should probably be a guard in here for kernels with
+        # even integer sizes (in either direction), as they don't really make sense...
 
         self._kernel_w = shape_kernel[WIDTH]
         self._kernel_h = shape_kernel[HEIGHT]
@@ -85,8 +88,8 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
             self._post_step_w = post_sample_steps[WIDTH]
             self._post_step_h = post_sample_steps[HEIGHT]
 
-#         self._krn_weights = self.get_kernel_vals(self._weights)
-#         self._krn_delays = self.get_kernel_vals(self._delays)
+        self._krn_weights = self.get_kernel_vals(weight_kernel)
+        self._krn_delays = self.get_kernel_vals(delay_kernel)
 
         self._shape_common = \
             shape_pre if shape_common is None else shape_common
@@ -131,8 +134,11 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
         return (r, c)
 
     def get_kernel_vals(self, vals):
+        if vals is None:
+            return None
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
+        print('vals: ', vals)
         if isinstance(vals, RandomDistribution):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
@@ -168,8 +174,10 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
         print("In kernel connector, compute_statistics")
 
         # probably only need to call these once?
-        self._krn_weights = self.get_kernel_vals(weights)
-        self._krn_delays = self.get_kernel_vals(delays)
+        if self._krn_weights is None:
+            self._krn_weights = self.get_kernel_vals(weights)
+        if self._krn_delays is None:
+            self._krn_delays = self.get_kernel_vals(delays)
 
         print('weights: ', self._krn_weights)
 
@@ -181,7 +189,7 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
         coords = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
         print('hh, hw', hh, hw)
-        print('post_as: ', post_as_pre_r, post_as_pre_c)
+#         print('post_as: ', post_as_pre_r, post_as_pre_c)
         unique_pre_ids = []
         all_pre_ids = []
         all_post_ids = []
@@ -194,7 +202,7 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r = pre_idx // self._shape_pre[WIDTH]
             pre_c = pre_idx % self._shape_pre[WIDTH]
-            print('pre_idx, pre_r, pre_c: ', pre_idx, pre_r, pre_c)
+#             print('pre_idx, pre_r, pre_c: ', pre_idx, pre_r, pre_c)
             coords[pre_idx] = []
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
@@ -221,15 +229,19 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
 
                     coords[pre_idx].append(post_idx)
 
-                    dr = abs(r - pre_r)  # absolute?
+#                     dr = abs(r - pre_r)  # absolute?
+                    dr = r - pre_r
                     kr = hh - dr
-                    dc = abs(c - pre_c)  # absolute?
+#                     dc = abs(c - pre_c)  # absolute?
+                    dc = c - pre_c
                     kc = hw - dc
 
-                    print('dr, dc: ', dr, dc)
+#                     print('dr, dc: ', dr, dc, self._krn_weights)
 
                     w = self._krn_weights[kr, kc]
                     d = self._krn_delays[kr, kc]
+
+#                     print('w, d: ', w, d)
 
                     count += 1
 
