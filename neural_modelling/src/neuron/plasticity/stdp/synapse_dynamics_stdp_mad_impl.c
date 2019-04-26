@@ -440,4 +440,3 @@ bool synapse_dynamics_add_neuron(uint32_t id, address_t row,
 uint32_t synapse_dynamics_n_connections_in_row(address_t fixed) {
     return synapse_row_num_plastic_controls(fixed);
 }
-
