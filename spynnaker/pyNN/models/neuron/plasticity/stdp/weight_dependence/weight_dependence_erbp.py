@@ -68,10 +68,10 @@ class WeightDependenceERBP(
 
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * self._w_max * w)),
+                data=int(round(self._a_plus * (1 << 15))), # * self._w_max ),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * self._w_max * w)),
+                data=int(round(self._a_minus * (1 << 15))), # * self._w_max ,
                 data_type=DataType.INT32)
 
             spec.write_value(self._reg_rate, data_type=DataType.S1615)

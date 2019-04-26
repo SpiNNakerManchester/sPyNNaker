@@ -5,7 +5,7 @@
 // Macros
 //---------------------------------------
 // Fixed-point number system used STDP
-#define STDP_FIXED_POINT 11
+#define STDP_FIXED_POINT 12
 #define STDP_FIXED_POINT_ONE (1 << STDP_FIXED_POINT)
 
 // Helper macros for 16-bit fixed-point multiplication

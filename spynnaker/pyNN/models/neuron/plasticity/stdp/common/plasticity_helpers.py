@@ -5,7 +5,7 @@ from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 logger = logging.getLogger(__name__)
 # Default value of fixed-point one for STDP
-STDP_FIXED_POINT_ONE = (1 << 11)
+STDP_FIXED_POINT_ONE = (1 << 12)
 
 
 def float_to_fixed(value, fixed_point_one):

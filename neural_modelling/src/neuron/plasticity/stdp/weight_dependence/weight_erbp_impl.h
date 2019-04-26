@@ -74,10 +74,12 @@ static inline weight_t weight_get_final(weight_state_t new_state, REAL diff_to_t
 
     // Scale potentiation and depression
     // **NOTE** A2+ and A2- are pre-scaled into weight format
-    int32_t scaled_a2_plus = new_state.a2_plus << 1;
+    int32_t scaled_a2_plus = // new_state.a2_plus; // << 1;
+    		maths_fixed_mul16(new_state.a2_plus, new_state.weight_region->a2_plus, 15);
 //    		STDP_FIXED_MUL_16X16(
 //        new_state.a2_plus, new_state.weight_region->a2_plus);
-    int32_t scaled_a2_minus = new_state.a2_minus << 1;
+    int32_t scaled_a2_minus = // new_state.a2_minus; // << 1;
+    		maths_fixed_mul16(new_state.a2_minus, new_state.weight_region->a2_minus, 15);
 //    		STDP_FIXED_MUL_16X16(
 //        new_state.a2_minus, new_state.weight_region->a2_minus);
 
