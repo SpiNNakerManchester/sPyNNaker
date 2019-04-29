@@ -1,19 +1,13 @@
+import logging
 from spinn_utilities.progress_bar import ProgressBar
-
-# pacman imports
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
 from pacman.model.graphs.common import GraphMapper
-
-# spynnaker imports
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron.synapse_dynamics import \
-    AbstractSynapseDynamicsStructural
-
-# import logging
-import logging
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 logger = logging.getLogger(__name__)
 

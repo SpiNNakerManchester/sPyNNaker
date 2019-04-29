@@ -1,7 +1,7 @@
+from six import Iterator
 from spinn_utilities.ranged.abstract_list import AbstractList
 from data_specification.enums import DataType, Commands
 from data_specification.exceptions import UnknownTypeException
-from six import Iterator
 
 
 class _Range_Iterator(Iterator):
