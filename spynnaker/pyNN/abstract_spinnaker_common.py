@@ -360,12 +360,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         mother_lode = ExtractedData()
 
         # acquire data objects from front end
-        using_extra_monitor_functionality = \
-            self._last_run_outputs["UsingAdvancedMonitorSupport"]
+        using_monitors = self._last_run_outputs["UsingAdvancedMonitorSupport"]
 
         # if using extra monitor functionality, locate extra data items
         receivers = list()
-        if using_extra_monitor_functionality:
+        if using_monitors:
             receivers = self._locate_receivers_from_projections(
                 projection_to_attribute_map.keys(),
                 self.get_generated_output(
