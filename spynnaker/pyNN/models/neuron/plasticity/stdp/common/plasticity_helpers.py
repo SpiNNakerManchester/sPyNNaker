@@ -1,11 +1,9 @@
 import math
 import logging
-<<<<<<< HEAD
+
 import matplotlib.pyplot as plt
 import numpy as np
 
-=======
->>>>>>> refs/remotes/origin/master
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
