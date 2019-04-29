@@ -1022,7 +1022,7 @@ class SynapticManager(object):
         return master_pop_table, direct_synapses, synaptic_matrix
 
     def _retrieve_synaptic_block(
-            self, transceiver, placement, master_pop_table_address,
+            self, txrx, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
             key, n_rows, index, using_monitors, placements=None,
             monitor_api=None, monitor_placement=None, monitor_cores=None,
@@ -1035,8 +1035,7 @@ class SynapticManager(object):
             return self._retrieved_blocks[placement, key, index]
 
         items = self._poptable_type.extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver,
-            placement.x, placement.y)
+            key, master_pop_table_address, txrx, placement.x, placement.y)
         if index >= len(items):
             return None, None
 
@@ -1046,27 +1045,27 @@ class SynapticManager(object):
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
-            # if exploiting the extra monitor_api cores, need to set the machine
+            # if exploiting the extra monitor cores, need to set the machine
             # for data extraction mode
             if using_monitors and handle_time_out_configuration:
                 monitor_api.set_cores_for_data_extraction(
-                    transceiver, monitor_cores, placements)
+                    txrx, monitor_cores, placements)
 
             # read in the synaptic block
             if not is_single:
                 block = self.__read_multiple_synaptic_blocks(
-                    transceiver, monitor_api, placement, n_rows, max_row_length,
+                    txrx, monitor_api, placement, n_rows, max_row_length,
                     indirect_synapses_address + synaptic_block_offset,
                     using_monitors, monitor_placement, fixed_routes)
             else:
                 block, max_row_length = self.__read_single_synaptic_block(
-                    transceiver, monitor_api, placement, n_rows,
+                    txrx, monitor_api, placement, n_rows,
                     direct_synapses_address + synaptic_block_offset,
                     using_monitors, monitor_placement, fixed_routes)
 
             if using_monitors and handle_time_out_configuration:
                 monitor_api.unset_cores_for_data_extraction(
-                    transceiver, monitor_cores, placements)
+                    txrx, monitor_cores, placements)
 
         self._retrieved_blocks[placement, key, index] = (block, max_row_length)
         return block, max_row_length

@@ -103,18 +103,18 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         first_block, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
             using_monitors=False)
         same_block, row_len_1_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
             using_monitors=False)
         synaptic_manager.clear_connection_cache()
         different_block, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
             using_monitors=False)
@@ -157,12 +157,12 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=0,
             using_monitors=False)
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=1,
             using_monitors=False)
@@ -303,7 +303,7 @@ class TestSynapticManager(unittest.TestCase):
         assert not items[2][2]
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
@@ -323,7 +323,7 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
@@ -343,7 +343,7 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
         data_3, row_len_3 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
