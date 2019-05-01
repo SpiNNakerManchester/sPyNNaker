@@ -321,7 +321,7 @@ void synapses_do_timestep_update(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
-                                   bool write, uint32_t process_id) {
+                                   bool *write_back) {
 
     _print_synaptic_row(row);
 
@@ -349,9 +349,7 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
 
 
         // Perform DMA write back
-        if (write) {
-            spike_processing_finish_write(process_id);
-        }
+        *write_back = true;
     }
 
     // Process any fixed synapses

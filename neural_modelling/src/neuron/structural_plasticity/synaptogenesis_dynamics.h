@@ -24,8 +24,12 @@ address_t synaptogenesis_dynamics_initialise(
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
-//! \return None
-void synaptogenesis_dynamics_rewire(uint32_t time);
+//! \param[out] spike: variable to hold the spike
+//! \param[out] synaptic_row_address: variable to hold the address of the row
+//! \param[out] n_bytes: variable to hold the size of the row
+//! \return True if a row is to be transferred, false otherwise
+bool synaptogenesis_dynamics_rewire(uint32_t time,
+    spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
 
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
@@ -38,7 +42,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time);
 //!  The formation rule calls the add neuron function in the appropriate
 //!  module (STDP or static).
 //!  \return true if formation was successful
-bool synaptogenesis_dynamics_formation_rule();
+bool synaptogenesis_dynamics_formation_rule(uint32_t time, address_t row);
 
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
@@ -51,22 +55,22 @@ bool synaptogenesis_dynamics_formation_rule();
 //!  The elimination rule calls the remove neuron function in the appropriate
 //!  module (STDP or static).
 //!  \return true if elimination was successful
-bool synaptogenesis_dynamics_elimination_rule();
+bool synaptogenesis_dynamics_elimination_rule(uint32_t time, address_t row);
 
-//! \brief This function is a rewiring DMA callback
-//! \param[in] dma_id: the ID of the DMA
-//! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for rew.
-//! \return nothing
-void synaptic_row_restructure();
+//! \brief Performs the actual restructuring of a row
+//! \param[in] time: The time of the restructure
+//! \param[in] row: The row to restructure
+//! \return True if the row was changed and needs to be written back
+bool synaptogenesis_row_restructure(uint32_t time, address_t row);
 
 //! retrieve the period of rewiring
 //! based on is_fast(), this can either mean how many times rewiring happens
 //! in a timestep, or how many timesteps have to pass until rewiring happens.
-int32_t get_p_rew();
+int32_t synaptogenesis_rewiring_period();
 
-//! controls whether rewiring is attempted multiple times per timstep
+//! controls whether rewiring is attempted multiple times per timestep
 //! or after a number of timesteps.
-bool is_fast();
+bool synaptogenesis_is_fast();
 
 //! after a set of rewiring attempts, update the indices in the circular buffer
 //! between which we will be looking at the next batch of attempts
