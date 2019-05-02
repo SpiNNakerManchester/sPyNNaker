@@ -21,7 +21,8 @@ def shape2word(sw, sh):
             (numpy.uint32(sh) & 0xFFFF))
 
 
-class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine):
+# class KernelConnector(AbstractConnector):
+class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and post-synaptic populations are thought-of as a 2D array.\
     Connect every post(row, col) neuron to many pre(row, col, kernel) through\
@@ -426,13 +427,13 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
 
 #    Double-check this, but I think this property exists in
 #    AbstractGenerateConnectorOnMachine already
-#     @property
-#     def generate_on_machine(self):
-#         super_generate = super(KernelConnector, self).generate_on_machine
-#
-#         # This connector can also cope with listed weights and delays
-#         return super_generate or (isinstance(self._delays, numpy.ndarray) and
-#                                   isinstance(self._weights, numpy.ndarray))
+    @property
+    def generate_on_machine(self):
+        super_generate = super(KernelConnector, self).generate_on_machine
+
+        # This connector can also cope with listed weights and delays
+        return super_generate or (isinstance(self._delays, numpy.ndarray) and
+                                  isinstance(self._weights, numpy.ndarray))
 
     @property
     def _kernel_properties(self):
@@ -448,53 +449,57 @@ class KernelConnector(AbstractConnector):  # AbstractGenerateConnectorOnMachine)
 
 #    I think everything commented out below is covered in
 #    AbstractGenerateConnectorOnMachine
-# #     @property
-#     def gen_delays_id(self, delays):
-#         if isinstance(delays, numpy.ndarray):
-#             return PARAM_TYPE_KERNEL
-#         return super(KernelConnector, self).gen_delays_id(delays)
-#
-# #     @property
-#     def gen_delay_params_size_in_bytes(self, delays):
-#         if isinstance(delays, numpy.ndarray):
-#             return (N_KERNEL_PARAMS + 1 + delays.size) * 4
-#         return super(KernelConnector, self).gen_delay_params_size_in_bytes(
-#             delays)
-#
-#     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
-#         if isinstance(delays, numpy.ndarray):
-#             properties = self._kernel_properties
-#             properties.append(post_vertex_slice.lo_atom)
-#             data = numpy.array(properties, dtype="uint32")
-#             values = numpy.round(
-#                 delays * float(DataType.S1615.scale)).astype("uint32")
-#             return numpy.concatenate(data, values)
-#         return super(KernelConnector, self).gen_delay_params(
-#             delays, pre_vertex_slice, post_vertex_slice)
-#
-# #     @property
-#     def gen_weights_id(self, weights):
-#         if isinstance(weights, numpy.ndarray):
-#             return PARAM_TYPE_KERNEL
-#         return super(KernelConnector, self).gen_weights_id(weights)
-#
-# #     @property
-#     def gen_weight_params_size_in_bytes(self, weights):
-#         if isinstance(weights, numpy.ndarray):
-#             return (N_KERNEL_PARAMS + 1 + weights.size) * 4
-#         return super(KernelConnector, self).gen_weight_params_size_in_bytes(
-#             weights)
-#
-#     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
-#         if isinstance(weights, numpy.ndarray):
-#             properties = self._kernel_propertiesnel_h),
-#             properties.append(post_vertex_slice.lo_atom)
-#             data = numpy.array(properties, dtype="uint32")
-#             values = numpy.round(
-#                 weights * float(DataType.S1615.scale)).astype("uint32")
-#             return numpy.concatenate(data, values)
-#         return super(KernelConnector, self).gen_weights_params(
-#             weights, pre_vertex_slice, post_vertex_slice)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_delays_id)
+    def gen_delays_id(self, delays):
+        if isinstance(delays, numpy.ndarray):
+            return PARAM_TYPE_KERNEL
+        return super(KernelConnector, self).gen_delays_id(delays)
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_delay_params_size_in_bytes)
+    def gen_delay_params_size_in_bytes(self, delays):
+        if isinstance(delays, numpy.ndarray):
+            return (N_KERNEL_PARAMS + 1 + delays.size) * 4
+        return super(KernelConnector, self).gen_delay_params_size_in_bytes(
+            delays)
+
+    @overrides(AbstractGenerateConnectorOnMachine.gen_delay_params)
+    def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
+        if isinstance(delays, numpy.ndarray):
+            properties = self._kernel_properties
+            properties.append(post_vertex_slice.lo_atom)
+            data = numpy.array(properties, dtype="uint32")
+            values = numpy.round(
+                delays * float(DataType.S1615.scale)).astype("uint32")
+            return numpy.concatenate(data, values)
+        return super(KernelConnector, self).gen_delay_params(
+            delays, pre_vertex_slice, post_vertex_slice)
+
+    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_id)
+    def gen_weights_id(self, weights):
+        if isinstance(weights, numpy.ndarray):
+            return PARAM_TYPE_KERNEL
+        return super(KernelConnector, self).gen_weights_id(weights)
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_weight_params_size_in_bytes)
+    def gen_weight_params_size_in_bytes(self, weights):
+        if isinstance(weights, numpy.ndarray):
+            return (N_KERNEL_PARAMS + 1 + weights.size) * 4
+        return super(KernelConnector, self).gen_weight_params_size_in_bytes(
+            weights)
+
+    @overrides(AbstractGenerateConnectorOnMachine.gen_weights_params)
+    def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
+        if isinstance(weights, numpy.ndarray):
+            properties = self._kernel_properties,
+            properties.append(post_vertex_slice.lo_atom)
+            data = numpy.array(properties, dtype="uint32")
+            values = numpy.round(
+                weights * float(DataType.S1615.scale)).astype("uint32")
+            return numpy.concatenate(data, values)
+        return super(KernelConnector, self).gen_weights_params(
+            weights, pre_vertex_slice, post_vertex_slice)
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

@@ -97,12 +97,12 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
     }
 }
 
-void param_generator_kernel_generate(void *data, uint32_t n_synapses, rng_t rng,
+void param_generator_kernel_generate(void *data, uint32_t n_synapses,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
     use(pre_neuron_index);
     use(indices);
     struct all_params *all_params = (struct all_params *) data;
-    struct param_generator_kernel *params = &params->params;
+    struct param_generator_kernel *params = &all_params->params; // what's this line?
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, params->m_preWidth, &pre_c);
 
@@ -134,7 +134,7 @@ void param_generator_kernel_generate(void *data, uint32_t n_synapses, rng_t rng,
 
         if (0 <= k_r && k_r < params->m_kernelHeight && 0 <= k_c
                 && k_c < params->m_kernelWidth) {
-            values[i] = all_params[values[k_r * params->m_kernelWidth + k_c]];
+            values[i] = all_params->values[k_r * params->m_kernelWidth + k_c];
             //      LOG_PRINT(LOG_LEVEL_INFO, "val = %5.6k", output[i]);
         } else {
             log_error("Kernel coordinates off range (%d, %d)", k_r, k_c);

@@ -12,6 +12,7 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
+#include "param_generators/param_generator_kernel.h"
 
 /**
  *! \brief The number of known generators
