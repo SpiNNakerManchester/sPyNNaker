@@ -1097,8 +1097,7 @@ class SynapticManager(object):
         # read in the synaptic row data
         if using_monitors:
             single_block = data_receiver.get_data(
-                transceiver, monitor_placement, address,
-                synaptic_block_size, fixed_routes)
+                monitor_placement, address, synaptic_block_size, fixed_routes)
         else:
             single_block = transceiver.read_memory(
                 placement.x, placement.y, address, synaptic_block_size)
