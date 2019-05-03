@@ -50,6 +50,8 @@ class OnChipBitFieldGenerator(object):
     # n elements in each key to n atoms map
     _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
 
+    _BYTES_PER_FILTER = 12
+
     # bit field report file name
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
 
@@ -163,8 +165,8 @@ class OnChipBitFieldGenerator(object):
                             struct.unpack(
                             "<III", transceiver.read_memory(
                                 placement.x, placement.y, reading_address,
-                                self._BYTES_PER_WORD * 3))
-                        reading_address += self._BYTES_PER_WORD * 3
+                                self._BYTES_PER_FILTER))
+                        reading_address += self._BYTES_PER_FILTER
 
                         # get bitfield words
                         #logger.info(

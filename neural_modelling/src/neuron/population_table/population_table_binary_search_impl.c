@@ -86,7 +86,7 @@ static inline void _print_master_population_table() {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
             if (!_is_single(address_list[j])) {
-                log_info(
+                log_debug(
                     "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                     " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
                     i, j, entry.key, entry.mask,
@@ -95,7 +95,7 @@ static inline void _print_master_population_table() {
                         (uint32_t) synaptic_rows_base_address,
                     _get_row_length(address_list[j]));
             } else {
-                log_info(
+                log_debug(
                     "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                     " offset: 0x%.8x, address: 0x%.8x, single",
                     i, j, entry.key, entry.mask,
