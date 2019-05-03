@@ -106,10 +106,8 @@ class NeuronRecorder(object):
                 continue
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_data = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, missing_data = buffer_manager.get_data_by_placement(
                     placement, region)
-            record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
 
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
@@ -117,9 +115,12 @@ class NeuronRecorder(object):
 
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
-            # Converts bytes to ints and make a matrix
-            record = (numpy.asarray(record_raw, dtype="uint8").
-                      view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            if record_length > 0:
+                # Converts bytes to ints and make a matrix
+                record = (numpy.asarray(record_raw, dtype="uint8").
+                          view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            else:
+                record = numpy.empty((0, n_neurons))
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
@@ -133,10 +134,13 @@ class NeuronRecorder(object):
                     time = i * sampling_rate
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
-                    if len(local_indexes[0]) > 0:
-                        # Set row to data for that timestep
+                    if len(local_indexes[0]) == 1:
                         fragment[i] = (record[local_indexes[0], 1:] /
                                        float(DataType.S1615.scale))
+                    elif len(local_indexes[0]) > 1:
+                        logger.warning(
+                            "Population {} on multiple recorded data for "
+                            "time {}".format(label, time))
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -146,7 +150,7 @@ class NeuronRecorder(object):
                 # Add the slice fragment on axis 1 which is IDs/channel_index
                 data = numpy.append(data, fragment, axis=1)
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
         sampling_interval = self.get_neuron_sampling_interval(variable)
@@ -183,16 +187,17 @@ class NeuronRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, data_missing = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
-            record_raw = neuron_param_region_data_pointer.read_all()
-            raw_data = (numpy.asarray(record_raw, dtype="uint8").
-                        view(dtype="<i4")).reshape(
-                [-1, n_words_with_timestamp])
+            if len(record_raw) > 0:
+                raw_data = (numpy.asarray(record_raw, dtype="uint8").
+                            view(dtype="<i4")).reshape(
+                    [-1, n_words_with_timestamp])
+            else:
+                raw_data = record_raw
             if len(raw_data) > 0:
                 record_time = raw_data[:, 0] * float(ms_per_tick)
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
