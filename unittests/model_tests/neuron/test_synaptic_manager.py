@@ -4,6 +4,7 @@ import tempfile
 import unittest
 import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.overrides import overrides
+from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import GraphMapper, Slice
@@ -177,6 +178,8 @@ class TestSynapticManager(unittest.TestCase):
 
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
+        # Add an sdram so maxsdram is high enough
+        SDRAM(10000)
 
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
