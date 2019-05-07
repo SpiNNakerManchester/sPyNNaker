@@ -4,13 +4,13 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/models/neuron_model_ht_impl.h>
-#include <neuron/synapse_types/synapse_types_ht_impl.h>
-#include <neuron/input_types/input_type_ht_conductance.h>
+#include <neuron/models/neuron_model_patch_clamped_impl.h>
+#include <neuron/synapse_types/synapse_types_exponential_impl.h>
+#include <neuron/input_types/input_type_current.h>
 //#include <neuron/additional_inputs/additional_input_HT_currents_impl.h>
 //#include <neuron/additional_inputs/additional_input_HT_currents_mixed_precision_impl.h>
 #include <neuron/additional_inputs/additional_input_generic_ion_ch_current_impl.h>
-#include <neuron/threshold_types/threshold_type_ht_dynamic.h>
+#include <neuron/threshold_types/threshold_type_static.h>
 
 // Further includes
 #include <common/out_spikes.h>
@@ -232,14 +232,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     	external_bias += currents[i];
     }
 
-    // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		currents[2];
-//    		total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		currents[3];
-//    		threshold_type->threshold_value;
-//    		total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -255,6 +247,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
             external_bias, neuron);
+
+    // Call functions to get the input values to be recorded
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    		currents[0];
+//    		total_exc;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		result;
+//    		threshold_type->threshold_value;
+//    		total_inh;
 
     // determine if a spike should occur
     bool spike = threshold_type_is_above_threshold(result, threshold_type);
