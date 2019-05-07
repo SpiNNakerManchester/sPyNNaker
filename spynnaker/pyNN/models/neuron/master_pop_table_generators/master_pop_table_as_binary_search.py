@@ -109,8 +109,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 max_atoms = sys.maxsize
                 edge_pre_vertex = in_edge.pre_vertex
                 if (isinstance(edge_pre_vertex, ApplicationVertex) and
-                        isinstance(
-                            edge_pre_vertex, ApplicationVertex)):
+                        isinstance(edge_pre_vertex, ApplicationVertex)):
 
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:

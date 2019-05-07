@@ -246,7 +246,7 @@ class SynapticManager(object):
                     # Get the number of likely vertices
                     max_atoms = sys.maxsize
                     edge_pre_vertex = in_edge.pre_vertex
-                    if (isinstance(edge_pre_vertex, ApplicationVertex)):
+                    if isinstance(edge_pre_vertex, ApplicationVertex):
                         max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
                         max_atoms = in_edge.pre_vertex.n_atoms
