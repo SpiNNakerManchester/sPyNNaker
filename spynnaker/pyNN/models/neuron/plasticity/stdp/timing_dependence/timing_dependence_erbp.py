@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     import SynapseStructureWeightAndTrace
-
+from data_specification.enums import DataType
 
 import logging
 logger = logging.getLogger(__name__)
@@ -21,17 +21,20 @@ class TimingDependenceERBP(AbstractTimingDependence):
         "_tau_minus",
         "_tau_minus_last_entry",
         "_tau_plus",
-        "_tau_plus_last_entry"]
+        "_tau_plus_last_entry",
+        "_is_readout"]
 
-    def __init__(self, tau_plus=20.0, tau_minus=20.0):
+    def __init__(self, tau_plus=20.0, tau_minus=20.0, is_readout=False):
         self._tau_plus = tau_plus
         self._tau_minus = tau_minus
 
+        self._is_readout = is_readout
         self._synapse_structure = SynapseStructureWeightAndTrace()
 
         # provenance data
         self._tau_plus_last_entry = None
         self._tau_minus_last_entry = None
+
 
     @property
     def tau_plus(self):
@@ -61,7 +64,8 @@ class TimingDependenceERBP(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) \
+            + 4  # for is_readout flag
 
     @property
     def n_weight_terms(self):
@@ -81,6 +85,9 @@ class TimingDependenceERBP(AbstractTimingDependence):
 #         self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
 #             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
 #             LOOKUP_TAU_MINUS_SHIFT)
+        spec.write_value(
+                data=int(self._is_readout),
+                data_type=DataType.INT32)
 
     @property
     def synaptic_structure(self):

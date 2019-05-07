@@ -118,6 +118,10 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
         }
     }
 
+    // Initialise pointers to Neuron parameters in STDP code
+    synapse_dynamics_set_neuron_array(neuron_array);
+    log_info("set pointer to neuron array in stdp code");
+
     return true;
 }
 
@@ -356,7 +360,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     			NUM_EXCITATORY_RECEPTORS, exc_input_values,
 				NUM_INHIBITORY_RECEPTORS, inh_input_values,
 				external_bias, neuron);
-
+//    	io_printf(IO_BUF, "Readout membrane pot: %k\n", voltage);
     // determine if a spike should occur
     // bool spike = threshold_type_is_above_threshold(result, threshold_type);
 
@@ -373,7 +377,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 							 - global_parameters->readout_V); // calc difference to
 //        io_printf(IO_BUF, "New Rate: %k", rate);
 //        rate = rate * 10;
-
+        rate = rate * 5.0k;
         if (rate > 0) { // readout is below target, so set rate = diff.
         	// This will cause potentiation of excitatory synapses,
         	// and depression of inhibitory synapses
@@ -396,6 +400,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         recorded_variable_values[V_RECORDING_INDEX] = rate;
 //        rate = rate * 10;
 
+        rate = rate * 5.0k;
         if (rate < 0) {
         	// readout is above target, send spikes from inhibitory neuron with rate = -diff:
         	// this will depress excitatory synapses, and potenitate inhibitory synapses
