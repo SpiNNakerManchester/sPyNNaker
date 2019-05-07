@@ -3,18 +3,18 @@
 #include <stdfix-full-iso.h>
 
 struct param_generator_kernel {
-    uint16_t m_commonHeight;
     uint16_t m_commonWidth;
+    uint16_t m_commonHeight;
 
-    uint16_t m_preHeight;
     uint16_t m_preWidth;
-    uint16_t m_postHeight;
+    uint16_t m_preHeight;
     uint16_t m_postWidth;
+    uint16_t m_postHeight;
 
-    uint16_t m_startPreHeight;
     uint16_t m_startPreWidth;
-    uint16_t m_startPostHeight;
+    uint16_t m_startPreHeight;
     uint16_t m_startPostWidth;
+    uint16_t m_startPostHeight;
 
     uint16_t m_stepPreWidth;
     uint16_t m_stepPreHeight;
@@ -39,6 +39,23 @@ void *param_generator_kernel_initialize(address_t *region) {
         sizeof(struct param_generator_kernel));
     *region += sizeof(struct param_generator_kernel) >> 2;
     params->values = (accum *) *region;
+    io_printf(IO_BUF, "params->params.m_commonWidth %u \n",
+    		params->params.m_commonWidth);
+    io_printf(IO_BUF, "params->params.m_commonHeight %u \n",
+    		params->params.m_commonHeight);
+    io_printf(IO_BUF, "params->params.m_preWidth %u \n",
+    		params->params.m_preWidth);
+    io_printf(IO_BUF, "params->params.m_preHeight %u \n",
+    		params->params.m_preHeight);
+    io_printf(IO_BUF, "params->params.m_postWidth %u \n",
+    		params->params.m_postWidth);
+    io_printf(IO_BUF, "params->params.m_postHeight %u \n",
+    		params->params.m_postHeight);
+    io_printf(IO_BUF, "params->params.m_kernelWidth %u \n",
+    		params->params.m_kernelWidth);
+    io_printf(IO_BUF, "params->params.m_kernelHeight %u \n",
+    		params->params.m_kernelHeight);
+    io_printf(IO_BUF, "params->values[0] %k \n", params->values[0]);
     *region += params->params.m_kernelHeight * params->params.m_kernelWidth;
     return params;
 }
@@ -47,6 +64,7 @@ void param_generator_kernel_free(void *data) {
     sark_free(data);
 }
 
+// Note: the following three functions are used here and in connector_generator_kernel.h
 uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *reminder) {
     if (dividend == 0 || dividend < divider) {
         *reminder = dividend;
@@ -102,7 +120,7 @@ void param_generator_kernel_generate(void *data, uint32_t n_synapses,
     use(pre_neuron_index);
     use(indices);
     struct all_params *all_params = (struct all_params *) data;
-    struct param_generator_kernel *params = &all_params->params; // what's this line?
+    struct param_generator_kernel *params = &all_params->params;
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, params->m_preWidth, &pre_c);
 
@@ -110,6 +128,8 @@ void param_generator_kernel_generate(void *data, uint32_t n_synapses,
     uint16_t hlf_kh = params->m_kernelHeight >> 1;
     int16_t k_r, k_c;
     for (uint16_t i = 0; i < n_synapses; i++) {
+    	// the question here is whether this calculation is necessary again
+    	// as it was already done in connection_generator_kernel.h
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre

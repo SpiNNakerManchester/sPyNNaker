@@ -17,7 +17,7 @@
 /**
  *! \brief The number of known generators
  */
-#define N_PARAM_GENERATORS 6
+#define N_PARAM_GENERATORS 7
 
 /**
  *! \brief The data for a parameter generator
@@ -113,6 +113,12 @@ void register_param_generators() {
     param_generators[5].initialize = param_generator_exponential_initialize;
     param_generators[5].generate = param_generator_exponential_generate;
     param_generators[5].free = param_generator_exponential_free;
+
+    // Kernel values
+    param_generators[6].hash = 6;
+    param_generators[6].initialize = param_generator_kernel_initialize;
+    param_generators[6].generate = param_generator_kernel_generate;
+    param_generators[6].free = param_generator_kernel_free;
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
@@ -120,6 +126,7 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
 
+    	io_printf(IO_BUF, "param generators %u %u \n", i, hash);
         // If the hash requested matches the hash of the generator, use it
         if (hash == param_generators[i].hash) {
 
