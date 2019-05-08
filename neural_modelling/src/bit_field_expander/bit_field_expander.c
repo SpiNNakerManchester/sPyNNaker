@@ -396,7 +396,7 @@ bool generate_bit_field(){
 
         // update pointer to correct place
         bit_field_base_address->filters[master_pop_entry].data =
-            (bit_field_t*) &bit_field_words_location[position];
+            (bit_field_t) &bit_field_words_location[position];
 
         // update tracker
         position += n_words;
