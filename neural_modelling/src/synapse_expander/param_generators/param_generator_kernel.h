@@ -39,23 +39,8 @@ void *param_generator_kernel_initialize(address_t *region) {
         sizeof(struct param_generator_kernel));
     *region += sizeof(struct param_generator_kernel) >> 2;
     params->values = (accum *) *region;
-    io_printf(IO_BUF, "params->params.m_commonWidth %u \n",
-    		params->params.m_commonWidth);
-    io_printf(IO_BUF, "params->params.m_commonHeight %u \n",
-    		params->params.m_commonHeight);
-    io_printf(IO_BUF, "params->params.m_preWidth %u \n",
-    		params->params.m_preWidth);
-    io_printf(IO_BUF, "params->params.m_preHeight %u \n",
-    		params->params.m_preHeight);
-    io_printf(IO_BUF, "params->params.m_postWidth %u \n",
-    		params->params.m_postWidth);
-    io_printf(IO_BUF, "params->params.m_postHeight %u \n",
-    		params->params.m_postHeight);
-    io_printf(IO_BUF, "params->params.m_kernelWidth %u \n",
-    		params->params.m_kernelWidth);
-    io_printf(IO_BUF, "params->params.m_kernelHeight %u \n",
-    		params->params.m_kernelHeight);
-    io_printf(IO_BUF, "params->values[0] %k \n", params->values[0]);
+    log_debug("Kernel param generator, m_kernelWidth, m_kernelHeight = %u %u",
+    		params->params.m_kernelWidth, params->params.m_kernelHeight);
     *region += params->params.m_kernelHeight * params->params.m_kernelWidth;
     return params;
 }

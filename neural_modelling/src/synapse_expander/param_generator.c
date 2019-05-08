@@ -126,7 +126,6 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
 
-    	io_printf(IO_BUF, "param generators %u %u \n", i, hash);
         // If the hash requested matches the hash of the generator, use it
         if (hash == param_generators[i].hash) {
 

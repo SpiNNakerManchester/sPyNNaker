@@ -11,18 +11,17 @@ HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
 
 
-# TODO: Is this being used anywhere now?
 class ConvolutionKernel(numpy.ndarray):
     pass
 
 
 def shape2word(sw, sh):
-    return (((numpy.uint32(sw) & 0xFFFF) << 16) |
-            (numpy.uint32(sh) & 0xFFFF))
+    return (((numpy.uint32(sh) & 0xFFFF) << 16) |
+            (numpy.uint32(sw) & 0xFFFF))
 
 
-class KernelConnector(AbstractConnector):
-# class KernelConnector(AbstractGenerateConnectorOnMachine):
+# class KernelConnector(AbstractConnector):
+class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and post-synaptic populations are thought-of as a 2D array.\
     Connect every post(row, col) neuron to many pre(row, col, kernel) through\
@@ -62,14 +61,6 @@ class KernelConnector(AbstractConnector):
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]
         self._kernel_h = shape_kernel[HEIGHT]
-
-        print('pre-post neurons ', self._n_pre_neurons, self._n_post_neurons)
-
-        # if the width or height is even then thrown an exception
-        if (self._kernel_w % 2 == 0) or (self._kernel_h % 2 == 0):
-            raise SpynnakerException(
-                "Weight kernel specified with even size in one or"
-                "both dimensions; kernels should only have odd dimensions")
 
         # The half-value used here indicates the half-way array position
         self._hlf_k_w = shape_kernel[WIDTH] // 2
@@ -130,24 +121,19 @@ class KernelConnector(AbstractConnector):
         self._post_as_pre = {}
         self._num_conns = {}
 
-    # this function isn't called anywhere?
-#     def pre_in_range(self, pre_vertex_slice, post_vertex_slice):
-#         if (str(pre_vertex_slice) not in self._pre_in_range and
-#                 str(post_vertex_slice) not in
-#                 self._pre_in_range[str(pre_vertex_slice)]):
-#             self.compute_statistics(pre_vertex_slice, post_vertex_slice)
-#         return self._pre_in_range[pre_vertex_slice][post_vertex_slice]
-
+    # Get a list of possible post-slice coordinates
     def to_post_coords(self, post_vertex_slice):
         post = numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
 
         return post // self._post_w, post % self._post_w
 
+    # Get a map from post to pre coords
     def map_to_pre_coords(self, post_r, post_c):
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
+    # Write post coords as pre coords
     def post_as_pre(self, post_vertex_slice):
         if str(post_vertex_slice) not in self._post_as_pre:
             post_r, post_c = self.to_post_coords(post_vertex_slice)
@@ -155,11 +141,13 @@ class KernelConnector(AbstractConnector):
                 post_r, post_c)
         return self._post_as_pre[str(post_vertex_slice)]
 
+    # Write pre coords as post coords
     def pre_as_post(self, coords):
         r = ((coords[HEIGHT] - self._pre_start_h - 1) // self._pre_step_h) + 1
         c = ((coords[WIDTH] - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
+    # Convert kernel values given into the correct format
     def get_kernel_vals(self, vals):
         # TODO: can this be covered using _generate_values etc.
         #       in the AbstractConnector?
@@ -167,7 +155,6 @@ class KernelConnector(AbstractConnector):
             return None
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        print('vals: ', vals)
         if isinstance(vals, RandomDistribution):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
@@ -178,8 +165,12 @@ class KernelConnector(AbstractConnector):
                 vals.shape[WIDTH] == self._kernel_w):
             return vals.view(ConvolutionKernel)
         # TODO: make this error more descriptive?
-        raise SpynnakerException("Error generating KernelConnector values")
+        raise SpynnakerException(
+            "Error generating KernelConnector values; if you have supplied "
+            "weight and/or delay kernel then ensure they are the same size "
+            "as specified by the shape kernel values.")
 
+    # Initialise relevant pre-slice arrays
     def init_pre_entries(self, pre_vertex_slice_str):
         if pre_vertex_slice_str not in self._num_conns:
             self._num_conns[pre_vertex_slice_str] = {}
@@ -199,19 +190,17 @@ class KernelConnector(AbstractConnector):
         if pre_vertex_slice_str not in self._all_pre_in_range_weights:
             self._all_pre_in_range_weights[pre_vertex_slice_str] = {}
 
+    # Compute the relevant information required for the connections
     def compute_statistics(
             self, weights, delays, pre_vertex_slice, post_vertex_slice):
-        print("In kernel connector, compute_statistics")
-
         # If compute_statistics is called more than once, there's
-        # no need to get these weights and delays again
+        # no need to get the user-supplied weights and delays again
         if self._krn_weights is None:
             self._krn_weights = self.get_kernel_vals(weights)
         if self._krn_delays is None:
             self._krn_delays = self.get_kernel_vals(delays)
 
-        print('weights: ', self._krn_weights)
-
+        # Set up initial structures
         pre_vs = str(pre_vertex_slice)
         post_vs = str(post_vertex_slice)
         self.init_pre_entries(pre_vs)
@@ -219,8 +208,6 @@ class KernelConnector(AbstractConnector):
         post_as_pre_r, post_as_pre_c = self.post_as_pre(post_vertex_slice)
         coords = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
-        print('hh, hw', hh, hw)
-#         print('post_as: ', post_as_pre_r, post_as_pre_c)
         unique_pre_ids = []
         all_pre_ids = []
         all_post_ids = []
@@ -229,12 +216,13 @@ class KernelConnector(AbstractConnector):
         count = 0
         post_lo = post_vertex_slice.lo_atom
 
+        # Loop over pre-vertices
         for pre_idx in range(
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r = pre_idx // self._pre_w
             pre_c = pre_idx % self._pre_w
-#             print('pre_idx, pre_r, pre_c: ', pre_idx, pre_r, pre_c)
             coords[pre_idx] = []
+            # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
 
@@ -247,32 +235,32 @@ class KernelConnector(AbstractConnector):
 
                 r, c = self.pre_as_post((r, c))
 
-                fr_r = max(0, r - hh)
-                to_r = min(r + hh + 1, self._pre_h)
-                fr_c = max(0, c - hw)
-                to_c = min(c + hw + 1, self._pre_w)
+                # this is the issue: why do this?
+#                 fr_r = max(0, r - hh)
+#                 to_r = min(r + hh + 1, self._kernel_h) # self._pre_h) # wait, what?
+#                 fr_c = max(0, c - hw)
+#                 to_c = min(c + hw + 1, self._kernel_w) # self._pre_w)
 
-                if fr_r <= pre_r and pre_r < to_r and \
-                   fr_c <= pre_c and pre_c < to_c:
+                dr = r - pre_r
+                kr = hh - dr
+                dc = c - pre_c
+                kc = hw - dc
+
+                if 0 <= kr and kr < self._kernel_h and \
+                   0 <= kc and kc < self._kernel_w:
 
                     if post_idx in coords[pre_idx]:
                         continue
 
                     coords[pre_idx].append(post_idx)
 
-#                     dr = abs(r - pre_r)  # absolute?
-                    dr = r - pre_r
-                    kr = hh - dr
-#                     dc = abs(c - pre_c)  # absolute?
-                    dc = c - pre_c
-                    kc = hw - dc
-
-#                     print('dr, dc: ', dr, dc, self._krn_weights)
+#                     dr = r - pre_r
+#                     kr = hh - dr
+#                     dc = c - pre_c
+#                     kc = hw - dc
 
                     w = self._krn_weights[kr, kc]
                     d = self._krn_delays[kr, kc]
-
-#                     print('w, d: ', w, d)
 
                     count += 1
 
@@ -283,7 +271,6 @@ class KernelConnector(AbstractConnector):
 
         self._pre_in_range[pre_vs][post_vs] = numpy.array(unique_pre_ids)
         self._num_conns[pre_vs][post_vs] = count
-        # print("\n\n%s -> %s = %d conns\n"%(pre_vs, post_vs, count))
         self._all_post[pre_vs][post_vs] = numpy.array(
             all_post_ids, dtype='uint32')
         self._all_pre_in_range[pre_vs][post_vs] = numpy.array(
@@ -295,17 +282,19 @@ class KernelConnector(AbstractConnector):
 
         return self._pre_in_range[pre_vs][post_vs]
 
-    def min_max_coords(self, pre_r, pre_c):
-        hh, hw = self._hlf_k_h, self._hlf_k_w
-        return (numpy.array([pre_r[0] - hh, pre_c[0] - hw]),
-                numpy.array([pre_r[-1] + hh, pre_c[-1] + hw]))
+#     # Following three functions aren't used... ?
+#     def min_max_coords(self, pre_r, pre_c):
+#         hh, hw = self._hlf_k_h, self._hlf_k_w
+#         return (numpy.array([pre_r[0] - hh, pre_c[0] - hw]),
+#                 numpy.array([pre_r[-1] + hh, pre_c[-1] + hw]))
+#
+#     def to_pre_indices(self, pre_r, pre_c):
+#         return pre_r * self._pre_w + pre_c
+#
+#     def gen_key(self, pre_vertex_slice, post_vertex_slice):
+#         return '%s->%s' % (pre_vertex_slice, post_vertex_slice)
 
-    def to_pre_indices(self, pre_r, pre_c):
-        return pre_r * self._pre_w + pre_c
-
-    def gen_key(self, pre_vertex_slice, post_vertex_slice):
-        return '%s->%s' % (pre_vertex_slice, post_vertex_slice)
-
+    # Get the number of connections
     def get_num_conns(
             self, weights, delays, pre_vertex_slice, post_vertex_slice):
         if (str(pre_vertex_slice) not in self._num_conns or
@@ -316,19 +305,19 @@ class KernelConnector(AbstractConnector):
 
         return self._num_conns[str(pre_vertex_slice)][str(post_vertex_slice)]
 
-    def get_all_delays(self, pre_vertex_slice, post_vertex_slice):
-        if (str(pre_vertex_slice) not in self._all_pre_in_range_delays or
-                str(post_vertex_slice) not in
-                self._all_pre_in_range_delays[str(pre_vertex_slice)]):
-            self.compute_statistics(weights, delays,
-                                    pre_vertex_slice, post_vertex_slice)
-
-        return self._all_pre_in_range_delays[
-            str(pre_vertex_slice)][str(post_vertex_slice)]
+#     # This function isn't called either
+#     def get_all_delays(self, pre_vertex_slice, post_vertex_slice):
+#         if (str(pre_vertex_slice) not in self._all_pre_in_range_delays or
+#                 str(post_vertex_slice) not in
+#                 self._all_pre_in_range_delays[str(pre_vertex_slice)]):
+#             self.compute_statistics(weights, delays,
+#                                     pre_vertex_slice, post_vertex_slice)
+#
+#         return self._all_pre_in_range_delays[
+#             str(pre_vertex_slice)][str(post_vertex_slice)]
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
-        print('get_delay_maximum', self._n_pre_neurons, self._n_post_neurons)
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -342,7 +331,6 @@ class KernelConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
-        print('get_n_connections_from_pre_vertex_maximum')
         # If the user hasn't supplied delays, do it this way
 #         if self._krn_delays is None:
 #             return self._get_n_connections_from_pre_vertex_with_delay_maximum(
@@ -368,8 +356,6 @@ class KernelConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
-        print('get_n_connections_to_post_vertex_maximum')
-
 #         if isinstance(self._krn_weights, ConvolutionKernel):
 #             if self._krn_weights.size > pre_vertex_slice.n_atoms:
 #                 return pre_vertex_slice.n_atoms
@@ -386,12 +372,15 @@ class KernelConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
-        print('get_weight_maximum')
-        # Get relevant slices
-        slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
+#         # Get relevant slices
+#         slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
         # it would be better to use the pre to post sizes here...
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
+        # use the kernel delays if user has supplied them
+        if self._krn_weights is not None:
+            return self._get_delay_maximum(self._krn_weights, n_conns)
+
         return self._get_weight_maximum(weights, n_conns)
 
     def __repr__(self):
@@ -402,7 +391,6 @@ class KernelConnector(AbstractConnector):
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        print('create_synaptic_block')
         n_connections = self.get_num_conns(weights, delays,
                                            pre_vertex_slice, post_vertex_slice)
 
@@ -471,8 +459,8 @@ class KernelConnector(AbstractConnector):
             data = numpy.array(properties, dtype="uint32")
             values = numpy.round(self._krn_delays * float(
                 DataType.S1615.scale)).astype("uint32")
-            print('delays data, values ', data, values.flatten())
-            print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
+#             print('delays data, values ', data, values.flatten())
+#             print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
@@ -499,8 +487,8 @@ class KernelConnector(AbstractConnector):
             data = numpy.array(properties, dtype="uint32")
             values = numpy.round(self._krn_weights * float(
                 DataType.S1615.scale)).astype("uint32")
-            print('weights data, values ', data, values.flatten())
-            print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
+#             print('weights data, values ', data, values.flatten())
+#             print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)

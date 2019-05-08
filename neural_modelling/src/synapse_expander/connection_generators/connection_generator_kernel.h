@@ -31,7 +31,7 @@ struct kernel {
     uint16_t m_kernelWidth;
     uint16_t m_kernelHeight;
 
-    // any further parameters required ?
+    // any further parameters required would go here
     // uint32_t allow_self_connections;
 };
 
@@ -46,8 +46,6 @@ void *connection_generator_kernel_initialise(address_t *region) {
     spin1_memcpy(params, params_sdram, sizeof(struct kernel));
     params_sdram = &(params_sdram[sizeof(struct kernel) >> 2]);
     log_debug("Kernel connector, m_kernelWidth, m_kernelHeight = %u %u",
-    		params->m_kernelWidth, params->m_kernelHeight);
-    io_printf(IO_BUF, "Kernel connector, m_kernelWidth, m_kernelHeight = %u %u",
     		params->m_kernelWidth, params->m_kernelHeight);
 
     *region = params_sdram;
@@ -138,7 +136,7 @@ uint32_t connection_generator_kernel_generate(
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre
-        post_r = uidiv2(post_slice_start + i, // I think?
+        post_r = uidiv2(post_slice_start + i,
             params->m_postWidth, &post_c);
 
         //move post coords into common coordinate system
@@ -160,34 +158,8 @@ uint32_t connection_generator_kernel_generate(
         if (0 <= k_r && k_r < params->m_kernelHeight && 0 <= k_c
                 && k_c < params->m_kernelWidth) {
             indices[n_conns++] = i;
-            //      LOG_PRINT(LOG_LEVEL_INFO, "val = %5.6k", output[i]);
-        } else {
-            log_error("Kernel coordinates off range (%d, %d)", k_r, k_c);
         }
     }
-
-
-
-//    // If no space, generate nothing
-//    if (max_row_length < 1) {
-//        return 0;
-//    }
-//
-//    // Add the relevant connections to this pre-neuron,
-//    // dependent upon the width of the kernel I guess
-//    // Oh and also dependent upon the pre- and post-sizes...
-//    // Yuck.
-//    uint32_t n_conns = 0;
-//    for (uint32_t i = 0; i < post_slice_count; i++) {
-//
-//        // just testing for now
-//        if (pre_neuron_index == (post_slice_start + i)) {
-//            log_debug("Not generating for post %u %u",
-//            		post_slice_start + i, params->m_kernelWidth);
-//            continue;
-//        }
-//        indices[n_conns++] = i;
-//    }
 
     return n_conns;
 }

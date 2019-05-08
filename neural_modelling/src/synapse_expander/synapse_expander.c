@@ -53,7 +53,6 @@ bool read_connection_builder_region(address_t *in_region,
     const uint32_t weight_type_hash = *region++;
     const uint32_t delay_type_hash = *region++;
 
-    io_printf(IO_BUF, "synapse_expander, call init functions \n");
     // Get the matrix, connector, weight and delay parameter generators
     matrix_generator_t matrix_generator =
         matrix_generator_init(matrix_type_hash, &region);
