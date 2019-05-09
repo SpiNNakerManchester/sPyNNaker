@@ -38,11 +38,7 @@
 #endif
 
 typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
-    INPUT_BUFFER_OVERFLOW_COUNT = 2,
-    CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+    CURRENT_TIMER_TICK = 0,
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
