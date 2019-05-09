@@ -23,8 +23,8 @@ def shape2word(sw, sh):
 # class KernelConnector(AbstractConnector):
 class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
-    Where the pre- and post-synaptic populations are thought-of as a 2D array.\
-    Connect every post(row, col) neuron to many pre(row, col, kernel) through\
+    Where the pre- and post-synaptic populations are considered as a 2D array.
+    Connect every post(row, col) neuron to many pre(row, col, kernel) through
     a (kernel) set of weights and/or delays.
 
     TODO: should these include allow_self_connections and with_replacement?
@@ -50,10 +50,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             2D shape of common coordinate system (for both pre and post, \
             usually the input image sizes)
         :param pre/post_sample_steps (optional):\
-            Sampling steps/jumps for post pop <=> (startX, endX, _stepX_)
+            Sampling steps/jumps for pre/post pop <=> (startX, endX, _stepX_)
             None or 2-item array
         :param pre/post_start_coords (optional):\
-            Starting row/col for sampling <=> (_startX_, endX, stepX)
+            Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
         super(KernelConnector, self).__init__(safe=safe, verbose=verbose)
@@ -149,8 +149,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     # Convert kernel values given into the correct format
     def get_kernel_vals(self, vals):
-        # TODO: can this be covered using _generate_values etc.
-        #       in the AbstractConnector?
         if vals is None:
             return None
         krn_size = self._kernel_h * self._kernel_w
@@ -208,7 +206,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         post_as_pre_r, post_as_pre_c = self.post_as_pre(post_vertex_slice)
         coords = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
-        unique_pre_ids = []
         all_pre_ids = []
         all_post_ids = []
         all_delays = []
@@ -235,12 +232,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
                 r, c = self.pre_as_post((r, c))
 
-                # this is the issue: why do this?
-#                 fr_r = max(0, r - hh)
-#                 to_r = min(r + hh + 1, self._kernel_h) # self._pre_h) # wait, what?
-#                 fr_c = max(0, c - hw)
-#                 to_c = min(c + hw + 1, self._kernel_w) # self._pre_w)
-
+                # Obtain coordinates to test against kernel sizes
                 dr = r - pre_r
                 kr = hh - dr
                 dc = c - pre_c
@@ -254,11 +246,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
                     coords[pre_idx].append(post_idx)
 
-#                     dr = r - pre_r
-#                     kr = hh - dr
-#                     dc = c - pre_c
-#                     kc = hw - dc
-
+                    # Store weights, delays and pre/post ids
                     w = self._krn_weights[kr, kc]
                     d = self._krn_delays[kr, kc]
 
@@ -269,7 +257,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                     all_delays.append(d)
                     all_weights.append(w)
 
-        self._pre_in_range[pre_vs][post_vs] = numpy.array(unique_pre_ids)
+        # Now the loop is complete, store relevant data
         self._num_conns[pre_vs][post_vs] = count
         self._all_post[pre_vs][post_vs] = numpy.array(
             all_post_ids, dtype='uint32')
@@ -279,20 +267,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             all_delays)
         self._all_pre_in_range_weights[pre_vs][post_vs] = numpy.array(
             all_weights)
-
-        return self._pre_in_range[pre_vs][post_vs]
-
-#     # Following three functions aren't used... ?
-#     def min_max_coords(self, pre_r, pre_c):
-#         hh, hw = self._hlf_k_h, self._hlf_k_w
-#         return (numpy.array([pre_r[0] - hh, pre_c[0] - hw]),
-#                 numpy.array([pre_r[-1] + hh, pre_c[-1] + hw]))
-#
-#     def to_pre_indices(self, pre_r, pre_c):
-#         return pre_r * self._pre_w + pre_c
-#
-#     def gen_key(self, pre_vertex_slice, post_vertex_slice):
-#         return '%s->%s' % (pre_vertex_slice, post_vertex_slice)
 
     # Get the number of connections
     def get_num_conns(
@@ -305,23 +279,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
         return self._num_conns[str(pre_vertex_slice)][str(post_vertex_slice)]
 
-#     # This function isn't called either
-#     def get_all_delays(self, pre_vertex_slice, post_vertex_slice):
-#         if (str(pre_vertex_slice) not in self._all_pre_in_range_delays or
-#                 str(post_vertex_slice) not in
-#                 self._all_pre_in_range_delays[str(pre_vertex_slice)]):
-#             self.compute_statistics(weights, delays,
-#                                     pre_vertex_slice, post_vertex_slice)
-#
-#         return self._all_pre_in_range_delays[
-#             str(pre_vertex_slice)][str(post_vertex_slice)]
-
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # use the kernel delays if user has supplied them
+        # Use the kernel delays if user has supplied them
         if self._krn_delays is not None:
             return self._get_delay_maximum(self._krn_delays, n_conns)
 
@@ -331,23 +294,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
-        # If the user hasn't supplied delays, do it this way
-#         if self._krn_delays is None:
-#             return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-#                 delays, self._n_pre_neurons * self._n_post_neurons,
-#                 self._kernel_h * self._kernel_w * self._pre_w * self._pre_h,
-#                 min_delay, max_delay)
-
-        # I am not quite sure really what's going on here; it
-        # appears to basically be doing the same as the clip function anyway
-#         if isinstance(delays, ConvolutionKernel):
-#             if self._weights.size > pre_vertex_slice.n_atoms:
-#                 return pre_vertex_slice.n_atoms
-#             elif self._weights.size > 255:
-#                 return 255
-#             else:
-#                 return (self._weights[self._weights != 0]).size
-
         # This is clearly a cop-out, but it works at the moment:
         # I haven't been able to make this break for "standard usage"
         return numpy.clip(
@@ -356,14 +302,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
-#         if isinstance(self._krn_weights, ConvolutionKernel):
-#             if self._krn_weights.size > pre_vertex_slice.n_atoms:
-#                 return pre_vertex_slice.n_atoms
-#             elif self._krn_weights.size > 255:
-#                 return 255
-#             else:
-#                 return (self._weights[self._weights != 0]).size
-
         # Again as above this is something of a cop-out and we can
         # probably do better
         return numpy.clip(
@@ -372,19 +310,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
-#         # Get relevant slices
-#         slices = (slice(0, self._kernel_h), slice(0, self._kernel_w))
-        # it would be better to use the pre to post sizes here...
+        # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # use the kernel delays if user has supplied them
+        # Use the kernel delays if user has supplied them
         if self._krn_weights is not None:
             return self._get_delay_maximum(self._krn_weights, n_conns)
 
         return self._get_weight_maximum(weights, n_conns)
 
     def __repr__(self):
-        return "KernelConnector"
+        return "KernelConnector(shape_kernel[{},{}])".format(
+            self._kernel_w, self._kernel_h)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -413,13 +350,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         block["synapse_type"] = syn_type.astype('uint8')
         return block
 
-#    Double-check this, but I think this property exists in
-#    AbstractGenerateConnectorOnMachine already
     @property
     def generate_on_machine(self):
         super_generate = super(KernelConnector, self).generate_on_machine
 
-        # This connector can also cope with listed weights and delays
+        # This connector can also cope with "listed" weights and delays
         return super_generate or (isinstance(self._delays, numpy.ndarray) and
                                   isinstance(self._weights, numpy.ndarray))
 
@@ -435,8 +370,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             shape2word(self._post_step_w, self._post_step_h),
             shape2word(self._kernel_w, self._kernel_h)]
 
-#    I think everything commented out below is covered in
-#    AbstractGenerateConnectorOnMachine
     @overrides(AbstractGenerateConnectorOnMachine.gen_delays_id)
     def gen_delays_id(self, delays):
         if self._krn_delays is not None:
@@ -459,8 +392,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             data = numpy.array(properties, dtype="uint32")
             values = numpy.round(self._krn_delays * float(
                 DataType.S1615.scale)).astype("uint32")
-#             print('delays data, values ', data, values.flatten())
-#             print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
@@ -487,8 +418,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             data = numpy.array(properties, dtype="uint32")
             values = numpy.round(self._krn_weights * float(
                 DataType.S1615.scale)).astype("uint32")
-#             print('weights data, values ', data, values.flatten())
-#             print('kernel_h, kernel_w', self._kernel_h, self._kernel_w)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)
@@ -504,9 +433,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        # Not just the kernel_properties any more;
-        # add the kernel weights and delays as well?
-        # does it need the lo_atom value??
         return numpy.array(self._kernel_properties, dtype="uint32")
 
     @property
@@ -514,6 +440,3 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return N_KERNEL_PARAMS * 4
-
-    def get_max_num_connections(self, pre_slice, post_slice):
-        return post_slice.n_atoms * self._kernel_w * self._kernel_h
