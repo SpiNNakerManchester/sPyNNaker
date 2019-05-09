@@ -2,6 +2,7 @@ import csa
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
 from unittests.mocks import MockSimulator, MockPopulation, MockRNG
 from pacman.model.graphs.common.slice import Slice
+from unittest.case import SkipTest
 
 
 def test_csa_one_to_one_connector():
@@ -58,6 +59,7 @@ def test_csa_random_connector():
     assert(all(item["delay"] == 2.0 for item in block))
 
 
+@SkipTest("https://github.com/INCF/csa/issues/17")
 def test_csa_block_connector():
     MockSimulator.setup()
     # This creates a block of size (2, 5) with a probability of 0.5; then
