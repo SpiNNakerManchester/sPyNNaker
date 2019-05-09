@@ -107,7 +107,7 @@ class AbstractPopulationVertex(
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
 
     # number of elements
-    ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to the bitfield
+    ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
 
     ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2  # n bitfields,  pointer for array
 
