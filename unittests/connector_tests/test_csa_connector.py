@@ -1,7 +1,6 @@
 import csa
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
-from unittests.mocks import MockSimulator, MockPopulation
-from pyNN.random import NumpyRNG
+from unittests.mocks import MockSimulator, MockPopulation, MockRNG
 from pacman.model.graphs.common.slice import Slice
 
 
@@ -10,7 +9,7 @@ def test_csa_one_to_one_connector():
     connector = CSAConnector(csa.oneToOne)
     connector.set_projection_information(
         MockPopulation(10, "pre"), MockPopulation(10, "post"),
-        NumpyRNG(seed=1), 1000.0)
+        MockRNG(), 1000.0)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -28,7 +27,7 @@ def test_csa_from_list_connector():
     connector = CSAConnector(conn_list)
     connector.set_projection_information(
         MockPopulation(10, "pre"), MockPopulation(10, "post"),
-        NumpyRNG(seed=1), 1000.0)
+        MockRNG(), 1000.0)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -48,7 +47,7 @@ def test_csa_random_connector():
     connector = CSAConnector(csa.random(0.05))
     connector.set_projection_information(
         MockPopulation(10, "pre"), MockPopulation(10, "post"),
-        NumpyRNG(seed=1), 1000.0)
+        MockRNG(), 1000.0)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -67,7 +66,7 @@ def test_csa_block_connector():
         csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
     connector.set_projection_information(
         MockPopulation(10, "pre"), MockPopulation(10, "post"),
-        NumpyRNG(seed=1), 1000.0)
+        MockRNG(), 1000.0)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
