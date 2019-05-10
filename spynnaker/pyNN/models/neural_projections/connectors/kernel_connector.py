@@ -1,7 +1,7 @@
 import numpy
-from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from pacman.model.decorators.overrides import overrides
 from data_specification.enums.data_type import DataType
 from .abstract_generate_connector_on_machine \
@@ -153,7 +153,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return None
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if isinstance(vals, RandomDistribution):
+        if get_simulator().is_a_pynn_random(vals):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
             return vals * numpy.ones(krn_shape)
