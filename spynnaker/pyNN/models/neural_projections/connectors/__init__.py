@@ -15,7 +15,6 @@ from .multapse_connector import MultapseConnector
 from .one_to_one_connector import OneToOneConnector
 from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
-from .mapping_connector import MappingConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "AllToAllConnector", "ArrayConnector", "CSAConnector",
@@ -23,4 +22,4 @@ __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
            "MultapseConnector", "OneToOneConnector", "SmallWorldConnector",
-           "KernelConnector", "MappingConnector"]
+           "KernelConnector"]

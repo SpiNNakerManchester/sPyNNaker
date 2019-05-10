@@ -45,7 +45,6 @@ class ConnectorIDs(Enum):
     FIXED_PROBABILITY_CONNECTOR = 2
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
     KERNEL_CONNECTOR = 4
-    MAPPING_CONNECTOR = 5
 
 
 @add_metaclass(AbstractBase)
