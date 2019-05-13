@@ -139,7 +139,8 @@ class SynapticManager(object):
 
     @property
     def on_chip_written_matrix_size(self):
-        return self._on_chip_generated_block_addr
+        return (self._on_chip_generated_block_addr -
+                self._host_generated_block_addr)
 
     @property
     def synapse_dynamics(self):

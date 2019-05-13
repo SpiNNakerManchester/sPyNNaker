@@ -1006,7 +1006,7 @@ class AbstractPopulationVertex(
             synaptic_matrix_base_address +
             self._synapse_manager.host_written_matrix_size)
         return [(on_chip_begins_at,
-                self._synapse_manager.on_chip_written_matrix_size)]
+                 self._synapse_manager.on_chip_written_matrix_size)]
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                key_to_atom_map_region_base_address)
