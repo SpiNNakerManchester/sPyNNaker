@@ -403,7 +403,7 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.1k;
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.02k;
                         previous_state.lock = 1;
                     }
 
