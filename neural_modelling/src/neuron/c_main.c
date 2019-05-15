@@ -184,7 +184,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
                 "could not initialise bit field for key %d, packets with"
                 " that key will use a DMA to check if the packet targets "
                 "anything within this core. Potentially slowing down the "
-                "execution of neurons on this core.");
+                "execution of neurons on this core.", key);
             failed_bit_field_reads ++;
         } else{  // read in bit field into correct location
 
