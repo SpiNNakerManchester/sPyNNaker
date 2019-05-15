@@ -113,7 +113,7 @@ class SynapticManager(
 
     BASIC_MALLOC_USAGE = 2
 
-    BYTES_FOR_SYNAPSE_PARAMS = 24
+    BYTES_FOR_SYNAPSE_PARAMS = 28
 
     _n_vertices = 0
 
@@ -1072,6 +1072,9 @@ class SynapticManager(
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
+
+        #Write the index of the first neuron to compute the SDRAM offset
+        spec.write_value(data=vertex_slice.lo_atom)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             self, application_graph, machine_time_step)

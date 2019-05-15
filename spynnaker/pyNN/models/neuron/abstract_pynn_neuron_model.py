@@ -5,6 +5,8 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 from pacman.model.constraints.partitioner_constraints\
     import SameAtomsAsVertexConstraint
+from pacman.model.constraints.partitioner_constraints\
+    import MaxVertexAtomsConstraint
 
 
 DEFAULT_MAX_ATOMS_PER_CORE = 255
@@ -55,7 +57,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         else:
             syn_constraints = constraints
 
-        syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
+        #syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
+        syn_constraints.append(MaxVertexAtomsConstraint(32))
 
         for index in range(vertices[0].get_n_synapse_types()):
             vertices.append(SynapticManager(1, index, n_neurons, syn_constraints,

@@ -43,6 +43,7 @@ static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
 static uint32_t memory_index;
+static uint32_t low_neuron_index;
 
 static weight_t *synaptic_region;
 
@@ -53,7 +54,7 @@ static size_t size_to_be_transferred;
 //! readable form
 typedef enum parameters_in_synapse_parameter_data_region {
     N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
-    SYNAPSE_INDEX, MEM_INDEX, RING_BUFFER_LEFT_SHIFT,
+    SYNAPSE_INDEX, MEM_INDEX, LO_ATOM_INDEX, RING_BUFFER_LEFT_SHIFT,
 } parameters_in_synapse_parameter_data_region;
 
 
@@ -265,6 +266,8 @@ bool synapses_initialise(
     synapse_index = synapse_params_address[SYNAPSE_INDEX];
 
     memory_index = synapse_params_address[MEM_INDEX];
+
+    low_neuron_index = synapse_params_address[LO_ATOM_INDEX];
 
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
@@ -554,5 +557,6 @@ void synapses_flush_ring_buffer(uint32_t timestep) {
 void synapses_set_contribution_region() {
 
     synaptic_region = sark_tag_ptr(memory_index, 0);
+    synaptic_region += low_neuron_index;
     synaptic_region += (synapse_index << synapse_index_bits);
 }
