@@ -62,12 +62,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                 else:
                     syn_constraints = constraints
 
-                if n_neurons < max_atoms:
-                    neurons_per_syn_core = n_neurons // 2
-                else:
-                    neurons_per_syn_core = max_atoms // 2
-
-                syn_constraints.append(MaxVertexAtomsConstraint(neurons_per_syn_core))
+                syn_constraints.append(MaxVertexAtomsConstraint(32))
             else:
                 if constraints == None:
                     syn_constraints = list()
