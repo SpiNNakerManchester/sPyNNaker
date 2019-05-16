@@ -276,13 +276,14 @@ class AbstractPopulationVertex(
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
         AbstractPopulationVertex._n_vertices += 1
-        self._machine_vertices[vertex_slice.hi_atom] = vertex
+        self._machine_vertices[self._n_subvertices] = vertex
 
         for app_vertex in self._connected_app_vertices:
-            out_vertex =\
-                app_vertex.get_machine_vertex_at(vertex_slice.hi_atom)
-            if out_vertex is not None:
-                vertex.add_constraint(SameChipAsConstraint(out_vertex))
+            out_vertices =\
+                app_vertex.get_machine_vertex_at(vertex_slice.lo_atom, vertex_slice.hi_atom)
+            if len(out_vertices)> 0:
+                for out_vertex in out_vertices:
+                    vertex.add_constraint(SameChipAsConstraint(out_vertex))
         self._n_subvertices += 1
 
         # return machine vertex
@@ -441,7 +442,7 @@ class AbstractPopulationVertex(
             possible without too much overflow
         """
         weight_scale_squared = application_vertex.weight_scale * application_vertex.weight_scale
-        n_synapse_types = application_vertex.n_synapse_types
+        n_synapse_types = application_vertex.implemented_synapse_types
         running_totals = [RunningStats() for _ in range(n_synapse_types)]
         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
         total_weights = numpy.zeros(n_synapse_types)

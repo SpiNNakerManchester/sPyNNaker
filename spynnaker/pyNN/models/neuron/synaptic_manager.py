@@ -87,7 +87,7 @@ class SynapticManager(
     # pylint: disable=too-many-arguments, too-many-locals
     __slots__ = [
         "_delay_key_index",
-        "_n_synapse_types", #number of different synapse types implemented (set to one on higher level, but left as param here)
+        "_implemented_synapse_types", #number of different synapse types implemented (set to one on higher level, but left as param here)
         "_synapse_index", #index of the synapse type implemented, MUST be 0 if n_synapse_types is > 1
         "_one_to_one_connection_dtcm_max_bytes",
         "_poptable_type",
@@ -109,7 +109,8 @@ class SynapticManager(
         "_incoming_spike_buffer_size",
         "_machine_vertices",
         "_connected_app_vertices",
-        "_model_synapse_types"]
+        "_model_synapse_types",
+        "_atoms_neuron_cores"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -122,7 +123,7 @@ class SynapticManager(
                  spikes_per_second, incoming_spike_buffer_size, model_syn_types,
                  population_table_type=None, synapse_io=None):
 
-        self._n_synapse_types = n_synapse_types
+        self._implemented_synapse_types = n_synapse_types
         self._ring_buffer_sigma = ring_buffer_sigma
         self._spikes_per_second = spikes_per_second
         self._n_atoms = n_neurons
@@ -130,8 +131,9 @@ class SynapticManager(
         self._machine_vertices = dict()
         self._connected_app_vertices = None
         self._model_synapse_types = model_syn_types
+        self._atoms_neuron_cores = max_atoms_per_core
 
-        if self._n_synapse_types > 1:
+        if self._implemented_synapse_types > 1:
             # Hard coded to ensure it's 0.
             # Used at C level to compute SDRAM offsets
             self._synapse_index = 0
@@ -250,8 +252,8 @@ class SynapticManager(
         return self._weight_scale
 
     @property
-    def n_synapse_types(self):
-        return self._n_synapse_types
+    def implemented_synapse_types(self):
+        return self._implemented_synapse_types
 
     @overrides(AbstractAcceptsIncomingSynapses.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
@@ -338,7 +340,7 @@ class SynapticManager(
     def _get_synapse_params_size(self):
         # Params plus ring buffer left shift
         return (self.BYTES_FOR_SYNAPSE_PARAMS +
-                self._n_synapse_types * 4)
+                self._implemented_synapse_types * 4)
 
     def _get_static_synaptic_matrix_sdram_requirements(self):
 
@@ -429,7 +431,7 @@ class SynapticManager(
                         size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += self._n_synapse_types * 4
+            size += self._implemented_synapse_types * 4
         return size
 
     def _get_synapse_dynamics_parameter_size(self, vertex_slice,
@@ -441,11 +443,11 @@ class SynapticManager(
         if isinstance(self.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._n_synapse_types,
+                vertex_slice.n_atoms, self._implemented_synapse_types,
                 in_edges=in_edges)
         else:
             return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self._n_synapse_types)
+                vertex_slice.n_atoms, self._implemented_synapse_types)
 
     def get_sdram_usage_in_bytes(
             self, vertex_slice, graph, machine_time_step):
@@ -686,7 +688,9 @@ class SynapticManager(
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
 
-        return list(max_weight_powers)
+        return [list(max_weight_powers)[self._synapse_index]]
+
+        #return list(max_weight_powers)
 
     @staticmethod
     def _get_weight_scale(ring_buffer_to_input_left_shift):
@@ -783,7 +787,7 @@ class SynapticManager(
                             spec, synaptic_matrix_region, synapse_info,
                             pre_slices, pre_slice_idx, post_slices,
                             post_slice_index, pre_vertex_slice,
-                            post_vertex_slice, app_edge, self._n_synapse_types,
+                            post_vertex_slice, app_edge, self._implemented_synapse_types,
                             single_synapses, master_pop_table_region,
                             weight_scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
@@ -1062,7 +1066,7 @@ class SynapticManager(
         spec.write_value(data=n_atoms)
 
         # Write the number of synapse types managed
-        spec.write_value(data=self._n_synapse_types)
+        spec.write_value(data=self._implemented_synapse_types)
 
         # Write the size of the incoming spike buffer
         spec.write_value(data=self._incoming_spike_buffer_size)
@@ -1261,7 +1265,7 @@ class SynapticManager(
         # Convert the blocks into connections
         return self._synapse_io.read_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice,
-            max_row_length, delayed_max_row_len, self._n_synapse_types,
+            max_row_length, delayed_max_row_len, self._implemented_synapse_types,
             self._weight_scales[placement], data, delayed_data,
             app_edge.n_delay_stages, machine_time_step)
 
@@ -1398,7 +1402,7 @@ class SynapticManager(
 
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self._n_synapse_types * 4))
+            (self._implemented_synapse_types * 4))
         for data in generator_data:
             n_bytes += data.size
 
@@ -1411,8 +1415,8 @@ class SynapticManager(
         spec.write_value(len(generator_data))
         spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
-        spec.write_value(self._n_synapse_types)
-        spec.write_value(get_n_bits(self._n_synapse_types))
+        spec.write_value(self._implemented_synapse_types)
+        spec.write_value(get_n_bits(self._implemented_synapse_types))
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
         for w in weight_scales:
@@ -1453,20 +1457,24 @@ class SynapticManager(
             resources_required, is_recording, minimum_buffer_sdram,
             buffered_sdram_per_timestep, label, constraints, overflow_sdram)
 
-        self._machine_vertices[vertex_slice.hi_atom] = vertex
+        self._machine_vertices[(vertex_slice.lo_atom, vertex_slice.hi_atom)] = vertex
         SynapticManager._n_vertices += 1
 
         for app_vertex in self._connected_app_vertices:
             out_vertex =\
-                app_vertex.get_machine_vertex_at(vertex_slice.hi_atom)
+                app_vertex.get_machine_vertex_at(vertex_slice.lo_atom // self._atoms_neuron_cores)
             if out_vertex is not None:
                 vertex.add_constraint(SameChipAsConstraint(out_vertex))
 
         # return machine vertex
         return vertex
 
-    def get_machine_vertex_at(self, index):
+    def get_machine_vertex_at(self, low, high):
 
-        if index in self._machine_vertices:
-            return self._machine_vertices[index]
-        return None
+        vertices = list()
+
+        for (lo, hi) in self._machine_vertices:
+            if lo >= low and hi <= high:
+                vertices.append(self._machine_vertices[(lo, hi)])
+
+        return vertices

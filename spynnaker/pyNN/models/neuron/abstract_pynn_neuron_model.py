@@ -52,15 +52,25 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
             ring_buffer_sigma, self._model, self))
 
-        if constraints == None:
-            syn_constraints = list()
-        else:
-            syn_constraints = constraints
-
-        #syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
-        syn_constraints.append(MaxVertexAtomsConstraint(32))
 
         for index in range(vertices[0].get_n_synapse_types()):
+
+            if self._model.get_n_synapse_types() > 1 and index == 0:
+                # Set the constraint for the number of excitatory synapse cores
+                if constraints == None:
+                    syn_constraints = list()
+                else:
+                    syn_constraints = constraints
+
+                syn_constraints.append(MaxVertexAtomsConstraint(32))
+            else:
+                if constraints == None:
+                    syn_constraints = list()
+                else:
+                    syn_constraints = constraints
+
+                syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
+
             vertices.append(SynapticManager(1, index, n_neurons, syn_constraints,
                                             label+"_syn_vertex_"+str(index), max_atoms,
                                             self._model.get_global_weight_scale(),
@@ -68,7 +78,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                                             incoming_spike_buffer_size,
                                             self._model.get_n_synapse_types()))
 
-        for i in range(len(vertices)):
-            vertices[i].connected_app_vertices = (vertices[:i] + vertices[i+1:])
+        vertices[0].connected_app_vertices = vertices[1:]
+        for i in range(1, len(vertices)):
+            vertices[i].connected_app_vertices = [vertices[0]]
 
         return vertices
