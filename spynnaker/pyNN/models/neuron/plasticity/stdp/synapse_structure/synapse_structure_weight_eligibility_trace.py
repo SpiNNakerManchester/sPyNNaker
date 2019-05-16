@@ -12,4 +12,4 @@ class SynapseStructureWeightEligibilityTrace(AbstractSynapseStructure):
 
     @overrides(AbstractSynapseStructure.get_weight_half_word)
     def get_weight_half_word(self):
-        return 0
+        return 1
