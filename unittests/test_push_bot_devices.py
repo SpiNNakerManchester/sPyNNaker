@@ -1,13 +1,7 @@
 import unittest
-
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotLaser
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotMotor
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotSpeaker
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotLED
+    import (
+        PushBotLaser, PushBotMotor, PushBotSpeaker, PushBotLED)
 
 
 class Test(unittest.TestCase):

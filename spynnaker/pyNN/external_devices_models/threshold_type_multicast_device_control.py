@@ -1,79 +1,76 @@
 from data_specification.enums import DataType
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
-from enum import Enum
+from spinn_utilities.overrides import overrides
 
+DEVICE = "device"
+TIME_UNTIL_SEND = "time_until_send"
 
-class _THRESHOLD_TYPE_MULTICAST(Enum):
-    DEVICE_CONTROL_KEY = (1, DataType.UINT32)
-    DEVICE_CONTROLS_USES_PAYLOAD = (2, DataType.UINT32)
-    DEVICE_CONTROL_MIN_VALUE = (3, DataType.S1615)
-    DEVICE_CONTROL_MAX_VALUE = (4, DataType.S1615)
-    DEVICE_CONTROL_TIMESTEPS_BETWEEN_SENDING = (5, DataType.UINT32)
-    DEVICE_STATE = (6, DataType.UINT32)
-
-    def __new__(cls, value, data_type, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj._data_type = data_type
-        obj.__doc__ = doc
-        return obj
-
-    @property
-    def data_type(self):
-        return self._data_type
+UNITS = {
+    DEVICE: "",
+    TIME_UNTIL_SEND: ""
+}
 
 
 class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     """ A threshold type that can send multicast keys with the value of\
         membrane voltage as the payload
     """
-    __slots__ = ["_devices"]
+    __slots__ = ["_device"]
 
-    def __init__(self, devices):
-        self._devices = devices
+    def __init__(self, device):
+        super(ThresholdTypeMulticastDeviceControl, self).__init__([
+            DataType.UINT32,   # control_key
+            DataType.UINT32,   # control_uses_payload
+            DataType.S1615,    # min_value
+            DataType.S1615,    # max_value
+            DataType.UINT32,   # time steps between sending
+            DataType.UINT32])  # time steps until next send
+        self._device = device
 
-    def get_n_threshold_parameters(self):
-        return 6
+    @overrides(AbstractThresholdType.get_n_cpu_cycles)
+    def get_n_cpu_cycles(self, n_neurons):
+        return 10 * n_neurons
 
-    def get_threshold_parameter_types(self):
-        return [item.data_type for item in _THRESHOLD_TYPE_MULTICAST]
+    @overrides(AbstractThresholdType.add_parameters)
+    def add_parameters(self, parameters):
+        parameters[DEVICE] = self._device
 
-    def get_threshold_parameters(self):
-        timings = [device.device_control_timesteps_between_sending
-                   for device in self._devices]
-        max_time = max(timings)
-        time_between_send = int(max_time) // len(self._devices)
+    @overrides(AbstractThresholdType.add_state_variables)
+    def add_state_variables(self, state_variables):
+        state_variables[TIME_UNTIL_SEND] = 0
 
-        return [
-            NeuronParameter(
-                [device.device_control_key for device in self._devices],
-                _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROL_KEY.data_type),
-            NeuronParameter(
-                [1 if device.device_control_uses_payload else 0
-                 for device in self._devices],
-                _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROLS_USES_PAYLOAD
-                .data_type),
-            NeuronParameter(
-                [device.device_control_min_value for device in self._devices],
-                _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROL_MIN_VALUE.data_type),
-            NeuronParameter(
-                [device.device_control_max_value for device in self._devices],
-                _THRESHOLD_TYPE_MULTICAST.DEVICE_CONTROL_MAX_VALUE.data_type),
-            NeuronParameter(
-                timings,
-                _THRESHOLD_TYPE_MULTICAST
-                .DEVICE_CONTROL_TIMESTEPS_BETWEEN_SENDING.data_type),
+    @overrides(AbstractThresholdType.get_units)
+    def get_units(self, variable):
+        return UNITS[variable]
 
-            # This is the "state" variable that keeps track of how many
-            # timesteps to go before a send is done
-            # Initially set this to a different number for each device, to
-            # avoid them being in step with each other
-            NeuronParameter(
-                [i * time_between_send for i, _ in enumerate(self._devices)],
-                _THRESHOLD_TYPE_MULTICAST.DEVICE_STATE.data_type)
-        ]
+    @overrides(AbstractThresholdType.has_variable)
+    def has_variable(self, variable):
+        return variable in UNITS
 
-    def get_n_cpu_cycles_per_neuron(self):
-        return 10
+    @overrides(AbstractThresholdType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice):
+
+        # Add the rest of the data
+        return [parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_key),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_scaling_factor
+                    if x.device_control_uses_payload else 0),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_min_value),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_max_value),
+                parameters[DEVICE].apply_operation(
+                    lambda x: x.device_control_timesteps_between_sending),
+
+                # This is the "state" variable that keeps track of how many
+                # timesteps to go before a send is done
+                # Set to a different value for each item to avoid being in step
+                [i for i in range(vertex_slice.n_atoms)]]
+
+    @overrides(AbstractThresholdType.update_values)
+    def update_values(self, values, parameters, state_variables):
+
+        # Read the data
+        (_key, _uses_payload, _min, _max, _between, time_until_send) = values
+        state_variables[TIME_UNTIL_SEND] = time_until_send

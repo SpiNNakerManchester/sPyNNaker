@@ -1,11 +1,10 @@
+import logging
+import struct
+import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-
-import numpy
-import struct
-import logging
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -61,11 +60,11 @@ class EIEIOSpikeRecorder(object):
 
             # Read the spikes
             raw_spike_data, data_missing = \
-                buffer_manager.get_data_for_vertex(placement, region)
+                buffer_manager.get_data_by_placement(placement, region)
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
-                vertex_slice, raw_spike_data.read_all(), ms_per_tick,
+                vertex_slice, raw_spike_data, ms_per_tick,
                 base_key_function(vertex), results)
 
         if missing:
@@ -74,14 +73,13 @@ class EIEIOSpikeRecorder(object):
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}", label, region, missing_str)
         if not results:
-            return []
+            return numpy.empty(shape=(0, 2))
         result = numpy.vstack(results)
         return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     @staticmethod
     def _process_spike_data(
             vertex_slice, spike_data, ms_per_tick, base_key, results):
-        spike_data = str(spike_data)
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:
