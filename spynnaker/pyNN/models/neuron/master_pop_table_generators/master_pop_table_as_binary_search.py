@@ -4,7 +4,6 @@ import struct
 import sys
 import numpy
 from spinn_utilities.overrides import overrides
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
@@ -111,7 +110,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 edge_pre_vertex = in_edge.pre_vertex
                 if (isinstance(edge_pre_vertex, ApplicationVertex) and
                         isinstance(
-                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+                            edge_pre_vertex, ApplicationVertex)):
 
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:
