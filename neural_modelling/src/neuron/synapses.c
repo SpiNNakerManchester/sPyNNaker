@@ -161,7 +161,8 @@ static inline void _process_fixed_synapses(
         // Get the next 32 bit word from the synaptic_row
         // (should auto increment pointer in single instruction)
         uint32_t synaptic_word = *synaptic_words++;
-        uint32_t synapse_type = synapse_row_sparse_type(synaptic_word);
+        uint32_t synapse_type = synapse_row_sparse_type(
+            synaptic_word, synapse_index_bits, synapse_type_mask);
 
         // If synapse type has non-input synapses and this synapse
         // connects to one, pass event directly to synapse dynamics
@@ -169,7 +170,8 @@ static inline void _process_fixed_synapses(
             // Dopaminergic neurons send some amount of neuromodulator
             // concentration so this can actually be a weight as usual.
             uint32_t concentration = synapse_row_sparse_weight(synaptic_word);
-            uint32_t index = synapse_row_sparse_index(synaptic_word);
+            uint32_t index = synapse_row_sparse_index(
+                synaptic_word, synapse_index_mask);
             // In case this is punishment synapse, invert dopamine level
             // to cause depression.
             if (synapse_type == 3) {

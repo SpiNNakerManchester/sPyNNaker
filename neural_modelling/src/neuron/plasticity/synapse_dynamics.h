@@ -14,7 +14,7 @@ bool synapse_dynamics_process_plastic_synapses(
     weight_t *ring_buffers, uint32_t time);
 
 void synapse_dynamics_process_neuromodulator_event(
-        uint32_t time, int16_t concentration, uint32_t neuron_index,
+        uint32_t time, int32_t concentration, uint32_t neuron_index,
         uint32_t synapse_type);
 
 void synapse_dynamics_process_post_synaptic_event(
