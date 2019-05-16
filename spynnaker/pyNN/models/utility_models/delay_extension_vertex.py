@@ -1,23 +1,25 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import logging
 import math
 import sys
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
-from spinn_front_end_common.utilities.constants import (
-    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.constants import (
+    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -105,7 +107,7 @@ class DelayExtensionVertex(
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
-            sdram=SDRAMResource(
+            sdram=ConstantSDRAM(
                 self.get_sdram_usage_for_atoms(out_edges)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
@@ -321,13 +323,15 @@ class DelayExtensionVertex(
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
             connector, AbstractGenerateConnectorOnMachine) and \
-            connector.generate_on_machine
+            connector.generate_on_machine(
+                synapse_info.weight, synapse_info.delay)
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes,
+                connector.gen_delay_params_size_in_bytes(
+                    synapse_info.delay),
                 connector.gen_connector_params_size_in_bytes,
             ))
         return 0
@@ -345,7 +349,7 @@ class DelayExtensionVertex(
                     max_atoms = sys.maxsize
                     edge_post_vertex = out_edge.post_vertex
                     if (isinstance(
-                            edge_post_vertex, AbstractHasGlobalMaxAtoms)):
+                            edge_post_vertex, ApplicationVertex)):
                         max_atoms = edge_post_vertex.get_max_atoms_per_core()
                     if out_edge.post_vertex.n_atoms < max_atoms:
                         max_atoms = edge_post_vertex.n_atoms

@@ -25,6 +25,7 @@ typedef struct additional_input_t {
 static input_t additional_input_get_input_value_as_current(
         additional_input_pointer_t additional_input,
         state_t membrane_voltage) {
+	use(membrane_voltage);
 
     // Decay Ca2 trace
     additional_input->I_Ca2 *= additional_input->exp_TauCa;
