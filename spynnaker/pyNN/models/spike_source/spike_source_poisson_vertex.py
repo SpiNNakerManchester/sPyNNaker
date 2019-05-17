@@ -22,7 +22,7 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import (
@@ -77,7 +77,6 @@ class SpikeSourcePoissonVertex(
     """ A Poisson Spike source object
     """
 
-    _DEFAULT_MALLOCS_USED = 2
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
@@ -169,8 +168,7 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
-            self._get_number_of_mallocs_used_by_dsg() *
-            SARK_PER_MALLOC_SDRAM_USAGE)
+            recording_utilities.get_recording_data_constant_size(1))
 
         recording = self.get_recording_sdram_usage(
             vertex_slice,  machine_time_step)
@@ -271,7 +269,7 @@ class SpikeSourcePoissonVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=_REGIONS.SYSTEM_REGION.value,
-            size=SYSTEM_BYTES_REQUIREMENT,
+            size=SIMULATION_N_BYTES,
             label='setup')
 
         # reserve poisson params dsg region
@@ -488,16 +486,6 @@ class SpikeSourcePoissonVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
         return globals_variables.get_simulator().machine_time_step
-
-    def _get_number_of_mallocs_used_by_dsg(self):
-        """ Works out how many allocation requests are required by the tools
-
-        :return: the number of allocation requests
-        """
-        standard_mallocs = self._DEFAULT_MALLOCS_USED
-        if self._spike_recorder.record:
-            standard_mallocs += 1
-        return standard_mallocs
 
     @staticmethod
     def get_dtcm_usage_for_atoms():

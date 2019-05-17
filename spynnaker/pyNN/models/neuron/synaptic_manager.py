@@ -337,9 +337,6 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
 
-    def get_number_of_mallocs_used_by_dsg(self):
-        return 4
-
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
