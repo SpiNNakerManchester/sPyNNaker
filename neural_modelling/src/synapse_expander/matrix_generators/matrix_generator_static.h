@@ -155,7 +155,8 @@ void matrix_generator_static_write_row(
 
         // Avoid errors when rows are full
         if (space[delay.stage] == 0) {
-            log_warning("Row for delay stage %u is full - word not added!");
+            log_warning("Row for delay stage %u is full - word not added!",
+                delay.stage);
             continue;
         }
 
