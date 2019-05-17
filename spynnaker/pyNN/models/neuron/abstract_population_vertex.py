@@ -3,7 +3,8 @@ import os
 import math
 import sys
 
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import \
+    determine_max_atoms_for_vertex
 from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -299,11 +300,8 @@ class AbstractPopulationVertex(
         for in_edge in app_graph.get_edges_ending_at_vertex(self):
 
             # Get the number of likely vertices
-            max_atoms = sys.maxsize
             edge_pre_vertex = in_edge.pre_vertex
-            if (isinstance(
-                    edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
-                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
             if in_edge.pre_vertex.n_atoms < max_atoms:
                 max_atoms = in_edge.pre_vertex.n_atoms
             n_edge_vertices = int(math.ceil(
@@ -322,13 +320,8 @@ class AbstractPopulationVertex(
         sdram = 0
         for incoming_edge in incoming_edges:
             if isinstance(incoming_edge, ProjectionApplicationEdge):
-                max_atoms = sys.maxsize
                 edge_pre_vertex = incoming_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, ApplicationVertex) and
-                        isinstance(
-                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
-                    max_atoms = \
-                        incoming_edge.pre_vertex.get_max_atoms_per_core()
+                max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
                 if incoming_edge.pre_vertex.n_atoms < max_atoms:
                     max_atoms = incoming_edge.pre_vertex.n_atoms
 
@@ -854,8 +847,7 @@ class AbstractPopulationVertex(
         self._synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 
-    @overrides(
-        AbstractAcceptsIncomingSynapses.get_connections_from_machine)
+    @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
