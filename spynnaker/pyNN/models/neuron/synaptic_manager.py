@@ -1078,7 +1078,7 @@ class SynapticManager(
         spec.write_value(data=index)
 
         #Write the index of the first neuron to compute the SDRAM offset
-        spec.write_value(data=vertex_slice.lo_atom)
+        spec.write_value(data=(vertex_slice.lo_atom % self._atoms_neuron_cores))
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             self, application_graph, machine_time_step)

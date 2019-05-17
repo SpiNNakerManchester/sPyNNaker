@@ -8,8 +8,10 @@ from pacman.model.constraints.partitioner_constraints\
 from pacman.model.constraints.partitioner_constraints\
     import MaxVertexAtomsConstraint
 
+import math
 
-DEFAULT_MAX_ATOMS_PER_CORE = 255
+
+DEFAULT_MAX_ATOMS_PER_CORE = 128
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
@@ -62,7 +64,10 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                 else:
                     syn_constraints = constraints
 
-                syn_constraints.append(MaxVertexAtomsConstraint(32))
+                if n_neurons < max_atoms:
+                    syn_constraints.append(MaxVertexAtomsConstraint(n_neurons / 2))
+                else:
+                    syn_constraints.append(MaxVertexAtomsConstraint(max_atoms / 2))
             else:
                 if constraints == None:
                     syn_constraints = list()
