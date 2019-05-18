@@ -79,10 +79,10 @@ def _extract_iobuf(expander_cores, transceiver, provenance_file_path):
     """
     io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
     core_to_replacer = dict()
-    for binary in expander_cores.binaries():
+    for binary in expander_cores.binaries:
         replacer = Replacer(binary)
         for core_subsets in expander_cores.get_cores_for_binary(binary):
-            for core_subset in core_subsets.core_subsets:
+            for core_subset in core_subsets:
                 x = core_subset.x
                 y = core_subset.y
                 for p in core_subset.processor_ids:
