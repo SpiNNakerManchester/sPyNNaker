@@ -108,6 +108,10 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
             synapse_dynamics_get_plastic_saturation_count();
+
+
+    log_info("dma read count = %d",spike_processing_get_dma_read_count());
+    log_info("dma complete count = %d",spike_processing_get_dma_complete_count());
     log_debug("finished other provenance data");
 }
 
@@ -154,6 +158,8 @@ static bool initialise() {
             &timer_offset)) {
         return false;
     }
+
+    log_info("n_neurons = %d",n_neurons);
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;

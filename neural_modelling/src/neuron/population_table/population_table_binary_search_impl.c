@@ -1,6 +1,9 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+//! if using profiler import profiler tags
+#include <profiler.h>
+#include "profile_tags.h"
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -171,9 +174,11 @@ bool population_table_get_first_address(
             log_debug(
                 "spike = %08x, entry_index = %u, start = %u, count = %u",
                 spike, imid, next_item, items_to_go);
-
-            return population_table_get_next_address(
+            bool get_next = population_table_get_next_address(
                 row_address, n_bytes_to_transfer);
+//            if(get_next)profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_INCOMING_SPIKE);
+
+            return get_next;
         } else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
@@ -236,6 +241,8 @@ bool population_table_get_next_address(
         next_item += 1;
         items_to_go -= 1;
     } while (!is_valid && (items_to_go > 0));
+
+    if(is_valid)profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_INCOMING_SPIKE);
 
     return is_valid;
 }

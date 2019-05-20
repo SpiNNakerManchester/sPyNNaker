@@ -15,6 +15,9 @@ void spike_processing_finish_write(uint32_t process_id);
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows();
 
+uint32_t spike_processing_get_dma_complete_count();
+uint32_t spike_processing_get_dma_read_count();
+
 
 //! DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -58,5 +61,7 @@ void _setup_synaptic_dma_read();
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool
 bool received_any_spike();
+
+
 
 #endif // _SPIKE_PROCESSING_H_

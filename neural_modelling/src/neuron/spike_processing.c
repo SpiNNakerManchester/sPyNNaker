@@ -5,6 +5,8 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
+#include <profiler.h>
+#include "profile_tags.h"
 
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
@@ -36,6 +38,9 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
+uint32_t dma_read_count = 0;
+uint32_t dma_complete_count = 0;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -55,6 +60,7 @@ static inline void _do_dma_read(
         DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
         n_bytes_to_transfer);
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
+    dma_read_count ++;
 }
 
 
@@ -196,6 +202,8 @@ void _dma_complete_callback(uint unused, uint tag) {
     uint32_t current_buffer_index = buffer_being_read;
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
+    dma_complete_count ++;
+
     // Process synaptic row repeatedly
     bool subsequent_spikes;
     do {
@@ -225,6 +233,8 @@ void _dma_complete_callback(uint unused, uint tag) {
             rt_error(RTE_SWERR);
         }
     } while (subsequent_spikes);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_INCOMING_SPIKE);
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
@@ -285,6 +295,13 @@ uint32_t spike_processing_get_buffer_overflows() {
     return in_spikes_get_n_buffer_overflows();
 }
 
+uint32_t spike_processing_get_dma_read_count(){
+    return dma_read_count;
+}
+uint32_t spike_processing_get_dma_complete_count(){
+    return dma_complete_count;
+}
+
 //! \brief get the address of the circular buffer used for buffering received
 //! spikes before processing them
 //! \return address of circular buffer
@@ -317,3 +334,4 @@ bool do_rewiring(int number_of_rew) {
 bool received_any_spike() {
     return any_spike;
 }
+
