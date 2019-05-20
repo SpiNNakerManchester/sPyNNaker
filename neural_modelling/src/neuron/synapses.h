@@ -80,7 +80,9 @@ uint32_t synapses_get_saturation_count();
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events();
 
-
+//! \brief returns the number of DMA retrieved rows which were empty.
+//! \return the number of DMA retrieved rows which were empty.
+uint32_t synapses_get_empty_row_count(void);
 //------------------------------------------------------------------------------
 // Synaptic rewiring functions
 //------------------------------------------------------------------------------
@@ -111,5 +113,9 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 //! \return bool: was the addition successful?
 bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
                                uint32_t delay, uint32_t type);
+
+//! \brief allows clearing of dtcm used by synapses
+//! \return bool true if successful false otherwise
+bool synapses_shut_down();
 
 #endif // _SYNAPSES_H_

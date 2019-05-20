@@ -25,6 +25,9 @@ EIEIO_BUFFER_SIZE_BEFORE_RECEIVE = 512 * 1024
 
 INFINITE_SIMULATION = 4294967295
 
+# conversion from words to bytes (WHY IS THIS NOT A CONSTANT in FEC!)
+WORD_TO_BYTE_MULTIPLIER = 4
+
 # from synaptic manager
 # Words - 2 for row length and number of rows and 1 for plastic region size
 # (which might be 0)
@@ -57,7 +60,9 @@ POPULATION_BASED_REGIONS = Enum(
            ('PROVENANCE_DATA', 7),
            ('PROFILING', 8),
            ('CONNECTOR_BUILDER', 9),
-           ('DIRECT_MATRIX', 10)])
+           ('DIRECT_MATRIX', 10),
+           ('BIT_FIELD_FILTER', 11),
+           ('BIT_FIELD_BUILDER', 12)])
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

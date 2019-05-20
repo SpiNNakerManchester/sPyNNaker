@@ -40,6 +40,7 @@ bool any_spike = false;
 
 uint32_t dma_read_count = 0;
 uint32_t dma_complete_count = 0;
+static uint32_t spike_processing_count=0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -168,6 +169,8 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
+        // increment the spike count for provenance generation
+        spike_processing_count++;
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
@@ -298,8 +301,19 @@ uint32_t spike_processing_get_buffer_overflows() {
 uint32_t spike_processing_get_dma_read_count(){
     return dma_read_count;
 }
+
+uint32_t spike_processing_get_ghost_pop_table_searches(){
+	return population_table_get_ghost_pop_table_searches();
+}
+
 uint32_t spike_processing_get_dma_complete_count(){
     return dma_complete_count;
+}
+
+//! \brief returns the number of spikes that were processed
+//! \return the number of spikes that were processed
+uint32_t spike_processing_get_spike_processing_count(){
+    return spike_processing_count;
 }
 
 //! \brief get the address of the circular buffer used for buffering received

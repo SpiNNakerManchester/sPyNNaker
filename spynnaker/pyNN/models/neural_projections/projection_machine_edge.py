@@ -45,7 +45,7 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
-            elif isinstance(synapse_info.connector, FromListConnector) and isinstance(self.post_vertex, DRNLVertex):
+            elif isinstance(synapse_info.connector, FromListConnector):# and isinstance(self.post_vertex, DRNLVertex):
                 if isinstance(self.post_vertex, DRNLVertex):
                     # need to map the IDs to the correct DRNL instances
                     spinnakear_vertex = graph_mapper.get_application_vertex(self.post_vertex)

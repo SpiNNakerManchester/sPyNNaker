@@ -93,6 +93,10 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs["ReadBitFieldGeneratorIOBUF"] = \
+            self.config.getboolean("Reports", "read_bif_field_iobuf")
+        extra_mapping_inputs["GenerateBitFieldReport"] = \
+            self.config.getboolean("Reports", "generate_bit_field_report")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
@@ -101,6 +105,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         if extra_load_algorithms is None:
             extra_load_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
+        extra_load_algorithms.append("SpynnakerAtomBasedRoutingDataGenerator")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
