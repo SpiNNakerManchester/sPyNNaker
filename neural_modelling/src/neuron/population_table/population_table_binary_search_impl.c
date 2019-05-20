@@ -1,9 +1,19 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
-//! if using profiler import profiler tags
-#include <profiler.h>
+#include <bit_field.h>
 #include "profile_tags.h"
+#include <profiler.h>
+
+// bits in a word
+#define BITS_PER_WORD 32
+
+// the highest bit within the word
+#define TOP_BIT_IN_WORD 31
+
+// the flag for when a spike isnt in the master pop table (so shouldnt happen)
+#define NOT_IN_MASTER_POP_TABLE_FLAG -1
+
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -20,9 +30,21 @@ static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
 static address_t direct_rows_base_address;
 
+//! \brief the number of times a DMA resulted in 0 entries
+static uint32_t ghost_pop_table_searches = 0;
+
+//! \brief the number of times packet isnt in the master pop table at all!
+static uint32_t invalid_master_pop_hits = 0;
+
+//! \brief the last neuron id for the key
 static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
+
+static uint32_t bitfield_miss_count = 0;
+
+//! \brief pointer for the bitfield map
+bit_field_t* connectivity_bit_field;
 
 static inline uint32_t _get_direct_address(address_and_row_length entry) {
 
@@ -86,6 +108,8 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
+
+    log_debug("master pop base address is %d", &table_address[0]);
 
     master_population_table_length = table_address[0];
     log_debug("master pop table length is %d\n", master_population_table_length);
@@ -153,6 +177,83 @@ bool population_table_initialise(
 
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
+
+    // locate the position in the binary search / array
+    log_debug("searching for key %d", spike);
+    int position = population_table_position_in_the_master_pop_array(spike);
+    log_debug("position = %d", position);
+    if (position==NOT_IN_MASTER_POP_TABLE_FLAG) log_info("spike 08%x not in mpt",spike);
+    bool bitfield_test;
+
+    // check we don't have a complete miss
+    if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
+        master_population_table_entry entry = master_population_table[position];
+        if (entry.count == 0) {
+            log_debug(
+                "spike %u (= %x): population found in master population"
+                "table but count is 0");
+        }
+
+        log_debug("about to try to find neuron id");
+        last_neuron_id = _get_neuron_id(entry, spike);
+        log_debug("found neuron id of %d", last_neuron_id);
+
+        // check we have a entry in the bit field for this (possible not to due
+        // to dtcm limitations or router table compression). If not, go to
+        // DMA check. TODO need to verify that correct process
+        log_debug("checking bit field");
+        if (&connectivity_bit_field[position] != 0){
+            log_debug("can be checked, bitfield isnt not allocated");
+            // check that the bit flagged for this neuron id does hit a
+            // neuron here. If not return false and avoid the DMA check.
+            if (!bit_field_test(
+                    connectivity_bit_field[position],  last_neuron_id)){
+                log_debug("tested and wasnt set");
+//                log_info("tested and wasnt set");
+                bitfield_miss_count++;
+                return false;
+            }
+            log_debug("was set, carrying on");
+        }
+        else{
+            log_debug("wasnt set up. likely lack of dtcm");
+        }
+
+        // going to do a DMA to read the matrix and see if there's a hit.
+        log_debug("about to set items");
+        next_item = entry.start;
+        items_to_go = entry.count;
+
+        log_debug("about to do some other print");
+
+        log_debug(
+            "spike = %08x, entry_index = %u, start = %u, count = %u",
+            spike, position, next_item, items_to_go);
+
+        bool get_next = population_table_get_next_address(
+            row_address, n_bytes_to_transfer);
+
+        // tracks surplus dmas
+        if (!get_next){
+            ghost_pop_table_searches ++;
+        }
+        return get_next;
+    }
+    else{
+        invalid_master_pop_hits ++;
+    }
+
+    log_info("Ghost searches: %u\n", ghost_pop_table_searches);
+    log_debug(
+        "spike %u (= %x): population not found in master population table",
+        spike, spike);
+    return false;
+}
+
+//! \brief get the position in the master pop table
+//! \param[in] spike: The spike received
+//! \return the position in the master pop table
+int population_table_position_in_the_master_pop_array(spike_t spike){
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
@@ -161,25 +262,9 @@ bool population_table_get_first_address(
         int imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
-            if (entry.count == 0) {
-                log_debug(
-                    "spike %u (= %x): population found in master population"
-                    "table but count is 0");
-            }
-
-            last_neuron_id = _get_neuron_id(entry, spike);
-            next_item = entry.start;
-            items_to_go = entry.count;
-
-            log_debug(
-                "spike = %08x, entry_index = %u, start = %u, count = %u",
-                spike, imid, next_item, items_to_go);
-            bool get_next = population_table_get_next_address(
-                row_address, n_bytes_to_transfer);
-//            if(get_next)profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_INCOMING_SPIKE);
-
-            return get_next;
-        } else if (entry.key < spike) {
+            return imid;
+        }
+        else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
             imin = imid + 1;
@@ -189,10 +274,7 @@ bool population_table_get_first_address(
             imax = imid;
         }
     }
-    log_debug(
-        "spike %u (= %x): population not found in master population table",
-        spike, spike);
-    return false;
+    return NOT_IN_MASTER_POP_TABLE_FLAG;
 }
 
 bool population_table_get_next_address(
@@ -245,4 +327,60 @@ bool population_table_get_next_address(
     if(is_valid)profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_INCOMING_SPIKE);
 
     return is_valid;
+}
+
+//! \brief generates how many dma's were pointless
+//! \return uint of how many were done
+uint32_t population_table_get_ghost_pop_table_searches(){
+	return ghost_pop_table_searches;
+}
+
+//! \brief get the number of master pop table key misses
+//! \return the number of master pop table key misses
+uint32_t population_table_get_invalid_master_pop_hits(){
+    return invalid_master_pop_hits;
+}
+
+//! \brief sets the connectivity lookup element
+//! \param[in] connectivity_lookup: the connectivity lookup
+void population_table_set_connectivity_lookup(bit_field_t* connectivity_lookup){
+    connectivity_bit_field = connectivity_lookup;
+}
+
+uint32_t population_table_get_bitfield_miss_count(void){
+    return bitfield_miss_count;
+}
+
+//! \brief clears the dtcm allocated by the population table.
+//! \return bool that says if the clearing was successful or not.
+bool population_table_shut_down(){
+    sark_free(address_list);
+    sark_free(master_population_table);
+    ghost_pop_table_searches = 0;
+    invalid_master_pop_hits = 0;
+    last_neuron_id = 0;
+    next_item = 0;
+    items_to_go = 0;
+    connectivity_bit_field = NULL;
+    return true;
+}
+
+//! \brief length of master pop table
+//! \return length of the master pop table
+uint32_t population_table_length(){
+    return master_population_table_length;
+}
+
+//! \brief gets the spike associated at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the spike
+spike_t population_table_get_spike_for_index(uint32_t index){
+    return master_population_table[index].key;
+}
+
+//! \brief get the mask for the entry at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the mask associated with this entry
+uint32_t population_table_get_mask_for_entry(uint32_t index){
+    return master_population_table[index].mask;
 }

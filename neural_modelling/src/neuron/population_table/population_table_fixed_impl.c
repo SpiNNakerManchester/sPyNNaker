@@ -1,6 +1,7 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <bit_field.h>
 
 #define MASTER_POPULATION_MAX 1152
 #define ROW_SIZE_TABLE_MAX 8
@@ -8,6 +9,9 @@
 static uint16_t master_population_table[MASTER_POPULATION_MAX];
 static address_t synaptic_rows_base_address;
 static uint32_t row_size_table[ROW_SIZE_TABLE_MAX];
+uint32_t ghost_pop_table_searches = 0;
+static uint32_t invalid_master_pop_hits = 0;
+bit_field_t* connectivity_bit_field;
 
 static inline void _print_master_population_table() {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -118,6 +122,12 @@ static inline key_t _key_n(key_t k) {
     return k & 0x7FF;
 }
 
+//! helpful method for converting a index to a key
+static inline key_t _key_from_index(uint32_t index){
+    // TODO SOMEONE WITH BRAINS NEEDS TO SORT THIS
+    rt_error(RTE_ABORT);
+}
+
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
 
@@ -146,6 +156,7 @@ bool population_table_get_first_address(
         log_debug(
             "spike %u (= %x): population not found in master population table",
             spike, spike);
+        ghost_pop_table_searches++;
         return false;
     }
 
@@ -179,4 +190,56 @@ bool population_table_get_next_address(
 
     // We assume there is only one row in this representation
     return false;
+}
+
+//! \brief generates how many dma's were pointless
+//! \return uint of how many were done
+uint32_t population_table_get_ghost_pop_table_searches(){
+	return ghost_pop_table_searches;
+}
+
+//! \brief get the position in the master pop table
+//! \param[in] spike: The spike received
+//! \return the position in the master pop table
+int population_table_position_in_the_master_pop_array(spike_t spike){
+    return _get_table_index(_key_x(spike), _key_y(spike), _key_p(spike));
+}
+
+//! \brief sets the connectivity lookup element
+//! \param[in] connectivity_lookup: the connectivity lookup
+void population_table_set_connectivity_lookup(
+        bit_field_t* connectivity_lookup){
+    connectivity_bit_field = connectivity_lookup;
+}
+
+//! \brief get the number of master pop table key misses
+//! \return the number of master pop table key misses
+uint32_t population_table_get_invalid_master_pop_hits(){
+    return invalid_master_pop_hits;
+}
+
+//! \brief clears the dtcm allocated by the population table.
+//! \return bool that says if the clearing was successful or not.
+bool population_table_shut_down(){
+    return true;
+}
+
+//! \brief length of master pop table
+//! \return length of the master pop table
+uint32_t population_table_length(){
+    return MASTER_POPULATION_MAX;
+}
+
+//! \brief gets the spike associated at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the spike
+spike_t population_table_get_spike_for_index(uint32_t index){
+    return (spike_t) _key_from_index(index);
+}
+
+//! \brief get the mask for the entry at a specific index
+//! \param[in] index: the index in the master pop table
+//! \return the mask associated with this entry
+uint32_t population_table_get_mask_for_entry(uint32_t index){
+    return 0x7FF;
 }
