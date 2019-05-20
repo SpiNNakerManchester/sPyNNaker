@@ -716,12 +716,13 @@ class SynapticManager(object):
         # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
-        n_delay_stages = app_edge.n_delay_stages
+        n_delay_stages = 0
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if max_row_info.delayed_max_n_synapses:
+            n_delay_stages = app_edge.n_delay_stages
             delayed_synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(
                     block_addr)
