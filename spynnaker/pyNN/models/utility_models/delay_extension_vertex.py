@@ -19,7 +19,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -34,7 +34,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 logger = logging.getLogger(__name__)
 
 _DELAY_PARAM_HEADER_WORDS = 8
-_DEFAULT_MALLOCS_USED = 2
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * 4
@@ -190,7 +189,7 @@ class DelayExtensionVertex(
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
-            size=SYSTEM_BYTES_REQUIREMENT,
+            size=SIMULATION_N_BYTES,
             label='setup')
 
         spec.reserve_memory_region(
@@ -311,8 +310,7 @@ class DelayExtensionVertex(
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, out_edges):
-        return (_DEFAULT_MALLOCS_USED * SARK_PER_MALLOC_SDRAM_USAGE +
-                SYSTEM_BYTES_REQUIREMENT +
+        return (SYSTEM_BYTES_REQUIREMENT +
                 DelayExtensionMachineVertex.get_provenance_data_size(0) +
                 self._get_size_of_generator_information(out_edges))
 
