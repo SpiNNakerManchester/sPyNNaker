@@ -10,9 +10,10 @@ from pacman.model.constraints.partitioner_constraints\
 
 import math
 
-
-SYN_CORES_PER_NEURON_CORE = 2
-DEFAULT_MAX_ATOMS_PER_CORE = 32 * SYN_CORES_PER_NEURON_CORE
+#Must be a power of 2!!!
+DEFAULT_MAX_ATOMS_PER_SYN_CORE = 32
+SYN_CORES_PER_NEURON_CORE = 1
+DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
@@ -30,14 +31,14 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
         self._model = model
 
     @classmethod
-    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
+    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_NEURON_CORE):
         super(AbstractPyNNNeuronModel, cls).set_model_max_atoms_per_core(
             n_atoms)
 
     @classmethod
     def get_max_atoms_per_core(cls):
         if cls not in super(AbstractPyNNNeuronModel, cls)._max_atoms_per_core:
-            return DEFAULT_MAX_ATOMS_PER_CORE
+            return DEFAULT_MAX_ATOMS_PER_NEURON_CORE
         return super(AbstractPyNNNeuronModel, cls).get_max_atoms_per_core()
 
 
@@ -65,10 +66,10 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                 else:
                     syn_constraints = constraints
 
-                if n_neurons < max_atoms:
+                if n_neurons < DEFAULT_MAX_ATOMS_PER_SYN_CORE:
                     syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
                 else:
-                    syn_constraints.append(MaxVertexAtomsConstraint(32))
+                    syn_constraints.append(MaxVertexAtomsConstraint(DEFAULT_MAX_ATOMS_PER_SYN_CORE))
             else:
                 if constraints == None:
                     syn_constraints = list()
@@ -89,24 +90,3 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             vertices[i].connected_app_vertices = [vertices[0]]
 
         return vertices
-
-
-
-
-
-
-
-
-
-
-
-
-
-    #n -= 1
-    #n |= n >> 1
-    #n |= n >> 2
-    #n |= n >> 4
-    #n |= n >> 8
-    #n |= n >> 16
-    #n += 1
-    #return n
