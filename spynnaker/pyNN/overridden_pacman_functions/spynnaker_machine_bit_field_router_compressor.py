@@ -28,7 +28,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             machine_time_step, time_scale_factor,
             no_sync_changes, threshold_percentage,
             compress_only_when_needed=True,
-            compress_as_much_as_possible=False):
+            compress_as_much_as_possible=False,  provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
         :param routing_tables: routing tables
@@ -52,7 +52,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
         # build machine compressor
         machine_bit_field_router_compressor = MachineBitFieldRouterCompressor()
-        compressor_executable_targets = machine_bit_field_router_compressor(
+        (compressor_executable_targets, prov_items) = \
+            machine_bit_field_router_compressor(
             routing_tables=routing_tables, transceiver=transceiver,
             machine=machine, app_id=app_id,
             provenance_file_path=provenance_file_path,
@@ -80,6 +81,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         self._rerun_synaptic_cores(
             expander_chip_cores, transceiver, provenance_file_path,
             executable_finder, True, no_sync_changes)
+
+        return prov_items
 
     @staticmethod
     def _locate_synaptic_expander_cores(
