@@ -141,8 +141,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_load_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
-        extra_load_algorithms.append(
-            "SpynnakerMachineBitFieldRouterCompressor")
+        #extra_load_algorithms.append(
+        #    "SpynnakerMachineBitFieldRouterCompressor")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
