@@ -783,13 +783,20 @@ class SynapticManager(
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_idx, app_edge, rinfo))
                     else:
+                        scales = list()
+                        if self._synapse_index == 0:
+                            scales.extend(weight_scales)
+                            scales.append(0)
+                        else:
+                            scales.append(0)
+                            scales.extend(weight_scales)
                         block_addr, single_addr = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
                             pre_slices, pre_slice_idx, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge, self._implemented_synapse_types,
                             single_synapses, master_pop_table_region,
-                            weight_scales, machine_time_step, rinfo,
+                            scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
 
