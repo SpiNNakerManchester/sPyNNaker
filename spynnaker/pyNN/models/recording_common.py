@@ -1,4 +1,8 @@
-from collections import (defaultdict, Iterable)
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
+from collections import Iterable
 import logging
 import numpy
 from six.moves import xrange

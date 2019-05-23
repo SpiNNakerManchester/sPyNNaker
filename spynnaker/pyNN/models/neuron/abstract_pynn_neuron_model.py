@@ -11,7 +11,7 @@ from pacman.model.constraints.partitioner_constraints\
 import math
 
 #Must be a power of 2!!!
-DEFAULT_MAX_ATOMS_PER_SYN_CORE = 32
+DEFAULT_MAX_ATOMS_PER_SYN_CORE = 64
 SYN_CORES_PER_NEURON_CORE = 1
 DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 

@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import math
 import struct
 import sys
@@ -10,11 +13,10 @@ from spinn_utilities.overrides import overrides
 
 from spinn_utilities.helpful_functions import get_valid_components
 
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.model.constraints.placer_constraints\
     import SameChipAsConstraint
 
@@ -110,7 +112,8 @@ class SynapticManager(
         "_machine_vertices",
         "_connected_app_vertices",
         "_model_synapse_types",
-        "_atoms_neuron_cores"]
+        "_atoms_neuron_cores",
+        "_synapse_recorder"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -132,6 +135,9 @@ class SynapticManager(
         self._connected_app_vertices = None
         self._model_synapse_types = model_syn_types
         self._atoms_neuron_cores = max_atoms_per_core
+
+        #FOR RECORDING
+        self._synapse_recorder = None
 
         if self._implemented_synapse_types > 1:
             # Hard coded to ensure it's 0.
@@ -300,41 +306,36 @@ class SynapticManager(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "n_machine_time_steps": "TotalMachineTimeSteps",
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
         ApplicationVertex.get_resources_used_by_atoms,
         additional_arguments={
-            "graph", "n_machine_time_steps", "machine_time_step"
+            "graph", "machine_time_step"
         }
     )
     def get_resources_used_by_atoms(
-            self, vertex_slice, graph, n_machine_time_steps,
-            machine_time_step):
+            self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
+
+        #Region for recording, get it from synapse_recorder
+        variableSDRAM = 0
+
+        constantSDRAM = ConstantSDRAM(self.get_sdram_usage_in_bytes(
+            vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=SDRAMResource(self.get_sdram_usage_in_bytes(
-                vertex_slice, graph, machine_time_step)),
+            sdram=constantSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_in_bytes()),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_n_cpu_cycles(vertex_slice)))
-
-        #TODO: MODIFY FOR RECODING, SEE ABSTRACT_POP_VERTEX!!
-        #recording_sizes = recording_utilities.get_recording_region_sizes(
-        #    self._get_buffered_sdram(vertex_slice, n_machine_time_steps),
-        #    self._minimum_buffer_sdram, self._maximum_sdram_for_buffering,
-        #    self._using_auto_pause_and_resume)
-        #container.extend(recording_utilities.get_recording_resources(
-        #    recording_sizes, self._receive_buffer_host,
-        #    self._receive_buffer_port))
 
         # return the total resources.
         return container
 
     def get_dtcm_usage_in_bytes(self):
+        #Add dtcm region from synapse_recorder for recording
         return _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES
 
     def _get_synapse_params_size(self):
@@ -398,8 +399,7 @@ class SynapticManager(
                     # Get the number of likely vertices
                     max_atoms = sys.maxsize
                     edge_pre_vertex = in_edge.pre_vertex
-                    if (isinstance(
-                            edge_pre_vertex, AbstractHasGlobalMaxAtoms)):
+                    if (isinstance(edge_pre_vertex, ApplicationVertex)):
                         max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
                         max_atoms = in_edge.pre_vertex.n_atoms
@@ -451,6 +451,8 @@ class SynapticManager(
 
     def get_sdram_usage_in_bytes(
             self, vertex_slice, graph, machine_time_step):
+
+        #Add sdram usage from synapse_recorder for recording
 
         in_edges = graph.get_edges_ending_at_vertex(self)
         return (
@@ -891,12 +893,13 @@ class SynapticManager(
         # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
-        n_delay_stages = app_edge.n_delay_stages
+        n_delay_stages = 0
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if max_row_info.delayed_max_n_synapses:
+            n_delay_stages = app_edge.n_delay_stages
             delayed_synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(
                     block_addr)
@@ -1102,20 +1105,19 @@ class SynapticManager(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "tags": "MemoryTags",
-        "n_machine_time_steps": "TotalMachineTimeSteps",
         "placements": "MemoryPlacements",
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "application_graph", "machine_graph", "routing_info", "tags",
-            "n_machine_time_steps", "placements",
+            "application_graph", "machine_graph", "routing_info",
+            "tags", "placements",
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            tags, n_machine_time_steps, placements):
+            tags, placements):
 
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
@@ -1438,31 +1440,24 @@ class SynapticManager(
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self._gen_on_machine.get(key, False)
 
-    #TODO: IMPLEMENT THESE TWO METHODS FOR RECORDING!!
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        return []
-
+    #TODO: IMPLEMENT THIS METHOD FOR RECORDING!!
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         return []
 
-    @inject_items({"n_machine_time_steps": "TotalMachineTimeSteps"})
-    @overrides(
-        ApplicationVertex.create_machine_vertex,
-        additional_arguments={"n_machine_time_steps"})
+
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
-            self, vertex_slice, resources_required, n_machine_time_steps,
-            label=None, constraints=None):
-        # pylint: disable=too-many-arguments, arguments-differ
-        is_recording = False #CHANGE IT FOR RECORDING
-        buffered_sdram_per_timestep = self._get_buffered_sdram_per_timestep(
-            vertex_slice)
-        buffered_sdram = self._get_buffered_sdram(
-            vertex_slice, n_machine_time_steps)
-        minimum_buffer_sdram = []
-        overflow_sdram = 0
+            self, vertex_slice, resources_required, label=None,
+            constraints=None):
+
+        #FOR RECORDING
+        #buffered_sdram = self._get_buffered_sdram(
+        #    vertex_slice, n_machine_time_steps)
+
+        #For recording change [] with self._synapse_recorder.recorded_region_ids
         vertex = SynapseMachineVertex(
-            resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, label, constraints, overflow_sdram)
+            resources_required, [],
+            label, constraints)
 
         self._machine_vertices[(vertex_slice.lo_atom, vertex_slice.hi_atom)] = vertex
         SynapticManager._n_vertices += 1

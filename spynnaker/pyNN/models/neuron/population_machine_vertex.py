@@ -22,10 +22,7 @@ class PopulationMachineVertex(
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData):
     __slots__ = [
-        "_buffered_sdram_per_timestep",
-        "_is_recording",
-        "_minimum_buffer_sdram_usage",
-        "_overflow_sdram",
+        "_recorded_region_ids",
         "_resources",
         "_vertex_index"]
 
@@ -44,27 +41,18 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
-            self, resources_required, is_recording, minimum_buffer_sdram_usage,
-            buffered_sdram_per_timestep, label, constraints=None,
-            overflow_sdram=0):
+            self, resources_required, recorded_region_ids, label, constraints):
         """
         :param resources_required:
-        :param is_recording:
-        :param minimum_buffer_sdram_usage:
-        :param buffered_sdram_per_timestep:
+        :param recorded_region_ids:
         :param label:
         :param constraints:
-        :param overflow_sdram: Extra SDRAM that may be required if\
-            buffered_sdram_per_timestep is an average
         :type sampling: bool
         """
         MachineVertex.__init__(self, label, constraints)
         AbstractRecordable.__init__(self)
-        self._is_recording = is_recording
+        self._recorded_region_ids = recorded_region_ids
         self._resources = resources_required
-        self._minimum_buffer_sdram_usage = minimum_buffer_sdram_usage
-        self._buffered_sdram_per_timestep = buffered_sdram_per_timestep
-        self._overflow_sdram = overflow_sdram
         self._vertex_index = None
 
     @property
@@ -84,7 +72,7 @@ class PopulationMachineVertex(
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
-        return self._is_recording
+        return len(self._recorded_region_ids) > 0
 
     @property
     def vertex_index(self):
@@ -114,20 +102,9 @@ class PopulationMachineVertex(
 
         return provenance_items
 
-    @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)
-    def get_minimum_buffer_sdram_usage(self):
-        return sum(self._minimum_buffer_sdram_usage)
-
-    @overrides(AbstractReceiveBuffersToHost.get_n_timesteps_in_buffer_space)
-    def get_n_timesteps_in_buffer_space(self, buffer_space, machine_time_step):
-        safe_space = buffer_space - self._overflow_sdram
-        return recording_utilities.get_n_timesteps_in_buffer_space(
-            safe_space, self._buffered_sdram_per_timestep)
-
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
-        return recording_utilities.get_recorded_region_ids(
-            self._buffered_sdram_per_timestep)
+        return self._recorded_region_ids
 
     @overrides(AbstractReceiveBuffersToHost.get_recording_region_base_address)
     def get_recording_region_base_address(self, txrx, placement):
