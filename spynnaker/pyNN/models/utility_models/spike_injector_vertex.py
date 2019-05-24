@@ -1,17 +1,13 @@
 import logging
-
 from spinn_utilities.overrides import overrides
-from pacman.model.constraints.key_allocator_constraints \
-    import ContiguousKeyRangeContraint
-
-from spinn_front_end_common.abstract_models \
-    import AbstractProvidesOutgoingPartitionConstraints
+from pacman.model.constraints.key_allocator_constraints import (
+    ContiguousKeyRangeContraint)
+from spinn_front_end_common.abstract_models import (
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-from spynnaker.pyNN.models.common \
-    import AbstractSpikeRecordable, EIEIOSpikeRecorder, \
-    SimplePopulationSettable
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +20,9 @@ class SpikeInjectorVertex(
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
-        "_buffer_size_before_receive",
         "_receive_port",
         "_requires_mapping",
-        "_spike_buffer_max_size",
         "_spike_recorder",
-        "_time_between_requests",
         "_virtual_key"]
 
     default_parameters = {
@@ -39,39 +32,17 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons, label, constraints, port, virtual_key,
-            spike_buffer_max_size, buffer_size_before_receive,
-            time_between_requests, buffer_notification_ip_address,
-            buffer_notification_port):
+            reserve_reverse_ip_tag):
         # pylint: disable=too-many-arguments
-        config = get_simulator().config
-        if buffer_notification_ip_address is None:
-            buffer_notification_ip_address = config.get(
-                "Buffers", "receive_buffer_host")
-        if buffer_notification_port is None:
-            buffer_notification_port = config.get_int(
-                "Buffers", "receive_buffer_port")
 
         super(SpikeInjectorVertex, self).__init__(
             n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True,
-            buffer_notification_ip_address=buffer_notification_ip_address,
-            buffer_notification_port=buffer_notification_port,
+            virtual_key=virtual_key,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints)
 
         # Set up for recording
         self._spike_recorder = EIEIOSpikeRecorder()
-        self._spike_buffer_max_size = spike_buffer_max_size
-        if spike_buffer_max_size is None:
-            self._spike_buffer_max_size = config.getint(
-                "Buffers", "spike_buffer_size")
-        self._buffer_size_before_receive = buffer_size_before_receive
-        if buffer_size_before_receive is None:
-            self._buffer_size_before_receive = config.getint(
-                "Buffers", "buffer_size_before_receive")
-        self._time_between_requests = time_between_requests
-        if time_between_requests is None:
-            self._time_between_requests = config.getint(
-                "Buffers", "time_between_requests")
 
     @property
     def port(self):
@@ -102,9 +73,7 @@ class SpikeInjectorVertex(
         if indexes is not None:
             logger.warning("Indexes currently not supported "
                            "so being ignored")
-        self.enable_recording(
-            self._spike_buffer_max_size, self._buffer_size_before_receive,
-            self._time_between_requests)
+        self.enable_recording(new_state)
         self._requires_mapping = not self._spike_recorder.record
         self._spike_recorder.record = new_state
 

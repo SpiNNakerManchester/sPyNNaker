@@ -1,39 +1,32 @@
-import unittest
-import struct
 import os
+import struct
 import tempfile
-
+import unittest
 import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.overrides import overrides
-
+from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph
-from pacman.model.routing_info import RoutingInfo
-from pacman.model.routing_info import PartitionRoutingInfo
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.routing_info import (
+    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
-
-from data_specification \
-    import DataSpecificationGenerator, DataSpecificationExecutor
-
 from spinn_storage_handlers import FileDataWriter, FileDataReader
-
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from data_specification import (
+    DataSpecificationGenerator, DataSpecificationExecutor)
+from spynnaker.pyNN.models.neuron import SynapticManager
+import spynnaker.pyNN.models.neural_projections.connectors.\
+    abstract_generate_connector_on_machine as \
+    abstract_generate_connector_on_machine
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, ProjectionMachineEdge
-from spynnaker.pyNN.models.neural_projections \
-    import SynapseInformation
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import OneToOneConnector, AllToAllConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic
-
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector, AllToAllConnector)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic)
 from unittests.mocks import MockSimulator
 
 
@@ -185,6 +178,8 @@ class TestSynapticManager(unittest.TestCase):
 
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
+        # Add an sdram so maxsdram is high enough
+        SDRAM(10000)
 
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
@@ -206,24 +201,18 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_1.set_weights_and_delays(
-            [1.5 for _ in range(10)], 1.0)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_2.set_weights_and_delays(
-            [2.5 for _ in range(10)], 2.0)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector.set_weights_and_delays(
-            [4.5 for _ in range(10) for _ in range(10)], 4.0)
         direct_synapse_information_1 = SynapseInformation(
-            one_to_one_connector_1, SynapseDynamicsStatic(), 0)
+            one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(
-            one_to_one_connector_2, SynapseDynamicsStatic(), 1)
+            one_to_one_connector_2, SynapseDynamicsStatic(), 1, 2.5, 2.0)
         all_to_all_synapse_information = SynapseInformation(
-            all_to_all_connector, SynapseDynamicsStatic(), 0)
+            all_to_all_connector, SynapseDynamicsStatic(), 0, 4.5, 4.0)
         app_edge = ProjectionApplicationEdge(
             pre_app_vertex, post_app_vertex, direct_synapse_information_1)
         app_edge.add_synapse_information(direct_synapse_information_2)
@@ -267,6 +256,8 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
+        # UGLY but the mock transceiver NEED generate_on_machine be False
+        abstract_generate_connector_on_machine.IS_PYNN_8 = False
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
