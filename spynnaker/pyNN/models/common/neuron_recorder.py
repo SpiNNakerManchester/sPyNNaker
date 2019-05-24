@@ -6,10 +6,11 @@ except ImportError:
 import logging
 import math
 import numpy
-from six import iteritems, raise_from
+from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
@@ -28,6 +29,8 @@ class NeuronRecorder(object):
     N_CPU_CYCLES_PER_NEURON = 8
     N_BYTES_PER_WORD = 4
     N_BYTES_PER_POINTER = 4
+    SARK_BLOCK_SIZE = 8  # Seen in sark.c
+
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(self, allowed_variables, n_neurons):
@@ -106,10 +109,8 @@ class NeuronRecorder(object):
                 continue
             indexes.extend(neurons)
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, missing_data = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, missing_data = buffer_manager.get_data_by_placement(
                     placement, region)
-            record_raw = neuron_param_region_data_pointer.read_all()
             record_length = len(record_raw)
 
             row_length = self.N_BYTES_FOR_TIMESTAMP + \
@@ -117,9 +118,12 @@ class NeuronRecorder(object):
 
             # There is one column for time and one for each neuron recording
             n_rows = record_length // row_length
-            # Converts bytes to ints and make a matrix
-            record = (numpy.asarray(record_raw, dtype="uint8").
-                      view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            if record_length > 0:
+                # Converts bytes to ints and make a matrix
+                record = (numpy.asarray(record_raw, dtype="uint8").
+                          view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+            else:
+                record = numpy.empty((0, n_neurons))
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
@@ -133,10 +137,13 @@ class NeuronRecorder(object):
                     time = i * sampling_rate
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
-                    if len(local_indexes[0]) > 0:
-                        # Set row to data for that timestep
+                    if len(local_indexes[0]) == 1:
                         fragment[i] = (record[local_indexes[0], 1:] /
                                        float(DataType.S1615.scale))
+                    elif len(local_indexes[0]) > 1:
+                        logger.warning(
+                            "Population {} on multiple recorded data for "
+                            "time {}".format(label, time))
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -146,7 +153,7 @@ class NeuronRecorder(object):
                 # Add the slice fragment on axis 1 which is IDs/channel_index
                 data = numpy.append(data, fragment, axis=1)
         if len(missing_str) > 0:
-            logger.warn(
+            logger.warning(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
         sampling_interval = self.get_neuron_sampling_interval(variable)
@@ -183,16 +190,17 @@ class NeuronRecorder(object):
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
-            neuron_param_region_data_pointer, data_missing = \
-                buffer_manager.get_data_for_vertex(
+            record_raw, data_missing = buffer_manager.get_data_by_placement(
                     placement, region)
             if data_missing:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
-            record_raw = neuron_param_region_data_pointer.read_all()
-            raw_data = (numpy.asarray(record_raw, dtype="uint8").
-                        view(dtype="<i4")).reshape(
-                [-1, n_words_with_timestamp])
+            if len(record_raw) > 0:
+                raw_data = (numpy.asarray(record_raw, dtype="uint8").
+                            view(dtype="<i4")).reshape(
+                    [-1, n_words_with_timestamp])
+            else:
+                raw_data = record_raw
             if len(raw_data) > 0:
                 record_time = raw_data[:, 0] * float(ms_per_tick)
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
@@ -237,9 +245,17 @@ class NeuronRecorder(object):
     @property
     def recording_variables(self):
         results = list()
-        for key in self._sampling_rates:
-            if self.is_recording(key):
-                results.append(key)
+        for region, rate in self._sampling_rates.items():
+            if rate > 0:
+                results.append(region)
+        return results
+
+    @property
+    def recorded_region_ids(self):
+        results = list()
+        for id, rate in enumerate(self._sampling_rates.values()):
+            if rate > 0:
+                results.append(id)
         return results
 
     def _compute_rate(self, sampling_interval):
@@ -440,12 +456,11 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Return the SDRAM used per timestep
+        """ Returns the SDRAM used for this may timesteps
 
-        In the case where sampling is used it returns the average\
-        for recording and none recording based on the recording rate
+        If required the total is rounded up so the space will always fit
 
-        :param variable:
+        :param variable: The
         :param vertex_slice:
         :return:
         """
@@ -462,6 +477,39 @@ class NeuronRecorder(object):
         n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
         n_bytes_for_n_neurons = n_words_for_n_neurons * 4
         return (8 + n_bytes_for_n_neurons) * len(self._sampling_rates)
+
+    def _get_fixed_sdram_usage(self, vertex_slice):
+        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        fixed_sdram = 0
+        # Recording rate for each neuron
+        fixed_sdram += self.N_BYTES_PER_RATE
+        # Number of recording neurons
+        fixed_sdram += self.N_BYTES_PER_INDEX
+        # index_parameters one per neuron
+        # even if not recording as also act as a gate
+        fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
+        return fixed_sdram
+
+    def get_variable_sdram_usage(self, vertex_slice):
+        fixed_sdram = 0
+        per_timestep_sdram = 0
+        for variable in self._sampling_rates:
+            rate = self._sampling_rates[variable]
+            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
+            if rate > 0:
+                fixed_sdram += self.SARK_BLOCK_SIZE
+                per_record = self.get_buffered_sdram_per_record(
+                    variable, vertex_slice)
+                if rate == 1:
+                    # Add size for one record as recording every timestep
+                    per_timestep_sdram += per_record
+                else:
+                    # Get the average cost per timestep
+                    average_per_timestep = per_record / rate
+                    per_timestep_sdram += average_per_timestep
+                    # Add the rest once to fixed for worst case
+                    fixed_sdram += (per_record - average_per_timestep)
+        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes

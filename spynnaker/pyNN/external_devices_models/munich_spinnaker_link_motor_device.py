@@ -7,7 +7,7 @@ from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationVertex)
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
     AbstractProvidesOutgoingPartitionConstraints,
@@ -16,7 +16,8 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.utilities.constants import SYSTEM_BYTES_REQUIREMENT
+from spinn_front_end_common.utilities.constants import (
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 
@@ -88,7 +89,7 @@ class MunichMotorDevice(
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
-            sdram=SDRAMResource(
+            sdram=ConstantSDRAM(
                 SYSTEM_BYTES_REQUIREMENT + self.PARAMS_SIZE),
             dtcm=DTCMResource(0), cpu_cycles=CPUCyclesPerTickResource(0))
 
@@ -166,7 +167,7 @@ class MunichMotorDevice(
 
         # Reserve memory:
         spec.reserve_memory_region(
-            self.SYSTEM_REGION, SYSTEM_BYTES_REQUIREMENT, label='setup')
+            self.SYSTEM_REGION, SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
             self.PARAMS_REGION, self.PARAMS_SIZE, label='params')

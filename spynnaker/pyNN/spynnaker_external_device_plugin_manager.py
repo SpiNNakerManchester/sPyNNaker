@@ -207,7 +207,8 @@ class SpynnakerExternalDevicePluginManager(object):
             poisson_population, control_label_extension="_control",
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
-            database_ack_port_num=None, notify=True):
+            database_ack_port_num=None, notify=True,
+            reserve_reverse_ip_tag=False):
         """ Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
@@ -231,13 +232,17 @@ class SpynnakerExternalDevicePluginManager(object):
         :param database_notify_port_num: The port number to which a external\
             device will receive the database is ready command
         :type database_notify_port_num: int
+        :param reserve_reverse_ip_tag: True if a reverse ip tag is to be\
+            used, False if SDP is to be used (default)
+        :type reserve_reverse_ip_tag: bool
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._get_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
-            receive_port=receive_port, reserve_reverse_ip_tag=True)
+            receive_port=receive_port,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
