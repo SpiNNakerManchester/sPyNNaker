@@ -456,9 +456,9 @@ class SynapticManager(object):
                     spikes_per_second = self._spikes_per_second
                     if isinstance(app_edge.pre_vertex,
                                   SpikeSourcePoissonVertex):
-                        rate = app_edge.pre_vertex.rate
+                        rate = app_edge.pre_vertex.max_rate
                         # If non-zero rate then use it; otherwise keep default
-                        if (sum(rate) != 0):
+                        if (rate != 0):
                             spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = max(spikes_per_second)
