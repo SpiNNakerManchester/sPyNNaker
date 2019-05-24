@@ -60,9 +60,9 @@ class GeneratorData(object):
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
                     connector.gen_weight_params_size_in_bytes(
-                        self._synapse_information.weight),
+                        self.__synapse_information.weight),
                     connector.gen_delay_params_size_in_bytes(
-                        self._synapse_information.delay)))
+                        self.__synapse_information.delay)))
 
     @property
     def gen_data(self):
@@ -88,8 +88,8 @@ class GeneratorData(object):
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
-            connector.gen_weights_id(self._synapse_information.weight),
-            connector.gen_delays_id(self._synapse_information.delay)],
+            connector.gen_weights_id(self.__synapse_information.weight),
+            connector.gen_delays_id(self.__synapse_information.delay)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(

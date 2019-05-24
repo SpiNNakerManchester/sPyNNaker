@@ -59,7 +59,7 @@ class PushBotEthernetDevice(with_metaclass(
     @overrides(AbstractMulticastControllableDevice
                .device_control_send_type)
     def device_control_send_type(self):
-        return self._device.send_type
+        return self.__device.send_type
 
     @property
     def protocol(self):

@@ -67,8 +67,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             n_pre_atoms = sum([pre.n_atoms for pre in pre_slices])
             n_post_atoms = sum([post.n_atoms for post in post_slices])
             n_connections = n_pre_atoms * n_post_atoms
-            if (not self._with_replacement and
-                    n_connections < self._num_synapses):
+            if (not self.__with_replacement and
+                    n_connections < self.__num_synapses):
                 raise SpynnakerException(
                     "FixedNumberTotalConnector will not work correctly when "
                     "with_replacement=False & num_synapses > n_pre * n_post")

@@ -165,7 +165,7 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        variableSDRAM = self._neuron_recorder.get_variable_sdram_usage(
+        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
@@ -214,9 +214,9 @@ class AbstractPopulationVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
-        self._n_subvertices += 1
+        self.__n_subvertices += 1
         return PopulationMachineVertex(
-            resources_required, self._neuron_recorder.recorded_region_ids,
+            resources_required, self.__neuron_recorder.recorded_region_ids,
             label, constraints)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
@@ -315,9 +315,9 @@ class AbstractPopulationVertex(
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self._n_subvertices)) *
-            self._n_data_specs)
-        self._n_data_specs += 1
+            int(math.ceil(max_offset / self.__n_subvertices)) *
+            self.__n_data_specs)
+        self.__n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (

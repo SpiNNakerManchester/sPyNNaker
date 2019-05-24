@@ -510,8 +510,8 @@ class NeuronRecorder(object):
     def get_variable_sdram_usage(self, vertex_slice):
         fixed_sdram = 0
         per_timestep_sdram = 0
-        for variable in self._sampling_rates:
-            rate = self._sampling_rates[variable]
+        for variable in self.__sampling_rates:
+            rate = self.__sampling_rates[variable]
             fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
             if rate > 0:
                 fixed_sdram += self.SARK_BLOCK_SIZE
