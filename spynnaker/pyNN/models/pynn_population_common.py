@@ -21,14 +21,14 @@ logger = FormatAdapter(logging.getLogger(__file__))
 
 class PyNNPopulationCommon(object):
     __slots__ = [
-        "__all_ids",
+        "_all_ids",
         "__change_requires_mapping",
         "__delay_vertex",
         "__first_id",
         "__has_read_neuron_parameters_this_run",
         "__label",
         "__last_id",
-        "__positions",
+        "_positions",
         "__record_gsyn_file",
         "__record_spike_file",
         "__record_v_file",
@@ -108,7 +108,7 @@ class PyNNPopulationCommon(object):
         # structure should be a valid Space.py structure type.
         # generation of positions is deferred until needed.
         self.__structure = structure
-        self.__positions = None
+        self._positions = None
 
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
@@ -125,11 +125,11 @@ class PyNNPopulationCommon(object):
         self.__has_read_neuron_parameters_this_run = False
 
         # things for pynn demands
-        self.__all_ids = numpy.arange(
+        self._all_ids = numpy.arange(
             globals_variables.get_simulator().id_counter,
             globals_variables.get_simulator().id_counter + size)
-        self.__first_id = self.__all_ids[0]
-        self.__last_id = self.__all_ids[-1]
+        self.__first_id = self._all_ids[0]
+        self.__last_id = self._all_ids[-1]
 
         # update the simulators id_counter for giving a unique ID for every
         # atom
@@ -455,13 +455,13 @@ class PyNNPopulationCommon(object):
     def positions(self):
         """ Return the position array for structured populations.
         """
-        if self.__positions is None:
+        if self._positions is None:
             if self.__structure is None:
                 raise ValueError("attempted to retrieve positions "
                                  "for an unstructured population")
-            self.__positions = self.__structure.generate_positions(
+            self._positions = self.__structure.generate_positions(
                 self.__vertex.n_atoms)
-        return self.__positions
+        return self._positions
 
     @property
     def structure(self):

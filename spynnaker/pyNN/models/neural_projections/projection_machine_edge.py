@@ -44,7 +44,7 @@ class ProjectionMachineEdge(
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
 
-        return (n_filtered == len(self._synapse_information))
+        return (n_filtered == len(self.__synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
