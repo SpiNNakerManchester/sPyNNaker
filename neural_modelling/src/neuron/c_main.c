@@ -49,11 +49,10 @@ typedef enum extra_provenance_data_region_entries{
     PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
 	GHOST_POP_TABLE_SEARCHES = 5,
 	FAILED_TO_READ_BIT_FIELDS = 6,
-	EMPTY_ROW_READS = 7,
-	DMA_COMPLETES = 8,
-	SPIKE_PROGRESSING_COUNT = 9,
-	INVALID_MASTER_POP_HITS = 10,
-	BIT_FIELD_FILTERED_COUNT = 11
+	DMA_COMPLETES = 7,
+	SPIKE_PROGRESSING_COUNT = 8,
+	INVALID_MASTER_POP_HITS = 9,
+	BIT_FIELD_FILTERED_COUNT = 10
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -127,7 +126,6 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[GHOST_POP_TABLE_SEARCHES] =
     	spike_processing_get_ghost_pop_table_searches();
     provenance_region[FAILED_TO_READ_BIT_FIELDS] = failed_bit_field_reads;
-    provenance_region[EMPTY_ROW_READS] = synapses_get_empty_row_count();
     provenance_region[DMA_COMPLETES] =
         spike_processing_get_dma_complete_count();
     provenance_region[SPIKE_PROGRESSING_COUNT] =

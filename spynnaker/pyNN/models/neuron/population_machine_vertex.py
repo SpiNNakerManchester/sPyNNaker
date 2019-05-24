@@ -19,6 +19,7 @@ class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData):
+
     __slots__ = [
         "_recorded_region_ids",
         "_resources"]
@@ -33,11 +34,10 @@ class PopulationMachineVertex(
                ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4),
                ("GHOST_POP_TABLE_SEARCHES", 5),
                ("FAILED_TO_READ_BIT_FIELDS", 6),
-               ("EMPTY_ROW_READS", 7),
-               ("DMA_COMPLETES", 8),
-               ("SPIKE_PROGRESSING_COUNT", 9),
-               ("INVALID_MASTER_POP_HITS", 10),
-               ("BIT_FIELD_FILTERED_COUNT", 11)])
+               ("DMA_COMPLETES", 7),
+               ("SPIKE_PROGRESSING_COUNT", 8),
+               ("INVALID_MASTER_POP_HITS", 9),
+               ("BIT_FIELD_FILTERED_COUNT", 10)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -48,6 +48,20 @@ class PopulationMachineVertex(
 
     # x words needed for a bitfield covering 256 atoms
     WORDS_TO_COVER_256_ATOMS = 8
+
+    # provenance data items
+    BIT_FIELD_FILTERED_PACKETS = \
+        "How many packets were filtered by the bitfield filterer."
+    INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
+    SPIKES_PROCESSED = "how many spikes were processed"
+    DMA_COMPLETE = "DMA's that were completed"
+    BIT_FIELDS_NOT_READ = "N bit fields not able to be read into DTCM"
+    GHOST_SEARCHES = "Number of failed pop table searches"
+    PLASTIC_WEIGHT_SATURATION = "Times_plastic_synaptic_weights_have_saturated"
+    LAST_TIMER_TICK = "Last_timer_tic_the_core_ran_to"
+    TOTAL_PRE_SYNAPTIC_EVENTS = "Total_pre_synaptic_events"
+    LOST_INPUT_BUFFER_PACKETS = "Times_the_input_buffer_lost_packets"
+    WEIGHT_SATURATION = "Times_synaptic_weights_have_saturated"
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -113,8 +127,6 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.GHOST_POP_TABLE_SEARCHES.value]
         failed_to_read_bit_fields = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.FAILED_TO_READ_BIT_FIELDS.value]
-        empty_row_reads = provenance_data[
-            self.EXTRA_PROVENANCE_DATA_ENTRIES.EMPTY_ROW_READS.value]
         dma_completes = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.DMA_COMPLETES.value]
         spike_processing_count = provenance_data[
@@ -128,7 +140,7 @@ class PopulationMachineVertex(
 
         # translate into provenance data items
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_synaptic_weights_have_saturated"),
+            self._add_name(names, self.WEIGHT_SATURATION),
             n_saturations,
             report=n_saturations > 0,
             message=(
@@ -138,9 +150,8 @@ class PopulationMachineVertex(
                 "values located within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_saturations))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_the_input_buffer_lost_packets"),
-            n_buffer_overflows,
-            report=n_buffer_overflows > 0,
+            self._add_name(names, self.LOST_INPUT_BUFFER_PACKETS),
+            n_buffer_overflows, report=n_buffer_overflows > 0,
             message=(
                 "The input buffer for {} on {}, {}, {} lost packets on {} "
                 "occasions. This is often a sign that the system is running "
@@ -149,14 +160,12 @@ class PopulationMachineVertex(
                 "number of neurons per core.".format(
                     label, x, y, p, n_buffer_overflows))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Total_pre_synaptic_events"),
+            self._add_name(names, self.TOTAL_PRE_SYNAPTIC_EVENTS),
             n_pre_synaptic_events))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Last_timer_tic_the_core_ran_to"),
-            last_timer_tick))
+            self._add_name(names, self.LAST_TIMER_TICK), last_timer_tick))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names,
-                           "Times_plastic_synaptic_weights_have_saturated"),
+            self._add_name(names, self.PLASTIC_WEIGHT_SATURATION),
             n_plastic_saturations,
             report=n_plastic_saturations > 0,
             message=(
@@ -166,8 +175,7 @@ class PopulationMachineVertex(
                 "within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_plastic_saturations))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number of failed pop table searches"),
-            n_ghost_searches,
+            self._add_name(names, self.GHOST_SEARCHES), n_ghost_searches,
             report=n_ghost_searches > 0,
             message=(
                 "The number of failed population table searches for {} on {},"
@@ -176,8 +184,7 @@ class PopulationMachineVertex(
                 "target neurons per core".format(
                     label, x, y, p, n_ghost_searches))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names,
-                           "N bit fields not able to be read into DTCM"),
+            self._add_name(names, self.BIT_FIELDS_NOT_READ),
             failed_to_read_bit_fields, report=failed_to_read_bit_fields > 0,
             message=(
                 "The filter for stopping redundant DMA's couldn't be fully "
@@ -189,20 +196,12 @@ class PopulationMachineVertex(
                     failed_to_read_bit_fields *
                     self.WORDS_TO_COVER_256_ATOMS))))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "N rows read that were empty"),
-            empty_row_reads, report=empty_row_reads > 0,
-            message=(
-                "During DMA reads for synaptic matrix, read {} rows which were"
-                " empty. This meant surplus DMA's which would have slowed down"
-                " the running of the neurons. Try increasing source and target"
-                " neurons per core".format(empty_row_reads))))
+            self._add_name(names, self.DMA_COMPLETE), dma_completes))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "DMA's that were completed"), dma_completes))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "how many spikes were processed"),
+            self._add_name(names, self.SPIKES_PROCESSED),
             spike_processing_count))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Invalid Master Pop hits"),
+            self._add_name(names, self.INVALID_MASTER_POP_HITS),
             invalid_master_pop_hits, report=invalid_master_pop_hits > 0,
             message=(
                 "There were {} keys which were received by core {}:{}:{} which"
@@ -210,9 +209,7 @@ class PopulationMachineVertex(
                 "likely strives from bad routing.".format(
                     invalid_master_pop_hits, x, y, p))))
         provenance_items.append((ProvenanceDataItem(
-            self._add_name(
-                names,
-                "How many packets were filtered by the bitfield filterer."),
+            self._add_name(names, self.BIT_FIELD_FILTERED_PACKETS),
             n_packets_filtered_by_bit_field_filter,
             report=(
                 n_packets_filtered_by_bit_field_filter > 0 and (

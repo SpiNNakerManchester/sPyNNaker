@@ -129,6 +129,9 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             self.config.getboolean("Reports", "read_bif_field_iobuf")
         extra_mapping_inputs["GenerateBitFieldReport"] = \
             self.config.getboolean("Reports", "generate_bit_field_report")
+        extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
+            self.config.getboolean(
+                "Reports", "generate_bit_field_summary_report")
         extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
             self.config.getboolean(
                 "Reports", "read_router_compressor_with_bitfield_iobuf")
@@ -139,6 +142,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        if extra_post_run_algorithms is None:
+            extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
         #extra_load_algorithms.append(
@@ -158,6 +163,11 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
+
+        if self.config.getboolean("Reports", "reports_enabled"):
+            if self.config.getboolean(
+                    "Reports", "write_redundant_packet_count_report"):
+                extra_post_run_algorithms.append("RedundantPacketCountReport")
 
         self.update_extra_mapping_inputs(extra_mapping_inputs)
         self.extend_extra_mapping_algorithms(extra_mapping_algorithms)

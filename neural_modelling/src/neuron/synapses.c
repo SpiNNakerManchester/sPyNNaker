@@ -37,10 +37,6 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
-//! the number of rows the DMA read which were empty.
-static uint32_t empty_row_count = 0;
-
-
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -151,12 +147,6 @@ static inline void _process_fixed_synapses(
         fixed_region_address);
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
         fixed_region_address);
-
-    // increment counter of rows that were empty (provenance data)
-    if (fixed_synapse==0){
-        log_debug("empty row found");
-        empty_row_count++;
-    }
 
     num_fixed_pre_synaptic_events += fixed_synapse;
 
@@ -469,12 +459,6 @@ bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
    // Increment FF
     fixed_region[0] = fixed_region[0] + 1;
     return true;
-}
-
-//! \brief returns the number of DMA retrieved rows which were empty.
-//! \return the number of DMA retrieved rows which were empty.
-uint32_t synapses_get_empty_row_count(void){
-    return empty_row_count;
 }
 
 //! \brief allows clearing of dtcm used by synapses
