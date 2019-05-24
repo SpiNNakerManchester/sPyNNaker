@@ -1,7 +1,7 @@
-from .abstract_neuron_impl import AbstractNeuronImpl
-from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
-from spinn_utilities.overrides import overrides
 import numpy
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
+from .abstract_neuron_impl import AbstractNeuronImpl
 
 
 class NeuronImplStandard(AbstractNeuronImpl):

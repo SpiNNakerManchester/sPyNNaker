@@ -1,9 +1,12 @@
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod,\
-    abstractproperty
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import sys
+from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 from spynnaker.pyNN.models.defaults import get_dict_from_init
 
 

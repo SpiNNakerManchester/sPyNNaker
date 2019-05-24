@@ -1,13 +1,9 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
-
-# front end common imports
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-
-# general imports
-from enum import Enum
 
 
 class DelayExtensionMachineVertex(

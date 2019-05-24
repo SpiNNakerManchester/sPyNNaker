@@ -1,9 +1,9 @@
+import logging
+import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs
-import numpy
-import logging
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 
 logger = logging.getLogger(__file__)
 
@@ -28,11 +28,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         super(AllToAllConnector, self).__init__(safe, verbose)
         self.__allow_self_connections = allow_self_connections
 
-    @overrides(AbstractConnector.set_weights_and_delays)
-    def set_weights_and_delays(self, weights, delays):
-        self._set_weights_and_delays(
-            weights, delays, allow_lists=True)
-
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections.
         """
@@ -50,20 +45,20 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                 n_post_neurons)]
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         return self._get_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons)
+            delays, self._n_pre_neurons * self._n_post_neurons)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
 
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons,
+            delays, self._n_pre_neurons * self._n_post_neurons,
             post_vertex_slice.n_atoms, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -71,14 +66,14 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         return self._n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
         n_connections = self._n_pre_neurons * self._n_post_neurons
-        return self._get_weight_maximum(n_connections)
+        return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
@@ -109,9 +104,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                 post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1),
                 pre_vertex_slice.n_atoms)
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, connection_slices)
+            weights, n_connections, connection_slices)
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, connection_slices)
+            delays, n_connections, connection_slices)
         block["synapse_type"] = synapse_type
         return block
 

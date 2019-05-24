@@ -1,23 +1,18 @@
-from pacman.model.constraints.partitioner_constraints \
-    import SameAtomsAsVertexConstraint
+import logging
+import math
+from spinn_utilities.progress_bar import ProgressBar
+from pacman.model.constraints.partitioner_constraints import (
+    SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
-
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractAcceptsIncomingSynapses
-from spynnaker.pyNN.models.neural_projections \
-    import DelayedApplicationEdge, SynapseInformation
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, DelayAfferentApplicationEdge
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractAcceptsIncomingSynapses)
+from spynnaker.pyNN.models.neural_projections import (
+    DelayedApplicationEdge, SynapseInformation,
+    ProjectionApplicationEdge, DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-
-from spinn_utilities.progress_bar import ProgressBar
-
-import logging
-import math
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
@@ -76,15 +71,19 @@ class PyNNProjectionCommon(object):
         post_synaptic_population._get_vertex.set_synapse_dynamics(
             synapse_dynamics_stdp)
 
-        # Set and store information for future processing
+        # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
-            connector, synapse_dynamics_stdp, synapse_type)
+            connector, synapse_dynamics_stdp, synapse_type,
+            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
+
+        # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
             machine_time_step)
 
         # handle max delay
-        max_delay = synapse_dynamics_stdp.get_delay_maximum(connector)
+        max_delay = synapse_dynamics_stdp.get_delay_maximum(
+            connector, self._synapse_information.delay)
         if max_delay is None:
             max_delay = user_max_delay
 
@@ -317,7 +316,7 @@ class PyNNProjectionCommon(object):
                 receiver = helpful_functions.locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
-                    extra_monitor_cores_to_ethernet_connection_map=receivers)
+                    packet_gather_cores_to_ethernet_connection_map=receivers)
                 sender_extra_monitor_core = extra_monitor_placements[
                     placement.x, placement.y]
                 sender_monitor_place = ctl.placements.get_placement_of_vertex(

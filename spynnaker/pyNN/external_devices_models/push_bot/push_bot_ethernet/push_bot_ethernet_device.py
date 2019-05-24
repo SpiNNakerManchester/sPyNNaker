@@ -1,10 +1,8 @@
-from spynnaker.pyNN.external_devices_models \
-    import AbstractMulticastControllableDevice
-
 from six import with_metaclass
-
 from spinn_utilities.overrides import overrides
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spynnaker.pyNN.external_devices_models import (
+    AbstractMulticastControllableDevice)
 
 
 class PushBotEthernetDevice(with_metaclass(
@@ -56,6 +54,12 @@ class PushBotEthernetDevice(with_metaclass(
                .device_control_timesteps_between_sending)
     def device_control_timesteps_between_sending(self):
         return self.__time_between_send
+
+    @property
+    @overrides(AbstractMulticastControllableDevice
+               .device_control_send_type)
+    def device_control_send_type(self):
+        return self._device.send_type
 
     @property
     def protocol(self):

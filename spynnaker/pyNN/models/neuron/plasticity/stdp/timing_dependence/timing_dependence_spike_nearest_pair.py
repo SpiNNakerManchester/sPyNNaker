@@ -1,11 +1,10 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
-    import plasticity_helpers
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure \
-    import SynapseStructureWeightOnly
-from .abstract_timing_dependence import AbstractTimingDependence
-
 import logging
+from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    plasticity_helpers)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightOnly)
+from .abstract_timing_dependence import AbstractTimingDependence
 
 logger = logging.getLogger(__name__)
 

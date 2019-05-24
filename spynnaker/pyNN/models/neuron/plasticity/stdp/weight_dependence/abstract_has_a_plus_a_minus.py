@@ -1,5 +1,4 @@
 from six import with_metaclass
-
 from spinn_utilities.abstract_base import AbstractBase
 
 

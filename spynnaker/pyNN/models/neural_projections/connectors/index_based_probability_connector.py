@@ -1,18 +1,17 @@
+import logging
+import math
+import numpy
+from numpy import (
+    arccos, arcsin, arctan, arctan2, ceil, cos, cosh, exp, fabs, floor, fmod,
+    hypot, ldexp, log, log10, modf, power, sin, sinh, sqrt, tan, tanh, maximum,
+    minimum, e, pi)
 from spinn_utilities.overrides import overrides
+from spinn_utilities.safe_eval import SafeEval
 from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
-from spinn_utilities.safe_eval import SafeEval
-import logging
-import numpy
-import math
-
-# support for arbitrary expression for the indices
-from numpy import arccos, arcsin, arctan, arctan2, ceil, cos
-from numpy import cosh, exp, fabs, floor, fmod, hypot, ldexp
-from numpy import log, log10, modf, power, sin, sinh, sqrt
-from numpy import tan, tanh, maximum, minimum, e, pi
 
 logger = logging.getLogger(__name__)
+# support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
                                ldexp, log, log10, modf, power, sin, sinh, sqrt,
@@ -59,17 +58,17 @@ class IndexBasedProbabilityConnector(AbstractConnector):
                 (self._n_pre_neurons, self._n_post_neurons))
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self):
+    def get_delay_maximum(self, delays):
         self._update_probs_from_index_expression()
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
             self._n_pre_neurons * self._n_post_neurons,
             numpy.amax(self.__probs))
-        return self._get_delay_maximum(n_connections)
+        return self._get_delay_maximum(delays, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
         self._update_probs_from_index_expression()
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
@@ -79,8 +78,8 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            self._n_pre_neurons * self._n_post_neurons, n_connections,
-            min_delay, max_delay)
+            delays, self._n_pre_neurons * self._n_post_neurons,
+            n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
@@ -90,17 +89,17 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self._n_pre_neurons, numpy.amax(self.__probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self):
+    def get_weight_maximum(self, weights):
         self._update_probs_from_index_expression()
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
             self._n_pre_neurons * self._n_post_neurons,
             numpy.amax(self.__probs))
-        return self._get_weight_maximum(n_connections)
+        return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
+            self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
 
@@ -129,9 +128,9 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            self._weights, n_connections, None)
+            weights, n_connections, None)
         block["delay"] = self._generate_delays(
-            self._delays, n_connections, None)
+            delays, n_connections, None)
         block["synapse_type"] = synapse_type
         return block
 

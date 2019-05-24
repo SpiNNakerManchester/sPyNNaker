@@ -1,4 +1,3 @@
-
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
         and synapse dynamics
@@ -7,13 +6,18 @@ class SynapseInformation(object):
         "__connector",
         "__index",
         "__synapse_dynamics",
-        "__synapse_type"]
+        "__synapse_type",
+        "__weight",
+        "__delay"]
 
-    def __init__(self, connector, synapse_dynamics, synapse_type):
+    def __init__(self, connector, synapse_dynamics, synapse_type,
+                 weight=None, delay=None):
         self.__connector = connector
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__index = 0
+        self.__weight = weight
+        self.__delay = delay
 
     @property
     def connector(self):
@@ -34,3 +38,11 @@ class SynapseInformation(object):
     @index.setter
     def index(self, index):
         self.__index = index
+
+    @property
+    def weight(self):
+        return self.__weight
+
+    @property
+    def delay(self):
+        return self.__delay

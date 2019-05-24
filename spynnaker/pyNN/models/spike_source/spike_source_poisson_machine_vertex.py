@@ -1,23 +1,18 @@
+from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.abstract_models \
-    import AbstractSupportsDatabaseInjection
-from spinn_front_end_common.utilities.helpful_functions \
-    import locate_memory_region_for_placement
 from pacman.model.graphs.machine import MachineVertex
-from spinn_front_end_common.abstract_models import AbstractRecordable
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
-from spinn_front_end_common.interface.buffer_management.buffer_models \
-    import AbstractReceiveBuffersToHost
-from spinn_front_end_common.interface.buffer_management \
-    import recording_utilities
-
-from spynnaker.pyNN.utilities.constants \
-    import LIVE_POISSON_CONTROL_PARTITION_ID
-
-from enum import Enum
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsDatabaseInjection, AbstractRecordable)
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.interface.buffer_management.buffer_models import (
+    AbstractReceiveBuffersToHost)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID)
 
 
 class SpikeSourcePoissonMachineVertex(
@@ -38,15 +33,13 @@ class SpikeSourcePoissonMachineVertex(
                ('PROVENANCE_REGION', 3)])
 
     def __init__(
-            self, resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, constraints=None, label=None):
+            self, resources_required, is_recording, constraints=None,
+            label=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
             label, constraints=constraints)
         self.__is_recording = is_recording
         self.__resources = resources_required
-        self.__minimum_buffer_sdram = minimum_buffer_sdram
-        self.__buffered_sdram_per_timestep = buffered_sdram_per_timestep
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -67,15 +60,6 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
         return self.__is_recording
-
-    @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)
-    def get_minimum_buffer_sdram_usage(self):
-        return self.__minimum_buffer_sdram
-
-    @overrides(AbstractReceiveBuffersToHost.get_n_timesteps_in_buffer_space)
-    def get_n_timesteps_in_buffer_space(self, buffer_space, machine_time_step):
-        return recording_utilities.get_n_timesteps_in_buffer_space(
-            buffer_space, [self.__buffered_sdram_per_timestep])
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):

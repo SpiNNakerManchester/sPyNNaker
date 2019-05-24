@@ -1,7 +1,7 @@
-from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
-from spynnaker.pyNN.external_devices_models.push_bot \
-    import AbstractPushBotOutputDevice
 from data_specification.enums import DataType
+from spynnaker.pyNN.protocols import MunichIoSpiNNakerLinkProtocol
+from spynnaker.pyNN.external_devices_models.push_bot import (
+    AbstractPushBotOutputDevice)
 
 
 class PushBotLED(AbstractPushBotOutputDevice):

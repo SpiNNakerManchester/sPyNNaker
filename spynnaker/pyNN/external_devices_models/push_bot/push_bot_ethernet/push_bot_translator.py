@@ -1,10 +1,10 @@
+import logging
+from time import sleep
 from spinn_utilities.overrides import overrides
 from spinn_utilities.log import FormatAdapter
-from time import sleep
-import logging
 from spynnaker.pyNN.external_devices_models import AbstractEthernetTranslator
-from spynnaker.pyNN.protocols import MunichIoEthernetProtocol
-from spynnaker.pyNN.protocols import munich_io_spinnaker_link_protocol
+from spynnaker.pyNN.protocols import (
+    MunichIoEthernetProtocol, munich_io_spinnaker_link_protocol)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 

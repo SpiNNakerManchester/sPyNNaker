@@ -1,9 +1,9 @@
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.synapse_dynamics import \
-    AbstractSynapseDynamicsStructural
-from spynnaker.pyNN.models.neuron.synapse_dynamics. \
-    synapse_dynamics_structural_common import \
-    SynapseDynamicsStructuralCommon as CommonSP
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
+from .synapse_dynamics_structural_common import (
+    SynapseDynamicsStructuralCommon as
+    CommonSP)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 
 

@@ -1,18 +1,16 @@
 import math
 import numpy
-
-from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_generate_on_machine import AbstractGenerateOnMachine, \
-    MatrixGeneratorID
+from .abstract_generate_on_machine import (
+    AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-
 # When not using the MAD scheme, how many pre-synaptic events are buffered
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
@@ -314,21 +312,21 @@ class SynapseDynamicsSTDP(
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
-    def get_weight_mean(self, connector):
+    def get_weight_mean(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
         return self.__weight_dependence.weight_maximum
 
-    def get_weight_variance(self, connector):
+    def get_weight_variance(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
-    def get_weight_maximum(self, connector):
+    def get_weight_maximum(self, connector, weights):
         # pylint: disable=too-many-arguments
 
         # The maximum weight is the largest that it could be set to from

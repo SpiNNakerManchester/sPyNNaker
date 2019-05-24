@@ -1,11 +1,9 @@
-from spinn_front_end_common.utility_models import MultiCastCommand
-
-from spinnman.connections.udp_packet_connections import EIEIOConnection
-from spinnman.messages.eieio.data_messages \
-    import EIEIODataMessage, KeyDataElement, KeyPayloadDataElement
-
 import logging
 from threading import Thread
+from spinn_front_end_common.utility_models import MultiCastCommand
+from spinnman.connections.udp_packet_connections import EIEIOConnection
+from spinnman.messages.eieio.data_messages import (
+    EIEIODataMessage, KeyDataElement, KeyPayloadDataElement)
 
 logger = logging.getLogger(__name__)
 
