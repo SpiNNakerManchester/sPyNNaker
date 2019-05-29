@@ -29,6 +29,7 @@ from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
@@ -332,6 +333,9 @@ class AbstractPopulationVertex(
                 n_atoms_per_machine_vertex = int(math.ceil(
                     float(incoming_edge.pre_vertex.n_atoms) /
                     n_machine_vertices))
+                if isinstance(edge_pre_vertex, DelayExtensionVertex):
+                    n_atoms_per_machine_vertex *= \
+                        edge_pre_vertex.n_delay_stages
                 n_words_for_atoms = int(math.ceil(
                     n_atoms_per_machine_vertex / self.BIT_IN_A_WORD))
                 sdram += (
@@ -341,23 +345,23 @@ class AbstractPopulationVertex(
         return sdram
 
     def _exact_sdram_for_bit_field_region(
-            self, machine_graph, graph_mapper, vertex):
+            self, machine_graph, vertex, n_key_map):
         """ calculates the correct sdram for the bitfield region based off \
             the machine graph and graph mapper
 
         :param machine_graph: machine graph
-        :param graph_mapper: graph mapping between app and machine graphs.\
-                             Used to locate atom slices.
         :param vertex: the machine vertex
+        :param n_key_map: n keys map
         :return: sdram in bytes
         """
         sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
                  WORD_TO_BYTE_MULTIPLIER)
         for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-            atoms_of_source_vertex = \
-                graph_mapper.get_slice(incoming_edge.pre_vertex).n_atoms
+
+            n_keys = n_key_map.n_keys_for_partition(
+                machine_graph.get_outgoing_partition_for_edge(incoming_edge))
             n_words_for_atoms = int(math.ceil(
-                atoms_of_source_vertex / self.BIT_IN_A_WORD))
+                n_keys / self.BIT_IN_A_WORD))
 
             sdram += (
                 (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
@@ -372,14 +376,14 @@ class AbstractPopulationVertex(
             extra_mallocs)
 
     def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
+            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
         """ reserves the dsg memory regions
 
         :param spec: the data spec object
         :param vertex_slice: this vertex atom slice
         :param vertex: this vertex
         :param machine_graph: machine graph
-        :param graph_mapper: the graph mapper
+        :param n_key_map: nkey map
         :rtype: None
         """
 
@@ -406,7 +410,7 @@ class AbstractPopulationVertex(
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
             size=self._exact_sdram_for_bit_field_region(
-                machine_graph, graph_mapper, vertex),
+                machine_graph, vertex, n_key_map),
             label="bit_field region")
 
         vertex.reserve_provenance_data_region(spec)
@@ -528,19 +532,20 @@ class AbstractPopulationVertex(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "placements": "MemoryPlacements"
+        "placements": "MemoryPlacements",
+        "n_key_map": "MemoryMachinePartitionNKeysMap"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "placements"
+            "data_n_time_steps", "placements", "n_key_map"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps, placements):
+            data_n_time_steps, placements, n_key_map):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -550,7 +555,7 @@ class AbstractPopulationVertex(
 
         # Reserve memory regions
         self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, graph_mapper)
+            spec, vertex_slice, vertex, machine_graph, n_key_map)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -593,14 +598,15 @@ class AbstractPopulationVertex(
 
         # write up the bitfield builder data
         self._write_bitfield_init_data(
-            spec, vertex, machine_graph, routing_info, graph_mapper)
+            spec, vertex, machine_graph, routing_info, graph_mapper,
+            n_key_map)
 
         # End the writing of this specification:
         spec.end_specification()
 
     def _write_bitfield_init_data(
             self, spec, machine_vertex, machine_graph, routing_info,
-            graph_mapper):
+            graph_mapper, n_key_map):
         """ writes the init data needed for the bitfield generator
 
         :param spec: data spec writer
@@ -608,6 +614,7 @@ class AbstractPopulationVertex(
         :param machine_graph: machine graph
         :param routing_info: keys
         :param graph_mapper: mapping between graphs
+        :param n_key_map: map for edge to n keys
         :rtype: None
         """
         # deduce sdram for the truer setup
@@ -630,10 +637,12 @@ class AbstractPopulationVertex(
         # load in key to max atoms map
         for in_coming_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
-            spec.write_value(routing_info.get_first_key_from_partition(
-                machine_graph.get_outgoing_partition_for_edge(in_coming_edge)))
+            out_going_partition = \
+                machine_graph.get_outgoing_partition_for_edge(in_coming_edge)
             spec.write_value(
-                graph_mapper.get_slice(in_coming_edge.pre_vertex).n_atoms)
+                routing_info.get_first_key_from_partition(out_going_partition))
+            spec.write_value(
+                n_key_map.n_keys_for_partition(out_going_partition))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

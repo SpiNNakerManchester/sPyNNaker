@@ -32,9 +32,6 @@ filter_region_t* bit_field_base_address;
 // direct matrix base address
 address_t direct_matrix_region_base_address;
 
-// bitfield builder data base address
-address_t bit_field_builder_base_address;
-
 // used to store the dtcm based master pop entries. (used during pop table
 // init, and reading back synaptic rows).
 address_t direct_synapses_address;
@@ -74,7 +71,7 @@ void read_in_addresses(){
         data_specification_get_region(BIT_FIELD_FILTER_REGION, core_address);
     direct_matrix_region_base_address = data_specification_get_region(
         DIRECT_MATRIX_REGION, core_address);
-    bit_field_builder_base_address = data_specification_get_region(
+    keys_to_max_atoms = (key_atom_data_t*) data_specification_get_region(
         BIT_FIELD_BUILDER, core_address);
 
     // printer
@@ -84,15 +81,11 @@ void read_in_addresses(){
     log_debug("bit_field_base_address = %0x", bit_field_base_address);
     log_debug("direct_matrix_region_base_address = %0x",
               direct_matrix_region_base_address);
-    log_debug("bit_field_builder = %0x", bit_field_builder_base_address);
     log_info("finished reading in vertex data region addresses");
 }
 
 
-void _read_in_the_key_to_max_atom_map(){
-
-    // malloc the dtcm
-    keys_to_max_atoms = (key_atom_data_t*) bit_field_builder_base_address;
+void _print_key_to_max_atom_map(){
 
     log_info("n items is %d", keys_to_max_atoms->n_pairs);
 
@@ -107,22 +100,6 @@ void _read_in_the_key_to_max_atom_map(){
             keys_to_max_atoms->pairs[key_to_max_atom_index].key,
             keys_to_max_atoms->pairs[key_to_max_atom_index].n_atoms);
     }
-
-    // put map into dtcm
-    uint32_t pointer = 1;
-    for (uint32_t key_to_max_atom_index = 0;
-            key_to_max_atom_index < bit_field_builder_base_address[0];
-            key_to_max_atom_index++){
-
-        // print
-        log_info("entry %d has key %x and n_atoms of %d",
-            key_to_max_atom_index,
-            bit_field_builder_base_address[pointer],
-            bit_field_builder_base_address[pointer + 1]);
-        pointer += 2;
-    }
-
-    log_info("finished reading in key to max atom map");
 }
 
 
@@ -131,6 +108,7 @@ void _read_in_the_key_to_max_atom_map(){
 //! \return the number of neurons from the key map based off this key
 uint32_t _n_neurons_from_key(uint32_t key){
     int key_index = 0;
+    log_info("n pairs is %d", keys_to_max_atoms->n_pairs);
     while (key_index < keys_to_max_atoms->n_pairs){
         key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
         if (entry.key == key){
@@ -138,8 +116,16 @@ uint32_t _n_neurons_from_key(uint32_t key){
         }
         key_index ++;
     }
-    log_error("didnt find the key %d in the map. WTF!", key);
-    rt_error(RTE_ABORT);
+
+    log_error("did not find the key %x in the map. WTF!", key);
+    log_error("n pairs is %d", keys_to_max_atoms->n_pairs);
+    for (int pair_id = 0; pair_id < keys_to_max_atoms->n_pairs; pair_id++){
+        key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
+        log_error(
+            "key at index %d is %x and equal = %d",
+            pair_id, entry.key, entry.key == key);
+    }
+    rt_error(RTE_SWERR);
     return NULL;
 }
 
@@ -162,13 +148,13 @@ bool _create_fake_bit_field(){
         // determine n_neurons
         uint32_t key = population_table_get_spike_for_index(master_pop_entry);
         uint32_t n_neurons = _n_neurons_from_key(key);
-        log_info("entry %d, key = %0x, n_neurons = %d",
+        log_debug("entry %d, key = %0x, n_neurons = %d",
                   master_pop_entry, key, n_neurons);
 
         // generate the bitfield for this master pop entry
         uint32_t n_words = get_bit_field_size(n_neurons);
 
-        log_info("n neurons is %d. n words is %d", n_neurons, n_words);
+        log_debug("n neurons is %d. n words is %d", n_neurons, n_words);
         fake_bit_fields[master_pop_entry] = bit_field_alloc(n_neurons);
         if (fake_bit_fields[master_pop_entry] == NULL){
             log_error("could not allocate %d bytes of dtcm for bit field",
@@ -229,7 +215,7 @@ bool initialise(){
              population_table_length(), row_max_n_words);
 
     // read in the correct key to max atom map
-    _read_in_the_key_to_max_atom_map();
+    _print_key_to_max_atom_map();
 
     // set up a fake bitfield so that it always says there's something to read
     if (!_create_fake_bit_field()){
@@ -342,7 +328,7 @@ bool generate_bit_field(){
             "putting master pop key %d in entry %d",
             key, master_pop_entry);
         bit_field_base_address->filters[master_pop_entry].n_words = n_words;
-        log_info("putting n words %d in entry %d", n_words, master_pop_entry);
+        log_debug("putting n words %d in entry %d", n_words, master_pop_entry);
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("searching neuron ids");
@@ -377,10 +363,7 @@ bool generate_bit_field(){
                 }
             }
             else{
-                log_error("should never get here!!! As this would imply a "
-                          "master pop entry which has no master pop entry. "
-                          "if this is true for all atoms. Would indicate a "
-                          "prunable edge");
+                // atom has no entry.....
             }
             // if returned false, then the bitfield should be set to 0.
             // Which its by default already set to. so do nothing. so no else.

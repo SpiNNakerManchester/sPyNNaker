@@ -12,7 +12,7 @@ class RedundantPacketCountReport(object):
 
     _FILE_NAME = "redundant_packet_count.rpt"
 
-    def __init__(self, provenance_items, report_default_directory):
+    def __call__(self, provenance_items, report_default_directory):
         file_name = os.path.join(report_default_directory, self._FILE_NAME)
 
         try:

@@ -178,7 +178,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
         connectivity_bit_field[position_in_array] = spin1_malloc(
             sizeof(bit_field_t) * n_words);
         if (connectivity_bit_field[position_in_array] == NULL){
-            log_warning(
+            log_debug(
                 "could not initialise bit field for key %d, packets with"
                 " that key will use a DMA to check if the packet targets "
                 "anything within this core. Potentially slowing down the "

@@ -468,6 +468,5 @@ bool synapses_shut_down(){
     sark_free(ring_buffers);
     num_fixed_pre_synaptic_events = 0;
     saturation_count = 0;
-    empty_row_count = 0;
     return true;
 }
