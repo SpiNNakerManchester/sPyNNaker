@@ -51,7 +51,7 @@ class SmallWorldConnector(AbstractConnector):
         else:
             d = distances
 
-        self.__mask = (d < self.__degree).as_type(float)
+        self.__mask = (d < self.__degree).astype(float)
 
         self.__n_connections = numpy.sum(self.__mask)
 
