@@ -50,7 +50,7 @@ PARAMS_WORDS_PER_NEURON = 6
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH
+SLOW_RATE_PER_TICK_CUTOFF = 0.00001  # as suggested by MH
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -376,9 +376,6 @@ class SpikeSourcePoissonVertex(
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (accum)
-#         spec.write_value(
-#             data=MICROSECONDS_PER_SECOND / float(machine_time_step),
-#             data_type=DataType.S1615)
         spec.write_value(
             data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
