@@ -50,7 +50,7 @@ PARAMS_WORDS_PER_NEURON = 6
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 1.0
+SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -134,7 +134,7 @@ class SpikeSourcePoissonVertex(
     def _max_spikes_per_ts(self, machine_time_step):
 
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
-        if float(self._max_rate) / ts_per_second <= \
+        if float(self._max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
@@ -376,9 +376,11 @@ class SpikeSourcePoissonVertex(
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (accum)
+#         spec.write_value(
+#             data=MICROSECONDS_PER_SECOND / float(machine_time_step),
+#             data_type=DataType.S1615)
         spec.write_value(
-            data=MICROSECONDS_PER_SECOND / float(machine_time_step),
-            data_type=DataType.S1615)
+            data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -424,7 +426,7 @@ class SpikeSourcePoissonVertex(
             rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
         # Determine which sources are fast and which are slow
-        is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
+        is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
 
         # Compute the e^-(spikes_per_tick) for fast sources to allow fast
         # computation of the Poisson distribution to get the number of spikes
@@ -434,15 +436,15 @@ class SpikeSourcePoissonVertex(
             -1.0 * spikes_per_tick[is_fast_source])
         # Compute the inter-spike-interval for slow sources to get the average
         # number of timesteps between spikes
-        isi_val = numpy.zeros(len(spikes_per_tick), dtype="float")
+        isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
         elements = numpy.logical_not(is_fast_source) & (spikes_per_tick > 0)
-        isi_val[elements] = 1.0 / spikes_per_tick[elements]
+        isi_val[elements] = (1.0 / spikes_per_tick[elements]).astype(int)
 
         # Get the time to spike value
-        time_to_spike = self._time_to_spike[vertex_slice.as_slice]
+        time_to_spike = self._time_to_spike[vertex_slice.as_slice].astype(int)
         changed_rates = (
             self._rate_change[vertex_slice.as_slice].astype("bool") & elements)
-        time_to_spike[changed_rates] = 0.0
+        time_to_spike[changed_rates] = 0
 
         # Merge the arrays as parameters per atom
         data = numpy.dstack((
@@ -450,8 +452,8 @@ class SpikeSourcePoissonVertex(
             end_scaled.astype("uint32"),
             is_fast_source.astype("uint32"),
             (exp_minus_lambda * (2 ** 32)).astype("uint32"),
-            (isi_val * (2 ** 15)).astype("uint32"),
-            (time_to_spike * (2 ** 15)).astype("uint32")
+            (isi_val).astype("uint32"),
+            (time_to_spike).astype("uint32")
         ))[0]
 
         spec.write_array(data)

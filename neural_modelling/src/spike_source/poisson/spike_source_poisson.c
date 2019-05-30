@@ -28,8 +28,8 @@ typedef struct spike_source_t {
     bool is_fast_source;
 
     UFRACT exp_minus_lambda;
-    REAL mean_isi_ticks;
-    REAL time_to_spike_ticks;
+    uint32_t mean_isi_ticks;
+    uint32_t time_to_spike_ticks;
 } spike_source_t;
 
 //! \brief data structure for recording spikes
@@ -75,7 +75,8 @@ struct global_parameters {
     UFRACT seconds_per_tick;
 
     //! The number of ticks per second for setting the rate
-    REAL ticks_per_second;
+//    REAL ticks_per_second;
+    uint32_t ticks_per_second;
 
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
@@ -130,14 +131,14 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
-//! \brief ??????????????
-//! \param[in] n ?????????????????
-//! \return bit field of the ???????????????
+//! \brief Set specific spikes for recording
+//! \param[in] n is the spike array index
+//! \return bit field at the location n
 static inline bit_field_t _out_spikes(uint32_t n) {
     return &(spikes->out_spikes[n * n_spike_buffer_words]);
 }
 
-//! \brief ??????????????
+//! \brief Reset the spike buffer by clearing the bit field
 //! \return None
 static inline void _reset_spikes() {
     spikes->n_buffers = 0;
@@ -152,11 +153,13 @@ static inline void _reset_spikes() {
 //!            before a spike is expected to occur in a slow process.
 //! \return a real which represents time in timer ticks until the next spike is
 //!         to occur
-static inline REAL slow_spike_source_get_time_to_spike(
-        REAL mean_inter_spike_interval_in_ticks) {
-    return exponential_dist_variate(
-            mars_kiss64_seed, global_parameters.spike_source_seed)
-        * mean_inter_spike_interval_in_ticks;
+static inline uint32_t slow_spike_source_get_time_to_spike(
+	    uint32_t mean_inter_spike_interval_in_ticks) {
+	// some rounding needs to happen here, perhaps
+	uint32_t exp_variate = (uint32_t) (exponential_dist_variate(
+            mars_kiss64_seed, global_parameters.spike_source_seed) *
+			mean_inter_spike_interval_in_ticks);
+    return exp_variate;
 }
 
 //! \brief Determines how many spikes to transmit this timer tick.
@@ -185,9 +188,9 @@ void print_spike_sources(){
         log_info(
             "exp_minus_lamda = %k",
             (REAL)(poisson_parameters[s].exp_minus_lambda));
-        log_info("isi_val = %k", poisson_parameters[s].mean_isi_ticks);
+        log_info("isi_val = %u", poisson_parameters[s].mean_isi_ticks);
         log_info(
-            "time_to_spike = %k", poisson_parameters[s].time_to_spike_ticks);
+            "time_to_spike = %u", poisson_parameters[s].time_to_spike_ticks);
     }
 }
 
@@ -221,7 +224,7 @@ bool read_global_parameters(address_t address) {
     log_info(
         "seconds_per_tick = %k\n",
         (REAL)(global_parameters.seconds_per_tick));
-    log_info("ticks_per_second = %k\n", global_parameters.ticks_per_second);
+    log_info("ticks_per_second = %u\n", global_parameters.ticks_per_second);
     log_info(
         "slow_rate_per_tick_cutoff = %k\n",
         global_parameters.slow_rate_per_tick_cutoff);
@@ -545,7 +548,7 @@ void timer_callback(uint timer_count, uint unused) {
                     _mark_spike(s, num_spikes);
 
                     // if no key has been given, do not send spike to fabric.
-                    if (global_parameters.has_key){
+                    if (global_parameters.has_key) {
 
                         // Send spikes
                         const uint32_t spike_key = global_parameters.key | s;
@@ -563,9 +566,7 @@ void timer_callback(uint timer_count, uint unused) {
                     && (spike_source->mean_isi_ticks != 0)) {
 
                 // If this spike source should spike now
-                if (REAL_COMPARE(
-                        spike_source->time_to_spike_ticks, <=,
-                        REAL_CONST(0.0))) {
+                if (spike_source->time_to_spike_ticks == 0) {
 
                     // Write spike to out spikes
                     _mark_spike(s, 1);
@@ -584,8 +585,7 @@ void timer_callback(uint timer_count, uint unused) {
                 }
 
                 // Subtract tick
-                spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
-
+                spike_source->time_to_spike_ticks -= 1;
             }
         }
     }
@@ -607,14 +607,14 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        if (rate > global_parameters.slow_rate_per_tick_cutoff) {
+        if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
             poisson_parameters[sub_id].exp_minus_lambda =
                 (UFRACT) EXP(-rate_per_tick);
         } else {
             poisson_parameters[sub_id].is_fast_source = false;
             poisson_parameters[sub_id].mean_isi_ticks =
-                rate * global_parameters.ticks_per_second;
+                (uint32_t) rate * global_parameters.ticks_per_second;
         }
     }
 }
