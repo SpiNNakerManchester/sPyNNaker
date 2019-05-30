@@ -1,12 +1,6 @@
 from pacman.model.decorators.overrides import overrides
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-
-from pacman.model.constraints.partitioner_constraints\
-    import SameAtomsAsVertexConstraint
-from pacman.model.constraints.partitioner_constraints\
-    import MaxVertexAtomsConstraint
+from spynnaker.pyNN.models.neuron.pynn_partition_vertex import PyNNPartitionVertex
 
 import math
 
@@ -29,6 +23,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     def __init__(self, model):
         self._model = model
+        self._pynn_partition_vertices = list()
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_NEURON_CORE):
@@ -41,7 +36,6 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
             return DEFAULT_MAX_ATOMS_PER_NEURON_CORE
         return super(AbstractPyNNNeuronModel, cls).get_max_atoms_per_core()
 
-
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
@@ -50,43 +44,14 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         max_atoms = self.get_max_atoms_per_core()
 
-        vertices = list()
+        for i in range(2):
+            self._pynn_partition_vertices.append(PyNNPartitionVertex(i, n_neurons/2, label, constraints, max_atoms,
+                                                                     spikes_per_second, ring_buffer_sigma, self._model,
+                                                                     self, incoming_spike_buffer_size))
 
-        vertices.append(AbstractPopulationVertex(
-            n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, self._model, self))
+        return self._pynn_partition_vertices
 
+    def add_internal_edges_and_vertices(self, spinnaker_control):
 
-        for index in range(vertices[0].get_n_synapse_types()):
-
-            if self._model.get_n_synapse_types() > 1 and index == 0:
-                # Set the constraint for the number of excitatory synapse cores
-                if constraints == None:
-                    syn_constraints = list()
-                else:
-                    syn_constraints = constraints
-
-                if n_neurons < DEFAULT_MAX_ATOMS_PER_SYN_CORE:
-                    syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
-                else:
-                    syn_constraints.append(MaxVertexAtomsConstraint(DEFAULT_MAX_ATOMS_PER_SYN_CORE))
-            else:
-                if constraints == None:
-                    syn_constraints = list()
-                else:
-                    syn_constraints = constraints
-
-                syn_constraints.append(SameAtomsAsVertexConstraint(vertices[0]))
-
-            vertices.append(SynapticManager(1, index, n_neurons, syn_constraints,
-                                            label+"_syn_vertex_"+str(index), max_atoms,
-                                            self._model.get_global_weight_scale(),
-                                            ring_buffer_sigma, spikes_per_second,
-                                            incoming_spike_buffer_size,
-                                            self._model.get_n_synapse_types()))
-
-        vertices[0].connected_app_vertices = vertices[1:]
-        for i in range(1, len(vertices)):
-            vertices[i].connected_app_vertices = [vertices[0]]
-
-        return vertices
+        for i in range(2):
+            self._pynn_partition_vertices[i].add_internal_edges_and_vertices(spinnaker_control)

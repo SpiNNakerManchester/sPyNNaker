@@ -7,8 +7,6 @@ from pacman.model.constraints.partitioner_constraints\
     import MaxVertexAtomsConstraint
 from pacman.model.graphs.application.application_vertex \
     import ApplicationVertex
-from pacman.model.graphs.application.application_edge \
-    import ApplicationEdge
 
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models \
@@ -16,6 +14,7 @@ from spynnaker.pyNN.models.abstract_models \
 from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
 from .abstract_pynn_model import AbstractPyNNModel
+from .neuron.pynn_partition_vertex import PyNNPartitionVertex
 
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -84,14 +83,11 @@ class PyNNPopulationCommon(object):
                 self._vertex = list()
                 self._vertex.append(vertex)
 
-            self._spinnaker_control.add_application_vertex(self._vertex[0])
-
-            for index in range(1, len(self._vertex)):
-                self._spinnaker_control.add_application_vertex(self._vertex[index])
-                self._spinnaker_control.add_application_edge(ApplicationEdge(
-                    self._vertex[index], self._vertex[0],
-                    label="internal_edge {}".format(self._spinnaker_control.none_labelled_edge_count)), constants.SPIKE_PARTITION_ID)
-                self._spinnaker_control.increment_none_labelled_edge_count()
+            for v in self._vertex:
+                if isinstance(v, PyNNPartitionVertex):
+                    v.add_internal_edges_and_vertices(self._spinnaker_control)
+                else:
+                    self._spinnaker_control.add_application_vertex(v)
 
 
         # Use a provided application vertex directly
