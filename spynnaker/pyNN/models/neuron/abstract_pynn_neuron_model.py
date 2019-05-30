@@ -50,8 +50,3 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                                                                      self, incoming_spike_buffer_size))
 
         return self._pynn_partition_vertices
-
-    def add_internal_edges_and_vertices(self, spinnaker_control):
-
-        for i in range(2):
-            self._pynn_partition_vertices[i].add_internal_edges_and_vertices(spinnaker_control)

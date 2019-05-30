@@ -1,11 +1,15 @@
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neuron import SynapticManager
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractPopulationInitializable, AbstractPopulationSettable,
+    AbstractReadParametersBeforeSet, AbstractContainsUnits)
+from spynnaker.pyNN.utilities import constants
+
+from spinn_front_end_common.abstract_models import \
+    AbstractChangableAfterRun
 
 from pacman.model.constraints.partitioner_constraints\
     import SameAtomsAsVertexConstraint
-
-from spynnaker.pyNN.utilities import constants
-
 from pacman.model.graphs.application.application_edge \
     import ApplicationEdge
 
@@ -15,17 +19,21 @@ SYN_CORES_PER_NEURON_CORE = 1
 DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_PER_NEURON_CORE
 
 
-class PyNNPartitionVertex():
+class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
+                          AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
+                          AbstractContainsUnits):
 
     __slots__ = [
         "_partition_index",
         "_neuron_vertex",
-        "_synapse_vertices"]
+        "_synapse_vertices",
+        "_n_atoms"]
 
     def __init__(self, partition_index, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size):
 
         self._partition_index = partition_index
+        self._n_atoms = n_neurons
 
         self._neuron_vertex = AbstractPopulationVertex(
             n_neurons, label + "_" + str(self._partition_index) + "_neuron_vertex",
@@ -97,6 +105,10 @@ class PyNNPartitionVertex():
     @property
     def partition_index(self):
         return self._partition_index
+
+    @property
+    def n_atoms(self):
+        return self._n_atoms
 
     def add_internal_edges_and_vertices(self, spinnaker_control):
 
