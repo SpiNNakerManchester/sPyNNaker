@@ -463,7 +463,7 @@ class SynapticManager(object):
                         if (rate != 0):
                             spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = max(spikes_per_second)
+                            spikes_per_second = numpy.max(spikes_per_second)
                         elif get_simulator().is_a_pynn_random(
                                 spikes_per_second):
                             spikes_per_second = get_maximum_probable_value(
