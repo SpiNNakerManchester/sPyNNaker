@@ -622,11 +622,10 @@ class SynapticManager(object):
                     block_addr, single_addr = self.__write_matrix(
                         m_edges, graph_mapper, synapse_info, pre_slices,
                         post_slices, post_slice_index, post_vertex_slice,
-                        app_edge, weight_scales, machine_time_step,
-                        app_key, app_mask, n_keys, d_app_key, d_app_mask,
-                        d_n_keys, block_addr, single_addr, spec,
-                        master_pop_table_region, all_syn_block_sz,
-                        routing_info)
+                        app_edge, weight_scales, machine_time_step, app_key,
+                        app_mask, n_keys, d_app_key, d_app_mask, d_n_keys,
+                        block_addr, single_addr, spec, master_pop_table_region,
+                        all_syn_block_sz, single_synapses, routing_info)
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
@@ -745,7 +744,7 @@ class SynapticManager(object):
             all_syn_block_sz, n_ranges):
         # Write a matrix for the whole application vertex with padding in the
         # appropriate places to make the keys work
-        next_block_addr = self._write_pop_table_padding(block_addr)
+        next_block_addr = self._write_pop_table_padding(spec, block_addr)
         self._poptable_type.update_master_population_table(
             spec, next_block_addr, max_words,
             BaseKeyAndMask(app_key, app_mask), master_pop_table_region)
@@ -785,7 +784,7 @@ class SynapticManager(object):
             single_synapses.append(single_rows)
             single_addr = single_addr + len(single_rows) * 4
         else:
-            block_addr = self._write_pop_table_padding(block_addr)
+            block_addr = self._write_pop_table_padding(spec, block_addr)
             self._poptable_type.update_master_population_table(
                 spec, block_addr, max_words,
                 r_info.first_key_and_mask, master_pop_table_region)
@@ -798,7 +797,7 @@ class SynapticManager(object):
         return block_addr, single_addr
 
     @staticmethod
-    def __count_trailing_0s(self, mask):
+    def __count_trailing_0s(mask):
         # Count zeros at the LSB of a number
         # NOTE assumes a 32-bit number
         for i in range(32):
@@ -831,23 +830,24 @@ class SynapticManager(object):
         mask = None
         keys = list()
 
-        # Can be merged only of all the masks are the same and nothing is
-        # "direct matrix compatible"
+        # Can be merged only of all the masks are the same
         for m_edge in m_edges:
             rinfo = routing_info.get_routing_info_for_edge(m_edge)
+            if rinfo is None:
+                return None, None, None
             if mask is not None and rinfo.first_mask != mask:
-                return None, None, None, None
+                return None, None, None
             mask = rinfo.first_mask
             keys.append(rinfo.first_key)
 
         if mask is None:
-            return None, None, None, None
+            return None, None, None
 
         # Can be merged only if keys are adjacent outside the mask
         keys = sorted(keys)
         mask_size = self.__count_trailing_0s(mask)
         if not self.__check_keys_adjacent(keys, mask, mask_size):
-            return None, None, None, None
+            return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
         return app_key, app_mask, 2 ** mask_size
@@ -864,8 +864,10 @@ class SynapticManager(object):
             delay_info_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                               pre_vertex_slice.hi_atom)
             rinfo = self._delay_key_index.get(delay_info_key, None)
+            if rinfo is None:
+                return None, None, None
             if mask is not None and rinfo.first_mask != mask:
-                return None, None, None, None
+                return None, None, None
             mask = rinfo.first_mask
             keys.append(rinfo.first_key)
 
@@ -873,7 +875,7 @@ class SynapticManager(object):
         keys = sorted(keys)
         mask_size = self.__count_trailing_0s(mask)
         if not self.__check_keys_adjacent(keys, mask, mask_size):
-            return None, None, None, None
+            return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
         return app_key, app_mask, 2 ** mask_size
@@ -1028,11 +1030,10 @@ class SynapticManager(object):
             max_row_info):
         (row_data, delayed_row_data, delayed_source_ids,
          delay_stages) = self._synapse_io.get_synapses(
-             synapse_info, pre_slices, pre_slice_idx, post_slices,
-             post_slice_index, pre_vertex_slice, post_vertex_slice,
-             app_edge.n_delay_stages, self._poptable_type, n_synapse_types,
-             weight_scales, machine_time_step, max_row_info,
-             app_edge=app_edge, machine_edge=machine_edge)
+            synapse_info, pre_slices, pre_slice_idx, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            app_edge.n_delay_stages, n_synapse_types, weight_scales,
+            machine_time_step, app_edge, machine_edge, max_row_info)
 
         if app_edge.delay_edge is not None:
             app_edge.delay_edge.pre_vertex.add_delays(
@@ -1084,8 +1085,7 @@ class SynapticManager(object):
             self._poptable_type.update_master_population_table(
                 spec, single_addr, 1, rinfo.first_key_and_mask,
                 master_pop_table_region, is_single=True)
-        block_addr = self._write_pop_table_padding(
-            spec, synaptic_matrix_region, block_addr)
+        block_addr = self._write_pop_table_padding(spec, block_addr)
         spec.switch_write_focus(synaptic_matrix_region)
         spec.write_array(row_data)
         next_block_addr = block_addr + len(row_data) * 4

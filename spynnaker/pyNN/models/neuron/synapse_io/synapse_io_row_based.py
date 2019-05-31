@@ -224,7 +224,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
                 synapse_info.synapse_dynamics, app_edge, machine_edge,
-                max_row_info.undelayed_max_n_synapses)
+                max_row_info.undelayed_max_n_synapses,
+                max_row_info.undelayed_max_words)
 
             del undelayed_row_indices
         del undelayed_connections
@@ -252,7 +253,8 @@ class SynapseIORowBased(AbstractSynapseIO):
                 delayed_connections, delayed_row_indices,
                 pre_vertex_slice.n_atoms * n_delay_stages, post_vertex_slice,
                 n_synapse_types, synapse_info.synapse_dynamics, app_edge,
-                machine_edge, max_row_info.delayed_max_n_synapses)
+                machine_edge, max_row_info.delayed_max_n_synapses,
+                max_row_info.delayed_max_words)
             del delayed_row_indices
         del delayed_connections
 

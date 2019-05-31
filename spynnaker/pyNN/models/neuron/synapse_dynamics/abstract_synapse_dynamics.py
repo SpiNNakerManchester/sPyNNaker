@@ -94,7 +94,7 @@ class AbstractSynapseDynamics(object):
             row-based data to be returned from get_synaptic_data
         """
         return [
-            data[connection_row_indices == i].reshape(-1)[:max_n_synapses]
+            data[connection_row_indices == i][:max_n_synapses].reshape(-1)
             for i in range(n_rows)]
 
     def get_n_items(self, rows, item_size):
