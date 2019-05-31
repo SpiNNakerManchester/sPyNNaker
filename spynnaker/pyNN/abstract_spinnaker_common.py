@@ -146,8 +146,6 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
-        #extra_load_algorithms.append(
-        #    "SpynnakerMachineBitFieldRouterCompressor")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
@@ -345,7 +343,7 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator()
+        globals_variables.unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.

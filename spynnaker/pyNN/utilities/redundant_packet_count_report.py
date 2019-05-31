@@ -81,4 +81,3 @@ class RedundantPacketCountReport(object):
                                 PopulationMachineVertex.
                                 INVALID_MASTER_POP_HITS],
                             (100.0 / total) * redundant))
-

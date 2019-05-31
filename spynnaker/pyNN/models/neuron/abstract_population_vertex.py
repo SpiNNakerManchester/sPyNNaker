@@ -1,10 +1,9 @@
 import logging
 import os
 import math
-import sys
 
-from pacman.utilities.algorithm_utilities.partition_algorithm_utilities import \
-    determine_max_atoms_for_vertex
+from pacman.utilities.algorithm_utilities.\
+    partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
