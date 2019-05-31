@@ -24,21 +24,21 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                           AbstractContainsUnits):
 
     __slots__ = [
-        "_partition_index",
-        "_neuron_vertex",
+        "_neuron_vertices",
         "_synapse_vertices",
         "_n_atoms"]
 
-    def __init__(self, partition_index, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
+    def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size):
 
-        self._partition_index = partition_index
         self._n_atoms = n_neurons
 
-        self._neuron_vertex = AbstractPopulationVertex(
+        self._neuron_vertices = list()
+
+        self._neuron_vertices.append(AbstractPopulationVertex(
             n_neurons, label + "_" + str(self._partition_index) + "_neuron_vertex",
             constraints, max_atoms_neuron_core, spikes_per_second,
-            ring_buffer_sigma, neuron_model, pynn_model)
+            ring_buffer_sigma, neuron_model, pynn_model))
 
         self._synapse_vertices = list()
 
@@ -49,9 +49,9 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             syn_constraints = constraints
 
-        syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertex))
+        syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertices))
 
-        n_syn_types = self._neuron_vertex.get_n_synapse_types()
+        n_syn_types = self._neuron_vertices.get_n_synapse_types()
 
         for index in range(n_syn_types):
 
@@ -63,7 +63,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                          ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                          neuron_model.get_n_synapse_types())
 
-                vertex.connected_app_vertices = [self._neuron_vertex]
+                vertex.connected_app_vertices = [self._neuron_vertices]
                 self._synapse_vertices.append(vertex)
 
                 vertex = SynapticManager(1, 0, n_neurons, syn_constraints,
@@ -72,7 +72,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                          ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                          neuron_model.get_n_synapse_types())
 
-                vertex.connected_app_vertices = [self._neuron_vertex]
+                vertex.connected_app_vertices = [self._neuron_vertices]
                 self._synapse_vertices.append(vertex)
             else:
 
@@ -82,29 +82,25 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                                          ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                          neuron_model.get_n_synapse_types())
 
-                vertex.connected_app_vertices = [self._neuron_vertex]
+                vertex.connected_app_vertices = [self._neuron_vertices]
                 self._synapse_vertices.append(vertex)
 
-        self._neuron_vertex.connected_app_vertices = self._synapse_vertices
+        self._neuron_vertices.connected_app_vertices = self._synapse_vertices
 
     def get_application_vertices(self):
 
-        vertices = [self._neuron_vertex]
+        vertices = [self._neuron_vertices]
         vertices.extend(self._synapse_vertices)
 
         return vertices
 
     @property
     def neuron_vertex(self):
-        return self._neuron_vertex
+        return self._neuron_vertices
 
     @property
     def synapse_vertices(self):
         return self._synapse_vertices
-
-    @property
-    def partition_index(self):
-        return self._partition_index
 
     @property
     def n_atoms(self):
@@ -112,13 +108,13 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     def add_internal_edges_and_vertices(self, spinnaker_control):
 
-        spinnaker_control.add_application_vertex(self._neuron_vertex)
+        spinnaker_control.add_application_vertex(self._neuron_vertices)
 
         for index in range(len(self._synapse_vertices)):
 
             spinnaker_control.add_application_vertex(self._synapse_vertices[index])
             spinnaker_control.add_application_edge(ApplicationEdge(
-                self._synapse_vertices[index], self._neuron_vertex,
+                self._synapse_vertices[index], self._neuron_vertices,
                 label="internal_edge {}".format(spinnaker_control.none_labelled_edge_count)),
                 constants.SPIKE_PARTITION_ID)
             spinnaker_control.increment_none_labelled_edge_count()

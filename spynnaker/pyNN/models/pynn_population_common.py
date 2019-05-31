@@ -116,17 +116,16 @@ class PyNNPopulationCommon(object):
                 " ApplicationVertex")
 
         # Introspect properties of the vertex
-        for v in self._vertex:
-            self._vertex_population_settable = \
-                isinstance(v, AbstractPopulationSettable)
-            self._vertex_population_initializable = \
-                isinstance(v, AbstractPopulationInitializable)
-            self._vertex_changeable_after_run = \
-                isinstance(v, AbstractChangableAfterRun)
-            self._vertex_read_parameters_before_set = \
-                isinstance(v, AbstractReadParametersBeforeSet)
-            self._vertex_contains_units = \
-                isinstance(v, AbstractContainsUnits)
+        self._vertex_population_settable = \
+            isinstance(self._vertex[0], AbstractPopulationSettable)
+        self._vertex_population_initializable = \
+            isinstance(self._vertex[0], AbstractPopulationInitializable)
+        self._vertex_changeable_after_run = \
+            isinstance(self._vertex[0], AbstractChangableAfterRun)
+        self._vertex_read_parameters_before_set = \
+            isinstance(self._vertex[0], AbstractReadParametersBeforeSet)
+        self._vertex_contains_units = \
+            isinstance(self._vertex[0], AbstractContainsUnits)
 
         self._delay_vertex = None
 

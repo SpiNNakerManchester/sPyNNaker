@@ -44,9 +44,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         max_atoms = self.get_max_atoms_per_core()
 
-        for i in range(2):
-            self._pynn_partition_vertices.append(PyNNPartitionVertex(i, n_neurons/2, label, constraints, max_atoms,
-                                                                     spikes_per_second, ring_buffer_sigma, self._model,
-                                                                     self, incoming_spike_buffer_size))
+        self._pynn_partition_vertices.append(PyNNPartitionVertex(n_neurons, label, constraints, max_atoms,
+                                                                 spikes_per_second, ring_buffer_sigma, self._model,
+                                                                 self, incoming_spike_buffer_size))
 
         return self._pynn_partition_vertices
