@@ -14,6 +14,8 @@
 #include <simulation.h>
 #include <spin1_api.h>
 #include <bit_field.h>
+#include <stdfix-full-iso.h>
+#include <limits.h>
 
 // Declare spin1_wfi
 extern void spin1_wfi();
@@ -48,6 +50,7 @@ typedef enum region {
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 #define BYTE_TO_WORD_CONVERTER 4
+#define ISI_SCALE_FACTOR 1000
 
 typedef enum callback_priorities{
     MULTICAST = -1, SDP = 0, TIMER = 2, DMA = 1
@@ -156,9 +159,15 @@ static inline void _reset_spikes() {
 static inline uint32_t slow_spike_source_get_time_to_spike(
 	    uint32_t mean_inter_spike_interval_in_ticks) {
 	// some rounding needs to happen here, perhaps
-	uint32_t exp_variate = (uint32_t) (exponential_dist_variate(
-            mars_kiss64_seed, global_parameters.spike_source_seed) *
-			mean_inter_spike_interval_in_ticks);
+	int nbits = 15;
+	accum variate = exponential_dist_variate(
+			mars_kiss64_seed, global_parameters.spike_source_seed);
+//	REAL uint_max_scale = 1.0k / UINT_MAX;
+//	accum variate = -logk(ulrbits(mars_kiss64_simp()));
+	uint32_t value = (uint32_t) roundk(variate * ISI_SCALE_FACTOR, nbits);
+	uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
+	log_info("variate, rounded value, meanISI, exp_variate %k %u %u %u",
+			variate, value, mean_inter_spike_interval_in_ticks, exp_variate);
     return exp_variate;
 }
 
@@ -566,7 +575,7 @@ void timer_callback(uint timer_count, uint unused) {
                     && (spike_source->mean_isi_ticks != 0)) {
 
                 // If this spike source should spike now
-                if (spike_source->time_to_spike_ticks == 0) {
+                while (spike_source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
 
                     // Write spike to out spikes
                     _mark_spike(s, 1);
@@ -585,7 +594,7 @@ void timer_callback(uint timer_count, uint unused) {
                 }
 
                 // Subtract tick
-                spike_source->time_to_spike_ticks -= 1;
+                spike_source->time_to_spike_ticks -= ISI_SCALE_FACTOR;
             }
         }
     }
