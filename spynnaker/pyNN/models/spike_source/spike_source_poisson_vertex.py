@@ -63,8 +63,8 @@ _PoissonStruct = Struct([
     DataType.UINT32,  # End Scaled
     DataType.UINT32,  # is_fast_source
     DataType.U032,    # exp^(-rate)
-    DataType.S1615,   # inter-spike-interval
-    DataType.S1615])  # timesteps to next spike
+    DataType.UINT32,   # inter-spike-interval
+    DataType.UINT32])  # timesteps to next spike
 
 
 class SpikeSourcePoissonVertex(
@@ -375,13 +375,13 @@ class SpikeSourcePoissonVertex(
             data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
             data_type=DataType.U032)
 
-        # Write the number of timesteps per second (accum)
+        # Write the number of timesteps per second (integer)
         spec.write_value(
             data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
-        # Write the slow-rate-per-tick-cutoff (accum)
+        # Write the slow-rate-per-tick-cutoff (unsigned long fract)
         spec.write_value(
-            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.U032)
 
         # Write the lo_atom id
         spec.write_value(data=vertex_slice.lo_atom)

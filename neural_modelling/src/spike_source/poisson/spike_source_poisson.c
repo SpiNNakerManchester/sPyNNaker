@@ -79,7 +79,7 @@ struct global_parameters {
     uint32_t ticks_per_second;
 
     //! The border rate between slow and fast sources
-    REAL slow_rate_per_tick_cutoff;
+    UFRACT slow_rate_per_tick_cutoff;
 
     //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
@@ -227,7 +227,7 @@ bool read_global_parameters(address_t address) {
     log_info("ticks_per_second = %u\n", global_parameters.ticks_per_second);
     log_info(
         "slow_rate_per_tick_cutoff = %k\n",
-        global_parameters.slow_rate_per_tick_cutoff);
+        (REAL)global_parameters.slow_rate_per_tick_cutoff);
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -339,7 +339,7 @@ static bool initialize() {
     }
 
     // print spike sources for debug purposes
-    // print_spike_sources();
+//    print_spike_sources();
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
@@ -378,7 +378,7 @@ void resume_callback() {
     log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
-    // print_spike_sources();
+//    print_spike_sources();
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
@@ -607,7 +607,7 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
+        if ((UFRACT)rate >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
             poisson_parameters[sub_id].exp_minus_lambda =
                 (UFRACT) EXP(-rate_per_tick);
@@ -619,6 +619,7 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
     }
 }
 
+// Is this function actually used any more?
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
