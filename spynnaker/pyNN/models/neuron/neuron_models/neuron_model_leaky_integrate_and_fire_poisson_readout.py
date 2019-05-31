@@ -24,6 +24,7 @@ TICKS_PER_SECOND = "ticks_per_second"
 TIME_SINCE_LAST_SPIKE = "time_since_last_spike"
 RATE_AT_LAST_SETTING = "rate_at_last_setting"
 RATE_UPDATE_THRESHOLD = "rate_update_threshold"
+TARGET_DATA = "target_data"
 
 UNITS = {
     V: 'mV',
@@ -49,12 +50,13 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
         "_time_to_spike_ticks",
         "_time_since_last_spike",
         "_rate_at_last_setting",
-        "_rate_update_threshold"
+        "_rate_update_threshold",
+        "_target_data"
         ]
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            mean_isi_ticks, time_to_spike_ticks, rate_update_threshold):
+            mean_isi_ticks, time_to_spike_ticks, rate_update_threshold, target_data):
 
         global_data_types=[
                     DataType.UINT32,  # MARS KISS seed
@@ -103,6 +105,7 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
         self._time_since_last_spike = 0 # this should be initialised to zero - we know nothing about before the simulation
         self._rate_at_last_setting = 0
         self._rate_update_threshold = 2
+        self._target_data = target_data
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -121,9 +124,11 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
         parameters[SEED2] = 232
         parameters[SEED3] = 3634
         parameters[SEED4] = 4877
+        parameters[TARGET_DATA] = 0.0
 
         parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
         parameters[RATE_UPDATE_THRESHOLD] = self._rate_update_threshold
+#         parameters[TARGET_DATA] = self._target_data
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -197,18 +202,24 @@ class NeuronModelLeakyIntegrateAndFirePoissonReadout(AbstractNeuronModel):
                 0.0, # set to 0, as will be set in first timestep of model anyway
                 ]
 
-        target_data = []
-
-        for i in range(1024):
-            target_data.append(
-#                 4
-                5 + 2 * numpy.sin(2 * i * 2* numpy.pi / 1024) \
-                    + 2 * numpy.sin((4 * i * 2* numpy.pi / 1024))
-                )
-        vals.extend(target_data)
+#         target_data = []
+#
+#         for i in range(1024):
+#             target_data.append(
+# #                 4
+#                 5 + 2 * numpy.sin(2 * i * 2* numpy.pi / 1024) \
+#                     + 5 * numpy.sin((4 * i * 2* numpy.pi / 1024))
+#                 )
+        vals.extend(self._target_data)
         return vals
 
+    @property
+    def target_data(self):
+        return self._target_data
 
+    @target_data.setter
+    def target_data(self, target_data):
+        self._target_data = target_data
 
     @property
     def v_init(self):
