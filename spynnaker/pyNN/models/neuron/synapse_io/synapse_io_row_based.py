@@ -14,6 +14,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 _N_HEADER_WORDS = 3
 
+delay_slots = 255
 
 class SynapseIORowBased(AbstractSynapseIO):
     """ A SynapseRowIO implementation that uses a row for each source neuron,\
@@ -27,7 +28,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         # There are 16 slots, one per time step
-        return 16 * (machine_time_step / 1000.0)
+        return delay_slots * (machine_time_step / 1000.0)
 
     def _n_words(self, n_bytes):
         return math.ceil(float(n_bytes) / 4.0)
@@ -354,7 +355,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             row_stage = numpy.array([
                 i // pre_vertex_slice.n_atoms
                 for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
+            row_min_delay = (row_stage + 1) * delay_slots
             connection_min_delay = numpy.concatenate([
                 numpy.repeat(row_min_delay[i], n_synapses[i])
                 for i in synapse_ids])
@@ -416,7 +417,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             row_stage = numpy.array([
                 (i // pre_vertex_slice.n_atoms)
                 for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
+            row_min_delay = (row_stage + 1) * delay_slots
             connection_min_delay = numpy.concatenate([
                 numpy.repeat(row_min_delay[i], n_synapses[i])
                 for i in synapse_ids])
