@@ -998,7 +998,7 @@ class SynapticManager(object):
         if do_padding and n_extra_rows:
             padding = max_bytes * n_extra_rows
             block_addr += padding
-        if block_addr >= max_pos:
+        if block_addr > max_pos:
             raise Exception(
                 "Too much synaptic memory has been reserved: {} of {}".format(
                     block_addr, max_pos))
