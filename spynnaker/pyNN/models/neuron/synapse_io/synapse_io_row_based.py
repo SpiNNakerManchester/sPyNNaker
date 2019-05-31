@@ -109,10 +109,10 @@ class SynapseIORowBased(AbstractSynapseIO):
             undelayed_max_n_words, delayed_max_n_words)
 
     @staticmethod
-    def _get_max_row_length_and_row_data(
+    def _get_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
-            n_synapse_types, population_table, synapse_dynamics,
-            app_edge, machine_edge):
+            n_synapse_types, synapse_dynamics, app_edge, machine_edge,
+            max_row_n_synapses, max_row_n_words):
         # pylint: disable=too-many-arguments, too-many-locals
         row_ids = range(n_rows)
         ff_data, ff_size = None, None
@@ -124,12 +124,12 @@ class SynapseIORowBased(AbstractSynapseIO):
             if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
                 ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
                     connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types, app_edge=app_edge,
+                    n_synapse_types, max_row_n_synapses, app_edge=app_edge,
                     machine_edge=machine_edge)
             else:
                 ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
                     connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types)
+                    n_synapse_types, max_row_n_synapses)
 
             # Blank the plastic data
             fp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
@@ -148,24 +148,20 @@ class SynapseIORowBased(AbstractSynapseIO):
                 fp_data, pp_data, fp_size, pp_size = \
                     synapse_dynamics.get_plastic_synaptic_data(
                         connections, row_indices, n_rows, post_vertex_slice,
-                        n_synapse_types, app_edge=app_edge,
+                        n_synapse_types, max_row_n_synapses, app_edge=app_edge,
                         machine_edge=machine_edge)
             else:
                 fp_data, pp_data, fp_size, pp_size = \
                     synapse_dynamics.get_plastic_synaptic_data(
                         connections, row_indices, n_rows, post_vertex_slice,
-                        n_synapse_types)
+                        n_synapse_types, max_row_n_synapses)
 
         # Add some padding
         row_lengths = [
-            _N_HEADER_WORDS + pp_data[i].size + fp_data[i].size +
-            ff_data[i].size for i in row_ids]
-        max_length = max(row_lengths) - _N_HEADER_WORDS
-        max_row_length = population_table.get_allowed_row_length(max_length)
+            pp_data[i].size + fp_data[i].size + ff_data[i].size
+            for i in row_ids]
         padding = [
-            numpy.zeros(
-                max_row_length - (row_length - _N_HEADER_WORDS),
-                dtype="uint32")
+            numpy.zeros(max_row_n_words - row_length, dtype="uint32")
             for row_length in row_lengths]
 
         # Join the bits into rows
@@ -175,15 +171,14 @@ class SynapseIORowBased(AbstractSynapseIO):
         row_data = numpy.concatenate(rows)
 
         # Return the data
-        return max_row_length, row_data
+        return row_data
 
     @overrides(AbstractSynapseIO.get_synapses)
     def get_synapses(
-            self, synapse_info, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages, population_table,
-            n_synapse_types, weight_scales, machine_time_step,
-            app_edge, machine_edge):
+            self, synapse_info, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            n_delay_stages, n_synapse_types, weight_scales, machine_time_step,
+            app_edge, machine_edge, max_row_info):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
@@ -219,25 +214,23 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
-        max_row_length = 0
         if undelayed_connections.size or \
                 isinstance(synapse_info.synapse_dynamics,
                            AbstractSynapseDynamicsStructural):
             # Get which row each connection will go into
             undelayed_row_indices = (
                     undelayed_connections["source"] - pre_vertex_slice.lo_atom)
-            max_row_length, row_data = self._get_max_row_length_and_row_data(
+            row_data = self._get_row_data(
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
-                population_table, synapse_info.synapse_dynamics,
-                app_edge, machine_edge)
+                synapse_info.synapse_dynamics, app_edge, machine_edge,
+                max_row_info.undelayed_max_n_synapses)
 
             del undelayed_row_indices
         del undelayed_connections
 
         # Get the data for the delayed connections
         delayed_row_data = numpy.zeros(0, dtype="uint32")
-        max_delayed_row_length = 0
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
         if delayed_connections.size:
@@ -255,17 +248,15 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_connections["source"] - pre_vertex_slice.lo_atom)
 
             # Get the data
-            max_delayed_row_length, delayed_row_data = \
-                self._get_max_row_length_and_row_data(
-                    delayed_connections, delayed_row_indices,
-                    pre_vertex_slice.n_atoms * n_delay_stages,
-                    post_vertex_slice, n_synapse_types, population_table,
-                    synapse_info.synapse_dynamics, app_edge, machine_edge)
+            delayed_row_data = self._get_row_data(
+                delayed_connections, delayed_row_indices,
+                pre_vertex_slice.n_atoms * n_delay_stages, post_vertex_slice,
+                n_synapse_types, synapse_info.synapse_dynamics, app_edge,
+                machine_edge, max_row_info.delayed_max_n_synapses)
             del delayed_row_indices
         del delayed_connections
 
-        return (row_data, max_row_length, delayed_row_data,
-                max_delayed_row_length, delayed_source_ids, stages)
+        return (row_data, delayed_row_data, delayed_source_ids, stages)
 
     @overrides(AbstractSynapseIO.read_synapses)
     def read_synapses(

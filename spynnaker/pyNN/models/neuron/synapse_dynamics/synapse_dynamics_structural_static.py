@@ -166,16 +166,17 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsStatic.get_static_synaptic_data,
                additional_arguments={"app_edge", "machine_edge"})
-    def get_static_synaptic_data(self, connections, connection_row_indices,
-                                 n_rows, post_vertex_slice,
-                                 n_synapse_types, app_edge, machine_edge):
+    def get_static_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            app_edge, machine_edge):
         self._common_sp.synaptic_data_update(
             connections, post_vertex_slice,
             app_edge, machine_edge)
         return super(SynapseDynamicsStructuralStatic,
                      self).get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
-            n_synapse_types)
+            n_synapse_types, max_n_synapses)
 
     @overrides(SynapseDynamicsStatic.get_n_static_words_per_row)
     def get_n_static_words_per_row(self, ff_size):

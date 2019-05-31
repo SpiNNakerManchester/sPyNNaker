@@ -55,7 +55,7 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -72,7 +72,8 @@ class SynapseDynamicsStatic(
              neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
+            fixed_fixed.view(dtype="uint8").reshape((-1, 4)),
+            max_n_synapses)
         ff_size = self.get_n_items(fixed_fixed_rows, 4)
         if self._pad_to_length is not None:
             # Pad the data

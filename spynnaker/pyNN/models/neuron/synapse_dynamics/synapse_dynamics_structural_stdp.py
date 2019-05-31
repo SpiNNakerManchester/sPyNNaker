@@ -170,16 +170,17 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsSTDP.get_plastic_synaptic_data,
                additional_arguments={"app_edge", "machine_edge"})
-    def get_plastic_synaptic_data(self, connections, connection_row_indices,
-                                  n_rows, post_vertex_slice,
-                                  n_synapse_types, app_edge, machine_edge):
+    def get_plastic_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            app_edge, machine_edge):
         self._common_sp.synaptic_data_update(
             connections, post_vertex_slice,
             app_edge, machine_edge)
         return super(SynapseDynamicsStructuralSTDP,
                      self).get_plastic_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
-            n_synapse_types)
+            n_synapse_types, max_n_synapses)
 
     @overrides(SynapseDynamicsSTDP.get_n_plastic_plastic_words_per_row)
     def get_n_plastic_plastic_words_per_row(self, pp_size):
