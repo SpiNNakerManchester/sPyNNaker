@@ -850,6 +850,7 @@ class SynapticManager(object):
             return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
+        print("Using app key 0x{:08x} with mask 0x{:08x}".format(app_key, app_mask))
         return app_key, app_mask, 2 ** mask_size
 
     def __delay_app_key_and_mask(self, graph_mapper, m_edges, app_edge):
@@ -878,6 +879,7 @@ class SynapticManager(object):
             return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
+        print("Using delay app key 0x{:08x} and mask 0x{:08x}".format(app_key, app_mask))
         return app_key, app_mask, 2 ** mask_size
 
     def __write_on_chip_matrix_data(
@@ -961,7 +963,7 @@ class SynapticManager(object):
 
             # Create the generator data and note it exists for this post vertex
             generator_data.append(GeneratorData(
-                syn_mat_offset, d_mat_offset,
+                syn_mat_offset // 4, d_mat_offset // 4,
                 max_row_info.undelayed_max_words,
                 max_row_info.delayed_max_words,
                 max_row_info.undelayed_max_n_synapses,
