@@ -352,9 +352,6 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
 
-    def get_number_of_mallocs_used_by_dsg(self):
-        return 4
-
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
@@ -474,9 +471,12 @@ class SynapticManager(object):
                     spikes_per_second = self._spikes_per_second
                     if isinstance(app_edge.pre_vertex,
                                   SpikeSourcePoissonVertex):
-                        spikes_per_second = app_edge.pre_vertex.rate
+                        rate = app_edge.pre_vertex.max_rate
+                        # If non-zero rate then use it; otherwise keep default
+                        if (rate != 0):
+                            spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = max(spikes_per_second)
+                            spikes_per_second = numpy.max(spikes_per_second)
                         elif get_simulator().is_a_pynn_random(
                                 spikes_per_second):
                             spikes_per_second = get_maximum_probable_value(
@@ -737,12 +737,13 @@ class SynapticManager(object):
         # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
-        n_delay_stages = app_edge.n_delay_stages
+        n_delay_stages = 0
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if max_row_info.delayed_max_n_synapses:
+            n_delay_stages = app_edge.n_delay_stages
             delayed_synaptic_matrix_offset = \
                 self._poptable_type.get_next_allowed_address(
                     block_addr)
