@@ -61,7 +61,7 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         # Add the rest of the data
         return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
                 parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
-                parameters[V_THRESH], float(ts) / 10000.0]
+                parameters[V_THRESH], float(ts) / -10000.0]
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):

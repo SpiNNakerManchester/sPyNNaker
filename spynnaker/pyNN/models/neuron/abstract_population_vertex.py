@@ -263,18 +263,17 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
+        n_record = len(self._neuron_impl.get_recordable_variables()) + 1
         sdram_requirement = (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            recording_utilities.get_recording_header_size(
-                len(self._neuron_impl.get_recordable_variables()) + 1) +
+            recording_utilities.get_recording_header_size(n_record) +
+            recording_utilities.get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.get_edges_ending_at_vertex(self),
                 machine_time_step) +
-            (self._get_number_of_mallocs_used_by_dsg() *
-             common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
             profile_utils.get_profile_region_size(
                 self._n_profile_samples) +
             self._get_estimated_sdram_for_bit_field_region(
@@ -367,13 +366,6 @@ class AbstractPopulationVertex(
                 constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
-    def _get_number_of_mallocs_used_by_dsg(self):
-        extra_mallocs = len(self._neuron_recorder.recording_variables)
-        return (
-            self.BASIC_MALLOC_USAGE +
-            self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
-            extra_mallocs)
-
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
         """ reserves the dsg memory regions
@@ -391,7 +383,7 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            size=common_constants.SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)

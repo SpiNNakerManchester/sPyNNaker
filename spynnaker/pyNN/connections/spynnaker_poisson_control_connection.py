@@ -5,6 +5,7 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
+from spinnman.constants import SCP_SCAMP_PORT
 from decimal import Decimal
 
 _MAX_RATES_PER_PACKET = 32
@@ -33,16 +34,21 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :type control_label_extension: str
 
         """
-        control_labels = [
-            "{}{}".format(label, control_label_extension)
-            for label in poisson_labels
-        ]
+        control_labels = None
+        if poisson_labels is not None:
+            control_labels = [
+                "{}{}".format(label, control_label_extension)
+                for label in poisson_labels
+            ]
 
         super(SpynnakerPoissonControlConnection, self).__init__(
             live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
         self._control_label_extension = control_label_extension
+
+    def add_poisson_label(self, label):
+        self.add_send_label(self._control_label(label))
 
     def _control_label(self, label):
         return "{}{}".format(label, self._control_label_extension)
@@ -51,6 +57,12 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def add_start_callback(self, label, start_callback):
         super(SpynnakerPoissonControlConnection, self).add_start_callback(
             self._control_label(label), start_callback)
+
+    @overrides(LiveEventConnection.add_start_resume_callback)
+    def add_start_resume_callback(self, label, start_resume_callback):
+        super(SpynnakerPoissonControlConnection, self)\
+            .add_start_resume_callback(
+            self._control_label(label), start_resume_callback)
 
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
@@ -61,6 +73,11 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def add_receive_callback(self, label, live_event_callback):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
+
+    @overrides(LiveEventConnection.add_pause_stop_callback)
+    def add_pause_stop_callback(self, label, pause_stop_callback):
+        super(SpynnakerPoissonControlConnection, self).add_pause_stop_callback(
+            self._control_label(label), pause_stop_callback)
 
     def set_rate(self, label, neuron_id, rate):
         """ Set the rate of a Poisson neuron within a Poisson source
@@ -84,12 +101,13 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         if not control_label.endswith(self._control_label_extension):
             control_label = self._control_label(label)
         pos = 0
+        x, y, p, ip_address = self._send_address_details[label]
         while pos < len(neuron_id_rates):
             message, pos = self._assemble_message(
                 self._atom_id_to_key[control_label], neuron_id_rates, pos)
-            ip_address, port = self._send_address_details[control_label]
-            self._sender_connection.send_eieio_message_to(
-                message, ip_address, port)
+            self._sender_connection.send_to(
+                self._get_sdp_data(message, x, y, p),
+                (ip_address, SCP_SCAMP_PORT))
 
     @staticmethod
     def _assemble_message(id_to_key_map, neuron_id_rates, pos):
