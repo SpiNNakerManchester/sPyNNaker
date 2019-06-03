@@ -23,7 +23,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     def __init__(self, model):
         self._model = model
-        self._pynn_partition_vertices = list()
+        self._pynn_partition_vertex = list()
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_NEURON_CORE):
@@ -44,8 +44,8 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         max_atoms = self.get_max_atoms_per_core()
 
-        self._pynn_partition_vertices.append(PyNNPartitionVertex(n_neurons, label, constraints, max_atoms,
-                                                                 spikes_per_second, ring_buffer_sigma, self._model,
-                                                                 self, incoming_spike_buffer_size))
+        self._pynn_partition_vertex.append(PyNNPartitionVertex(n_neurons, label, constraints, max_atoms,
+                                                               spikes_per_second, ring_buffer_sigma, self._model,
+                                                               self, incoming_spike_buffer_size))
 
-        return self._pynn_partition_vertices
+        return self._pynn_partition_vertex
