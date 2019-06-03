@@ -441,23 +441,24 @@ class PyNNPopulationCommon(object):
             # locate machine vertices from the application vertices
 
             if isinstance(self._vertex[0], PyNNPartitionVertex):
-                self._vertex[0] =
-            machine_vertices = globals_variables.get_simulator().graph_mapper\
-                .get_machine_vertices(self._vertex[0])
+                self._vertex[0].read_parameterss_from_machine(globals_variables)
+            else:
+                machine_vertices = globals_variables.get_simulator().graph_mapper\
+                    .get_machine_vertices(self._vertex[0])
 
-            # go through each machine vertex and read the neuron parameters
-            # it contains
-            for machine_vertex in machine_vertices:
+                # go through each machine vertex and read the neuron parameters
+                # it contains
+                for machine_vertex in machine_vertices:
 
-                # tell the core to rewrite neuron params back to the
-                # SDRAM space.
-                placement = globals_variables.get_simulator().placements.\
-                    get_placement_of_vertex(machine_vertex)
+                    # tell the core to rewrite neuron params back to the
+                    # SDRAM space.
+                    placement = globals_variables.get_simulator().placements.\
+                        get_placement_of_vertex(machine_vertex)
 
-                self._vertex[0].read_parameters_from_machine(
-                    globals_variables.get_simulator().transceiver, placement,
-                    globals_variables.get_simulator().graph_mapper.get_slice(
-                        machine_vertex))
+                    self._vertex[0].read_parameters_from_machine(
+                        globals_variables.get_simulator().transceiver, placement,
+                        globals_variables.get_simulator().graph_mapper.get_slice(
+                            machine_vertex))
 
             self._has_read_neuron_parameters_this_run = True
 
@@ -470,6 +471,9 @@ class PyNNPopulationCommon(object):
         for i in range(self._vertex[0].n_atoms):
             n_spikes[i] = counts[i]
         return n_spikes
+
+    def get_synapse_id_by_target(self, target):
+        return self.vertex[0].get_synapse_id_by_target(target)
 
     @property
     def positions(self):

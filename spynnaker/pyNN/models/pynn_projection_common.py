@@ -44,8 +44,7 @@ class PyNNProjectionCommon(object):
         self._label = None
 
         # sort out synapse type
-        synapse_type = post_synaptic_population.get_neuron_vertex \
-            .get_synapse_id_by_target(target)
+        synapse_type = post_synaptic_population.get_synapse_id_by_target(target)
 
         pre_vertex = pre_synaptic_population.get_neuron_vertex
         post_vertex = post_synaptic_population.get_syn_vertices[synapse_type]

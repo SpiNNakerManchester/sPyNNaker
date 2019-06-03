@@ -37,6 +37,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._n_atoms = n_neurons
 
         self._neuron_vertices = list()
+        self._synapse_vertices = list()
 
         for i in range(N_PARTITIONS):
 
@@ -136,12 +137,59 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for i in range(N_PARTITIONS):
             self._neuron_vertices[i].initialize(variable, value)
 
+    # THINK PARAMS ARE THE SAME FOR BOTH THE APP VERTICES!!!!!!!
+    def get_value(self, key):
+        return self._neuron_vertices[0].get_value(key)
+
     def set_value(self, key, value):
         for i in range(N_PARTITIONS):
             self._neuron_vertices[i].set_value(key, value)
 
-    def set_value_by_selector(self, selector, parameter, value):
+    def read_parameters_from_machine(self, globals_variables):
+
         for i in range(N_PARTITIONS):
-            self._neuron_vertices[i].set_value_by_selector(selector, parameter, value)
+            machine_vertices = globals_variables.get_simulator().graph_mapper \
+                .get_machine_vertices(self._neuron_vertices[i])
 
+            # go through each machine vertex and read the neuron parameters
+            # it contains
+            for machine_vertex in machine_vertices:
+                # tell the core to rewrite neuron params back to the
+                # SDRAM space.
+                placement = globals_variables.get_simulator().placements. \
+                    get_placement_of_vertex(machine_vertex)
 
+                self.neuron_vertices[i].read_parameters_from_machine(
+                    globals_variables.get_simulator().transceiver, placement,
+                    globals_variables.get_simulator().graph_mapper.get_slice(
+                        machine_vertex))
+
+    @property
+    def n_atoms(self):
+        return self._n_atoms
+
+    def get_units(self, variable):
+        return self._neuron_vertices[0].get_units(variable)
+
+    def mark_no_changes(self):
+        for i in range(N_PARTITIONS):
+            self._neuron_vertices[i].mark_no_changes()
+
+    @property
+    def requires_mapping(self):
+        return self._neuron_vertices[0].requires_mapping()
+
+    def set_initial_value(self, variable, value, selector=None):
+        for i in range(N_PARTITIONS):
+            self._neuron_vertices[i].set_initial_value(variable, value, selector)
+
+    # SHOULD BE THE SAME FOR BOTH THE VERTICES!!!!s
+    def get_initial_value(self, variable, selector=None):
+        return self._neuron_vertices[0].get_initial_value(variable, selector)
+
+    @property
+    def initialize_parameters(self):
+        return self._neuron_vertices[0].initialize_parameters
+
+    def get_synapse_id_by_target(self, target):
+        self._neuron_vertices[0].get_synapse_id_by_target(target)
