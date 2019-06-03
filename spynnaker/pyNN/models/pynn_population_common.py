@@ -439,6 +439,9 @@ class PyNNPopulationCommon(object):
                 and not self._has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
             # locate machine vertices from the application vertices
+
+            if isinstance(self._vertex[0], PyNNPartitionVertex):
+                self._vertex[0] =
             machine_vertices = globals_variables.get_simulator().graph_mapper\
                 .get_machine_vertices(self._vertex[0])
 

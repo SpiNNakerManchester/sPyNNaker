@@ -131,3 +131,17 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @property
     def conductance_based(self):
         return self._neuron_vertices[0].conductance_based
+
+    def initialize(self, variable, value):
+        for i in range(N_PARTITIONS):
+            self._neuron_vertices[i].initialize(variable, value)
+
+    def set_value(self, key, value):
+        for i in range(N_PARTITIONS):
+            self._neuron_vertices[i].set_value(key, value)
+
+    def set_value_by_selector(self, selector, parameter, value):
+        for i in range(N_PARTITIONS):
+            self._neuron_vertices[i].set_value_by_selector(selector, parameter, value)
+
+
