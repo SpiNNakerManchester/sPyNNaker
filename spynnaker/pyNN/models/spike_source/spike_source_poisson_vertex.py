@@ -379,9 +379,9 @@ class SpikeSourcePoissonVertex(
         spec.write_value(
             data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
-        # Write the slow-rate-per-tick-cutoff (unsigned long fract)
+        # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
-            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.U032)
+            data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
         # Write the lo_atom id
         spec.write_value(data=vertex_slice.lo_atom)
