@@ -42,7 +42,9 @@ typedef enum extra_provenance_data_region_entries{
     SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
+    FLUSHED_SPIKES = 5,
+    MAX_FLUSHED_SPIKES = 6
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -74,6 +76,9 @@ static uint32_t timer_period;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+static uint32_t max_spikes_remaining = 0;
+static uint32_t spikes_remaining = 0;
+
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
@@ -88,6 +93,8 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
             synapse_dynamics_get_plastic_saturation_count();
+    provenance_region[FLUSHED_SPIKES] = spikes_remaining;
+    provenance_region[MAX_FLUSHED_SPIKES] = max_spikes_remaining;
     log_debug("finished other provenance data");
 }
 
@@ -99,7 +106,10 @@ void write_contributions(uint unused1, uint unused2) {
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
 
-        uint32_t spikes_remaining = spike_processing_flush_in_buffer();
+        spikes_remaining += spike_processing_flush_in_buffer();
+
+        if(spikes_remaining > max_spikes_remaining)
+            max_spikes_remaining = spikes_remaining;
 }
 
 //! \brief Initialises the model by reading in the regions and checking
