@@ -813,7 +813,7 @@ class SynapticManager(object):
         for key in keys:
             if last_key is None:
                 last_key = key
-            elif ((last_key & mask) + key_increment) != last_key:
+            elif (last_key + key_increment) != key:
                 return False
             last_key = key
         return True
@@ -851,7 +851,6 @@ class SynapticManager(object):
             return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
-        print("Using app key 0x{:08x} with mask 0x{:08x}".format(app_key, app_mask))
         return app_key, app_mask, 2 ** mask_size
 
     def __delay_app_key_and_mask(self, graph_mapper, m_edges, app_edge):
@@ -880,7 +879,6 @@ class SynapticManager(object):
             return None, None, None
 
         app_key, app_mask = self.__get_app_key_and_mask(keys, mask, mask_size)
-        print("Using delay app key 0x{:08x} and mask 0x{:08x}".format(app_key, app_mask))
         return app_key, app_mask, 2 ** mask_size
 
     def __write_on_chip_matrix_data(
@@ -904,16 +902,18 @@ class SynapticManager(object):
                 block_addr, spec, master_pop_table_region,
                 max_row_info.undelayed_max_bytes,
                 max_row_info.undelayed_max_words, app_key, app_mask,
-                all_syn_block_sz, app_edge.pre_vertex.n_atoms)
+                all_syn_block_sz,
+                (n_keys * (len(m_edges) - 1)) + pre_slices[-1].n_atoms)
             syn_max_addr = block_addr
         delay_block_addr = 0xFFFFFFFF
         if is_delayed and delay_app_key is not None:
             block_addr, delay_block_addr = self.__reserve_mpop_block(
                 block_addr, spec, master_pop_table_region,
-                max_row_info.delayed_max_bytes,
-                max_row_info.delayed_max_words, delay_app_key, delay_app_mask,
+                max_row_info.delayed_max_bytes, max_row_info.delayed_max_words,
+                delay_app_key, delay_app_mask,
                 all_syn_block_sz,
-                app_edge.pre_vertex.n_atoms * app_edge.n_delay_stages)
+                (delay_n_keys * (len(m_edges) - 1)) +
+                (pre_slices[-1].n_atoms * app_edge.n_delay_stages))
             delay_max_addr = block_addr
 
         for i, m_edge in enumerate(m_edges):
