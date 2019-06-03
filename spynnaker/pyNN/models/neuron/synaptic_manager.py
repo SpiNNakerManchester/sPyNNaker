@@ -697,7 +697,7 @@ class SynapticManager(object):
                     max_row_info.undelayed_max_n_synapses,
                     max_row_info.undelayed_max_words, r_info, row_data,
                     synapse_info.connector, pre_slice, post_vertex_slice,
-                    app_edge, single_synapses, all_syn_block_sz)
+                    app_edge, single_synapses, all_syn_block_sz, is_delayed)
             elif is_undelayed:
                 # If there is an app_key, save the data to be written later
                 # Note: row_data will not be blank here since we told it to
@@ -710,10 +710,10 @@ class SynapticManager(object):
                 r_info = self._delay_key_index[delay_key]
                 block_addr, single_addr = self.__write_machine_matrix(
                     block_addr, single_addr, spec, master_pop_table_region,
-                    max_row_info.undelayed_max_n_synapses,
-                    max_row_info.undelayed_max_words, r_info, row_data,
+                    max_row_info.delayed_max_n_synapses,
+                    max_row_info.delayed_max_words, r_info, delayed_row_data,
                     synapse_info.connector, pre_slice, post_vertex_slice,
-                    app_edge, single_synapses, all_syn_block_sz)
+                    app_edge, single_synapses, all_syn_block_sz, True)
             elif is_delayed:
                 # If there is a delay_app_key, save the data for delays
                 # Note delayed_row_data will not be blank as above.
@@ -723,7 +723,7 @@ class SynapticManager(object):
         # If there is an app key, add a single matrix and entry
         # to the population table but also put in padding
         # between tables when necessary
-        if app_key is not None and is_undelayed:
+        if app_key is not None and len(m_edges) > 1 and is_undelayed:
             block_addr = self.__write_app_matrix(
                 block_addr, spec, master_pop_table_region,
                 max_row_info.undelayed_max_words,
@@ -772,24 +772,25 @@ class SynapticManager(object):
             self, block_addr, single_addr, spec, master_pop_table_region,
             max_synapses, max_words, r_info, row_data, connector,
             pre_slice, post_vertex_slice, app_edge, single_synapses,
-            all_syn_block_sz):
+            all_syn_block_sz, is_delayed):
         # Write a matrix for an incoming machine vertex
         if max_synapses == 1 and self.__is_direct(
                 single_addr, connector, pre_slice, post_vertex_slice,
-                app_edge):
+                is_delayed):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             self._poptable_type.update_master_population_table(
                 spec, single_addr, max_words,
-                r_info.first_key_and_mask, master_pop_table_region)
+                r_info.first_key_and_mask, master_pop_table_region,
+                is_single=True)
             single_synapses.append(single_rows)
-            single_addr = single_addr + len(single_rows) * 4
+            single_addr = single_addr + (len(single_rows) * 4)
         else:
             block_addr = self._write_pop_table_padding(spec, block_addr)
             self._poptable_type.update_master_population_table(
                 spec, block_addr, max_words,
                 r_info.first_key_and_mask, master_pop_table_region)
             spec.write_array(row_data)
-            block_addr = block_addr + len(row_data)
+            block_addr = block_addr + (len(row_data) * 4)
             if block_addr > all_syn_block_sz:
                 raise Exception(
                     "Too much synaptic memory has been written: {} of {} "
@@ -822,7 +823,7 @@ class SynapticManager(object):
         # keys
         key = keys[0]
         n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
-        new_mask = mask & ~(((2 ** n_extra_mask_bits) - 1) << mask_size)
+        new_mask = mask & (~(((2 ** n_extra_mask_bits) - 1)) << mask_size)
         return key, new_mask
 
     def __app_key_and_mask(self, m_edges, routing_info):
@@ -1060,41 +1061,17 @@ class SynapticManager(object):
 
     def __is_direct(
             self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
-            app_edge):
+            is_delayed):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
         """
         return (
-            app_edge.n_delay_stages == 0 and
+            not is_delayed and
             isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self._one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
             (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
-
-    def __write_row_data(
-            self, spec, connector, pre_vertex_slice, post_vertex_slice,
-            row_length, row_data, rinfo, single_synapses,
-            master_pop_table_region, synaptic_matrix_region,
-            block_addr, single_addr, app_edge):
-        if row_length == 1 and self.__is_direct(
-                single_addr, connector, pre_vertex_slice, post_vertex_slice,
-                app_edge):
-            single_rows = row_data.reshape(-1, 4)[:, 3]
-            single_synapses.append(single_rows)
-            next_single_addr = single_addr + len(single_rows) * 4
-            return single_addr, row_length, True, block_addr, next_single_addr
-            self._poptable_type.update_master_population_table(
-                spec, single_addr, 1, rinfo.first_key_and_mask,
-                master_pop_table_region, is_single=True)
-        block_addr = self._write_pop_table_padding(spec, block_addr)
-        spec.switch_write_focus(synaptic_matrix_region)
-        spec.write_array(row_data)
-        next_block_addr = block_addr + len(row_data) * 4
-        return block_addr, row_length, False, next_block_addr, single_addr
-        self._poptable_type.update_master_population_table(
-            spec, block_addr, row_length,
-            rinfo.first_key_and_mask, master_pop_table_region)
 
     def _get_ring_buffer_shifts(
             self, application_vertex, application_graph, machine_timestep,

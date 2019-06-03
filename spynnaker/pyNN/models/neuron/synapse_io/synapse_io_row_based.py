@@ -214,7 +214,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
-        if undelayed_connections.size or \
+        if max_row_info.undelayed_max_n_synapses or \
                 isinstance(synapse_info.synapse_dynamics,
                            AbstractSynapseDynamicsStructural):
             # Get which row each connection will go into
@@ -234,7 +234,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         delayed_row_data = numpy.zeros(0, dtype="uint32")
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
-        if delayed_connections.size:
+        if max_row_info.delayed_max_n_synapses:
             # Get the delay stages and which row each delayed connection will
             # go into
             stages = numpy.floor((numpy.round(
