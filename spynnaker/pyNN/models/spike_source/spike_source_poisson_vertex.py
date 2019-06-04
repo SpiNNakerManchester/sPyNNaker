@@ -39,18 +39,20 @@ logger = logging.getLogger(__name__)
 # bool has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
 # uint32_t random_backoff_us; uint32_t time_between_spikes;
 # UFRACT seconds_per_tick; REAL ticks_per_second;
-# REAL slow_rate_per_tick_cutoff; uint32_t first_source_id;
-# uint32_t n_spike_sources; mars_kiss64_seed_t (uint[4]) spike_source_seed;
-PARAMS_BASE_WORDS = 14
+# REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
+# uint32_t first_source_id; uint32_t n_spike_sources;
+# mars_kiss64_seed_t (uint[4]) spike_source_seed;
+PARAMS_BASE_WORDS = 15
 
-# start_scaled, end_scaled, is_fast_source, exp_minus_lambda, isi_val,
-# time_to_spike
-PARAMS_WORDS_PER_NEURON = 6
+# start_scaled, end_scaled, is_fast_source, exp_minus_lambda, sqrt_lambda,
+# isi_val, time_to_spike
+PARAMS_WORDS_PER_NEURON = 7
 
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH
+SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
+FAST_RATE_PER_TICK_CUTOFF = 10 # between Knuth algorithm and Gaussian approx.
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -62,7 +64,8 @@ _PoissonStruct = Struct([
     DataType.UINT32,  # Start Scaled
     DataType.UINT32,  # End Scaled
     DataType.UINT32,  # is_fast_source
-    DataType.U032,    # exp^(-rate)
+    DataType.U032,    # exp^(-spikes_per_tick)
+    DataType.S1615,   # sqrt(spikes_per_tick)
     DataType.UINT32,   # inter-spike-interval
     DataType.UINT32])  # timesteps to next spike
 
@@ -138,7 +141,7 @@ class SpikeSourcePoissonVertex(
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
-        # experiement show at 1000 is result is typically higher than actual
+        # Experiments show at 1000 this result is typically higher than actual
         chance_ts = 1000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
@@ -383,6 +386,10 @@ class SpikeSourcePoissonVertex(
         spec.write_value(
             data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
+        # Write the fast-rate-per-tick-cutoff (accum)
+        spec.write_value(
+            data=FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+
         # Write the lo_atom id
         spec.write_value(data=vertex_slice.lo_atom)
 
@@ -424,6 +431,7 @@ class SpikeSourcePoissonVertex(
 
         # Determine which sources are fast and which are slow
         is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
+        is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
 
         # Compute the e^-(spikes_per_tick) for fast sources to allow fast
         # computation of the Poisson distribution to get the number of spikes
@@ -431,6 +439,16 @@ class SpikeSourcePoissonVertex(
         exp_minus_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
         exp_minus_lambda[is_fast_source] = numpy.exp(
             -1.0 * spikes_per_tick[is_fast_source])
+
+        # Compute sqrt(lambda) for "faster" sources to allow Gaussian
+        # approximation of the Poisson distribution to get the number of
+        # spikes per timestep
+        sqrt_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
+        sqrt_lambda[is_faster_source] = numpy.sqrt(
+            spikes_per_tick[is_faster_source])
+
+        print('sqrt_lambda is ', sqrt_lambda)
+
         # Compute the inter-spike-interval for slow sources to get the average
         # number of timesteps between spikes
         isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
@@ -449,8 +467,9 @@ class SpikeSourcePoissonVertex(
             end_scaled.astype("uint32"),
             is_fast_source.astype("uint32"),
             (exp_minus_lambda * (2 ** 32)).astype("uint32"),
-            (isi_val).astype("uint32"),
-            (time_to_spike).astype("uint32")
+            (sqrt_lambda * (2 ** 15)).astype("uint32"),
+            isi_val.astype("uint32"),
+            time_to_spike.astype("uint32")
         ))[0]
 
         spec.write_array(data)

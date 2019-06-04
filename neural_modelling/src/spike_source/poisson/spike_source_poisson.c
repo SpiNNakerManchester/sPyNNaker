@@ -30,6 +30,7 @@ typedef struct spike_source_t {
     bool is_fast_source;
 
     UFRACT exp_minus_lambda;
+    REAL sqrt_lambda;
     uint32_t mean_isi_ticks;
     uint32_t time_to_spike_ticks;
 } spike_source_t;
@@ -83,6 +84,9 @@ struct global_parameters {
 
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
+
+    //! The border rate between fast and faster sources
+    REAL fast_rate_per_tick_cutoff;
 
     //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
@@ -169,8 +173,8 @@ static inline uint32_t slow_spike_source_get_time_to_spike(
 }
 
 //! \brief Determines how many spikes to transmit this timer tick, for a fast source
-//! \param[in] exp_minus_lambda The amount of spikes expected to be produced
-//!            this timer interval (timer tick in real time)
+//! \param[in] exp_minus_lambda exp(-lambda), lambda is amount of spikes expected to be
+//!            produced this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
 //!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
@@ -186,19 +190,23 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 }
 
 //! \brief Determines how many spikes to transmit this timer tick, for a faster(!) source
-//! \param[in] exp_minus_lambda The amount of spikes expected to be produced
+//! \param[in] sqrt_lambda Square root of the amount of spikes expected to be produced
 //!            this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
 //!         this timer tick
 static inline uint32_t faster_spike_source_get_num_spikes(
-        UFRACT exp_minus_lambda) {
-    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
+        REAL sqrt_lambda) {
+	// I don't think this part is likely to happen... ?
+    if (bitsulr(sqrt_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
     else {
-        return poisson_dist_variate_exp_minus_lambda(
-            mars_kiss64_seed,
-            global_parameters.spike_source_seed, exp_minus_lambda);
+    	// here we do invgausscdf(U(0,1)) * 0.5 + sqrt(lambda)
+    	accum x = (gaussian_dist_variate(
+    			mars_kiss64_seed, global_parameters.spike_source_seed) >> 2) + sqrt_lambda;
+    	// and we return int(roundk(x^2))
+    	int nbits = 15;
+        return (uint32_t) roundk(x * x, nbits);
     }
 }
 
@@ -251,6 +259,9 @@ bool read_global_parameters(address_t address) {
     log_info(
         "slow_rate_per_tick_cutoff = %k\n",
         global_parameters.slow_rate_per_tick_cutoff);
+    log_info(
+        "fast_rate_per_tick_cutoff = %k\n",
+        global_parameters.fast_rate_per_tick_cutoff);
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -561,8 +572,15 @@ void timer_callback(uint timer_count, uint unused) {
                     && time < spike_source->end_ticks) {
 
                 // Get number of spikes to send this tick
-                uint32_t num_spikes = fast_spike_source_get_num_spikes(
-                    spike_source->exp_minus_lambda);
+            	uint32_t num_spikes = 0;
+            	if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
+            		num_spikes = faster_spike_source_get_num_spikes(
+            				spike_source->sqrt_lambda);
+            	} else {
+            		num_spikes = fast_spike_source_get_num_spikes(
+            				spike_source->exp_minus_lambda);
+            	}
+
                 log_debug("Generating %d spikes", num_spikes);
 
                 // If there are any
@@ -638,8 +656,13 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
         if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
-            poisson_parameters[sub_id].exp_minus_lambda =
-                (UFRACT) EXP(-rate_per_tick);
+            if (rate >= global_parameters.fast_rate_per_tick_cutoff) {
+            	poisson_parameters[sub_id].sqrt_lambda =
+            			SQRT(rate_per_tick); // warning: sqrtk is untested...
+            } else {
+            	poisson_parameters[sub_id].exp_minus_lambda =
+            			(UFRACT) EXP(-rate_per_tick);
+            }
         } else {
             poisson_parameters[sub_id].is_fast_source = false;
             poisson_parameters[sub_id].mean_isi_ticks =
