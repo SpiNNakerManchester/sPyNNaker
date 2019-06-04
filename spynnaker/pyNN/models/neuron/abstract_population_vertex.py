@@ -1,16 +1,15 @@
 import logging
 import os
-import math
 import sys
-
+import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
+from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -35,9 +34,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-from spynnaker.pyNN.utilities.constants import WORD_TO_BYTE_MULTIPLIER,POPULATION_BASED_REGIONS
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-
 
 logger = logging.getLogger(__name__)
 
@@ -263,18 +260,17 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
+        n_record = len(self._neuron_impl.get_recordable_variables()) + 1
         sdram_requirement = (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            recording_utilities.get_recording_header_size(
-                len(self._neuron_impl.get_recordable_variables()) + 1) +
+            recording_utilities.get_recording_header_size(n_record) +
+            recording_utilities.get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self._synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.get_edges_ending_at_vertex(self),
                 machine_time_step) +
-            (self._get_number_of_mallocs_used_by_dsg() *
-             common_constants.SARK_PER_MALLOC_SDRAM_USAGE) +
             profile_utils.get_profile_region_size(
                 self._n_profile_samples) +
             self._get_estimated_sdram_for_bit_field_region(
@@ -291,7 +287,7 @@ class AbstractPopulationVertex(
         """
 
         # basic sdram
-        sdram = self._N_KEYS_DATA_SET_IN_WORDS * WORD_TO_BYTE_MULTIPLIER
+        sdram = self._N_KEYS_DATA_SET_IN_WORDS * constants.WORD_TO_BYTE_MULTIPLIER
         for in_edge in app_graph.get_edges_ending_at_vertex(self):
 
             # Get the number of likely vertices
@@ -306,7 +302,7 @@ class AbstractPopulationVertex(
                 float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
             sdram += (n_edge_vertices *
                       self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                      WORD_TO_BYTE_MULTIPLIER)
+                      constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
     def _get_estimated_sdram_for_bit_field_region(self, incoming_edges):
@@ -367,31 +363,16 @@ class AbstractPopulationVertex(
                 constants.WORD_TO_BYTE_MULTIPLIER)
         return sdram
 
-    def _get_number_of_mallocs_used_by_dsg(self):
-        extra_mallocs = len(self._neuron_recorder.recording_variables)
-        return (
-            self.BASIC_MALLOC_USAGE +
-            self._synapse_manager.get_number_of_mallocs_used_by_dsg() +
-            extra_mallocs)
 
-    def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
-        """ reserves the dsg memory regions
-
-        :param spec: the data spec object
-        :param vertex_slice: this vertex atom slice
-        :param vertex: this vertex
-        :param machine_graph: machine graph
-        :param graph_mapper: the graph mapper
-        :rtype: None
-        """
+    def _reserve_memory_regions(self, spec, vertex_slice, vertex,
+                                machine_graph, graph_mapper):
 
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
         spec.reserve_memory_region(
             region=constants.POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SYSTEM_BYTES_REQUIREMENT,
+            size=common_constants.SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
@@ -552,8 +533,7 @@ class AbstractPopulationVertex(
         vertex_slice = graph_mapper.get_slice(vertex)
 
         # Reserve memory regions
-        self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, graph_mapper)
+        self._reserve_memory_regions(spec, vertex_slice, vertex,machine_graph,graph_mapper)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -617,14 +597,14 @@ class AbstractPopulationVertex(
         sdram = (
             self._N_KEYS_DATA_SET_IN_WORDS +
             len(machine_graph.get_edges_ending_at_vertex(machine_vertex)) *
-            self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
+            self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * constants.WORD_TO_BYTE_MULTIPLIER
 
         # reserve memory region
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             size=sdram, label="bitfield setup data")
         spec.switch_write_focus(
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
+            constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
         # write n keys max atom map
         spec.write_value(

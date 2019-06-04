@@ -52,8 +52,12 @@ class FromListConnector(AbstractConnector):
                 (int(self.conn_list[:, 0].max() + 1), int(self.conn_list[:, 1].max() + 1)), dtype=bool)
         except IndexError:
             print "too many indices for array"
-        for [pre, post,w,d] in self.conn_list:
-            self._conn_matrix[int(pre)][int(post)] = 1
+        if len(self.conn_list[0])==4:
+            for [pre, post,w,d] in self.conn_list:
+                self._conn_matrix[int(pre)][int(post)] = 1
+        else:
+            for [pre, post] in self.conn_list:
+                self._conn_matrix[int(pre)][int(post)] = 1
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):

@@ -4,7 +4,8 @@ from .spike_injector_vertex import SpikeInjectorVertex
 
 _population_parameters = {
     "port": None,
-    "virtual_key": None
+    "virtual_key": None,
+    "reserve_reverse_ip_tag": False
 }
 
 
@@ -15,6 +16,8 @@ class SpikeInjector(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex,
                additional_arguments=_population_parameters.keys())
     def create_vertex(
-            self, n_neurons, label, constraints, port, virtual_key):
+            self, n_neurons, label, constraints, port, virtual_key,
+            reserve_reverse_ip_tag):
         return SpikeInjectorVertex(
-            n_neurons, label, constraints, port, virtual_key)
+            n_neurons, label, constraints, port, virtual_key,
+            reserve_reverse_ip_tag)
