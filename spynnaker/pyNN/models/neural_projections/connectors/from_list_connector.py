@@ -1,6 +1,7 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -141,15 +142,29 @@ class FromListConnector(AbstractConnector):
         block["source"] = sources
         block["target"] = self._targets[mask]
         # check that conn_list has weights, if not then use the value passed in
+        connection_slices = None
         if self._weights is None:
-            block["weight"] = self._generate_weights(
-                weights, sources.size, None)
+            if sources.size:
+                # create connection slices for this pre+post based on the mask
+                connection_slices = [
+                    slice(n, n+1) for n in range(mask.size) if mask[n]]
+                block["weight"] = self._generate_weights(
+                    weights, sources.size, connection_slices)
+            else:
+                block["weight"] = 0
         else:
             block["weight"] = self._weights[mask]
         # check that conn_list has delays, if not then use the value passed in
         if self._delays is None:
-            block["delay"] = self._generate_delays(
-                delays, sources.size, None)
+            if sources.size:
+                # create connection slices for this pre+post based on the mask
+                if connection_slices is None:
+                    connection_slices = [
+                        slice(n, n+1) for n in range(mask.size) if mask[n]]
+                block["delay"] = self._generate_delays(
+                    delays, sources.size, connection_slices)
+            else:
+                block["delay"] = 0
         else:
             block["delay"] = self._clip_delays(self._delays[mask])
         block["synapse_type"] = synapse_type
@@ -219,7 +234,11 @@ class FromListConnector(AbstractConnector):
         self._delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            self._delays = self._conn_list[:, delay_column]
+            machine_time_step = globals_variables.get_simulator(
+                ).machine_time_step
+            self._delays = numpy.rint(
+                numpy.array(self._conn_list[:, delay_column]) * (
+                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
         except ValueError:
             pass
 
