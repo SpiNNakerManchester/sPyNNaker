@@ -108,7 +108,7 @@ void _print_key_to_max_atom_map(){
 //! \return the number of neurons from the key map based off this key
 uint32_t _n_neurons_from_key(uint32_t key){
     int key_index = 0;
-    log_info("n pairs is %d", keys_to_max_atoms->n_pairs);
+    log_debug("n pairs is %d", keys_to_max_atoms->n_pairs);
     while (key_index < keys_to_max_atoms->n_pairs){
         key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
         if (entry.key == key){
@@ -144,49 +144,10 @@ bool _create_fake_bit_field(){
     for (uint32_t master_pop_entry=0;
             master_pop_entry < population_table_length();
             master_pop_entry++){
-
-        // determine n_neurons
-        uint32_t key = population_table_get_spike_for_index(master_pop_entry);
-        uint32_t n_neurons = _n_neurons_from_key(key);
-        log_debug("entry %d, key = %0x, n_neurons = %d",
-                  master_pop_entry, key, n_neurons);
-
-        // generate the bitfield for this master pop entry
-        uint32_t n_words = get_bit_field_size(n_neurons);
-
-        log_debug("n neurons is %d. n words is %d", n_neurons, n_words);
-        fake_bit_fields[master_pop_entry] = bit_field_alloc(n_neurons);
-        if (fake_bit_fields[master_pop_entry] == NULL){
-            log_error("could not allocate %d bytes of dtcm for bit field",
-                      n_words * sizeof(uint32_t));
-            return false;
-        }
-
-        // set bitfield elements to 1 and store in fake bitfields.
-        set_bit_field((bit_field_t)fake_bit_fields[master_pop_entry], n_words);
+        fake_bit_fields[master_pop_entry] = NULL;
     }
     log_info("finished fake bit field");
     return true;
-}
-
-void _print_fake_bit_field(){
-    uint32_t length = population_table_length();
-    for (uint32_t bit_field_index = 0; bit_field_index < length;
-            bit_field_index++){
-        log_debug("\n\nfield for index %d", bit_field_index);
-        bit_field_t field = (bit_field_t) fake_bit_fields[bit_field_index];
-        uint32_t key = population_table_get_spike_for_index(bit_field_index);
-        uint32_t n_neurons = _n_neurons_from_key(key);
-        for (uint32_t neuron_id = 0; neuron_id < n_neurons; neuron_id ++){
-            if (bit_field_test(field, neuron_id)){
-                log_debug("neuron id %d was set", neuron_id);
-            }
-            else{
-                log_debug("neuron id %d was not set", neuron_id);
-            }
-        }
-    }
-    log_debug("finished bit field print");
 }
 
 //! \brief sets up the master pop table and synaptic matrix for the bit field
@@ -215,16 +176,13 @@ bool initialise(){
              population_table_length(), row_max_n_words);
 
     // read in the correct key to max atom map
-    _print_key_to_max_atom_map();
+    //_print_key_to_max_atom_map();
 
     // set up a fake bitfield so that it always says there's something to read
     if (!_create_fake_bit_field()){
         log_error("failed to create fake bit field");
         return false;
     }
-
-    // print fake bitfield
-    //_print_fake_bit_field();
 
     // set up a sdram read for a row
     log_info("allocating dtcm for row data");
@@ -391,6 +349,19 @@ bool generate_bit_field(){
     return true;
 }
 
+void fail_shut_down(void){
+    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
+    uint core = spin1_get_core_id();
+    sark_virtual_processor_info[core].user2 = 1;
+    bit_field_base_address->n_filters = 0;
+}
+
+void success_shut_down(void){
+    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
+    uint core = spin1_get_core_id();
+    sark_virtual_processor_info[core].user2 = 0;
+}
+
 void c_main(void) {
     // set to running state
     sark_cpu_state(CPU_STATE_RUN);
@@ -403,14 +374,15 @@ void c_main(void) {
     // generate bit field for each vertex regions
     if (!initialise()){
         log_error("failed to init the master pop and synaptic matrix");
-        rt_error(RTE_ABORT);
+        fail_shut_down();
     }
     log_info("generating bit field");
     if (!generate_bit_field()){
         log_error("failed to generate bitfield");
-        rt_error(RTE_ABORT);
-    };
-
-    log_info("successfully processed the bitfield");
-
+        fail_shut_down();
+    }
+    else{
+        success_shut_down();
+        log_info("successfully processed the bitfield");
+    }
 }
