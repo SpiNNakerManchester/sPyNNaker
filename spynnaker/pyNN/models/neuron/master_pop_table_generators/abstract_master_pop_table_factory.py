@@ -33,6 +33,7 @@ class AbstractMasterPopTableFactory(object):
     @abstractmethod
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
+            core_mask, core_shift, n_neurons,
             master_pop_table_region, is_single=False):
         """ Update a data specification with a master pop entry in some form
 

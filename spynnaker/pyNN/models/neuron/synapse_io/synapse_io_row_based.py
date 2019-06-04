@@ -35,6 +35,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_max_row_length(
             self, size, dynamics, population_table, in_edge, row_length):
         # pylint: disable=too-many-arguments
+        if size == 0:
+            return 0
         try:
             return population_table.get_allowed_row_length(size)
         except SynapseRowTooBigException as e:
