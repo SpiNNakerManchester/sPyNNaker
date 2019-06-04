@@ -553,8 +553,9 @@ class AbstractPopulationVertex(
             data=len(self._neuron_impl.get_recordable_variables()))
 
         # Write Synaptic contribution left shift
-        ring_buffer_shifts = self._get_ring_buffer_shifts(
-            application_graph, machine_time_step)
+        # ring_buffer_shifts = self._get_ring_buffer_shifts(
+        #     application_graph, machine_time_step)
+        ring_buffer_shifts = [7, 7]
 
         #Since they're more than ones they get collapsed in GLOBAL_PARAMETERS
         spec.write_array(ring_buffer_shifts)
