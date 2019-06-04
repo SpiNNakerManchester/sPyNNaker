@@ -2,9 +2,11 @@ import math
 import logging
 import struct
 import numpy
+from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
+from pacman.model.resources.variable_sdram import VariableSDRAM
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -25,14 +27,12 @@ class MultiSpikeRecorder(object):
     def record(self, record):
         self._record = record
 
-    def get_sdram_usage_in_bytes(
-            self, n_neurons, spikes_per_timestep, n_machine_time_steps):
+    def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
         if not self._record:
-            return 0
+            return ConstantSDRAM(0)
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
-        return recording_utils.get_recording_region_size_in_bytes(
-            n_machine_time_steps, out_spike_bytes * spikes_per_timestep)
+        return VariableSDRAM(0, 8 + (out_spike_bytes * spikes_per_timestep))
 
     def get_dtcm_usage_in_bytes(self):
         if not self._record:
@@ -61,14 +61,14 @@ class MultiSpikeRecorder(object):
             vertex_slice = graph_mapper.get_slice(vertex)
 
             # Read the spikes from the buffer manager
-            neuron_param_region, data_missing = \
-                buffer_manager.get_data_for_vertex(placement, region)
+            neuron_param_data, data_missing = \
+                buffer_manager.get_data_by_placement(placement, region)
             if data_missing:
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
                 int(math.ceil(vertex_slice.n_atoms / 32.0)),
-                neuron_param_region.read_all(), spike_ids, spike_times)
+                neuron_param_data, spike_ids, spike_times)
 
         if missing:
             logger.warning(

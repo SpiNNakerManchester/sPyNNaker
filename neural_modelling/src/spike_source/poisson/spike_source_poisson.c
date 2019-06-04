@@ -96,9 +96,6 @@ static struct global_parameters global_parameters;
 //! global variable which contains all the data for neurons
 static spike_source_t *poisson_parameters = NULL;
 
-//! The number of clock ticks between sending each spike
-static uint32_t time_between_spikes;
-
 //! The expected current clock tick of timer_1
 static uint32_t expected_time;
 
@@ -419,7 +416,7 @@ void _send_spike(uint spike_key, uint timer_count) {
 
         // Do Nothing
     }
-    expected_time -= time_between_spikes;
+    expected_time -= global_parameters.time_between_spikes;
 
     // Send the spike
     log_debug("Sending spike packet %x at %d\n", spike_key, time);

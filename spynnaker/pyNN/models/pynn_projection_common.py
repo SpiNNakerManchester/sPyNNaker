@@ -1,5 +1,6 @@
 import logging
 import math
+import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -13,6 +14,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
@@ -56,6 +59,13 @@ class PyNNProjectionCommon(object):
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
+
+        # round the delays to multiples of full timesteps
+        # (otherwise SDRAM estimation calculations can go wrong)
+        if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
+            synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
+                synapse_dynamics_stdp.delay) * (
+                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -299,7 +309,7 @@ class PyNNProjectionCommon(object):
                 receiver = helpful_functions.locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
-                    extra_monitor_cores_to_ethernet_connection_map=receivers)
+                    packet_gather_cores_to_ethernet_connection_map=receivers)
                 sender_extra_monitor_core = extra_monitor_placements[
                     placement.x, placement.y]
                 sender_monitor_place = ctl.placements.get_placement_of_vertex(
