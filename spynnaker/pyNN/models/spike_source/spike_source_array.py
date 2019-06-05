@@ -17,5 +17,3 @@ class SpikeSourceArray(AbstractPyNNModel):
 
         return SpikeSourceArrayPartition(
             n_neurons, self._spike_times, constraints, label, max_atoms, self)
-        # return SpikeSourceArrayVertex(
-        #     n_neurons, self._spike_times, constraints, label, max_atoms, self)
