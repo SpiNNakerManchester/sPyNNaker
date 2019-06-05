@@ -614,7 +614,10 @@ class SynapticManager(object):
                         connector.generate_on_machine(
                             synapse_info.weight, synapse_info.delay) and
                         isinstance(dynamics, AbstractGenerateOnMachine) and
-                        dynamics.generate_on_machine):
+                        dynamics.generate_on_machine and
+                        self.__is_app_edge_direct(
+                            app_edge, synapse_info, m_edges, graph_mapper,
+                            post_vertex_slice, single_addr)):
                     generate_on_machine.append(
                         (app_edge, m_edges, synapse_info, app_key_info,
                          d_app_key_info, pre_slices))
@@ -661,6 +664,18 @@ class SynapticManager(object):
             spec.write_value(0)
 
         return generator_data
+
+    def __is_app_edge_direct(
+            self, app_edge, synapse_info, m_edges, graph_mapper,
+            post_vertex_slice, single_addr):
+        next_single_addr = single_addr
+        for m_edge in m_edges:
+            pre_slice = graph_mapper.get_slice(m_edge.pre_vertex)
+            if not self.__is_direct(
+                    next_single_addr, synapse_info.connector, pre_slice,
+                    post_vertex_slice, app_edge.n_delay_stages > 0):
+                return False
+            next_single_addr += pre_slice.n_atoms * 4
 
     def __write_matrix(
             self, m_edges, graph_mapper, synapse_info, pre_slices, post_slices,
