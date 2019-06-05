@@ -79,6 +79,7 @@ uint32_t count_rewires = 0;
 
 static uint32_t max_spikes_remaining = 0;
 static uint32_t spikes_remaining = 0;
+static uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
 
 
@@ -109,10 +110,13 @@ void write_contributions(uint unused1, uint unused2) {
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
 
-        spikes_remaining += spike_processing_flush_in_buffer();
+//        spikes_remaining += spike_processing_flush_in_buffer();
 
-        if(spikes_remaining > max_spikes_remaining) {
-            max_spikes_remaining = spikes_remaining;
+        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
+        spikes_remaining += spikes_remaining_this_tick;
+
+        if(spikes_remaining_this_tick > max_spikes_remaining) {
+            max_spikes_remaining = spikes_remaining_this_tick;
             max_time = time;
         }
 }
