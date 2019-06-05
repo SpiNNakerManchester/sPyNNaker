@@ -44,7 +44,8 @@ typedef enum extra_provenance_data_region_entries{
     CURRENT_TIMER_TICK = 3,
     PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
     FLUSHED_SPIKES = 5,
-    MAX_FLUSHED_SPIKES = 6
+    MAX_FLUSHED_SPIKES = 6,
+    MAX_TIME = 7
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -78,6 +79,7 @@ uint32_t count_rewires = 0;
 
 static uint32_t max_spikes_remaining = 0;
 static uint32_t spikes_remaining = 0;
+static uint32_t max_time = UINT32_MAX;
 
 
 void c_main_store_provenance_data(address_t provenance_region){
@@ -95,6 +97,7 @@ void c_main_store_provenance_data(address_t provenance_region){
             synapse_dynamics_get_plastic_saturation_count();
     provenance_region[FLUSHED_SPIKES] = spikes_remaining;
     provenance_region[MAX_FLUSHED_SPIKES] = max_spikes_remaining;
+    provenance_region[MAX_TIME] = max_time;
     log_debug("finished other provenance data");
 }
 
@@ -108,8 +111,10 @@ void write_contributions(uint unused1, uint unused2) {
 
         spikes_remaining += spike_processing_flush_in_buffer();
 
-        if(spikes_remaining > max_spikes_remaining)
+        if(spikes_remaining > max_spikes_remaining) {
             max_spikes_remaining = spikes_remaining;
+            max_time = time;
+        }
 }
 
 //! \brief Initialises the model by reading in the regions and checking

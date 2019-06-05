@@ -35,7 +35,8 @@ class SynapseMachineVertex(
                ("CURRENT_TIMER_TIC", 3),
                ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4),
                ("FLUSHED_SPIKES", 5),
-               ("MAX_FLUSHED_SPIKES", 6)])
+               ("MAX_FLUSHED_SPIKES", 6),
+               ("MAX_TIME", 7)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -118,6 +119,9 @@ class SynapseMachineVertex(
         max_flushed_per_timestep = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
                 MAX_FLUSHED_SPIKES.value]
+        max_time = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_TIME.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -177,6 +181,15 @@ class SynapseMachineVertex(
             message=(
                 "Max flushed spikes: {}, for {} on {}, {}, {}".format(
                     max_flushed_per_timestep, label, x, y, p)
+            )))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Timestep during which we dropped more spikes"),
+            max_time,
+            report=max_flushed_per_timestep > 0,
+            message=(
+                "Timestep for Max flushed spikes: {}, for {} on {}, {}, {}".format(
+                    max_time, label, x, y, p)
             )))
 
         return provenance_items
