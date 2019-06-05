@@ -447,8 +447,6 @@ class SpikeSourcePoissonVertex(
         sqrt_lambda[is_faster_source] = numpy.sqrt(
             spikes_per_tick[is_faster_source])
 
-        print('sqrt_lambda is ', sqrt_lambda)
-
         # Compute the inter-spike-interval for slow sources to get the average
         # number of timesteps between spikes
         isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
