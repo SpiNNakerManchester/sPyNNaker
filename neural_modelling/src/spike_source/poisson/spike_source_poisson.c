@@ -196,14 +196,12 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 //!         this timer tick
 static inline uint32_t faster_spike_source_get_num_spikes(
         REAL sqrt_lambda) {
-    // here we do invgausscdf(U(0,1)) * 0.5 + sqrt(lambda)
+    // First we do x = (invgausscdf(U(0,1)) * 0.5) + sqrt(lambda)
     REAL x = (gaussian_dist_variate(
 			mars_kiss64_seed,
 			global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
-    // and we return int(roundk(x^2))
+    // Then we return int(roundk(x^2))
     int nbits = 15;
-//    REAL xsqr = x * x;
-//   	REAL roundx = roundk(xsqr, nbits);
    	return (uint32_t) roundk(x * x, nbits);
 }
 
