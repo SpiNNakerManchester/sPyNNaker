@@ -25,37 +25,37 @@ class Test(unittest.TestCase):
             .split('.')
         spynnaker_parts = spynnaker.__version__.split('.')
 
-        self.assertEqual(spinn_utilities_parts[0],
+        self.assertEquals(spinn_utilities_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(spinn_utilities_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(spinn_machine_parts[0],
+        self.assertEquals(spinn_machine_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(spinn_machine_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(spinn_storage_handlers_parts[0],
+        self.assertEquals(spinn_storage_handlers_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(spinn_storage_handlers_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(data_specification_parts[0],
+        self.assertEquals(data_specification_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(data_specification_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(pacman_parts[0],
+        self.assertEquals(pacman_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(pacman_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(spinnman_parts[0],
+        self.assertEquals(spinnman_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(spinnman_parts[1],
                              spynnaker_parts[1])
 
-        self.assertEqual(spinn_front_end_common_parts[0],
+        self.assertEquals(spinn_front_end_common_parts[0],
                          spynnaker_parts[0])
         self.assertLessEqual(spinn_front_end_common_parts[1],
                              spynnaker_parts[1])
