@@ -361,7 +361,7 @@ class DelayExtensionVertex(
                         size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _EXPANDER_BASE_PARAMS_SIZE
-        return 0
+        return size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
