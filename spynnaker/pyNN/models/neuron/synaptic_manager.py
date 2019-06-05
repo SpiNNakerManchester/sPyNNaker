@@ -615,7 +615,7 @@ class SynapticManager(object):
                             synapse_info.weight, synapse_info.delay) and
                         isinstance(dynamics, AbstractGenerateOnMachine) and
                         dynamics.generate_on_machine and
-                        self.__is_app_edge_direct(
+                        not self.__is_app_edge_direct(
                             app_edge, synapse_info, m_edges, graph_mapper,
                             post_vertex_slice, single_addr)):
                     generate_on_machine.append(
@@ -676,6 +676,7 @@ class SynapticManager(object):
                     post_vertex_slice, app_edge.n_delay_stages > 0):
                 return False
             next_single_addr += pre_slice.n_atoms * 4
+        return True
 
     def __write_matrix(
             self, m_edges, graph_mapper, synapse_info, pre_slices, post_slices,
@@ -867,6 +868,10 @@ class SynapticManager(object):
 
         app_key, app_mask, core_mask = self.__get_app_key_and_mask(
             keys, mask, mask_size)
+        # Final check because adjacent keys don't mean they all fit under a
+        # single mask
+        if app_key & app_mask != app_key:
+            return None
         return _AppKeyInfo(app_key, app_mask, core_mask, mask_size,
                            keys[0][1].n_atoms)
 
@@ -897,6 +902,10 @@ class SynapticManager(object):
 
         app_key, app_mask, core_mask = self.__get_app_key_and_mask(
             keys, mask, mask_size)
+        # Final check because adjacent keys don't mean they all fit under a
+        # single mask
+        if app_key & app_mask != app_key:
+            return None
         return _AppKeyInfo(app_key, app_mask, core_mask, mask_size,
                            keys[0][1].n_atoms * app_edge.n_delay_stages)
 
