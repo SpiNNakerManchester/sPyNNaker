@@ -163,9 +163,11 @@ class SynapseMachineVertex(
 
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Total dropped spikes"),
+            report=total_flushed>0,
             total_flushed))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Maximum number of spiked dropped in a timestep"),
+            report=max_flushed_per_timestep>0,
             max_flushed_per_timestep))
 
         return provenance_items
