@@ -207,14 +207,20 @@ class FromListConnector(AbstractConnector):
         # check that conn_list has weights, if not then use the value passed in
         connection_slices = None
         if self._weights is None:
-            block["weight"] = self._generate_weights(
-                weights, len(indices), None)
+            if hasattr(weights, "__getitem__"):
+                block["weight"] = numpy.array(weights)[indices]
+            else:
+                block["weight"] = self._generate_weights(
+                    weights, len(indices), None)
         else:
             block["weight"] = self._weights[indices]
         # check that conn_list has delays, if not then use the value passed in
         if self._delays is None:
-            block["delay"] = self._generate_delays(
-                delays, len(indices), None)
+            if hasattr(weights, "__getitem__"):
+                block["delay"] = numpy.array(weights)[indices]
+            else:
+                block["delay"] = self._generate_delays(
+                    delays, len(indices), None)
         else:
             block["delay"] = self._clip_delays(self._delays[indices])
         block["synapse_type"] = synapse_type
