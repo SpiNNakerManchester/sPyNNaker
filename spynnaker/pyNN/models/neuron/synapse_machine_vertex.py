@@ -183,7 +183,7 @@ class SynapseMachineVertex(
             max_flushed_per_timestep,
             report=max_flushed_per_timestep>0,
             message=(
-                "Max flushed spikes: {}, for {} on {}, {}, {}".format(
+                "Max   flushed spikes: {}, for {} on {}, {}, {}".format(
                     max_flushed_per_timestep, label, x, y, p)
             )))
 

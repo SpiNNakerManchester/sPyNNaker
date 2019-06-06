@@ -64,7 +64,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 10
+_MAX_OFFSET_DENOMINATOR = 100000
 
 
 class AbstractPopulationVertex(
@@ -515,11 +515,18 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
+
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
             int(math.ceil(max_offset / self._n_subvertices)) *
             self._n_data_specs)
+
+#         print "max offset = {} micro s, written offset = {}micro s".format(
+#             max_offset,
+#             int(math.ceil(max_offset / self._n_subvertices)) * self._n_data_specs
+#             )
+
         self._n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
