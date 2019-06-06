@@ -422,8 +422,8 @@ class AbstractSpiNNakerCommon(AbstractSpinnakerBase,
 
                 # locate extra monitor cores on the board of this chip
                 extra_monitor_cores_on_board = set(
-                    extra_monitors_per_chip[key]
-                    for key in self._machine.get_chips_on_board(chip))
+                    extra_monitors_per_chip[xy]
+                    for xy in self._machine.get_existing_xys_on_board(chip))
 
                 # map gatherer to extra monitor cores for board
                 important_gathers.add((
