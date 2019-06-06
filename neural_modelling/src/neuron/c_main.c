@@ -145,6 +145,8 @@ static bool initialise() {
     profiler_init(
         data_specification_get_region(PROFILER_REGION, address));
 
+    io_printf(IO_BUF, "timer period: %u\n", timer_period);
+
     log_debug("Initialise: finished");
     return true;
 }
@@ -259,6 +261,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+//    io_printf(IO_BUF, "timer_callback complete: %u\n", tc[T1_COUNT]);
 }
 
 //! \brief The entry point for this model.

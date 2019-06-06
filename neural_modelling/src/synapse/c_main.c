@@ -107,6 +107,9 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
+        volatile uint32_t temp = tc[T1_COUNT];
+//        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);
+
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
 
@@ -206,7 +209,10 @@ static bool initialise(uint32_t *timer_period) {
     log_debug("Initialise: finished");
 
     // Register timer2 for periodic events(used to write contributions in SDRAM)
-    event_register_timer(SLOT_8);
+    tc[T2_INT_CLR] = 1; // clear any interrupts on T2
+    event_register_timer(SLOT_9);
+
+//    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
 
     return true;
 }
@@ -222,11 +228,14 @@ void resume_callback() {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
 
-    use(timer_count);
+//	io_printf(IO_BUF, "t_c s: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
+//	io_printf(IO_BUF, "t_c s: %u\n", timer_period-40);
+
+	use(timer_count);
     use(unused);
 
     //Schedule event 20 microseconds before the end of the timer period
-    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-20)) {
+    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-40)) {
 
         rt_error(RTE_API);
     }
@@ -265,9 +274,11 @@ void timer_callback(uint timer_count, uint unused) {
 
         simulation_ready_to_read();
 
+
+
         return;
     }
-
+//    io_printf(IO_BUF, "t_c f: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
