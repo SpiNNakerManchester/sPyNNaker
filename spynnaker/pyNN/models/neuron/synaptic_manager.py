@@ -676,7 +676,7 @@ class SynapticManager(object):
         for m_edge in m_edges:
             pre_slice = graph_mapper.get_slice(m_edge.pre_vertex)
             if not self.__is_direct(
-                    next_single_addr, synapse_info.connector, pre_slice,
+                    next_single_addr, synapse_info, pre_slice,
                     post_vertex_slice, app_edge.n_delay_stages > 0):
                 return False
             next_single_addr += pre_slice.n_atoms * 4
@@ -714,7 +714,7 @@ class SynapticManager(object):
                     block_addr, single_addr, spec, master_pop_table_region,
                     max_row_info.undelayed_max_n_synapses,
                     max_row_info.undelayed_max_words, r_info, row_data,
-                    synapse_info.connector, pre_slice, post_vertex_slice,
+                    synapse_info, pre_slice, post_vertex_slice,
                     single_synapses, all_syn_block_sz, is_delayed)
             elif is_undelayed:
                 # If there is an app_key, save the data to be written later
@@ -730,7 +730,7 @@ class SynapticManager(object):
                     block_addr, single_addr, spec, master_pop_table_region,
                     max_row_info.delayed_max_n_synapses,
                     max_row_info.delayed_max_words, r_info, delayed_row_data,
-                    synapse_info.connector, pre_slice, post_vertex_slice,
+                    synapse_info, pre_slice, post_vertex_slice,
                     single_synapses, all_syn_block_sz, True)
             elif is_delayed:
                 # If there is a delay_app_key, save the data for delays
@@ -782,11 +782,11 @@ class SynapticManager(object):
 
     def __write_machine_matrix(
             self, block_addr, single_addr, spec, master_pop_table_region,
-            max_synapses, max_words, r_info, row_data, connector, pre_slice,
+            max_synapses, max_words, r_info, row_data, synapse_info, pre_slice,
             post_vertex_slice, single_synapses, all_syn_block_sz, is_delayed):
         # Write a matrix for an incoming machine vertex
         if max_synapses == 1 and self.__is_direct(
-                single_addr, connector, pre_slice, post_vertex_slice,
+                single_addr, synapse_info, pre_slice, post_vertex_slice,
                 is_delayed):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             self._poptable_type.update_master_population_table(
@@ -1075,14 +1075,15 @@ class SynapticManager(object):
         return (row_data, delayed_row_data)
 
     def __is_direct(
-            self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
+            self, single_addr, s_info, pre_vertex_slice, post_vertex_slice,
             is_delayed):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
         """
         return (
             not is_delayed and
-            isinstance(connector, OneToOneConnector) and
+            isinstance(s_info.connector, OneToOneConnector) and
+            isinstance(s_info.synapse_dynamics, SynapseDynamicsStatic) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self._one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
