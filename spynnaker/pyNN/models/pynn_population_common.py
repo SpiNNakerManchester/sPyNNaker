@@ -473,7 +473,7 @@ class PyNNPopulationCommon(object):
         return n_spikes
 
     def get_synapse_id_by_target(self, target):
-        return self.vertex[0].get_synapse_id_by_target(target)
+        return self._vertex[0].get_synapse_id_by_target(target)
 
     @property
     def positions(self):
@@ -560,15 +560,15 @@ class PyNNPopulationCommon(object):
         return atoms
 
     @property
-    def get_neuron_vertex(self):
+    def get_vertex(self):
         return self._vertex[0]
 
-    @property
-    def get_syn_vertices(self):
-        if len(self._vertex) > 0:
-            return self._vertex[1:len(self._vertex)]
-        raise ConfigurationException(
-            "There are not synapse vertices")
+    #@property
+    #def get_syn_vertices(self):
+    #    if len(self._vertex) > 0:
+    #        return self._vertex[1:len(self._vertex)]
+    #    raise ConfigurationException(
+    #        "There are not synapse vertices")
 
     @property
     def _internal_delay_vertex(self):

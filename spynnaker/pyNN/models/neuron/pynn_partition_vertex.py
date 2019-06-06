@@ -103,11 +103,11 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         return vertices
 
     @property
-    def neuron_vertex(self):
+    def out_vertices(self):
         return self._neuron_vertices
 
     @property
-    def synapse_vertices(self):
+    def in_vertices(self):
         return self._synapse_vertices
 
     @property

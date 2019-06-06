@@ -31,7 +31,7 @@ class SpikeSourceArrayPartition(ReverseIpTagMultiCastSource, AbstractSpikeRecord
         return self._n_atoms
 
     @property
-    def vertices(self):
+    def out_vertices(self):
         return self._vertices
 
     def mark_no_changes(self):

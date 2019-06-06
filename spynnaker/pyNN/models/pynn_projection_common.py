@@ -46,19 +46,13 @@ class PyNNProjectionCommon(object):
         # sort out synapse type
         synapse_type = post_synaptic_population.get_synapse_id_by_target(target)
 
-        pre_vertex = pre_synaptic_population.get_neuron_vertex
-        post_vertex = post_synaptic_population.get_syn_vertices[synapse_type]
+        pre_vertex = pre_synaptic_population.get_vertex
+        post_vertex = post_synaptic_population.get_vertex
 
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
-
-        if not isinstance(post_vertex,
-                          AbstractAcceptsIncomingSynapses):
-            raise ConfigurationException(
-                "postsynaptic population is not designed to receive"
-                " synaptic projections")
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
