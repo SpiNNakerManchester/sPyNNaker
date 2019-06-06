@@ -45,7 +45,8 @@ typedef enum extra_provenance_data_region_entries{
     PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
     FLUSHED_SPIKES = 5,
     MAX_FLUSHED_SPIKES = 6,
-    MAX_TIME = 7
+    MAX_TIME = 7,
+    CB_CALLS = 8
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -81,6 +82,7 @@ static uint32_t max_spikes_remaining = 0;
 static uint32_t spikes_remaining = 0;
 static uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
+static uint32_t cb_calls = 0;
 
 
 void c_main_store_provenance_data(address_t provenance_region){
@@ -99,6 +101,7 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[FLUSHED_SPIKES] = spikes_remaining;
     provenance_region[MAX_FLUSHED_SPIKES] = max_spikes_remaining;
     provenance_region[MAX_TIME] = max_time;
+    provenance_region[CB_CALLS] = cb_calls;
     log_debug("finished other provenance data");
 }
 
@@ -106,6 +109,8 @@ void write_contributions(uint unused1, uint unused2) {
 
         use(unused1);
         use(unused2);
+
+        cb_calls++;
 
         volatile uint32_t temp = tc[T1_COUNT];
 //        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);

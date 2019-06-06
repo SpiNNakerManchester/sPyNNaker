@@ -36,7 +36,8 @@ class SynapseMachineVertex(
                ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4),
                ("FLUSHED_SPIKES", 5),
                ("MAX_FLUSHED_SPIKES", 6),
-               ("MAX_TIME", 7)])
+               ("MAX_TIME", 7),
+               ("CB_CALLS", 8)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -115,13 +116,16 @@ class SynapseMachineVertex(
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
         total_flushed = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-                FLUSHED_SPIKES.value]
+            FLUSHED_SPIKES.value]
         max_flushed_per_timestep = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-                MAX_FLUSHED_SPIKES.value]
+            MAX_FLUSHED_SPIKES.value]
         max_time = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-                MAX_TIME.value]
+            MAX_TIME.value]
+        cb_calls = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            CB_CALLS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -190,6 +194,15 @@ class SynapseMachineVertex(
             message=(
                 "Timestep for Max flushed spikes: {}, for {} on {}, {}, {}".format(
                     max_time, label, x, y, p)
+            )))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number of calls for the write contribution callback"),
+            cb_calls,
+            report=cb_calls > 0,
+            message=(
+                "write_contributions cb calls: {}, for {} on {}, {}, {}".format(
+                    cb_calls, label, x, y, p)
             )))
 
         return provenance_items
