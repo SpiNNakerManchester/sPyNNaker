@@ -190,7 +190,8 @@ static inline void _process_fixed_synapses(
     register uint32_t fixed_synapse = synapse_row_num_fixed_synapses(
         fixed_region_address);
 
-    num_fixed_pre_synaptic_events += fixed_synapse;
+//    num_fixed_pre_synaptic_events += fixed_synapse;
+    num_fixed_pre_synaptic_events += 1; // count processed spikes instead
 
     for (; fixed_synapse > 0; fixed_synapse--) {
 
