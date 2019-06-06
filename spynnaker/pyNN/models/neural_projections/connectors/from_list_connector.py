@@ -205,7 +205,6 @@ class FromListConnector(AbstractConnector):
         block["source"] = self._sources[indices]
         block["target"] = self._targets[indices]
         # check that conn_list has weights, if not then use the value passed in
-        connection_slices = None
         if self._weights is None:
             if hasattr(weights, "__getitem__"):
                 block["weight"] = numpy.array(weights)[indices]
