@@ -35,6 +35,7 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+from .key_space_tracker import KeySpaceTracker
 
 TIME_STAMP_BYTES = 4
 
@@ -575,7 +576,10 @@ class SynapticManager(object):
         in_machine_edges = machine_graph.get_edges_ending_at_vertex(
             machine_vertex)
         in_edges_by_app_edge = defaultdict(list)
+        key_space_tracker = KeySpaceTracker()
         for edge in in_machine_edges:
+            rinfo = routing_info.get_routing_info_for_edge(edge)
+            key_space_tracker.allocate_keys(rinfo)
             app_edge = graph_mapper.get_application_edge(edge)
             if isinstance(app_edge, ProjectionApplicationEdge):
                 in_edges_by_app_edge[app_edge].append(edge)
@@ -598,9 +602,9 @@ class SynapticManager(object):
             spec.comment("\nWriting matrix for edge:{}\n".format(
                 app_edge.label))
             app_key_info = self.__app_key_and_mask(
-                graph_mapper, m_edges, routing_info)
+                graph_mapper, m_edges, routing_info, key_space_tracker)
             d_app_key_info = self.__delay_app_key_and_mask(
-                graph_mapper, m_edges, app_edge)
+                graph_mapper, m_edges, app_edge, key_space_tracker)
             pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
 
             for synapse_info in app_edge.synapse_information:
@@ -804,15 +808,6 @@ class SynapticManager(object):
                     .format(block_addr, all_syn_block_sz))
         return block_addr, single_addr
 
-    @staticmethod
-    def __count_trailing_0s(mask):
-        # Count zeros at the LSB of a number
-        # NOTE assumes a 32-bit number
-        for i in range(32):
-            if mask & (1 << i):
-                return i
-        return 32
-
     def __check_keys_adjacent(self, keys, mask, mask_size):
         # Check that keys are all adjacent
         key_increment = (1 << mask_size)
@@ -832,16 +827,38 @@ class SynapticManager(object):
             last_slice = v_slice
         return True
 
-    def __get_app_key_and_mask(self, keys, mask, mask_size):
-        # The key is the smallest key, the mask is the one that fits all the
-        # keys
+    def __get_app_key_and_mask(self, keys, mask, n_stages, key_space_tracker):
+
+        # Can be merged only if keys are adjacent outside the mask
+        keys = sorted(keys, key=lambda item: item[0])
+        mask_size = KeySpaceTracker.count_trailing_0s(mask)
+        if not self.__check_keys_adjacent(keys, mask, mask_size):
+            return None
+
+        # Get the key as the first key and the mask as the mask that covers
+        # enough keys
         key = keys[0][0]
         n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
         core_mask = (((2 ** n_extra_mask_bits) - 1))
         new_mask = mask & ~(core_mask << mask_size)
-        return key, new_mask, core_mask
 
-    def __app_key_and_mask(self, graph_mapper, m_edges, routing_info):
+        # Final check because adjacent keys don't mean they all fit under a
+        # single mask
+        if key & new_mask != key:
+            return None
+
+        # Check that the key doesn't cover other keys that it shouldn't
+        next_key = keys[-1][0] + (2 ** mask_size)
+        max_key = key + (2 ** (mask_size + n_extra_mask_bits))
+        n_unused = max_key - (next_key & mask)
+        if n_unused > 0 and key_space_tracker.is_allocated(next_key, n_unused):
+            return None
+
+        return _AppKeyInfo(key, new_mask, core_mask, mask_size,
+                           keys[0][1].n_atoms * n_stages)
+
+    def __app_key_and_mask(self, graph_mapper, m_edges, routing_info,
+                           key_space_tracker):
         # Work out if the keys allow the machine vertices to be merged
         mask = None
         keys = list()
@@ -860,22 +877,10 @@ class SynapticManager(object):
         if mask is None:
             return None
 
-        # Can be merged only if keys are adjacent outside the mask
-        keys = sorted(keys, key=lambda item: item[0])
-        mask_size = self.__count_trailing_0s(mask)
-        if not self.__check_keys_adjacent(keys, mask, mask_size):
-            return None
+        return self.__get_app_key_and_mask(keys, mask, 1, key_space_tracker)
 
-        app_key, app_mask, core_mask = self.__get_app_key_and_mask(
-            keys, mask, mask_size)
-        # Final check because adjacent keys don't mean they all fit under a
-        # single mask
-        if app_key & app_mask != app_key:
-            return None
-        return _AppKeyInfo(app_key, app_mask, core_mask, mask_size,
-                           keys[0][1].n_atoms)
-
-    def __delay_app_key_and_mask(self, graph_mapper, m_edges, app_edge):
+    def __delay_app_key_and_mask(self, graph_mapper, m_edges, app_edge,
+                                 key_space_tracker):
         # Work out if the keys allow the machine vertices to be
         # merged
         mask = None
@@ -894,20 +899,8 @@ class SynapticManager(object):
             mask = rinfo.first_mask
             keys.append((rinfo.first_key, pre_vertex_slice))
 
-        # Can be merged only if keys are adjacent outside the mask
-        keys = sorted(keys)
-        mask_size = self.__count_trailing_0s(mask)
-        if not self.__check_keys_adjacent(keys, mask, mask_size):
-            return None
-
-        app_key, app_mask, core_mask = self.__get_app_key_and_mask(
-            keys, mask, mask_size)
-        # Final check because adjacent keys don't mean they all fit under a
-        # single mask
-        if app_key & app_mask != app_key:
-            return None
-        return _AppKeyInfo(app_key, app_mask, core_mask, mask_size,
-                           keys[0][1].n_atoms * app_edge.n_delay_stages)
+        return self.__get_app_key_and_mask(keys, mask, app_edge.n_delay_stages,
+                                           key_space_tracker)
 
     def __write_on_chip_matrix_data(
             self, m_edges, graph_mapper, synapse_info, pre_slices, post_slices,
