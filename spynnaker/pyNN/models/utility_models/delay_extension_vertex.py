@@ -7,20 +7,19 @@ import math
 import sys
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, ResourceContainer, SDRAMResource)
-from spinn_front_end_common.utilities.constants import (
-    SARK_PER_MALLOC_SDRAM_USAGE, SYSTEM_BYTES_REQUIREMENT)
+    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities.constants import (
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -35,7 +34,6 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 logger = logging.getLogger(__name__)
 
 _DELAY_PARAM_HEADER_WORDS = 8
-_DEFAULT_MALLOCS_USED = 2
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * 4
@@ -108,7 +106,7 @@ class DelayExtensionVertex(
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
-            sdram=SDRAMResource(
+            sdram=ConstantSDRAM(
                 self.get_sdram_usage_for_atoms(out_edges)),
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
@@ -191,7 +189,7 @@ class DelayExtensionVertex(
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
-            size=SYSTEM_BYTES_REQUIREMENT,
+            size=SIMULATION_N_BYTES,
             label='setup')
 
         spec.reserve_memory_region(
@@ -312,8 +310,7 @@ class DelayExtensionVertex(
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, out_edges):
-        return (_DEFAULT_MALLOCS_USED * SARK_PER_MALLOC_SDRAM_USAGE +
-                SYSTEM_BYTES_REQUIREMENT +
+        return (SYSTEM_BYTES_REQUIREMENT +
                 DelayExtensionMachineVertex.get_provenance_data_size(0) +
                 self._get_size_of_generator_information(out_edges))
 
@@ -350,7 +347,7 @@ class DelayExtensionVertex(
                     max_atoms = sys.maxsize
                     edge_post_vertex = out_edge.post_vertex
                     if (isinstance(
-                            edge_post_vertex, AbstractHasGlobalMaxAtoms)):
+                            edge_post_vertex, ApplicationVertex)):
                         max_atoms = edge_post_vertex.get_max_atoms_per_core()
                     if out_edge.post_vertex.n_atoms < max_atoms:
                         max_atoms = edge_post_vertex.n_atoms
@@ -364,7 +361,7 @@ class DelayExtensionVertex(
                         size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _EXPANDER_BASE_PARAMS_SIZE
-        return 0
+        return size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1

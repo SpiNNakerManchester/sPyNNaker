@@ -42,8 +42,11 @@ def get_lut_provenance(
     # pylint: disable=too-many-arguments
     top_level_name = "{}_{}_STDP_{}".format(
         pre_population_label, post_population_label, rule_name)
+    report = False
+    if last_entry is not None:
+        report = last_entry > 0
     return ProvenanceDataItem(
-        [top_level_name, entry_name], last_entry, report=last_entry > 0,
+        [top_level_name, entry_name], last_entry, report=report,
         message=(
             "The last entry in the STDP exponential lookup table for the {}"
             " parameter of the {} between {} and {} was {} rather than 0,"

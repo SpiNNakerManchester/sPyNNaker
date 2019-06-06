@@ -75,6 +75,10 @@ class MockSimulator(object):
         return False
 
     @property
+    def machine_time_step(self):
+        return 1000
+
+    @property
     def id_counter(self):
         return 1
 

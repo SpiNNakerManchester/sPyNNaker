@@ -20,8 +20,8 @@ typedef struct threshold_type_t {
     // soft threshold value  [mV]
     REAL     v_thresh;
 
-    //
-    REAL     machine_time_step_ms_div_10;
+    // time step scaling factor
+    REAL     neg_machine_time_step_ms_div_10;
 
 } threshold_type_t;
 
@@ -38,8 +38,8 @@ static inline bool threshold_type_is_above_threshold(state_t value,
     UREAL result;
     if (exponent < 5.0k) {
         REAL hazard = expk(exponent) * threshold_type->tau_th_inv;
-        result = (1. - expk(-hazard *
-                            threshold_type->machine_time_step_ms_div_10)) *
+        result = (1. - expk(hazard *
+                            threshold_type->neg_machine_time_step_ms_div_10)) *
                   PROB_SATURATION;
 
     } else {

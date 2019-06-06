@@ -1,6 +1,7 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -204,6 +205,7 @@ class FromListConnector(AbstractConnector):
         block["source"] = self._sources[indices]
         block["target"] = self._targets[indices]
         # check that conn_list has weights, if not then use the value passed in
+        connection_slices = None
         if self._weights is None:
             block["weight"] = self._generate_weights(
                 weights, len(indices), None)
@@ -282,7 +284,11 @@ class FromListConnector(AbstractConnector):
         self._delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            self._delays = self._conn_list[:, delay_column]
+            machine_time_step = globals_variables.get_simulator(
+                ).machine_time_step
+            self._delays = numpy.rint(
+                numpy.array(self._conn_list[:, delay_column]) * (
+                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
         except ValueError:
             pass
 
