@@ -13,6 +13,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neural_projections.pynn_partition_edge import \
+    PyNNPartitionEdge
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
@@ -63,6 +65,8 @@ class PyNNProjectionCommon(object):
             connector, synapse_dynamics_stdp, synapse_type,
             synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
 
+        self._projection_edge = PyNNPartitionEdge(pre_vertex, post_vertex, self._synapse_information)
+
         # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
@@ -87,6 +91,8 @@ class PyNNProjectionCommon(object):
         if max_delay > user_max_delay / (machine_time_step / 1000.0):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
+
+        #SHOULD BE OK UNTIL HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!
 
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None

@@ -28,7 +28,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     __slots__ = [
         "_neuron_vertices",
-        "_synapse_vertices",
+        "_synapse_vertices",  # List of lists, each list corresponds to a neuron vertex
         "_n_atoms"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
@@ -193,3 +193,12 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     def get_synapse_id_by_target(self, target):
         self._neuron_vertices[0].get_synapse_id_by_target(target)
+
+    def set_synapse_dynamics(self, synapse_dynamics):
+        for vertex_list in self._synapse_vertices:
+            for vertex in vertex_list:
+                vertex.set_synapse_dynamics(synapse_dynamics)
+
+    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        return self._synapse_vertices[0][0].\
+            get_maximum_delay_supported_in_ms(machine_time_step)
