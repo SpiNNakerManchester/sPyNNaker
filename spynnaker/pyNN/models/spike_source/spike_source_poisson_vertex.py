@@ -716,4 +716,4 @@ class SpikeSourcePoissonVertex(
 
     @property
     def max_rate(self):
-        return self._max_rate
+        return self.__max_rate
