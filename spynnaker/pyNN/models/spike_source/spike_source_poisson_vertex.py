@@ -575,7 +575,7 @@ class SpikeSourcePoissonVertex(
             poisson_parameter_parameters_sdram_address, size_of_region)
 
         # Convert the data to parameter values
-        (start, end, is_fast_source, exp_minus_lambda, isi,
+        (start, end, is_fast_source, exp_minus_lambda, sqrt_lambda, isi,
          time_to_next_spike) = _PoissonStruct.read_data(
              byte_array, 0, vertex_slice.n_atoms)
 
@@ -588,12 +588,15 @@ class SpikeSourcePoissonVertex(
             self._convert_n_timesteps_to_ms(end, self._machine_time_step) -
             self._start[vertex_slice.as_slice])
 
-        # Work out the spikes per tick depending on if the source is slow
-        # or fast
+        # Work out the spikes per tick depending on if the source is
+        # slow (isi), fast (exp) or faster (sqrt)
         is_fast_source = is_fast_source == 1.0
         spikes_per_tick = numpy.zeros(len(is_fast_source), dtype="float")
         spikes_per_tick[is_fast_source] = numpy.log(
             exp_minus_lambda[is_fast_source]) * -1.0
+        is_faster_source = sqrt_lambda > 0
+        spikes_per_tick[is_faster_source] = numpy.square(
+            sqrt_lambda[is_faster_source])
         slow_elements = isi > 0
         spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 

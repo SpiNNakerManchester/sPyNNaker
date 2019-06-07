@@ -202,7 +202,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 			global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
     // Then we return int(roundk(x^2))
     int nbits = 15;
-   	return (uint32_t) roundk(x * x, nbits);
+    return (uint32_t) roundk(x * x, nbits);
 }
 
 void print_spike_sources(){
