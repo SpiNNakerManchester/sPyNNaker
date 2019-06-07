@@ -75,11 +75,18 @@ static inline void _print_master_population_table() {
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            if (!_is_single(address_list[j])) {
+            if (address_list[j] == INVALID_ADDRESS_AND_ROW_LENGTH) {
                 log_info(
                     "index (%d, %d), key: 0x%08x, mask: 0x%08x,"
                     " core_mask: 0x%08x, core_shift: %u, n_neurons: %u,"
-                    " offset: 0x%08x, address: 0x%08x, row_length: %u\n",
+                    " INVALID",
+                    i, j, entry.key, entry.mask, entry.core_mask,
+                    _get_core_shift(entry), _get_n_neurons(entry));
+            } else if (!_is_single(address_list[j])) {
+                log_info(
+                    "index (%d, %d), key: 0x%08x, mask: 0x%08x,"
+                    " core_mask: 0x%08x, core_shift: %u, n_neurons: %u,"
+                    " offset: 0x%08x, address: 0x%08x, row_length: %u",
                     i, j, entry.key, entry.mask, entry.core_mask,
                     _get_core_shift(entry), _get_n_neurons(entry),
                     _get_address(address_list[j]),
