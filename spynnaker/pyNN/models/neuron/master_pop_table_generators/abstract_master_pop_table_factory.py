@@ -46,9 +46,36 @@ class AbstractMasterPopTableFactory(object):
             this function
         :type key_and_mask: \
             :py:class:`pacman.model.routing_info.BaseKeyAndMask`
+        :param core_mask: Mask for the part of the key that identifies the core
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons: \
+            The number of neurons in each machine vertex (bar the last)
         :param master_pop_table_region: \
             The region to which the master pop table is being stored
         :param is_single: True if this is a single synapse, False otherwise
+        """
+
+    @abstractmethod
+    def add_invalid_entry(
+            self, spec, key_and_mask, core_mask, core_shift, n_neurons,
+            master_pop_table_region):
+        """ Add an entry to the table that doesn't point to anywhere.  Used\
+            to keep indices in synchronisation between e.g. normal and delay\
+            entries and between entries on different cores
+
+        :param spec: the data specification to write the master pop entry to
+        :param key_and_mask: a key_and_mask object used as part of describing\
+            an edge that will require being received to be stored in the\
+            master pop table; the whole edge will become multiple calls to\
+            this function
+        :type key_and_mask: \
+            :py:class:`pacman.model.routing_info.BaseKeyAndMask`
+        :param core_mask: Mask for the part of the key that identifies the core
+        :param core_shift: The shift of the mask to get to the core_mask
+        :param n_neurons: \
+            The number of neurons in each machine vertex (bar the last)
+        :param master_pop_table_region: \
+            The region to which the master pop table is being stored
         """
 
     @abstractmethod

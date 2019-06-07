@@ -29,6 +29,8 @@ _ADDRESS_SCALED_SHIFT = 8 - 4
 _ADDRESS_SHIFT = 8
 # The shift of n_neurons in the n_neurons_and_core_shift field
 _N_NEURONS_SHIFT = 5
+# An invalid entry in the address and row length list
+_INVALID_ADDDRESS_AND_ROW_LENGTH = 0xFFFFFFFF
 
 # DTypes of the structs
 _MASTER_POP_ENTRY_DTYPE = [
@@ -66,7 +68,10 @@ class _MasterPopEntry(object):
 
     def append(self, address, row_length, is_single):
         self._addresses_and_row_lengths.append(
-            (address, row_length, is_single))
+            (address, row_length, is_single, True))
+
+    def append_invalid(self):
+        self._addresses_and_row_lengths.append((0, 0, 0, False))
 
     @property
     def routing_key(self):
@@ -91,13 +96,16 @@ class _MasterPopEntry(object):
         entry["core_mask"] = self._core_mask
         entry["n_neurons_and_core_shift"] = (
             (self._n_neurons << _N_NEURONS_SHIFT) | self._core_shift)
-        for j, (address, row_length, is_single) in enumerate(
+        for j, (address, row_length, is_single, is_valid) in enumerate(
                 self._addresses_and_row_lengths):
-            single_bit = _SINGLE_BIT_FLAG_BIT if is_single else 0
-            address_list[start + j] = (
-                single_bit |
-                ((address & _ADDRESS_MASK) << _ADDRESS_SHIFT) |
-                (row_length & _ROW_LENGTH_MASK))
+            if not is_valid:
+                address_list[start + j] = _INVALID_ADDDRESS_AND_ROW_LENGTH
+            else:
+                single_bit = _SINGLE_BIT_FLAG_BIT if is_single else 0
+                address_list[start + j] = (
+                    single_bit |
+                    ((address & _ADDRESS_MASK) << _ADDRESS_SHIFT) |
+                    (row_length & _ROW_LENGTH_MASK))
         return count
 
 
@@ -210,24 +218,12 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self._n_addresses = 0
         self._n_single_entries = 0
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
-               extend_doc=False)
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             core_mask, core_shift, n_neurons,
             master_pop_table_region, is_single=False):
-        """ Add an entry in the binary search to deal with the synaptic matrix
-
-        :param spec: the writer for DSG
-        :param block_start_addr: where the synaptic matrix block starts
-        :param row_length: how long in bytes each synaptic entry is
-        :param key_and_mask: the key and mask for this master pop entry
-        :param master_pop_table_region: the region ID for the master pop
-        :param is_single: \
-            Flag that states if the entry is a direct entry for a single row.
-        :rtype: None
-        """
-        # pylint: disable=too-many-arguments, arguments-differ
+        # pylint: disable=too-many-arguments
         if key_and_mask.key not in self._entries:
             self._entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
@@ -250,6 +246,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 row_length)
         self._entries[key_and_mask.key].append(
             start_addr, row_length - 1, is_single)
+        self._n_addresses += 1
+
+    @overrides(AbstractMasterPopTableFactory.add_invalid_entry)
+    def add_invalid_entry(
+            self, spec, key_and_mask, core_mask, core_shift, n_neurons,
+            master_pop_table_region):
+        if key_and_mask.key not in self._entries:
+            self._entries[key_and_mask.key] = _MasterPopEntry(
+                key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
+                n_neurons)
+        self._entries[key_and_mask.key].append_invalid()
         self._n_addresses += 1
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
@@ -318,15 +325,18 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         addresses = list()
         for i in range(entry["start"], entry["start"] + entry["count"]):
             address_and_row_length = address_list[i]
-            is_single = (address_and_row_length & _SINGLE_BIT_FLAG_BIT) > 0
-            address = address_and_row_length & _ADDRESS_MASK_SHIFTED
-            row_length = (address_and_row_length & _ROW_LENGTH_MASK)
-            if is_single:
-                address = address >> _ADDRESS_SHIFT
+            if address_and_row_length == _INVALID_ADDDRESS_AND_ROW_LENGTH:
+                addresses.append((0, 0, 0))
             else:
-                address = address >> _ADDRESS_SCALED_SHIFT
+                is_single = (address_and_row_length & _SINGLE_BIT_FLAG_BIT) > 0
+                address = address_and_row_length & _ADDRESS_MASK_SHIFTED
+                row_length = (address_and_row_length & _ROW_LENGTH_MASK)
+                if is_single:
+                    address = address >> _ADDRESS_SHIFT
+                else:
+                    address = address >> _ADDRESS_SCALED_SHIFT
 
-            addresses.append((row_length + 1, address, is_single))
+                addresses.append((row_length + 1, address, is_single))
         return addresses
 
     @staticmethod
