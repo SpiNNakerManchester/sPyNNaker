@@ -341,14 +341,33 @@ class TestSynapticManager(unittest.TestCase):
 
         # The first entry should be direct, but the rest should be indirect;
         # the second is potentially direct, but has been restricted by the
-        # restriction on the size of the direct matrix
+        # restriction on the size of the direct matrix.  All items
+        # should be "valid" in that they have row length
         assert len(items) == 4
         assert items[0][2]
         assert not items[1][2]
         assert not items[2][2]
         assert not items[3][2]
-        assert len(delay_items) == 1
-        assert not delay_items[0][2]
+        assert items[0][0] > 0
+        assert items[1][0] > 0
+        assert items[2][0] > 0
+        assert items[3][0] > 0
+        assert items[0][1] == 0
+        assert items[1][1] == 0
+        assert items[2][1] > 0
+        assert items[3][1] > 0
+
+        # There are 4 delay items even though there is only one delayed entry
+        # because invalid entries are added to keep the indices the same
+        # between delayed and not delayed items.  The first 3 items should all
+        # be invalid in that they have a row length of 0.  The last item should
+        # not be single
+        assert len(delay_items) == 4
+        assert delay_items[0][0] == 0
+        assert delay_items[1][0] == 0
+        assert delay_items[2][0] == 0
+        assert delay_items[3][0] > 0
+        assert not delay_items[3][2]
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
             transceiver=transceiver, placement=placement,
@@ -423,7 +442,7 @@ class TestSynapticManager(unittest.TestCase):
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=delay_key,
-            n_rows=pre_vertex_slice.n_atoms * n_delay_stages, index=0,
+            n_rows=pre_vertex_slice.n_atoms * n_delay_stages, index=3,
             using_extra_monitor_cores=False)
         connections_4 = synaptic_manager._synapse_io.read_synapses(
             from_list_synapse_information, pre_vertex_slice,
