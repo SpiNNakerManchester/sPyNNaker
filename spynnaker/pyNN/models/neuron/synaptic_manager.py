@@ -1020,7 +1020,7 @@ class SynapticManager(object):
 
             # Create the generator data and note it exists for this post vertex
             generator_data.append(GeneratorData(
-                syn_mat_offset // 4, d_mat_offset // 4,
+                syn_mat_offset, d_mat_offset,
                 max_row_info.undelayed_max_words,
                 max_row_info.delayed_max_words,
                 max_row_info.undelayed_max_n_synapses,
