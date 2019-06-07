@@ -713,3 +713,7 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
         return context
+
+    @property
+    def max_rate(self):
+        return self._max_rate

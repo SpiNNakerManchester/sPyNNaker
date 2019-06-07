@@ -43,8 +43,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
         slice_min_delay = min(delays)
         slice_max_delay = max(delays)
-        if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
+        if ((min_delay <= slice_max_delay <= max_delay) or
+                (min_delay <= slice_min_delay <= max_delay)):
             return 1
+
         return 0
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
