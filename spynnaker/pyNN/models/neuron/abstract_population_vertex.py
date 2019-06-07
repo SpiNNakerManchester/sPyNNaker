@@ -64,7 +64,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 100000
+_MAX_OFFSET_DENOMINATOR = 10
 
 
 class AbstractPopulationVertex(
@@ -521,7 +521,6 @@ class AbstractPopulationVertex(
         spec.write_value(
             int(math.ceil(max_offset / self._n_subvertices)) *
             self._n_data_specs)
-
 #         print "max offset = {} micro s, written offset = {}micro s".format(
 #             max_offset,
 #             int(math.ceil(max_offset / self._n_subvertices)) * self._n_data_specs
@@ -531,8 +530,9 @@ class AbstractPopulationVertex(
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
+            (machine_time_step * time_scale_factor) / (n_atoms * 100.0))
         spec.write_value(data=int(time_between_spikes))
+#         print "time between spikes: {}".format(time_between_spikes)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used

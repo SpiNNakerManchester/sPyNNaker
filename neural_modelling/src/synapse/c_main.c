@@ -112,7 +112,7 @@ void write_contributions(uint unused1, uint unused2) {
 
         cb_calls++;
 
-        volatile uint32_t temp = tc[T1_COUNT];
+//        volatile uint32_t temp = tc[T1_COUNT];
 //        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);
 
         //Start DMA Writing procedure for the contribution of this timestep
@@ -239,11 +239,23 @@ void timer_callback(uint timer_count, uint unused) {
 	use(timer_count);
     use(unused);
 
-    //Schedule event 20 microseconds before the end of the timer period
+
     if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-40)) {
 
         rt_error(RTE_API);
     }
+
+//    Sould this be done in a safer way?
+//    uint32_t state = spin1_int_disable();
+//    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+//
+//    //Schedule event 20 microseconds before the end of the timer period
+//    if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
+//
+//        rt_error(RTE_API);
+//    }
+//    io_printf(IO_BUF, "wc_reg: %u", wc_start);
+//    spin1_mode_restore(state);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
