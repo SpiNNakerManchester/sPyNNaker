@@ -17,6 +17,9 @@
 #include <stdfix-full-iso.h>
 #include <limits.h>
 
+#include "profile_tags.h"
+#include <profiler.h>
+
 // Declare spin1_wfi
 extern void spin1_wfi();
 
@@ -46,7 +49,8 @@ typedef struct timed_out_spikes{
 typedef enum region {
     SYSTEM, POISSON_PARAMS,
     SPIKE_HISTORY_REGION,
-    PROVENANCE_REGION
+    PROVENANCE_REGION,
+	PROFILER_REGION
 } region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
@@ -212,8 +216,9 @@ void print_spike_sources(){
         log_info("scaled end = %u", poisson_parameters[s].end_ticks);
         log_info("is_fast_source = %d", poisson_parameters[s].is_fast_source);
         log_info(
-            "exp_minus_lamda = %k",
+            "exp_minus_lambda = %k",
             (REAL)(poisson_parameters[s].exp_minus_lambda));
+        log_info("sqrt_lambda = %k", poisson_parameters[s].sqrt_lambda);
         log_info("isi_val = %u", poisson_parameters[s].mean_isi_ticks);
         log_info(
             "time_to_spike = %u", poisson_parameters[s].time_to_spike_ticks);
@@ -368,13 +373,17 @@ static bool initialize() {
     }
 
     // print spike sources for debug purposes
-//    print_spike_sources();
+    print_spike_sources();
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
     n_spike_buffer_words = get_bit_field_size(
         global_parameters.n_spike_sources);
     spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
+
+    // Setup profiler
+    profiler_init(
+        data_specification_get_region(PROFILER_REGION, address));
 
     log_info("Initialise: completed successfully");
 
@@ -407,7 +416,7 @@ void resume_callback() {
     log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
-//    print_spike_sources();
+    print_spike_sources();
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
@@ -523,6 +532,9 @@ static inline void _record_spikes(uint32_t time) {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+
     time++;
 
     log_debug("Timer tick %u", time);
@@ -539,11 +551,15 @@ void timer_callback(uint timer_count, uint unused) {
             rt_error(RTE_SWERR);
         }
 
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             recording_finalise();
         }
+
+        profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -636,6 +652,9 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
 }
 
 //! \brief set the spike source rate as required

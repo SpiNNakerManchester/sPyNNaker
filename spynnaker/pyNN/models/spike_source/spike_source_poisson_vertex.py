@@ -25,6 +25,7 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants, utility_calls
@@ -117,6 +118,11 @@ class SpikeSourcePoissonVertex(
             0, n_neurons)
         self._machine_time_step = None
 
+        # get config from simulator
+        config = globals_variables.get_simulator().config
+        self._n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
+
         # Prepare for recording, and to get spikes
         self._spike_recorder = MultiSpikeRecorder()
 
@@ -171,10 +177,11 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
-            recording_utilities.get_recording_data_constant_size(1))
+            recording_utilities.get_recording_data_constant_size(1) +
+            profile_utils.get_profile_region_size(self._n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
-            vertex_slice,  machine_time_step)
+            vertex_slice, machine_time_step)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
@@ -282,6 +289,10 @@ class SpikeSourcePoissonVertex(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
+
+        profile_utils.reserve_profile_region(
+            spec, _REGIONS.PROFILER_REGION.value, self._n_profile_samples)
+
         placement.vertex.reserve_provenance_data_region(spec)
 
     def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
@@ -655,6 +666,11 @@ class SpikeSourcePoissonVertex(
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
             machine_time_step, time_scale_factor)
+
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, _REGIONS.PROFILER_REGION.value,
+            self._n_profile_samples)
 
         # End-of-Spec:
         spec.end_specification()

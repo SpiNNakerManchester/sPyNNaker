@@ -11,6 +11,9 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.interface.profiling import AbstractHasProfileData
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data)
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 
@@ -18,13 +21,18 @@ from spynnaker.pyNN.utilities.constants import (
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractSupportsDatabaseInjection):
+        AbstractSupportsDatabaseInjection, AbstractHasProfileData):
     POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
                ('POISSON_PARAMS_REGION', 1),
                ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3)])
+               ('PROVENANCE_REGION', 3),
+               ('PROFILER_REGION', 4)])
+
+    PROFILE_TAG_LABELS = {
+        0: "TIMER",
+        1: "DMA_READ"}
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -80,3 +88,9 @@ class SpikeSourcePoissonMachineVertex(
             raise ConfigurationException(
                 "Poisson source can only have one incoming control")
         return len(in_edges) == 1
+
+    @overrides(AbstractHasProfileData.get_profile_data)
+    def get_profile_data(self, transceiver, placement):
+        return get_profiling_data(
+            self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
+            self.PROFILE_TAG_LABELS, transceiver, placement)
