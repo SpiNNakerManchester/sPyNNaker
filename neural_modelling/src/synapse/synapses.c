@@ -350,7 +350,8 @@ void synapses_do_timestep_update(timer_t time) {
     _print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
-    uint32_t state = spin1_irq_disable();
+    //Interrupts are now disabled in the caller
+    //uint32_t state = spin1_irq_disable();
 
     // Starting position of the memory chunk
     uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
@@ -365,7 +366,7 @@ void synapses_do_timestep_update(timer_t time) {
     _print_inputs();
 
     // Re-enable the interrupts
-    spin1_mode_restore(state);
+    //spin1_mode_restore(state);
 }
 
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,

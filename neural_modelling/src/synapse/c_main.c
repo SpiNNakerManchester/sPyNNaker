@@ -110,6 +110,8 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
+        uint32_t state = spin1_int_disable();
+
         cb_calls++;
 
 //        volatile uint32_t temp = tc[T1_COUNT];
@@ -127,6 +129,8 @@ void write_contributions(uint unused1, uint unused2) {
             max_spikes_remaining = spikes_remaining_this_tick;
             max_time = time;
         }
+
+        spin1_mode_restore(state);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
