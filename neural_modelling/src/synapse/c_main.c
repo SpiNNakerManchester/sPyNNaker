@@ -254,7 +254,7 @@ void timer_callback(uint timer_count, uint unused) {
 
         rt_error(RTE_API);
     }
-    io_printf(IO_BUF, "wc_reg: %u", wc_start);
+//    io_printf(IO_BUF, "wc_reg: %u", wc_reg);
     spin1_mode_restore(state);
 
 
