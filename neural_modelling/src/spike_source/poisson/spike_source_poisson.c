@@ -385,7 +385,7 @@ static void _send_spike(uint spike_key, uint timer_count) {
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
         // Do Nothing
     }
-    expected_time -= global_parameters.time_between_spikes;
+    expected_time -= globals.time_between_spikes;
 
     // Send the spike
     log_debug("Sending spike packet %x at %d\n", spike_key, time);
