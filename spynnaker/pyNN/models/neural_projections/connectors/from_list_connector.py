@@ -24,7 +24,10 @@ class FromListConnector(AbstractConnector):
         "_weights",
         "_delays",
         "_extra_parameters",
-        "_extra_parameter_names"]
+        "_extra_parameter_names",
+        "_split_conn_list",
+        "_split_pre_slices",
+        "_split_post_slices"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
@@ -49,6 +52,11 @@ class FromListConnector(AbstractConnector):
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
 
+        # The connection list split by pre/post vertex slices
+        self._split_conn_list = None
+        self._split_pre_slices = None
+        self._split_post_slices = None
+
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
         if self._delays is None:
@@ -62,6 +70,61 @@ class FromListConnector(AbstractConnector):
             return numpy.var(delays)
         else:
             return numpy.var(self._delays)
+
+    def _split_connections(self, pre_slices, post_slices):
+        # If there are no connections, return
+        if not len(self._sources):
+            return False
+
+        # If nothing has changed, use the cache
+        if (self._split_pre_slices == pre_slices and
+                self._split_post_slices == post_slices):
+            return False
+
+        self._split_pre_slices = pre_slices
+        self._split_post_slices = post_slices
+
+        # Create bins into which connections are to be grouped
+        pre_bins = numpy.concatenate((
+            [0], numpy.sort([s.hi_atom + 1 for s in pre_slices])))
+        post_bins = numpy.concatenate((
+            [0], numpy.sort([s.hi_atom + 1 for s in post_slices])))
+
+        # Find the group of each item in the separate bins
+        pre_indices = numpy.searchsorted(
+            pre_bins, self._sources, side="right")
+        post_indices = numpy.searchsorted(
+            post_bins, self._targets, side="right")
+
+        # Join the groups from both axes
+        n_bins = (len(pre_bins) + 1, len(post_bins) + 1)
+        joined_indices = numpy.ravel_multi_index(
+            (pre_indices, post_indices), n_bins)
+
+        # Get a count of the indices in each bin
+        index_count = numpy.bincount(
+            joined_indices, minlength=numpy.prod(n_bins))
+
+        # Get a sort order on the connections
+        sort_indices = numpy.argsort(joined_indices)
+
+        # Split the sort order in to groups of connection indices
+        split_indices = numpy.array(numpy.split(
+            sort_indices, numpy.cumsum(index_count)))
+
+        # Ignore the outliers
+        split_indices = split_indices[:-1].reshape(n_bins)[1:-1, 1:-1]
+        split_indices = split_indices.reshape(-1)
+
+        # Get the results indexed by hi_atom in the slices
+        pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
+                         for post in post_bins[1:]]
+        self._split_conn_list = {
+            (pre_post): indices
+            for pre_post, indices in zip(pre_post_bins, split_indices)
+        }
+
+        return True
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -133,40 +196,32 @@ class FromListConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
-        mask = ((self._sources >= pre_vertex_slice.lo_atom) &
-                (self._sources <= pre_vertex_slice.hi_atom) &
-                (self._targets >= post_vertex_slice.lo_atom) &
-                (self._targets <= post_vertex_slice.hi_atom))
-        sources = self._sources[mask]
-        block = numpy.zeros(sources.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = sources
-        block["target"] = self._targets[mask]
+        if not len(self._sources):
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        self._split_connections(pre_slices, post_slices)
+        indices = self._split_conn_list[
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+        block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
+        block["source"] = self._sources[indices]
+        block["target"] = self._targets[indices]
         # check that conn_list has weights, if not then use the value passed in
-        connection_slices = None
         if self._weights is None:
-            if sources.size:
-                # create connection slices for this pre+post based on the mask
-                connection_slices = [
-                    slice(n, n+1) for n in range(mask.size) if mask[n]]
-                block["weight"] = self._generate_weights(
-                    weights, sources.size, connection_slices)
+            if hasattr(weights, "__getitem__"):
+                block["weight"] = numpy.array(weights)[indices]
             else:
-                block["weight"] = 0
+                block["weight"] = self._generate_weights(
+                    weights, len(indices), None)
         else:
-            block["weight"] = self._weights[mask]
+            block["weight"] = self._weights[indices]
         # check that conn_list has delays, if not then use the value passed in
         if self._delays is None:
-            if sources.size:
-                # create connection slices for this pre+post based on the mask
-                if connection_slices is None:
-                    connection_slices = [
-                        slice(n, n+1) for n in range(mask.size) if mask[n]]
-                block["delay"] = self._generate_delays(
-                    delays, sources.size, connection_slices)
+            if hasattr(weights, "__getitem__"):
+                block["delay"] = numpy.array(weights)[indices]
             else:
-                block["delay"] = 0
+                block["delay"] = self._generate_delays(
+                    delays, len(indices), None)
         else:
-            block["delay"] = self._clip_delays(self._delays[mask])
+            block["delay"] = self._clip_delays(self._delays[indices])
         block["synapse_type"] = synapse_type
         return block
 

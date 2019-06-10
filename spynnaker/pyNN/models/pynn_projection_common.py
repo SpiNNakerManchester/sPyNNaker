@@ -14,6 +14,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
@@ -60,9 +62,10 @@ class PyNNProjectionCommon(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
-        synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
-            synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) * (
-                machine_time_step / 1000.0)
+        if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
+            synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
+                synapse_dynamics_stdp.delay) * (
+                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
