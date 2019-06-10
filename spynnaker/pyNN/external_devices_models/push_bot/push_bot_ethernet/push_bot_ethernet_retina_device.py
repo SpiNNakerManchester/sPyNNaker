@@ -17,12 +17,13 @@ class PushBotEthernetRetinaDevice(
         super(PushBotEthernetRetinaDevice, self).__init__(protocol, resolution)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
             pushbot_ip_address, pushbot_port)
-        self._translator = PushBotTranslator(protocol, pushbot_wifi_connection)
-        self._injector_port = injector_port
-        self._retina_injector_label = retina_injector_label
+        self.__translator = PushBotTranslator(
+            protocol, pushbot_wifi_connection)
+        self.__injector_port = injector_port
+        self.__retina_injector_label = retina_injector_label
 
-        self._database_connection = PushBotRetinaConnection(
-            self._retina_injector_label, pushbot_wifi_connection, resolution,
+        self.__database_connection = PushBotRetinaConnection(
+            self.__retina_injector_label, pushbot_wifi_connection, resolution,
             local_host, local_port)
 
     @overrides(AbstractEthernetSensor.get_n_neurons)
@@ -31,16 +32,16 @@ class PushBotEthernetRetinaDevice(
 
     @overrides(AbstractEthernetSensor.get_injector_parameters)
     def get_injector_parameters(self):
-        return {"port": self._injector_port}
+        return {"port": self.__injector_port}
 
     @overrides(AbstractEthernetSensor.get_injector_label)
     def get_injector_label(self):
-        return self._retina_injector_label
+        return self.__retina_injector_label
 
     @overrides(AbstractEthernetSensor.get_translator)
     def get_translator(self):
-        return self._translator
+        return self.__translator
 
     @overrides(AbstractEthernetSensor.get_database_connection)
     def get_database_connection(self):
-        return self._database_connection
+        return self.__database_connection

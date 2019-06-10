@@ -7,24 +7,24 @@ logger = logging.getLogger(__name__)
 
 
 class ArrayConnector(AbstractConnector):
-    """ Make connections using an array of integers based on the IDs
+    """ Make connections using an array of integers based on the IDs\
         of the neurons in the pre- and post-populations.
     """
 
     __slots = [
-        "_array"]
+        "__array", "__array_dims", "__n_total_connections"]
 
     def __init__(
             self, array,
             safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections
-            between the pre- and post-populations
+            An explicit boolean matrix that specifies the connections\
+            between the pre- and post-populations\
             (see PyNN documentation)
         """
         super(ArrayConnector, self).__init__(safe, verbose)
-        self._array = array
+        self.__array = array
         # we can get the total number of connections straight away
         # from the boolean matrix
         n_total_connections = 0
@@ -35,12 +35,12 @@ class ArrayConnector(AbstractConnector):
                 if array[i, j] == 1:
                     n_total_connections += 1
 
-        self._n_total_connections = n_total_connections
-        self._array_dims = dims
+        self.__n_total_connections = n_total_connections
+        self.__array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
-        return self._get_delay_maximum(delays, len(self._array))
+        return self._get_delay_maximum(delays, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -48,25 +48,25 @@ class ArrayConnector(AbstractConnector):
         n_connections = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
-        for i in range(self._array_dims[0]):
+        for i in range(self.__array_dims[0]):
             for j in range(post_lo, post_hi+1):
-                if self._array[i, j] == 1:
+                if self.__array[i, j] == 1:
                     n_connections += 1
 
         if min_delay is None and max_delay is None:
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_total_connections, n_connections, min_delay,
+            delays, self.__n_total_connections, n_connections, min_delay,
             max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
-        return self._n_total_connections
+        return self.__n_total_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
-        return self._get_weight_maximum(weights, self._n_total_connections)
+        return self._get_weight_maximum(weights, self.__n_total_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -82,7 +82,7 @@ class ArrayConnector(AbstractConnector):
         post_hi = post_vertex_slice.hi_atom
         for i in range(pre_lo, pre_hi+1):
             for j in range(post_lo, post_hi+1):
-                if self._array[i, j] == 1:
+                if self.__array[i, j] == 1:
                     pre_neurons.append(i)
                     post_neurons.append(j)
                     n_connections += 1
@@ -101,4 +101,4 @@ class ArrayConnector(AbstractConnector):
 
     def __repr__(self):
         return "ArrayConnector({})".format(
-            self._array)
+            self.__array)

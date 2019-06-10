@@ -27,14 +27,14 @@ UNITS = {
 
 class SynapseTypeAlpha(AbstractSynapseType):
     __slots__ = [
-        "_exc_exp_response",
-        "_exc_response",
-        "_inh_exp_response",
-        "_inh_response",
-        "_tau_syn_E",
-        "_tau_syn_I",
-        "_q_exc",
-        "_q_inh"]
+        "__exc_exp_response",
+        "__exc_response",
+        "__inh_exp_response",
+        "__inh_response",
+        "__tau_syn_E",
+        "__tau_syn_I",
+        "__q_exc",
+        "__q_inh"]
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
@@ -51,12 +51,12 @@ class SynapseTypeAlpha(AbstractSynapseType):
             DataType.S1615])  # inhibitory q
 
         # pylint: disable=too-many-arguments
-        self._exc_response = exc_response
-        self._exc_exp_response = exc_exp_response
-        self._tau_syn_E = tau_syn_E
-        self._inh_response = inh_response
-        self._inh_exp_response = inh_exp_response
-        self._tau_syn_I = tau_syn_I
+        self.__exc_response = exc_response
+        self.__exc_exp_response = exc_exp_response
+        self.__tau_syn_E = tau_syn_E
+        self.__inh_response = inh_response
+        self.__inh_exp_response = inh_exp_response
+        self.__tau_syn_I = tau_syn_I
 
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -64,16 +64,16 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TAU_SYN_E] = self._tau_syn_E
-        parameters[TAU_SYN_I] = self._tau_syn_I
+        parameters[TAU_SYN_E] = self.__tau_syn_E
+        parameters[TAU_SYN_I] = self.__tau_syn_I
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[EXC_RESPONSE] = self._exc_response
-        state_variables[EXC_EXP_RESPONSE] = self._exc_exp_response
+        state_variables[EXC_RESPONSE] = self.__exc_response
+        state_variables[EXC_EXP_RESPONSE] = self.__exc_exp_response
         state_variables[Q_EXC] = 0
-        state_variables[INH_RESPONSE] = self._inh_response
-        state_variables[INH_EXP_RESPONSE] = self._inh_exp_response
+        state_variables[INH_RESPONSE] = self.__inh_response
+        state_variables[INH_EXP_RESPONSE] = self.__inh_exp_response
         state_variables[Q_INH] = 0
 
     @overrides(AbstractSynapseType.get_units)
@@ -135,32 +135,32 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     @property
     def exc_response(self):
-        return self._exc_response
+        return self.__exc_response
 
     @exc_response.setter
     def exc_response(self, exc_response):
-        self._exc_response = exc_response
+        self.__exc_response = exc_response
 
     @property
     def tau_syn_E(self):
-        return self._tau_syn_E
+        return self.__tau_syn_E
 
     @tau_syn_E.setter
     def tau_syn_E(self, tau_syn_E):
-        self._tau_syn_E = tau_syn_E
+        self.__tau_syn_E = tau_syn_E
 
     @property
     def inh_response(self):
-        return self._inh_response
+        return self.__inh_response
 
     @inh_response.setter
     def inh_response(self, inh_response):
-        self._inh_response = inh_response
+        self.__inh_response = inh_response
 
     @property
     def tau_syn_I(self):
-        return self._tau_syn_I
+        return self.__tau_syn_I
 
     @tau_syn_I.setter
     def tau_syn_I(self, tau_syn_I):
-        self._tau_syn_I = tau_syn_I
+        self.__tau_syn_I = tau_syn_I

@@ -19,32 +19,33 @@ class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
-        # ??????????????
-        "_change_requires_mapping",
-        # ??????????????
-        "_dendritic_delay_fraction",
+        # Flag: whether there is state in this class that is not reflected on
+        # the SpiNNaker system
+        "__change_requires_mapping",
+        # Fraction of delay that is dendritic (instead of axonal or synaptic)
+        "__dendritic_delay_fraction",
         # timing dependence to use for the STDP rule
-        "_timing_dependence",
+        "__timing_dependence",
         # weight dependence to use for the STDP rule
-        "_weight_dependence",
+        "__weight_dependence",
         # padding to add to a synaptic row for synaptic rewiring
-        "_pad_to_length"]
+        "__pad_to_length"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             pad_to_length=None):
-        self._timing_dependence = timing_dependence
-        self._weight_dependence = weight_dependence
-        self._dendritic_delay_fraction = float(dendritic_delay_fraction)
-        self._change_requires_mapping = True
-        self._pad_to_length = pad_to_length
+        self.__timing_dependence = timing_dependence
+        self.__weight_dependence = weight_dependence
+        self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
+        self.__change_requires_mapping = True
+        self.__pad_to_length = pad_to_length
 
-        if not (0.5 <= self._dendritic_delay_fraction <= 1.0):
+        if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
                 "dendritic_delay_fraction must be in the interval [0.5, 1.0]")
 
-        if self._timing_dependence is None or self._weight_dependence is None:
+        if timing_dependence is None or weight_dependence is None:
             raise NotImplementedError(
                 "Both timing_dependence and weight_dependence must be"
                 "specified")
@@ -60,20 +61,20 @@ class SynapseDynamicsSTDP(
             is called, as the vertex must require mapping as it has been\
             created!
         """
-        return self._change_requires_mapping
+        return self.__change_requires_mapping
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
         """
-        self._change_requires_mapping = False
+        self.__change_requires_mapping = False
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
         """ Get a property
         """
-        for obj in [self._timing_dependence, self._weight_dependence, self]:
+        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
         raise InvalidParameterType(
@@ -86,55 +87,55 @@ class SynapseDynamicsSTDP(
         :param key: the name of the parameter to change
         :param value: the new value of the parameter to assign
         """
-        for obj in [self._timing_dependence, self._weight_dependence, self]:
+        for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
-                self._change_requires_mapping = True
+                self.__change_requires_mapping = True
                 return
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
     @property
     def weight_dependence(self):
-        return self._weight_dependence
+        return self.__weight_dependence
 
     @property
     def timing_dependence(self):
-        return self._timing_dependence
+        return self.__timing_dependence
 
     @property
     def dendritic_delay_fraction(self):
-        return self._dendritic_delay_fraction
+        return self.__dendritic_delay_fraction
 
     @dendritic_delay_fraction.setter
     def dendritic_delay_fraction(self, new_value):
-        self._dendritic_delay_fraction = new_value
+        self.__dendritic_delay_fraction = new_value
 
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
-            self._timing_dependence.is_same_as(
-                synapse_dynamics._timing_dependence) and
-            self._weight_dependence.is_same_as(
-                synapse_dynamics._weight_dependence) and
-            (self._dendritic_delay_fraction ==
-             synapse_dynamics._dendritic_delay_fraction))
+            self.__timing_dependence.is_same_as(
+                synapse_dynamics.timing_dependence) and
+            self.__weight_dependence.is_same_as(
+                synapse_dynamics.weight_dependence) and
+            (self.__dendritic_delay_fraction ==
+             synapse_dynamics.dendritic_delay_fraction))
 
     def are_weights_signed(self):
         return False
 
     def get_vertex_executable_suffix(self):
         name = "_stdp_mad"
-        name += "_" + self._timing_dependence.vertex_executable_suffix
-        name += "_" + self._weight_dependence.vertex_executable_suffix
+        name += "_" + self.__timing_dependence.vertex_executable_suffix
+        name += "_" + self.__weight_dependence.vertex_executable_suffix
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        size = self._timing_dependence.get_parameters_sdram_usage_in_bytes()
-        size += self._weight_dependence.get_parameters_sdram_usage_in_bytes(
-            n_synapse_types, self._timing_dependence.n_weight_terms)
+        size = self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
+        size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
+            n_synapse_types, self.__timing_dependence.n_weight_terms)
         return size
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
@@ -144,28 +145,28 @@ class SynapseDynamicsSTDP(
         spec.switch_write_focus(region)
 
         # Write timing dependence parameters to region
-        self._timing_dependence.write_parameters(
+        self.__timing_dependence.write_parameters(
             spec, machine_time_step, weight_scales)
 
         # Write weight dependence information to region
-        self._weight_dependence.write_parameters(
+        self.__weight_dependence.write_parameters(
             spec, machine_time_step, weight_scales,
-            self._timing_dependence.n_weight_terms)
+            self.__timing_dependence.n_weight_terms)
 
     @property
     def _n_header_bytes(self):
         # The header contains a single timestamp and pre-trace
         n_bytes = (
-            TIME_STAMP_BYTES + self.timing_dependence.pre_trace_n_bytes)
+            TIME_STAMP_BYTES + self.__timing_dependence.pre_trace_n_bytes)
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
         return int(math.ceil(float(n_bytes) / 4.0)) * 4
 
     def get_n_words_for_plastic_connections(self, n_connections):
-        synapse_structure = self._timing_dependence.synaptic_structure
-        if self._pad_to_length is not None:
-            n_connections = max(n_connections, self._pad_to_length)
+        synapse_structure = self.__timing_dependence.synaptic_structure
+        if self.__pad_to_length is not None:
+            n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
         fp_size_words = (
@@ -189,9 +190,9 @@ class SynapseDynamicsSTDP(
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
 
         dendritic_delays = (
-            connections["delay"] * self._dendritic_delay_fraction)
+            connections["delay"] * self.__dendritic_delay_fraction)
         axonal_delays = (
-            connections["delay"] * (1.0 - self._dendritic_delay_fraction))
+            connections["delay"] * (1.0 - self.__dendritic_delay_fraction))
 
         # Get the fixed data
         fixed_plastic = (
@@ -207,14 +208,14 @@ class SynapseDynamicsSTDP(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
         fp_size = self.get_n_items(fixed_plastic_rows, 2)
-        if self._pad_to_length is not None:
+        if self.__pad_to_length is not None:
             # Pad the data
             fixed_plastic_rows = self._pad_row(fixed_plastic_rows, 2)
         fp_data = self.get_words(fixed_plastic_rows)
 
         # Get the plastic data by inserting the weight into the half-word
         # specified by the synapse structure
-        synapse_structure = self._timing_dependence.synaptic_structure
+        synapse_structure = self.__timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
         plastic_plastic = numpy.zeros(
@@ -230,7 +231,7 @@ class SynapseDynamicsSTDP(
             connection_row_indices, n_rows, plastic_plastic)
 
         # pp_size = fp_size in words => fp_size * no_bytes / 4 (bytes)
-        if self._pad_to_length is not None:
+        if self.__pad_to_length is not None:
             # Pad the data
             plastic_plastic_row_data = self._pad_row(
                 plastic_plastic_row_data, n_half_words * 2)
@@ -251,7 +252,7 @@ class SynapseDynamicsSTDP(
             numpy.concatenate((
                 row, numpy.zeros(
                     numpy.clip(
-                        (no_bytes_per_connection * self._pad_to_length -
+                        (no_bytes_per_connection * self.__pad_to_length -
                          row.size),
                         0, None)).astype(dtype="uint8"))
                 ).view(dtype="uint8")
@@ -291,7 +292,7 @@ class SynapseDynamicsSTDP(
             for i in range(n_rows)])
         pp_without_headers = [
             row.view(dtype="uint8")[self._n_header_bytes:] for row in pp_data]
-        synapse_structure = self._timing_dependence.synaptic_structure
+        synapse_structure = self.__timing_dependence.synaptic_structure
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
         pp_half_words = numpy.concatenate([
@@ -316,7 +317,7 @@ class SynapseDynamicsSTDP(
 
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
-        return self._weight_dependence.weight_maximum
+        return self.__weight_dependence.weight_maximum
 
     def get_weight_variance(self, connector, weights):
         # pylint: disable=too-many-arguments
@@ -330,25 +331,25 @@ class SynapseDynamicsSTDP(
 
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
-        return self._weight_dependence.weight_maximum
+        return self.__weight_dependence.weight_maximum
 
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
-        if self._timing_dependence is not None:
-            prov_data.extend(self._timing_dependence.get_provenance_data(
+        if self.__timing_dependence is not None:
+            prov_data.extend(self.__timing_dependence.get_provenance_data(
                 pre_population_label, post_population_label))
-        if self._weight_dependence is not None:
-            prov_data.extend(self._weight_dependence.get_provenance_data(
+        if self.__weight_dependence is not None:
+            prov_data.extend(self.__weight_dependence.get_provenance_data(
                 pre_population_label, post_population_label))
         return prov_data
 
     @overrides(AbstractPlasticSynapseDynamics.get_parameter_names)
     def get_parameter_names(self):
         names = ['weight', 'delay']
-        if self._timing_dependence is not None:
-            names.extend(self._timing_dependence.get_parameter_names())
-        if self._weight_dependence is not None:
-            names.extend(self._weight_dependence.get_parameter_names())
+        if self.__timing_dependence is not None:
+            names.extend(self.__timing_dependence.get_parameter_names())
+        if self.__weight_dependence is not None:
+            names.extend(self.__weight_dependence.get_parameter_names())
         return names
 
     @overrides(AbstractPlasticSynapseDynamics.get_max_synapses)
@@ -359,7 +360,7 @@ class SynapseDynamicsSTDP(
         n_words_space = n_words - n_header_words
 
         # Get plastic plastic size per connection
-        synapse_structure = self._timing_dependence.synaptic_structure
+        synapse_structure = self.__timing_dependence.synaptic_structure
         bytes_per_pp = synapse_structure.get_n_half_words_per_connection() * 2
 
         # The fixed plastic size per connection is 2 bytes
@@ -383,7 +384,7 @@ class SynapseDynamicsSTDP(
     @property
     @overrides(AbstractGenerateOnMachine.gen_matrix_params)
     def gen_matrix_params(self):
-        synapse_struct = self._timing_dependence.synaptic_structure
+        synapse_struct = self.__timing_dependence.synaptic_structure
         return numpy.array([
             self._n_header_bytes // 2,
             synapse_struct.get_n_half_words_per_connection(),

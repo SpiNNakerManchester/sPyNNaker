@@ -17,14 +17,17 @@ class FromListConnector(AbstractConnector):
     """ Make connections according to a list.
     """
     __slots__ = [
-        "_conn_list",
-        "_column_names",
-        "_sources",
-        "_targets",
-        "_weights",
-        "_delays",
-        "_extra_parameters",
-        "_extra_parameter_names"]
+        "__conn_list",
+        "__column_names",
+        "__sources",
+        "__targets",
+        "__weights",
+        "__delays",
+        "__extra_parameters",
+        "__extra_parameter_names",
+        "__split_conn_list",
+        "__split_pre_slices",
+        "__split_post_slices"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
@@ -44,42 +47,102 @@ class FromListConnector(AbstractConnector):
         super(FromListConnector, self).__init__(safe, verbose)
 
         # Need to set column names first, as setter uses this
-        self._column_names = column_names
+        self.__column_names = column_names
 
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
 
+        # The connection list split by pre/post vertex slices
+        self.__split_conn_list = None
+        self.__split_pre_slices = None
+        self.__split_post_slices = None
+
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
-        if self._delays is None:
+        if self.__delays is None:
             return numpy.max(delays)
         else:
-            return numpy.max(self._delays)
+            return numpy.max(self.__delays)
 
     @overrides(AbstractConnector.get_delay_variance)
     def get_delay_variance(self, delays):
-        if self._delays is None:
+        if self.__delays is None:
             return numpy.var(delays)
         else:
-            return numpy.var(self._delays)
+            return numpy.var(self.__delays)
+
+    def _split_connections(self, pre_slices, post_slices):
+        # If there are no connections, return
+        if not len(self.__sources):
+            return False
+
+        # If nothing has changed, use the cache
+        if (self.__split_pre_slices == pre_slices and
+                self.__split_post_slices == post_slices):
+            return False
+
+        self.__split_pre_slices = pre_slices
+        self.__split_post_slices = post_slices
+
+        # Create bins into which connections are to be grouped
+        pre_bins = numpy.concatenate((
+            [0], numpy.sort([s.hi_atom + 1 for s in pre_slices])))
+        post_bins = numpy.concatenate((
+            [0], numpy.sort([s.hi_atom + 1 for s in post_slices])))
+
+        # Find the group of each item in the separate bins
+        pre_indices = numpy.searchsorted(
+            pre_bins, self.__sources, side="right")
+        post_indices = numpy.searchsorted(
+            post_bins, self.__targets, side="right")
+
+        # Join the groups from both axes
+        n_bins = (len(pre_bins) + 1, len(post_bins) + 1)
+        joined_indices = numpy.ravel_multi_index(
+            (pre_indices, post_indices), n_bins)
+
+        # Get a count of the indices in each bin
+        index_count = numpy.bincount(
+            joined_indices, minlength=numpy.prod(n_bins))
+
+        # Get a sort order on the connections
+        sort_indices = numpy.argsort(joined_indices)
+
+        # Split the sort order in to groups of connection indices
+        split_indices = numpy.array(numpy.split(
+            sort_indices, numpy.cumsum(index_count)))
+
+        # Ignore the outliers
+        split_indices = split_indices[:-1].reshape(n_bins)[1:-1, 1:-1]
+        split_indices = split_indices.reshape(-1)
+
+        # Get the results indexed by hi_atom in the slices
+        pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
+                         for post in post_bins[1:]]
+        self.__split_conn_list = {
+            (pre_post): indices
+            for pre_post, indices in zip(pre_post_bins, split_indices)
+        }
+
+        return True
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
 
         mask = None
-        if min_delay is None or max_delay is None or self._delays is None:
-            mask = ((self._targets >= post_vertex_slice.lo_atom) &
-                    (self._targets <= post_vertex_slice.hi_atom))
-        elif self._delays is not None:
-            mask = ((self._targets >= post_vertex_slice.lo_atom) &
-                    (self._targets <= post_vertex_slice.hi_atom) &
-                    (self._delays >= min_delay) &
-                    (self._delays <= max_delay))
+        if min_delay is None or max_delay is None or self.__delays is None:
+            mask = ((self.__targets >= post_vertex_slice.lo_atom) &
+                    (self.__targets <= post_vertex_slice.hi_atom))
+        elif self.__delays is not None:
+            mask = ((self.__targets >= post_vertex_slice.lo_atom) &
+                    (self.__targets <= post_vertex_slice.hi_atom) &
+                    (self.__delays >= min_delay) &
+                    (self.__delays <= max_delay))
         if mask is None:
-            sources = self._sources
+            sources = self.__sources
         else:
-            sources = self._sources[mask]
+            sources = self.__sources[mask]
         if sources.size == 0:
             return 0
         max_targets = numpy.max(numpy.bincount(
@@ -87,7 +150,7 @@ class FromListConnector(AbstractConnector):
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
-        if min_delay is None or max_delay is None or self._delays is not None:
+        if min_delay is None or max_delay is None or self.__delays is not None:
             return max_targets
 
         # If here, there must be no delays in the list, so use the passed in
@@ -98,34 +161,34 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
-        if not len(self._targets):
+        if not len(self.__targets):
             return 0
         # pylint: disable=too-many-arguments
         return numpy.max(numpy.bincount(
-            self._targets.astype('int64', copy=False)))
+            self.__targets.astype('int64', copy=False)))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
-        if self._weights is None:
+        if self.__weights is None:
             return numpy.mean(weights)
         else:
-            return numpy.mean(numpy.abs(self._weights))
+            return numpy.mean(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
         # pylint: disable=too-many-arguments
-        if self._weights is None:
+        if self.__weights is None:
             return numpy.amax(weights)
         else:
-            return numpy.amax(numpy.abs(self._weights))
+            return numpy.amax(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_variance)
     def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
-        if self._weights is None:
+        if self.__weights is None:
             return numpy.var(weights)
         else:
-            return numpy.var(numpy.abs(self._weights))
+            return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -133,82 +196,74 @@ class FromListConnector(AbstractConnector):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
-        mask = ((self._sources >= pre_vertex_slice.lo_atom) &
-                (self._sources <= pre_vertex_slice.hi_atom) &
-                (self._targets >= post_vertex_slice.lo_atom) &
-                (self._targets <= post_vertex_slice.hi_atom))
-        sources = self._sources[mask]
-        block = numpy.zeros(sources.size, dtype=self.NUMPY_SYNAPSES_DTYPE)
-        block["source"] = sources
-        block["target"] = self._targets[mask]
+        if not len(self.__sources):
+            return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
+        self._split_connections(pre_slices, post_slices)
+        indices = self.__split_conn_list[
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+        block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
+        block["source"] = self.__sources[indices]
+        block["target"] = self.__targets[indices]
         # check that conn_list has weights, if not then use the value passed in
-        connection_slices = None
-        if self._weights is None:
-            if sources.size:
-                # create connection slices for this pre+post based on the mask
-                connection_slices = [
-                    slice(n, n+1) for n in range(mask.size) if mask[n]]
+        if self.__weights is None:
+            if hasattr(weights, "__getitem__"):
+                block["weight"] = numpy.array(weights)[indices]
+            else:
                 block["weight"] = self._generate_weights(
-                    weights, sources.size, connection_slices)
-            else:
-                block["weight"] = 0
+                    weights, len(indices), None)
         else:
-            block["weight"] = self._weights[mask]
+            block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
-        if self._delays is None:
-            if sources.size:
-                # create connection slices for this pre+post based on the mask
-                if connection_slices is None:
-                    connection_slices = [
-                        slice(n, n+1) for n in range(mask.size) if mask[n]]
-                block["delay"] = self._generate_delays(
-                    delays, sources.size, connection_slices)
+        if self.__delays is None:
+            if hasattr(weights, "__getitem__"):
+                block["delay"] = numpy.array(weights)[indices]
             else:
-                block["delay"] = 0
+                block["delay"] = self._generate_delays(
+                    delays, len(indices), None)
         else:
-            block["delay"] = self._clip_delays(self._delays[mask])
+            block["delay"] = self._clip_delays(self.__delays[indices])
         block["synapse_type"] = synapse_type
         return block
 
     def __repr__(self):
         return "FromListConnector(n_connections={})".format(
-            len(self._sources))
+            len(self.__sources))
 
     @property
     def conn_list(self):
-        return self._conn_list
+        return self.__conn_list
 
     @conn_list.setter
     def conn_list(self, conn_list):
         if conn_list is None or not len(conn_list):
-            self._conn_list = numpy.zeros((0, 2), dtype="uint32")
+            self.__conn_list = numpy.zeros((0, 2), dtype="uint32")
         else:
-            self._conn_list = numpy.array(conn_list)
+            self.__conn_list = numpy.array(conn_list)
 
         # If the shape of the conn_list is 2D, numpy has been able to create
         # a 2D array which means every entry has the same number of values.
         # If this was not possible, raise an exception!
-        if len(self._conn_list.shape) != 2:
+        if len(self.__conn_list.shape) != 2:
             raise InvalidParameterType(
                 "Each tuple in the connection list for the"
                 " FromListConnector must have the same number of elements")
 
         # This tells us how many columns are in the list
-        n_columns = self._conn_list.shape[1]
+        n_columns = self.__conn_list.shape[1]
         if n_columns < 2:
             raise InvalidParameterType(
                 "Each tuple in the connection list for the"
                 " FromListConnector must have at least 2 elements")
-        if (self._column_names is not None and
-                n_columns != len(self._column_names) + _FIRST_PARAM):
+        if (self.__column_names is not None and
+                n_columns != len(self.__column_names) + _FIRST_PARAM):
             raise InvalidParameterType(
                 "The number of column names must match the number of"
                 " additional elements in each tuple in the connection list,"
                 " not including the pre_idx or post_idx")
 
         # Get the column names if not specified
-        column_names = self._column_names
-        if self._column_names is None:
+        column_names = self.__column_names
+        if self.__column_names is None:
             if n_columns == 4:
                 column_names = ('weight', 'delay')
             elif n_columns == 2:
@@ -219,25 +274,25 @@ class FromListConnector(AbstractConnector):
                         n_columns))
 
         # Set the source and targets
-        self._sources = self._conn_list[:, _SOURCE]
-        self._targets = self._conn_list[:, _TARGET]
+        self.__sources = self.__conn_list[:, _SOURCE]
+        self.__targets = self.__conn_list[:, _TARGET]
 
         # Find any weights
-        self._weights = None
+        self.__weights = None
         try:
             weight_column = column_names.index('weight') + _FIRST_PARAM
-            self._weights = self._conn_list[:, weight_column]
+            self.__weights = self.__conn_list[:, weight_column]
         except ValueError:
             pass
 
         # Find any delays
-        self._delays = None
+        self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             machine_time_step = globals_variables.get_simulator(
                 ).machine_time_step
-            self._delays = numpy.rint(
-                numpy.array(self._conn_list[:, delay_column]) * (
+            self.__delays = numpy.rint(
+                numpy.array(self.__conn_list[:, delay_column]) * (
                     1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
         except ValueError:
             pass
@@ -253,36 +308,36 @@ class FromListConnector(AbstractConnector):
         for i in extra_columns:
             # numpy.ptp gives the difference between the maximum and
             # minimum values of an array, so if 0, all values are equal
-            if numpy.ptp(self._conn_list[:, i]):
+            if numpy.ptp(self.__conn_list[:, i]):
                 raise ValueError(
                     "All values in column {} ({}) of a FromListConnector must"
                     " have the same value".format(
                         i, column_names[i - _FIRST_PARAM]))
 
         # Store the extra data
-        self._extra_parameters = None
-        self._extra_parameter_names = None
+        self.__extra_parameters = None
+        self.__extra_parameter_names = None
         if extra_columns:
-            self._extra_parameters = self._conn_list[:, extra_columns]
-            self._extra_parameter_names = [
+            self.__extra_parameters = self.__conn_list[:, extra_columns]
+            self.__extra_parameter_names = [
                 column_names[i - _FIRST_PARAM] for i in extra_columns]
 
     @property
     def column_names(self):
-        return self._column_names
+        return self.__column_names
 
     @column_names.setter
     def column_names(self, column_names):
-        self._column_names = column_names
+        self.__column_names = column_names
 
     def get_extra_parameters(self):
         """ Getter for the extra parameters.
 
         :return: The extra parameters
         """
-        return self._extra_parameters
+        return self.__extra_parameters
 
     def get_extra_parameter_names(self):
         """ Getter for the names of the extra parameters
         """
-        return self._extra_parameter_names
+        return self.__extra_parameter_names
