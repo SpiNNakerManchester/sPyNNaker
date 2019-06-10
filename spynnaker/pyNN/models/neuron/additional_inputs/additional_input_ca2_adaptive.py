@@ -26,15 +26,12 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
             DataType.S1615,   # e^(-ts / tau_ca2)
             DataType.S1615,   # i_ca_2
             DataType.S1615])  # i_alpha
-        self.__tau_ca2 = tau_ca2
-        self.__i_ca2 = i_ca2
         self.__i_alpha = i_alpha
-        self._tau_ca2 = tau_ca2
         if i_ca2 is None:
-            self._i_ca2 = 0.0
+            self._i__ca2 = 0.0
         else:
-            self._i_ca2 = i_ca2
-        self._i_alpha = i_alpha
+            self._i__ca2 = i_ca2
+        self.__tau_ca2 = tau_ca2
 
     @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):

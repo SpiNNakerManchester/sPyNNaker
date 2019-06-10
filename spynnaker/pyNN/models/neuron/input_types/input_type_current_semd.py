@@ -24,11 +24,10 @@ class InputTypeCurrentSEMD(AbstractInputType):
             DataType.S1615])  # inh_input_previous
         self._multiplicator = multiplicator
         if inh_input_previous is None:
-            self._inh_input_previous = 0.0
+            self.__inh_input_previous = 0.0
         else:
-            self._inh_input_previous = inh_input_previous
+            self.__inh_input_previous = inh_input_previous
         self.__multiplicator = multiplicator
-        self.__inh_input_previous = inh_input_previous
 
     @overrides(AbstractInputType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):

@@ -32,20 +32,16 @@ class SynapseTypeExponential(AbstractSynapseType):
             DataType.U032,    # decay_I
             DataType.U032,    # init_I
             DataType.S1615])  # isyn_inh
-        self._tau_syn_E = tau_syn_E
-        self._tau_syn_I = tau_syn_I
         if isyn_exc is None:
-            self._isyn_exc = 0.0
+            self.__isyn_exc = 0.0
         else:
-            self._isyn_exc = isyn_exc
+            self.__isyn_exc = isyn_exc
         if isyn_inh is None:
-            self._isyn_inh = 0.0
+            self.__isyn_inh = 0.0
         else:
-            self._isyn_inh = isyn_inh
+            self.__isyn_inh = isyn_inh
         self.__tau_syn_E = tau_syn_E
         self.__tau_syn_I = tau_syn_I
-        self.__isyn_exc = isyn_exc
-        self.__isyn_inh = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):

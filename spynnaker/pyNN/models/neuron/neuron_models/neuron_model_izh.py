@@ -39,26 +39,19 @@ class NeuronModelIzh(AbstractNeuronModel):
              DataType.S1615],  # this_h (= machine_time_step)
             [DataType.S1615])  # machine_time_step
 
-        self._a = a
-        self._b = b
-        self._c = c
-        self._d = d
-        self._i_offset = i_offset
-        if v_init is None:
-            v_init = -70.0
-        else:
-            self._v_init = v_init
-        if u_init is None:
-            self._u_init = -14.0
-        else:
-            self._u_init = u_init
         self.__a = a
         self.__b = b
         self.__c = c
         self.__d = d
         self.__i_offset = i_offset
-        self.__v_init = v_init
-        self.__u_init = u_init
+        if v_init is None:
+            self.__v_init = -70.0
+        else:
+            self.__v_init = v_init
+        if u_init is None:
+            self.__u_init = -14.0
+        else:
+            self.__u_init = u_init
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
