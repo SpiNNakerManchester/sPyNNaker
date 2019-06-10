@@ -9,17 +9,16 @@ class Struct(object):
     """ Represents a C code structure
     """
 
-    __slots__ = ("_field_types")
+    __slots__ = ["__field_types"]
 
     def __init__(self, field_types):
         """
-
         :param field_types:\
             The types of the fields, ordered as they appear in the struct
         :type field_types:\
             list of :py:class:`data_specification.enums.data_type.DataType`
         """
-        self._field_types = field_types
+        self.__field_types = field_types
 
     @property
     def field_types(self):
@@ -27,7 +26,7 @@ class Struct(object):
 
         :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
         """
-        return self._field_types
+        return self.__field_types
 
     @property
     def numpy_dtype(self):
