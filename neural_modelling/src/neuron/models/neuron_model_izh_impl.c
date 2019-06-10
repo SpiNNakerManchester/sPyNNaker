@@ -50,14 +50,14 @@ static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
 
     REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
     REAL alpha = pre_alph
-                 + ( REAL_CONST(5.0) + REAL_CONST(0.0400) * lastV1) * lastV1;
+                 + ( REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * lastV1) * lastV1;
     REAL eta = lastV1 + REAL_HALF(h * alpha);
 
     // could be represented as a long fract?
     REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
 
     neuron->V += h * (pre_alph - beta
-                      + ( REAL_CONST(5.0) + REAL_CONST(0.0400) * eta) * eta);
+                      + ( REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * eta) * eta);
 
     neuron->U += a * h * (-lastU1 - beta + b * eta);
 }

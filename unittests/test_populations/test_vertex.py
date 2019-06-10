@@ -1,14 +1,13 @@
 import pytest
-
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from unittests.mocks import MockSimulator
-from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 import numpy
+from spynnaker.pyNN.models.neuron import (
+    AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
 from spynnaker.pyNN.models.defaults import default_initial_values
-from spynnaker.pyNN.models.neuron.implementations \
-    import AbstractStandardNeuronComponent
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
+from unittests.mocks import MockSimulator
 
 
 class EmptyNeuronComponent(AbstractStandardNeuronComponent):

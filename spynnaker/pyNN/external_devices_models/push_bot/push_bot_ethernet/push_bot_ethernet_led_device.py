@@ -1,12 +1,13 @@
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models \
-    import AbstractSendMeMulticastCommandsVertex
-from spinn_front_end_common.abstract_models.impl import \
-    ProvidesKeyToAtomMappingImpl
+from spinn_front_end_common.abstract_models import (
+    AbstractSendMeMulticastCommandsVertex)
+from spinn_front_end_common.abstract_models.impl import (
+    ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from .push_bot_ethernet_device import PushBotEthernetDevice
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
-    import PushBotLED
+    import (
+        PushBotLED)
 
 
 class PushBotEthernetLEDDevice(
@@ -43,14 +44,14 @@ class PushBotEthernetLEDDevice(
             protocol, led, True, timesteps_between_send)
 
         # protocol specific data items
-        self._command_protocol = protocol
-        self._start_active_time_front = start_active_time_front
-        self._start_active_time_back = start_active_time_back
-        self._start_total_period = start_total_period
-        self._start_frequency = start_frequency
+        self.__command_protocol = protocol
+        self.__start_active_time_front = start_active_time_front
+        self.__start_active_time_back = start_active_time_back
+        self.__start_total_period = start_total_period
+        self.__start_frequency = start_frequency
 
     def set_command_protocol(self, command_protocol):
-        self._command_protocol = command_protocol
+        self.__command_protocol = command_protocol
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -62,30 +63,30 @@ class PushBotEthernetLEDDevice(
             commands.append(self.protocol.set_mode())
 
         # device specific commands
-        if self._start_total_period is not None:
-            commands.append(self._command_protocol.push_bot_led_total_period(
-                self._start_total_period))
-        if self._start_active_time_front is not None:
+        if self.__start_total_period is not None:
+            commands.append(self.__command_protocol.push_bot_led_total_period(
+                self.__start_total_period))
+        if self.__start_active_time_front is not None:
             commands.append(
-                self._command_protocol.push_bot_led_front_active_time(
-                    self._start_active_time_front))
-        if self._start_active_time_back is not None:
+                self.__command_protocol.push_bot_led_front_active_time(
+                    self.__start_active_time_front))
+        if self.__start_active_time_back is not None:
             commands.append(
-                self._command_protocol.push_bot_led_back_active_time(
-                    self._start_active_time_back))
-        if self._start_frequency is not None:
-            commands.append(self._command_protocol.push_bot_led_set_frequency(
-                self._start_frequency))
+                self.__command_protocol.push_bot_led_back_active_time(
+                    self.__start_active_time_back))
+        if self.__start_frequency is not None:
+            commands.append(self.__command_protocol.push_bot_led_set_frequency(
+                self.__start_frequency))
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [
-            self._command_protocol.push_bot_led_front_active_time(0),
-            self._command_protocol.push_bot_led_back_active_time(0),
-            self._command_protocol.push_bot_led_total_period(0),
-            self._command_protocol.push_bot_led_set_frequency(0)]
+            self.__command_protocol.push_bot_led_front_active_time(0),
+            self.__command_protocol.push_bot_led_back_active_time(0),
+            self.__command_protocol.push_bot_led_total_period(0),
+            self.__command_protocol.push_bot_led_set_frequency(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
