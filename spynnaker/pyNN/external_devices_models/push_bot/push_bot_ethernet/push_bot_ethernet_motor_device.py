@@ -18,7 +18,6 @@ class PushBotEthernetMotorDevice(
 
     def __init__(self, motor, protocol, timesteps_between_send=None):
         """
-
         :param motor: a PushBotMotor value to indicate the motor to control
         :param protocol: The protocol used to control the device
         :param timesteps_between_send:\
@@ -32,10 +31,10 @@ class PushBotEthernetMotorDevice(
 
         super(PushBotEthernetMotorDevice, self).__init__(
             protocol, motor, True, timesteps_between_send)
-        self._command_protocol = protocol
+        self.__command_protocol = protocol
 
     def set_command_protocol(self, command_protocol):
-        self._command_protocol = command_protocol
+        self.__command_protocol = command_protocol
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -47,13 +46,13 @@ class PushBotEthernetMotorDevice(
             commands.append(self.protocol.set_mode())
 
         # device specific commands
-        commands.append(self._command_protocol.generic_motor_enable())
+        commands.append(self.__command_protocol.generic_motor_enable())
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
-        return [self._command_protocol.generic_motor_disable()]
+        return [self.__command_protocol.generic_motor_disable()]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

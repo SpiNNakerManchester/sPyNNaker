@@ -7,33 +7,32 @@ class ConnectionHolder(object):
     """
 
     __slots__ = (
-
         # A list of items of data that are to be present in each element
-        "_data_items_to_return",
+        "__data_items_to_return",
 
         # True if the values should be returned as a list of tuples,
         # False if they should be returned as a tuple of matrices
-        "_as_list",
+        "__as_list",
 
         # The number of atoms in the pre-vertex
-        "_n_pre_atoms",
+        "__n_pre_atoms",
 
         # The number of atoms in the post-vertex
-        "_n_post_atoms",
+        "__n_post_atoms",
 
         # A list of the connections that have been added
-        "_connections",
+        "__connections",
 
         # The merged connections formed just before the data is read
-        "_data_items",
+        "__data_items",
 
         # Additional fixed values to be added to the data returned,
         # with the same values per synapse, as a list of tuples of
         # (field name, value)
-        "_fixed_values",
+        "__fixed_values",
 
         # A callback to call with the data when finished
-        "_notify",
+        "__notify",
     )
 
     def __init__(
@@ -63,14 +62,14 @@ class ConnectionHolder(object):
             data requested
         """
         # pylint: disable=too-many-arguments
-        self._data_items_to_return = data_items_to_return
-        self._as_list = as_list
-        self._n_pre_atoms = n_pre_atoms
-        self._n_post_atoms = n_post_atoms
-        self._connections = connections
-        self._data_items = None
-        self._notify = notify
-        self._fixed_values = fixed_values
+        self.__data_items_to_return = data_items_to_return
+        self.__as_list = as_list
+        self.__n_pre_atoms = n_pre_atoms
+        self.__n_post_atoms = n_post_atoms
+        self.__connections = connections
+        self.__data_items = None
+        self.__notify = notify
+        self.__fixed_values = fixed_values
 
     def add_connections(self, connections):
         """ Add connections to the holder to be returned
@@ -79,42 +78,42 @@ class ConnectionHolder(object):
             The connection to add, as a numpy structured array of\
             source, target, weight and delay
         """
-        if self._connections is None:
-            self._connections = list()
-        self._connections.append(connections)
+        if self.__connections is None:
+            self.__connections = list()
+        self.__connections.append(connections)
 
     @property
     def connections(self):
         """ The connections stored
         """
-        return self._connections
+        return self.__connections
 
     def finish(self):
         """ Finish adding connections
         """
-        if self._notify is not None:
-            self._notify(self)
+        if self.__notify is not None:
+            self.__notify(self)
 
     def _get_data_items(self):
         """ Merges the connections into the result data format
         """
 
         # If there are already merged connections cached, return those
-        if self._data_items is not None:
-            return self._data_items
+        if self.__data_items is not None:
+            return self.__data_items
 
-        if not self._connections:
+        if not self.__connections:
             # If there are no connections added, raise an exception
-            if self._connections is None:
+            if self.__connections is None:
                 raise Exception(
                     "Connections are only set after run has been called, "
                     "even if you are trying to see the data before changes "
                     "have been made.  "
                     "Try examining the {} after the call to run.".format(
-                        self._data_items_to_return))
+                        self.__data_items_to_return))
             # If the list is empty assume on a virtual machine
             # with generation on machine
-            if len(self._connections) == 0:
+            if len(self.__connections) == 0:
                 raise Exception(
                     "Connections list is empty. "
                     "This may be because you are using a virtual machine. "
@@ -122,19 +121,19 @@ class ConnectionHolder(object):
 
         # Join all the connections that have been added (probably over multiple
         # sub-vertices of a population)
-        connections = numpy.concatenate(self._connections)
+        connections = numpy.concatenate(self.__connections)
 
         # If there are additional fixed values, merge them in
-        if self._fixed_values is not None and self._fixed_values:
+        if self.__fixed_values is not None and self.__fixed_values:
 
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
                 ('{}'.format(field[0]), None)
-                for field in self._fixed_values]
+                for field in self.__fixed_values]
 
             # Get the actual data as a record array
             fixed_data = numpy.asarray(
-                tuple([field[1] for field in self._fixed_values]),
+                tuple([field[1] for field in self.__fixed_values]),
                 dtype=fixed_dtypes)
 
             # Tile the array to be the correct size
@@ -145,7 +144,7 @@ class ConnectionHolder(object):
                 (connections, fixed_values), flatten=True)
 
         # If we are returning a list...
-        if self._as_list:
+        if self.__as_list:
 
             # ...sort by source then target
             order = numpy.lexsort(
@@ -153,31 +152,31 @@ class ConnectionHolder(object):
 
             # There are no specific items to return, so just get
             # all the data
-            if (self._data_items_to_return is None or
-                    not self._data_items_to_return):
-                self._data_items = connections[order]
+            if (self.__data_items_to_return is None or
+                    not self.__data_items_to_return):
+                self.__data_items = connections[order]
 
             # There is more than one item to return, so let numpy do its magic
-            elif len(self._data_items_to_return) > 1:
-                self._data_items = \
-                    connections[order][self._data_items_to_return]
+            elif len(self.__data_items_to_return) > 1:
+                self.__data_items = \
+                    connections[order][self.__data_items_to_return]
 
             # There is 1 item to return, so make sure only one item exists
             else:
-                self._data_items = \
-                    connections[order][self._data_items_to_return[0]]
+                self.__data_items = \
+                    connections[order][self.__data_items_to_return[0]]
 
         else:
 
-            if self._data_items_to_return is None:
+            if self.__data_items_to_return is None:
                 return []
 
             # Keep track of the matrices
             merged_connections = list()
-            for item in self._data_items_to_return:
+            for item in self.__data_items_to_return:
 
                 # Build an empty matrix and fill it with NAN
-                matrix = numpy.empty((self._n_pre_atoms, self._n_post_atoms))
+                matrix = numpy.empty((self.__n_pre_atoms, self.__n_post_atoms))
                 matrix.fill(numpy.nan)
 
                 # Fill in the values that have data
@@ -191,13 +190,13 @@ class ConnectionHolder(object):
 
             # If there is only one matrix, use it directly
             if len(merged_connections) == 1:
-                self._data_items = merged_connections[0]
+                self.__data_items = merged_connections[0]
 
             # Otherwise use a tuple of the matrices
             else:
-                self._data_items = tuple(merged_connections)
+                self.__data_items = tuple(merged_connections)
 
-        return self._data_items
+        return self.__data_items
 
     def __getitem__(self, s):
         data = self._get_data_items()

@@ -52,6 +52,9 @@ static void *param_generator_normal_clipped_boundary_initialize(
 }
 
 static void param_generator_normal_clipped_boundary_free(void *data) {
+    struct param_generator_normal_clipped_boundary *params =
+            (struct param_generator_normal_clipped_boundary *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

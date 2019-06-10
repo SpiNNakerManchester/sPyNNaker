@@ -16,8 +16,8 @@ struct threshold_type_t {
     REAL     tau_th_inv;
     // soft threshold value  [mV]
     REAL     v_thresh;
-    //
-    REAL     machine_time_step_ms_div_10;
+    // time step scaling factor
+    REAL     neg_machine_time_step_ms_div_10;
 };
 
 static inline UREAL above_threshold_probability(

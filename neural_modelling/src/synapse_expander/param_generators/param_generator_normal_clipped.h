@@ -49,6 +49,9 @@ static void *param_generator_normal_clipped_initialize(address_t *region) {
 }
 
 static void param_generator_normal_clipped_free(void *data) {
+    struct param_generator_normal_clipped *params =
+            (struct param_generator_normal_clipped *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

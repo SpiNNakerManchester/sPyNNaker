@@ -371,6 +371,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
 void update_goal_posts(uint32_t time) {
     use(time);
     if (!received_any_spike()) {
+        state.no_spike_in_interval = 0;
         return;
     }
     state.cb = get_circular_buffer();
@@ -538,12 +539,8 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
     } else {
         // Retrieve the last spike
-        if (!received_any_spike()) {
-            goto no_spike;
-        }
         _spike = select_last_spike();
         if (_spike == ANY_SPIKE) {
-        no_spike:
             log_debug("No previous spikes");
             setup_synaptic_dma_read();
             return;
@@ -610,9 +607,9 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
 
 // Trivial helper; has to be macro because uses log_error()
 #define DMA_WRITEBACK(msg) \
-	do {\
-	    while (!spin1_dma_transfer(\
-		        DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,\
+    do {\
+        while (!spin1_dma_transfer(\
+                DMA_TAG_WRITE_SYNAPTIC_ROW_AFTER_REWIRING,\
                 rewiring_dma_buffer.sdram_writeback_address,\
                 rewiring_dma_buffer.row, DMA_WRITE,\
                 rewiring_dma_buffer.n_bytes_transferred)) {\

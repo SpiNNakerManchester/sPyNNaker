@@ -42,6 +42,9 @@ static void *param_generator_exponential_initialize(address_t *region) {
 }
 
 static void param_generator_exponential_free(void *data) {
+    struct param_generator_exponential *params =
+            (struct param_generator_exponential *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

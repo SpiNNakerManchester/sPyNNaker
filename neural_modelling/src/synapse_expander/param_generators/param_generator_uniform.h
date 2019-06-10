@@ -45,6 +45,9 @@ static void *param_generator_uniform_initialize(address_t *region) {
 }
 
 static void param_generator_uniform_free(void *data) {
+    struct param_generator_uniform *params =
+            (struct param_generator_uniform *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

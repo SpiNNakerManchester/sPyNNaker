@@ -45,6 +45,9 @@ static void *param_generator_normal_initialize(address_t *region) {
 }
 
 static void param_generator_normal_free(void *data) {
+    struct param_generator_normal *params =
+            (struct param_generator_normal *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

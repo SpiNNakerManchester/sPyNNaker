@@ -41,13 +41,13 @@ class PushBotEthernetLaserDevice(
             protocol, laser, True, timesteps_between_send)
 
         # protocol specific data items
-        self._command_protocol = protocol
-        self._start_active_time = start_active_time
-        self._start_total_period = start_total_period
-        self._start_frequency = start_frequency
+        self.__command_protocol = protocol
+        self.__start_active_time = start_active_time
+        self.__start_total_period = start_total_period
+        self.__start_frequency = start_frequency
 
     def set_command_protocol(self, command_protocol):
-        self._command_protocol = command_protocol
+        self.__command_protocol = command_protocol
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -59,27 +59,27 @@ class PushBotEthernetLaserDevice(
             commands.append(self.protocol.set_mode())
 
         # device specific commands
-        if self._start_total_period is not None:
+        if self.__start_total_period is not None:
             commands.append(
-                self._command_protocol.push_bot_laser_config_total_period(
-                    total_period=self._start_total_period))
-        if self._start_active_time is not None:
+                self.__command_protocol.push_bot_laser_config_total_period(
+                    total_period=self.__start_total_period))
+        if self.__start_active_time is not None:
             commands.append(
-                self._command_protocol.push_bot_laser_config_active_time(
-                    active_time=self._start_active_time))
-        if self._start_frequency is not None:
+                self.__command_protocol.push_bot_laser_config_active_time(
+                    active_time=self.__start_active_time))
+        if self.__start_frequency is not None:
             commands.append(
-                self._command_protocol.push_bot_laser_set_frequency(
-                    frequency=self._start_frequency))
+                self.__command_protocol.push_bot_laser_set_frequency(
+                    frequency=self.__start_frequency))
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [
-            self._command_protocol.push_bot_laser_config_total_period(0),
-            self._command_protocol.push_bot_laser_config_active_time(0),
-            self._command_protocol.push_bot_laser_set_frequency(0)]
+            self.__command_protocol.push_bot_laser_config_total_period(0),
+            self.__command_protocol.push_bot_laser_config_active_time(0),
+            self.__command_protocol.push_bot_laser_set_frequency(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
