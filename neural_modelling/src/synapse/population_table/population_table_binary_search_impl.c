@@ -7,9 +7,12 @@ typedef struct master_population_table_entry {
     uint32_t mask;
     uint16_t start;
     uint16_t count;
+    uint16_t core_mask;
+    uint16_t n_neurons_and_mask_shift;
 } master_population_table_entry;
 
 typedef uint32_t address_and_row_length;
+#define INVALID_ADDRESS_AND_ROW_LENGTH 0xFFFFFFFF
 
 static master_population_table_entry *master_population_table;
 static uint32_t master_population_table_length;
@@ -38,16 +41,32 @@ static inline uint32_t _get_address(address_and_row_length entry) {
 }
 
 static inline uint32_t _get_row_length(address_and_row_length entry) {
-    return entry & 0xFF;
+    // Row lengths are stored offset by 1, to allow 1-256 length rows
+    return (entry & 0xFF) + 1;
 }
 
 static inline uint32_t _is_single(address_and_row_length entry) {
     return entry & 0x80000000;
 }
 
+static inline uint32_t _get_n_neurons(master_population_table_entry entry) {
+    return entry.n_neurons_and_mask_shift >> 5;
+}
+
+static inline uint32_t _get_core_shift(master_population_table_entry entry) {
+    return entry.n_neurons_and_mask_shift & 0x1F;
+}
+
+static inline uint32_t _get_core_sum(
+        master_population_table_entry entry, spike_t spike) {
+    return ((spike >> _get_core_shift(entry)) & entry.core_mask) *
+            _get_n_neurons(entry);
+}
+
 static inline uint32_t _get_neuron_id(
         master_population_table_entry entry, spike_t spike) {
-    return spike & ~entry.mask;
+    return (spike & ~(entry.mask | (entry.core_mask << _get_core_shift(entry)))) +
+            _get_core_sum(entry, spike);
 }
 
 static inline void _print_master_population_table() {
@@ -56,20 +75,31 @@ static inline void _print_master_population_table() {
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            if (!_is_single(address_list[j])) {
+            if (address_list[j] == INVALID_ADDRESS_AND_ROW_LENGTH) {
                 log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
-                    i, j, entry.key, entry.mask,
+                    "index (%d, %d), key: 0x%08x, mask: 0x%08x,"
+                    " core_mask: 0x%08x, core_shift: %u, n_neurons: %u,"
+                    " INVALID",
+                    i, j, entry.key, entry.mask, entry.core_mask,
+                    _get_core_shift(entry), _get_n_neurons(entry));
+            } else if (!_is_single(address_list[j])) {
+                log_info(
+                    "index (%d, %d), key: 0x%08x, mask: 0x%08x,"
+                    " core_mask: 0x%08x, core_shift: %u, n_neurons: %u,"
+                    " offset: 0x%08x, address: 0x%08x, row_length: %u",
+                    i, j, entry.key, entry.mask, entry.core_mask,
+                    _get_core_shift(entry), _get_n_neurons(entry),
                     _get_address(address_list[j]),
                     _get_address(address_list[j]) +
                         (uint32_t) synaptic_rows_base_address,
                     _get_row_length(address_list[j]));
             } else {
                 log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, single",
-                    i, j, entry.key, entry.mask,
+                    "index (%d, %d), key: 0x%08x, mask: 0x%08x"
+                    " core_mask: 0x%08x, core_shift: %u, n_neurons: %u,"
+                    " offset: 0x%08x, address: 0x%08x, single",
+                    i, j, entry.key, entry.mask, entry.core_mask,
+                    _get_core_shift(entry), _get_n_neurons(entry),
                     _get_direct_address(address_list[j]),
                     _get_direct_address(address_list[j]) +
                         (uint32_t) direct_rows_base_address);
@@ -201,21 +231,20 @@ bool population_table_get_next_address(
     bool is_valid = false;
     do {
         address_and_row_length item = address_list[next_item];
+        if (item != INVALID_ADDRESS_AND_ROW_LENGTH) {
 
-        // If the row is a direct row, indicate this by specifying the
-        // n_bytes_to_transfer is 0
-        if (_is_single(item)) {
-            *row_address = (address_t) (
-                _get_direct_address(item) +
-                (uint32_t) direct_rows_base_address +
-                (last_neuron_id * sizeof(uint32_t)));
-            *n_bytes_to_transfer = 0;
-            is_valid = true;
-        } else {
+            // If the row is a direct row, indicate this by specifying the
+            // n_bytes_to_transfer is 0
+            if (_is_single(item)) {
+                *row_address = (address_t) (
+                    _get_direct_address(item) +
+                    (uint32_t) direct_rows_base_address +
+                    (last_neuron_id * sizeof(uint32_t)));
+                *n_bytes_to_transfer = 0;
+                is_valid = true;
+            } else {
 
-            uint32_t row_length = _get_row_length(item);
-            if (row_length > 0) {
-
+                uint32_t row_length = _get_row_length(item);
                 uint32_t block_address =
                     _get_address(item) + (uint32_t) synaptic_rows_base_address;
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);

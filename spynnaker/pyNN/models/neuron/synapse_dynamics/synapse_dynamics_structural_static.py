@@ -161,16 +161,36 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsStatic.get_static_synaptic_data,
                additional_arguments={"app_edge", "machine_edge"})
-    def get_static_synaptic_data(self, connections, connection_row_indices,
-                                 n_rows, post_vertex_slice,
-                                 n_synapse_types, app_edge, machine_edge):
+    def get_static_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            app_edge, machine_edge):
         self.__common_sp.synaptic_data_update(
             connections, post_vertex_slice,
             app_edge, machine_edge)
         return super(SynapseDynamicsStructuralStatic,
                      self).get_static_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
-            n_synapse_types)
+            n_synapse_types, max_n_synapses)
+
+    @overrides(SynapseDynamicsStatic.get_n_static_words_per_row)
+    def get_n_static_words_per_row(self, ff_size):
+
+        return super(SynapseDynamicsStructuralStatic,
+                     self).get_n_static_words_per_row(ff_size)
+
+    @overrides(SynapseDynamicsStatic.get_n_synapses_in_rows)
+    def get_n_synapses_in_rows(self, ff_size):
+        return super(SynapseDynamicsStructuralStatic,
+                     self).get_n_synapses_in_rows(ff_size)
+
+    @overrides(SynapseDynamicsStatic.read_static_synaptic_data)
+    def read_static_synaptic_data(self, post_vertex_slice, n_synapse_types,
+                                  ff_size, ff_data):
+        return super(SynapseDynamicsStructuralStatic,
+                     self).read_static_synaptic_data(post_vertex_slice,
+                                                     n_synapse_types, ff_size,
+                                                     ff_data)
 
     @overrides(SynapseDynamicsStatic.get_parameter_names)
     def get_parameter_names(self):
@@ -178,3 +198,8 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
                       self).get_parameter_names()
         names.extend(self.__common_sp.get_parameter_names())
         return names
+
+    @overrides(SynapseDynamicsStatic.get_max_synapses)
+    def get_max_synapses(self, n_words):
+        return super(SynapseDynamicsStructuralStatic, self).get_max_synapses(
+            n_words)

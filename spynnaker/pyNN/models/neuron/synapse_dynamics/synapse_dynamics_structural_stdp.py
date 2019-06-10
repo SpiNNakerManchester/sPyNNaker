@@ -159,15 +159,31 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsSTDP.get_plastic_synaptic_data,
                additional_arguments={"app_edge", "machine_edge"})
-    def get_plastic_synaptic_data(self, connections, connection_row_indices,
-                                  n_rows, post_vertex_slice,
-                                  n_synapse_types, app_edge, machine_edge):
-        self.__common_sp.synaptic_data_update(
-            connections, post_vertex_slice, app_edge, machine_edge)
+    def get_plastic_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, max_n_synapses,
+            app_edge, machine_edge):
+        self._common_sp.synaptic_data_update(
+            connections, post_vertex_slice,
+            app_edge, machine_edge)
         return super(SynapseDynamicsStructuralSTDP,
                      self).get_plastic_synaptic_data(
             connections, connection_row_indices, n_rows, post_vertex_slice,
-            n_synapse_types)
+            n_synapse_types, max_n_synapses)
+
+    @overrides(SynapseDynamicsSTDP.get_n_plastic_plastic_words_per_row)
+    def get_n_plastic_plastic_words_per_row(self, pp_size):
+
+        return super(SynapseDynamicsStructuralSTDP,
+                     self).get_n_plastic_plastic_words_per_row(pp_size)
+
+    @overrides(SynapseDynamicsSTDP.read_plastic_synaptic_data)
+    def read_plastic_synaptic_data(self, post_vertex_slice, n_synapse_types,
+                                   pp_size, pp_data, fp_size, fp_data):
+        return super(SynapseDynamicsStructuralSTDP,
+                     self).read_plastic_synaptic_data(
+            post_vertex_slice, n_synapse_types,
+            pp_size, pp_data, fp_size, fp_data)
 
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
@@ -175,3 +191,8 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                       self).get_parameter_names()
         names.extend(self.__common_sp.get_parameter_names())
         return names
+
+    @overrides(SynapseDynamicsSTDP.get_max_synapses)
+    def get_max_synapses(self, n_words):
+        return super(SynapseDynamicsStructuralSTDP, self).get_max_synapses(
+            n_words)

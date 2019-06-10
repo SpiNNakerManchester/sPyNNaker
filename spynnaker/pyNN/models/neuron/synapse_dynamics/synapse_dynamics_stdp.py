@@ -183,7 +183,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
@@ -206,7 +206,8 @@ class SynapseDynamicsSTDP(
               post_vertex_slice.lo_atom) & neuron_id_mask))
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
+            fixed_plastic.view(dtype="uint8").reshape((-1, 2)),
+            max_n_synapses)
         fp_size = self.get_n_items(fixed_plastic_rows, 2)
         if self.__pad_to_length is not None:
             # Pad the data
@@ -228,7 +229,7 @@ class SynapseDynamicsSTDP(
         plastic_plastic = plastic_plastic.view(dtype="uint8").reshape(
             (-1, n_half_words * 2))
         plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
-            connection_row_indices, n_rows, plastic_plastic)
+            connection_row_indices, n_rows, plastic_plastic, max_n_synapses)
 
         # pp_size = fp_size in words => fp_size * no_bytes / 4 (bytes)
         if self.__pad_to_length is not None:

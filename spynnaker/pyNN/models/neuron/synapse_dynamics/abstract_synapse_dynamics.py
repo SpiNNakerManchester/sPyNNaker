@@ -89,12 +89,12 @@ class AbstractSynapseDynamics(object):
         return connector.get_weight_variance(weights)
 
     def convert_per_connection_data_to_rows(
-            self, connection_row_indices, n_rows, data):
+            self, connection_row_indices, n_rows, data, max_n_synapses):
         """ Converts per-connection data generated from connections into\
             row-based data to be returned from get_synaptic_data
         """
         return [
-            data[connection_row_indices == i].reshape(-1)
+            data[connection_row_indices == i][:max_n_synapses].reshape(-1)
             for i in range(n_rows)]
 
     def get_n_items(self, rows, item_size):

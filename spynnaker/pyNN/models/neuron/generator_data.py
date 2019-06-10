@@ -47,6 +47,11 @@ class GeneratorData(object):
         self.__max_stage = max_stage
         self.__machine_time_step = machine_time_step
 
+        if self.__synaptic_matrix_offset != 0xFFFFFFFF:
+            self.__synaptic_matrix_offset //= 4
+        if self.__delayed_synaptic_matrix_offset != 0xFFFFFFFF:
+            self.__delayed_synaptic_matrix_offset //= 4
+
     @property
     def size(self):
         """ The size of the generated data in bytes

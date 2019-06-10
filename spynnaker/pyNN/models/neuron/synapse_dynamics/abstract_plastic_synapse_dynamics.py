@@ -19,7 +19,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
     @abstractmethod
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         """ Get the fixed-plastic data, and plastic-plastic data for each row,\
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
