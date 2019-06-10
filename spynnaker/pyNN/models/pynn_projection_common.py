@@ -65,8 +65,6 @@ class PyNNProjectionCommon(object):
             connector, synapse_dynamics_stdp, synapse_type,
             synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
 
-        self._projection_edge = PyNNPartitionEdge(pre_vertex, post_vertex, self._synapse_information)
-
         # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
@@ -92,38 +90,20 @@ class PyNNProjectionCommon(object):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 
-        #SHOULD BE OK UNTIL HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1!
-
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None
-        if label is None:
-            label = "projection edge {}".format(
-                spinnaker_control.none_labelled_edge_count)
-            spinnaker_control.increment_none_labelled_edge_count()
+        # Moved into pynn_partition_edge
+        # if label is None:
+        #     label = "projection edge {}".format(
+        #         spinnaker_control.none_labelled_edge_count)
+        #     spinnaker_control.increment_none_labelled_edge_count()
 
-        # Find out if there is an existing edge between the populations
-        edge_to_merge = self._find_existing_edge(
-            pre_vertex,
-            post_vertex)
-        if edge_to_merge is not None:
-
-            # If there is an existing edge, add the connector
-            edge_to_merge.add_synapse_information(self._synapse_information)
-            self._projection_edge = edge_to_merge
-        else:
-
-            # If there isn't an existing edge, create a new one
-            self._projection_edge = ProjectionApplicationEdge(
-                pre_vertex,
-                post_vertex,
-                self._synapse_information, label=label)
-
-            # add edge to the graph
-            spinnaker_control.add_application_edge(
-                self._projection_edge, constants.SPIKE_PARTITION_ID)
+        self._projection_edge = PyNNPartitionEdge(pre_vertex, post_vertex,
+                                                  self._synapse_information, spinnaker_control, label)
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
+            #BUTTA ADD DELAY EXTENSION DENTRO AL PYNN PARTITION VERTEX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             delay_edge = self._add_delay_extension(
                 pre_synaptic_population, post_synaptic_population, max_delay,
                 post_vertex_max_supported_delay_ms, machine_time_step,
@@ -154,33 +134,11 @@ class PyNNProjectionCommon(object):
         # Does Nothing currently
         self._requires_mapping = False
 
-    def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
-        """ Searches though the graph's edges to locate any\
-            edge which has the same post and pre vertex
-
-        :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
-        :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
-        :return: None or the edge going to these vertices.
-        """
-
-        # Find edges ending at the postsynaptic vertex
-        graph_edges = self._spinnaker_control.original_application_graph.\
-            get_edges_ending_at_vertex(post_synaptic_vertex)
-
-        # Search the edges for any that start at the presynaptic vertex
-        for edge in graph_edges:
-            if edge.pre_vertex == pre_synaptic_vertex:
-                return edge
-        return None
-
     def _add_delay_extension(
             self, pre_synaptic_population, post_synaptic_population,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             timescale_factor, synapse_type):
+        #BUTTA DENTRO PYNN PARTITION VERTEX, COME SCRITTO SOPRA!!!!!!!!!!!!!!!!!!!!!!!
         """ Instantiate delay extension component
         """
         # pylint: disable=too-many-arguments

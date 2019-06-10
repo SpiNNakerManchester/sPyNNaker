@@ -2,7 +2,8 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractPopulationSettable,
-    AbstractReadParametersBeforeSet, AbstractContainsUnits)
+    AbstractReadParametersBeforeSet, AbstractContainsUnits,
+    AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.utilities import constants
 
 from spinn_front_end_common.abstract_models import \
@@ -24,7 +25,7 @@ N_PARTITIONS = 2
 
 class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
                           AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-                          AbstractContainsUnits):
+                          AbstractContainsUnits, AbstractAcceptsIncomingSynapses):
 
     __slots__ = [
         "_neuron_vertices",
@@ -164,10 +165,6 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                     globals_variables.get_simulator().graph_mapper.get_slice(
                         machine_vertex))
 
-    @property
-    def n_atoms(self):
-        return self._n_atoms
-
     def get_units(self, variable):
         return self._neuron_vertices[0].get_units(variable)
 
@@ -202,3 +199,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self._synapse_vertices[0][0].\
             get_maximum_delay_supported_in_ms(machine_time_step)
+
+    def clear_connection_cache(self):
+        for partition in self._synapse_vertices:
+            for vertex in partition:
+                vertex.clear_connection_cache()
