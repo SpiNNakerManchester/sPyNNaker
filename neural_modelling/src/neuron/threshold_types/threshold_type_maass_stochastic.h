@@ -32,7 +32,7 @@ static inline UREAL above_threshold_probability(
     }
 
     REAL hazard = expk(exponent) * threshold_type->tau_th_inv;
-    return (1.0k - expk(-hazard * threshold_type->machine_time_step_ms_div_10))
+    return (1.0k - expk(-hazard * threshold_type->neg_machine_time_step_ms_div_10))
             * PROB_SATURATION;
 }
 
