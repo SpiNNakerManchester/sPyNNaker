@@ -13,13 +13,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         connect cell i in the presynaptic pynn_population.py to cell i in the\
         postsynaptic pynn_population.py for all i.
     """
-    __slots__ = ["_random_number_class"]
+    __slots__ = ["__random_number_class"]
 
     def __init__(
             self, random_number_class, safe=True, verbose=False):
         """
         """
-        self._random_number_class = random_number_class
+        self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -38,13 +38,15 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             if delays >= min_delay and delays <= max_delay:
                 return 1
             return 0
-        if isinstance(delays, self._random_number_class):
+        if isinstance(delays, self.__random_number_class):
             return 1
 
         slice_min_delay = min(delays)
         slice_max_delay = max(delays)
-        if slice_min_delay >= min_delay and slice_max_delay <= max_delay:
+        if ((min_delay <= slice_max_delay <= max_delay) or
+                (min_delay <= slice_min_delay <= max_delay)):
             return 1
+
         return 0
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)

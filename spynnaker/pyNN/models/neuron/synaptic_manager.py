@@ -88,22 +88,22 @@ class SynapticManager(
     """
     # pylint: disable=too-many-arguments, too-many-locals
     __slots__ = [
-        "_delay_key_index",
+        "__delay_key_index",
         "_implemented_synapse_types", #number of different synapse types implemented (set to one on higher level, but left as param here)
         "_synapse_index", #index of the synapse type implemented, MUST be 0 if n_synapse_types is > 1
-        "_one_to_one_connection_dtcm_max_bytes",
-        "_poptable_type",
-        "_pre_run_connection_holders",
-        "_retrieved_blocks",
+        "__one_to_one_connection_dtcm_max_bytes",
+        "__poptable_type",
+        "__pre_run_connection_holders",
+        "__retrieved_blocks",
         "_weight_scale",
-        "_ring_buffer_sigma",
-        "_spikes_per_second",
-        "_synapse_dynamics",
-        "_synapse_io",
-        "_weight_scales",
-        "_ring_buffer_shifts",
-        "_gen_on_machine",
-        "_max_row_info",
+        "__ring_buffer_sigma",
+        "__spikes_per_second",
+        "__synapse_dynamics",
+        "__synapse_io",
+        "__weight_scales",
+        "__ring_buffer_shifts",
+        "__gen_on_machine",
+        "__max_row_info",
         "_n_atoms",
         "_n_profile_samples",
         "_vertex",
@@ -127,8 +127,8 @@ class SynapticManager(
                  population_table_type=None, synapse_io=None):
 
         self._implemented_synapse_types = n_synapse_types
-        self._ring_buffer_sigma = ring_buffer_sigma
-        self._spikes_per_second = spikes_per_second
+        self.__ring_buffer_sigma = ring_buffer_sigma
+        self.__spikes_per_second = spikes_per_second
         self._n_atoms = n_neurons
         self._weight_scale = weight_scale
         self._machine_vertices = dict()
@@ -158,51 +158,51 @@ class SynapticManager(
             label, constraints, max_atoms_per_core)
 
         # Get the type of population table
-        self._poptable_type = population_table_type
+        self.__poptable_type = population_table_type
         if population_table_type is None:
             population_table_type = ("MasterPopTableAs" + config.get(
                 "MasterPopTable", "generator"))
             algorithms = get_valid_components(
                 master_pop_table_generators, "master_pop_table_as")
-            self._poptable_type = algorithms[population_table_type]()
+            self.__poptable_type = algorithms[population_table_type]()
 
         # Get the synapse IO
-        self._synapse_io = synapse_io
+        self.__synapse_io = synapse_io
         if synapse_io is None:
-            self._synapse_io = SynapseIORowBased()
+            self.__synapse_io = SynapseIORowBased()
 
-        if self._ring_buffer_sigma is None:
-            self._ring_buffer_sigma = config.getfloat(
+        if self.__ring_buffer_sigma is None:
+            self.__ring_buffer_sigma = config.getfloat(
                 "Simulation", "ring_buffer_sigma")
 
-        if self._spikes_per_second is None:
-            self._spikes_per_second = config.getfloat(
+        if self.__spikes_per_second is None:
+            self.__spikes_per_second = config.getfloat(
                 "Simulation", "spikes_per_second")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
-        self._synapse_dynamics = SynapseDynamicsStatic()
+        self.__synapse_dynamics = SynapseDynamicsStatic()
 
         # Keep the details once computed to allow reading back
-        self._weight_scales = dict()
-        self._ring_buffer_shifts = None
-        self._delay_key_index = dict()
-        self._retrieved_blocks = dict()
+        self.__weight_scales = dict()
+        self.__ring_buffer_shifts = None
+        self.__delay_key_index = dict()
+        self.__retrieved_blocks = dict()
 
         # A list of connection holders to be filled in pre-run, indexed by
         # the edge the connection is for
-        self._pre_run_connection_holders = defaultdict(list)
+        self.__pre_run_connection_holders = defaultdict(list)
 
         # Limit the DTCM used by one-to-one connections
-        self._one_to_one_connection_dtcm_max_bytes = config.getint(
+        self.__one_to_one_connection_dtcm_max_bytes = config.getint(
             "Simulation", "one_to_one_connection_dtcm_max_bytes")
 
         # Whether to generate on machine or not for a given vertex slice
-        self._gen_on_machine = dict()
+        self.__gen_on_machine = dict()
 
         # A map of synapse information to maximum row / delayed row length and
         # size in bytes
-        self._max_row_info = dict()
+        self.__max_row_info = dict()
 
         # Set up for profiling
         self._n_profile_samples = helpful_functions.read_config_int(
@@ -219,39 +219,39 @@ class SynapticManager(
 
     @property
     def synapse_dynamics(self):
-        return self._synapse_dynamics
+        return self.__synapse_dynamics
 
     def set_synapse_dynamics(self, synapse_dynamics):
 
         # We can always override static dynamics or None
-        if isinstance(self._synapse_dynamics, SynapseDynamicsStatic):
-            self._synapse_dynamics = synapse_dynamics
+        if isinstance(self.__synapse_dynamics, SynapseDynamicsStatic):
+            self.__synapse_dynamics = synapse_dynamics
 
         # We can ignore a static dynamics trying to overwrite a plastic one
         elif isinstance(synapse_dynamics, SynapseDynamicsStatic):
             pass
 
         # Otherwise, the dynamics must be equal
-        elif not synapse_dynamics.is_same_as(self._synapse_dynamics):
+        elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")
 
     @property
     def ring_buffer_sigma(self):
-        return self._ring_buffer_sigma
+        return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
     def ring_buffer_sigma(self, ring_buffer_sigma):
-        self._ring_buffer_sigma = ring_buffer_sigma
+        self.__ring_buffer_sigma = ring_buffer_sigma
 
     @property
     def spikes_per_second(self):
-        return self._spikes_per_second
+        return self.__spikes_per_second
 
     @spikes_per_second.setter
     def spikes_per_second(self, spikes_per_second):
-        self._spikes_per_second = spikes_per_second
+        self.__spikes_per_second = spikes_per_second
 
     @property
     def weight_scale(self):
@@ -266,12 +266,12 @@ class SynapticManager(
         return self._synapse_index
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        return self._synapse_io.get_maximum_delay_supported_in_ms(
+        return self.__synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
 
     @property
     def vertex_executable_suffix(self):
-        return self._synapse_dynamics.get_vertex_executable_suffix()
+        return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     @property
     def connected_app_vertices(self):
@@ -292,7 +292,7 @@ class SynapticManager(
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
-        self._pre_run_connection_holders[edge, synapse_info].append(
+        self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
     def get_n_cpu_cycles(self, vertex_slice):
@@ -356,36 +356,39 @@ class SynapticManager(
         """
         key = (synapse_info, post_vertex_slice.lo_atom,
                post_vertex_slice.hi_atom)
-        if key not in self._max_row_info:
-            self._max_row_info[key] = self._synapse_io.get_max_row_info(
+        if key not in self.__max_row_info:
+            self.__max_row_info[key] = self.__synapse_io.get_max_row_info(
                 synapse_info, post_vertex_slice,
-                app_edge.n_delay_stages, self._poptable_type,
+                app_edge.n_delay_stages, self.__poptable_type,
                 machine_time_step, app_edge)
-        return self._max_row_info[key]
+        return self.__max_row_info[key]
 
     def _get_synaptic_blocks_size(
             self, post_vertex_slice, in_edges, machine_time_step):
         """ Get the size of the synaptic blocks in bytes
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
-
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
-                    max_row_info = self._get_max_row_info(
-                        synapse_info, post_vertex_slice, in_edge,
+                    memory_size = self.__add_synapse_size(
+                        memory_size, synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
-                    n_atoms = in_edge.pre_vertex.n_atoms
-                    memory_size = self._poptable_type.get_next_allowed_address(
-                        memory_size)
-                    memory_size += max_row_info.undelayed_max_bytes * n_atoms
-                    memory_size = self._poptable_type.get_next_allowed_address(
-                        memory_size)
-                    memory_size += (
-                        max_row_info.delayed_max_bytes * n_atoms *
-                        in_edge.n_delay_stages)
-
         return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+
+    def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
+                           in_edge, machine_time_step):
+        max_row_info = self._get_max_row_info(
+            synapse_info, post_vertex_slice, in_edge, machine_time_step)
+        n_atoms = in_edge.pre_vertex.n_atoms
+        memory_size = self.__poptable_type.get_next_allowed_address(
+            memory_size)
+        memory_size += max_row_info.undelayed_max_bytes * n_atoms
+        memory_size = self.__poptable_type.get_next_allowed_address(
+            memory_size)
+        memory_size += (
+            max_row_info.delayed_max_bytes * n_atoms * in_edge.n_delay_stages)
+        return memory_size
 
     def _get_size_of_generator_information(self, in_edges):
         """ Get the size of the synaptic expander parameters
@@ -442,11 +445,11 @@ class SynapticManager(
         # connections in any way?
         if isinstance(self.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
-            return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+            return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._implemented_synapse_types,
                 in_edges=in_edges)
         else:
-            return self._synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+            return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self._implemented_synapse_types)
 
     def get_sdram_usage_in_bytes(
@@ -462,7 +465,7 @@ class SynapticManager(
                                                       in_edges=in_edges) +
             self._get_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
-            self._poptable_type.get_master_population_table_size(
+            self.__poptable_type.get_master_population_table_size(
                 vertex_slice, in_edges) +
             self._get_size_of_generator_information(in_edges) +
             (self._get_number_of_mallocs_used_by_dsg() *
@@ -490,7 +493,7 @@ class SynapticManager(
         self._reserve_synapse_param_data_region(spec)
 
         master_pop_table_sz = \
-            self._poptable_type.get_exact_master_population_table_size(
+            self.__poptable_type.get_exact_master_population_table_size(
                 machine_vertex, machine_graph, graph_mapper)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
@@ -633,13 +636,16 @@ class SynapticManager(
                         biggest_weight[synapse_type], weight_max)
 
                     spikes_per_tick = max(
-                        1.0, self._spikes_per_second / steps_per_second)
-                    spikes_per_second = self._spikes_per_second
+                        1.0, self.__spikes_per_second / steps_per_second)
+                    spikes_per_second = self.__spikes_per_second
                     if isinstance(app_edge.pre_vertex,
                                   SpikeSourcePoissonVertex):
-                        spikes_per_second = app_edge.pre_vertex.rate
+                        rate = app_edge.pre_vertex.max_rate
+                        # If non-zero rate then use it; otherwise keep default
+                        if (rate != 0):
+                            spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
-                            spikes_per_second = max(spikes_per_second)
+                            spikes_per_second = numpy.max(spikes_per_second)
                         elif get_simulator().is_a_pynn_random(
                                 spikes_per_second):
                             spikes_per_second = get_maximum_probable_value(
@@ -669,7 +675,7 @@ class SynapticManager(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
                         machine_timestep, stats.n_items,
-                        self._ring_buffer_sigma),
+                        self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
@@ -705,7 +711,7 @@ class SynapticManager(
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
-        next_block_allowed_address = self._poptable_type\
+        next_block_allowed_address = self.__poptable_type\
             .get_next_allowed_address(next_block_start_address)
         if next_block_allowed_address != next_block_start_address:
 
@@ -740,7 +746,7 @@ class SynapticManager(
         in_edges = machine_graph.get_edges_ending_at_vertex(machine_vertex)
 
         # Set up the master population table
-        self._poptable_type.initialise_table(spec, master_pop_table_region)
+        self.__poptable_type.initialise_table(spec, master_pop_table_region)
 
         # Set up for single synapses - write the offset of the single synapses
         # initially 0
@@ -817,7 +823,7 @@ class SynapticManager(
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
 
-        self._poptable_type.finish_master_pop_table(
+        self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
 
         # Write the size and data of single synapses to the direct region
@@ -870,8 +876,8 @@ class SynapticManager(
         synaptic_matrix_offset = 0xFFFFFFFF
         if max_row_info.undelayed_max_n_synapses:
             synaptic_matrix_offset = \
-                self._poptable_type.get_next_allowed_address(block_addr)
-            self._poptable_type.update_master_population_table(
+                self.__poptable_type.get_next_allowed_address(block_addr)
+            self.__poptable_type.update_master_population_table(
                 spec, synaptic_matrix_offset,
                 max_row_info.undelayed_max_words,
                 rinfo.first_key_and_mask, master_pop_table_region)
@@ -882,7 +888,7 @@ class SynapticManager(
             # The synaptic matrix offset is in words for the generator
             synaptic_matrix_offset = synaptic_matrix_offset // 4
         elif rinfo is not None:
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
 
         if block_addr > all_syn_block_sz:
@@ -896,14 +902,14 @@ class SynapticManager(
         n_delay_stages = 0
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
-        if delay_key in self._delay_key_index:
-            delay_rinfo = self._delay_key_index[delay_key]
+        if delay_key in self.__delay_key_index:
+            delay_rinfo = self.__delay_key_index[delay_key]
         if max_row_info.delayed_max_n_synapses:
             n_delay_stages = app_edge.n_delay_stages
             delayed_synaptic_matrix_offset = \
-                self._poptable_type.get_next_allowed_address(
+                self.__poptable_type.get_next_allowed_address(
                     block_addr)
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, delayed_synaptic_matrix_offset,
                 max_row_info.delayed_max_words,
                 delay_rinfo.first_key_and_mask, master_pop_table_region)
@@ -916,7 +922,7 @@ class SynapticManager(
             delayed_synaptic_matrix_offset = \
                 delayed_synaptic_matrix_offset // 4
         elif delay_rinfo is not None:
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
                 master_pop_table_region)
 
@@ -936,7 +942,7 @@ class SynapticManager(
             synapse_info, n_delay_stages + 1,
             machine_time_step))
         key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
-        self._gen_on_machine[key] = True
+        self.__gen_on_machine[key] = True
 
         return block_addr
 
@@ -948,10 +954,10 @@ class SynapticManager(
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
-         delayed_source_ids, delay_stages) = self._synapse_io.get_synapses(
+         delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
              synapse_info, pre_slices, pre_slice_idx, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
-             app_edge.n_delay_stages, self._poptable_type, n_synapse_types,
+             app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
              weight_scales, machine_time_step,
              app_edge=app_edge, machine_edge=machine_edge)
 
@@ -963,10 +969,10 @@ class SynapticManager(
                 "Found delayed source IDs but no delay "
                 "machine edge for {}".format(app_edge.label))
 
-        if (app_edge, synapse_info) in self._pre_run_connection_holders:
-            for conn_holder in self._pre_run_connection_holders[
+        if (app_edge, synapse_info) in self.__pre_run_connection_holders:
+            for conn_holder in self.__pre_run_connection_holders[
                     app_edge, synapse_info]:
-                conn_holder.add_connections(self._synapse_io.read_synapses(
+                conn_holder.add_connections(self._read_synapses(
                     synapse_info, pre_vertex_slice, post_vertex_slice,
                     row_length, delayed_row_length, n_synapse_types,
                     weight_scales, row_data, delayed_row_data,
@@ -980,7 +986,7 @@ class SynapticManager(
                 single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif rinfo is not None:
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
         del row_data
 
@@ -992,8 +998,8 @@ class SynapticManager(
         delay_rinfo = None
         delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                      pre_vertex_slice.hi_atom)
-        if delay_key in self._delay_key_index:
-            delay_rinfo = self._delay_key_index[delay_key]
+        if delay_key in self.__delay_key_index:
+            delay_rinfo = self.__delay_key_index[delay_key]
         if delayed_row_data.size:
             block_addr, single_addr = self.__write_row_data(
                 spec, synapse_info.connector, pre_vertex_slice,
@@ -1001,7 +1007,7 @@ class SynapticManager(
                 delay_rinfo, single_synapses, master_pop_table_region,
                 synaptic_matrix_region, block_addr, single_addr, app_edge)
         elif delay_rinfo is not None:
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
                 master_pop_table_region)
         del delayed_row_data
@@ -1022,7 +1028,7 @@ class SynapticManager(
             app_edge.n_delay_stages == 0 and
             isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
-                self._one_to_one_connection_dtcm_max_bytes) and
+                self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
             (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
 
@@ -1036,7 +1042,7 @@ class SynapticManager(
                 app_edge):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             single_synapses.append(single_rows)
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, single_addr, 1, rinfo.first_key_and_mask,
                 master_pop_table_region, is_single=True)
             single_addr += len(single_rows) * 4
@@ -1045,7 +1051,7 @@ class SynapticManager(
                 spec, synaptic_matrix_region, block_addr)
             spec.switch_write_focus(synaptic_matrix_region)
             spec.write_array(row_data)
-            self._poptable_type.update_master_population_table(
+            self.__poptable_type.update_master_population_table(
                 spec, block_addr, row_length,
                 rinfo.first_key_and_mask, master_pop_table_region)
             block_addr += len(row_data) * 4
@@ -1055,11 +1061,11 @@ class SynapticManager(
             self, application_vertex, application_graph, machine_timestep):
         """ Get the ring buffer shifts for this vertex
         """
-        if self._ring_buffer_shifts is None:
-            self._ring_buffer_shifts = \
+        if self.__ring_buffer_shifts is None:
+            self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep)
-        return self._ring_buffer_shifts
+        return self.__ring_buffer_shifts
 
     def _write_synapse_parameters(
             self, spec, vertex_slice, application_graph, machine_time_step, index):
@@ -1128,9 +1134,9 @@ class SynapticManager(
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
                 pre_vertex_slice = graph_mapper.get_slice(
                     m_edge.pre_vertex)
-                self._delay_key_index[app_edge.pre_vertex.source_vertex,
-                                      pre_vertex_slice.lo_atom,
-                                      pre_vertex_slice.hi_atom] = \
+                self.__delay_key_index[app_edge.pre_vertex.source_vertex,
+                                       pre_vertex_slice.lo_atom,
+                                       pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
         spec.comment("\n*** Synapses spec block ***\n")
@@ -1189,9 +1195,9 @@ class SynapticManager(
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        if isinstance(self._synapse_dynamics,
+        if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
-            self._synapse_dynamics.write_parameters(
+            self.__synapse_dynamics.write_parameters(
                 spec,
                 POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 machine_time_step, scales,
@@ -1201,12 +1207,12 @@ class SynapticManager(
                 machine_vertex=vertex,
                 graph_mapper=graph_mapper, routing_info=routing_info)
         else:
-            self._synapse_dynamics.write_parameters(
+            self.__synapse_dynamics.write_parameters(
                 spec,
                 POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 machine_time_step, scales)
 
-        self._weight_scales[placement] = scales
+        self.__weight_scales[placement] = scales
 
         self._write_on_machine_data_spec(
             spec, vertex_slice, scales, gen_data)
@@ -1220,7 +1226,7 @@ class SynapticManager(
         spec.end_specification()
 
     def clear_connection_cache(self):
-        self._retrieved_blocks = dict()
+        self.__retrieved_blocks = dict()
 
     #For retrieving data, it is wrapped in abstract_pop_vertex, remove the wrapper and call directly this in the caller!
     def get_connections_from_machine(
@@ -1244,7 +1250,7 @@ class SynapticManager(
         # Get the key for the delayed pre_vertex
         delayed_key = None
         if app_edge.delay_edge is not None:
-            delayed_key = self._delay_key_index[
+            delayed_key = self.__delay_key_index[
                 app_edge.pre_vertex, pre_vertex_slice.lo_atom,
                 pre_vertex_slice.hi_atom].first_key
 
@@ -1272,10 +1278,10 @@ class SynapticManager(
                 handle_time_out_configuration, fixed_routes)
 
         # Convert the blocks into connections
-        return self._synapse_io.read_synapses(
+        return self._read_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_len, self._implemented_synapse_types,
-            self._weight_scales[placement], data, delayed_data,
+            self.__weight_scales[placement], data, delayed_data,
             app_edge.n_delay_stages, machine_time_step)
 
     def __compute_addresses(self, transceiver, placement):
@@ -1293,6 +1299,18 @@ class SynapticManager(
             transceiver) + 4
         return master_pop_table, direct_synapses, synaptic_matrix
 
+    def _extract_synaptic_matrix_data_location(
+            self, key, master_pop_table_address, transceiver, placement):
+        return self.__poptable_type.extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver,
+            placement.x, placement.y)
+
+    def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
+                       weight_scales, data1, data2, n_delays, timestep):
+        return self.__synapse_io.read_synapses(
+            info, pre_slice, post_slice, len1, len2, len3, weight_scales,
+            data1, data2, n_delays, timestep)
+
     def _retrieve_synaptic_block(
             self, transceiver, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
@@ -1304,12 +1322,11 @@ class SynapticManager(
             the machine
         """
         # See if we have already got this block
-        if (placement, key, index) in self._retrieved_blocks:
-            return self._retrieved_blocks[placement, key, index]
+        if (placement, key, index) in self.__retrieved_blocks:
+            return self.__retrieved_blocks[placement, key, index]
 
-        items = self._poptable_type.extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver,
-            placement.x, placement.y)
+        items = self._extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver, placement)
         if index >= len(items):
             return None, None
 
@@ -1346,7 +1363,8 @@ class SynapticManager(
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
 
-        self._retrieved_blocks[placement, key, index] = (block, max_row_length)
+        self.__retrieved_blocks[placement, key, index] = \
+            (block, max_row_length)
         return block, max_row_length
 
     def __read_multiple_synaptic_blocks(
@@ -1356,7 +1374,7 @@ class SynapticManager(
         """ Read in an array of synaptic blocks.
         """
         # calculate the synaptic block size in bytes
-        synaptic_block_size = self._synapse_io.get_block_n_bytes(
+        synaptic_block_size = self.__synapse_io.get_block_n_bytes(
             max_row_length, n_rows)
 
         # read in the synaptic block
@@ -1396,7 +1414,7 @@ class SynapticManager(
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
-        return self._poptable_type.get_edge_constraints()
+        return self.__poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
             self, spec, post_vertex_slice, weight_scales, generator_data):
@@ -1449,7 +1467,7 @@ class SynapticManager(
         """ True if the synapses should be generated on the machine
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        return self._gen_on_machine.get(key, False)
+        return self.__gen_on_machine.get(key, False)
 
     #TODO: IMPLEMENT THIS METHOD FOR RECORDING!!
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):

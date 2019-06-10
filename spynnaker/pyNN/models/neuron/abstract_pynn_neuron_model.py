@@ -22,13 +22,16 @@ _population_parameters = {
 
 
 class AbstractPyNNNeuronModel(AbstractPyNNModel):
-
-    __slots__ = ("_model")
+    __slots__ = ["__model"]
 
     default_population_parameters = _population_parameters
 
     def __init__(self, model):
-        self._model = model
+        self.__model = model
+
+    @property
+    def _model(self):
+        return self.__model
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_NEURON_CORE):
@@ -54,7 +57,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
         vertices.append(AbstractPopulationVertex(
             n_neurons, label+"_neuron_vertex", constraints, max_atoms, spikes_per_second,
-            ring_buffer_sigma, self._model, self))
+            ring_buffer_sigma, self.__model, self))
 
 
         for index in range(vertices[0].get_n_synapse_types()):
