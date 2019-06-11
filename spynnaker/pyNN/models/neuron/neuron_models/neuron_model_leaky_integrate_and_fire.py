@@ -37,13 +37,13 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
         super(NeuronModelLeakyIntegrateAndFire, self).__init__(
-            [DataType.S1615,   # v
-             DataType.S1615,   # v_rest
-             DataType.S1615,   # r_membrane (= tau_m / cm)
-             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
-             DataType.S1615,   # i_offset
-             DataType.INT32,   # count_refrac
-             DataType.S1615,   # v_reset
+            [DataType.S1615,  # v
+             DataType.S1615,  # v_rest
+             DataType.S1615,  # r_membrane (= tau_m / cm)
+             DataType.S1615,  # exp_tc (= e^(-ts / tau_m))
+             DataType.S1615,  # i_offset
+             DataType.INT32,  # count_refrac
+             DataType.S1615,  # v_reset
              DataType.INT32])  # tau_refrac
 
         if v_init is None:
@@ -86,7 +86,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
@@ -99,7 +98,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac) = values
@@ -163,3 +161,14 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self.__tau_refrac = tau_refrac
+
+    def get_all_parameters(self):
+        all_params = {
+            'v_init': self.__v_init,
+            'v_rest': self.__v_rest,
+            'tau_m': self.__tau_m,
+            'cm': self.__cm,
+            'i_offset': self.__i_offset,
+            'v_reset': self.__v_reset,
+            'tau_refrac': self.__tau_refrac}
+        return all_params

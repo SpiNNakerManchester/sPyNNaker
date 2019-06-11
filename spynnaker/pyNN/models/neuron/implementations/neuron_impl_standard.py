@@ -16,7 +16,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__synapse_type",
         "__threshold_type",
         "__additional_input_type",
-        "__components"
+        "_components"
     ]
 
     _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
@@ -38,11 +38,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
         self.__threshold_type = threshold_type
         self.__additional_input_type = additional_input_type
 
-        self.__components = [
+        self._components = [
             self.__neuron_model, self.__input_type, self.__threshold_type,
             self.__synapse_type]
         if self.__additional_input_type is not None:
-            self.__components.append(self.__additional_input_type)
+            self._components.append(self.__additional_input_type)
 
     @property
     @overrides(AbstractNeuronImpl.model_name)
@@ -120,32 +120,32 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.add_parameters)
     def add_parameters(self, parameters):
-        for component in self.__components:
+        for component in self._components:
             component.add_parameters(parameters)
 
     @overrides(AbstractNeuronImpl.add_state_variables)
     def add_state_variables(self, state_variables):
-        for component in self.__components:
+        for component in self._components:
             component.add_state_variables(state_variables)
 
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
         return numpy.concatenate([
             component.get_data(parameters, state_variables, vertex_slice)
-            for component in self.__components
+            for component in self._components
         ])
 
     @overrides(AbstractNeuronImpl.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-        for component in self.__components:
+        for component in self._components:
             offset = component.read_data(
                 data, offset, vertex_slice, parameters, state_variables)
         return offset
 
     @overrides(AbstractNeuronImpl.get_units)
     def get_units(self, variable):
-        for component in self.__components:
+        for component in self._components:
             if component.has_variable(variable):
                 return component.get_units(variable)
 
@@ -160,7 +160,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     def __getitem__(self, key):
         # Find the property in the components...
-        for component in self.__components:
+        for component in self._components:
             if hasattr(component, key):
                 return getattr(component, key)
         # ... or fail
@@ -169,7 +169,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     def __setitem__(self, key, value):
         # Find the property in the components...
-        for component in self.__components:
+        for component in self._components:
             if hasattr(component, key):
                 return setattr(component, key, value)
         # ... or fail

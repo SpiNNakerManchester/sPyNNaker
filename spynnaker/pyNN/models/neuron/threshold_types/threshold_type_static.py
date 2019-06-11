@@ -57,3 +57,8 @@ class ThresholdTypeStatic(AbstractThresholdType):
     @v_thresh.setter
     def v_thresh(self, v_thresh):
         self.__v_thresh = v_thresh
+
+    def get_all_parameters(self):
+        all_params = {
+            'v_thresh': self.__v_thresh}
+        return all_params

@@ -41,3 +41,6 @@ class InputTypeCurrent(AbstractInputType):
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
         return 1.0
+
+    def get_all_parameters(self):
+        return {}

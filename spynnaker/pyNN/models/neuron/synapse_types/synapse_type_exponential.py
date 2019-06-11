@@ -131,3 +131,11 @@ class SynapseTypeExponential(AbstractSynapseType):
     @isyn_inh.setter
     def isyn_inh(self, isyn_inh):
         self.__isyn_inh = isyn_inh
+
+    def get_all_parameters(self):
+        all_params = {
+            'tau_syn_E': self.__tau_syn_E,
+            'tau_syn_I': self.__tau_syn_I,
+            'isyn_exc': self.__isyn_exc,
+            'isyn_inh': self.__isyn_inh}
+        return all_params
