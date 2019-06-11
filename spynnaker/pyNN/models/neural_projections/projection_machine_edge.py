@@ -55,6 +55,7 @@ class ProjectionMachineEdge(
                         n_filtered += 1
                 except ValueError:
                     print "Value error"
+                    n_filtered += 1
         return (n_filtered == len(self._synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
