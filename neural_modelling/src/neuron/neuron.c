@@ -346,12 +346,12 @@ void neuron_do_timestep_update(
             if (use_key) {
 
                 // Wait until the expected time to send
-                while ((ticks == timer_count) &&
+               /* while ((ticks == timer_count) &&
                         (tc[T1_COUNT] > expected_time)) {
 
                     // Do Nothing
                 }
-                expected_time -= time_between_spikes;
+                expected_time -= time_between_spikes;*/
 
                 // Send the spike
                 while (!spin1_send_mc_packet(
