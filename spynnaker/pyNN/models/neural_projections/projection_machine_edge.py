@@ -70,7 +70,8 @@ class ProjectionMachineEdge(
                                                             synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1,
                                                             post_lo:post_hi + 1])
                 except ValueError:
-                    print "Value error"
+                    # print "Value error"
+                    n_filtered += 1
         return (n_filtered == len(self._synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
