@@ -585,11 +585,15 @@ void timer_callback(uint timer_count, uint unused) {
                 // Get number of spikes to send this tick
             	uint32_t num_spikes = 0;
             	if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
-            		num_spikes = faster_spike_source_get_num_spikes(
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            	    num_spikes = faster_spike_source_get_num_spikes(
             				spike_source->sqrt_lambda);
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
             	} else {
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
             		num_spikes = fast_spike_source_get_num_spikes(
             				spike_source->exp_minus_lambda);
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
             	}
 
                 log_debug("Generating %d spikes", num_spikes);
@@ -633,9 +637,11 @@ void timer_callback(uint timer_count, uint unused) {
 
                     // Update time to spike (note, this might not get us back above
                     // the scale factor, particularly if the mean_isi is smaller)
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
                     spike_source->time_to_spike_ticks +=
                         slow_spike_source_get_time_to_spike(
                             spike_source->mean_isi_ticks);
+            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
                 }
 
                 // Now we have finished for this tick, subtract the scale factor
@@ -643,6 +649,8 @@ void timer_callback(uint timer_count, uint unused) {
             }
         }
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
     // Record output spikes if required
     if (recording_flags > 0) {
@@ -653,7 +661,7 @@ void timer_callback(uint timer_count, uint unused) {
         recording_do_timestep_update(time);
     }
 
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
 }
 

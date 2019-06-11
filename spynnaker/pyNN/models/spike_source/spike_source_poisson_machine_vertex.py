@@ -32,7 +32,7 @@ class SpikeSourcePoissonMachineVertex(
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
-        1: "DMA_READ"}
+        1: "PROB_FUNC"}
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
