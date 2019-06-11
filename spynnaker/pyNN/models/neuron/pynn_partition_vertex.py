@@ -25,12 +25,13 @@ N_PARTITIONS = 2
 
 class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
                           AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-                          AbstractContainsUnits, AbstractAcceptsIncomingSynapses):
+                          AbstractContainsUnits):
 
     __slots__ = [
         "_neuron_vertices",
         "_synapse_vertices",  # List of lists, each list corresponds to a neuron vertex
-        "_n_atoms"]
+        "_n_atoms",
+        "_n_syn_types"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size):
@@ -39,6 +40,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         self._neuron_vertices = list()
         self._synapse_vertices = list()
+        self._n_syn_types = neuron_model.get_n_synapse_types()
 
         for i in range(N_PARTITIONS):
 
@@ -46,8 +48,6 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 n_neurons/N_PARTITIONS, label + "_" + str(i) + "_neuron_vertex",
                 constraints, max_atoms_neuron_core, spikes_per_second,
                 ring_buffer_sigma, neuron_model, pynn_model))
-
-            n_syn_types = self._neuron_vertices[i].get_n_synapse_types()
 
             syn_vertices = list()
 
@@ -60,35 +60,35 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             syn_constraints.append(SameAtomsAsVertexConstraint(self._neuron_vertices[i]))
 
-            for index in range(n_syn_types):
+            for index in range(self._n_syn_types):
 
-                if n_syn_types > 1 and index == 0:
+                if self._n_syn_types > 1 and index == 0:
 
-                    vertex = SynapticManager(1, 0, n_neurons, syn_constraints,
+                    vertex = SynapticManager(1, 0, n_neurons/N_PARTITIONS, syn_constraints,
                                              label + "_" + str(i) + "_low_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                             neuron_model.get_n_synapse_types())
+                                             self._n_syn_types)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
 
-                    vertex = SynapticManager(1, 0, n_neurons, syn_constraints,
+                    vertex = SynapticManager(1, 0, n_neurons/N_PARTITIONS, syn_constraints,
                                              label + "_" + str(i) + "_high_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                             neuron_model.get_n_synapse_types())
+                                             self._n_syn_types)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
 
                 else:
 
-                    vertex = SynapticManager(1, index, n_neurons, syn_constraints,
+                    vertex = SynapticManager(1, index, n_neurons/N_PARTITIONS, syn_constraints,
                                              label + "_" + str(i) + "_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
-                                             neuron_model.get_n_synapse_types())
+                                             self._n_syn_types)
 
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
@@ -114,6 +114,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @property
     def n_atoms(self):
         return self._n_atoms
+
+    @property
+    def n_syn_types(self):
+        return self._n_syn_types
 
     def add_internal_edges_and_vertices(self, spinnaker_control):
 
@@ -189,7 +193,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         return self._neuron_vertices[0].initialize_parameters
 
     def get_synapse_id_by_target(self, target):
-        self._neuron_vertices[0].get_synapse_id_by_target(target)
+        return self._neuron_vertices[0].get_synapse_id_by_target(target)
 
     def set_synapse_dynamics(self, synapse_dynamics):
         for vertex_list in self._synapse_vertices:
@@ -204,3 +208,36 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for partition in self._synapse_vertices:
             for vertex in partition:
                 vertex.clear_connection_cache()
+
+    def get_max_atoms_per_core(self):
+        return DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+
+    def describe(self):
+        # Correct??
+        return self._neuron_vertices[0].describe()
+
+    # def add_pre_run_connection_holder(
+    #         self, connection_holder, projection_edge, synapse_information):
+    #
+    #     for vertex_list in self._synapse_vertices:
+    #         for vertex in vertex_list:
+    #             vertex.add_pre_run_connection_holder(
+    #                 connection_holder, projection_edge, synapse_information)
+    #
+    # # List of the connections, one per syn vertex, BAH
+    # def get_connections_from_machine(self, transceiver, placement, machine_edge, graph_mapper,
+    #                                  routing_infos, synapse_info, machine_time_step,
+    #                                  using_extra_monitor_cores, placements=None, data_receiver=None,
+    #                                  sender_extra_monitor_core_placement=None,
+    #                                  extra_monitor_cores_for_router_timeout=None,
+    #                                  handle_time_out_configuration=True, fixed_routes=None):
+    #     connections = list()
+    #     for vertex_list in self._synapse_vertices:
+    #         for vertex in vertex_list:
+    #             connections.append(vertex.get_connections_from_machine(
+    #                 transceiver, placement, machine_edge, graph_mapper,
+    #                 routing_infos, synapse_info, machine_time_step,
+    #                 using_extra_monitor_cores, placements, data_receiver,
+    #                 sender_extra_monitor_core_placement,
+    #                 extra_monitor_cores_for_router_timeout,
+    #                 handle_time_out_configuration, fixed_routes))

@@ -87,7 +87,8 @@ class PyNNPopulationCommon(object):
                 if isinstance(v, PyNNPartitionVertex):
                     v.add_internal_edges_and_vertices(self._spinnaker_control)
                 else:
-                    self._spinnaker_control.add_application_vertex(v)
+                    for app_vertex in v.out_vertices:
+                        self._spinnaker_control.add_application_vertex(app_vertex)
 
 
         # Use a provided application vertex directly

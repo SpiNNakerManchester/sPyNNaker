@@ -103,7 +103,6 @@ class PyNNProjectionCommon(object):
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
-            #BUTTA ADD DELAY EXTENSION DENTRO AL PYNN PARTITION VERTEX!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             delay_edge = self._add_delay_extension(
                 pre_synaptic_population, post_synaptic_population, max_delay,
                 post_vertex_max_supported_delay_ms, machine_time_step,
@@ -138,7 +137,6 @@ class PyNNProjectionCommon(object):
             self, pre_synaptic_population, post_synaptic_population,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             timescale_factor, synapse_type):
-        #BUTTA DENTRO PYNN PARTITION VERTEX, COME SCRITTO SOPRA!!!!!!!!!!!!!!!!!!!!!!!
         """ Instantiate delay extension component
         """
         # pylint: disable=too-many-arguments

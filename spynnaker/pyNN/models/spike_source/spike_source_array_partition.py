@@ -24,7 +24,7 @@ class SpikeSourceArrayPartition(ReverseIpTagMultiCastSource, AbstractSpikeRecord
 
         for i in range(N_PARTITIONS):
             self._vertices.append(SpikeSourceArrayVertex(
-                n_neurons/N_PARTITIONS, spike_times, constraints, label, max_atoms, spike_source_array))
+                n_neurons/N_PARTITIONS, spike_times, constraints, label+"_"+str(i), max_atoms, spike_source_array))
 
     @property
     def n_atoms(self):

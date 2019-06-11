@@ -27,37 +27,49 @@ class PyNNPartitionEdge():
 
         pre_app_vertices = self._pre_vertex.out_vertices
         post_app_vertices = self._post_vertex.in_vertices
+        synapse_type = synapse_information.synapse_type
+
+        __offset = 0
 
         for index in range(len(pre_app_vertices)):
-            if not isinstance(post_vertex,
-                              AbstractAcceptsIncomingSynapses):
-                raise ConfigurationException(
-                    "postsynaptic population is not designed to receive"
-                    " synaptic projections")
+            for syn_index in range(len(post_app_vertices)):
+                # Check offset for multiple exc syn types(2nd exc)
+                if synapse_type == 0:
+                    dest = index
+                else:
+                    dest = synapse_type * len(pre_app_vertices)
 
-            # check that the projection edges label is not none, and give an
-            # auto generated label if set to None
-            if self._label is None:
-                self._label = "projection edge {}".format(
-                    spinnaker_control.none_labelled_edge_count)
-                spinnaker_control.increment_none_labelled_edge_count()
-            else:
-                label = label + "_" + str(index)
+                if not isinstance(post_app_vertices[syn_index][dest],
+                                  AbstractAcceptsIncomingSynapses):
+                    raise ConfigurationException(
+                        "postsynaptic population is not designed to receive"
+                        " synaptic projections")
 
-            edge_to_merge = self._find_existing_edge(
-                pre_vertex, post_vertex, spinnaker_control)
+                # check that the projection edges label is not none, and give an
+                # auto generated label if set to None
+                if self._label is None:
+                    self._label = "projection edge {}".format(
+                        spinnaker_control.none_labelled_edge_count)
+                    spinnaker_control.increment_none_labelled_edge_count()
+                    name = self._label
+                else:
+                    name = self._label + "_" + str(__offset)
+                    __offset += 1
 
-            if edge_to_merge is not None:
-                edge_to_merge.add_synapse_information(self._synapse_information)
-                edge = edge_to_merge
-            else:
-                edge = ProjectionApplicationEdge(
-                    pre_app_vertices[index], post_app_vertices[index], synapse_information, label)
+                edge_to_merge = self._find_existing_edge(
+                    pre_app_vertices[index], post_app_vertices[syn_index][dest], spinnaker_control)
 
-            # add edge to the graph
-            spinnaker_control.add_application_edge(edge, constants.SPIKE_PARTITION_ID)
+                if edge_to_merge is not None:
+                    edge_to_merge.add_synapse_information(self._synapse_information)
+                    edge = edge_to_merge
+                else:
+                    edge = ProjectionApplicationEdge(
+                        pre_app_vertices[index], post_app_vertices[syn_index][dest], synapse_information, name)
 
-            self._application_edges.append(edge)
+                # add edge to the graph
+                spinnaker_control.add_application_edge(edge, constants.SPIKE_PARTITION_ID)
+
+                self._application_edges.append(edge)
 
     @property
     def application_edges(self):

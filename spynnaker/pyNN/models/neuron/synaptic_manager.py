@@ -1222,7 +1222,6 @@ class SynapticManager(
     def clear_connection_cache(self):
         self._retrieved_blocks = dict()
 
-    #For retrieving data, it is wrapped in abstract_pop_vertex, remove the wrapper and call directly this in the caller!
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
             routing_infos, synapse_info, machine_time_step,
