@@ -685,17 +685,14 @@ class AbstractPopulationVertex(
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, data_receiver=None,
-            sender_extra_monitor_core_placement=None,
-            extra_monitor_cores_for_router_timeout=None,
-            handle_time_out_configuration=True, fixed_routes=None):
+            placements=None, monitor_api=None, monitor_placement=None,
+            monitor_cores=None, handle_time_out_configuration=True,
+            fixed_routes=None):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, graph_mapper,
-            routing_infos, synapse_information, machine_time_step,
-            using_extra_monitor_cores, placements, data_receiver,
-            sender_extra_monitor_core_placement,
-            extra_monitor_cores_for_router_timeout,
+            transceiver, placement, edge, graph_mapper, routing_infos,
+            synapse_information, machine_time_step, using_extra_monitor_cores,
+            placements, monitor_api, monitor_placement, monitor_cores,
             handle_time_out_configuration, fixed_routes)
 
     def clear_connection_cache(self):
