@@ -15,6 +15,7 @@ from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 class SpynnakerExternalDevicePluginManager(object):
     """ User-level interface for the external device plugin manager.
     """
+    __slots__ = []
 
     @staticmethod
     def add_database_socket_address(
@@ -153,9 +154,9 @@ class SpynnakerExternalDevicePluginManager(object):
             or :py:class:`pacman.model.graphs.application.ApplicationVertex`
         """
         device_vertex = device
+        # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
-        # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
             population._get_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)
