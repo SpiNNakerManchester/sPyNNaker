@@ -116,6 +116,7 @@ static volatile bool dma_finished;
 
 static weight_t *synaptic_region;
 
+
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
@@ -161,7 +162,8 @@ static void _reset_record_counter() {
 static bool _neuron_load_neuron_parameters(address_t address) {
 
     //cut off synaptic contribution left shift
-    uint32_t next = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
+    uint32_t next =
+        START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
     log_debug("loading parameters");
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
@@ -214,7 +216,8 @@ bool neuron_reload_neuron_parameters(address_t address){
 void neuron_store_neuron_parameters(address_t address){
 
     //cut off synaptic contribution left shift
-    uint32_t next = START_OF_GLOBAL_PARAMETERS + n_synapse_types;
+    uint32_t next =
+        START_OF_GLOBAL_PARAMETERS + n_synapse_types;
 
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
     next += (n_words_for_n_neurons + 2) * (n_recorded_vars + 1);
@@ -426,7 +429,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     uint32_t contribution_bits =
         log_n_neurons + log_n_synapse_types;
-    uint32_t contribution_size = 1 << (contribution_bits);
+    uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
 
     dma_size = contribution_size * sizeof(weight_t);
 
@@ -455,14 +458,14 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     }
 
     synaptic_contributions_to_input_left_shifts = (uint32_t *) spin1_malloc(
-        n_synapse_types * sizeof(uint32_t));
+        (n_synapse_types) * sizeof(uint32_t));
     if (synaptic_contributions_to_input_left_shifts == NULL) {
         log_error("Unable to allocate Synaptic contribution shift array");
         return false;
     }
     spin1_memcpy(
         synaptic_contributions_to_input_left_shifts, address + START_OF_GLOBAL_PARAMETERS,
-        n_synapse_types * sizeof(uint32_t));
+        (n_synapse_types) * sizeof(uint32_t));
 
     // Set up the out spikes array - this is always n_neurons in size to ensure
     // it continues to work if changed between runs, but less might be used in

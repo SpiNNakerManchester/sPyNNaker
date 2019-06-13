@@ -95,7 +95,8 @@ class AbstractPopulationVertex(
         "_machine_vertices",
         "_connected_app_vertices",
         "_n_subvertices",
-        "_n_data_specs"]
+        "_n_data_specs",
+        "_atoms_offset"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -114,7 +115,7 @@ class AbstractPopulationVertex(
     _n_vertices = 0
 
     def __init__(
-            self, n_neurons, label, constraints, max_atoms_per_core,
+            self, n_neurons, atoms_offset, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
@@ -123,6 +124,7 @@ class AbstractPopulationVertex(
         self._n_atoms = n_neurons
         self._n_subvertices = 0
         self._n_data_specs = 0
+        self._atoms_offset = atoms_offset
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -235,7 +237,8 @@ class AbstractPopulationVertex(
 
         for app_vertex in self._connected_app_vertices:
             out_vertices =\
-                app_vertex.get_machine_vertex_at(vertex_slice.lo_atom, vertex_slice.hi_atom)
+                app_vertex.get_machine_vertex_at(
+                    vertex_slice.lo_atom + self._atoms_offset, vertex_slice.hi_atom + self._atoms_offset)
             if len(out_vertices)> 0:
                 for out_vertex in out_vertices:
                     vertex.add_constraint(SameChipAsConstraint(out_vertex))
@@ -494,12 +497,14 @@ class AbstractPopulationVertex(
         """
         if self._ring_buffer_shifts is None:
             self._ring_buffer_shifts = []
-            for app_edge in application_graph.\
-                    get_edges_ending_at_vertex(self):
-                self._ring_buffer_shifts.extend(
-                    self._get_ring_buffer_to_input_left_shifts(
-                        app_edge.pre_vertex, application_graph,
-                        machine_timestep))
+            previous_syn_type = -1
+            for vertex in self._connected_app_vertices:
+                if vertex.synapse_index != previous_syn_type:
+                    self._ring_buffer_shifts.extend(
+                        self._get_ring_buffer_to_input_left_shifts(
+                            vertex, application_graph,
+                            machine_timestep))
+                    previous_syn_type = vertex.synapse_index
         return self._ring_buffer_shifts
 
     def _write_neuron_parameters(
@@ -595,7 +600,7 @@ class AbstractPopulationVertex(
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice,
-            index = placement.vertex.vertex_index)
+            index=placement.vertex.vertex_index)
 
         # close spec
         spec.end_specification()

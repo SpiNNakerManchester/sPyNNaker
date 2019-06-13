@@ -31,7 +31,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_neuron_vertices",
         "_synapse_vertices",  # List of lists, each list corresponds to a neuron vertex
         "_n_atoms",
-        "_n_syn_types"]
+        "_n_syn_types",
+        "_offset"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
                  ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size):
@@ -42,10 +43,15 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()
 
+        self._offset = self._compute_partition_and_offset_size()
+
         for i in range(N_PARTITIONS):
 
+            atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
+                else self._n_atoms - (self._offset * i)
+
             self._neuron_vertices.append(AbstractPopulationVertex(
-                n_neurons/N_PARTITIONS, label + "_" + str(i) + "_neuron_vertex",
+                atoms, self._offset*i, label + "_" + str(i) + "_neuron_vertex",
                 constraints, max_atoms_neuron_core, spikes_per_second,
                 ring_buffer_sigma, neuron_model, pynn_model))
 
@@ -64,7 +70,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                 if self._n_syn_types > 1 and index == 0:
 
-                    vertex = SynapticManager(1, 0, n_neurons/N_PARTITIONS, syn_constraints,
+                    vertex = SynapticManager(1, 0, atoms, self._offset*i, syn_constraints,
                                              label + "_" + str(i) + "_low_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
@@ -73,7 +79,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                     vertex.connected_app_vertices = [self._neuron_vertices[i]]
                     syn_vertices.append(vertex)
 
-                    vertex = SynapticManager(1, 0, n_neurons/N_PARTITIONS, syn_constraints,
+                    vertex = SynapticManager(1, 0, atoms, self._offset*i, syn_constraints,
                                              label + "_" + str(i) + "_high_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
@@ -84,7 +90,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                 else:
 
-                    vertex = SynapticManager(1, index, n_neurons/N_PARTITIONS, syn_constraints,
+                    vertex = SynapticManager(1, index, atoms, self._offset*i, syn_constraints,
                                              label + "_" + str(i) + "_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
@@ -95,6 +101,12 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             self._neuron_vertices[i].connected_app_vertices = syn_vertices
             self._synapse_vertices.append(syn_vertices)
+
+    def _compute_partition_and_offset_size(self):
+
+        if self._n_atoms % DEFAULT_MAX_ATOMS_PER_NEURON_CORE != 0:
+            return -((-self._n_atoms / N_PARTITIONS) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+        return self._n_atoms / N_PARTITIONS
 
     def get_application_vertices(self):
 

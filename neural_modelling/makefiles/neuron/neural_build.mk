@@ -192,7 +192,7 @@ SOURCES = common/out_spikes.c \
 
 include $(SPINN_DIRS)/make/local.mk
 
-FEC_OPT = $(OSPACE)
+#FEC_OPT = $(OSPACE)
 
 # Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
