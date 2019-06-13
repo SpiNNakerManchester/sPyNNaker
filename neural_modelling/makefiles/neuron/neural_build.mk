@@ -199,27 +199,22 @@ SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABL
 
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
 	#spike_processing.c
-	-mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
-
-$(BUILD_DIR)neuron/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_fixed_impl.c
-	#population_table/population_table_fixed_impln.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
-	#population_table/population_table_binary_search_impl
-	-mkdir -p $(dir $@)
+	#population_table/population_table_binary_search_impl.c
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 #STDP Build rules If and only if STDP used
@@ -229,49 +224,49 @@ ifeq ($(STDP_ENABLED), 1)
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O stdp
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
     $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
 else
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O Synapese
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 endif
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
 	# WEIGHT_DEPENDENCE_O
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
 	# TIMING_DEPENDENCE_O
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	# neuron.o
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
 .PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
