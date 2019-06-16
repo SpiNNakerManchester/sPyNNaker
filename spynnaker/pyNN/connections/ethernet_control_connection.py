@@ -1,11 +1,9 @@
-from spinn_front_end_common.utility_models import MultiCastCommand
-
-from spinnman.connections.udp_packet_connections import EIEIOConnection
-from spinnman.messages.eieio.data_messages \
-    import EIEIODataMessage, KeyDataElement, KeyPayloadDataElement
-
 import logging
 from threading import Thread
+from spinn_front_end_common.utility_models import MultiCastCommand
+from spinnman.connections.udp_packet_connections import EIEIOConnection
+from spinnman.messages.eieio.data_messages import (
+    EIEIODataMessage, KeyDataElement, KeyPayloadDataElement)
 
 logger = logging.getLogger(__name__)
 
@@ -28,16 +26,16 @@ class EthernetControlConnection(EIEIOConnection):
         thread = Thread(name="Ethernet Control Connection on {}:{}".format(
             self.local_ip_address, self.local_port), target=self.run)
         thread.daemon = True
-        self._translator = translator
-        self._running = True
+        self.__translator = translator
+        self.__running = True
         thread.start()
 
     def run(self):
         try:
-            while self._running:
+            while self.__running:
                 self._step()
         except Exception:
-            if self._running:
+            if self.__running:
                 logger.exception("failure processing EIEIO message")
 
     def _step(self):
@@ -48,14 +46,14 @@ class EthernetControlConnection(EIEIOConnection):
 
     def _translate(self, element):
         if isinstance(element, KeyDataElement):
-            self._translator.translate_control_packet(
+            self.__translator.translate_control_packet(
                 MultiCastCommand(element.key))
         elif isinstance(element, KeyPayloadDataElement):
-            self._translator.translate_control_packet(
+            self.__translator.translate_control_packet(
                 MultiCastCommand(element.key, element.payload))
 
     def close(self):
         """ Close the connection
         """
-        self._running = False
+        self.__running = False
         super(EthernetControlConnection, self).close()

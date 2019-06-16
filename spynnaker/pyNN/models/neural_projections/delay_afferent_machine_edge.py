@@ -1,14 +1,15 @@
-from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.abstract_models \
-    import AbstractWeightUpdatable, AbstractFilterableEdge
-from pacman.model.graphs.machine import MachineEdge
-
 import logging
+from spinn_utilities.overrides import overrides
+from pacman.model.graphs.machine import MachineEdge
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractWeightUpdatable, AbstractFilterableEdge)
+
 logger = logging.getLogger(__name__)
 
 
 class DelayAfferentMachineEdge(
         MachineEdge, AbstractFilterableEdge, AbstractWeightUpdatable):
+    __slots__ = []
 
     def __init__(self, pre_vertex, post_vertex, label, weight=1):
         super(DelayAfferentMachineEdge, self).__init__(

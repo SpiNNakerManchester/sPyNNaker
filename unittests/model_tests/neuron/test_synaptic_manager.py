@@ -1,39 +1,32 @@
-import unittest
-import struct
 import os
+import struct
 import tempfile
-
+import unittest
 import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.overrides import overrides
-
+from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper
-from pacman.model.graphs.common import Slice
-from pacman.model.graphs.machine import MachineGraph
-from pacman.model.routing_info import RoutingInfo
-from pacman.model.routing_info import PartitionRoutingInfo
-from pacman.model.routing_info import BaseKeyAndMask
-from pacman.model.graphs.machine import SimpleMachineVertex
+from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.routing_info import (
+    RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
-
-from data_specification \
-    import DataSpecificationGenerator, DataSpecificationExecutor
-
 from spinn_storage_handlers import FileDataWriter, FileDataReader
-
-from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
+from data_specification import (
+    DataSpecificationGenerator, DataSpecificationExecutor)
+from spynnaker.pyNN.models.neuron import SynapticManager
+import spynnaker.pyNN.models.neural_projections.connectors.\
+    abstract_generate_connector_on_machine as \
+    abstract_generate_connector_on_machine
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
-from spynnaker.pyNN.models.neural_projections \
-    import ProjectionApplicationEdge, ProjectionMachineEdge
-from spynnaker.pyNN.models.neural_projections \
-    import SynapseInformation
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import OneToOneConnector, AllToAllConnector
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStatic
-
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    OneToOneConnector, AllToAllConnector)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStatic)
 from unittests.mocks import MockSimulator
 
 
@@ -113,21 +106,21 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         first_block, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         same_block, row_len_1_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         synaptic_manager.clear_connection_cache()
         different_block, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
 
         # Check that the row lengths are all the same
         assert row_len_1 == row_len_1_2
@@ -167,15 +160,15 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=1,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
 
         # Row lengths should be 1
         assert row_len_1 == 1
@@ -187,6 +180,8 @@ class TestSynapticManager(unittest.TestCase):
 
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
+        # Add an sdram so maxsdram is high enough
+        SDRAM(10000)
 
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
@@ -208,24 +203,18 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_1.set_weights_and_delays(
-            [1.5 for _ in range(10)], 1.0)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        one_to_one_connector_2.set_weights_and_delays(
-            [2.5 for _ in range(10)], 2.0)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
             pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector.set_weights_and_delays(
-            [4.5 for _ in range(10) for _ in range(10)], 4.0)
         direct_synapse_information_1 = SynapseInformation(
-            one_to_one_connector_1, SynapseDynamicsStatic(), 0)
+            one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(
-            one_to_one_connector_2, SynapseDynamicsStatic(), 1)
+            one_to_one_connector_2, SynapseDynamicsStatic(), 1, 2.5, 2.0)
         all_to_all_synapse_information = SynapseInformation(
-            all_to_all_connector, SynapseDynamicsStatic(), 0)
+            all_to_all_connector, SynapseDynamicsStatic(), 0, 4.5, 4.0)
         app_edge = ProjectionApplicationEdge(
             pre_app_vertex, post_app_vertex, direct_synapse_information_1)
         app_edge.add_synapse_information(direct_synapse_information_2)
@@ -269,6 +258,8 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
+        # UGLY but the mock transceiver NEED generate_on_machine be False
+        abstract_generate_connector_on_machine.IS_PYNN_8 = False
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
@@ -303,10 +294,8 @@ class TestSynapticManager(unittest.TestCase):
         transceiver = MockTransceiverRawData(all_data)
 
         # Get the master population table details
-        items = synaptic_manager._poptable_type\
-            .extract_synaptic_matrix_data_location(
-                key, master_pop_table_address, transceiver,
-                placement.x, placement.y)
+        items = synaptic_manager._extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver, placement)
 
         # The first entry should be direct, but the rest should be indirect;
         # the second is potentially direct, but has been restricted by the
@@ -317,13 +306,13 @@ class TestSynapticManager(unittest.TestCase):
         assert not items[2][2]
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=0,
-            using_extra_monitor_cores=False)
-        connections_1 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
             row_len_1, 0, 2, weight_scales, data_1, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -337,13 +326,13 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=1,
-            using_extra_monitor_cores=False)
-        connections_2 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
             row_len_2, 0, 2, weight_scales, data_2, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -357,13 +346,13 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
         data_3, row_len_3 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=2,
-            using_extra_monitor_cores=False)
-        connections_3 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
             app_edge.n_delay_stages, machine_time_step)
