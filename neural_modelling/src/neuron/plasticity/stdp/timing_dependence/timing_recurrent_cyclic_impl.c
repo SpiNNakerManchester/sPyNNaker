@@ -1,6 +1,6 @@
 #include "random.h"
 //#include <string.h>
-#include "timing_recurrent_cyclic_impl.h"
+#include "timing_recurrent_cyclic_split_accumulators_impl.h"
 
 //---------------------------------------
 // Globals

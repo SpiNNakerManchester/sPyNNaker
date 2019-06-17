@@ -8,7 +8,7 @@ THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
 SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_delta_combined_exponential_2E2I_impl.h
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_stdp_mad_impl_recurrent.c
 TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_cyclic_impl.c
-TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_cyclic_impl.h
+TIMING_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_recurrent_cyclic_split_accumulators_impl.h
 WEIGHT_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.c
 WEIGHT_DEPENDENCE_H = $(NEURON_DIR)/neuron/plasticity/stdp/weight_dependence/weight_multiplicative_impl.h
 

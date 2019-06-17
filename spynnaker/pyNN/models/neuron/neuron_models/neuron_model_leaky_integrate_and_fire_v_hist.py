@@ -29,14 +29,14 @@ UNITS = {
 
 class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
     __slots__ = [
-        "_v_init",
-        "_v_rest",
-        "_tau_m",
-        "_cm",
-        "_i_offset",
-        "_v_reset",
-        "_tau_refrac",
-        "_v_hist"
+        "__v_init",
+        "__v_rest",
+        "__tau_m",
+        "__cm",
+        "__i_offset",
+        "__v_reset",
+        "__tau_refrac",
+        "__v_hist"
         ]
 
     def __init__(
@@ -59,14 +59,14 @@ class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
         if v_hist is None: # initialise history V to initial V
             v_hist = v_init
 
-        self._v_init = v_init
-        self._v_rest = v_rest
-        self._tau_m = tau_m
-        self._cm = cm
-        self._i_offset = i_offset
-        self._v_reset = v_reset
-        self._tau_refrac = tau_refrac
-        self._v_hist = v_hist
+        self.__v_init = v_init
+        self.__v_rest = v_rest
+        self.__tau_m = tau_m
+        self.__cm = cm
+        self.__i_offset = i_offset
+        self.__v_reset = v_reset
+        self.__tau_refrac = tau_refrac
+        self.__v_hist = v_hist
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -75,18 +75,18 @@ class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
-        parameters[V_REST] = self._v_rest
-        parameters[TAU_M] = self._tau_m
-        parameters[CM] = self._cm
-        parameters[I_OFFSET] = self._i_offset
-        parameters[V_RESET] = self._v_reset
-        parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[V_REST] = self.__v_rest
+        parameters[TAU_M] = self.__tau_m
+        parameters[CM] = self.__cm
+        parameters[I_OFFSET] = self.__i_offset
+        parameters[V_RESET] = self.__v_reset
+        parameters[TAU_REFRAC] = self.__tau_refrac
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[V] = self._v_init
+        state_variables[V] = self.__v_init
         state_variables[COUNT_REFRAC] = 0
-        state_variables[V_HIST] = self._v_hist
+        state_variables[V_HIST] = self.__v_hist
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -124,64 +124,64 @@ class NeuronModelLeakyIntegrateAndFireVHist(AbstractNeuronModel):
 
     @property
     def v_init(self):
-        return self._v
+        return self.__v
 
     @v_init.setter
     def v_init(self, v_init):
-        self._v = v_init
+        self.__v = v_init
 
     @property
     def v_rest(self):
-        return self._v_rest
+        return self.__v_rest
 
     @v_rest.setter
     def v_rest(self, v_rest):
-        self._v_rest = v_rest
+        self.__v_rest = v_rest
 
     @property
     def tau_m(self):
-        return self._tau_m
+        return self.__tau_m
 
     @tau_m.setter
     def tau_m(self, tau_m):
-        self._tau_m = tau_m
+        self.__tau_m = tau_m
 
     @property
     def cm(self):
-        return self._cm
+        return self.__cm
 
     @cm.setter
     def cm(self, cm):
-        self._cm = cm
+        self.__cm = cm
 
     @property
     def i_offset(self):
-        return self._i_offset
+        return self.__i_offset
 
     @i_offset.setter
     def i_offset(self, i_offset):
-        self._i_offset = i_offset
+        self.__i_offset = i_offset
 
     @property
     def v_reset(self):
-        return self._v_reset
+        return self.__v_reset
 
     @v_reset.setter
     def v_reset(self, v_reset):
-        self._v_reset = v_reset
+        self.__v_reset = v_reset
 
     @property
     def tau_refrac(self):
-        return self._tau_refrac
+        return self.__tau_refrac
 
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
-        self._tau_refrac = tau_refrac
+        self.__tau_refrac = tau_refrac
 
     @property
     def v_hist(self):
-        return self._v_hist
+        return self.__v_hist
 
     @v_hist.setter
     def v_hist(self, v_hist):
-        self._v_hist = v_hist
+        self.__v_hist = v_hist

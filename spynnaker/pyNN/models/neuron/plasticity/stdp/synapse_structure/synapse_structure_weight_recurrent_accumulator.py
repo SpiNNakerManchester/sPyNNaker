@@ -14,8 +14,8 @@ class SynapseStructureWeightRecurrentAccumulator(AbstractSynapseStructure):
 #
 #     def get_synaptic_data(self, connections):
 #         # Plastic weight structure:
-#         # |      Weight     |  Accumulator   |
-#         # |----- 16 bit ----|---- 16 bit ----|
+#         # |     Weight    | P Accumulator | D Accumulator |     Lock     |
+#         # |---- 16 bit ---|---- 16 bit ---|---- 16 bit ---|--- 16 bit ---|
 #
 #         accumulator_init_val = 0
 #
@@ -37,7 +37,7 @@ class SynapseStructureWeightRecurrentAccumulator(AbstractSynapseStructure):
     def get_n_half_words_per_connection(self):
         """ Get the number of half words for each connection
         """
-        return 3 # 2 16-bit half-words
+        return 4 # 2 16-bit half-words
 
     @overrides(AbstractSynapseStructure.get_weight_half_word)
     def get_weight_half_word(self):

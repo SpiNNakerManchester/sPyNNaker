@@ -217,18 +217,21 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Param accum_decay_per_ts is actually per 32 time steps now, to avoid rounding to zero errors:
     int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event>>5);
-    //log_info("Acc step: %d,  time: %d, +/-: %d", recurrent_plasticity_params.accum_decay_per_ts, time_since_last_event, acc_change);
-    if (previous_state.accumulator > 0) {
-        previous_state.accumulator -= acc_change;
-        if (previous_state.accumulator < 0) {
-            previous_state.accumulator = 0;
-        }
-    } else if (previous_state.accumulator < 0) {
-        previous_state.accumulator += acc_change;
-        if (previous_state.accumulator > 0) {
-            previous_state.accumulator = 0;
-        }
-    }
+
+
+    // Decay pot_accumulator - THIS COULD BE WRONG TO DO HERE....
+	previous_state.pot_accumulator -= acc_change;
+	if (previous_state.pot_accumulator < 0) {
+		previous_state.pot_accumulator = 0;
+	}
+
+    // Decay dep_accumulator
+//    } else if (previous_state.accumulator < 0) {
+	previous_state.dep_accumulator += acc_change;
+	if (previous_state.dep_accumulator > 0) {
+		previous_state.dep_accumulator = 0;
+	}
+
 
     // Check if there was a post window open when this pre arrived and if so,
     // trigger an accum decrement (a step towards synaptic depression):
@@ -240,17 +243,17 @@ static inline update_state_t timing_apply_pre_spike(
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
 
-        if (previous_state.accumulator >
+        if (previous_state.dep_accumulator >
             recurrent_plasticity_params.accum_dep_plus_one[syn_type]<<ACCUM_SCALING){
         	if (print_plasticity){
-        		io_printf(IO_BUF, "        Decrementing Accumulator from: %d ", previous_state.accumulator);
+        		io_printf(IO_BUF, "        Decrementing Accumulator from: %d ", previous_state.dep_accumulator);
         	}
 
             // If accumulator's not going to hit depression limit, decrement it
-            previous_state.accumulator = previous_state.accumulator - (1<<ACCUM_SCALING);
+            previous_state.dep_accumulator = previous_state.dep_accumulator - (1<<ACCUM_SCALING);
 
             if (print_plasticity){
-            	io_printf(IO_BUF, " to %d \n", previous_state.accumulator);
+            	io_printf(IO_BUF, " to %d \n", previous_state.dep_accumulator);
             }
 
         } else {
@@ -263,7 +266,7 @@ static inline update_state_t timing_apply_pre_spike(
 
         			// Otherwise, reset accumulator and apply depression
         			// Note: at present this is not gated on membrane potential
-        			previous_state.accumulator = 0;
+        			previous_state.dep_accumulator = 0;
 
         			// Depress synapse using A2_minus rate
         			previous_state.weight_state = weight_one_term_apply_depression_sd(
@@ -275,7 +278,7 @@ static inline update_state_t timing_apply_pre_spike(
 
         		} else {
         			if (print_plasticity){
-        				io_printf(IO_BUF, "Synapse already loacked, so cannot depress\n");
+        				io_printf(IO_BUF, "Synapse already locked, so cannot depress\n");
         			}
         		}
 
@@ -326,8 +329,8 @@ static inline update_state_t timing_apply_post_spike(
    accum voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
 
    // Voltage difference will be rectified (so no negative values allowed):
-   if (voltage_difference < (accum)0.0) {
-      voltage_difference = (accum)0.0;
+   if (voltage_difference < (accum) 0.0) {
+      voltage_difference = (accum) 0.0;
    }
 
    //log_info("Thr: %k, postV: %k", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
@@ -338,23 +341,22 @@ static inline update_state_t timing_apply_post_spike(
    // Get time of event relative to last pre-synaptic event
    uint32_t time_since_last_pre = time - last_pre_time;
 
-
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
       if (time_since_last_pre < last_pre_trace) {
-         if (previous_state.accumulator <
+         if (previous_state.pot_accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
 
-             previous_state.accumulator = previous_state.accumulator + (1<<ACCUM_SCALING);
+             previous_state.pot_accumulator = previous_state.pot_accumulator + (1<<ACCUM_SCALING);
              if (print_plasticity){
-            	 io_printf(IO_BUF, "        Incrementing Accumulator to: %u\n", previous_state.accumulator);
+            	 io_printf(IO_BUF, "        Incrementing Accumulator to: %u\n", previous_state.pot_accumulator);
              }
          } else {
-             previous_state.accumulator = 0;
+             previous_state.pot_accumulator = 0;
              if (print_plasticity){
             	 io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
             		 "weight update for synapse of type: %u, lock state: %u \n", syn_type, previous_state.lock);
@@ -403,7 +405,7 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.5k;
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
                         previous_state.lock = 1;
                     }
 
