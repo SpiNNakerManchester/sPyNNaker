@@ -158,8 +158,8 @@ static inline void _reset_spikes() {
     }
 }
 
-//! \brief deduces the time in timer ticks until the next spike is to occur
-//!        given the mean inter-spike interval
+//! \brief deduces the time in timer ticks multiplied by ISI_SCALE_FACTOR
+//!        until the next spike is to occur given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
 //! \return a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR
@@ -183,6 +183,8 @@ static inline uint32_t slow_spike_source_get_time_to_spike(
 //!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
+	// If the value of exp_minus_lambda is very small then it's not worth
+	// using the algorithm, so just return 0
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
@@ -193,7 +195,8 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     }
 }
 
-//! \brief Determines how many spikes to transmit this timer tick, for a faster(!) source
+//! \brief Determines how many spikes to transmit this timer tick, for a faster source
+//!        (where lambda is large enough that a Gaussian can be used instead of a Poisson)
 //! \param[in] sqrt_lambda Square root of the amount of spikes expected to be produced
 //!            this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
@@ -577,19 +580,21 @@ void timer_callback(uint timer_count, uint unused) {
         // If this spike source is active this tick
         spike_source_t *spike_source = &poisson_parameters[s];
 
-        // handle fast spike sources
+        // Choose between fast or slow spike sources
         if (spike_source->is_fast_source) {
             if (time >= spike_source->start_ticks
                     && time < spike_source->end_ticks) {
 
                 // Get number of spikes to send this tick
             	uint32_t num_spikes = 0;
+            	// If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
             	if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
             	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
             	    num_spikes = faster_spike_source_get_num_spikes(
             				spike_source->sqrt_lambda);
             	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
             	} else {
+            		// Call the fast source Poisson algorithm
             	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
             		num_spikes = fast_spike_source_get_num_spikes(
             				spike_source->exp_minus_lambda);
@@ -601,23 +606,22 @@ void timer_callback(uint timer_count, uint unused) {
                 // If there are any
                 if (num_spikes > 0) {
 
-                    // Write spike to out spikes
+                    // Write spikes to out spikes
                     _mark_spike(s, num_spikes);
 
-                    // if no key has been given, do not send spike to fabric.
-                    if (global_parameters.has_key) {
+					// If no key has been given, do not send spikes to fabric
+					if (global_parameters.has_key) {
 
-                        // Send spikes
-                        const uint32_t spike_key = global_parameters.key | s;
-                        for (uint32_t index = 0; index < num_spikes; index++) {
-                            _send_spike(spike_key, timer_count);
-                        }
+						// Send spikes
+						const uint32_t spike_key = global_parameters.key | s;
+						for (uint32_t index = 0; index < num_spikes; index++) {
+							_send_spike(spike_key, timer_count);
+						}
                     }
                 }
             }
         } else {
-
-            // handle slow sources
+            // Handle slow sources
             if ((time >= spike_source->start_ticks)
                     && (time < spike_source->end_ticks)
                     && (spike_source->mean_isi_ticks != 0)) {
@@ -625,7 +629,7 @@ void timer_callback(uint timer_count, uint unused) {
                 // Mark a spike while the "timer" is below the scale factor value
                 while (spike_source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
 
-                    // Write spike to out spikes
+                    // Write spike to out_spikes
                     _mark_spike(s, 1);
 
                     // if no key has been given, do not send spike to fabric.
@@ -660,8 +664,6 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
-
-//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
 }
 
