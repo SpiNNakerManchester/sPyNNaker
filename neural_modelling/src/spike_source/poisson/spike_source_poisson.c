@@ -304,7 +304,7 @@ static bool initialize() {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM, address),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_data_address(
