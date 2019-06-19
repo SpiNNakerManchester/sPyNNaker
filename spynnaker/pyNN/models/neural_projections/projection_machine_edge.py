@@ -1,5 +1,3 @@
-from types import NoneType
-
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
@@ -12,7 +10,6 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractWeightUpdatable, AbstractFilterableEdge)
 from spinnak_ear.spinnak_ear_machine_vertices.drnl_machine_vertex import \
     DRNLMachineVertex
-
 
 
 class ProjectionMachineEdge(
@@ -62,7 +59,7 @@ class ProjectionMachineEdge(
                     if synapse_info.connector.conn_matrix[
                             pre_lo:pre_hi+1, post_lo:post_hi+1].max() > 0:
                         return False
-                except (ValueError, NoneType, TypeError):
+                except (ValueError, TypeError):
                     print("Value error")
                 return True
         return False
