@@ -40,8 +40,8 @@ class SpikeSourceArrayVertex(
             self, n_neurons, spike_times, constraints, label,
             max_atoms_per_core, model):
         # pylint: disable=too-many-arguments
-        self._model_name = "SpikeSourceArray"
-        self._model = model
+        self.__model_name = "SpikeSourceArray"
+        self.__model = model
 
         if spike_times is None:
             spike_times = []
@@ -55,19 +55,19 @@ class SpikeSourceArrayVertex(
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID)
 
         # handle recording
-        self._spike_recorder = EIEIOSpikeRecorder()
+        self.__spike_recorder = EIEIOSpikeRecorder()
 
         # used for reset and rerun
-        self._requires_mapping = True
+        self.__requires_mapping = True
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
-        return self._requires_mapping
+        return self.__requires_mapping
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
-        self._requires_mapping = False
+        self.__requires_mapping = False
 
     @property
     def spike_times(self):
@@ -87,7 +87,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
-        return self._spike_recorder.record
+        return self.__spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
@@ -99,8 +99,8 @@ class SpikeSourceArrayVertex(
             logger.warning("Indexes currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.enable_recording(new_state)
-        self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+        self.__requires_mapping = not self.__spike_recorder.record
+        self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
@@ -109,8 +109,7 @@ class SpikeSourceArrayVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
-
-        return self._spike_recorder.get_spikes(
+        return self.__spike_recorder.get_spikes(
             self.label, buffer_manager, 0,
             placements, graph_mapper, self,
             lambda vertex:
@@ -144,13 +143,13 @@ class SpikeSourceArrayVertex(
         """
 
         parameters = dict()
-        for parameter_name in self._model.default_parameters:
+        for parameter_name in self.__model.default_parameters:
             parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
-            "name": self._model_name,
-            "default_parameters": self._model.default_parameters,
-            "default_initial_values": self._model.default_parameters,
+            "name": self.__model_name,
+            "default_parameters": self.__model.default_parameters,
+            "default_initial_values": self.__model.default_parameters,
             "parameters": parameters,
         }
         return context

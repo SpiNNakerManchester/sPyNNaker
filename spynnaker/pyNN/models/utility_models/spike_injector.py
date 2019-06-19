@@ -10,6 +10,7 @@ _population_parameters = {
 
 
 class SpikeInjector(AbstractPyNNModel):
+    __slots__ = []
 
     default_population_parameters = _population_parameters
 
