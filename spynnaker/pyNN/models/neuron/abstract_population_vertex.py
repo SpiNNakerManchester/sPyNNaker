@@ -2,6 +2,8 @@ import logging
 import os
 import math
 
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
 from pacman.utilities.algorithm_utilities.\
     partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
@@ -69,7 +71,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun, AbstractSupportsBitFieldGeneration,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractSupportsBitFieldRoutingCompression):
+        AbstractSupportsBitFieldRoutingCompression, SplitterByAtoms):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -181,7 +183,7 @@ class AbstractPopulationVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        ApplicationVertex.get_resources_used_by_atoms,
+        SplitterByAtoms.get_resources_used_by_atoms,
         additional_arguments={
             "graph", "machine_time_step"
         }
@@ -234,7 +236,7 @@ class AbstractPopulationVertex(
                     variable, vertex_slice, n_machine_time_steps))
         return values
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

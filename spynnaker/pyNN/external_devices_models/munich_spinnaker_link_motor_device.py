@@ -1,4 +1,7 @@
 import logging
+
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -25,7 +28,8 @@ logger = logging.getLogger(__name__)
 MOTOR_PARTITION_ID = "MOTOR"
 
 
-class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
+class _MunichMotorDevice(
+        ApplicationSpiNNakerLinkVertex, SplitterByAtoms):
     __slots__ = []
 
     def __init__(self, spinnaker_link_id, board_address=None):
@@ -80,13 +84,13 @@ class MunichMotorDevice(
     def n_atoms(self):
         return 6
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
         return SimpleMachineVertex(
             resources_required, label, constraints)
 
-    @overrides(ApplicationVertex.get_resources_used_by_atoms)
+    @overrides(SplitterByAtoms.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer(
             sdram=ConstantSDRAM(

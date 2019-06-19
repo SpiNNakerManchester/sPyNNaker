@@ -1,3 +1,6 @@
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
+
 try:
     from collections.abc import defaultdict
 except ImportError:
@@ -44,7 +47,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary,
+        AbstractHasAssociatedBinary, SplitterByAtoms,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesNKeysForPartition):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
@@ -95,7 +98,7 @@ class DelayExtensionVertex(
         self.add_constraint(
             SameAtomsAsVertexConstraint(source_vertex))
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -105,7 +108,7 @@ class DelayExtensionVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
-    @overrides(ApplicationVertex.get_resources_used_by_atoms,
+    @overrides(SplitterByAtoms.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         out_edges = graph.get_edges_starting_at_vertex(self)
