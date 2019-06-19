@@ -24,12 +24,14 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
+#include "direct_synapses.h"
 
 #include <data_specification.h>
 #include <simulation.h>
 #include <profiler.h>
 #include <debug.h>
 #include <bit_field.h>
+#include <filter_info.h>
 
 /* validates that the model being compiled does indeed contain a application
    magic number*/
@@ -47,9 +49,10 @@ typedef enum extra_provenance_data_region_entries{
     PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
 	GHOST_POP_TABLE_SEARCHES = 5,
 	FAILED_TO_READ_BIT_FIELDS = 6,
-	EMPTY_ROW_READS = 7,
-	DMA_COMPLETES = 8,
-	SPIKE_PROGRESSING_COUNT = 9
+	DMA_COMPLETES = 7,
+	SPIKE_PROGRESSING_COUNT = 8,
+	INVALID_MASTER_POP_HITS = 9,
+	BIT_FIELD_FILTERED_COUNT = 10
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -87,7 +90,7 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-bit_field_t *connectivity_lookup;
+bit_field_t *connectivity_bit_field;
 
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
@@ -123,82 +126,84 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[GHOST_POP_TABLE_SEARCHES] =
     	spike_processing_get_ghost_pop_table_searches();
     provenance_region[FAILED_TO_READ_BIT_FIELDS] = failed_bit_field_reads;
-    provenance_region[EMPTY_ROW_READS] = synapses_get_empty_row_count();
     provenance_region[DMA_COMPLETES] =
         spike_processing_get_dma_complete_count();
     provenance_region[SPIKE_PROGRESSING_COUNT] =
         spike_processing_get_spike_processing_count();
-    io_printf (IO_BUF, "n_ghost_input_spikes=%d\n",spike_processing_get_ghost_pop_table_searches());
-    io_printf (IO_BUF, "bitfield miss count = %d\n",population_table_get_bitfield_miss_count());
-    io_printf (IO_BUF, "empty row count = %d\n",synapses_get_empty_row_count());
-    io_printf (IO_BUF, "nonzero row count = %d\n",synapses_get_nonzero_row_count());
-    io_printf (IO_BUF, "dma_complete_count=%d\n",spike_processing_get_dma_complete_count());
-    io_printf (IO_BUF, "spike_processing_count=%d\n",spike_processing_get_spike_processing_count());
-    io_printf (IO_BUF, "invalid_master_pop_hits=%d\n",population_table_get_invalid_master_pop_hits());
+    provenance_region[INVALID_MASTER_POP_HITS] =
+        spike_processing_get_invalid_master_pop_table_hits();
+    provenance_region[BIT_FIELD_FILTERED_COUNT] =
+        population_table_get_filtered_packet_count();
 
-
-    log_info("dma read count = %d",spike_processing_get_dma_read_count());
-    log_info("dma complete count = %d",spike_processing_get_dma_complete_count());
     log_debug("finished other provenance data");
 }
 
-static bool bit_field_filter_initialise(address_t bitfield_region){
+static bool bit_field_filter_initialise(address_t bitfield_region_address){
 
-    uint32_t position = 0;
-    uint32_t n_bit_fields = bitfield_region[position];
+    filter_region_t* filter_region = (filter_region_t*) bitfield_region_address;
+    uint32_t n_bit_fields = filter_region->n_filters;
+
+    log_info("n bitfields = %d", n_bit_fields);
 
     // try allocating dtcm for starting array for bitfields
-    connectivity_lookup = spin1_malloc(sizeof(bit_field_t) * n_bit_fields);
-    if (connectivity_lookup == NULL){
+    connectivity_bit_field =
+        spin1_malloc(sizeof(bit_field_t) * population_table_length());
+    if (connectivity_bit_field == NULL){
         log_warning(
             "couldn't  initialise basic bit field holder. Will end up doing "
             "possibly more DMA's during the execution than required");
         return true;
     }
-    position += 1;
+
+    // set all to NULL for when they not filled in.
+    for (uint32_t cur_bit_field = 0; cur_bit_field < population_table_length();
+            cur_bit_field++){
+         connectivity_bit_field[cur_bit_field] = NULL;
+    }
 
     // try allocating dtcm for each bit field
     for (uint32_t cur_bit_field = 0; cur_bit_field < n_bit_fields;
             cur_bit_field++){
         // get the key associated with this bitfield
-        uint32_t key = bitfield_region[position];
-        uint32_t n_words_for_bit_field = bitfield_region[position + 1];
-        position += 2;
+        uint32_t key = filter_region->filters[cur_bit_field].key;
+        uint32_t n_words = filter_region->filters[cur_bit_field].n_words;
 
         // locate the position in the array to match the master pop element.
         int position_in_array =
             population_table_position_in_the_master_pop_array(key);
 
+        log_debug("putting key %d in position %d", key, position_in_array);
+
         // alloc sdram into right region
-        connectivity_lookup[position_in_array] = spin1_malloc(
-            sizeof(bit_field_t) * n_words_for_bit_field);
-        if (connectivity_lookup[position_in_array] == NULL){
-            log_warning(
+        connectivity_bit_field[position_in_array] = spin1_malloc(
+            sizeof(bit_field_t) * n_words);
+        if (connectivity_bit_field[position_in_array] == NULL){
+            log_debug(
                 "could not initialise bit field for key %d, packets with"
                 " that key will use a DMA to check if the packet targets "
                 "anything within this core. Potentially slowing down the "
-                "execution of neurons on this core.");
+                "execution of neurons on this core.", key);
             failed_bit_field_reads ++;
         } else{  // read in bit field into correct location
 
             // read in the bits for the bitfield (think this avoids a for loop)
             spin1_memcpy(
-                connectivity_lookup[position_in_array],
-                &bitfield_region[position],
-                sizeof(uint32_t) * n_words_for_bit_field);
+                connectivity_bit_field[position_in_array],
+                filter_region->filters[cur_bit_field].data,
+                sizeof(uint32_t) * n_words);
 
             // print out the bit field for debug purposes
             log_debug("bit field for key %d is :", key);
             for (uint32_t bit_field_word_index = 0;
-                    bit_field_word_index < n_words_for_bit_field;
+                    bit_field_word_index < n_words;
                     bit_field_word_index++){
-                log_debug("%x", connectivity_lookup[position_in_array]
-                                                   [bit_field_word_index]);
+                log_debug(
+                    "%x", connectivity_bit_field[position_in_array][
+                        bit_field_word_index]);
             }
         }
-        position += n_words_for_bit_field;
     }
-    population_table_set_connectivity_lookup(connectivity_lookup);
+    population_table_set_connectivity_bit_field(connectivity_bit_field);
     return true;
 }
 
@@ -246,19 +251,20 @@ static bool initialise() {
         return false;
     }
 
-    log_info("n_neurons = %d",n_neurons);
-
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, address);
-    address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
             n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+
+    // set up direct synapses
+    address_t direct_synapses_address;
+    if (!direct_synapses_initialise(
+            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            &direct_synapses_address)){
         return false;
     }
 
@@ -266,8 +272,8 @@ static bool initialise() {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, address),
-            indirect_synapses_address, direct_synapses_address,
-            &row_max_n_words)) {
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics

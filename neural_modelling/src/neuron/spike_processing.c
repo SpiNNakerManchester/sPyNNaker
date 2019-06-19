@@ -2,6 +2,7 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
+#include "direct_synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
@@ -39,7 +40,11 @@ uint32_t number_of_rewires=0;
 bool any_spike = false;
 
 uint32_t dma_read_count = 0;
-uint32_t dma_complete_count = 0;
+
+// the number of dma completes (used in provenance generation)
+static uint32_t dma_complete_count=0;
+
+// the number of spikes that were processed (used in provenance generation)
 static uint32_t spike_processing_count=0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -62,12 +67,6 @@ static inline void _do_dma_read(
         n_bytes_to_transfer);
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
     dma_read_count ++;
-}
-
-
-static inline void _do_direct_row(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
 // Check if there is anything to do - if not, DMA is not busy
@@ -130,7 +129,7 @@ void _setup_synaptic_dma_read() {
             synaptogenesis_dynamics_rewire(time);
             setup_done = true;
         } else if (n_bytes_to_transfer == 0) {
-            _do_direct_row(row_address);
+            direct_synapses_get_direct_synapse(row_address);
         } else {
             _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
@@ -199,13 +198,14 @@ void _user_event_callback(uint unused0, uint unused1) {
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
+    // increment the dma complete count for provenance generation
+    dma_complete_count++;
+
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
-
-    dma_complete_count ++;
 
     // Process synaptic row repeatedly
     bool subsequent_spikes;
@@ -236,8 +236,6 @@ void _dma_complete_callback(uint unused, uint tag) {
             rt_error(RTE_SWERR);
         }
     } while (subsequent_spikes);
-
-    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_INCOMING_SPIKE);
 
     // Start the next DMA transfer, so it is complete when we are finished
     _setup_synaptic_dma_read();
@@ -271,11 +269,6 @@ bool spike_processing_initialise(
         return false;
     }
 
-    // Set up for single fixed synapses (data that is consistent per direct row)
-    single_fixed_synapse[0] = 0;
-    single_fixed_synapse[1] = 1;
-    single_fixed_synapse[2] = 0;
-
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
             _multicast_packet_received_callback, mc_packet_callback_priority);
@@ -298,14 +291,20 @@ uint32_t spike_processing_get_buffer_overflows() {
     return in_spikes_get_n_buffer_overflows();
 }
 
-uint32_t spike_processing_get_dma_read_count(){
-    return dma_read_count;
-}
-
+//! \brief returns the number of ghost searches occurred
+//! \return the number of times a ghost search occurred.
 uint32_t spike_processing_get_ghost_pop_table_searches(){
 	return population_table_get_ghost_pop_table_searches();
 }
 
+//! \brief returns the number of master pop table failed hits
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits(){
+    return population_table_get_invalid_master_pop_hits();
+}
+
+//! \brief returns the number of DMA's that were completed
+//! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count(){
     return dma_complete_count;
 }
@@ -348,4 +347,3 @@ bool do_rewiring(int number_of_rew) {
 bool received_any_spike() {
     return any_spike;
 }
-

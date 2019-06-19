@@ -24,7 +24,7 @@
             </parameter>
             <parameter>
                 <param_name>provenance_file_path</param_name>
-                <param_type>ProvenanceFilePath</param_type>
+                <param_type>SystemProvenanceFilePath</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>

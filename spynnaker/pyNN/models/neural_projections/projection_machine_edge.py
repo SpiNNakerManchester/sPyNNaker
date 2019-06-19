@@ -1,3 +1,5 @@
+from types import NoneType
+
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
@@ -46,33 +48,24 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
-            elif isinstance(synapse_info.connector, FromListConnector):# and isinstance(self.post_vertex, DRNLVertex):
-                if isinstance(self.post_vertex, DRNLMachineVertex):
-                    # need to map the IDs to the correct DRNL instances
-                    spinnakear_vertex = graph_mapper.get_application_vertex(self.post_vertex)
-                    drnl_ids = [i for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'drnl']
-                    post_lo = drnl_ids.index(graph_mapper.get_slice(self.post_vertex).lo_atom)
-                    post_hi = drnl_ids.index(graph_mapper.get_slice(self.post_vertex).hi_atom)
-                    pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                    pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                else:
-                    pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                    pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                    post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                    post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                # run through connection list and return false if we find any connections between the pre and post vertices
+                return n_filtered == len(self._synapse_information)
+            elif isinstance(synapse_info.connector, FromListConnector):
+                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                # run through connection list and return false if we find any
+                #  connections between the pre and post vertices
                 try:
-                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
-                        n_filtered += 1
-                    else:
-                        # add moc vertex
-                        if isinstance(self.post_vertex, DRNLMachineVertex):
-                            self.post_vertex.add_moc_vertex(self.pre_vertex,
-                                                            synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1,
-                                                            post_lo:post_hi + 1])
-                except ValueError:
+                    if synapse_info.connector.conn_matrix is None:
+                        return False
+                    if synapse_info.connector.conn_matrix[
+                            pre_lo:pre_hi+1, post_lo:post_hi+1].max() > 0:
+                        return False
+                except (ValueError, NoneType, TypeError):
                     print("Value error")
-        return (n_filtered == len(self.__synapse_information))
+                return True
+        return False
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):

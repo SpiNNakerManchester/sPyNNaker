@@ -22,11 +22,14 @@ uint32_t spike_processing_get_ghost_pop_table_searches();
 //! \brief returns the number of DMA's that were completed
 //! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count();
-uint32_t spike_processing_get_dma_read_count();
 
 //! \brief returns the number of spikes that were processed
 //! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count();
+
+//! \brief returns the number of master pop table failed hits
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits();
 
 //! DMA buffer structure combines the row read from SDRAM with
 typedef struct dma_buffer {
@@ -63,14 +66,11 @@ bool get_dma_busy();
 //! \return bool: currently, always true
 bool do_rewiring(int number_of_rew);
 
-
 //! exposing this so that other classes can call it
 void _setup_synaptic_dma_read();
 
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool
 bool received_any_spike();
-
-
 
 #endif // _SPIKE_PROCESSING_H_

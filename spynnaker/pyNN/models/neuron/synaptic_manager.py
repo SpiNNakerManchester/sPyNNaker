@@ -11,7 +11,6 @@ from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
-from pacman.model.abstract_classes import AbstractHasGlobalMaxAtoms
 
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -35,7 +34,8 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spinnak_ear.spinnakear_vertex import SpiNNakEarVertex
+from spinnak_ear.spinnak_ear_application_vertex.spinnakear_application_vertex\
+    import SpiNNakEarApplicationVertex
 
 
 TIME_STAMP_BYTES = 4
@@ -131,6 +131,19 @@ class SynapticManager(object):
         # A map of synapse information to maximum row / delayed row length and
         # size in bytes
         self.__max_row_info = dict()
+
+        # Track writes inside the synaptic matrix region (to meet sizes):
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
+
+    @property
+    def host_written_matrix_size(self):
+        return self._host_generated_block_addr
+
+    @property
+    def on_chip_written_matrix_size(self):
+        return (self._on_chip_generated_block_addr -
+                self._host_generated_block_addr)
 
     @property
     def synapse_dynamics(self):
@@ -232,7 +245,7 @@ class SynapticManager(object):
         max_row_info = self._get_max_row_info(
             synapse_info, post_vertex_slice, in_edge, machine_time_step)
         n_atoms = in_edge.pre_vertex.n_atoms
-        if isinstance(in_edge.pre_vertex, SpiNNakEarVertex):
+        if isinstance(in_edge.pre_vertex, SpiNNakEarApplicationVertex):
             n_atoms = in_edge.pre_vertex._size
         memory_size = self.__poptable_type.get_next_allowed_address(
             memory_size)
@@ -656,6 +669,8 @@ class SynapticManager(object):
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
+
+        self._host_generated_block_addr = block_addr
         # numpy.random.shuffle(order)
         for gen_data in generate_on_machine:
             (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
@@ -667,6 +682,7 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
+        self._on_chip_generated_block_addr = block_addr
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -917,7 +933,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step, placements):
+            graph_mapper, weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)

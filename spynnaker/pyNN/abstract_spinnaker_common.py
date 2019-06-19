@@ -10,6 +10,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.helpful_functions import read_config
 from spynnaker.pyNN.models.utility_models import synapse_expander
 from spynnaker.pyNN import overridden_pacman_functions, model_binaries
 from spynnaker.pyNN.utilities import constants
@@ -99,6 +100,37 @@ class AbstractSpiNNakerCommon(with_metaclass(
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
+            self.config.getboolean(
+                "Reports", "generate_router_compression_with_bitfield_report")
+
+        extra_mapping_inputs['RouterCompressorBitFieldUseCutOff'] = \
+            self.config.getboolean(
+                "Mapping",
+                "router_table_compression_with_bit_field_use_time_cutoff")
+
+        time = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_iteration_time")
+        if time is not None:
+            time = int(time)
+        extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
+
+        target_length = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_target_length")
+        if target_length is not None:
+            target_length = int(target_length)
+        extra_mapping_inputs[
+            'RouterCompressorBitFieldTargetLength'] = target_length
+        extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_pre_alloced_sdram")
+        extra_mapping_inputs["RouterCompressorBitFieldPercentageThreshold"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_acceptance_threshold")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
@@ -106,6 +138,12 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.config.getboolean("Reports", "read_bif_field_iobuf")
         extra_mapping_inputs["GenerateBitFieldReport"] = \
             self.config.getboolean("Reports", "generate_bit_field_report")
+        extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
+            self.config.getboolean(
+                "Reports", "generate_bit_field_summary_report")
+        extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
+            self.config.getboolean(
+                "Reports", "read_router_compressor_with_bitfield_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
@@ -113,13 +151,17 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        if extra_post_run_algorithms is None:
+            extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
-        extra_load_algorithms.append("SpynnakerAtomBasedRoutingDataGenerator")
+        extra_load_algorithms.append("OnChipBitFieldGenerator")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
+            extra_mapping_algorithms.append(
+                "PreAllocateForBitFieldRouterCompressor")
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
@@ -128,6 +170,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
+
+        if self.config.getboolean("Reports", "reports_enabled"):
+            if self.config.getboolean(
+                    "Reports", "write_redundant_packet_count_report"):
+                extra_post_run_algorithms.append("RedundantPacketCountReport")
 
         self.update_extra_mapping_inputs(extra_mapping_inputs)
         self.extend_extra_mapping_algorithms(extra_mapping_algorithms)
@@ -305,7 +352,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator()
+        globals_variables.unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.
