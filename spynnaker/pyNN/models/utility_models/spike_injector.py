@@ -13,11 +13,11 @@ class SpikeInjector(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    @overrides(AbstractPyNNModel.create_vertex,
+    @overrides(AbstractPyNNModel.create_vertices,
                additional_arguments=_population_parameters.keys())
-    def create_vertex(
+    def create_vertices(
             self, n_neurons, label, constraints, port, virtual_key,
             reserve_reverse_ip_tag):
-        return SpikeInjectorVertex(
+        return [SpikeInjectorVertex(
             n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag)
+            reserve_reverse_ip_tag)]

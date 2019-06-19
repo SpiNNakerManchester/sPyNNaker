@@ -10,9 +10,9 @@ class SpikeSourceArray(AbstractPyNNModel):
     def __init__(self, spike_times=[]):
         self._spike_times = spike_times
 
-    @overrides(AbstractPyNNModel.create_vertex)
-    def create_vertex(
+    @overrides(AbstractPyNNModel.create_vertices)
+    def create_vertices(
             self, n_neurons, label, constraints):
         max_atoms = self.get_max_atoms_per_core()
-        return SpikeSourceArrayVertex(
-            n_neurons, self._spike_times, constraints, label, max_atoms, self)
+        return [SpikeSourceArrayVertex(
+            n_neurons, self._spike_times, constraints, label, max_atoms, self)]

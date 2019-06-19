@@ -35,7 +35,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
-from spynnaker.pyNN.utilities.constants import WORD_TO_BYTE_MULTIPLIER,POPULATION_BASED_REGIONS
+from spynnaker.pyNN.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 
@@ -613,10 +613,10 @@ class AbstractPopulationVertex(
 
         # reserve memory region
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             size=sdram, label="bitfield setup data")
         spec.switch_write_focus(
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
+            constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
         # write n keys max atom map
         spec.write_value(

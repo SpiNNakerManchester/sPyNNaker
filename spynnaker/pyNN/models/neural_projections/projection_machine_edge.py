@@ -8,7 +8,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector,FromListConnector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractWeightUpdatable, AbstractFilterableEdge)
-from spinnak_ear.DRNL_vertex import DRNLVertex
+from spinnak_ear.spinnak_ear_machine_vertices.drnl_machine_vertex import \
+    DRNLMachineVertex
 
 
 
@@ -46,7 +47,7 @@ class ProjectionMachineEdge(
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):# and isinstance(self.post_vertex, DRNLVertex):
-                if isinstance(self.post_vertex, DRNLVertex):
+                if isinstance(self.post_vertex, DRNLMachineVertex):
                     # need to map the IDs to the correct DRNL instances
                     spinnakear_vertex = graph_mapper.get_application_vertex(self.post_vertex)
                     drnl_ids = [i for i, name in enumerate(spinnakear_vertex._mv_index_list) if name == 'drnl']
@@ -65,12 +66,12 @@ class ProjectionMachineEdge(
                         n_filtered += 1
                     else:
                         # add moc vertex
-                        if isinstance(self.post_vertex, DRNLVertex):
+                        if isinstance(self.post_vertex, DRNLMachineVertex):
                             self.post_vertex.add_moc_vertex(self.pre_vertex,
                                                             synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1,
                                                             post_lo:post_hi + 1])
                 except ValueError:
-                    print "Value error"
+                    print("Value error")
         return (n_filtered == len(self._synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
