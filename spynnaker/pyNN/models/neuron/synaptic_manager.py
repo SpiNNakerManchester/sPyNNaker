@@ -77,7 +77,9 @@ class SynapticManager(object):
         "__weight_scales",
         "__ring_buffer_shifts",
         "__gen_on_machine",
-        "__max_row_info"]
+        "__max_row_info",
+        "_host_generated_block_addr",
+        "_on_chip_generated_block_addr"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
