@@ -7,10 +7,10 @@ from .abstract_weight_dependence import AbstractWeightDependence
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
-        "_a3_minus",
-        "_a3_plus",
-        "_w_max",
-        "_w_min"]
+        "__a3_minus",
+        "__a3_plus",
+        "__w_max",
+        "__w_min"]
 
     default_parameters = {'w_min': 0.0, 'w_max': 1.0, 'A3_plus': 0.01,
                           'A3_minus': 0.01}
@@ -22,38 +22,38 @@ class WeightDependenceAdditiveTriplet(
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
         super(WeightDependenceAdditiveTriplet, self).__init__()
-        self._w_min = w_min
-        self._w_max = w_max
-        self._a3_plus = A3_plus
-        self._a3_minus = A3_minus
+        self.__w_min = w_min
+        self.__w_max = w_max
+        self.__a3_plus = A3_plus
+        self.__a3_minus = A3_minus
 
     @property
     def w_min(self):
-        return self._w_min
+        return self.__w_min
 
     @property
     def w_max(self):
-        return self._w_max
+        return self.__w_max
 
     @property
     def A3_plus(self):
-        return self._a3_plus
+        return self.__a3_plus
 
     @property
     def A3_minus(self):
-        return self._a3_minus
+        return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceAdditiveTriplet):
             return False
         return (
-            (self._w_min == weight_dependence.w_min) and
-            (self._w_max == weight_dependence.w_max) and
-            (self._a_plus == weight_dependence.A_plus) and
-            (self._a_minus == weight_dependence.A_minus) and
-            (self._a3_plus == weight_dependence.A3_plus) and
-            (self._a3_minus == weight_dependence.A3_minus))
+            (self.__w_min == weight_dependence.w_min) and
+            (self.__w_max == weight_dependence.w_max) and
+            (self.A_plus == weight_dependence.A_plus) and
+            (self.A_minus == weight_dependence.A_minus) and
+            (self.__a3_plus == weight_dependence.A3_plus) and
+            (self.__a3_minus == weight_dependence.A3_minus))
 
     @property
     def vertex_executable_suffix(self):
@@ -76,29 +76,29 @@ class WeightDependenceAdditiveTriplet(
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self._w_min * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._w_max * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * self._w_max * w)),
+                data=int(round(self.A_plus * self.__w_max * w)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * self._w_max * w)),
+                data=int(round(self.A_minus * self.__w_max * w)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a3_plus * self._w_max * w)),
+                data=int(round(self.__a3_plus * self.__w_max * w)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a3_minus * self._w_max * w)),
+                data=int(round(self.__a3_minus * self.__w_max * w)),
                 data_type=DataType.INT32)
 
     @property
     def weight_maximum(self):
-        return self._w_max
+        return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
