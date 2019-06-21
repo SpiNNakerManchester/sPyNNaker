@@ -4,13 +4,16 @@ import math
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPostConnector(AbstractConnector):
+# class FixedNumberPostConnector(AbstractConnector):
+class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -43,12 +46,13 @@ class FixedNumberPostConnector(AbstractConnector):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose, rng)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose)
         self.__n_post = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
+        self.__post_connector_seed = None
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -215,3 +219,34 @@ class FixedNumberPostConnector(AbstractConnector):
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
+        return ConnectorIDs.FIXED_NUMBER_POST_CONNECTOR.value
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params)
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
+        # The same seed needs to be sent to each of the slices
+        if self.__post_connector_seed is None:
+            self.__post_connector_seed = [
+                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+
+        params = [
+            self.__allow_self_connections,
+            self.__with_replacement,
+            self.__n_post,
+            self._n_post_neurons]
+        params.extend(self.__post_connector_seed)
+        print('params: ', params)
+        return numpy.array(params, dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
+        return 16 + 16

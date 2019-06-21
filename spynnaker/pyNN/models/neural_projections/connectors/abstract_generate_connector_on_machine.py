@@ -42,6 +42,8 @@ class ConnectorIDs(Enum):
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
+    FIXED_NUMBER_PRE_CONNECTOR = 4
+    FIXED_NUMBER_POST_CONNECTOR = 5
 
 
 class AbstractGenerateConnectorOnMachine(with_metaclass(
