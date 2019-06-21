@@ -71,7 +71,7 @@ uint32_t connection_generator_fixed_post_generate(
 
     // Work out how many values can be sampled from
     uint32_t n_values = params->params.n_post_neurons;
-    if (!params->params.allow_self_connections)
+    if (!params->params.allow_self_connections) {
         n_values -= 1;
     }
 
