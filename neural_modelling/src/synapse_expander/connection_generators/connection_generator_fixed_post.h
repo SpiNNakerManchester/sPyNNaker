@@ -71,11 +71,9 @@ uint32_t connection_generator_fixed_post_generate(
 
     // Work out how many values can be sampled from
     uint32_t n_values = params->params.n_post_neurons;
-//    if (!params->params.allow_self_connections
-//            && pre_neuron_index >= post_slice_start
-//            && pre_neuron_index < (post_slice_start + post_slice_count)) {
-//        n_values -= 1;
-//    }
+    if (!params->params.allow_self_connections)
+        n_values -= 1;
+    }
 
     // Count the number of connections on this row
     uint32_t n_conns = params->params.n_post;
