@@ -2,7 +2,7 @@ import decimal
 from distutils.version import StrictVersion
 from enum import Enum
 import numpy
-from six import add_metaclass
+from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
@@ -44,22 +44,22 @@ class ConnectorIDs(Enum):
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
 
 
-@add_metaclass(AbstractBase)
-class AbstractGenerateConnectorOnMachine(AbstractConnector):
+class AbstractGenerateConnectorOnMachine(with_metaclass(
+        AbstractBase, AbstractConnector)):
     """ Indicates that the connectivity can be generated on the machine
     """
 
     __slots__ = [
-        "_delay_seed",
-        "_weight_seed",
-        "_connector_seed"
+        "__delay_seed",
+        "__weight_seed",
+        "__connector_seed"
     ]
 
     def __init__(self, safe=True, verbose=False):
         AbstractConnector.__init__(self, safe=safe, verbose=verbose)
-        self._delay_seed = dict()
-        self._weight_seed = dict()
-        self._connector_seed = dict()
+        self.__delay_seed = dict()
+        self.__weight_seed = dict()
+        self.__connector_seed = dict()
 
     def _generate_lists_on_machine(self, values):
         """ Checks if the connector should generate lists on machine rather\
@@ -82,13 +82,14 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """ Get the seed of the connector for a given pre-post pairing
         """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
-        if key not in self._connector_seed:
-            self._connector_seed[key] = [
+        if key not in self.__connector_seed:
+            self.__connector_seed[key] = [
                 int(i * 0xFFFFFFFF) for i in rng.next(n=4)]
-        return self._connector_seed[key]
+        return self.__connector_seed[key]
 
+    @staticmethod
     def _generate_param_seed(
-            self, pre_vertex_slice, post_vertex_slice, values, seeds):
+            pre_vertex_slice, post_vertex_slice, values, seeds):
         """ Get the seed of a parameter generator for a given pre-post pairing
         """
         if not get_simulator().is_a_pynn_random(values):
@@ -98,7 +99,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
             seeds[key] = [int(i * 0xFFFFFFFF) for i in values.rng.next(n=4)]
         return seeds[key]
 
-    def _param_generator_params(self, values, seed):
+    @staticmethod
+    def _param_generator_params(values, seed):
         """ Get the parameter generator parameters as a numpy array
         """
         if numpy.isscalar(values):
@@ -122,7 +124,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         raise ValueError("Unexpected value {}".format(values))
 
-    def _param_generator_params_size_in_bytes(self, values):
+    @staticmethod
+    def _param_generator_params_size_in_bytes(values):
         """ Get the size of the parameter generator parameters in bytes
         """
         if numpy.isscalar(values):
@@ -134,7 +137,8 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
 
         raise ValueError("Unexpected value {}".format(values))
 
-    def _param_generator_id(self, values):
+    @staticmethod
+    def _param_generator_id(values):
         """ Get the id of the parameter generator
         """
         if numpy.isscalar(values):
@@ -172,7 +176,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, weights,
-            self._weight_seed)
+            self.__weight_seed)
         return self._param_generator_params(weights, seed)
 
     def gen_weight_params_size_in_bytes(self, weights):
@@ -196,7 +200,7 @@ class AbstractGenerateConnectorOnMachine(AbstractConnector):
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, delays,
-            self._delay_seed)
+            self.__delay_seed)
         return self._param_generator_params(delays, seed)
 
     def gen_delay_params_size_in_bytes(self, delays):

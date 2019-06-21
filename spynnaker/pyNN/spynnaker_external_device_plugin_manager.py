@@ -15,6 +15,7 @@ from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 class SpynnakerExternalDevicePluginManager(object):
     """ User-level interface for the external device plugin manager.
     """
+    __slots__ = []
 
     @staticmethod
     def add_database_socket_address(
@@ -153,9 +154,9 @@ class SpynnakerExternalDevicePluginManager(object):
             or :py:class:`pacman.model.graphs.application.ApplicationVertex`
         """
         device_vertex = device
+        # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
-        # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
             population._get_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)
@@ -207,7 +208,8 @@ class SpynnakerExternalDevicePluginManager(object):
             poisson_population, control_label_extension="_control",
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
-            database_ack_port_num=None, notify=True):
+            database_ack_port_num=None, notify=True,
+            reserve_reverse_ip_tag=False):
         """ Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
@@ -231,13 +233,17 @@ class SpynnakerExternalDevicePluginManager(object):
         :param database_notify_port_num: The port number to which a external\
             device will receive the database is ready command
         :type database_notify_port_num: int
+        :param reserve_reverse_ip_tag: True if a reverse ip tag is to be\
+            used, False if SDP is to be used (default)
+        :type reserve_reverse_ip_tag: bool
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._get_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
-            receive_port=receive_port, reserve_reverse_ip_tag=True)
+            receive_port=receive_port,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)

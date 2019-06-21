@@ -10,12 +10,12 @@ UNITS = {V_THRESH: "mV"}
 class ThresholdTypeStatic(AbstractThresholdType):
     """ A threshold that is a static value
     """
-    __slots__ = ["_v_thresh"]
+    __slots__ = ["__v_thresh"]
 
     def __init__(self, v_thresh):
         super(ThresholdTypeStatic, self).__init__([
             DataType.S1615])  # v_thresh
-        self._v_thresh = v_thresh
+        self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -24,7 +24,7 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[V_THRESH] = self._v_thresh
+        parameters[V_THRESH] = self.__v_thresh
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -52,8 +52,8 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @property
     def v_thresh(self):
-        return self._v_thresh
+        return self.__v_thresh
 
     @v_thresh.setter
     def v_thresh(self, v_thresh):
-        self._v_thresh = v_thresh
+        self.__v_thresh = v_thresh

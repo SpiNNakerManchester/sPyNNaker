@@ -29,9 +29,9 @@ def get_dict_from_init(init, skip=None, include=None):
 
     return {arg: value
             for arg, value in zip(default_args, default_values)
-            if arg != "self" and
-            (skip is None or arg not in skip) and
-            (include is None or arg in include)}
+            if ((arg != "self") and
+                (skip is None or arg not in skip) and
+                (include is None or arg in include))}
 
 
 def default_parameters(parameters):
