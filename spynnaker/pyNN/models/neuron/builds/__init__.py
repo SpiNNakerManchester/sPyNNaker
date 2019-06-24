@@ -14,10 +14,12 @@ from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_izhikevich_neuromodulation\
     import IFCurrExpIzhikevichNeuromodulation
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
-
+from .izk_curr_exp_izhikevich_neuromodulation\
+    import IZKCurrExpIzhikevichNeuromodulation
+    
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive",
-           "IFCurrExpIzhikevichNeuromodulation", "IFCurrExpSEMDBase"]
+           "IFCurrExpIzhikevichNeuromodulation", "IFCurrExpSEMDBase",  "IZKCurrExpIzhikevichNeuromodulation"]
