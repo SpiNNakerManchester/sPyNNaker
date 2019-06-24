@@ -240,6 +240,16 @@ address_t synapse_dynamics_initialise(
     return weight_result;
 }
 
+//---------------------------------------
+void synapse_dynamics_process_neuromodulator_event(
+        uint32_t time, int32_t concentration, uint32_t neuron_index,
+        uint32_t synapse_type) {
+    use(time);
+    use(concentration);
+    use(neuron_index);
+    use(synapse_type);
+}
+
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {

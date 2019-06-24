@@ -6,6 +6,7 @@ from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spinn_utilities.make_tools.replacer import Replacer
 
 logger = logging.getLogger(__name__)
 
@@ -73,16 +74,32 @@ def synapse_expander(
                 "The synapse expander failed to complete")
 
 
-def _extract_iobuf(expander_cores, transceiver, provenance_file_path):
+def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
+                   display=False):
     """ Extract IOBuf from the cores
     """
     io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
+    core_to_replacer = dict()
+    for binary in expander_cores.binaries:
+        replacer = Replacer(binary)
+        for core_subset in expander_cores.get_cores_for_binary(binary):
+            x = core_subset.x
+            y = core_subset.y
+            for p in core_subset.processor_ids:
+                core_to_replacer[x, y, p] = replacer
+
     for io_buf in io_buffers:
         file_path = os.path.join(
             provenance_file_path, "expander_{}_{}_{}.txt".format(
                 io_buf.x, io_buf.y, io_buf.p))
+        replacer = core_to_replacer[io_buf.x, io_buf.y, io_buf.p]
+        text = ""
+        for line in io_buf.iobuf.split("\n"):
+            text += replacer.replace(line) + "\n"
         with open(file_path, "w") as writer:
-            writer.write(io_buf.iobuf)
+            writer.write(text)
+        if display:
+            print("{}:{}:{} {}".format(io_buf.x, io_buf.y, io_buf.p, text))
 
 
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
@@ -97,4 +114,5 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
     error_cores = transceiver.get_cores_not_in_state(
         core_subsets, [CPUState.RUNNING, CPUState.FINISHED])
     logger.error(transceiver.get_core_status_string(error_cores))
-    _extract_iobuf(expander_cores, transceiver, provenance_file_path)
+    _extract_iobuf(expander_cores, transceiver, provenance_file_path,
+                   display=True)

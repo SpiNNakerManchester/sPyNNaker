@@ -52,5 +52,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=packages,
     package_data=package_data,
-    install_requires=install_requires
+    install_requires=install_requires,
+    maintainer="SpiNNakerTeam",
+    maintainer_email="spinnakerusers@googlegroups.com"
 )
