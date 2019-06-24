@@ -236,13 +236,17 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self.__post_connector_seed = [
                 int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
 
+        # Only deal with self-connections if the two populations are the same
+        self_connections = True
+        if ((not self.__allow_self_connections) and (
+                self.pre_population is self.post_population)):
+            self_connections = False
         params = [
-            self.__allow_self_connections,
+            self_connections,
             self.__with_replacement,
             self.__n_post,
             self._n_post_neurons]
         params.extend(self.__post_connector_seed)
-        print('params: ', params)
         return numpy.array(params, dtype="uint32")
 
     @property
