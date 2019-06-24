@@ -14,7 +14,7 @@ struct fixed_pre_params {
     uint32_t allow_self_connections;
     uint32_t with_replacement;
     uint32_t n_pre;
-    uint32_t n_potential_pre_synapses;
+    uint32_t n_pre_neurons;
 };
 
 /**
@@ -25,6 +25,9 @@ struct fixed_pre {
     struct fixed_pre_params params;
     rng_t rng;
 };
+
+// A global 2d array containing the indices for each column
+uint16_t** full_indices = NULL;
 
 void *connection_generator_fixed_pre_initialise(address_t *region) {
 
@@ -41,12 +44,13 @@ void *connection_generator_fixed_pre_initialise(address_t *region) {
     // Initialise the RNG
     params->rng = rng_init(&params_sdram);
     *region = params_sdram;
-    log_debug(
+//    log_debug(
+    log_info(
         "Fixed Total Number Connector, allow self connections = %u, "
         "with replacement = %u, n_pre = %u, "
-        "n potential pre connections = %u", params->params.allow_self_connections,
+        "n pre neurons = %u", params->params.allow_self_connections,
         params->params.with_replacement, params->params.n_pre,
-        params->params.n_potential_pre_synapses);
+        params->params.n_pre_neurons);
     return params;
 }
 
@@ -54,138 +58,139 @@ void connection_generator_fixed_pre_free(void *data) {
     sark_free(data);
 }
 
-///**
-// *! \brief Draw from a binomial distribution i.e. with replacement
-// *! \param[in] n The number of times the experiment is run
-// *! \param[in] N The number of items in the bag
-// *! \param[in] K The number of items that are valid
-// *! \param[in] rng The uniform random number generator
-// *! \return The number of times a valid item was drawn
-// */
-//static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
-//    uint32_t count = 0;
-//    uint32_t not_K = N - K;
-//    for (uint32_t i = 0; i < n; i++) {
-//        unsigned long fract value = ulrbits(rng_generator(rng));
-//        uint32_t pos = (uint32_t) (value * (K + not_K));
-//        if (pos < K) {
-//            count++;
-//        }
-//    }
-//    return count;
-//}
-//
-///**
-// * \brief Draw from a hyper-geometric distribution i.e. without replacement
-// * \param[in] n The number of times the experiment is run
-// * \param[in] N The number of items in the bag at the start
-// * \param[in] K The number of valid items in the bag at the start
-// * \param[in] rng The uniform random number generator
-// * \return The number of times a valid item was drawn
-// */
-//static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
-//    uint32_t count = 0;
-//    uint32_t K_remaining = K;
-//    uint32_t not_K_remaining = N - K;
-//    for (uint32_t i = 0; i < n; i++) {
-//        unsigned long fract value = ulrbits(rng_generator(rng));
-//        uint32_t pos = (uint32_t) (value * (K_remaining + not_K_remaining));
-//        if (pos < K_remaining) {
-//            count += 1;
-//            K_remaining -= 1;
-//        } else {
-//            not_K_remaining -= 1;
-//        }
-//    }
-//    return count;
-//}
-
 uint32_t connection_generator_fixed_pre_generate(
         void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
+    use(pre_slice_count);
 
-    // If there are no connections left or none to be made, return 0
+    // If there are no connections to be made, return 0
+
+    // Don't think that this is necessary, unless the user says 0 for some reason?
     struct fixed_pre *params = (struct fixed_pre *) data;
     if (max_row_length == 0 || params->params.n_pre == 0) {
         return 0;
     }
 
-    // Work out how many values can be sampled from
-    uint32_t n_values = post_slice_count;
-    if (!params->params.allow_self_connections
-            && pre_neuron_index >= post_slice_start
-            && pre_neuron_index < (post_slice_start + post_slice_count)) {
-        n_values -= 1;
+    // THIS IS THE FIXED PRE NUMBER CONNECTOR... and this algorithm goes row-by-row
+    // So the question is whether it's possible to "reverse-engineer" the post connector
+    // to do something similar...
+
+    // OK, so it's possible to do this...
+
+
+	// Get how many values can be sampled from
+	uint32_t n_values = params->params.n_pre_neurons;
+
+	// Get the number of connections in this column
+	uint32_t n_conns = params->params.n_pre;
+
+	log_debug("Generating %u from %u possible synapses", n_conns, n_values);
+
+	// The number of columns is the number of post-slices to do the calculation for
+	uint32_t n_columns = post_slice_count;
+    // If we're on the first row then do the calculations by looping over
+	// the post-slices available here
+
+	if (pre_neuron_index == 0) {
+	    // Allocate array for each column (i.e. post-slice on this slice)
+	    full_indices = (uint16_t**) spin1_malloc(
+	        n_columns * sizeof(uint16_t*));
+	    for (uint32_t n = 0; n < n_columns; n++) {
+	        // Allocate an array of size n_pre for each column
+	        full_indices[n] = (uint16_t*) spin1_malloc(
+	            n_conns * sizeof(uint16_t));
+	    }
+
+	    // Loop over the columns and fill the full_indices array accordingly
+	    for (uint32_t n = 0; n < n_columns; n++) {
+	    	// Sample from the possible connections in this column n_conns times
+	    	if (params->params.with_replacement) {
+	    		// Sample them with replacement
+	    		if (params->params.allow_self_connections) {
+	    			// self connections are allowed so sample
+	    			for (unsigned int i = 0; i < n_conns; i++) {
+	    				uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
+	    				uint32_t j = (u01 * n_values) >> 15;
+	    				full_indices[n][i] = j;
+	    			}
+	    		} else {
+	    			// self connections are not allowed (on this slice)
+	    			for (unsigned int i = 0; i < n_conns; i++) {
+	    				// Set j to the disallowed value, then test against it
+	    				uint32_t j = n + post_slice_start;
+
+	    				do {
+	    					uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
+	    					j = (u01 * n_values) >> 15;
+	    				} while (j == (n + post_slice_start));
+
+	    				full_indices[n][i] = j;
+	    			}
+	    		}
+	    	} else {
+	    		// Sample them without replacement using reservoir sampling
+	    		if (params->params.allow_self_connections) {
+	    			// Self-connections are allowed so do this normally
+	    			for (unsigned int i = 0; i < n_conns; i++) {
+	    				full_indices[n][i] = i;
+	    			}
+	    			// And now replace values if chosen at random to be replaced
+	    			for (unsigned int i = n_conns; i < n_values; i++) {
+	    				// j = random(0, i) (inclusive)
+	    				const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
+	    				const unsigned int j = (u01 * (i + 1)) >> 15;
+	    				if (j < n_conns) {
+	    					full_indices[n][j] = i;
+	    				}
+	    			}
+	    		} else {
+	    			// Self-connections are not allowed
+	    			for (unsigned int i = 0; i < n_conns; i++) {
+	    				if (i == n + post_slice_start) {
+	    					// set to a value not equal to i for now
+	    					full_indices[n][i] = n_conns;
+	    				} else {
+	    					full_indices[n][i] = i;
+	    				}
+	    			}
+	    			// And now "replace" values if chosen at random to be replaced
+	    			for (unsigned int i = n_conns; i < n_values; i++) {
+	    				// Set j to the disallowed value, then test against it
+	    				unsigned int j = n + post_slice_start;
+
+	    				do {
+	    					// j = random(0, i) (inclusive)
+	    					const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
+	    					j = (u01 * (i + 1)) >> 15;
+	    				} while (j == n + post_slice_start);
+
+	    				if (j < n_conns) {
+	    					full_indices[n][j] = i;
+	    				}
+					}
+				}
+			}
+		}
     }
-    uint32_t n_conns = 0;
 
-    // I think the easiest way to do this is to create arrays on the first time
-    // through (so there needs to be a flag set
-
-    // If we're on the last row of the sub-matrix, then all of the remaining
-    // sub-matrix connections get allocated to this row
-    if (pre_neuron_index == (pre_slice_start + pre_slice_count - 1)) {
-        n_conns = params->params.n_pre;
-
-    } else {
-
-        // If with replacement, generate a binomial for this row
-        if (params->params.with_replacement) {
-            n_conns = binomial(
-                params->params.n_pre,
-                params->params.n_potential_pre_synapses, n_values,
-                params->rng);
-
-        // If without replacement, generate a hyper-geometric for this row
-        } else {
-            n_conns = hypergeom(
-                params->params.n_pre,
-                params->params.n_potential_pre_synapses, n_values,
-                params->rng);
-        }
+    // Loop over the full indices array, and only keep indices on this post-slice
+    uint32_t count_indices = 0;
+    for (unsigned int i = 0; i < n_conns; i++) {
+    	uint32_t j = full_indices[pre_neuron_index][i];
+   		log_info("full_indices[%u][%u] = %u", pre_neuron_index, i, j);
+    	if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
+    		indices[count_indices] = j - post_slice_start; // On this slice!
+   			count_indices += 1;
+   		}
     }
 
-    // If too many connections, limit
-    if (n_conns > max_row_length) {
-        if (pre_neuron_index == (pre_slice_start + pre_slice_count - 1)) {
-            log_warning(
-                "Could not create %u connections", n_conns - max_row_length);
-        }
-        n_conns = max_row_length;
+    // Double-check for debug purposes
+    for (unsigned int i = 0; i < count_indices; i++) {
+    	log_info("Check: indices[%u] is %u", i, indices[i]);
     }
-    log_debug("Generating %u of %u synapses",
-        n_conns, params->params.n_pre);
+    log_info("pre_neuron_index is %u count_indices is %u", pre_neuron_index, count_indices);
 
-    // Sample from the possible connections in this row n_conns times
-    if (params->params.with_replacement) {
-
-        // Sample them with replacement
-        for (unsigned int i = 0; i < n_conns; i++) {
-            uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
-            uint32_t j = (u01 * post_slice_count) >> 15;
-            indices[i] = j;
-        }
-    } else {
-
-        // Sample them without replacement using reservoir sampling
-        for (unsigned int i = 0; i < n_conns; i++) {
-            indices[i] = i;
-        }
-        for (unsigned int i = n_conns; i < post_slice_count; i++) {
-
-            // j = random(0, i) (inclusive)
-            const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
-            const unsigned int j = (u01 * (i + 1)) >> 15;
-            if (j < n_conns) {
-                indices[j] = i;
-            }
-        }
-    }
-
-    params->params.n_pre -= n_conns;
-    params->params.n_potential_pre_synapses -= post_slice_count; // ?
-
-    return n_conns;
+    return count_indices;
 }

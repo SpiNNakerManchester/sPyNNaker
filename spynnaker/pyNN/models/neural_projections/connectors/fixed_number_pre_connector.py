@@ -18,7 +18,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
 
     __slots__ = [
         "__allow_self_connections",
-        "_n_pre",
+        "__n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
         "__with_replacement"]
@@ -55,6 +55,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
         self.__pre_neurons = None
+        self.__pre_connector_seed = None
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -163,7 +164,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self):
         # pylint: disable=too-many-arguments
-        return self._n_pre
+        return self.__n_pre
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
@@ -214,7 +215,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         return block
 
     def __repr__(self):
-        return "FixedNumberPreConnector({})".format(self._n_pre)
+        return "FixedNumberPreConnector({})".format(self.__n_pre)
 
     @property
     def allow_self_connections(self):
@@ -235,16 +236,23 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-#         self._update_synapses_per_post_vertex(pre_slices, post_slices)
-#         n_connections = self._get_n_connections(
-#             pre_slice_index, post_slice_index)
+        # The same seed needs to be sent to each of the slices
+        if self.__pre_connector_seed is None:
+            self.__pre_connector_seed = [
+                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+
+        # Only deal with self-connections if the two populations are the same
+        self_connections = True
+        if ((not self.__allow_self_connections) and (
+                self.pre_population is self.post_population)):
+            self_connections = False
+
         params = [
-            self.__allow_self_connections,
+            self_connections,
             self.__with_replacement,
             self.__n_pre,
-            post_vertex_slice.n_atoms]
-        params.extend(self._get_connector_seed(
-            pre_vertex_slice, post_vertex_slice, self._rng))
+            self._n_pre_neurons]
+        params.extend(self.__pre_connector_seed)
         return numpy.array(params, dtype="uint32")
 
     @property
