@@ -164,4 +164,3 @@ uint32_t connection_generator_fixed_post_generate(
 
     return count_indices;
 }
-
