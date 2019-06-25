@@ -94,7 +94,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
                 with open(filename, 'w') as file_handle:
                     numpy.savetxt(file_handle,
                                   [(self._n_pre_neurons, self._n_post_neurons,
-                                    self._n_pre)],
+                                    self.__n_pre)],
                                   fmt="%u,%u,%u")
 
             # Loop over all the post neurons
@@ -111,11 +111,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
 
                     # Now use this list in the random choice
                     self.__pre_neurons[m] = self._rng.choice(
-                        no_self_pre_neurons, self._n_pre,
+                        no_self_pre_neurons, self.__n_pre,
                         self.__with_replacement)
                 else:
                     self.__pre_neurons[m] = self._rng.choice(
-                        self._n_pre_neurons, self._n_pre,
+                        self._n_pre_neurons, self.__n_pre,
                         self.__with_replacement)
 
                 # Sort the neurons now that we have them
