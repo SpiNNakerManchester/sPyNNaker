@@ -177,13 +177,15 @@ uint32_t connection_generator_fixed_pre_generate(
 
     // Loop over the full indices array, and only keep indices on this post-slice
     uint32_t count_indices = 0;
-    for (unsigned int i = 0; i < n_conns; i++) {
-    	uint32_t j = full_indices[pre_neuron_index][i];
-   		log_info("full_indices[%u][%u] = %u", pre_neuron_index, i, j);
-    	if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
-    		indices[count_indices] = j - post_slice_start; // On this slice!
-   			count_indices += 1;
-   		}
+    for (unsigned int n = 0; n < n_columns; n++) {
+    	for (unsigned int i = 0; i < n_conns; i++) {
+    		uint32_t j = full_indices[n][i];
+    		log_info("full_indices[%u][%u] = %u", n, i, j);
+    		if (j == pre_neuron_index) {
+    			indices[count_indices] = n + post_slice_start; // On this slice!
+    			count_indices += 1;
+    		}
+    	}
     }
 
     // Double-check for debug purposes
