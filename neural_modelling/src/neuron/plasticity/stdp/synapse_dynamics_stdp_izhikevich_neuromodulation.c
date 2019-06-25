@@ -162,6 +162,7 @@ static inline void correlation_apply_pre_spike(
 
     use(&trace);
     use(&last_post_trace);
+    use(dopamine);
 
     // Calculate EXP components of the weight update equation
     int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(

@@ -30,4 +30,27 @@ static inline int32_t synapse_structure_update_state(int32_t trace, int32_t weig
     return (plastic_synapse_t)(weight << 16 | trace);
 }
 
+static inline update_state_t synapse_structure_get_update_state(
+        plastic_synapse_t synaptic_word, index_t synapse_type) {
+    return weight_get_initial(synaptic_word, synapse_type);
+}
+
+//---------------------------------------
+static inline final_state_t synapse_structure_get_final_state(
+        update_state_t state) {
+    return weight_get_final(state);
+}
+
+//---------------------------------------
+static inline weight_t synapse_structure_get_final_weight(
+        final_state_t final_state) {
+    return final_state;
+}
+
+//---------------------------------------
+static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
+        final_state_t final_state) {
+    return final_state;
+}
+
 #endif  // _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
