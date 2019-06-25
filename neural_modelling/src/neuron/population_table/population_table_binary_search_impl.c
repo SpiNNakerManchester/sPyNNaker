@@ -187,7 +187,6 @@ bool population_table_get_first_address(
     log_debug(
         "spike %u (= %x): population not found in master population table",
         spike, spike);
-
     return false;
 }
 
