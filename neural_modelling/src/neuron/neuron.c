@@ -8,11 +8,7 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <common/out_spikes.h>
-#include <recording.h>
-#include "profile_tags.h"
 #include <debug.h>
-#include <string.h>
-#include <profiler.h>
 
 // declare spin1_wfi
 void spin1_wfi();
@@ -404,8 +400,6 @@ void neuron_do_timestep_update(
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
-
-//    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER_NEURON_UPDATE);
 }
 
 void neuron_add_inputs(
