@@ -120,27 +120,26 @@ uint32_t connection_generator_fixed_post_generate(
     		}
     	} else {
     		// Self-connections are not allowed
+    		unsigned int replace_start = n_conns;
     		for (unsigned int i = 0; i < n_conns; i++) {
     			if (i == pre_neuron_index) {
     				// set to a value not equal to i for now
     				full_indices[i] = n_conns;
+    				replace_start = n_conns + 1;
     			} else {
     				full_indices[i] = i;
     			}
     		}
     		// And now "replace" values if chosen at random to be replaced
-    		for (unsigned int i = n_conns; i < n_values; i++) {
-    			// Set j to the disallowed value, then test against it
-    			unsigned int j = pre_neuron_index;
-
-    			do {
+    		for (unsigned int i = replace_start; i < n_values; i++) {
+    			if (i != pre_neuron_index) {
         			// j = random(0, i) (inclusive)
     				const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
-    				j = (u01 * (i + 1)) >> 15;
-    			} while (j == pre_neuron_index);
+    				const unsigned int j = (u01 * (i + 1)) >> 15;
 
-    			if (j < n_conns) {
-    				full_indices[j] = i;
+        			if (j < n_conns) {
+        				full_indices[j] = i;
+        			}
     			}
     		}
     	}

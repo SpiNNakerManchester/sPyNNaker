@@ -62,7 +62,7 @@ uint32_t connection_generator_fixed_pre_generate(
         void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
+//    use(pre_slice_start);
     use(pre_slice_count);
 
     // If there are no connections to be made, return 0
@@ -147,27 +147,26 @@ uint32_t connection_generator_fixed_pre_generate(
 	    			}
 	    		} else {
 	    			// Self-connections are not allowed
+	    			unsigned int replace_start = n_conns;
 	    			for (unsigned int i = 0; i < n_conns; i++) {
 	    				if (i == n + post_slice_start) {
 	    					// set to a value not equal to i for now
 	    					full_indices[n][i] = n_conns;
+	    					replace_start = n_conns + 1;
 	    				} else {
 	    					full_indices[n][i] = i;
 	    				}
 	    			}
 	    			// And now "replace" values if chosen at random to be replaced
-	    			for (unsigned int i = n_conns; i < n_values; i++) {
-	    				// Set j to the disallowed value, then test against it
-	    				unsigned int j = n + post_slice_start;
-
-	    				do {
+	    			for (unsigned int i = replace_start; i < n_values; i++) {
+	    				if (i != (n + post_slice_start)) {
 	    					// j = random(0, i) (inclusive)
 	    					const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
-	    					j = (u01 * (i + 1)) >> 15;
-	    				} while (j == n + post_slice_start);
+	    					const unsigned int j = (u01 * (i + 1)) >> 15;
 
-	    				if (j < n_conns) {
-	    					full_indices[n][j] = i;
+	    					if (j < n_conns) {
+	    						full_indices[n][j] = i;
+	    					}
 	    				}
 					}
 				}
@@ -180,7 +179,6 @@ uint32_t connection_generator_fixed_pre_generate(
     for (unsigned int n = 0; n < n_columns; n++) {
     	for (unsigned int i = 0; i < n_conns; i++) {
     		uint32_t j = full_indices[n][i];
-    		log_info("full_indices[%u][%u] = %u", n, i, j);
     		if (j == pre_neuron_index) {
     			indices[count_indices] = n + post_slice_start; // On this slice!
     			count_indices += 1;
@@ -188,11 +186,11 @@ uint32_t connection_generator_fixed_pre_generate(
     	}
     }
 
-    // Double-check for debug purposes
-    for (unsigned int i = 0; i < count_indices; i++) {
-    	log_info("Check: indices[%u] is %u", i, indices[i]);
-    }
-    log_info("pre_neuron_index is %u count_indices is %u", pre_neuron_index, count_indices);
+//    // Double-check for debug purposes
+//    for (unsigned int i = 0; i < count_indices; i++) {
+//    	log_info("Check: indices[%u] is %u", i, indices[i]);
+//    }
+//    log_info("pre_neuron_index is %u count_indices is %u", pre_neuron_index, count_indices);
 
     return count_indices;
 }
