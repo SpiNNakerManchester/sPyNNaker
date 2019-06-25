@@ -10,7 +10,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = logging.getLogger(__file__)
 
-# class FixedNumberPreConnnector(AbstractConnector):
+
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons.
@@ -21,7 +21,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         "__n_pre",
         "__pre_neurons",
         "__pre_neurons_set",
-        "__with_replacement"]
+        "__with_replacement",
+        "__pre_connector_seed"]
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
@@ -61,7 +62,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        if (not self.__with_replacement and self.__n_pre > self._n_pre_neurons):
+        if (not self.__with_replacement and
+                self.__n_pre > self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False and n > n_pre_neurons")

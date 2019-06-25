@@ -12,7 +12,6 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 logger = logging.getLogger(__file__)
 
 
-# class FixedNumberPostConnector(AbstractConnector):
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
@@ -23,7 +22,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement"]
+        "__with_replacement",
+        "__post_connector_seed"]
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
