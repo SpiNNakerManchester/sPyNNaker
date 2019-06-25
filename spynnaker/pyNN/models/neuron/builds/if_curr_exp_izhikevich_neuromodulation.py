@@ -7,11 +7,11 @@ from spynnaker.pyNN.models.neuron.synapse_types import\
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
+
 class IFCurrExpIzhikevichNeuromodulation(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
     """
-
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
