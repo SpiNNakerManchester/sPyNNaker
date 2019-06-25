@@ -62,7 +62,7 @@ uint32_t connection_generator_fixed_pre_generate(
         void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-//    use(pre_slice_start);
+    use(pre_slice_start);
     use(pre_slice_count);
 
     // If there are no connections to be made, return 0
@@ -72,13 +72,6 @@ uint32_t connection_generator_fixed_pre_generate(
     if (max_row_length == 0 || params->params.n_pre == 0) {
         return 0;
     }
-
-    // THIS IS THE FIXED PRE NUMBER CONNECTOR... and this algorithm goes row-by-row
-    // So the question is whether it's possible to "reverse-engineer" the post connector
-    // to do something similar...
-
-    // OK, so it's possible to do this...
-
 
 	// Get how many values can be sampled from
 	uint32_t n_values = params->params.n_pre_neurons;
@@ -180,7 +173,7 @@ uint32_t connection_generator_fixed_pre_generate(
     	for (unsigned int i = 0; i < n_conns; i++) {
     		uint32_t j = full_indices[n][i];
     		if (j == pre_neuron_index) {
-    			indices[count_indices] = n + post_slice_start; // On this slice!
+    			indices[count_indices] = n; // On this slice!
     			count_indices += 1;
     		}
     	}
