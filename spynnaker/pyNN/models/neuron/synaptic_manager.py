@@ -11,7 +11,6 @@ from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
-
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -34,9 +33,6 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spinnak_ear.spinnak_ear_application_vertex.spinnakear_application_vertex\
-    import SpiNNakEarApplicationVertex
-
 
 TIME_STAMP_BYTES = 4
 
@@ -247,8 +243,6 @@ class SynapticManager(object):
         max_row_info = self._get_max_row_info(
             synapse_info, post_vertex_slice, in_edge, machine_time_step)
         n_atoms = in_edge.pre_vertex.n_atoms
-        if isinstance(in_edge.pre_vertex, SpiNNakEarApplicationVertex):
-            n_atoms = in_edge.pre_vertex._size
         memory_size = self.__poptable_type.get_next_allowed_address(
             memory_size)
         memory_size += max_row_info.undelayed_max_bytes * n_atoms

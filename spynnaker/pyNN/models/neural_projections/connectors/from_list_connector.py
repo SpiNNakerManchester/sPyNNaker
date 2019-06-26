@@ -27,7 +27,8 @@ class FromListConnector(AbstractConnector):
         "__extra_parameter_names",
         "__split_conn_list",
         "__split_pre_slices",
-        "__split_post_slices"]
+        "__split_post_slices",
+        "_conn_matrix"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
@@ -64,6 +65,10 @@ class FromListConnector(AbstractConnector):
         self.__split_conn_list = None
         self.__split_pre_slices = None
         self.__split_post_slices = None
+
+    @property
+    def conn_matrix(self):
+        return self._conn_matrix
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
