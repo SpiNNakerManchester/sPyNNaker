@@ -577,6 +577,7 @@ class AbstractPopulationVertex(
         recording_data = self._neuron_recorder.get_data(vertex_slice)
         spec.write_array(recording_data)
 
+        # Remove offset from the slice to write correct neuron params
         new_slice = Slice(vertex_slice.lo_atom-self.atoms_offset,
                           vertex_slice.hi_atom-self.atoms_offset)
 
