@@ -225,6 +225,10 @@ class SynapticManager(
         return self._n_atoms
 
     @property
+    def atoms_offset(self):
+        return self._atoms_offset
+
+    @property
     def synapse_dynamics(self):
         return self._synapse_dynamics
 
@@ -1478,7 +1482,7 @@ class SynapticManager(
 
         for app_vertex in self._connected_app_vertices:
             out_vertex =\
-                app_vertex.get_machine_vertex_at(vertex_slice.lo_atom // self._atoms_neuron_cores)
+                app_vertex.get_machine_vertex_at((vertex_slice.lo_atom - self._atoms_offset) // self._atoms_neuron_cores)
             if out_vertex is not None:
                 vertex.add_constraint(SameChipAsConstraint(out_vertex))
 

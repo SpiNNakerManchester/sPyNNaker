@@ -47,6 +47,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         for i in range(N_PARTITIONS):
 
+            # Distribute neurons in order to have the low neuron cores completely filled
             atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
                 else self._n_atoms - (self._offset * i)
 

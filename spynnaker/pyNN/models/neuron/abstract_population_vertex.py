@@ -18,6 +18,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.model.constraints.placer_constraints\
     import SameChipAsConstraint
+from pacman.model.graphs.common import Slice
 
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
@@ -157,6 +158,10 @@ class AbstractPopulationVertex(
     def n_atoms(self):
         return self._n_atoms
 
+    @property
+    def atoms_offset(self):
+        return self._atoms_offset
+
     @inject_items({
         "graph": "MemoryApplicationGraph",
         "machine_time_step": "MachineTimeStep"
@@ -227,6 +232,10 @@ class AbstractPopulationVertex(
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
+
+        # Update the low and high atoms for the slice, transparent to PACMAN
+        #vertex_slice.lo_atom += self._atoms_offset
+        #vertex_slice.hi_atom += self._atoms_offset
 
         vertex = PopulationMachineVertex(
             resources_required, self._neuron_recorder.recorded_region_ids,
@@ -568,9 +577,12 @@ class AbstractPopulationVertex(
         recording_data = self._neuron_recorder.get_data(vertex_slice)
         spec.write_array(recording_data)
 
+        new_slice = Slice(vertex_slice.lo_atom-self.atoms_offset,
+                          vertex_slice.hi_atom-self.atoms_offset)
+
         # Write the neuron parameters
         neuron_data = self._neuron_impl.get_data(
-            self._parameters, self._state_variables, vertex_slice)
+            self._parameters, self._state_variables, new_slice)
         spec.write_array(neuron_data)
 
     @inject_items({
