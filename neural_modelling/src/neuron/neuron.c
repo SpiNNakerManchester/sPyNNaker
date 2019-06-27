@@ -292,15 +292,9 @@ bool neuron_do_timestep_update(
                     synaptic_contributions[buff_index] +
                     synaptic_contributions[buff_index + contribution_offset];
 
-                if(neuron_index == 0)
-                    io_printf(IO_BUF, "low %d high %d sum %d\n", synaptic_contributions[buff_index], synaptic_contributions[buff_index+contribution_offset], sum);
-
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;
-
-                    if(neuron_index == 0)
-                        io_printf(IO_BUF, "sat %d\n", sum);
                 }
             }
 
@@ -331,8 +325,6 @@ bool neuron_do_timestep_update(
         if (spike) {
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            io_printf(IO_BUF, "n %d\n", neuron_index);
 
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);

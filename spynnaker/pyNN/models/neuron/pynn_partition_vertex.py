@@ -4,6 +4,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractPopulationSettable,
     AbstractReadParametersBeforeSet, AbstractContainsUnits,
     AbstractAcceptsIncomingSynapses)
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
 
 from spinn_front_end_common.abstract_models import \
@@ -14,6 +16,8 @@ from pacman.model.constraints.partitioner_constraints\
 from pacman.model.graphs.application.application_edge \
     import ApplicationEdge
 
+from spinn_utilities.overrides import overrides
+
 
 DEFAULT_MAX_ATOMS_PER_SYN_CORE = 64
 SYN_CORES_PER_NEURON_CORE = 1
@@ -22,7 +26,8 @@ DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_P
 
 class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
                           AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
-                          AbstractContainsUnits):
+                          AbstractContainsUnits, AbstractSpikeRecordable,
+                          AbstractNeuronRecordable):
 
     __slots__ = [
         "_neuron_vertices",
@@ -197,7 +202,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for i in range(self._n_partitions):
             self._neuron_vertices[i].set_initial_value(variable, value, selector)
 
-    # SHOULD BE THE SAME FOR BOTH THE VERTICES!!!!s
+    # SHOULD BE THE SAME FOR BOTH THE VERTICES!!!!
     def get_initial_value(self, variable, selector=None):
         return self._neuron_vertices[0].get_initial_value(variable, selector)
 
@@ -228,6 +233,51 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     def describe(self):
         # Correct??
         return self._neuron_vertices[0].describe()
+
+    @overrides(
+        AbstractNeuronRecordable.clear_recording)
+    def clear_recording(
+            self, variable, buffer_manager, placements, graph_mapper):
+        for vertex in self._neuron_vertices:
+            vertex.clear_recording(variable, buffer_manager, placements, graph_mapper)
+
+    @overrides(
+        AbstractSpikeRecordable.clear_spike_recording)
+    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+        for vertex in self._neuron_vertices:
+            vertex.clear_spike_recording(buffer_manager, placements, graph_mapper)
+
+    @overrides(AbstractNeuronRecordable.is_recording)
+    def is_recording(self, variable):
+        return self._neuron_vertices[0].is_recording(variable)
+
+    @overrides(AbstractSpikeRecordable.is_recording_spikes)
+    def is_recording_spikes(self):
+        return self._neuron_vertices[0].is_recording_spikes()
+
+    @overrides(AbstractNeuronRecordable.set_recording)
+    def set_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
+        for vertex in self._neuron_vertices:
+            vertex.set_recording(variable, new_state, sampling_interval, indexes)
+
+    @overrides(AbstractSpikeRecordable.set_recording_spikes)
+    def set_recording_spikes(
+            self, new_state=True, sampling_interval=None, indexes=None):
+        for vertex in self._neuron_vertices:
+            vertex.set_recording_spikes(new_state, sampling_interval, indexes)
+
+    @overrides(AbstractNeuronRecordable.get_recordable_variables)
+    def get_recordable_variables(self):
+        return self._neuron_vertices[0].get_recordable_variables()
+
+    @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
+    def get_neuron_sampling_interval(self, variable):
+        return self._neuron_vertices[0].get_neuron_sampling_interval(variable)
+
+    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
+    def get_spikes_sampling_interval(self):
+        return self._neuron_vertices[0].get_spikes_sampling_interval()
 
     # def add_pre_run_connection_holder(
     #         self, connection_holder, projection_edge, synapse_information):
