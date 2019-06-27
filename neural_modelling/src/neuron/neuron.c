@@ -12,6 +12,8 @@
 #include <utils.h>
 #include <simulation.h>
 
+#define SAT_VALUE 0xFFFF
+
 // declare spin1_wfi
 void spin1_wfi();
 
@@ -115,6 +117,12 @@ static size_t dma_size;
 static volatile bool dma_finished;
 
 static weight_t *synaptic_region;
+
+//! Offset for the second exc synaptic contribution
+static uint32_t contribution_offset;
+
+//! Placeholder for synaptic contributions sum
+static uint32_t sum;
 
 
 //! parameters that reside in the neuron_parameter_data_region in human
@@ -274,11 +282,33 @@ bool neuron_do_timestep_update(
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
+            if(synapse_type_index > 0) {
+
+                sum = synaptic_contributions[buff_index];
+            }
+            else {
+
+                sum =
+                    synaptic_contributions[buff_index] +
+                    synaptic_contributions[buff_index + contribution_offset];
+
+                if(neuron_index == 0)
+                    io_printf(IO_BUF, "low %d high %d sum %d\n", synaptic_contributions[buff_index], synaptic_contributions[buff_index+contribution_offset], sum);
+
+                if(sum & 0x10000) {
+
+                    sum = SAT_VALUE;
+
+                    if(neuron_index == 0)
+                        io_printf(IO_BUF, "sat %d\n", sum);
+                }
+            }
+
             neuron_impl_add_inputs(
                 synapse_type_index,
                 neuron_index,
                 convert_weight_to_input(
-                    synaptic_contributions[buff_index],
+                    sum,
                     synaptic_contributions_to_input_left_shifts[synapse_type_index]));
         }
 
@@ -301,6 +331,8 @@ bool neuron_do_timestep_update(
         if (spike) {
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
+
+            io_printf(IO_BUF, "n %d\n", neuron_index);
 
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
@@ -408,6 +440,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
+
+    contribution_offset = 2 * n_neurons;
 
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
