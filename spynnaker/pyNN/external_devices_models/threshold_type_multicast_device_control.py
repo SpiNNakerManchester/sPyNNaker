@@ -15,7 +15,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     """ A threshold type that can send multicast keys with the value of\
         membrane voltage as the payload
     """
-    __slots__ = ["_device"]
+    __slots__ = ["__device"]
 
     def __init__(self, device):
         super(ThresholdTypeMulticastDeviceControl, self).__init__([
@@ -26,7 +26,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
             DataType.UINT32,   # time steps between sending
             DataType.UINT32,   # time steps until next send
             DataType.UINT32])  # type to send
-        self._device = device
+        self.__device = device
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -34,7 +34,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[DEVICE] = self._device
+        parameters[DEVICE] = self.__device
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):

@@ -30,11 +30,11 @@ class PushBotWIFIConnection(Connection, Listenable):
     """ A connection to a PushBot via Wi-Fi.
     """
     __slots__ = [
-        "_local_ip_address",
-        "_local_port",
-        "_remote_ip_address",
-        "_remote_port",
-        "_socket"]
+        "__local_ip_address",
+        "__local_port",
+        "__remote_ip_address",
+        "__remote_port",
+        "__socket"]
 
     def __init__(self, remote_host, remote_port=56000):
         """
@@ -47,43 +47,45 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             # Create a TCP Socket
-            self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         except Exception as e:
             raise_from(SpinnmanIOException(
                 "Error setting up socket: {}".format(e)), e)
 
         # Get the port to connect to
-        self._remote_port = int(remote_port)
+        self.__remote_port = int(remote_port)
 
         # Get the host to connect to
-        self._remote_ip_address = socket.gethostbyname(remote_host)
+        self.__remote_ip_address = socket.gethostbyname(remote_host)
 
         try:
             logger.info("Trying to connect to the PushBot via Wi-Fi")
             # Connect the socket
-            self._socket.connect((self._remote_ip_address, self._remote_port))
+            self.__socket.connect(
+                (self.__remote_ip_address, self.__remote_port))
             logger.info("Succeeded in connecting to PushBot via Wi-Fi")
 
         except Exception as e:
             raise_from(SpinnmanIOException(
                 "Error binding socket to {}:{}: {}".format(
-                    self._remote_ip_address, self._remote_port, e)), e)
+                    self.__remote_ip_address, self.__remote_port, e)), e)
 
         # Get the details of where the socket is connected
         try:
-            self._local_ip_address, self._local_port =\
-                self._socket.getsockname()
+            self.__local_ip_address, self.__local_port =\
+                self.__socket.getsockname()
 
             # Ensure that a standard address is used for the INADDR_ANY
             # hostname
-            if self._local_ip_address is None or self._local_ip_address == "":
-                self._local_ip_address = "0.0.0.0"
+            if (self.__local_ip_address is None
+                    or self.__local_ip_address == ""):
+                self.__local_ip_address = "0.0.0.0"
         except Exception as e:
             raise_from(SpinnmanIOException(
                 "Error querying socket: {}".format(e)), e)
 
         # Set a general timeout on the socket
-        self._socket.settimeout(0)
+        self.__socket.settimeout(0)
 
     def is_connected(self):
         """ See\
@@ -98,7 +100,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         for _ in range(5):  # Try up to five times...
             # Start a ping process
             process = subprocess.Popen(
-                "ping " + cmd_args + " " + self._remote_ip_address,
+                "ping " + cmd_args + " " + self.__remote_ip_address,
                 shell=True, stdout=subprocess.PIPE)
             process.wait()
             if process.returncode == 0:
@@ -116,7 +118,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :rtype: str
         :raise None: No known exceptions are thrown
         """
-        return self._local_ip_address
+        return self.__local_ip_address
 
     @property
     def local_port(self):
@@ -126,7 +128,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :rtype: int
         :raise None: No known exceptions are thrown
         """
-        return self._local_port
+        return self.__local_port
 
     @property
     def remote_ip_address(self):
@@ -136,7 +138,7 @@ class PushBotWIFIConnection(Connection, Listenable):
             connected remotely
         :rtype: str
         """
-        return self._remote_ip_address
+        return self.__remote_ip_address
 
     @property
     def remote_port(self):
@@ -145,7 +147,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :return: The remote port, or None if not connected remotely
         :rtype: int
         """
-        return self._remote_port
+        return self.__remote_port
 
     def receive(self, timeout=None):
         """ Receive data from the connection
@@ -159,8 +161,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         :raise SpinnmanIOException: If an error occurs receiving the data
         """
         try:
-            self._socket.settimeout(timeout)
-            return self._socket.recv(1024)
+            self.__socket.settimeout(timeout)
+            return self.__socket.recv(1024)
         except socket.timeout:
             raise SpinnmanTimeoutException("receive", timeout)
         except Exception as e:
@@ -174,7 +176,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :raise SpinnmanIOException: If there is an error sending the data
         """
         try:
-            self._socket.send(data)
+            self.__socket.send(data)
         except Exception as e:
             raise_from(SpinnmanIOException(str(e)), e)
 
@@ -183,13 +185,13 @@ class PushBotWIFIConnection(Connection, Listenable):
             :py:meth:`spinnman.connections.Connection.close`
         """
         try:
-            self._socket.shutdown(socket.SHUT_WR)
+            self.__socket.shutdown(socket.SHUT_WR)
         except Exception:
             pass
-        self._socket.close()
+        self.__socket.close()
 
     def is_ready_to_receive(self, timeout=0):
-        return bool(select.select([self._socket], [], [], timeout)[0])
+        return bool(select.select([self.__socket], [], [], timeout)[0])
 
     def get_receive_method(self):
         return self.receive

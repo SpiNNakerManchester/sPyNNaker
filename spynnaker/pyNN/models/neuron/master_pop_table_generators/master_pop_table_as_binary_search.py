@@ -46,58 +46,66 @@ class _MasterPopEntry(object):
     """ Internal class that contains a master population table entry
     """
     __slots__ = [
-        "_addresses_and_row_lengths",
+        "__addresses_and_row_lengths",
         # The mask to match this entry on
-        "_mask",
+        "__mask",
         # The routing key to match this entry on
-        "_routing_key",
+        "__routing_key",
         # The part of the key where the core id is held after shifting (below)
-        "_core_mask",
+        "__core_mask",
         # Where in the key that the core id is held
-        "_core_shift",
+        "__core_shift",
         # The number of neurons on every core except the last
-        "_n_neurons"]
+        "__n_neurons"]
 
     def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons):
-        self._routing_key = routing_key
-        self._mask = mask
-        self._core_mask = core_mask
-        self._core_shift = core_shift
-        self._n_neurons = n_neurons
-        self._addresses_and_row_lengths = list()
+        self.__routing_key = routing_key
+        self.__mask = mask
+        self.__core_mask = core_mask
+        self.__core_shift = core_shift
+        self.__n_neurons = n_neurons
+        self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
-        self._addresses_and_row_lengths.append(
+        self.__addresses_and_row_lengths.append(
             (address, row_length, is_single, True))
 
     def append_invalid(self):
-        self._addresses_and_row_lengths.append((0, 0, 0, False))
+        self.__addresses_and_row_lengths.append((0, 0, 0, False))
 
     @property
     def routing_key(self):
         """
         :return: the key combo of this entry
         """
-        return self._routing_key
+        return self.__routing_key
 
     @property
     def mask(self):
         """
         :return: the mask of the key for this master pop entry
         """
-        return self._mask
+        return self.__mask
+
+    @property
+    def addresses_and_row_lengths(self):
+        """
+        :return: the memory address that this master pop entry points at\
+            (synaptic matrix)
+        """
+        return self.__addresses_and_row_lengths
 
     def write_to_table(self, entry, address_list, start):
-        entry["key"] = self._routing_key
-        entry["mask"] = self._mask
+        entry["key"] = self.__routing_key
+        entry["mask"] = self.__mask
         entry["start"] = start
-        count = len(self._addresses_and_row_lengths)
+        count = len(self.__addresses_and_row_lengths)
         entry["count"] = count
-        entry["core_mask"] = self._core_mask
+        entry["core_mask"] = self.__core_mask
         entry["n_neurons_and_core_shift"] = (
-            (self._n_neurons << _N_NEURONS_SHIFT) | self._core_shift)
+            (self.__n_neurons << _N_NEURONS_SHIFT) | self.__core_shift)
         for j, (address, row_length, is_single, is_valid) in enumerate(
-                self._addresses_and_row_lengths):
+                self.__addresses_and_row_lengths):
             if not is_valid:
                 address_list[start + j] = _INVALID_ADDDRESS_AND_ROW_LENGTH
             else:
@@ -113,14 +121,14 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     """ Master population table, implemented as binary search master.
     """
     __slots__ = [
-        "_entries",
-        "_n_addresses",
-        "_n_single_entries"]
+        "__entries",
+        "__n_addresses",
+        "__n_single_entries"]
 
     def __init__(self):
-        self._entries = None
-        self._n_addresses = 0
-        self._n_single_entries = None
+        self.__entries = None
+        self.__n_addresses = 0
+        self.__n_single_entries = None
 
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
@@ -214,20 +222,32 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             the region in memory that the master pop table will be written in
         :rtype: None
         """
-        self._entries = dict()
-        self._n_addresses = 0
-        self._n_single_entries = 0
+        self.__entries = dict()
+        self.__n_addresses = 0
+        self.__n_single_entries = 0
 
     @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             core_mask, core_shift, n_neurons,
             master_pop_table_region, is_single=False):
-        # pylint: disable=too-many-arguments
-        if key_and_mask.key not in self._entries:
-            self._entries[key_and_mask.key] = _MasterPopEntry(
+        """ Add an entry in the binary search to deal with the synaptic matrix
+
+        :param spec: the writer for DSG
+        :param block_start_addr: where the synaptic matrix block starts
+        :param row_length: how long in bytes each synaptic entry is
+        :param key_and_mask: the key and mask for this master pop entry
+        :param master_pop_table_region: the region ID for the master pop
+        :param is_single: \
+            Flag that states if the entry is a direct entry for a single row.
+        :rtype: None
+        """
+        # pylint: disable=too-many-arguments, arguments-differ
+        if key_and_mask.key not in self.__entries:
+            self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
+        start_addr = block_start_addr
 
         # if not single, scale the address
         start_addr = block_start_addr
@@ -244,20 +264,20 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             raise SynapticConfigurationException(
                 "Row length {} is outside of allowed range for this table",
                 row_length)
-        self._entries[key_and_mask.key].append(
+        self.__entries[key_and_mask.key].append(
             start_addr, row_length - 1, is_single)
-        self._n_addresses += 1
+        self.__n_addresses += 1
 
     @overrides(AbstractMasterPopTableFactory.add_invalid_entry)
     def add_invalid_entry(
             self, spec, key_and_mask, core_mask, core_shift, n_neurons,
             master_pop_table_region):
-        if key_and_mask.key not in self._entries:
-            self._entries[key_and_mask.key] = _MasterPopEntry(
+        if key_and_mask.key not in self.__entries:
+            self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
-        self._entries[key_and_mask.key].append_invalid()
-        self._n_addresses += 1
+        self.__entries[key_and_mask.key].append_invalid()
+        self.__n_addresses += 1
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
@@ -265,18 +285,18 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # sort entries by key
         entries = sorted(
-            self._entries.values(),
+            self.__entries.values(),
             key=lambda entry: entry.routing_key)
 
         # write no master pop entries and the address list size
         n_entries = len(entries)
         spec.write_value(n_entries)
-        spec.write_value(self._n_addresses)
+        spec.write_value(self.__n_addresses)
 
         # Generate the table and list as arrays
         pop_table = numpy.zeros(n_entries, dtype=_MASTER_POP_ENTRY_DTYPE)
         address_list = numpy.zeros(
-            self._n_addresses, dtype=_ADDRESS_LIST_DTYPE)
+            self.__n_addresses, dtype=_ADDRESS_LIST_DTYPE)
         start = 0
         for i, entry in enumerate(entries):
             table_entry = pop_table[i]
@@ -286,10 +306,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_array(pop_table.view("<u4"))
         spec.write_array(address_list)
 
-        self._entries.clear()
-        del self._entries
-        self._entries = None
-        self._n_addresses = 0
+        self.__entries.clear()
+        del self.__entries
+        self.__entries = None
+        self.__n_addresses = 0
 
     @overrides(
         AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
