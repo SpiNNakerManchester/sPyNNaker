@@ -12,7 +12,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset)
+    AbstractCanReset, AbstractCanResetOnMachine)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -62,7 +62,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractCanReset, AbstractCanResetOnMachine):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -825,12 +825,15 @@ class AbstractPopulationVertex(
     def gen_on_machine(self, vertex_slice):
         return self.__synapse_manager.gen_on_machine(vertex_slice)
 
-    @overrides(AbstractCanReset.reset)
-    def reset(self):
+    @overrides(AbstractCanReset.reset_to_first_timestep)
+    def reset_to_first_timestep(self):
         # Reset the state variables and tell the synaptic manager to reset
         if self.__initial_state_variables is not None:
             self._state_variables = self.__copy_ranged_dict(
                 self.__initial_state_variables)
             self.__initial_state_variables = None
             self.__change_requires_neuron_parameters_reload = True
-        self.__synapse_manager.reset()
+
+    @overrides(AbstractCanResetOnMachine.reset_on_machine)
+    def reset_on_machine(self, txrx):
+        self.__synapse_manager.reset_synapses(txrx)

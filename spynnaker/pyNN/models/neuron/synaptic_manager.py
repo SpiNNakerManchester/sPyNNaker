@@ -1173,5 +1173,5 @@ class SynapticManager(object):
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self.__gen_on_machine.get(key, False)
 
-    def reset(self):
+    def reset_synapses(self, txrx):
         pass
