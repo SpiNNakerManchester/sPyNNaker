@@ -587,6 +587,9 @@ class SynapticManager(object):
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
 
+        # Store a full list of synapse info in the order written to blocks
+        synapse_infos = list()
+
         # For each machine edge in the vertex, create a synaptic list
         for machine_edge in in_edges:
             app_edge = graph_mapper.get_application_edge(machine_edge)
@@ -631,6 +634,7 @@ class SynapticManager(object):
                             weight_scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
+                        synapse_infos.append(synapse_info)
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
@@ -646,6 +650,11 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
+            synapse_infos.append(synapse_info)
+
+        # Loop over synapse infos as collected above and assign index in order
+        for n in range(len(synapse_infos)):
+            synapse_infos[n].index = n
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
