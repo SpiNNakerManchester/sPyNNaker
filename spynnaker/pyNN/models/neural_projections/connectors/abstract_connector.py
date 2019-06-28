@@ -3,6 +3,7 @@ import math
 import re
 import numpy
 from six import string_types, with_metaclass
+from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -40,7 +41,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         "__safe",
         "__space",
         "__verbose",
-        "_weights"]
+        "_weights",
+        "__param_seeds"]
 
     def __init__(self, safe=True, verbose=False, rng=None):
         self.__safe = safe
@@ -55,6 +57,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
         self.__n_clipped_delays = 0
         self.__min_delay = 0
+        self.__param_seeds = dict()
 
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
@@ -240,12 +243,26 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
 
-    def _generate_values(self, values, n_connections, connection_slices):
+    def _generate_random_values(
+            self, values, n_connections, pre_vertex_slice, post_vertex_slice):
+        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
+        seed = self.__param_seeds.get(key, None)
+        if seed is None:
+            seed = values.rng.next()
+            self.__param_seeds[key] = seed
+        new_rng = NumpyRNG(seed)
+        copy_rd = RandomDistribution(
+            values.distribution, parameters_pos=None, rng=new_rng,
+            **values.parameters)
+        if n_connections == 1:
+            return numpy.array([copy_rd.next(1)], dtype="float64")
+        return copy_rd.next(n_connections)
+
+    def _generate_values(self, values, n_connections, connection_slices,
+                         pre_slice, post_slice):
         if get_simulator().is_a_pynn_random(values):
-            if n_connections == 1:
-                return numpy.array([values.next(n_connections)],
-                                   dtype="float64")
-            return values.next(n_connections)
+            return self._generate_random_values(
+                values, n_connections, pre_slice, post_slice)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
         elif hasattr(values, "__getitem__"):
@@ -272,16 +289,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return values(d)
         raise Exception("what on earth are you giving me?")
 
-    def _generate_weights(self, values, n_connections, connection_slices):
+    def _generate_weights(self, values, n_connections, connection_slices,
+                          pre_slice, post_slice):
         """ Generate weight values.
         """
         weights = self._generate_values(
-            values, n_connections, connection_slices)
+            values, n_connections, connection_slices, pre_slice, post_slice)
         if self.__safe:
             if not weights.size:
                 logger_utils.warn_once(logger,
                                        "No connection in " + str(self))
-#                logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
@@ -306,12 +323,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
-    def _generate_delays(self, values, n_connections, connection_slices):
+    def _generate_delays(self, values, n_connections, connection_slices,
+                         pre_slice, post_slice):
         """ Generate valid delay values.
         """
 
         delays = self._generate_values(
-            values, n_connections, connection_slices)
+            values, n_connections, connection_slices, pre_slice, post_slice)
 
         return self._clip_delays(delays)
 
