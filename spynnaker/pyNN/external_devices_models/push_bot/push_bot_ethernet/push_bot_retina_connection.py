@@ -17,14 +17,14 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         of 16-bits per retina event.
     """
     __slots__ = [
-        "_lock",
-        "_old_data",
-        "_p_shift",
-        "_pixel_shift",
-        "_pushbot_listener",
-        "_retina_injector_label",
-        "_x_shift",
-        "_y_shift"]
+        "__lock",
+        "__old_data",
+        "__p_shift",
+        "__pixel_shift",
+        "__pushbot_listener",
+        "__retina_injector_label",
+        "__x_shift",
+        "__y_shift"]
 
     def __init__(
             self, retina_injector_label, pushbot_wifi_connection,
@@ -34,19 +34,19 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
         super(PushBotRetinaConnection, self).__init__(
             send_labels=[retina_injector_label], local_host=local_host,
             local_port=local_port)
-        self._retina_injector_label = retina_injector_label
-        self._pushbot_listener = ConnectionListener(
+        self.__retina_injector_label = retina_injector_label
+        self.__pushbot_listener = ConnectionListener(
             pushbot_wifi_connection, n_processes=1)
 
-        self._pixel_shift = 7 - resolution.value.bits_per_coordinate
-        self._x_shift = resolution.value.bits_per_coordinate
-        self._y_shift = 0
-        self._p_shift = resolution.value.bits_per_coordinate * 2
+        self.__pixel_shift = 7 - resolution.value.bits_per_coordinate
+        self.__x_shift = resolution.value.bits_per_coordinate
+        self.__y_shift = 0
+        self.__p_shift = resolution.value.bits_per_coordinate * 2
 
-        self._pushbot_listener.add_callback(self._receive_retina_data)
-        self._pushbot_listener.start()
-        self._old_data = None
-        self._lock = RLock()
+        self.__pushbot_listener.add_callback(self._receive_retina_data)
+        self.__pushbot_listener.start()
+        self.__old_data = None
+        self.__lock = RLock()
 
     def _receive_retina_data(self, data):
         """ Receive retina packets from the PushBot and converts them into\
@@ -54,11 +54,11 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
 
         :param data: Data to be processed
         """
-        with self._lock:
+        with self.__lock:
             # combine it with any leftover data from last time through the loop
-            if self._old_data is not None:
-                data = self._old_data + data
-                self._old_data = None
+            if self.__old_data is not None:
+                data = self.__old_data + data
+                self.__old_data = None
 
             # Put the data in a numpy array
             data_all = numpy.fromstring(data, numpy.uint8).astype(numpy.uint32)
@@ -81,19 +81,19 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
 
             extra = data_all.size % _RETINA_PACKET_SIZE
             if extra:
-                self._old_data = data[-extra:]
+                self.__old_data = data[-extra:]
                 data_all = data_all[:-extra]
 
             if data_all.size:
                 # now process those retina events
                 xs = (data_all[::_RETINA_PACKET_SIZE] & 0x7f) \
-                    >> self._pixel_shift
+                    >> self.__pixel_shift
                 ys = (data_all[1::_RETINA_PACKET_SIZE] & 0x7f) \
-                    >> self._pixel_shift
+                    >> self.__pixel_shift
                 polarity = numpy.where(
                     data_all[1::_RETINA_PACKET_SIZE] >= 0x80, 1, 0)
                 neuron_ids = (
-                    (xs << self._x_shift) |
-                    (ys << self._y_shift) |
-                    (polarity << self._p_shift))
-                self.send_spikes(self._retina_injector_label, neuron_ids)
+                    (xs << self.__x_shift) |
+                    (ys << self.__y_shift) |
+                    (polarity << self.__p_shift))
+                self.send_spikes(self.__retina_injector_label, neuron_ids)

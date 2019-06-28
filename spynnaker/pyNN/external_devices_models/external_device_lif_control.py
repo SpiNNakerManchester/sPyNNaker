@@ -19,6 +19,10 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         but without spikes, and using the voltage as the output to the various\
         devices
     """
+    __slots__ = [
+        "_create_edges",
+        "_devices",
+        "_translator"]
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
     def __init__(
