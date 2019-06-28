@@ -178,3 +178,8 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
                       self).get_parameter_names()
         names.extend(self.__common_sp.get_parameter_names())
         return names
+
+    @property
+    @overrides(SynapseDynamicsStatic.changes_during_run)
+    def changes_during_run(self):
+        return True
