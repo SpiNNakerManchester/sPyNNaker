@@ -1,3 +1,5 @@
+import numpy as np
+
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.abstract_models import (
@@ -278,6 +280,41 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
         return self._neuron_vertices[0].get_spikes_sampling_interval()
+
+    @overrides(AbstractNeuronRecordable.get_data)
+    def get_data(self, variable, n_machine_time_steps, placements,
+                 graph_mapper, buffer_manager, machine_time_step):
+        values = list()
+        for vertex in self._neuron_vertices:
+            values.append(vertex.get_data(
+                variable, n_machine_time_steps, placements, graph_mapper,
+                buffer_manager, machine_time_step))
+
+        sampling_interval = values[0][2]
+        indexes = values[0][1]
+        data = values[0][0]
+
+        for index in range(1, len(values)):
+            indexes.extend(values[index][1])
+            data = np.append(data, values[index][0], axis=1)
+
+        return (data, indexes, sampling_interval)
+
+
+
+    @overrides(AbstractSpikeRecordable.get_spikes)
+    def get_spikes(
+            self, placements, graph_mapper, buffer_manager, machine_time_step):
+        spikes = list()
+        for vertex in self._neuron_vertices:
+            spikes.append(vertex.get_spikes(placements, graph_mapper, buffer_manager, machine_time_step))
+
+        res = spikes[0]
+        for index in range(1, len(spikes)):
+            res = np.append(res, spikes[index], axis=0)
+
+        return res
+
 
     # def add_pre_run_connection_holder(
     #         self, connection_holder, projection_edge, synapse_information):
