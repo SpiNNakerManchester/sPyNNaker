@@ -828,6 +828,9 @@ class AbstractPopulationVertex(
     @overrides(AbstractCanReset.reset)
     def reset(self):
         # Reset the state variables and tell the synaptic manager to reset
-        self._state_variables = self.__copy_ranged_dict(
-            self.__initial_state_variables)
+        if self.__initial_state_variables is not None:
+            self._state_variables = self.__copy_ranged_dict(
+                self.__initial_state_variables)
+            self.__initial_state_variables = None
+            self.__change_requires_neuron_parameters_reload = True
         self.__synapse_manager.reset()
