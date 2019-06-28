@@ -11,7 +11,8 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -31,7 +32,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import (
+    SpynnakerRangeDictionary, SpynnakerRangedList)
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +61,8 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -77,7 +80,8 @@ class AbstractPopulationVertex(
         "__time_between_requests",
         "__units",
         "__n_subvertices",
-        "__n_data_specs"]
+        "__n_data_specs",
+        "__initial_state_variables"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -123,6 +127,7 @@ class AbstractPopulationVertex(
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
         self.__neuron_impl.add_state_variables(self._state_variables)
+        self.__initial_state_variables = None
 
         # Set up for recording
         recordables = ["spikes"]
@@ -299,9 +304,27 @@ class AbstractPopulationVertex(
             size=params_size,
             label='NeuronParams')
 
+    @staticmethod
+    def __copy_ranged_dict(source):
+        target = SpynnakerRangeDictionary(len(source))
+        for key in source.keys():
+            copy_list = SpynnakerRangedList(len(source))
+            init_list = source.get_list(key)
+            for start, stop, value in init_list.iter_ranges():
+                is_list = (hasattr(value, '__iter__') and
+                           not isinstance(value, str))
+                copy_list.set_value_by_slice(start, stop, value, is_list)
+            target[key] = copy_list
+
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
+
+        # If no initial state variables, copy them now
+        if self.__initial_state_variables is None:
+            self.__initial_state_variables = self.__copy_ranged_dict(
+                self._state_variables)
+
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -383,6 +406,10 @@ class AbstractPopulationVertex(
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
+        self.__synapse_manager.regenerate_data_specification(
+            spec, placement, machine_time_step, time_scale_factor,
+            graph_mapper, routing_info)
+
         # close spec
         spec.end_specification()
 
@@ -402,20 +429,19 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-        "placements": "MemoryPlacements"
+        "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "placements"
+            "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps, placements):
+            data_n_time_steps):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -463,7 +489,7 @@ class AbstractPopulationVertex(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step, placements)
+            weight_scale, machine_time_step)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -798,3 +824,10 @@ class AbstractPopulationVertex(
 
     def gen_on_machine(self, vertex_slice):
         return self.__synapse_manager.gen_on_machine(vertex_slice)
+
+    @overrides(AbstractCanReset.reset)
+    def reset(self):
+        # Reset the state variables and tell the synaptic manager to reset
+        self._state_variables = self.__copy_ranged_dict(
+            self.__initial_state_variables)
+        self.__synapse_manager.reset()
