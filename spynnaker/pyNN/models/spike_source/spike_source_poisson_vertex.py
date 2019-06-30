@@ -1,4 +1,5 @@
 import logging
+import struct
 import math
 import numpy
 import scipy.stats
@@ -27,7 +28,7 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.utilities import constants, utility_calls
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.models.neuron.implementations import Struct
@@ -256,7 +257,6 @@ class SpikeSourcePoissonVertex(
         self.__rate_change = numpy.zeros(n_neurons)
         self.__machine_time_step = None
 
-
         all_rates = list(_flatten(self._data["rates"]))
         self.__max_rate = max_rate
         if len(all_rates):
@@ -283,7 +283,7 @@ class SpikeSourcePoissonVertex(
         all_rates = list(_flatten(self._data["rates"]))
         if len(all_rates):
             new_max = numpy.amax(all_rates)
-        elif max_rate is None:
+        elif self.__max_rate is None:
             new_max = 0
         if self.__max_rate is None:
             self.__max_rate = new_max
