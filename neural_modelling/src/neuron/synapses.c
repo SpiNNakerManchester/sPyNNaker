@@ -12,10 +12,6 @@
     #include "profile_tags.h"
 #endif
 
-// Compute the size of the input buffers and ring buffers
-#define RING_BUFFER_SIZE (1 << (SYNAPSE_DELAY_BITS + SYNAPSE_INPUT_TYPE_BITS\
-                                + SYNAPSE_INDEX_BITS))
-
 // Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 

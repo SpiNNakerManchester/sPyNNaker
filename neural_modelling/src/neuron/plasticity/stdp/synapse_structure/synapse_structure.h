@@ -3,8 +3,6 @@
 
 #include <neuron/plasticity/stdp/weight_dependence/weight.h>
 
-#ifdef _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
-
 static update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type);
 
@@ -16,7 +14,5 @@ static weight_t synapse_structure_get_final_weight(
 
 static plastic_synapse_t synapse_structure_get_final_synaptic_word(
         final_state_t final_state);
-
-#endif
 
 #endif // _SYNAPSE_STRUCTURE_H_
