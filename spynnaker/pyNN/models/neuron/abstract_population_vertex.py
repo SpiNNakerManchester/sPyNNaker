@@ -12,7 +12,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset, AbstractCanResetOnMachine)
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -62,12 +62,13 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset, AbstractCanResetOnMachine):
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
+        "__change_required_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -142,6 +143,7 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
+        self.__change_required_data_generation = False
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -191,9 +193,15 @@ class AbstractPopulationVertex(
     def requires_mapping(self):
         return self.__change_requires_mapping
 
+    @property
+    @overrides(AbstractChangableAfterRun.requires_data_generation)
+    def requires_data_generation(self):
+        return self.__change_requires_data_generation
+
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__change_requires_mapping = False
+        self.__change_requires_data_generation = False
 
     # CB: May be dead code
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
@@ -827,13 +835,14 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
-        # Reset the state variables and tell the synaptic manager to reset
+        # Reset the state variables if set
         if self.__initial_state_variables is not None:
             self._state_variables = self.__copy_ranged_dict(
                 self.__initial_state_variables)
             self.__initial_state_variables = None
             self.__change_requires_neuron_parameters_reload = True
 
-    @overrides(AbstractCanResetOnMachine.reset_on_machine)
-    def reset_on_machine(self, txrx):
-        self.__synapse_manager.reset_synapses(txrx)
+        # If synapses change during the run,
+        if self.__synapse_manager.synapse_dynamics.changes_during_run:
+            self.__change_requires_data_generation = True
+            self.__change_requires_neuron_parameters_reload = False
