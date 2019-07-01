@@ -68,7 +68,7 @@ class AbstractPopulationVertex(
     __slots__ = [
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
-        "__change_required_data_generation",
+        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -143,7 +143,7 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
-        self.__change_required_data_generation = False
+        self.__change_requires_data_generation = False
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
