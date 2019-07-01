@@ -212,8 +212,11 @@ class FromListConnector(AbstractConnector):
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
-        indices = self.__split_conn_list[
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+        try:
+            indices = self.__split_conn_list[
+                (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+        except Exception as e:
+            print("WTF")
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]

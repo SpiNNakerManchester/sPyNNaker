@@ -50,3 +50,11 @@ class AbstractAcceptsIncomingSynapses(object):
     def clear_connection_cache(self):
         """ Clear the connection data stored in the vertex so far.
         """
+
+    @abstractmethod
+    def get_in_coming_size(self):
+        """ returns how many atoms are to be considered in incoming projections
+        
+        :return: 
+        """
+

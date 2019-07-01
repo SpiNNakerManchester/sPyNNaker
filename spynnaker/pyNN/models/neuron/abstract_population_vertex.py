@@ -29,6 +29,8 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
+from spynnaker.pyNN.models.abstract_models.abstract_sends_outgoing_synapses import \
+    AbstractSendsOutgoingSynapses
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
@@ -70,7 +72,8 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractSupportsBitFieldGeneration,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractAcceptsIncomingSynapses, AbstractSendsOutgoingSynapses,
+        ProvidesKeyToAtomMappingImpl,
         AbstractSupportsBitFieldRoutingCompression, SplitterByAtoms):
     """ Underlying vertex model for Neural Populations.
     """
@@ -168,6 +171,14 @@ class AbstractPopulationVertex(
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
+
+    @overrides(AbstractSendsOutgoingSynapses.get_out_going_size)
+    def get_out_going_size(self):
+        return self.__n_atoms
+
+    @overrides(AbstractAcceptsIncomingSynapses.get_in_coming_size)
+    def get_in_coming_size(self):
+        return self.__n_atoms
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -373,7 +384,8 @@ class AbstractPopulationVertex(
         return sdram
 
     def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
+            self, spec, vertex_slice, vertex, machine_graph, n_key_map,
+            graph_mapper):
         """ reserves the dsg memory regions
 
         :param spec: the data spec object
@@ -408,13 +420,6 @@ class AbstractPopulationVertex(
             region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
             size=self._exact_sdram_for_bit_field_region(
                 machine_graph, graph_mapper, vertex),
-            label="bit_field region")
-
-        # reserve bit field region
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            size=self._exact_sdram_for_bit_field_region(
-                machine_graph, vertex, n_key_map),
             label="bit_field region")
 
         vertex.reserve_provenance_data_region(spec)
@@ -559,7 +564,7 @@ class AbstractPopulationVertex(
 
         # Reserve memory regions
         self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, n_key_map)
+            spec, vertex_slice, vertex, machine_graph, n_key_map, graph_mapper)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -598,7 +603,13 @@ class AbstractPopulationVertex(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step)
+            weight_scale, machine_time_step,
+            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+            POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
 
         # write up the bitfield builder data
         self._write_bitfield_init_data(
@@ -872,6 +883,9 @@ class AbstractPopulationVertex(
         return self.__synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             placements, monitor_api, monitor_placement, monitor_cores,
             handle_time_out_configuration, fixed_routes)
 
