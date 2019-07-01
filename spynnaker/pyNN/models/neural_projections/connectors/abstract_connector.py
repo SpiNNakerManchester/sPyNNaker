@@ -3,7 +3,6 @@ import math
 import re
 import numpy
 from six import string_types, with_metaclass
-from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -73,7 +72,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
-        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG())
+        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
@@ -248,11 +247,11 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         seed = self.__param_seeds.get(key, None)
         if seed is None:
-            seed = values.rng.next()
+            seed = int(values.rng.next() * 0xFFFFFFFF)
             self.__param_seeds[key] = seed
-        new_rng = NumpyRNG(seed)
-        copy_rd = RandomDistribution(
-            values.distribution, parameters_pos=None, rng=new_rng,
+        new_rng = get_simulator().get_pynn_NumpyRNG()(seed)
+        copy_rd = get_simulator().get_random_distribution()(
+            values.name, parameters_pos=None, rng=new_rng,
             **values.parameters)
         if n_connections == 1:
             return numpy.array([copy_rd.next(1)], dtype="float64")
