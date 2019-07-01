@@ -292,6 +292,9 @@ bool neuron_do_timestep_update(
                     synaptic_contributions[buff_index] +
                     synaptic_contributions[buff_index + contribution_offset];
 
+                if(sum > 0)
+                    io_printf(IO_BUF, "n %d t %d", neuron_index, time);
+
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;
@@ -433,8 +436,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
-    contribution_offset = 2 * n_neurons;
-
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
@@ -456,6 +457,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     uint32_t contribution_bits =
         log_n_neurons + log_n_synapse_types;
     uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
+
+    contribution_offset = 2 * n_neurons_power_2;
 
     dma_size = contribution_size * sizeof(weight_t);
 

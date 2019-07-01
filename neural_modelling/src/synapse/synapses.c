@@ -226,6 +226,9 @@ static inline void _process_fixed_synapses(
         // Store saturated value back in ring-buffer
 
         ring_buffers[ring_buffer_index] = accumulation;
+
+        if(accumulation != 0)
+            io_printf(IO_BUF, "t %d i %d\n", time, ring_buffer_index);
     }
 }
 
