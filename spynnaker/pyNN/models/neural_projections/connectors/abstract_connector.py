@@ -247,7 +247,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
         seed = self.__param_seeds.get(key, None)
         if seed is None:
-            seed = int(values.rng.next() * 0xFFFFFFFF)
+            seed = int(values.rng.next() * 0x7FFFFFFF)
             self.__param_seeds[key] = seed
         new_rng = get_simulator().get_pynn_NumpyRNG()(seed)
         copy_rd = get_simulator().get_random_distribution()(

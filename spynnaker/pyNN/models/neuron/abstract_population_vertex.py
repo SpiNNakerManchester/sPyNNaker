@@ -323,6 +323,7 @@ class AbstractPopulationVertex(
                            not isinstance(value, str))
                 copy_list.set_value_by_slice(start, stop, value, is_list)
             target[key] = copy_list
+        return target
 
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
@@ -646,6 +647,17 @@ class AbstractPopulationVertex(
         self._parameters.set_value(key, value)
         self.__change_requires_neuron_parameters_reload = True
 
+    def read_all_parameters_from_machine(self):
+        sim = globals_variables.get_simulator()
+        txrx = sim.transceiver()
+        placements = sim.placements()
+        graph_mapper = sim.graph_mapper()
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            vertex_slice = graph_mapper.get_slice(machine_vertex)
+            self.read_parameters_from_machine(txrx, placement, vertex_slice)
+
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
@@ -837,6 +849,8 @@ class AbstractPopulationVertex(
     def reset_to_first_timestep(self):
         # Reset the state variables if set
         if self.__initial_state_variables is not None:
+            # Read back the data
+            self.read_all_parameters_from_machine()
             self._state_variables = self.__copy_ranged_dict(
                 self.__initial_state_variables)
             self.__initial_state_variables = None
