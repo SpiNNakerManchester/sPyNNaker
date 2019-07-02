@@ -433,10 +433,6 @@ class AbstractPopulationVertex(
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
-        self.__synapse_manager.regenerate_data_specification(
-            spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info)
-
         # close spec
         spec.end_specification()
 
@@ -665,17 +661,6 @@ class AbstractPopulationVertex(
                     self.__neuron_impl.model_name, key))
         self._parameters.set_value(key, value)
         self.__change_requires_neuron_parameters_reload = True
-
-    def read_all_parameters_from_machine(self):
-        sim = globals_variables.get_simulator()
-        txrx = sim.transceiver()
-        placements = sim.placements()
-        graph_mapper = sim.graph_mapper()
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
-            placement = placements.get_placement_of_vertex(machine_vertex)
-            vertex_slice = graph_mapper.get_slice(machine_vertex)
-            self.read_parameters_from_machine(txrx, placement, vertex_slice)
 
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
