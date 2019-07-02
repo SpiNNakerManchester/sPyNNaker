@@ -82,7 +82,9 @@ class AbstractPopulationVertex(
         "__units",
         "__n_subvertices",
         "__n_data_specs",
-        "__initial_state_variables"]
+        "__initial_state_variables",
+        "__has_reset_last",
+        "__updated_state_variables"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -129,6 +131,7 @@ class AbstractPopulationVertex(
         self.__neuron_impl.add_parameters(self._parameters)
         self.__neuron_impl.add_state_variables(self._state_variables)
         self.__initial_state_variables = None
+        self.__updated_state_variables = set()
 
         # Set up for recording
         recordables = ["spikes"]
@@ -144,6 +147,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
         self.__change_requires_data_generation = False
+        self.__has_reset_last = False
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -313,11 +317,14 @@ class AbstractPopulationVertex(
             label='NeuronParams')
 
     @staticmethod
-    def __copy_ranged_dict(source):
+    def __copy_ranged_dict(source, merge=None, merge_keys=None):
         target = SpynnakerRangeDictionary(len(source))
         for key in source.keys():
             copy_list = SpynnakerRangedList(len(source))
-            init_list = source.get_list(key)
+            if merge_keys is None or key not in merge_keys:
+                init_list = source.get_list(key)
+            else:
+                init_list = merge.get_list(key)
             for start, stop, value in init_list.iter_ranges():
                 is_list = (hasattr(value, '__iter__') and
                            not isinstance(value, str))
@@ -328,6 +335,17 @@ class AbstractPopulationVertex(
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
+
+        # If resetting, reset any state variables that need to be reset
+        if self.__has_reset_last:
+            self._state_variables = self.__copy_ranged_dict(
+                self.__initial_state_variables, self._state_variables,
+                self.__updated_state_variables)
+            self.__initial_state_variables = None
+
+        # Reset things that need resetting
+        self.__has_reset_last = False
+        self.__updated_state_variables.clear()
 
         # If no initial state variables, copy them now
         if self.__initial_state_variables is None:
@@ -621,6 +639,7 @@ class AbstractPopulationVertex(
 
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
+        self.__updated_state_variables.add(variable)
 
     @property
     def conductance_based(self):
@@ -847,14 +866,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractCanReset.reset_to_first_timestep)
     def reset_to_first_timestep(self):
-        # Reset the state variables if set
-        if self.__initial_state_variables is not None:
-            # Read back the data
-            self.read_all_parameters_from_machine()
-            self._state_variables = self.__copy_ranged_dict(
-                self.__initial_state_variables)
-            self.__initial_state_variables = None
-            self.__change_requires_neuron_parameters_reload = True
+        # Mark that reset has been done, and reload state variables
+        self.__has_reset_last = True
+        self.__change_requires_neuron_parameters_reload = True
 
         # If synapses change during the run,
         if self.__synapse_manager.synapse_dynamics.changes_during_run:
