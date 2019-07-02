@@ -1464,7 +1464,7 @@ class SynapticManager(
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
         """
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom + self._atoms_offset)
+        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self._gen_on_machine.get(key, False)
 
     #TODO: IMPLEMENT THIS METHOD FOR RECORDING!!
