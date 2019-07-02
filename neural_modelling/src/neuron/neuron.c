@@ -292,9 +292,6 @@ bool neuron_do_timestep_update(
                     synaptic_contributions[buff_index] +
                     synaptic_contributions[buff_index + contribution_offset];
 
-                if(sum > 0)
-                    io_printf(IO_BUF, "n %d t %d", neuron_index, time);
-
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;

@@ -1426,6 +1426,16 @@ class SynapticManager(
         if not generator_data:
             return
 
+        if len(weight_scales) < self._model_synapse_types:
+            tmp_weight_scales = list()
+            for i in range(self._model_synapse_types):
+                if i != self._synapse_index:
+                    tmp_weight_scales.append(0)
+                else:
+                    # ADAPT THIS FOR MULTIPLE EXCITATORY TYPES
+                    # AS THE SYNAPSE INDEX
+                    tmp_weight_scales.append(weight_scales[0])
+
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self._implemented_synapse_types * 4))
@@ -1441,11 +1451,11 @@ class SynapticManager(
         spec.write_value(len(generator_data))
         spec.write_value(post_vertex_slice.lo_atom + self._atoms_offset)
         spec.write_value(post_vertex_slice.n_atoms)
-        spec.write_value(self._implemented_synapse_types)
+        spec.write_value(self._model_synapse_types)
         spec.write_value(get_n_bits(self._implemented_synapse_types))
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
-        for w in weight_scales:
+        for w in tmp_weight_scales:
             spec.write_value(int(w), data_type=DataType.INT32)
 
         for data in generator_data:

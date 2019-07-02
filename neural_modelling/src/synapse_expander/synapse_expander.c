@@ -131,17 +131,19 @@ bool read_sdram_data(
     uint32_t n_in_edges = *params_address++;
     uint32_t post_slice_start = *params_address++;
     uint32_t post_slice_count = *params_address++;
-    uint32_t n_synapse_types = *params_address++;
+    //uint32_t n_synapse_types = *params_address++;
+    uint32_t model_synapse_types = *params_address++;
     uint32_t n_synapse_type_bits = *params_address++;
     uint32_t n_synapse_index_bits = *params_address++;
     log_info("Generating %u edges for %u atoms starting at %u",
         n_in_edges, post_slice_count, post_slice_start);
 
     // Read in the weight scales, one per synapse type
-    uint32_t weight_scales[n_synapse_types];
-    for (uint32_t i = 0; i < n_synapse_types; i++) {
+    uint32_t weight_scales[model_synapse_types];
+    for (uint32_t i = 0; i < model_synapse_types; i++) {
         weight_scales[i] = *params_address++;
     }
+
 
     // Go through each connector and generate
     for (uint32_t edge = 0; edge < n_in_edges; edge++) {
