@@ -100,7 +100,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
-        present = items < self._p_connect
+        present = items <= self._p_connect
         ids = numpy.where(present)[0]
         n_connections = numpy.sum(present)
 
@@ -130,10 +130,16 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        prob_value = round(decimal.Decimal(
+            str(self._p_connect)) * DataType.U032.scale)
+        # If prob=1.0 has been specified, take care when scaling value to
+        # ensure that it doesn't wrap round to zero as an unsigned long fract
+        if (self._p_connect == 1.0):
+            prob_value = round(decimal.Decimal(
+                str(self._p_connect)) * (DataType.U032.scale - 1))
         params = [
             self.__allow_self_connections,
-            round(decimal.Decimal(
-                str(self._p_connect)) * DataType.U032.scale)]
+            prob_value]
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
