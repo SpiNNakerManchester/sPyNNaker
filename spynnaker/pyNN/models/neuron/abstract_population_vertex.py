@@ -591,6 +591,7 @@ class AbstractPopulationVertex(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
         self._state_variables.set_value(variable, value)
+        self.__updated_state_variables.add(variable)
         self.__change_requires_neuron_parameters_reload = True
 
     @property
@@ -635,7 +636,6 @@ class AbstractPopulationVertex(
 
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
-        self.__updated_state_variables.add(variable)
 
     @property
     def conductance_based(self):
