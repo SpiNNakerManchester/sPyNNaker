@@ -15,11 +15,11 @@ class FixedNumberPreConnector(AbstractConnector):
     """
 
     __slots__ = [
-        "_allow_self_connections",
+        "__allow_self_connections",
         "_n_pre",
-        "_pre_neurons",
-        "_pre_neurons_set",
-        "_with_replacement"]
+        "__pre_neurons",
+        "__pre_neurons_set",
+        "__with_replacement"]
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
@@ -49,21 +49,22 @@ class FixedNumberPreConnector(AbstractConnector):
         # :type space: pyNN.Space
         super(FixedNumberPreConnector, self).__init__(safe, verbose, rng)
         self._n_pre = n
-        self._allow_self_connections = allow_self_connections
-        self._with_replacement = with_replacement
-        self._verbose = verbose
-        self._pre_neurons_set = False
+        self.__allow_self_connections = allow_self_connections
+        self.__with_replacement = with_replacement
+        self.__pre_neurons_set = False
+        self.__pre_neurons = None
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        if (not self._with_replacement and self._n_pre > self._n_pre_neurons):
+        if (not self.__with_replacement and self._n_pre > self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False and n > n_pre_neurons")
 
-        if (not self._with_replacement and not self._allow_self_connections and
+        if (not self.__with_replacement and
+                not self.__allow_self_connections and
                 self._n_pre == self._n_pre_neurons):
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
@@ -77,14 +78,14 @@ class FixedNumberPreConnector(AbstractConnector):
 
     def _get_pre_neurons(self):
         # If we haven't set the array up yet, do it now
-        if not self._pre_neurons_set:
-            self._pre_neurons = [None] * self._n_post_neurons
-            self._pre_neurons_set = True
+        if not self.__pre_neurons_set:
+            self.__pre_neurons = [None] * self._n_post_neurons
+            self.__pre_neurons_set = True
 
             # if verbose open a file to output the connectivity
-            if self._verbose:
-                filename = self._pre_population.label + '_to_' + \
-                    self._post_population.label + '_fixednumberpre-conn.csv'
+            if self.verbose:
+                filename = self.pre_population.label + '_to_' + \
+                    self.post_population.label + '_fixednumberpre-conn.csv'
                 with open(filename, 'w') as file_handle:
                     numpy.savetxt(file_handle,
                                   [(self._n_pre_neurons, self._n_post_neurons,
@@ -96,33 +97,34 @@ class FixedNumberPreConnector(AbstractConnector):
 
                 # If the pre and post populations are the same
                 # then deal with allow_self_connections=False
-                if (self._pre_population is self._post_population and
-                        not self._allow_self_connections):
+                if (self.pre_population is self.post_population and
+                        not self.__allow_self_connections):
                     # Exclude the current pre-neuron from the post-neuron
                     # list
                     no_self_pre_neurons = [
                         n for n in range(self._n_pre_neurons) if n != m]
 
                     # Now use this list in the random choice
-                    self._pre_neurons[m] = self._rng.choice(
+                    self.__pre_neurons[m] = self._rng.choice(
                         no_self_pre_neurons, self._n_pre,
-                        self._with_replacement)
+                        self.__with_replacement)
                 else:
-                    self._pre_neurons[m] = self._rng.choice(
+                    self.__pre_neurons[m] = self._rng.choice(
                         self._n_pre_neurons, self._n_pre,
-                        self._with_replacement)
+                        self.__with_replacement)
 
                 # Sort the neurons now that we have them
-                self._pre_neurons[m].sort()
+                self.__pre_neurons[m].sort()
 
                 # If verbose then output the list connected to this
                 # post-neuron
-                if self._verbose:
-                    numpy.savetxt(file_handle,
-                                  self._pre_neurons[m][None, :],
-                                  fmt=("%u,"*(self._n_pre-1)+"%u"))
+                if self.verbose:
+                    numpy.savetxt(
+                        file_handle,
+                        self.__pre_neurons[m][None, :],
+                        fmt=("%u," * (self._n_pre - 1) + "%u"))
 
-        return self._pre_neurons
+        return self.__pre_neurons
 
     def _pre_neurons_in_slice(self, pre_vertex_slice, n):
         pre_neurons = self._get_pre_neurons()
@@ -214,8 +216,8 @@ class FixedNumberPreConnector(AbstractConnector):
 
     @property
     def allow_self_connections(self):
-        return self._allow_self_connections
+        return self.__allow_self_connections
 
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
-        self._allow_self_connections = new_value
+        self.__allow_self_connections = new_value

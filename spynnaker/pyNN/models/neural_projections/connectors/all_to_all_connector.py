@@ -14,7 +14,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     """
 
     __slots__ = [
-        "_allow_self_connections"]
+        "__allow_self_connections"]
 
     def __init__(self, allow_self_connections=True, safe=True, verbose=None):
         """
@@ -26,14 +26,14 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         :type allow_self_connections: bool
         """
         super(AllToAllConnector, self).__init__(safe, verbose)
-        self._allow_self_connections = allow_self_connections
+        self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
         """ Get a slice of the overall set of connections.
         """
         n_post_neurons = self._n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
-        if (not self._allow_self_connections and
+        if (not self.__allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
             n_post_neurons -= 1
             stop_atom -= 1
@@ -78,7 +78,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             synapse_type):
         # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
-        if (not self._allow_self_connections and
+        if (not self.__allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
             n_connections -= post_vertex_slice.n_atoms
         connection_slices = self._connection_slices(
@@ -86,7 +86,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
 
-        if (not self._allow_self_connections and
+        if (not self.__allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
             n_atoms = pre_vertex_slice.n_atoms
             block["source"] = numpy.where(numpy.diag(
@@ -115,11 +115,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     @property
     def allow_self_connections(self):
-        return self._allow_self_connections
+        return self.__allow_self_connections
 
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
-        self._allow_self_connections = new_value
+        self.__allow_self_connections = new_value
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)

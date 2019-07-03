@@ -2,9 +2,11 @@ import math
 import logging
 import struct
 import numpy
+from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
+from pacman.model.resources.variable_sdram import VariableSDRAM
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -12,35 +14,33 @@ _TWO_WORDS = struct.Struct("<II")
 
 class MultiSpikeRecorder(object):
     __slots__ = [
-        "_record"]
+        "__record"]
 
     def __init__(self):
-        self._record = False
+        self.__record = False
 
     @property
     def record(self):
-        return self._record
+        return self.__record
 
     @record.setter
     def record(self, record):
-        self._record = record
+        self.__record = record
 
-    def get_sdram_usage_in_bytes(
-            self, n_neurons, spikes_per_timestep, n_machine_time_steps):
-        if not self._record:
-            return 0
+    def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
+        if not self.__record:
+            return ConstantSDRAM(0)
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * 4
-        return recording_utils.get_recording_region_size_in_bytes(
-            n_machine_time_steps, out_spike_bytes * spikes_per_timestep)
+        return VariableSDRAM(0, 8 + (out_spike_bytes * spikes_per_timestep))
 
     def get_dtcm_usage_in_bytes(self):
-        if not self._record:
+        if not self.__record:
             return 0
         return 4
 
     def get_n_cpu_cycles(self, n_neurons):
-        if not self._record:
+        if not self.__record:
             return 0
         return n_neurons * 4
 

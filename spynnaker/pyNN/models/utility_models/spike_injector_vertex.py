@@ -20,13 +20,10 @@ class SpikeInjectorVertex(
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
-        "_buffer_size_before_receive",
-        "_receive_port",
-        "_requires_mapping",
-        "_spike_buffer_max_size",
-        "_spike_recorder",
-        "_time_between_requests",
-        "_virtual_key"]
+        "__receive_port",
+        "__requires_mapping",
+        "__spike_recorder",
+        "__virtual_key"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -35,59 +32,40 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons, label, constraints, port, virtual_key,
-            spike_buffer_max_size, buffer_size_before_receive,
-            time_between_requests, buffer_notification_ip_address,
-            buffer_notification_port):
+            reserve_reverse_ip_tag):
         # pylint: disable=too-many-arguments
-        config = get_simulator().config
-        if buffer_notification_ip_address is None:
-            buffer_notification_ip_address = config.get(
-                "Buffers", "receive_buffer_host")
-        if buffer_notification_port is None:
-            buffer_notification_port = config.get_int(
-                "Buffers", "receive_buffer_port")
+        self.__requires_mapping = True
+        self.__receive_port = None
+        self.__virtual_key = None
 
         super(SpikeInjectorVertex, self).__init__(
             n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True,
-            buffer_notification_ip_address=buffer_notification_ip_address,
-            buffer_notification_port=buffer_notification_port,
+            virtual_key=virtual_key,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints)
 
         # Set up for recording
-        self._spike_recorder = EIEIOSpikeRecorder()
-        self._spike_buffer_max_size = spike_buffer_max_size
-        if spike_buffer_max_size is None:
-            self._spike_buffer_max_size = config.getint(
-                "Buffers", "spike_buffer_size")
-        self._buffer_size_before_receive = buffer_size_before_receive
-        if buffer_size_before_receive is None:
-            self._buffer_size_before_receive = config.getint(
-                "Buffers", "buffer_size_before_receive")
-        self._time_between_requests = time_between_requests
-        if time_between_requests is None:
-            self._time_between_requests = config.getint(
-                "Buffers", "time_between_requests")
+        self.__spike_recorder = EIEIOSpikeRecorder()
 
     @property
     def port(self):
-        return self._receive_port
+        return self.__receive_port
 
     @port.setter
     def port(self, port):
-        self._receive_port = port
+        self.__receive_port = port
 
     @property
     def virtual_key(self):
-        return self._virtual_key
+        return self.__virtual_key
 
     @virtual_key.setter
     def virtual_key(self, virtual_key):
-        self._virtual_key = virtual_key
+        self.__virtual_key = virtual_key
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
-        return self._spike_recorder.record
+        return self.__spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
@@ -98,11 +76,9 @@ class SpikeInjectorVertex(
         if indexes is not None:
             logger.warning("Indexes currently not supported "
                            "so being ignored")
-        self.enable_recording(
-            self._spike_buffer_max_size, self._buffer_size_before_receive,
-            self._time_between_requests)
-        self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+        self.enable_recording(new_state)
+        self.__requires_mapping = not self.__spike_recorder.record
+        self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
@@ -111,7 +87,7 @@ class SpikeInjectorVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
-        return self._spike_recorder.get_spikes(
+        return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID,
             placements, graph_mapper, self,

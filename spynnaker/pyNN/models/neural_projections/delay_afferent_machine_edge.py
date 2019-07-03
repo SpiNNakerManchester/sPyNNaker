@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 class DelayAfferentMachineEdge(
         MachineEdge, AbstractFilterableEdge, AbstractWeightUpdatable):
+    __slots__ = []
 
     def __init__(self, pre_vertex, post_vertex, label, weight=1):
         super(DelayAfferentMachineEdge, self).__init__(
