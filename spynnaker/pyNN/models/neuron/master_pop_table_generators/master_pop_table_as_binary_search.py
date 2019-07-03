@@ -1,10 +1,8 @@
 import logging
 import math
 import struct
-import sys
 import numpy
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -106,13 +104,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxsize
-                edge_pre_vertex = in_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, ApplicationVertex) and
-                        isinstance(
-                            edge_pre_vertex, ApplicationVertex)):
-
-                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:
                     max_atoms = in_edge.pre_vertex.n_atoms
 
