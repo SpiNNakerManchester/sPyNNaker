@@ -369,8 +369,8 @@ class SynapticManager(
             machine_time_step):
         """ Get the maximum size of each row for a given slice of the vertex
         """
-        key = (synapse_info, post_vertex_slice.lo_atom + self._atoms_offset,
-               post_vertex_slice.hi_atom + self._atoms_offset)
+        key = (synapse_info, post_vertex_slice.lo_atom,
+               post_vertex_slice.hi_atom)
         if key not in self._max_row_info:
             self._max_row_info[key] = self._synapse_io.get_max_row_info(
                 synapse_info, post_vertex_slice,
@@ -909,8 +909,8 @@ class SynapticManager(
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
         n_delay_stages = 0
-        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom + self._atoms_offset,
-                     pre_vertex_slice.hi_atom + self._atoms_offset)
+        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+                     pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if max_row_info.delayed_max_n_synapses:
@@ -1005,8 +1005,8 @@ class SynapticManager(
                     block_addr, all_syn_block_sz))
 
         delay_rinfo = None
-        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom + self._atoms_offset,
-                     pre_vertex_slice.hi_atom + self._atoms_offset)
+        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+                     pre_vertex_slice.hi_atom)
         if delay_key in self._delay_key_index:
             delay_rinfo = self._delay_key_index[delay_key]
         if delayed_row_data.size:
@@ -1038,8 +1038,8 @@ class SynapticManager(
             isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self._one_to_one_connection_dtcm_max_bytes) and
-            (pre_vertex_slice.lo_atom + self._atoms_offset == post_vertex_slice.lo_atom + self._atoms_offset) and
-            (pre_vertex_slice.hi_atom + self._atoms_offset == post_vertex_slice.hi_atom + self._atoms_offset))
+            (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
+            (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
 
     def __write_row_data(
             self, spec, connector, pre_vertex_slice, post_vertex_slice,
@@ -1147,8 +1147,8 @@ class SynapticManager(
                 pre_vertex_slice = graph_mapper.get_slice(
                     m_edge.pre_vertex)
                 self._delay_key_index[app_edge.pre_vertex.source_vertex,
-                                      pre_vertex_slice.lo_atom + self._atoms_offset,
-                                      pre_vertex_slice.hi_atom + self._atoms_offset] = \
+                                      pre_vertex_slice.lo_atom,
+                                      pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
         spec.comment("\n*** Synapses spec block ***\n")
@@ -1262,8 +1262,8 @@ class SynapticManager(
         delayed_key = None
         if app_edge.delay_edge is not None:
             delayed_key = self._delay_key_index[
-                app_edge.pre_vertex, pre_vertex_slice.lo_atom + self._atoms_offset,
-                pre_vertex_slice.hi_atom + self._atoms_offset].first_key
+                app_edge.pre_vertex, pre_vertex_slice.lo_atom,
+                pre_vertex_slice.hi_atom].first_key
 
         # Get the block for the connections from the pre_vertex
         master_pop_table, direct_synapses, indirect_synapses = \
@@ -1449,7 +1449,7 @@ class SynapticManager(
             region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
 
         spec.write_value(len(generator_data))
-        spec.write_value(post_vertex_slice.lo_atom + self._atoms_offset)
+        spec.write_value(post_vertex_slice.lo_atom)
         spec.write_value(post_vertex_slice.n_atoms)
         spec.write_value(self._model_synapse_types)
         spec.write_value(get_n_bits(self._implemented_synapse_types))
@@ -1487,12 +1487,12 @@ class SynapticManager(
             label, constraints)
 
         self._machine_vertices[(
-            vertex_slice.lo_atom + self._atoms_offset, vertex_slice.hi_atom + self._atoms_offset)] = vertex
+            vertex_slice.lo_atom, vertex_slice.hi_atom)] = vertex
         SynapticManager._n_vertices += 1
 
         for app_vertex in self._connected_app_vertices:
             out_vertex =\
-                app_vertex.get_machine_vertex_at((vertex_slice.lo_atom - self._atoms_offset) // self._atoms_neuron_cores)
+                app_vertex.get_machine_vertex_at((vertex_slice.hi_atom - self._atoms_offset) // self._atoms_neuron_cores)
             if out_vertex is not None:
                 vertex.add_constraint(SameChipAsConstraint(out_vertex))
 

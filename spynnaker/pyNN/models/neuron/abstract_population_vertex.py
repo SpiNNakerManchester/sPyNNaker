@@ -247,7 +247,7 @@ class AbstractPopulationVertex(
         for app_vertex in self._connected_app_vertices:
             out_vertices =\
                 app_vertex.get_machine_vertex_at(
-                    vertex_slice.lo_atom + self._atoms_offset, vertex_slice.hi_atom + self._atoms_offset)
+                    vertex_slice.lo_atom, vertex_slice.hi_atom)
             if len(out_vertices)> 0:
                 for out_vertex in out_vertices:
                     vertex.add_constraint(SameChipAsConstraint(out_vertex))

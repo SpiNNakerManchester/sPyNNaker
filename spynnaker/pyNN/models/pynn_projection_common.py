@@ -143,7 +143,7 @@ class PyNNProjectionCommon(object):
 
         # Create a delay extension vertex to do the extra delays
         delay_vertex = pre_synaptic_population._internal_delay_vertex
-        pre_vertex = pre_synaptic_population.get_neuron_vertex
+        pre_vertex = pre_synaptic_population.get_vertex
         if delay_vertex is None:
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
