@@ -4,13 +4,10 @@ except ImportError:
     from collections import defaultdict
 import math
 import struct
-import sys
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
-from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -247,10 +244,7 @@ class SynapticManager(object):
                 for synapse_info in in_edge.synapse_information:
 
                     # Get the number of likely vertices
-                    max_atoms = sys.maxsize
-                    edge_pre_vertex = in_edge.pre_vertex
-                    if isinstance(edge_pre_vertex, ApplicationVertex):
-                        max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
                         max_atoms = in_edge.pre_vertex.n_atoms
                     n_edge_vertices = int(math.ceil(

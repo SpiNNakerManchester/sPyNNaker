@@ -4,7 +4,6 @@ except ImportError:
     from collections import defaultdict
 import logging
 import math
-import sys
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -347,15 +346,11 @@ class DelayExtensionVertex(
                 for synapse_info in out_edge.synapse_information:
 
                     # Get the number of likely vertices
-                    max_atoms = sys.maxsize
-                    edge_post_vertex = out_edge.post_vertex
-                    if (isinstance(
-                            edge_post_vertex, ApplicationVertex)):
-                        max_atoms = edge_post_vertex.get_max_atoms_per_core()
+                    max_atoms = out_edge.post_vertex.get_max_atoms_per_core()
                     if out_edge.post_vertex.n_atoms < max_atoms:
-                        max_atoms = edge_post_vertex.n_atoms
-                    n_edge_vertices = int(math.ceil(
-                        float(edge_post_vertex.n_atoms) / float(max_atoms)))
+                        max_atoms = out_edge.post_vertex.n_atoms
+                    n_edge_vertices = int(math.ceil(float(
+                        out_edge.post_vertex.n_atoms) / float(max_atoms)))
 
                     # Get the size
                     gen_size = self._get_edge_generator_size(synapse_info)

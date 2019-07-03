@@ -1,5 +1,4 @@
 import logging
-import sys
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
@@ -126,10 +125,6 @@ class SpikeSourceArrayVertex(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)
-
-    @staticmethod
-    def set_model_max_atoms_per_core(new_value=sys.maxsize):
-        SpikeSourceArrayVertex._model_based_max_atoms_per_core = new_value
 
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
