@@ -42,7 +42,11 @@ typedef enum extra_provenance_data_region_entries{
     SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
     INPUT_BUFFER_OVERFLOW_COUNT = 2,
     CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
+    FLUSHED_SPIKES = 5,
+    MAX_FLUSHED_SPIKES = 6,
+    MAX_TIME = 7,
+    CB_CALLS = 8
 } extra_provenance_data_region_entries;
 
 //! values for the priority for each callback
@@ -74,6 +78,12 @@ static uint32_t timer_period;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+static uint32_t max_spikes_remaining = 0;
+static uint32_t spikes_remaining = 0;
+static uint32_t spikes_remaining_this_tick = 0;
+static uint32_t max_time = UINT32_MAX;
+static uint32_t cb_calls = 0;
+
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
@@ -88,6 +98,10 @@ void c_main_store_provenance_data(address_t provenance_region){
     provenance_region[CURRENT_TIMER_TICK] = time;
     provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
             synapse_dynamics_get_plastic_saturation_count();
+    provenance_region[FLUSHED_SPIKES] = spikes_remaining;
+    provenance_region[MAX_FLUSHED_SPIKES] = max_spikes_remaining;
+    provenance_region[MAX_TIME] = max_time;
+    provenance_region[CB_CALLS] = cb_calls;
     log_debug("finished other provenance data");
 }
 
@@ -96,10 +110,27 @@ void write_contributions(uint unused1, uint unused2) {
         use(unused1);
         use(unused2);
 
+        uint32_t state = spin1_int_disable();
+
+        cb_calls++;
+
+//        volatile uint32_t temp = tc[T1_COUNT];
+//        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);
+
         //Start DMA Writing procedure for the contribution of this timestep
         synapses_do_timestep_update(time);
 
-        uint32_t spikes_remaining = spike_processing_flush_in_buffer();
+//        spikes_remaining += spike_processing_flush_in_buffer();
+
+        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
+        spikes_remaining += spikes_remaining_this_tick;
+
+        if(spikes_remaining_this_tick > max_spikes_remaining) {
+            max_spikes_remaining = spikes_remaining_this_tick;
+            max_time = time;
+        }
+
+        spin1_mode_restore(state);
 }
 
 //! \brief Initialises the model by reading in the regions and checking
@@ -187,7 +218,10 @@ static bool initialise(uint32_t *timer_period) {
     log_debug("Initialise: finished");
 
     // Register timer2 for periodic events(used to write contributions in SDRAM)
-    event_register_timer(SLOT_8);
+    tc[T2_INT_CLR] = 1; // clear any interrupts on T2
+    event_register_timer(SLOT_9);
+
+//    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
 
     return true;
 }
@@ -203,14 +237,31 @@ void resume_callback() {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
 
-    use(timer_count);
+//	io_printf(IO_BUF, "t_c s: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
+//	io_printf(IO_BUF, "t_c s: %u\n", timer_period-40);
+
+	use(timer_count);
     use(unused);
 
+
+//    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-40)) {
+//
+//        rt_error(RTE_API);
+//    }
+
+//    Sould this be done in a safer way?
+    uint32_t state = spin1_int_disable();
+    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+
     //Schedule event 20 microseconds before the end of the timer period
-    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-20)) {
+    if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
 
         rt_error(RTE_API);
     }
+//    io_printf(IO_BUF, "wc_reg: %u", wc_reg);
+    spin1_mode_restore(state);
+
+
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -246,9 +297,11 @@ void timer_callback(uint timer_count, uint unused) {
 
         simulation_ready_to_read();
 
+
+
         return;
     }
-
+//    io_printf(IO_BUF, "t_c f: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 

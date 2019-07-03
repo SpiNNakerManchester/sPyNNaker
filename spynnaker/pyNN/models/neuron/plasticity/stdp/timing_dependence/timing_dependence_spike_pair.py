@@ -16,36 +16,36 @@ LOOKUP_TAU_MINUS_SHIFT = 0
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
     __slots__ = [
-        "_synapse_structure",
-        "_tau_minus",
-        "_tau_minus_last_entry",
-        "_tau_plus",
-        "_tau_plus_last_entry"]
+        "__synapse_structure",
+        "__tau_minus",
+        "__tau_minus_last_entry",
+        "__tau_plus",
+        "__tau_plus_last_entry"]
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0):
-        self._tau_plus = tau_plus
-        self._tau_minus = tau_minus
+        self.__tau_plus = tau_plus
+        self.__tau_minus = tau_minus
 
-        self._synapse_structure = SynapseStructureWeightOnly()
+        self.__synapse_structure = SynapseStructureWeightOnly()
 
         # provenance data
-        self._tau_plus_last_entry = None
-        self._tau_minus_last_entry = None
+        self.__tau_plus_last_entry = None
+        self.__tau_minus_last_entry = None
 
     @property
     def tau_plus(self):
-        return self._tau_plus
+        return self.__tau_plus
 
     @property
     def tau_minus(self):
-        return self._tau_minus
+        return self.__tau_minus
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         if not isinstance(timing_dependence, TimingDependenceSpikePair):
             return False
-        return (self.tau_plus == timing_dependence.tau_plus and
-                self.tau_minus == timing_dependence.tau_minus)
+        return (self.__tau_plus == timing_dependence.tau_plus and
+                self.__tau_minus == timing_dependence.tau_minus)
 
     @property
     def vertex_executable_suffix(self):
@@ -74,26 +74,26 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
                 "STDP LUT generation currently only supports 1ms timesteps")
 
         # Write lookup tables
-        self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
+        self.__tau_plus_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self.__tau_plus, LOOKUP_TAU_PLUS_SIZE,
             LOOKUP_TAU_PLUS_SHIFT)
-        self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
+        self.__tau_minus_last_entry = plasticity_helpers.write_exp_lut(
+            spec, self.__tau_minus, LOOKUP_TAU_MINUS_SIZE,
             LOOKUP_TAU_MINUS_SHIFT)
 
     @property
     def synaptic_structure(self):
-        return self._synapse_structure
+        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
         prov_data.append(plasticity_helpers.get_lut_provenance(
             pre_population_label, post_population_label, "SpikePairRule",
-            "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
+            "tau_plus_last_entry", "tau_plus", self.__tau_plus_last_entry))
         prov_data.append(plasticity_helpers.get_lut_provenance(
             pre_population_label, post_population_label, "SpikePairRule",
-            "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
+            "tau_minus_last_entry", "tau_minus", self.__tau_minus_last_entry))
         return prov_data
 
     @overrides(AbstractTimingDependence.get_parameter_names)

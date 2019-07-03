@@ -33,7 +33,11 @@ class SynapseMachineVertex(
                ("SATURATION_COUNT", 1),
                ("BUFFER_OVERFLOW_COUNT", 2),
                ("CURRENT_TIMER_TIC", 3),
-               ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4)])
+               ("PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT", 4),
+               ("FLUSHED_SPIKES", 5),
+               ("MAX_FLUSHED_SPIKES", 6),
+               ("MAX_TIME", 7),
+               ("CB_CALLS", 8)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -110,6 +114,18 @@ class SynapseMachineVertex(
         n_plastic_saturations = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
+        total_flushed = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            FLUSHED_SPIKES.value]
+        max_flushed_per_timestep = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            MAX_FLUSHED_SPIKES.value]
+        max_time = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            MAX_TIME.value]
+        cb_calls = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            CB_CALLS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -152,6 +168,42 @@ class SynapseMachineVertex(
                 "spikes_per_second and / or ring_buffer_sigma values located "
                 "within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_plastic_saturations))))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Total dropped spikes"),
+            total_flushed,
+            report=total_flushed>0,
+            message=(
+                "Total flushed spikes: {}, for {} on {}, {}, {}".format(
+                    total_flushed, label, x, y, p)
+            )))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Maximum number of spiked dropped in a timestep"),
+            max_flushed_per_timestep,
+            report=max_flushed_per_timestep>0,
+            message=(
+                "Max   flushed spikes: {}, for {} on {}, {}, {}".format(
+                    max_flushed_per_timestep, label, x, y, p)
+            )))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Timestep during which we dropped more spikes"),
+            max_time,
+            report=max_flushed_per_timestep > 0,
+            message=(
+                "Timestep for Max flushed spikes: {}, for {} on {}, {}, {}".format(
+                    max_time, label, x, y, p)
+            )))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number of calls for the write contribution callback"),
+            cb_calls,
+            report=cb_calls > 0,
+            message=(
+                "write_contributions cb calls: {}, for {} on {}, {}, {}".format(
+                    cb_calls, label, x, y, p)
+            )))
 
         return provenance_items
 

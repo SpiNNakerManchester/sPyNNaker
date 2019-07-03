@@ -2,11 +2,13 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 
 
 class FakeHBPPortalMachineProvider(object):
+    __slots__ = ["__bmp_details", "__height", "__ip_addresses", "__width"]
+
     def __init__(self, n_boards, config):
-        self._ip_addresses = config.get("Machine", "machineName")
-        self._bmp_details = config.get("Machine", "bmp_names")
-        self._width = 8
-        self._height = 8
+        self.__ip_addresses = config.get("Machine", "machineName")
+        self.__bmp_details = config.get("Machine", "bmp_names")
+        self.__width = 8
+        self.__height = 8
         if n_boards != 1:
             raise InvalidParameterType("Not enough machine size")
 
@@ -17,10 +19,10 @@ class FakeHBPPortalMachineProvider(object):
         return
 
     def get_machine_info(self):
-        connections = {"(0, 0)": self._ip_addresses}
+        connections = {"(0, 0)": self.__ip_addresses}
         return {'connections': connections,
-                'width': self._width,
-                'height': self._height,
+                'width': self.__width,
+                'height': self.__height,
                 'machine_name': "BOB"}
 
     def destroy(self):

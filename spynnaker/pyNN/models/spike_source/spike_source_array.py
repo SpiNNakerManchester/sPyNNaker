@@ -8,7 +8,7 @@ class SpikeSourceArray(AbstractPyNNModel):
     default_population_parameters = {}
 
     def __init__(self, spike_times=[]):
-        self._spike_times = spike_times
+        self.__spike_times = spike_times
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(
@@ -17,3 +17,7 @@ class SpikeSourceArray(AbstractPyNNModel):
 
         return SpikeSourceArrayPartition(
             n_neurons, self._spike_times, constraints, label, max_atoms, self)
+
+    @property
+    def _spike_times(self):
+        return self.__spike_times

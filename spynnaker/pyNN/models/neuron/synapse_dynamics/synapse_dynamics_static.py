@@ -15,13 +15,13 @@ class SynapseDynamicsStatic(
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????
-        "_change_requires_mapping",
+        "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
-        "_pad_to_length"]
+        "__pad_to_length"]
 
     def __init__(self, pad_to_length=None):
-        self._change_requires_mapping = True
-        self._pad_to_length = pad_to_length
+        self.__change_requires_mapping = True
+        self.__pad_to_length = pad_to_length
 
     @overrides(AbstractSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
@@ -47,15 +47,15 @@ class SynapseDynamicsStatic(
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
-        if (self._pad_to_length is not None and
-                n_connections < self._pad_to_length):
-            n_connections = self._pad_to_length
+        if (self.__pad_to_length is not None and
+                n_connections < self.__pad_to_length):
+            n_connections = self.__pad_to_length
         return n_connections
 
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
     def get_static_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, max_n_synapses):
         # pylint: disable=too-many-arguments
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         neuron_id_mask = (1 << n_neuron_id_bits) - 1
@@ -64,7 +64,7 @@ class SynapseDynamicsStatic(
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
-            ((connections["delay"].astype("uint32") & 0xF) <<
+            ((connections["delay"].astype("uint32") & 0xFF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
@@ -72,9 +72,10 @@ class SynapseDynamicsStatic(
              neuron_id_mask))
         fixed_fixed_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
-            fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
+            fixed_fixed.view(dtype="uint8").reshape((-1, 4)),
+            max_n_synapses)
         ff_size = self.get_n_items(fixed_fixed_rows, 4)
-        if self._pad_to_length is not None:
+        if self.__pad_to_length is not None:
             # Pad the data
             fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
@@ -87,7 +88,7 @@ class SynapseDynamicsStatic(
             padded_rows.append(
                 numpy.concatenate((
                     row, numpy.zeros(numpy.clip(
-                        no_bytes_per_connection * self._pad_to_length -
+                        no_bytes_per_connection * self.__pad_to_length -
                         row.size, 0, None)).astype(
                             dtype="uint8"))).view(dtype="uint8"))
 
@@ -121,7 +122,7 @@ class SynapseDynamicsStatic(
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (n_neuron_id_bits +
-                                         n_synapse_type_bits)) & 0xF
+                                         n_synapse_type_bits)) & 0xFF
         connections["delay"][connections["delay"] == 0] = 16
 
         return connections
@@ -133,14 +134,14 @@ class SynapseDynamicsStatic(
             is called, as the vertex must require mapping as it has been\
             created!
         """
-        return self._change_requires_mapping
+        return self.__change_requires_mapping
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
         """
-        self._change_requires_mapping = False
+        self.__change_requires_mapping = False
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
@@ -160,7 +161,7 @@ class SynapseDynamicsStatic(
         """
         if hasattr(self, key):
             setattr(self, key, value)
-            self._change_requires_mapping = True
+            self.__change_requires_mapping = True
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 

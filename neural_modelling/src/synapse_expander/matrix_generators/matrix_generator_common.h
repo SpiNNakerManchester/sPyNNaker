@@ -11,7 +11,7 @@
 /**
  *! \brief The maximum delay value that can be represented on core
  */
-#define MAX_DELAY 16
+#define MAX_DELAY 256
 
 /**
  *! \brief A converted final delay value and delay stage

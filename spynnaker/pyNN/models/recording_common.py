@@ -23,19 +23,19 @@ class RecordingCommon(object):
     """
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = [
-    #     "_indices_to_record",
-    #     "_population",
-    #     "_write_to_files_indicators"]
+    #     "__indices_to_record",
+    #     "__population",
+    #     "__write_to_files_indicators"]
 
     def __init__(self, population):
         """
         :param population: the population to record for
         """
 
-        self._population = population
+        self.__population = population
 
         # file flags, allows separate files for the recorded variables
-        self._write_to_files_indicators = {
+        self.__write_to_files_indicators = {
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
@@ -43,8 +43,16 @@ class RecordingCommon(object):
 
         # Create a dict of variable name -> bool array of indices in population
         # that are recorded (initially all False)
-        self._indices_to_record = defaultdict(
+        self.__indices_to_record = defaultdict(
             lambda: numpy.repeat(False, population.size))
+
+    @property
+    def _population(self):
+        return self.__population
+
+    @property
+    def _write_to_files_indicators(self):
+        return self.__write_to_files_indicators
 
     def _record(self, variable, sampling_interval=None, to_file=None,
                 indexes=None):
@@ -59,14 +67,13 @@ class RecordingCommon(object):
 
         get_simulator().verify_not_running()
         # tell vertex its recording
-        if isinstance(self._population._vertex, Iterable):
-            vertex = self._population._vertex[0]
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
         else:
-            vertex = self._population._vertex
+            vertex = self.__population._vertex
 
         if variable == "spikes":
-            if not isinstance(vertex,
-                            AbstractSpikeRecordable):
+            if not isinstance(vertex, AbstractSpikeRecordable):
                 raise Exception("This population does not support the "
                                 "recording of spikes!")
             vertex.set_recording_spikes(
@@ -82,7 +89,7 @@ class RecordingCommon(object):
                 variable, sampling_interval=sampling_interval, indexes=indexes)
 
         # update file writer
-        self._write_to_files_indicators[variable] = to_file
+        self.__write_to_files_indicators[variable] = to_file
 
         if variable == "gsyn_exc":
             if not vertex.conductance_based:
@@ -103,10 +110,10 @@ class RecordingCommon(object):
         :return: None
         """
 
-        if isinstance(self._population._vertex, Iterable):
-            vertex = self._population._vertex[0]
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
         else:
-            vertex = self._population._vertex
+            vertex = self.__population._vertex
 
         vertex.set_recording("v")
 
@@ -158,10 +165,10 @@ class RecordingCommon(object):
 
         get_simulator().verify_not_running()
 
-        if isinstance(self._population._vertex, Iterable):
-            vertex = self._population._vertex[0]
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
         else:
-            vertex = self._population._vertex
+            vertex = self.__population._vertex
 
         # check that we're in a state to get voltages
         if not isinstance(
@@ -210,10 +217,10 @@ class RecordingCommon(object):
         :return: the spikes from a vertex
         """
 
-        if isinstance(self._population._vertex, Iterable):
-            vertex = self._population._vertex[0]
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
         else:
-            vertex = self._population._vertex
+            vertex = self.__population._vertex
 
         # check we're in a state where we can get spikes
         if not isinstance(vertex, AbstractSpikeRecordable):
@@ -248,10 +255,10 @@ class RecordingCommon(object):
         :rtype: None
         """
 
-        if isinstance(self._population._vertex, Iterable):
-            vertex = self._population._vertex[0]
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
         else:
-            vertex = self._population._vertex
+            vertex = self.__population._vertex
 
         # check for standard record which includes spikes
         if isinstance(vertex, AbstractNeuronRecordable):

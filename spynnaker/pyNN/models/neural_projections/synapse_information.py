@@ -3,46 +3,46 @@ class SynapseInformation(object):
         and synapse dynamics
     """
     __slots__ = [
-        "_connector",
-        "_index",
-        "_synapse_dynamics",
-        "_synapse_type",
-        "_weight",
-        "_delay"]
+        "__connector",
+        "__index",
+        "__synapse_dynamics",
+        "__synapse_type",
+        "__weight",
+        "__delay"]
 
     def __init__(self, connector, synapse_dynamics, synapse_type,
                  weight=None, delay=None):
-        self._connector = connector
-        self._synapse_dynamics = synapse_dynamics
-        self._synapse_type = synapse_type
-        self._index = 0
-        self._weight = weight
-        self._delay = delay
+        self.__connector = connector
+        self.__synapse_dynamics = synapse_dynamics
+        self.__synapse_type = synapse_type
+        self.__index = 0
+        self.__weight = weight
+        self.__delay = delay
 
     @property
     def connector(self):
-        return self._connector
+        return self.__connector
 
     @property
     def synapse_dynamics(self):
-        return self._synapse_dynamics
+        return self.__synapse_dynamics
 
     @property
     def synapse_type(self):
-        return self._synapse_type
+        return self.__synapse_type
 
     @property
     def index(self):
-        return self._index
+        return self.__index
 
     @index.setter
     def index(self, index):
-        self._index = index
+        self.__index = index
 
     @property
     def weight(self):
-        return self._weight
+        return self.__weight
 
     @property
     def delay(self):
-        return self._delay
+        return self.__delay

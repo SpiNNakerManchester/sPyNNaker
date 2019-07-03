@@ -172,7 +172,7 @@ static void neuron_impl_load_neuron_parameters(
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-static bool neuron_impl_do_timestep_update(index_t neuron_index,
+static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
     // Get the neuron itself
