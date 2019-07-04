@@ -1,4 +1,7 @@
-from collections import defaultdict
+try:
+    from collections.abc import defaultdict
+except ImportError:
+    from collections import defaultdict
 import sys
 from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
@@ -12,6 +15,7 @@ class AbstractPyNNModel(object):
     """ A Model that can be passed in to a Population object in PyNN
     """
 
+    __slots__ = []
     _max_atoms_per_core = defaultdict(lambda: sys.maxsize)
 
     @classmethod

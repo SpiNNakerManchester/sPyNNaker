@@ -15,15 +15,15 @@ class SynapseTypeDelta(AbstractSynapseType):
     """ This represents a synapse type with two delta synapses
     """
     __slots__ = [
-        "_isyn_exc",
-        "_isyn_inh"]
+        "__isyn_exc",
+        "__isyn_inh"]
 
     def __init__(self, isyn_exc, isyn_inh):
         super(SynapseTypeDelta, self).__init__([
             DataType.S1615,   # isyn_exc
             DataType.S1615])  # isyn_inh
-        self._isyn_exc = isyn_exc
-        self._isyn_inh = isyn_inh
+        self.__isyn_exc = isyn_exc
+        self.__isyn_inh = isyn_inh
 
     @overrides(AbstractSynapseType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -35,8 +35,8 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[ISYN_EXC] = self._isyn_exc
-        state_variables[ISYN_INH] = self._isyn_inh
+        state_variables[ISYN_EXC] = self.__isyn_exc
+        state_variables[ISYN_INH] = self.__isyn_inh
 
     @overrides(AbstractSynapseType.get_units)
     def get_units(self, variable):
@@ -79,16 +79,16 @@ class SynapseTypeDelta(AbstractSynapseType):
 
     @property
     def isyn_exc(self):
-        return self._isyn_exc
+        return self.__isyn_exc
 
     @isyn_exc.setter
     def isyn_exc(self, isyn_exc):
-        self._isyn_exc = isyn_exc
+        self.__isyn_exc = isyn_exc
 
     @property
     def isyn_inh(self):
-        return self._isyn_inh
+        return self.__isyn_inh
 
     @isyn_inh.setter
     def isyn_inh(self, isyn_inh):
-        self._isyn_inh = isyn_inh
+        self.__isyn_inh = isyn_inh

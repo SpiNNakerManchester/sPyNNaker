@@ -11,9 +11,9 @@ class SpynnakerDataSpecificationWriter(
     __slots__ = ()
 
     def __call__(
-            self, placements, graph, hostname,
-            report_default_directory, write_text_specs,
-            app_data_runtime_folder, machine, graph_mapper=None):
+            self, placements, hostname,
+            report_default_directory, write_text_specs, machine,
+            data_n_timesteps, graph_mapper=None):
         # pylint: disable=too-many-arguments
 
         delay_extensions = list()
@@ -30,4 +30,5 @@ class SpynnakerDataSpecificationWriter(
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,
-            app_data_runtime_folder, machine, graph_mapper, placement_order)
+            machine, data_n_timesteps, graph_mapper,
+            placement_order)
