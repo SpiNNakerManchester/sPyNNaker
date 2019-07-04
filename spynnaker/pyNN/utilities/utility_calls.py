@@ -163,7 +163,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
 
 
 def get_probable_maximum_selected(
-        n_total_trials, n_trials, selection_prob, chance=(1.0 / 10000.0)):
+        n_total_trials, n_trials, selection_prob, chance=(1.0 / 100.0)):
     """ Get the likely maximum number of items that will be selected from a\
         set of n_trials from a total set of n_total_trials\
         with a probability of selection of selection_prob

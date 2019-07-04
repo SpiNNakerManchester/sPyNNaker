@@ -56,7 +56,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            post_vertex_slice.n_atoms, self._p_connect)
+            post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
