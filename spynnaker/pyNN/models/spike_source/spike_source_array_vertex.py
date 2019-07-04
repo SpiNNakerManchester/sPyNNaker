@@ -75,6 +75,11 @@ class SpikeSourceArrayVertex(
         """
         return self._spike_times
 
+    @property
+    def slice_list(self):
+        # to be extended when moving to multiple partitions
+        return [self]
+
     @spike_times.setter
     def spike_times(self, spike_times):
         """ Set the spike source array's spike times. Not an extend, but an\

@@ -119,7 +119,8 @@ class SynapticManager(
         "_synapse_recorder",
         "__partition",
         "_atoms_offset",
-        "_ring_buffer_shifts"]
+        "_ring_buffer_shifts",
+        "_slice_list"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -144,6 +145,7 @@ class SynapticManager(
         self._atoms_offset = atoms_offset
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
         self._ring_buffer_shifts = [7]
+        self._slice_list = None
 
         #FOR RECORDING
         self._synapse_recorder = None
@@ -305,6 +307,14 @@ class SynapticManager(
     @connected_app_vertices.setter
     def connected_app_vertices(self, connected_app_vertices):
         self._connected_app_vertices = connected_app_vertices
+
+    @property
+    def slice_list(self):
+        return self._slice_list
+
+    @slice_list.setter
+    def slice_list(self, slices):
+        self._slice_list = slices
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -800,7 +810,9 @@ class SynapticManager(
                 graph_mapper, m_edges, routing_info, key_space_tracker)
             d_app_key_info = self.__delay_app_key_and_mask(
                 graph_mapper, m_edges, app_edge, key_space_tracker)
-            pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
+            pre_slices = list()
+            for v in app_edge.pre_vertex.slice_list:
+                pre_slices.extend(graph_mapper.get_slices(v))
 
             for synapse_info in app_edge.synapse_information:
 
@@ -1481,8 +1493,13 @@ class SynapticManager(
             self._get_weight_scale(r) * self._weight_scale
             for r in self._ring_buffer_shifts])
 
-        post_slices = graph_mapper.get_slices(self)
-        post_slice_idx = graph_mapper.get_machine_vertex_index(vertex)
+        # post_slices = graph_mapper.get_slices(self)
+        post_slices = list()
+        for v in self._slice_list:
+            post_slices.extend(graph_mapper.get_slices(v))
+
+        #post_slice_idx = graph_mapper.get_machine_vertex_index(vertex)
+        post_slice_idx = self._slice_list.index(self)
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, vertex,

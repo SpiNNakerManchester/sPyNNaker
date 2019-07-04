@@ -98,7 +98,8 @@ class AbstractPopulationVertex(
         "_connected_app_vertices",
         "__n_subvertices",
         "__n_data_specs",
-        "_atoms_offset"]
+        "_atoms_offset",
+        "_slice_list"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -140,6 +141,7 @@ class AbstractPopulationVertex(
         self._ring_buffer_shifts = None
         self._machine_vertices = dict()
         self._connected_app_vertices = None
+        self._slice_list = None
 
         # Set up for recording
         recordables = ["spikes"]
@@ -209,6 +211,14 @@ class AbstractPopulationVertex(
     @connected_app_vertices.setter
     def connected_app_vertices(self, connected_app_vertices):
         self._connected_app_vertices = connected_app_vertices
+
+    @property
+    def slice_list(self):
+        return self._slice_list
+
+    @slice_list.setter
+    def slice_list(self, slices):
+        self._slice_list = slices
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
