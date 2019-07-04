@@ -50,11 +50,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self._n_pre_neurons * self._n_post_neurons, self._p_connect)
         return self._get_delay_maximum(delays, n_connections)
 
-    def _get_n_connections(self, out_of):
-        return utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons, out_of,
-            self._p_connect)
-
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
             self, delays, post_vertex_slice, min_delay=None, max_delay=None):
