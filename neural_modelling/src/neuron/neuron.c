@@ -326,6 +326,8 @@ bool neuron_do_timestep_update(
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
+            io_printf(IO_BUF, "n %d t %d\n", neuron_index, time);
+
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 

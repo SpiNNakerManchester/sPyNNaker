@@ -113,6 +113,21 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
             self._neuron_vertices[i].connected_app_vertices = syn_vertices
             self._synapse_vertices.append(syn_vertices)
 
+        for syn_index in range(len(self._synapse_vertices[0])):
+
+            slice_list = list()
+            for i in range(self._n_partitions):
+
+                slice_list.append(self._synapse_vertices[i][syn_index])
+
+            for i in range(self._n_partitions):
+
+                self._synapse_vertices[i][syn_index].slice_list = slice_list
+
+        for i in range(self._n_partitions):
+            self._neuron_vertices[i].slice_list = self._neuron_vertices
+
+
     def _compute_partition_and_offset_size(self):
         return -((-self._n_atoms / self._n_partitions) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
 
