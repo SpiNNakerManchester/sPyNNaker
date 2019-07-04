@@ -70,7 +70,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons, self._p_connect)
+            self._n_pre_neurons, self._p_connect, chance=1.0/10000.0)
         return n_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
