@@ -147,7 +147,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
         self.__change_requires_data_generation = False
-        self.__has_reset_last = False
+        self.__has_reset_last = True
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -337,20 +337,21 @@ class AbstractPopulationVertex(
             time_scale_factor):
 
         # If resetting, reset any state variables that need to be reset
-        if self.__has_reset_last:
+        if (self.__has_reset_last and
+                self.__initial_state_variables is not None):
             self._state_variables = self.__copy_ranged_dict(
                 self.__initial_state_variables, self._state_variables,
                 self.__updated_state_variables)
             self.__initial_state_variables = None
 
+        # If no initial state variables, copy them now
+        if self.__has_reset_last:
+            self.__initial_state_variables = self.__copy_ranged_dict(
+                self._state_variables)
+
         # Reset things that need resetting
         self.__has_reset_last = False
         self.__updated_state_variables.clear()
-
-        # If no initial state variables, copy them now
-        if self.__initial_state_variables is None:
-            self.__initial_state_variables = self.__copy_ranged_dict(
-                self._state_variables)
 
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
@@ -586,6 +587,10 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
+        if not self.__has_reset_last:
+            raise Exception(
+                "initialize can only be called before the first call to run, "
+                "or before the first call to run after a reset")
         if variable not in self._state_variables:
             raise KeyError(
                 "Vertex does not support initialisation of"

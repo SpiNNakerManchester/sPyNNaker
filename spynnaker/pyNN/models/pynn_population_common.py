@@ -285,6 +285,7 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
+        self._read_parameters_before_set()
         self.__vertex.initialize(variable, value)
 
     def can_record(self, variable):
@@ -417,7 +418,6 @@ class PyNNPopulationCommon(object):
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
         if globals_variables.get_simulator().has_ran \
-                and not globals_variables.get_simulator().has_reset_last \
                 and self._vertex_read_parameters_before_set \
                 and not self.__has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
