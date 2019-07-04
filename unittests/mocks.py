@@ -106,3 +106,7 @@ class MockSimulator(object):
         globals_variables.set_failed_state(SpynnakerFailedState())
         globals_variables.set_simulator(simulator)
         return simulator
+
+    @property
+    def use_virtual_board(self):
+        return True
