@@ -98,7 +98,8 @@ class SpikeSourcePoissonVertex(
         "__n_subvertices",
         "__n_data_specs",
         "__max_rate",
-        "__rate_change"]
+        "__rate_change",
+        "__n_profile_samples"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -123,7 +124,6 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
 
-        # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
 
         # Store the parameters
@@ -139,7 +139,7 @@ class SpikeSourcePoissonVertex(
 
         # get config from simulator
         config = globals_variables.get_simulator().config
-        self._n_profile_samples = helpful_functions.read_config_int(
+        self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
 
         # Prepare for recording, and to get spikes
@@ -197,7 +197,7 @@ class SpikeSourcePoissonVertex(
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
-            profile_utils.get_profile_region_size(self._n_profile_samples))
+            profile_utils.get_profile_region_size(self.__n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
             vertex_slice, machine_time_step)
@@ -310,7 +310,7 @@ class SpikeSourcePoissonVertex(
             label="Recording")
 
         profile_utils.reserve_profile_region(
-            spec, _REGIONS.PROFILER_REGION.value, self._n_profile_samples)
+            spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
 
         placement.vertex.reserve_provenance_data_region(spec)
 
@@ -689,7 +689,7 @@ class SpikeSourcePoissonVertex(
         # write profile data
         profile_utils.write_profile_region_data(
             spec, _REGIONS.PROFILER_REGION.value,
-            self._n_profile_samples)
+            self.__n_profile_samples)
 
         # End-of-Spec:
         spec.end_specification()
