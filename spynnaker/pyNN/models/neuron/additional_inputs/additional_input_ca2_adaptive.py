@@ -17,18 +17,18 @@ UNITS = {
 
 class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     __slots__ = [
-        "_tau_ca2",
-        "_i_ca2",
-        "_i_alpha"]
+        "__tau_ca2",
+        "__i_ca2",
+        "__i_alpha"]
 
     def __init__(self,  tau_ca2, i_ca2, i_alpha):
         super(AdditionalInputCa2Adaptive, self).__init__([
             DataType.S1615,   # e^(-ts / tau_ca2)
             DataType.S1615,   # i_ca_2
             DataType.S1615])  # i_alpha
-        self._tau_ca2 = tau_ca2
-        self._i_ca2 = i_ca2
-        self._i_alpha = i_alpha
+        self.__tau_ca2 = tau_ca2
+        self.__i_ca2 = i_ca2
+        self.__i_alpha = i_alpha
 
     @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -37,12 +37,12 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TAU_CA2] = self._tau_ca2
-        parameters[I_ALPHA] = self._i_alpha
+        parameters[TAU_CA2] = self.__tau_ca2
+        parameters[I_ALPHA] = self.__i_alpha
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[I_CA2] = self._i_ca2
+        state_variables[I_CA2] = self.__i_ca2
 
     @overrides(AbstractAdditionalInput.get_units)
     def get_units(self, variable):
@@ -72,24 +72,24 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @property
     def tau_ca2(self):
-        return self._tau_ca2
+        return self.__tau_ca2
 
     @tau_ca2.setter
     def tau_ca2(self, tau_ca2):
-        self._tau_ca2 = tau_ca2
+        self.__tau_ca2 = tau_ca2
 
     @property
     def i_ca2(self):
-        return self._i_ca2
+        return self.__i_ca2
 
     @i_ca2.setter
     def i_ca2(self, i_ca2):
-        self._i_ca2 = i_ca2
+        self.__i_ca2 = i_ca2
 
     @property
     def i_alpha(self):
-        return self._i_alpha
+        return self.__i_alpha
 
     @i_alpha.setter
     def i_alpha(self, i_alpha):
-        self._i_alpha = i_alpha
+        self.__i_alpha = i_alpha

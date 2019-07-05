@@ -8,9 +8,10 @@ class ExtractedData(object):
     """ Data holder for all synaptic data being extracted in parallel.
     @Chimp: play here to hearts content.
     """
+    __slots__ = ["__data"]
 
     def __init__(self):
-        self._data = defaultdict(dict)
+        self.__data = defaultdict(dict)
 
     def get(self, projection, attribute):
         """ Allow getting data from a given projection and attribute
@@ -19,9 +20,9 @@ class ExtractedData(object):
         :param attribute: the attribute to retrieve
         :return: the attribute data in a connection holder
         """
-        if projection in self._data:
-            if attribute in self._data[projection]:
-                return self._data[projection][attribute]
+        if projection in self.__data:
+            if attribute in self.__data[projection]:
+                return self.__data[projection][attribute]
         return None
 
     def set(self, projection, attribute, data):
@@ -32,4 +33,4 @@ class ExtractedData(object):
         :param data: attribute data in a connection holder
         :rtype: None
         """
-        self._data[projection][attribute] = data
+        self.__data[projection][attribute] = data

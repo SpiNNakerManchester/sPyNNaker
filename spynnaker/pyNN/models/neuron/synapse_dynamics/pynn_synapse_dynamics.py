@@ -1,13 +1,13 @@
 class PyNNSynapseDynamics(object):
-    __slots__ = ["_slow"]
+    __slots__ = ["__slow"]
 
     def __init__(self, slow=None, fast=None):
         if fast is not None:
             raise NotImplementedError(
                 "Fast synapse dynamics are not currently supported")
 
-        self._slow = slow
+        self.__slow = slow
 
     @property
     def slow(self):
-        return self._slow
+        return self.__slow

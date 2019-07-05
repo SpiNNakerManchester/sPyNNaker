@@ -21,7 +21,6 @@ class PushBotEthernetSpeakerDevice(
             start_total_period=0, start_frequency=0, start_melody=None,
             timesteps_between_send=None):
         """
-
         :param speaker: The PushBotSpeaker value to control
         :param protocol: The protocol instance to get commands from
         :param start_active_time: The "active time" to set at the start
@@ -41,14 +40,14 @@ class PushBotEthernetSpeakerDevice(
             protocol, speaker, True, timesteps_between_send)
 
         # protocol specific data items
-        self._command_protocol = protocol
-        self._start_active_time = start_active_time
-        self._start_total_period = start_total_period
-        self._start_frequency = start_frequency
-        self._start_melody = start_melody
+        self.__command_protocol = protocol
+        self.__start_active_time = start_active_time
+        self.__start_total_period = start_total_period
+        self.__start_frequency = start_frequency
+        self.__start_melody = start_melody
 
     def set_command_protocol(self, command_protocol):
-        self._command_protocol = command_protocol
+        self.__command_protocol = command_protocol
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -61,26 +60,27 @@ class PushBotEthernetSpeakerDevice(
 
         # device specific commands
         commands.append(
-            self._command_protocol.push_bot_speaker_config_total_period(
-                total_period=self._start_total_period))
+            self.__command_protocol.push_bot_speaker_config_total_period(
+                total_period=self.__start_total_period))
         commands.append(
-            self._command_protocol.push_bot_speaker_config_active_time(
-                active_time=self._start_active_time))
-        if self._start_frequency is not None:
-            commands.append(self._command_protocol.push_bot_speaker_set_tone(
-                frequency=self._start_frequency))
-        if self._start_melody is not None:
-            commands.append(self._command_protocol.push_bot_speaker_set_melody(
-                melody=self._start_melody))
+            self.__command_protocol.push_bot_speaker_config_active_time(
+                active_time=self.__start_active_time))
+        if self.__start_frequency is not None:
+            commands.append(self.__command_protocol.push_bot_speaker_set_tone(
+                frequency=self.__start_frequency))
+        if self.__start_melody is not None:
+            commands.append(
+                self.__command_protocol.push_bot_speaker_set_melody(
+                    melody=self.__start_melody))
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [
-            self._command_protocol.push_bot_speaker_config_total_period(0),
-            self._command_protocol.push_bot_speaker_config_active_time(0),
-            self._command_protocol.push_bot_speaker_set_tone(0)]
+            self.__command_protocol.push_bot_speaker_config_total_period(0),
+            self.__command_protocol.push_bot_speaker_config_active_time(0),
+            self.__command_protocol.push_bot_speaker_set_tone(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)
