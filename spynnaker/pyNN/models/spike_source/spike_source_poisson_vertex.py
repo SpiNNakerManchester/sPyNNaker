@@ -486,7 +486,8 @@ class SpikeSourcePoissonVertex(
         # Get the time to spike value
         time_to_spike = self.__time_to_spike[vertex_slice.as_slice].astype(int)
         changed_rates = (
-            self.__rate_change[vertex_slice.as_slice].astype("bool") & elements)
+            self.__rate_change[vertex_slice.as_slice].astype("bool") &
+            elements)
         time_to_spike[changed_rates] = 0
 
         # Merge the arrays as parameters per atom
