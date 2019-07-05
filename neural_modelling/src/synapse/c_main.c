@@ -251,7 +251,7 @@ void timer_callback(uint timer_count, uint unused) {
 
 //    Sould this be done in a safer way?
     uint32_t state = spin1_int_disable();
-    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 40;
+    uint32_t wc_reg = tc[T1_COUNT] * 0.005 - 10;
 
     //Schedule event 20 microseconds before the end of the timer period
     if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
