@@ -388,7 +388,7 @@ static bool initialize() {
 
     // Setup profiler
     profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+        data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_info("Initialise: completed successfully");
 
