@@ -4,3 +4,4 @@ flake8
 pytest-cov
 pytest-timeout
 sphinx==1.5.3
+testfixtures
