@@ -256,7 +256,7 @@ void timer_callback(uint timer_count, uint unused) {
     //Schedule event 20 microseconds before the end of the timer period
     if(!timer_schedule_proc(write_contributions, 0, 0, wc_reg)) {
 
-        rt_error(RTE_API);
+    	// rt_error(RTE_API);
     }
 //    io_printf(IO_BUF, "wc_reg: %u", wc_reg);
     spin1_mode_restore(state);
