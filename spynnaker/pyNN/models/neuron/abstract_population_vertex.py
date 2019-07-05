@@ -349,10 +349,6 @@ class AbstractPopulationVertex(
             self.__initial_state_variables = self.__copy_ranged_dict(
                 self._state_variables)
 
-        # Reset things that need resetting
-        self.__has_reset_last = False
-        self.__updated_state_variables.clear()
-
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -445,6 +441,8 @@ class AbstractPopulationVertex(
     @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
     def mark_regions_reloaded(self):
         self.__change_requires_neuron_parameters_reload = False
+        self.__has_reset_last = False
+        self.__updated_state_variables.clear()
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
