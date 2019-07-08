@@ -12,7 +12,7 @@ from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractSynapseRecordable)
 # pylint: disable=protected-access
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -80,6 +80,13 @@ class RecordingCommon(object):
                 sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
             raise Exception("Illegal call with all")
+        elif variable == "synapse":
+            if not isinstance(vertex,
+                              AbstractSynapseRecordable):
+                raise Exception("This population does not support the "
+                                "recording of {}!".format(variable))
+            vertex.set_synapse_recording(
+                variable, sampling_interval=sampling_interval, indexes=indexes)
         else:
             if not isinstance(vertex,
                               AbstractNeuronRecordable):
@@ -155,7 +162,7 @@ class RecordingCommon(object):
             in matrix format.
 
         :param variable: the variable name to read. supported variable names
-            are :'gsyn_exc', 'gsyn_inh', 'v'
+            are :'gsyn_exc', 'gsyn_inh', 'v', 'synapse'
         :return: the data
         """
         timer = Timer()
@@ -172,7 +179,9 @@ class RecordingCommon(object):
 
         # check that we're in a state to get voltages
         if not isinstance(
-                vertex, AbstractNeuronRecordable):
+                vertex, AbstractNeuronRecordable) or \
+            not isinstance(
+                vertex, AbstractSynapseRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record {}"
                 .format(variable))
@@ -202,9 +211,14 @@ class RecordingCommon(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            results = vertex.get_data(
-                variable, sim.no_machine_time_steps, sim.placements,
-                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            if variable == "synapse":
+                results = vertex.get_synapse_data(
+                    variable, sim.no_machine_time_steps, sim.placements,
+                    sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            else:
+                results = vertex.get_data(
+                    variable, sim.no_machine_time_steps, sim.placements,
+                    sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
             (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
@@ -271,3 +285,8 @@ class RecordingCommon(object):
         elif isinstance(vertex, AbstractSpikeRecordable):
             vertex.set_recording_spikes(
                 new_state=False, indexes=indexes)
+
+        # check for synapse recording
+        if isinstance(vertex, AbstractSynapseRecordable):
+            vertex.set_synapse_recording(
+                variable, new_state=False, indexes=indexes)

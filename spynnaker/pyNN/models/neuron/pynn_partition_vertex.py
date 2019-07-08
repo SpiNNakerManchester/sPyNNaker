@@ -7,7 +7,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet, AbstractContainsUnits,
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+    AbstractSpikeRecordable, AbstractNeuronRecordable,
+    AbstractSynapseRecordable)
 from spynnaker.pyNN.utilities import constants
 
 from spinn_front_end_common.abstract_models import \
@@ -29,7 +30,7 @@ DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_P
 class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSettable,
                           AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
                           AbstractContainsUnits, AbstractSpikeRecordable,
-                          AbstractNeuronRecordable):
+                          AbstractNeuronRecordable, AbstractSynapseRecordable):
 
     __slots__ = [
         "_neuron_vertices",
@@ -264,6 +265,15 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for vertex in self._neuron_vertices:
             vertex.clear_spike_recording(buffer_manager, placements, graph_mapper)
 
+    @overrides(
+        AbstractSynapseRecordable.clear_synapse_recording)
+    def clear_synapse_recording(self, variable, buffer_manager, placements,
+                                graph_mapper):
+        for partition in self._synapse_vertices:
+            for vertex in partition:
+                vertex.clear_synapse_recording(
+                    variable, buffer_manager, placements, graph_mapper)
+
     @overrides(AbstractNeuronRecordable.is_recording)
     def is_recording(self, variable):
         return self._neuron_vertices[0].is_recording(variable)
@@ -271,6 +281,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
         return self._neuron_vertices[0].is_recording_spikes()
+
+    @overrides(AbstractSynapseRecordable.is_recording_synapses)
+    def is_recording_synapses(self, variable):
+        return self._synapse_vertices[0][0].is_recording_synapses(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
     def set_recording(self, variable, new_state=True, sampling_interval=None,
@@ -284,9 +298,21 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for vertex in self._neuron_vertices:
             vertex.set_recording_spikes(new_state, sampling_interval, indexes)
 
+    @overrides(AbstractSynapseRecordable.set_synapse_recording)
+    def set_synapse_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
+        for partition in self._synapse_vertices:
+            for vertex in partition:
+                vertex.set_synapse_recording(
+                    variable, new_state, sampling_interval, indexes)
+
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
         return self._neuron_vertices[0].get_recordable_variables()
+
+    @overrides(AbstractSynapseRecordable.get_synapse_recordable_variables)
+    def get_synapse_recordable_variables(self):
+        return self._synapse_vertices[0][0].get_synapse_recordable_variables()
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
@@ -295,6 +321,11 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
         return self._neuron_vertices[0].get_spikes_sampling_interval()
+
+    @overrides(AbstractSynapseRecordable.get_synapse_sampling_interval)
+    def get_synapse_sampling_interval(self, variable):
+        return self._synapse_vertices[0][0].\
+            get_synapse_sampling_interval(variable)
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
@@ -315,8 +346,6 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         return (data, indexes, sampling_interval)
 
-
-
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
@@ -330,6 +359,12 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         return res
 
+    @overrides(AbstractSynapseRecordable.get_synapse_data)
+    def get_synapse_data(self, variable, n_machine_time_steps, placements,
+                 graph_mapper, buffer_manager, machine_time_step):
+        # TODO: BLOODY HELL
+        return NotImplementedError
+
 
     # def add_pre_run_connection_holder(
     #         self, connection_holder, projection_edge, synapse_information):
@@ -339,7 +374,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     #             vertex.add_pre_run_connection_holder(
     #                 connection_holder, projection_edge, synapse_information)
     #
-    # # List of the connections, one per syn vertex, BAH
+    # # List of the connections, one per syn vertex
     # def get_connections_from_machine(self, transceiver, placement, machine_edge, graph_mapper,
     #                                  routing_infos, synapse_info, machine_time_step,
     #                                  using_extra_monitor_cores, placements=None, data_receiver=None,

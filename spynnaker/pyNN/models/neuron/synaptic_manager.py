@@ -35,7 +35,7 @@ from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
-    AbstractProvidesIncomingPartitionConstraints)
+    AbstractProvidesIncomingPartitionConstraints, AbstractChangableAfterRun)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
@@ -60,6 +60,7 @@ from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
+from spynnaker.pyNN.models.common import AbstractSynapseRecordable
 from .synapse_machine_vertex import SynapseMachineVertex
 from .key_space_tracker import KeySpaceTracker
 
@@ -86,7 +87,8 @@ _ONE_WORD = struct.Struct("<I")
 
 class SynapticManager(
         ApplicationVertex, AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
-        AbstractProvidesIncomingPartitionConstraints, AbstractAcceptsIncomingSynapses):
+        AbstractProvidesIncomingPartitionConstraints, AbstractAcceptsIncomingSynapses,
+        AbstractSynapseRecordable, AbstractChangableAfterRun):
     """ Deals with synapses
     """
     # pylint: disable=too-many-arguments, too-many-locals
@@ -116,11 +118,12 @@ class SynapticManager(
         "_connected_app_vertices",
         "_model_synapse_types",
         "_atoms_neuron_cores",
-        "_synapse_recorder",
+        "__synapse_recorder",
         "__partition",
         "_atoms_offset",
         "_ring_buffer_shifts",
-        "_slice_list"]
+        "_slice_list",
+        "__change_requires_mapping"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -148,7 +151,8 @@ class SynapticManager(
         self._slice_list = None
 
         #FOR RECORDING
-        self._synapse_recorder = None
+        self.__synapse_recorder = None
+        self.__change_requires_mapping = True
 
         if self._implemented_synapse_types > 1:
             # Hard coded to ensure it's 0.
@@ -284,6 +288,11 @@ class SynapticManager(
     def synapse_index(self):
         return self._synapse_index
 
+    @property
+    @overrides(AbstractChangableAfterRun.requires_mapping)
+    def requires_mapping(self):
+        return self.__change_requires_mapping
+
     @overrides(AbstractAcceptsIncomingSynapses.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
         return self._synapse_index
@@ -315,6 +324,10 @@ class SynapticManager(
     @slice_list.setter
     def slice_list(self, slices):
         self._slice_list = slices
+
+    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    def mark_no_changes(self):
+        self.__change_requires_mapping = False
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -1791,11 +1804,11 @@ class SynapticManager(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
 
-        #FOR RECORDING
-        #buffered_sdram = self._get_buffered_sdram(
+        # FOR RECORDING
+        # buffered_sdram = self._get_buffered_sdram(
         #    vertex_slice, n_machine_time_steps)
 
-        #For recording change [] with self._synapse_recorder.recorded_region_ids
+        # For recording change [] with self._synapse_recorder.recorded_region_ids
         vertex = SynapseMachineVertex(
             resources_required, [],
             label, constraints)
@@ -1812,6 +1825,55 @@ class SynapticManager(
 
         # return machine vertex
         return vertex
+
+    @overrides(AbstractSynapseRecordable.set_synapse_recording)
+    def set_synapse_recording(self, variable, new_state=True, sampling_interval=None,
+                      indexes=None):
+        self.__change_requires_mapping = not self.is_recording(variable)
+        self.__synapse_recorder.set_recording(variable, new_state, sampling_interval, indexes)
+
+    @overrides(AbstractSynapseRecordable.get_synapse_data)
+    def get_synapse_data(self, variable, n_machine_time_steps, placements,
+                 graph_mapper, buffer_manager, machine_time_step):
+        # CHECK THAT 0 IS CORRECT AS INDEX!!
+        return self._synapse_recorder.get_matrix_data(
+            self.label, buffer_manager, 0, placements, graph_mapper,
+            self, variable, n_machine_time_steps)
+
+    @overrides(AbstractSynapseRecordable.get_synapse_recordable_variables)
+    def get_synapse_recordable_variables(self):
+        return self.__synapse_recorder.get_recordable_variables()
+
+    @overrides(AbstractSynapseRecordable.is_recording_synapses)
+    def is_recording_synapses(self, variable):
+        return self.__synapse_recorder.is_recording(variable)
+
+    @overrides(AbstractSynapseRecordable.get_synapse_sampling_interval)
+    def get_synapse_sampling_interval(self, variable):
+        return self.__synapse_recorder.get_synapse_sampling_interval(variable)
+
+    @overrides(AbstractSynapseRecordable.clear_synapse_recording)
+    def clear_synapse_recording(self, variable, buffer_manager, placements,
+                                graph_mapper):
+        # CHECK THAT 0 IS CORRECT!
+        self._clear_recording_region(
+            buffer_manager, placements, graph_mapper, 0)
+
+    def _clear_recording_region(
+            self, buffer_manager, placements, graph_mapper,
+            recording_region_id):
+        """ Clear a recorded data region from the buffer manager.
+        :param buffer_manager: the buffer manager object
+        :param placements: the placements object
+        :param graph_mapper: the graph mapper object
+        :param recording_region_id: the recorded region ID for clearing
+        :rtype: None
+        """
+        machine_vertices = graph_mapper.get_machine_vertices(self)
+        for machine_vertex in machine_vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+            buffer_manager.clear_recorded_data(
+                placement.x, placement.y, placement.p, recording_region_id)
 
     def get_machine_vertex_at(self, low, high):
 
