@@ -7,6 +7,7 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
+from six import iteritems
 from spinn_utilities.helpful_functions import get_valid_components
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -581,8 +582,8 @@ class SynapticManager(object):
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
 
-        # Store a full list of synapse info in the order written to blocks
-        synapse_infos = list()
+        # Store synapse information by projection edge to get indices
+        synapse_infos = defaultdict(list)
 
         # For each machine edge in the vertex, create a synaptic list
         for machine_edge in in_edges:
@@ -629,14 +630,7 @@ class SynapticManager(object):
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
 
-                        # Add a distinct synapse info (determined by
-                        # connector) to the list of synapse info
-                        connector_found = False
-                        for n in range(len(synapse_infos)):
-                            if (synapse_infos[n].connector is connector):
-                                connector_found = True
-                        if not connector_found:
-                            synapse_infos.append(synapse_info)
+                        synapse_infos[app_edge].append(synapse_info)
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
@@ -652,18 +646,12 @@ class SynapticManager(object):
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
 
-            # Add a distinct synapse info (determined by
-            # connector) to the list of synapse info
-            connector_found = False
-            for n in range(len(synapse_infos)):
-                if (synapse_infos[n].connector is connector):
-                    connector_found = True
-            if not connector_found:
-                synapse_infos.append(synapse_info)
+            synapse_infos[app_edge].append(synapse_info)
 
         # Loop over synapse infos as collected above and assign index in order
-        for n in range(len(synapse_infos)):
-            synapse_infos[n].index = n
+        for app_edge, infos in iteritems(synapse_infos):
+            for i, info in enumerate(infos):
+                info.index = i
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
