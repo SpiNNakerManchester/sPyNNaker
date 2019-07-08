@@ -22,8 +22,8 @@ def get_dict_from_init(init, skip=None, include=None):
     init_args = getfullargspec(init)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
-    default_args = [] if init_args.args is None else \
-        init_args.args[n_args - n_defaults:]
+    default_args = ([] if init_args.args is None else
+                    init_args.args[n_args - n_defaults:])
     default_values = [] if init_args.defaults is None else init_args.defaults
 
     # Check that included / skipped things exist
