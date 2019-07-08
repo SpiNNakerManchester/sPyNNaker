@@ -11,6 +11,12 @@ from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
 from pacman.model.graphs.application.application_vertex import (
     ApplicationVertex)
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_destination_of_edges import \
+    AbstractControlsDestinationOfEdges
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_source_of_edges import \
+    AbstractControlsSourceOfEdges
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -28,8 +34,7 @@ from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
-from spynnaker.pyNN.utilities.constants import (
-     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
+from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -612,9 +617,16 @@ class SynapticManager(object):
                 spec.comment("\nWriting matrix for m_edge:{}\n".format(
                     machine_edge.label))
 
-                pre_vertex_slice = graph_mapper.get_slice(
-                    machine_edge.pre_vertex)
-                pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
+                if isinstance(
+                        app_edge.pre_vertex, AbstractControlsSourceOfEdges):
+                    pre_slices = app_edge.pre_vertex.get_out_going_slices()
+                    pre_vertex_slice = app_edge.pre_vertex.get_pre_slice_for(
+                        machine_edge.pre_vertex)
+                else:
+                    pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
+                    pre_vertex_slice = graph_mapper.get_slice(
+                        machine_edge.pre_vertex)
+
                 pre_slice_idx = graph_mapper.get_machine_vertex_index(
                     machine_edge.pre_vertex)
 
@@ -933,7 +945,10 @@ class SynapticManager(object):
                                        pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
-        post_slices = graph_mapper.get_slices(application_vertex)
+        if isinstance(application_vertex, AbstractControlsDestinationOfEdges):
+            post_slices = application_vertex.get_in_coming_slices()
+        else:
+            post_slices = graph_mapper.get_slices(application_vertex)
         post_slice_idx = graph_mapper.get_machine_vertex_index(machine_vertex)
 
         # Reserve the memory
