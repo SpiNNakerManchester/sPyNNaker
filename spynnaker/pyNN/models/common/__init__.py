@@ -3,6 +3,7 @@ from .abstract_spike_recordable import AbstractSpikeRecordable
 from .abstract_synapse_recordable import AbstractSynapseRecordable
 from .eieio_spike_recorder import EIEIOSpikeRecorder
 from .neuron_recorder import NeuronRecorder
+from .synapse_recorder import SynapseRecorder
 from .multi_spike_recorder import MultiSpikeRecorder
 from .recording_utils import (
     get_buffer_sizes, get_data, get_recording_region_size_in_bytes,

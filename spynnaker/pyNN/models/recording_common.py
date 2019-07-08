@@ -39,7 +39,8 @@ class RecordingCommon(object):
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
-            'v': None}
+            'v': None,
+            'synapse': None}
 
         # Create a dict of variable name -> bool array of indices in population
         # that are recorded (initially all False)

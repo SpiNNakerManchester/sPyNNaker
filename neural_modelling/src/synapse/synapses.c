@@ -50,11 +50,14 @@ static weight_t *synaptic_region;
 // Size of the memory chunk containing this timestep's ring buffers
 static size_t size_to_be_transferred;
 
+// Recording
+static uint32_t n_recorded_vars;
+
 //! parameters that reside in the synapse_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_synapse_parameter_data_region {
     N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES, INCOMING_SPIKE_BUFFER_SIZE,
-    SYNAPSE_INDEX, MEM_INDEX, OFFSET, RING_BUFFER_LEFT_SHIFT,
+    SYNAPSE_INDEX, MEM_INDEX, OFFSET, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_synapse_parameter_data_region;
 
 
@@ -270,11 +273,13 @@ bool synapses_initialise(
 
     offset = synapse_params_address[OFFSET];
 
+    n_recorded_vars = synapse_params_address[N_RECORDED_VARIABLES]
+
     // Set up ring buffer left shifts
     ring_buffer_to_input_left_shifts = (uint32_t *) spin1_malloc(
         n_synapse_types * sizeof(uint32_t));
     spin1_memcpy(
-    ring_buffer_to_input_left_shifts, synapse_params_address + RING_BUFFER_LEFT_SHIFT,
+    ring_buffer_to_input_left_shifts, synapse_params_address + START_OF_GLOBAL_PARAMETERS,
         n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
         ring_buffer_to_input_left_shifts;
