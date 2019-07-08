@@ -4,13 +4,10 @@ except ImportError:
     from collections import defaultdict
 import math
 import struct
-import sys
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
-from pacman.model.graphs.application.application_vertex import (
-    ApplicationVertex)
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -247,10 +244,7 @@ class SynapticManager(object):
                 for synapse_info in in_edge.synapse_information:
 
                     # Get the number of likely vertices
-                    max_atoms = sys.maxsize
-                    edge_pre_vertex = in_edge.pre_vertex
-                    if (isinstance(edge_pre_vertex, ApplicationVertex)):
-                        max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
                         max_atoms = in_edge.pre_vertex.n_atoms
                     n_edge_vertices = int(math.ceil(
@@ -587,6 +581,9 @@ class SynapticManager(object):
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
 
+        # Store a full list of synapse info in the order written to blocks
+        synapse_infos = list()
+
         # For each machine edge in the vertex, create a synaptic list
         for machine_edge in in_edges:
             app_edge = graph_mapper.get_application_edge(machine_edge)
@@ -632,10 +629,18 @@ class SynapticManager(object):
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
 
+                        # Add a distinct synapse info (determined by
+                        # connector) to the list of synapse info
+                        connector_found = False
+                        for n in range(len(synapse_infos)):
+                            if (synapse_infos[n].connector is connector):
+                                connector_found = True
+                        if not connector_found:
+                            synapse_infos.append(synapse_info)
+
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
-        # numpy.random.shuffle(order)
         for gen_data in generate_on_machine:
             (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
                 app_edge, rinfo) = gen_data
@@ -646,6 +651,19 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
+
+            # Add a distinct synapse info (determined by
+            # connector) to the list of synapse info
+            connector_found = False
+            for n in range(len(synapse_infos)):
+                if (synapse_infos[n].connector is connector):
+                    connector_found = True
+            if not connector_found:
+                synapse_infos.append(synapse_info)
+
+        # Loop over synapse infos as collected above and assign index in order
+        for n in range(len(synapse_infos)):
+            synapse_infos[n].index = n
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
