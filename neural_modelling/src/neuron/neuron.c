@@ -409,7 +409,7 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     log_debug("neuron_initialise: starting");
 
-    *timer_offset = address[TIMER_START_OFFSET];
+    *timer_offset = 0; // address[TIMER_START_OFFSET];
     time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
     log_debug(
         "\t back off = %u, time between spikes %u",
