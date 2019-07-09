@@ -1457,7 +1457,7 @@ class SynapticManager(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "tags": "MemoryTags",
+        "data_n_time_steps": "DataNTimeSteps",
         "placements": "MemoryPlacements",
     })
     @overrides(
@@ -1465,7 +1465,7 @@ class SynapticManager(
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "tags", "placements",
+            "data_n_time_steps", "placements",
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
@@ -1845,7 +1845,7 @@ class SynapticManager(
     @overrides(AbstractSynapseRecordable.set_synapse_recording)
     def set_synapse_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
-        self.__change_requires_mapping = not self.is_recording(variable)
+        self.__change_requires_mapping = not self.is_recording_synapses(variable)
         self.__synapse_recorder.set_recording(variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractSynapseRecordable.get_synapse_data)

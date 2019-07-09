@@ -53,7 +53,7 @@ class SynapseRecorder(object):
     def __init__(self, allowed_variables, n_neurons):
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
-        self.__n_neurons = n_neurons
+        self.__n_neurons = 1
         for variable in allowed_variables:
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
@@ -62,18 +62,22 @@ class SynapseRecorder(object):
         if self.__sampling_rates[variable] == 0:
             return 0
         if self.__indexes[variable] is None:
-            return vertex_slice.n_atoms
-        return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                   for index in self.__indexes[variable])
+            #return vertex_slice.n_atoms
+            return 1
+        # return sum(vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
+        #            for index in self.__indexes[variable])
+        return 1
 
     def _neurons_recording(self, variable, vertex_slice):
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
-            return range(vertex_slice.lo_atom, vertex_slice.hi_atom+1)
+            #return range(vertex_slice.lo_atom, vertex_slice.hi_atom+1)
+            return [0]
         recording = []
         indexes = self.__indexes[variable]
-        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+        #for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+        for index in xrange(1):
             if index in indexes:
                 recording.append(index)
         return recording
@@ -105,9 +109,7 @@ class SynapseRecorder(object):
         :param n_machine_time_steps:
         :return:
         """
-        if variable == SPIKES:
-            msg = "Variable {} is not supported use get_spikes".format(SPIKES)
-            raise ConfigurationException(msg)
+
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
@@ -175,7 +177,7 @@ class SynapseRecorder(object):
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
-        sampling_interval = self.get_neuron_sampling_interval(variable)
+        sampling_interval = self.get_synapse_sampling_interval(variable)
         return (data, indexes, sampling_interval)
 
 
@@ -414,12 +416,14 @@ class SynapseRecorder(object):
         return data_size * records
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
-        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        #n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        n_words_for_n_neurons = (1 + 3) // 4
         n_bytes_for_n_neurons = n_words_for_n_neurons * 4
         return (8 + n_bytes_for_n_neurons) * len(self.__sampling_rates)
 
     def _get_fixed_sdram_usage(self, vertex_slice):
-        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        #total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
+        total_neurons = 1
         fixed_sdram = 0
         # Recording rate for each neuron
         fixed_sdram += self.N_BYTES_PER_RATE
@@ -458,8 +462,9 @@ class SynapseRecorder(object):
         usage += len(self.__sampling_rates) * self.N_BYTES_PER_POINTER * 2
         # out_spikes, *_values
         for variable in self.__sampling_rates:
-            usage += (self.N_BYTES_FOR_TIMESTAMP +
-                      vertex_slice.n_atoms * self.N_BYTES_PER_VALUE)
+            # usage += (self.N_BYTES_FOR_TIMESTAMP +
+            #           vertex_slice.n_atoms * self.N_BYTES_PER_VALUE)
+            usage += (self.N_BYTES_FOR_TIMESTAMP + self.N_BYTES_PER_VALUE)
         # *_size
         usage += len(self.__sampling_rates) * self.N_BYTES_PER_SIZE
         # n_recordings_outstanding
@@ -467,12 +472,14 @@ class SynapseRecorder(object):
         return usage
 
     def get_n_cpu_cycles(self, n_neurons):
-        return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
-                len(self.recording_variables)
+        # return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
+        #         len(self.recording_variables)
+        return self.N_CPU_CYCLES_PER_NEURON * len(self.recording_variables)
 
     def get_data(self, vertex_slice):
         data = list()
-        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        # n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
+        n_words_for_n_neurons = (1 + 3) // 4
         n_bytes_for_n_neurons = n_words_for_n_neurons * 4
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
@@ -489,7 +496,7 @@ class SynapseRecorder(object):
                 local_index = 0
                 local_indexes = list()
                 for index in xrange(n_bytes_for_n_neurons):
-                    if index + vertex_slice.lo_atom in indexes:
+                    if index + (vertex_slice.lo_atom // vertex_slice.n_atoms) in indexes:
                         local_indexes.append(local_index)
                         local_index += 1
                     else:
@@ -519,9 +526,10 @@ class SynapseRecorder(object):
                 local_indexes = IndexIsValue()
             else:
                 local_indexes = []
-                n_recording = sum(
-                    vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                    for index in self.__indexes[variable])
+                # n_recording = sum(
+                #     vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
+                #     for index in self.__indexes[variable])
+                n_recording = 1
                 indexes = self.__indexes[variable]
                 local_index = 0
                 for index in xrange(

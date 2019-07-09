@@ -158,12 +158,12 @@ class RecordingCommon(object):
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
         return self.pynn7_format(data, ids, sampling_interval)
 
-    def _get_recorded_matrix(self, variable):
+    def _get_recorded_synapse_matrix(self, variable):
         """ Perform safety checks and get the recorded data from the vertex\
             in matrix format.
 
         :param variable: the variable name to read. supported variable names
-            are :'gsyn_exc', 'gsyn_inh', 'v', 'synapse'
+            are : 'synapse'
         :return: the data
         """
         timer = Timer()
@@ -180,9 +180,68 @@ class RecordingCommon(object):
 
         # check that we're in a state to get voltages
         if not isinstance(
-                vertex, AbstractNeuronRecordable) or \
-            not isinstance(
                 vertex, AbstractSynapseRecordable):
+            raise ConfigurationException(
+                "This population has not got the capability to record {}"
+                .format(variable))
+
+        if not vertex.is_recording_synapses(variable):
+            raise ConfigurationException(
+                "This population has not been set to record {}"
+                .format(variable))
+
+        if not sim.has_ran:
+            logger.warning(
+                "The simulation has not yet run, therefore {} cannot"
+                " be retrieved, hence the list will be empty".format(
+                    variable))
+            data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = vertex.\
+                get_synapse_sampling_interval(variable)
+        elif sim.use_virtual_board:
+            logger.warning(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
+            data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = vertex.\
+                get_synapse_sampling_interval(variable)
+        else:
+            # assuming we got here, everything is ok, so we should go get the
+            # data
+            results = vertex.get_synapse_data(
+                variable, sim.no_machine_time_steps, sim.placements,
+                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
+
+        get_simulator().add_extraction_timing(
+            timer.take_sample())
+        return (data, indexes, sampling_interval)
+
+    def _get_recorded_matrix(self, variable):
+        """ Perform safety checks and get the recorded data from the vertex\
+            in matrix format.
+
+        :param variable: the variable name to read. supported variable names
+            are :'gsyn_exc', 'gsyn_inh', 'v'
+        :return: the data
+        """
+        timer = Timer()
+        timer.start_timing()
+        data = None
+        sim = get_simulator()
+
+        get_simulator().verify_not_running()
+
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
+        else:
+            vertex = self.__population._vertex
+
+        # check that we're in a state to get voltages
+        if not isinstance(
+                vertex, AbstractNeuronRecordable):
             raise ConfigurationException(
                 "This population has not got the capability to record {}"
                 .format(variable))
@@ -212,14 +271,9 @@ class RecordingCommon(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            if variable == "synapse":
-                results = vertex.get_synapse_data(
-                    variable, sim.no_machine_time_steps, sim.placements,
-                    sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
-            else:
-                results = vertex.get_data(
-                    variable, sim.no_machine_time_steps, sim.placements,
-                    sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            results = vertex.get_data(
+                variable, sim.no_machine_time_steps, sim.placements,
+                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
             (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
