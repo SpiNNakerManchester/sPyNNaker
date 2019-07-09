@@ -32,8 +32,10 @@ class _MasterPopEntry(object):
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
+        index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append(
             (address, row_length, is_single))
+        return index
 
     @property
     def routing_key(self):
@@ -191,7 +193,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         :param master_pop_table_region: the region ID for the master pop
         :param is_single: \
             Flag that states if the entry is a direct entry for a single row.
-        :rtype: None
+        :return: The index of the entry, to be used to retrieve it
+        :rtype: int
         """
         # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self.__entries:
@@ -202,9 +205,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # if single, don' t add to start address as its going in its own block
         if not is_single:
             start_addr = block_start_addr // self.ADDRESS_SCALE
-        self.__entries[key_and_mask.key].append(
+        index = self.__entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self.__n_addresses += 1
+        return index
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
