@@ -653,6 +653,7 @@ class SynapticManager(object):
             key = (synapse_info, pre_vertex_slice.lo_atom,
                    post_vertex_slice.lo_atom)
             self.__synapse_indices[key] = index
+            index += 1
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
