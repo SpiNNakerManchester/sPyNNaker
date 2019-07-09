@@ -7,7 +7,6 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from six import iteritems
 from spinn_utilities.helpful_functions import get_valid_components
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -72,7 +71,7 @@ class SynapticManager(object):
         "__ring_buffer_shifts",
         "__gen_on_machine",
         "__max_row_info",
-        "__synaptic_indices"]
+        "__synapse_indices"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -587,7 +586,7 @@ class SynapticManager(object):
         generate_on_machine = list()
 
         # Store synapse information by projection edge to get indices
-        synapse_infos = defaultdict(list)
+        index = 0
 
         # For each machine edge in the vertex, create a synaptic list
         for machine_edge in in_edges:
@@ -633,8 +632,10 @@ class SynapticManager(object):
                             weight_scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
-
-                        synapse_infos[app_edge].append(synapse_info)
+                        key = (synapse_info, pre_vertex_slice.lo_atom,
+                               post_vertex_slice.lo_atom)
+                        self.__synapse_indices[key] = index
+                        index += 1
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
@@ -649,13 +650,9 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
-
-            synapse_infos[app_edge].append(synapse_info)
-
-        # Loop over synapse infos as collected above and assign index in order
-        for app_edge, infos in iteritems(synapse_infos):
-            for i, info in enumerate(infos):
-                info.index = i
+            key = (synapse_info, pre_vertex_slice.lo_atom,
+                   post_vertex_slice.lo_atom)
+            self.__synapse_indices[key] = index
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -994,11 +991,14 @@ class SynapticManager(object):
                 pre_vertex_slice.hi_atom].first_key
 
         # Get the block for the connections from the pre_vertex
+        synapse_key = (synapse_info, pre_vertex_slice.lo_atom,
+                       post_vertex_slice.lo_atom)
+        index = self.__synapse_indices[synapse_key]
         master_pop_table, direct_synapses, indirect_synapses = \
             self.__compute_addresses(transceiver, placement)
         data, max_row_length = self._retrieve_synaptic_block(
             transceiver, placement, master_pop_table, indirect_synapses,
-            direct_synapses, key, pre_vertex_slice.n_atoms, synapse_info.index,
+            direct_synapses, key, pre_vertex_slice.n_atoms, index,
             using_extra_monitor_cores, placements, monitor_api,
             monitor_placement, monitor_cores, fixed_routes)
 
@@ -1010,7 +1010,7 @@ class SynapticManager(object):
                 transceiver, placement, master_pop_table, indirect_synapses,
                 direct_synapses, delayed_key,
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
-                synapse_info.index, using_extra_monitor_cores, placements,
+                index, using_extra_monitor_cores, placements,
                 monitor_api, monitor_placement, monitor_cores,
                 handle_time_out_configuration, fixed_routes)
 

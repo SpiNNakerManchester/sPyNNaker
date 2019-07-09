@@ -30,7 +30,6 @@ class ProjectionApplicationEdge(ApplicationEdge):
         self.__stored_synaptic_data_from_machine = None
 
     def add_synapse_information(self, synapse_information):
-        synapse_information.index = len(self.__synapse_information)
         self.__synapse_information.append(synapse_information)
 
     @property
