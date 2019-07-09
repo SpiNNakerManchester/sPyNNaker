@@ -4,7 +4,6 @@ class SynapseInformation(object):
     """
     __slots__ = [
         "__connector",
-        "__index",
         "__synapse_dynamics",
         "__synapse_type",
         "__weight",
@@ -15,7 +14,6 @@ class SynapseInformation(object):
         self.__connector = connector
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
-        self.__index = 0
         self.__weight = weight
         self.__delay = delay
 
@@ -30,14 +28,6 @@ class SynapseInformation(object):
     @property
     def synapse_type(self):
         return self.__synapse_type
-
-    @property
-    def index(self):
-        return self.__index
-
-    @index.setter
-    def index(self, index):
-        self.__index = index
 
     @property
     def weight(self):

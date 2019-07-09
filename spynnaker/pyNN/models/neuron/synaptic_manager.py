@@ -71,7 +71,8 @@ class SynapticManager(object):
         "__weight_scales",
         "__ring_buffer_shifts",
         "__gen_on_machine",
-        "__max_row_info"]
+        "__max_row_info",
+        "__synaptic_indices"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -125,6 +126,9 @@ class SynapticManager(object):
         # A map of synapse information to maximum row / delayed row length and
         # size in bytes
         self.__max_row_info = dict()
+
+        # A map of synapse information for each machine pre vertex to index
+        self.__synapse_indices = dict()
 
     @property
     def synapse_dynamics(self):
