@@ -68,7 +68,7 @@ from .key_space_tracker import KeySpaceTracker
 TIME_STAMP_BYTES = 4
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
+_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 36
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 12
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
@@ -128,7 +128,7 @@ class SynapticManager(
 
     BASIC_MALLOC_USAGE = 2
 
-    BYTES_FOR_SYNAPSE_PARAMS = 32
+    BYTES_FOR_SYNAPSE_PARAMS = 36
 
     _n_vertices = 0
 
@@ -1443,6 +1443,18 @@ class SynapticManager(
 
         # Number of variables that can be recorded
         spec.write_value(len(self.RECORDABLES))
+
+        # Check if we are recording something
+        recording = False
+        for v in self.RECORDABLES:
+            if self.is_recording_synapses(v):
+                recording = True
+
+        # Tell the core if we are recording
+        if recording:
+            spec.write_value(1)
+        else:
+            spec.write_value(0)
 
         spec.write_array(self._ring_buffer_shifts)
 

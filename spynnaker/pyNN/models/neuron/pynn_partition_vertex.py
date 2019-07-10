@@ -362,15 +362,16 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     @overrides(AbstractSynapseRecordable.get_synapse_data)
     def get_synapse_data(self, variable, n_machine_time_steps, placements,
                  graph_mapper, buffer_manager, machine_time_step):
-        in_spikes = list()
+        in_spikes = dict()
 
         for vertex in range(len(self._synapse_vertices[0])):
             for partition in range(len(self._synapse_vertices)):
-                in_spikes.extend(self._synapse_vertices[partition][vertex].\
+                (data, index, sampling_interval) = self._synapse_vertices[partition][vertex].\
                                  get_synapse_data(variable, n_machine_time_steps, placements,
-                                                  graph_mapper, buffer_manager, machine_time_step))
+                                                  graph_mapper, buffer_manager, machine_time_step)
+                in_spikes.update(data)
 
-        return in_spikes
+        return (in_spikes, index, sampling_interval)
 
 
     # def add_pre_run_connection_holder(

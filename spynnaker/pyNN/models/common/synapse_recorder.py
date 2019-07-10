@@ -117,7 +117,7 @@ class SynapseRecorder(object):
         expected_rows = int(math.ceil(
             n_machine_time_steps / sampling_rate))
         missing_str = ""
-        data = None
+        data = dict()
         indexes = []
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
@@ -168,11 +168,11 @@ class SynapseRecorder(object):
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
-            if data is None:
-                data = fragment
+            if vertex.label not in data.keys():
+                data[vertex.label] = fragment
             else:
                 # Add the slice fragment on axis 1 which is IDs/channel_index
-                data = numpy.append(data, fragment, axis=1)
+                data[vertex.label] = numpy.append(data[vertex.label], fragment, axis=1)
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
