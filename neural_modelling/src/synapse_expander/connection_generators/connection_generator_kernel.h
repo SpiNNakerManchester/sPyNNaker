@@ -4,6 +4,7 @@
  */
 
 #include <stdbool.h>
+#include <synapse_expander/common_kernel.h>
 
 /**
  *! \brief The parameters to be passed around for this connector
@@ -56,57 +57,6 @@ void connection_generator_kernel_free(void *data) {
     sark_free(data);
 }
 
-// Note: the following three functions are used here and in param_generator_kernel.h
-uint16_t uidiv2(uint16_t dividend, uint16_t divider, uint16_t *reminder) {
-    if (dividend == 0 || dividend < divider) {
-        *reminder = dividend;
-        return 0;
-    }
-
-    uint16_t d = 0;
-    *reminder = dividend;
-    while (*reminder >= divider) {
-        d += 1;
-        *reminder -= divider;
-    }
-    return d;
-}
-
-void post_in_pre_world2(uint16_t in_row, uint16_t in_col,
-        uint16_t start_row, uint16_t start_col,
-        uint16_t step_row, uint16_t step_col,
-        uint16_t *out_row, uint16_t *out_col) {
-    *out_row = start_row + in_row * step_row;
-    *out_col = start_col + in_col * step_col;
-}
-
-void pre_in_post_world2(uint16_t in_row, uint16_t in_col, uint16_t start_row,
-        uint16_t start_col, uint16_t step_row, uint16_t step_col,
-        int16_t *out_row, int16_t *out_col) {
-    int16_t d = (int16_t) (in_row - start_row - 1);
-    uint16_t r;
-    if (d == 0) {
-        *out_row = 1;
-    } else if (d < 0) {
-        d = (int16_t) uidiv2((uint16_t) (-d), step_row, &r);
-        *out_row = (-d + 1);
-    } else {
-        d = (int16_t) uidiv2((uint16_t) (d), step_row, &r);
-        *out_row = (d + 1);
-    }
-
-    d = (int16_t) (in_col - start_col - 1);
-    if (d == 0) {
-        *out_col = 1;
-    } else if (d < 0) {
-        d = (int16_t) uidiv2((uint16_t) (-d), step_col, &r);
-        *out_col = (-d + 1);
-    } else {
-        d = (int16_t) uidiv2((uint16_t) (d), step_col, &r);
-        *out_col = (d + 1);
-    }
-}
-
 uint32_t connection_generator_kernel_generate(
         void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
@@ -127,7 +77,7 @@ uint32_t connection_generator_kernel_generate(
     uint32_t n_conns = 0;
 
     uint16_t pre_c = 0;
-    uint16_t pre_r = uidiv2(pre_neuron_index, params->m_preWidth, &pre_c);
+    uint16_t pre_r = uidiv(pre_neuron_index, params->m_preWidth, &pre_c);
 
     uint16_t hlf_kw = params->m_kernelWidth >> 1;
     uint16_t hlf_kh = params->m_kernelHeight >> 1;
@@ -136,16 +86,16 @@ uint32_t connection_generator_kernel_generate(
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre
-        post_r = uidiv2(post_slice_start + i,
+        post_r = uidiv(post_slice_start + i,
             params->m_postWidth, &post_c);
 
         //move post coords into common coordinate system
-        post_in_pre_world2(post_r, post_c, params->m_startPostHeight,
+        post_in_pre_world(post_r, post_c, params->m_startPostHeight,
             params->m_startPostWidth, params->m_stepPostHeight,
             params->m_stepPostWidth, &pac_r, &pac_c);
 
         //move common to pre coords
-        pre_in_post_world2(
+        pre_in_post_world(
             pac_r, pac_c, params->m_startPreHeight, params->m_startPreHeight,
             params->m_stepPreHeight, params->m_stepPreWidth, &pap_r, &pap_c);
 

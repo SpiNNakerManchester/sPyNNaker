@@ -1,6 +1,7 @@
 #include <stdfix.h>
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>
+#include <synapse_expander/common_kernel.h>
 
 struct param_generator_kernel {
     uint16_t m_commonWidth;
@@ -49,56 +50,6 @@ void param_generator_kernel_free(void *data) {
     sark_free(data);
 }
 
-// Note: the following three functions are used here and in connector_generator_kernel.h
-uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *reminder) {
-    if (dividend == 0 || dividend < divider) {
-        *reminder = dividend;
-        return 0;
-    }
-
-    uint16_t d = 0;
-    *reminder = dividend;
-    while (*reminder >= divider) {
-        d += 1;
-        *reminder -= divider;
-    }
-    return d;
-}
-
-void post_in_pre_world(uint16_t in_row, uint16_t in_col,
-        uint16_t start_row, uint16_t start_col,
-        uint16_t step_row, uint16_t step_col,
-        uint16_t *out_row, uint16_t *out_col) {
-    *out_row = start_row + in_row * step_row;
-    *out_col = start_col + in_col * step_col;
-}
-
-void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
-        uint16_t start_col, uint16_t step_row, uint16_t step_col,
-        int16_t *out_row, int16_t *out_col) {
-    int16_t d = (int16_t) (in_row - start_row - 1);
-    uint16_t r;
-    if (d == 0) {
-        *out_row = 1;
-    } else if (d < 0) {
-        d = (int16_t) uidiv((uint16_t) (-d), step_row, &r);
-        *out_row = (-d + 1);
-    } else {
-        d = (int16_t) uidiv((uint16_t) (d), step_row, &r);
-        *out_row = (d + 1);
-    }
-
-    d = (int16_t) (in_col - start_col - 1);
-    if (d == 0) {
-        *out_col = 1;
-    } else if (d < 0) {
-        d = (int16_t) uidiv((uint16_t) (-d), step_col, &r);
-        *out_col = (-d + 1);
-    } else {
-        d = (int16_t) uidiv((uint16_t) (d), step_col, &r);
-        *out_col = (d + 1);
-    }
-}
 
 void param_generator_kernel_generate(void *data, uint32_t n_synapses,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
@@ -113,8 +64,6 @@ void param_generator_kernel_generate(void *data, uint32_t n_synapses,
     uint16_t hlf_kh = params->m_kernelHeight >> 1;
     int16_t k_r, k_c;
     for (uint16_t i = 0; i < n_synapses; i++) {
-    	// the question here is whether this calculation is necessary again
-    	// as it was already done in connection_generator_kernel.h
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre
