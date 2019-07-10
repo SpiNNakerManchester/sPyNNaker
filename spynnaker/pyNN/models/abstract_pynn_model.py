@@ -15,6 +15,7 @@ class AbstractPyNNModel(object):
     """ A Model that can be passed in to a Population object in PyNN
     """
 
+    __slots__ = []
     _max_atoms_per_core = defaultdict(lambda: sys.maxsize)
 
     @classmethod

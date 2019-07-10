@@ -104,21 +104,21 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         first_block, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         same_block, row_len_1_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         synaptic_manager.clear_connection_cache()
         different_block, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
 
         # Check that the row lengths are all the same
         assert row_len_1 == row_len_1_2
@@ -158,15 +158,15 @@ class TestSynapticManager(unittest.TestCase):
         placement = Placement(None, 0, 0, 1)
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=0,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=0, indirect_synapses_address=0,
             direct_synapses_address=0, key=key, n_rows=n_rows, index=1,
-            using_extra_monitor_cores=False)
+            using_monitors=False)
 
         # Row lengths should be 1
         assert row_len_1 == 1
@@ -292,10 +292,8 @@ class TestSynapticManager(unittest.TestCase):
         transceiver = MockTransceiverRawData(all_data)
 
         # Get the master population table details
-        items = synaptic_manager._poptable_type\
-            .extract_synaptic_matrix_data_location(
-                key, master_pop_table_address, transceiver,
-                placement.x, placement.y)
+        items = synaptic_manager._extract_synaptic_matrix_data_location(
+            key, master_pop_table_address, transceiver, placement)
 
         # The first entry should be direct, but the rest should be indirect;
         # the second is potentially direct, but has been restricted by the
@@ -306,13 +304,13 @@ class TestSynapticManager(unittest.TestCase):
         assert not items[2][2]
 
         data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=0,
-            using_extra_monitor_cores=False)
-        connections_1 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
             row_len_1, 0, 2, weight_scales, data_1, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -326,13 +324,13 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 1.0 for conn in connections_1])
 
         data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=1,
-            using_extra_monitor_cores=False)
-        connections_2 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
             row_len_2, 0, 2, weight_scales, data_2, None,
             app_edge.n_delay_stages, machine_time_step)
@@ -346,13 +344,13 @@ class TestSynapticManager(unittest.TestCase):
         assert all([conn["delay"] == 2.0 for conn in connections_2])
 
         data_3, row_len_3 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
+            txrx=transceiver, placement=placement,
             master_pop_table_address=master_pop_table_address,
             indirect_synapses_address=indirect_synapses_address,
             direct_synapses_address=direct_synapses_address, key=key,
             n_rows=pre_vertex_slice.n_atoms, index=2,
-            using_extra_monitor_cores=False)
-        connections_3 = synaptic_manager._synapse_io.read_synapses(
+            using_monitors=False)
+        connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
             app_edge.n_delay_stages, machine_time_step)

@@ -12,3 +12,4 @@ lxml
 six
 matplotlib
 csa
+# spinnaker_tools
