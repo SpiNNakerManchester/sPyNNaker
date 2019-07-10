@@ -20,7 +20,6 @@ def shape2word(sw, sh):
             (numpy.uint32(sw) & 0xFFFF))
 
 
-# class KernelConnector(AbstractConnector):
 class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
     Where the pre- and post-synaptic populations are considered as a 2D array.
@@ -113,13 +112,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         self._shape_post = shape_post
 
         # Create storage for later
-        self._pre_in_range = {}
-        self._all_post = {}
-        self._all_pre_in_range = {}
-        self._all_pre_in_range_delays = {}
-        self._all_pre_in_range_weights = {}
         self._post_as_pre = {}
-        self._num_conns = {}
 
     # Get a list of possible post-slice coordinates
     def to_post_coords(self, post_vertex_slice):
@@ -168,26 +161,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             "weight and/or delay kernel then ensure they are the same size "
             "as specified by the shape kernel values.")
 
-    # Initialise relevant pre-slice arrays
-    def init_pre_entries(self, pre_vertex_slice_str):
-        if pre_vertex_slice_str not in self._num_conns:
-            self._num_conns[pre_vertex_slice_str] = {}
-
-        if pre_vertex_slice_str not in self._pre_in_range:
-            self._pre_in_range[pre_vertex_slice_str] = {}
-
-        if pre_vertex_slice_str not in self._all_post:
-            self._all_post[pre_vertex_slice_str] = {}
-
-        if pre_vertex_slice_str not in self._all_pre_in_range:
-            self._all_pre_in_range[pre_vertex_slice_str] = {}
-
-        if pre_vertex_slice_str not in self._all_pre_in_range_delays:
-            self._all_pre_in_range_delays[pre_vertex_slice_str] = {}
-
-        if pre_vertex_slice_str not in self._all_pre_in_range_weights:
-            self._all_pre_in_range_weights[pre_vertex_slice_str] = {}
-
     # Compute the relevant information required for the connections
     def compute_statistics(
             self, weights, delays, pre_vertex_slice, post_vertex_slice):
@@ -197,11 +170,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._krn_weights = self.get_kernel_vals(weights)
         if self._krn_delays is None:
             self._krn_delays = self.get_kernel_vals(delays)
-
-        # Set up initial structures
-        pre_vs = str(pre_vertex_slice)
-        post_vs = str(post_vertex_slice)
-        self.init_pre_entries(pre_vs)
 
         post_as_pre_r, post_as_pre_c = self.post_as_pre(post_vertex_slice)
         coords = {}
@@ -257,27 +225,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                     all_delays.append(d)
                     all_weights.append(w)
 
-        # Now the loop is complete, store relevant data
-        self._num_conns[pre_vs][post_vs] = count
-        self._all_post[pre_vs][post_vs] = numpy.array(
-            all_post_ids, dtype='uint32')
-        self._all_pre_in_range[pre_vs][post_vs] = numpy.array(
-            all_pre_ids, dtype='uint32')
-        self._all_pre_in_range_delays[pre_vs][post_vs] = numpy.array(
-            all_delays)
-        self._all_pre_in_range_weights[pre_vs][post_vs] = numpy.array(
-            all_weights)
-
-    # Get the number of connections
-    def get_num_conns(
-            self, weights, delays, pre_vertex_slice, post_vertex_slice):
-        if (str(pre_vertex_slice) not in self._num_conns or
-                str(post_vertex_slice) not in
-                self._num_conns[str(pre_vertex_slice)]):
-            self.compute_statistics(weights, delays,
-                                    pre_vertex_slice, post_vertex_slice)
-
-        return self._num_conns[str(pre_vertex_slice)][str(post_vertex_slice)]
+        # Now the loop is complete, return relevant data
+        return (count, numpy.array(all_post_ids, dtype='uint32'),
+                numpy.array(all_pre_ids, dtype='uint32'),
+                numpy.array(all_delays), numpy.array(all_weights))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
@@ -327,8 +278,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        n_connections = self.get_num_conns(weights, delays,
-                                           pre_vertex_slice, post_vertex_slice)
+        (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
+         all_pre_in_range_weights) = self.compute_statistics(
+            weights, delays, pre_vertex_slice, post_vertex_slice)
 
         syn_dtypes = AbstractConnector.NUMPY_SYNAPSES_DTYPE
 
@@ -339,13 +291,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         post_vs = str(post_vertex_slice)
 
         # 0 for exc, 1 for inh
-        syn_type = numpy.array(
-            self._all_pre_in_range_weights[pre_vs][post_vs] < 0)
+        syn_type = numpy.array(all_pre_in_range_weights < 0)
         block = numpy.zeros(n_connections, dtype=syn_dtypes)
-        block["source"] = self._all_pre_in_range[pre_vs][post_vs]
-        block["target"] = self._all_post[pre_vs][post_vs]
-        block["weight"] = self._all_pre_in_range_weights[pre_vs][post_vs]
-        block["delay"] = self._all_pre_in_range_delays[pre_vs][post_vs]
+        block["source"] = all_pre_in_range
+        block["target"] = all_post
+        block["weight"] = all_pre_in_range_weights
+        block["delay"] = all_pre_in_range_delays
         block["synapse_type"] = syn_type.astype('uint8')
         return block
 
