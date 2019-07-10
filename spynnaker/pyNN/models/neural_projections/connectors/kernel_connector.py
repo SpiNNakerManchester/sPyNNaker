@@ -287,9 +287,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if n_connections <= 0:
             return numpy.zeros(0, dtype=syn_dtypes)
 
-        pre_vs = str(pre_vertex_slice)
-        post_vs = str(post_vertex_slice)
-
         # 0 for exc, 1 for inh
         syn_type = numpy.array(all_pre_in_range_weights < 0)
         block = numpy.zeros(n_connections, dtype=syn_dtypes)
