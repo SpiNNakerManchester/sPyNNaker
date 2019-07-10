@@ -279,9 +279,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             values, n_connections, connection_slices)
         if self.__safe:
             if not weights.size:
-                logger_utils.warn_once(logger,
-                                       "No connection in " + str(self))
-#                logger.warning("No connection in " + str(self))
+                logger_utils.warn_once(logger, "No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"

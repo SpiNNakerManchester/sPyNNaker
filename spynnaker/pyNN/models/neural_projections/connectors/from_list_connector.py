@@ -133,7 +133,7 @@ class FromListConnector(AbstractConnector):
         pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
                          for post in post_bins[1:]]
         self.__split_conn_list = {
-            (pre_post): indices
+            pre_post: indices
             for pre_post, indices in zip(pre_post_bins, split_indices)
         }
 
@@ -216,7 +216,9 @@ class FromListConnector(AbstractConnector):
             indices = self.__split_conn_list[
                 (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
         except Exception as e:
+            a = 1 + 1
             print("WTF")
+            print(e)
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
