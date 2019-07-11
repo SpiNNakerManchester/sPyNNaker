@@ -50,6 +50,10 @@ class SynapseRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
+    _RECORDABLE_UNITS = {
+        'synapse': 'mV'
+    }
+
     def __init__(self, allowed_variables, n_neurons):
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
@@ -146,8 +150,7 @@ class SynapseRecorder(object):
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
-                # fragment = (record[:, 1:] / float(DataType.S1615.scale))
-                fragment = record[:, 1:]
+                fragment = (record[:, 1:] / float(DataType.S1615.scale))
             else:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
@@ -158,9 +161,8 @@ class SynapseRecorder(object):
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
                     if len(local_indexes[0]) == 1:
-                        # fragment[i] = (record[local_indexes[0], 1:] /
-                        #                float(DataType.S1615.scale))
-                        fragment[i] = record[local_indexes[0], 1:]
+                        fragment[i] = (record[local_indexes[0], 1:] /
+                                       float(DataType.S1615.scale))
                     elif len(local_indexes[0]) > 1:
                         logger.warning(
                             "Population {} on multiple recorded data for "
@@ -546,3 +548,6 @@ class SynapseRecorder(object):
     @property
     def _indexes(self):  # for testing only
         return _ReadOnlyDict(self.__indexes)
+
+    def get_recordable_units(self, variable):
+        return self._RECORDABLE_UNITS[variable]

@@ -83,7 +83,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 if self._n_syn_types > 1 and index == 0:
 
                     vertex = SynapticManager(1, 0, atoms, self._offset*i, syn_constraints,
-                                             label + "_" + str(i) + "_low_syn_vertex_" + str(index),
+                                             label + "_p" + str(i) + "_low_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                              self._n_syn_types)
@@ -92,7 +92,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                     syn_vertices.append(vertex)
 
                     vertex = SynapticManager(1, 0, atoms, self._offset*i, syn_constraints,
-                                             label + "_" + str(i) + "_high_syn_vertex_" + str(index),
+                                             label + "_p" + str(i) + "_high_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                              self._n_syn_types)
@@ -103,7 +103,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 else:
 
                     vertex = SynapticManager(1, index, atoms, self._offset*i, syn_constraints,
-                                             label + "_" + str(i) + "_syn_vertex_" + str(index),
+                                             label + "_p" + str(i) + "_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
                                              self._n_syn_types)
@@ -206,6 +206,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                         machine_vertex))
 
     def get_units(self, variable):
+        if variable == 'synapse':
+            return self._synapse_vertices[0][0].get_units(variable)
         return self._neuron_vertices[0].get_units(variable)
 
     def mark_no_changes(self):

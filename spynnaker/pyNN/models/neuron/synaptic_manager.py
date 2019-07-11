@@ -1903,6 +1903,11 @@ class SynapticManager(
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
 
+    def get_units(self, variable):
+        if variable in self.RECORDABLES:
+            return self._synapse_recorder.get_recordable_units(variable)
+        raise Exception("Population does not have parameter {}".format(variable))
+
     def get_machine_vertex_at(self, low, high):
 
         vertices = list()
