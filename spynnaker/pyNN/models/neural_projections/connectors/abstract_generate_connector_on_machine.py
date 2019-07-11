@@ -35,6 +35,8 @@ PARAM_TYPE_BY_NAME = {
     "exponential": 5
 }
 
+PARAM_TYPE_KERNEL = 6
+
 
 # Hashes of the connection generators supported by the synapse expander
 class ConnectorIDs(Enum):
@@ -44,6 +46,7 @@ class ConnectorIDs(Enum):
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
     FIXED_NUMBER_PRE_CONNECTOR = 4
     FIXED_NUMBER_POST_CONNECTOR = 5
+    KERNEL_CONNECTOR = 6
 
 
 class AbstractGenerateConnectorOnMachine(with_metaclass(
