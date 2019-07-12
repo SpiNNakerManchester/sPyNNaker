@@ -5,3 +5,4 @@
 **/application_generated_data_files/**
 **/*.aplx
 **/*.json
+**/neural_modelling/builds/**/*.txt

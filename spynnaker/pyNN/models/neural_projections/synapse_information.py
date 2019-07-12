@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
         and synapse dynamics
