@@ -20,7 +20,8 @@ python:
   - 3.7
 dist: xenial
 cache: pip
-
+env:
+  - MPLBACKEND=module://matplotlib.backends.backend_agg
 addons:
   apt:
     packages:
