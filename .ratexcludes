@@ -1,5 +1,6 @@
 **/spinnaker_tools/**
 **/spinn_common/**
+**/SpiNNFrontEndCommon/**
 **/modified_src/**
 **/reports/**
 **/application_generated_data_files/**
