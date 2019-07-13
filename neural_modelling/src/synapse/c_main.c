@@ -125,6 +125,9 @@ void write_contributions(uint unused1, uint unused2) {
 
         cb_calls++;
 
+        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
+        spikes_remaining += spikes_remaining_this_tick;
+
 //        volatile uint32_t temp = tc[T1_COUNT];
 //        io_printf(IO_BUF, "w_c s: %u, %u\n", temp, tc[T2_COUNT]);
 
@@ -133,8 +136,6 @@ void write_contributions(uint unused1, uint unused2) {
 
 //        spikes_remaining += spike_processing_flush_in_buffer();
 
-        spikes_remaining_this_tick = spike_processing_flush_in_buffer();
-        spikes_remaining += spikes_remaining_this_tick;
 
         if(spikes_remaining_this_tick > max_spikes_remaining) {
             max_spikes_remaining = spikes_remaining_this_tick;
