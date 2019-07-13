@@ -80,7 +80,7 @@ uint32_t count_rewires = 0;
 
 static uint32_t max_spikes_remaining = 0;
 static uint32_t spikes_remaining = 0;
-static uint32_t spikes_remaining_this_tick = 0;
+uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
 static uint32_t cb_calls = 0;
 

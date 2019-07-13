@@ -2,6 +2,8 @@
 #include "spike_processing.h"
 #include "neuron/neuron.h"
 #include "synapse/plasticity/synapse_dynamics.h"
+#include "spike_profiling.h"
+
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -15,10 +17,16 @@
     #include "profile_tags.h"
 #endif
 
+
+
 // Globals required for synapse benchmarking to work.
-uint32_t  num_fixed_pre_synaptic_events = 0;
+uint32_t num_fixed_pre_synaptic_events = 0;
 
 uint32_t num_fixed_pre_synaptic_events_per_timestep = 0;
+
+extern uint32_t spikes_remaining_this_tick;
+spike_holder_t syn_rec;
+
 
 // The number of neurons
 static uint32_t n_neurons;
@@ -463,7 +471,11 @@ static inline void write_recording(timer_t time) {
     // Write recording data. Doesn't use DMA, since the cb is NULL
     for(uint32_t i = 0; i < n_recorded_vars; i++) {
        uint32_t index = var_recording_indexes[i];
-       var_recording_values[i]->states[index] = num_fixed_pre_synaptic_events_per_timestep;
+
+       syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
+       syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
+
+       var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
 
        if (var_recording_count[i] == var_recording_rate[i]) {
             var_recording_count[i] = 1;
