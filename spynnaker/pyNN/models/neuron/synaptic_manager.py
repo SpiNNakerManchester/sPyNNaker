@@ -144,7 +144,7 @@ class SynapticManager(
         self._atoms_neuron_cores = max_atoms_per_core
         self._atoms_offset = atoms_offset
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
-        self._ring_buffer_shifts = [7]
+        self._ring_buffer_shifts = [2]
         self._slice_list = None
 
         #FOR RECORDING
