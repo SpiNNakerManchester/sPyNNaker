@@ -70,7 +70,7 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! The recording flags
-//static uint32_t recording_flags = 0;
+static uint32_t recording_flags = 0;
 
 // Load DTCM data
 static uint32_t timer_period;
@@ -84,6 +84,17 @@ static uint32_t spikes_remaining_this_tick = 0;
 static uint32_t max_time = UINT32_MAX;
 static uint32_t cb_calls = 0;
 
+
+
+//! \brief Initialises the recording parts of the model
+//! \param[in] recording_address: the address in SDRAM where to store
+//! recordings
+//! \return True if recording initialisation is successful, false otherwise
+static bool initialise_recording(address_t recording_address){
+    bool success = recording_initialize(recording_address, &recording_flags);
+    log_debug("Recording flags = 0x%08x", recording_flags);
+    return success;
+}
 
 void c_main_store_provenance_data(address_t provenance_region){
     log_debug("writing other provenance data");
@@ -163,6 +174,11 @@ static bool initialise(uint32_t *timer_period) {
     simulation_set_provenance_function(
         c_main_store_provenance_data,
         data_specification_get_region(PROVENANCE_DATA_REGION, address));
+
+    if(!initialise_recording(
+           data_specification_get_region(RECORDING_REGION, address))) {
+        return false;
+    }
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
@@ -261,8 +277,6 @@ void timer_callback(uint timer_count, uint unused) {
 //    io_printf(IO_BUF, "wc_reg: %u", wc_reg);
     spin1_mode_restore(state);
 
-
-
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
@@ -289,6 +303,13 @@ void timer_callback(uint timer_count, uint unused) {
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
+        // Finalise any recordings that are in progress, writing back the final
+        // amounts of samples recorded to SDRAM
+        if (recording_flags > 0) {
+            log_debug("updating recording regions");
+            recording_finalise();
+        }
+
         profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
@@ -297,11 +318,14 @@ void timer_callback(uint timer_count, uint unused) {
 
         simulation_ready_to_read();
 
-
-
         return;
     }
-//    io_printf(IO_BUF, "t_c f: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
+
+    // trigger buffering_out_mechanism
+    if (recording_flags > 0) {
+        recording_do_timestep_update(time);
+    }
+
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 

@@ -585,9 +585,6 @@ class AbstractPopulationVertex(
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
 
-        # Get the weight_scale value from the appropriate location
-        #weight_scale = self._neuron_impl.get_global_weight_scale()
-
         # Write the number of variables that can be recorded
         spec.write_value(
             data=len(self.__neuron_impl.get_recordable_variables()))
@@ -595,7 +592,6 @@ class AbstractPopulationVertex(
         # Write Synaptic contribution left shift
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_graph, machine_time_step)
-        #ring_buffer_shifts = [7, 7]
 
         #Since they're more than ones they get collapsed in GLOBAL_PARAMETERS
         spec.write_array(ring_buffer_shifts)

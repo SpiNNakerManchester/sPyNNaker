@@ -12,7 +12,7 @@ from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable)
+    AbstractSpikeRecordable, AbstractNeuronRecordable, AbstractSynapseRecordable)
 # pylint: disable=protected-access
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -39,7 +39,8 @@ class RecordingCommon(object):
             'spikes': None,
             'gsyn_exc': None,
             'gsyn_inh': None,
-            'v': None}
+            'v': None,
+            'synapse': None}
 
         # Create a dict of variable name -> bool array of indices in population
         # that are recorded (initially all False)
@@ -80,6 +81,13 @@ class RecordingCommon(object):
                 sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
             raise Exception("Illegal call with all")
+        elif variable == "synapse":
+            if not isinstance(vertex,
+                              AbstractSynapseRecordable):
+                raise Exception("This population does not support the "
+                                "recording of {}!".format(variable))
+            vertex.set_synapse_recording(
+                variable, sampling_interval=sampling_interval, indexes=indexes)
         else:
             if not isinstance(vertex,
                               AbstractNeuronRecordable):
@@ -149,6 +157,67 @@ class RecordingCommon(object):
 
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
         return self.pynn7_format(data, ids, sampling_interval)
+
+    def _get_recorded_synapse_matrix(self, variable):
+        """ Perform safety checks and get the recorded data from the vertex\
+            in matrix format.
+
+        :param variable: the variable name to read. supported variable names
+            are : 'synapse'
+        :return: the data
+        """
+        timer = Timer()
+        timer.start_timing()
+        data = None
+        sim = get_simulator()
+
+        get_simulator().verify_not_running()
+
+        if isinstance(self.__population._vertex, Iterable):
+            vertex = self.__population._vertex[0]
+        else:
+            vertex = self.__population._vertex
+
+        # check that we're in a state to get voltages
+        if not isinstance(
+                vertex, AbstractSynapseRecordable):
+            raise ConfigurationException(
+                "This population has not got the capability to record {}"
+                .format(variable))
+
+        if not vertex.is_recording_synapses(variable):
+            raise ConfigurationException(
+                "This population has not been set to record {}"
+                .format(variable))
+
+        if not sim.has_ran:
+            logger.warning(
+                "The simulation has not yet run, therefore {} cannot"
+                " be retrieved, hence the list will be empty".format(
+                    variable))
+            data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = vertex.\
+                get_synapse_sampling_interval(variable)
+        elif sim.use_virtual_board:
+            logger.warning(
+                "The simulation is using a virtual machine and so has not"
+                " truly ran, hence the list will be empty")
+            data = numpy.zeros((0, 3))
+            indexes = []
+            sampling_interval = vertex.\
+                get_synapse_sampling_interval(variable)
+        else:
+            # assuming we got here, everything is ok, so we should go get the
+            # data
+            results = vertex.get_synapse_data(
+                variable, sim.no_machine_time_steps, sim.placements,
+                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+            (data, indexes, sampling_interval) = results
+
+        get_simulator().add_extraction_timing(
+            timer.take_sample())
+        return (data, indexes, sampling_interval)
 
     def _get_recorded_matrix(self, variable):
         """ Perform safety checks and get the recorded data from the vertex\
@@ -271,3 +340,8 @@ class RecordingCommon(object):
         elif isinstance(vertex, AbstractSpikeRecordable):
             vertex.set_recording_spikes(
                 new_state=False, indexes=indexes)
+
+        # check for synapse recording
+        if isinstance(vertex, AbstractSynapseRecordable):
+            vertex.set_synapse_recording(
+                variable, new_state=False, indexes=indexes)

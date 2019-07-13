@@ -3,6 +3,7 @@
 
 #include <common/neuron-typedefs.h>
 #include <synapse/structural_plasticity/sp_structs.h>
+#include <recording.h>
 #include "synapse_row.h"
 #include "neuron/neuron.h"
 
