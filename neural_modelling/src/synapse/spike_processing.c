@@ -196,6 +196,10 @@ void _dma_complete_callback(uint unused, uint tag) {
     uint32_t current_buffer_index = buffer_being_read;
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
+
+    // Start the next DMA transfer, so it is complete when we are finished
+    _setup_synaptic_dma_read();
+
     // Process synaptic row repeatedly
     bool subsequent_spikes;
     do {
@@ -226,8 +230,7 @@ void _dma_complete_callback(uint unused, uint tag) {
         }
     } while (subsequent_spikes);
 
-    // Start the next DMA transfer, so it is complete when we are finished
-    _setup_synaptic_dma_read();
+
 }
 
 
