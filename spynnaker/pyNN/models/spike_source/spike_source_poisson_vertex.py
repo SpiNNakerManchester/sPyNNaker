@@ -650,7 +650,7 @@ class SpikeSourcePoissonVertex(
             # Get the time to spike value
             time_to_spike = self._data["time_to_spike"][i]
             if self.__rate_change[i]:
-                time_to_spike = 0.0
+                time_to_spike = numpy.asarray(0.0)
 
             # Merge the arrays as parameters per atom
             data = numpy.dstack((
