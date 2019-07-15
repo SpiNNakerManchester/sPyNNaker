@@ -486,7 +486,7 @@ bool store_poisson_parameters() {
     log_info("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    ata_specification_metadata_t *ds_regions =
+    data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
     address_t params_store = data_specification_get_region(
         POISSON_PARAMS, ds_regions);
