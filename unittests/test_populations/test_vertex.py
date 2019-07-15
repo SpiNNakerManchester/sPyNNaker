@@ -4,7 +4,7 @@ from spynnaker.pyNN.models.neuron import (
     AbstractPopulationVertex, AbstractPyNNNeuronModelStandard)
 from spynnaker.pyNN.models.neuron.synapse_types import AbstractSynapseType
 from spynnaker.pyNN.models.neuron.neuron_models import AbstractNeuronModel
-from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.models.defaults import default_initial_values, defaults
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 from unittests.mocks import MockSimulator
@@ -79,6 +79,7 @@ class _MyNeuronModel(AbstractNeuronModel):
         return None
 
 
+@defaults
 class FooBar(AbstractPyNNNeuronModelStandard):
 
     @default_initial_values({"foo", "bar"})
