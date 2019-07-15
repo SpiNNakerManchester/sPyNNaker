@@ -166,11 +166,12 @@ void c_main(void) {
 
     // Get the addresses of the regions
     log_info("Starting To Build Connectors");
-    address_t core_address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
     address_t params_address = data_specification_get_region(
-        CONNECTOR_BUILDER_REGION, core_address);
+            CONNECTOR_BUILDER_REGION, ds_regions);
     address_t syn_mtx_addr = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, core_address);
+            SYNAPTIC_MATRIX_REGION, ds_regions);
     log_info("\tReading SDRAM at 0x%08x, writing to matrix at 0x%08x",
             params_address, syn_mtx_addr);
 

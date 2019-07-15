@@ -8,8 +8,6 @@ from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
     AbstractReceiveBuffersToHost)
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -21,6 +19,12 @@ class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection):
+    __slots__ = [
+        "__buffered_sdram_per_timestep",
+        "__is_recording",
+        "__minimum_buffer_sdram",
+        "__resources"]
+
     POISSON_SPIKE_SOURCE_REGIONS = Enum(
         value="POISSON_SPIKE_SOURCE_REGIONS",
         names=[('SYSTEM_REGION', 0),
@@ -30,20 +34,18 @@ class SpikeSourcePoissonMachineVertex(
                ('PROVENANCE_REGION', 4)])
 
     def __init__(
-            self, resources_required, is_recording, minimum_buffer_sdram,
-            buffered_sdram_per_timestep, constraints=None, label=None):
+            self, resources_required, is_recording, constraints=None,
+            label=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
             label, constraints=constraints)
-        self._is_recording = is_recording
-        self._resources = resources_required
-        self._minimum_buffer_sdram = minimum_buffer_sdram
-        self._buffered_sdram_per_timestep = buffered_sdram_per_timestep
+        self.__is_recording = is_recording
+        self.__resources = resources_required
 
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
-        return self._resources
+        return self.__resources
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -58,20 +60,11 @@ class SpikeSourcePoissonMachineVertex(
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
-        return self._is_recording
-
-    @overrides(AbstractReceiveBuffersToHost.get_minimum_buffer_sdram_usage)
-    def get_minimum_buffer_sdram_usage(self):
-        return self._minimum_buffer_sdram
-
-    @overrides(AbstractReceiveBuffersToHost.get_n_timesteps_in_buffer_space)
-    def get_n_timesteps_in_buffer_space(self, buffer_space, machine_time_step):
-        return recording_utilities.get_n_timesteps_in_buffer_space(
-            buffer_space, [self._buffered_sdram_per_timestep])
+        return self.__is_recording
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
     def get_recorded_region_ids(self):
-        if self._is_recording:
+        if self.__is_recording:
             return [0]
         return []
 
