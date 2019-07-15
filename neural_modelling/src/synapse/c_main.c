@@ -236,7 +236,8 @@ static bool initialise(uint32_t *timer_period) {
 
     // Register timer2 for periodic events(used to write contributions in SDRAM)
     tc[T2_INT_CLR] = 1; // clear any interrupts on T2
-    event_register_timer(SLOT_9);
+    //event_register_timer(SLOT_9);
+    event_register_timer(SLOT_1);
 
 //    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
 
