@@ -38,6 +38,8 @@ class AbstractPyNNModel(object):
     @staticmethod
     def _get_init_params_and_svars(cls):
         init = getattr(cls, "__init__")
+        while hasattr(init, "_method"):
+            init = getattr(init, "_method")
         params = None
         if hasattr(init, "_parameters"):
             params = getattr(init, "_parameters")
