@@ -5,7 +5,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector,FromListConnector)
+    OneToOneConnector, FromListConnector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractWeightUpdatable, AbstractFilterableEdge)
 
@@ -32,7 +32,6 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-        import numpy as np
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
         n_filtered = 0
@@ -52,8 +51,8 @@ class ProjectionMachineEdge(
             # run through connection list and return false if we find any
             # connections between the pre and post vertices
                 try:
-                    if synapse_info.connector.conn_matrix[
-                        pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
+                    cm = synapse_info.connector.conn_matrix
+                    if cm[pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
                         n_filtered += 1
                 except ValueError:
                     print("Value error")
