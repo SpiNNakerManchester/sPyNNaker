@@ -51,8 +51,8 @@ typedef enum callback_priorities{
 
 // Globals
 
-//uint32_t measurement_in[100];
-//uint32_t measurement_out[100];
+//uint32_t measurement_in[1000];
+//uint32_t measurement_out[1000];
 //uint32_t measurement_index = 0;
 
 //! the current timer tick value
@@ -193,7 +193,7 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
-//        for (int i=0; i< 100; i++){
+//        for (int i=0; i< 1000; i++){
 //        	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
 //        			measurement_in[i],
 //					measurement_out[i],

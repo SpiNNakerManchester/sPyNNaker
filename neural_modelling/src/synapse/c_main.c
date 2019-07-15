@@ -85,6 +85,10 @@ static uint32_t max_time = UINT32_MAX;
 static uint32_t cb_calls = 0;
 
 
+uint32_t measurement_in[1000];
+uint32_t measurement_out[1000];
+uint32_t measurement_index = 0;
+
 
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
@@ -302,6 +306,14 @@ void timer_callback(uint timer_count, uint unused) {
         simulation_handle_pause_resume(resume_callback);
 
         log_debug("Completed a run");
+
+                for (int i=0; i< 1000; i++){
+                	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
+                			measurement_in[i],
+        					measurement_out[i],
+        					(measurement_in[i] - measurement_out[i]));
+                }
+                io_printf(IO_BUF, " Job Done ");
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 

@@ -235,14 +235,14 @@ bool population_table_get_next_address(
 
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
-            if (_is_single(item)) {
-                *row_address = (address_t) (
-                    _get_direct_address(item) +
-                    (uint32_t) direct_rows_base_address +
-                    (last_neuron_id * sizeof(uint32_t)));
-                *n_bytes_to_transfer = 0;
-                is_valid = true;
-            } else {
+//            if (_is_single(item)) {
+//                *row_address = (address_t) (
+//                    _get_direct_address(item) +
+//                    (uint32_t) direct_rows_base_address +
+//                    (last_neuron_id * sizeof(uint32_t)));
+//                *n_bytes_to_transfer = 0;
+//                is_valid = true;
+//            } else {
 
                 uint32_t row_length = _get_row_length(item);
                 uint32_t block_address =
@@ -259,7 +259,7 @@ bool population_table_get_next_address(
                     last_neuron_id, block_address, row_length, *row_address,
                     *n_bytes_to_transfer);
                 is_valid = true;
-            }
+//            }
         }
 
         next_item += 1;

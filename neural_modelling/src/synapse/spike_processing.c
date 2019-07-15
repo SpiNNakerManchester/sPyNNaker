@@ -37,6 +37,12 @@ uint32_t number_of_rewires=0;
 bool any_spike = false;
 
 
+
+extern uint32_t measurement_in[1000];
+extern uint32_t measurement_out[1000];
+extern uint32_t measurement_index;
+
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void _do_dma_read(
@@ -74,24 +80,24 @@ void _setup_synaptic_dma_read() {
     bool finished = false;
     uint cpsr = 0;
     while (!setup_done && !finished) {
-        if (number_of_rewires) {
-            number_of_rewires--;
-            synaptogenesis_dynamics_rewire(time);
-            setup_done = true;
-        }
+//        if (number_of_rewires) {
+//            number_of_rewires--;
+//            synaptogenesis_dynamics_rewire(time);
+//            setup_done = true;
+//        }
 
-        // If there's more rows to process from the previous spike
-        while (!setup_done && population_table_get_next_address(
-                &row_address, &n_bytes_to_transfer)) {
-
-            // This is a direct row to process
-            if (n_bytes_to_transfer == 0) {
-                _do_direct_row(row_address);
-            } else {
-                _do_dma_read(row_address, n_bytes_to_transfer);
-                setup_done = true;
-            }
-        }
+//        // If there's more rows to process from the previous spike
+//        while (!setup_done && population_table_get_next_address(
+//                &row_address, &n_bytes_to_transfer)) {
+//
+//            // This is a direct row to process
+//            if (n_bytes_to_transfer == 0) {
+//                _do_direct_row(row_address);
+//            } else {
+//                _do_dma_read(row_address, n_bytes_to_transfer);
+//                setup_done = true;
+//            }
+//        }
 
         // If there's more incoming spikes
         cpsr = spin1_int_disable();
@@ -104,12 +110,12 @@ void _setup_synaptic_dma_read() {
             if (population_table_get_first_address(
                     spike, &row_address, &n_bytes_to_transfer)) {
                 // This is a direct row to process
-                if (n_bytes_to_transfer == 0) {
-                    _do_direct_row(row_address);
-                } else {
+//                if (n_bytes_to_transfer == 0) {
+//                    _do_direct_row(row_address);
+//                } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     setup_done = true;
-                }
+//                }
             }
             cpsr = spin1_int_disable();
         }
@@ -158,23 +164,30 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
+
+    measurement_in[measurement_index] = tc[T1_COUNT];
+
     // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
+//    if (
+    		in_spikes_add_spike(key);
+//			) {
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
-
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                dma_busy = true;
-            } else {
-                log_debug("Could not trigger user event\n");
-            }
+        	spin1_trigger_user_event(0, 0);
+        	dma_busy = true;
+//            log_debug("Sending user event for new spike");
+//            if () {
+//
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
         }
-    } else {
-        log_debug("Could not add spike");
-    }
+//    } else {
+//        log_debug("Could not add spike");
+//    }
+
 }
 
 // Called when a user event is received
@@ -202,12 +215,12 @@ void _dma_complete_callback(uint unused, uint tag) {
 
     // Process synaptic row repeatedly
     bool subsequent_spikes;
-    do {
+//    do {
 
-        // Are there any more incoming spikes from the same pre-synaptic
-        // neuron?population_table_get_next_address
-        subsequent_spikes = in_spikes_is_next_spike_equal(
-            current_buffer->originating_spike);
+//        // Are there any more incoming spikes from the same pre-synaptic
+//        // neuron?population_table_get_next_address
+//        subsequent_spikes = in_spikes_is_next_spike_equal(
+//            current_buffer->originating_spike);
 
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
@@ -228,9 +241,11 @@ void _dma_complete_callback(uint unused, uint tag) {
 
             rt_error(RTE_SWERR);
         }
-    } while (subsequent_spikes);
+//    } while (subsequent_spikes);
 
 
+        measurement_out[measurement_index] = tc[T1_COUNT];
+        measurement_index++;
 }
 
 
@@ -256,7 +271,7 @@ bool spike_processing_initialise(
     buffer_being_read = N_DMA_BUFFERS;
     max_n_words = row_max_n_words;
 
-    io_printf(IO_BUF, "incoming_spike_buffer_size: %u\n", incoming_spike_buffer_size);
+    io_printf(IO_BUF, "incoming_spike_buffer_size is: %u\n", incoming_spike_buffer_size);
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
