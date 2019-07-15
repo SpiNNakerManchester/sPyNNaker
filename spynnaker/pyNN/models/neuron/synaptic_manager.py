@@ -176,6 +176,7 @@ class SynapticManager(object):
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
+        print('synapse_info, connector', synapse_info, synapse_info.connector)
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 

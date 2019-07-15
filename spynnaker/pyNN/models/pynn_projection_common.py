@@ -282,6 +282,7 @@ class PyNNProjectionCommon(object):
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
         if not self.__spinnaker_control.has_ran:
+            print('we have not run yet')
             post_vertex.add_pre_run_connection_holder(
                 connection_holder, self.__projection_edge,
                 self.__synapse_information)
@@ -342,6 +343,7 @@ class PyNNProjectionCommon(object):
                 ctl.placements, receiver, sender_monitor_place,
                 extra_monitors, handle_time_out_configuration,
                 ctl.fixed_routes)
+            print('get_projection_data, connections: ', connections)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()

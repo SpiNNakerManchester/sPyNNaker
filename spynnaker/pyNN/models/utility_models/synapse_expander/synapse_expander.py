@@ -6,6 +6,7 @@ from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spinn_utilities.make_tools.replacer import Replacer
 
 logger = logging.getLogger(__name__)
@@ -59,6 +60,7 @@ def synapse_expander(
             [CPUState.FINISHED])
         progress.update()
         finished = True
+        _fill_in_connection_data(app_graph, graph_mapper)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
     except Exception:
@@ -116,3 +118,27 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
     logger.error(transceiver.get_core_status_string(error_cores))
     _extract_iobuf(expander_cores, transceiver, provenance_file_path,
                    display=True)
+
+def _fill_in_connection_data(app_graph, graph_mapper):
+    """ Once connection has run, fill in the connection data
+    :param app_graph
+    :param graph_mapper
+    :rtype: None
+    """
+    for app_edge in app_graph.edges:
+        if isinstance(app_edge, ProjectionApplicationEdge):
+            synapse_info = app_edge.synapse_information
+            print('app_edge, synapse_info: ', app_edge, synapse_info)
+
+    for app_vertex in app_graph.vertices:
+        if isinstance(app_edge, AbstractPopulationVertex):
+            print('app_vertex: ', app_vertex)
+#         if (app_edge, synapse_info) in self.__pre_run_connection_holders:
+#             for conn_holder in self.__pre_run_connection_holders[
+#                     app_edge, synapse_info]:
+#                 conn_holder.add_connections(self._read_synapses(
+#                     synapse_info, pre_vertex_slice, post_vertex_slice,
+#                     row_length, delayed_row_length, n_synapse_types,
+#                     weight_scales, row_data, delayed_row_data,
+#                     app_edge.n_delay_stages, machine_time_step))
+#                 conn_holder.finish()
