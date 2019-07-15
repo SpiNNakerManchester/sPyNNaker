@@ -271,8 +271,8 @@ class SpikeSourcePoissonVertex(
     @rate.setter
     def rate(self, rate):
         # TODO Fix _rate_change
-        # scalar - array TODO FIX THIS
-        self.__rate_change = rate - list(_flatten(self._data["rates"]))
+        self.__rate_change = rate - numpy.asarray(
+            list(_flatten(self._data["rates"])))
         # Normalise parameter
         if hasattr(rate, "__len__"):
             # Single rate per neuron for whole simulation
