@@ -37,6 +37,9 @@ class MainInterfaceImpl(AbstractSpiNNakerCommon):
     def is_a_pynn_random(self, thing):
         return True
 
+    def get_random_distribution(self):
+        return None
+
 
 class TestSpinnakerMainInterface(unittest.TestCase):
 

@@ -15,6 +15,7 @@ class AbstractPyNNModel(object):
     """ A Model that can be passed in to a Population object in PyNN
     """
 
+    __slots__ = []
     _max_atoms_per_core = defaultdict(lambda: sys.maxsize)
 
     @classmethod
@@ -37,6 +38,8 @@ class AbstractPyNNModel(object):
     @staticmethod
     def _get_init_params_and_svars(cls):
         init = getattr(cls, "__init__")
+        while hasattr(init, "_method"):
+            init = getattr(init, "_method")
         params = None
         if hasattr(init, "_parameters"):
             params = getattr(init, "_parameters")

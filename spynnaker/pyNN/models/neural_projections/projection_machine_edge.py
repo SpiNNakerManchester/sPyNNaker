@@ -14,7 +14,7 @@ class ProjectionMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
     __slots__ = [
-        "_synapse_information"]
+        "__synapse_information"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
@@ -24,11 +24,11 @@ class ProjectionMachineEdge(
             pre_vertex, post_vertex, label=label,
             traffic_weight=traffic_weight)
 
-        self._synapse_information = synapse_information
+        self.__synapse_information = synapse_information
 
     @property
     def synapse_information(self):
-        return self._synapse_information
+        return self.__synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
@@ -36,7 +36,7 @@ class ProjectionMachineEdge(
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
         n_filtered = 0
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
@@ -49,14 +49,17 @@ class ProjectionMachineEdge(
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-            # run through connection list and return false if we find any connections between the pre and post vertices
+            # run through connection list and return false if we find any
+            # connections between the pre and post vertices
                 try:
-                    if synapse_info.connector._conn_matrix[pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
+                    if synapse_info.connector.conn_matrix[
+                        pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
                         n_filtered += 1
                 except ValueError:
-                    print "Value error"
+                    print("Value error")
                     n_filtered += 1
-        return (n_filtered == len(self._synapse_information))
+
+        return (n_filtered == len(self.__synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
@@ -66,7 +69,7 @@ class ProjectionMachineEdge(
             self.pre_vertex)
 
         weight = 0
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             new_weight = synapse_info.connector.\
                 get_n_connections_to_post_vertex_maximum()
             new_weight *= pre_vertex_slice.n_atoms
@@ -87,7 +90,7 @@ class ProjectionMachineEdge(
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         prov_items = list()
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             prov_items.extend(
                 synapse_info.connector.get_provenance_data())
             prov_items.extend(

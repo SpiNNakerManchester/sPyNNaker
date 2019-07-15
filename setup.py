@@ -18,11 +18,12 @@ install_requires = [
     'SpiNNaker_DataSpecification >= 1!4.0.1, < 1!5.0.0',
     'spalloc >= 1.0.1, < 2.0.0',
     'SpiNNFrontEndCommon >= 1!4.0.1, < 1!5.0.0',
-    'numpy', 'lxml', 'six', 'csa']
+    'numpy', 'lxml', 'six']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
     # scipy must be added in config.py as a mock
     install_requires.append('scipy')
+    install_requires.append('csa')
 
 
 # Build a list of all project modules, as well as supplementary files
@@ -52,5 +53,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=packages,
     package_data=package_data,
-    install_requires=install_requires
+    install_requires=install_requires,
+    maintainer="SpiNNakerTeam",
+    maintainer_email="spinnakerusers@googlegroups.com"
 )

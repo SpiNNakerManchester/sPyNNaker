@@ -8,30 +8,28 @@ logger = logging.getLogger(__name__)
 
 
 class CSAConnector(AbstractConnector):
-    """ Make connections using a Connection Set Algebra (Djurfeldt 2012)
+    """ Make connections using a Connection Set Algebra (Djurfeldt 2012)\
         description between the neurons in the pre- and post-populations.
         If you get TypeError in Python 3 see:
         https://github.com/INCF/csa/issues/10
     """
 
     __slots = [
-        "_cset"]
+        "__cset", "__full_connection_set", "__full_cset"]
 
     def __init__(
             self, cset,
             safe=True, callback=None, verbose=False):
         """
-
         :param '?' cset:
             A description of the connection set between populations
         """
         super(CSAConnector, self).__init__(safe, verbose)
-        self._cset = cset
-        self._verbose = verbose
+        self.__cset = cset
 
         # Storage for full connection sets
-        self._full_connection_set = None
-        self._full_cset = None
+        self.__full_connection_set = None
+        self.__full_cset = None
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
@@ -48,18 +46,18 @@ class CSAConnector(AbstractConnector):
         post_hi = post_vertex_slice.hi_atom
 
         # this is where the magic needs to happen somehow
-        if self._full_cset is None:
-            self._full_cset = [x for x in csa.cross(
+        if self.__full_cset is None:
+            self.__full_cset = [x for x in csa.cross(
                 range(self._n_pre_neurons),
-                range(self._n_post_neurons)) * self._cset]
+                range(self._n_post_neurons)) * self.__cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
             range(pre_lo, pre_hi+1),
-            range(post_lo, post_hi+1)) * self._full_cset
+            range(post_lo, post_hi+1)) * self.__full_cset
 
-        if self._verbose:
-            print('full cset: ', self._full_cset)
+        if self.verbose:
+            print('full cset: ', self.__full_cset)
             print('this vertex pair_list: ', pair_list)
             print('this vertex pre_neurons: ',
                   [x[0] for x in pair_list])
@@ -98,10 +96,10 @@ class CSAConnector(AbstractConnector):
 
         # Use whatever has been set up in _get_n_connections here
         # to send into the block structure
-        if self._full_connection_set is None:
-            self._full_connection_set = [x for x in pair_list]
+        if self.__full_connection_set is None:
+            self.__full_connection_set = [x for x in pair_list]
         else:
-            self._full_connection_set += [x for x in pair_list]
+            self.__full_connection_set += [x for x in pair_list]
 
         block = numpy.zeros(
             n_connections, dtype=AbstractConnector.NUMPY_SYNAPSES_DTYPE)
@@ -109,16 +107,16 @@ class CSAConnector(AbstractConnector):
         block["source"] = [x[0] for x in pair_list]
         block["target"] = [x[1] for x in pair_list]
         block["weight"] = self._generate_weights(
-            weights, n_connections, None)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
     def show_connection_set(self):
-        csa.show(self._full_connection_set,
+        csa.show(self.__full_connection_set,
                  self._n_pre_neurons, self._n_post_neurons)
 
     def __repr__(self):
         return "CSAConnector({})".format(
-            self._full_cset)
+            self.__full_cset)

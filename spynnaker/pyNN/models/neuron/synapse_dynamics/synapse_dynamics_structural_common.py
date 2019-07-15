@@ -10,14 +10,14 @@ from spynnaker.pyNN.utilities import constants
 
 
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
-    """ Common class that enables synaptic rewiring. It acts as a wrapper
-        around SynapseDynamicsStatic or SynapseDynamicsSTDP.
-        This means rewiring can operate in parallel with these
+    """ Common class that enables synaptic rewiring. It acts as a wrapper\
+        around SynapseDynamicsStatic or SynapseDynamicsSTDP.\
+        This means rewiring can operate in parallel with these\
         types of synapses.
 
         Written by Petrut Bogdan.
 
-    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will
+    :param f_rew: Frequency of rewiring (Hz). How many rewiring attempts will\
         be done per second.
     :type f_rew: int
     :param weight: Initial weight assigned to a newly formed connection
@@ -51,52 +51,52 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     """
     __slots__ = [
         # Frequency of rewiring (Hz)
-        "_f_rew",
+        "__f_rew",
         # Period of rewiring (ms)
-        "_p_rew",
+        "__p_rew",
         # Initial weight assigned to a newly formed connection
-        "_initial_weight",
+        "__initial_weight",
         # Delay assigned to a newly formed connection
-        "_initial_delay",
+        "__initial_delay",
         # Maximum fan-in per target layer neuron
-        "_s_max",
+        "__s_max",
         # Flag whether to mark synapses formed within a layer as
         # inhibitory or excitatory
-        "_lateral_inhibition",
+        "__lateral_inhibition",
         # Spread of feed-forward formation receptive field
-        "_sigma_form_forward",
+        "__sigma_form_forward",
         # Spread of lateral formation receptive field
-        "_sigma_form_lateral",
+        "__sigma_form_lateral",
         # Peak probability for feed-forward formation
-        "_p_form_forward",
+        "__p_form_forward",
         # Peak probability for lateral formation
-        "_p_form_lateral",
+        "__p_form_lateral",
         # Probability of elimination of a depressed synapse
-        "_p_elim_dep",
+        "__p_elim_dep",
         # Probability of elimination of a potentiated synapse
-        "_p_elim_pot",
+        "__p_elim_pot",
         # Grid shape
-        "_grid",
+        "__grid",
         # Flag whether to randomly select pre-synaptic partner for formation
-        "_random_partner",
+        "__random_partner",
         # Holds initial connectivity as defined via connector
-        "_connections",
+        "__connections",
         # SDRAM usage estimates are not perfect. This value adjusts estimates
-        "fudge_factor",
+        "__fudge_factor",
         # Maximum synaptic row length based on connectivity + padding
-        "_actual_row_max_length",
+        "__actual_row_max_length",
         # The actual type of weights: static through the simulation or those
         # that can be change through STDP
-        "_weight_dynamics",
+        "__weight_dynamics",
         # Shared RNG seed to be written on all cores
-        "_seeds",
+        "__seeds",
         # Stores the actual SDRAM usage (value obtained only after writing spec
         # is finished)
-        "_actual_sdram_usage",
+        "__actual_sdram_usage",
         # Exponentially decayed probability LUT for feed-forward formations
-        "_ff_distance_probabilities",
+        "__ff_distance_probabilities",
         # Exponentially decayed probability LUT for lateral formations
-        "_lat_distance_probabilities"]
+        "__lat_distance_probabilities"]
 
     default_parameters = {
         'stdp_model': None, 'f_rew': 10 ** 4, 'weight': 0, 'delay': 1,
@@ -122,45 +122,45 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  lateral_inhibition=default_parameters['lateral_inhibition'],
                  random_partner=default_parameters['random_partner'],
                  seed=None):
-        self._f_rew = f_rew
-        self._p_rew = 1. / self._f_rew
-        self._initial_weight = weight
-        self._initial_delay = delay
-        self._s_max = s_max
-        self._lateral_inhibition = lateral_inhibition
-        self._sigma_form_forward = sigma_form_forward
-        self._sigma_form_lateral = sigma_form_lateral
-        self._p_form_forward = p_form_forward
-        self._p_form_lateral = p_form_lateral
-        self._p_elim_dep = p_elim_dep
-        self._p_elim_pot = p_elim_pot
-        self._grid = np.asarray(grid, dtype=int)
-        self._random_partner = random_partner
-        self._connections = {}
+        self.__f_rew = f_rew
+        self.__p_rew = 1. / self.__f_rew
+        self.__initial_weight = weight
+        self.__initial_delay = delay
+        self.__s_max = s_max
+        self.__lateral_inhibition = lateral_inhibition
+        self.__sigma_form_forward = sigma_form_forward
+        self.__sigma_form_lateral = sigma_form_lateral
+        self.__p_form_forward = p_form_forward
+        self.__p_form_lateral = p_form_lateral
+        self.__p_elim_dep = p_elim_dep
+        self.__p_elim_pot = p_elim_pot
+        self.__grid = np.asarray(grid, dtype=int)
+        self.__random_partner = random_partner
+        self.__connections = {}
 
-        self.fudge_factor = 1.5
-        self._actual_row_max_length = self._s_max
+        self.__fudge_factor = 1.5
+        self.__actual_row_max_length = self.__s_max
 
-        self._weight_dynamics = stdp_model
+        self.__weight_dynamics = stdp_model
 
         # Generate a seed for the RNG on chip that should be the same for all
         # of the cores that have my learning rule
         _rng = np.random.RandomState(seed)
-        self._seeds = [_rng.randint(0x7FFFFFFF) for _ in range(4)]
+        self.__seeds = [_rng.randint(0x7FFFFFFF) for _ in range(4)]
 
         # Addition information -- used for SDRAM usage
-        self._actual_sdram_usage = {}
+        self.__actual_sdram_usage = {}
 
-        self._ff_distance_probabilities = \
+        self.__ff_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_forward, self._sigma_form_forward)
-        self._lat_distance_probabilities = \
+                self.__p_form_forward, self.__sigma_form_forward)
+        self.__lat_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_lateral, self._sigma_form_lateral)
+                self.__p_form_lateral, self.__sigma_form_lateral)
 
     @property
     def weight_dynamics(self):
-        return self._weight_dynamics
+        return self.__weight_dynamics
 
     def get_parameter_names(self):
         names = ['initial_weight', 'initial_delay', 'f_rew', 's_max',
@@ -209,18 +209,18 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: distance-dependent probabilities
         :rtype: numpy.ndarray(float)
         """
-        euclidian_distances = np.ones(self._grid ** 2) * np.nan
+        euclidian_distances = np.ones(self.__grid ** 2) * np.nan
         for row in range(euclidian_distances.shape[0]):
             for column in range(euclidian_distances.shape[1]):
-                if self._grid[0] > 1:
-                    pre = (row // self._grid[0], row % self._grid[1])
-                    post = (column // self._grid[0], column % self._grid[1])
+                if self.__grid[0] > 1:
+                    pre = (row // self.__grid[0], row % self.__grid[1])
+                    post = (column // self.__grid[0], column % self.__grid[1])
                 else:
-                    pre = (0, row % self._grid[1])
-                    post = (0, column % self._grid[1])
+                    pre = (0, row % self.__grid[1])
+                    post = (0, column % self.__grid[1])
 
-                euclidian_distances[row, column] = \
-                    self.distance(pre, post, grid=self._grid, type='euclidian')
+                euclidian_distances[row, column] = self.distance(
+                    pre, post, grid=self.__grid, type='euclidian')
         largest_squared_distance = np.max(euclidian_distances ** 2)
         squared_distances = np.arange(largest_squared_distance)
         raw_probabilities = probability * (
@@ -246,7 +246,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: The period of rewiring
         :rtype: int
         """
-        return self._p_rew
+        return self.__p_rew
 
     @property
     def actual_sdram_usage(self):
@@ -255,16 +255,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: actual SDRAM usage
         :rtype: int
         """
-        return self._actual_sdram_usage
-
-    @property
-    def approximate_sdram_usage(self):
-        """ Approximate the SDRAM usage before final partitioning.
-
-        :return: SDRAM usage approximation
-        :rtype: int
-        """
-        return self._approximate_sdram_usage
+        return self.__actual_sdram_usage
 
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
@@ -336,28 +327,28 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: None
         :rtype: None
         """
-        if self._p_rew * 1000. < machine_time_step / 1000.:
+        if self.__p_rew * 1000. < machine_time_step / 1000.:
             # Fast rewiring
             spec.write_value(data=1)
             spec.write_value(
-                data=int(machine_time_step / (self._p_rew * 10 ** 6)))
+                data=int(machine_time_step / (self.__p_rew * 10 ** 6)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
             spec.write_value(
-                data=int((self._p_rew * 10 ** 6) / float(machine_time_step)))
+                data=int((self.__p_rew * 10 ** 6) / float(machine_time_step)))
 
         # scale the excitatory weight appropriately
         spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[0])))
+            data=int(round(self.__initial_weight * weight_scales[0])))
         # scale the inhibitory weight appropriately
         spec.write_value(
-            data=int(round(self._initial_weight * weight_scales[1])))
-        spec.write_value(data=self._initial_delay)
-        spec.write_value(data=int(self._s_max))
-        spec.write_value(data=int(self._lateral_inhibition),
+            data=int(round(self.__initial_weight * weight_scales[1])))
+        spec.write_value(data=self.__initial_delay)
+        spec.write_value(data=int(self.__s_max))
+        spec.write_value(data=int(self.__lateral_inhibition),
                          data_type=DataType.INT32)
-        spec.write_value(data=int(self._random_partner),
+        spec.write_value(data=int(self.__random_partner),
                          data_type=DataType.INT32)
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms)
@@ -367,16 +358,16 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         spec.write_value(data=post_slice[2])
 
         # write the grid size for periodic boundary distance computation
-        spec.write_value(data=self._grid[0])
-        spec.write_value(data=self._grid[1])
+        spec.write_value(data=self.__grid[0])
+        spec.write_value(data=self.__grid[1])
 
         # write probabilities for elimination
-        spec.write_value(data=self._p_elim_dep, data_type=DataType.U032)
-        spec.write_value(data=self._p_elim_pot, data_type=DataType.U032)
+        spec.write_value(data=self.__p_elim_dep, data_type=DataType.U032)
+        spec.write_value(data=self.__p_elim_pot, data_type=DataType.U032)
 
         # write the random seed (4 words), generated randomly,
         # but the same for all postsynaptic vertices!
-        for seed in self._seeds:
+        for seed in self.__seeds:
             spec.write_value(data=seed)
 
         # write local seed (4 words), generated randomly!
@@ -428,7 +419,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
-                    if synapse_info.synapse_dynamics is self._weight_dynamics:
+                    if synapse_info.synapse_dynamics is self.__weight_dynamics:
                         structural_application_edges.append(app_edge)
                         population_to_subpopulation_information[
                             app_edge.pre_vertex] = []
@@ -441,7 +432,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 machine_vertex):
             if isinstance(machine_edge, ProjectionMachineEdge):
                 for synapse_info in machine_edge._synapse_information:
-                    if synapse_info.synapse_dynamics is self._weight_dynamics:
+                    if synapse_info.synapse_dynamics is self.__weight_dynamics:
                         structural_machine_edges.append(machine_edge)
                         # For each structurally plastic MACHINE edge find the
                         # corresponding presynaptic subvertices
@@ -557,17 +548,17 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         # Now we write the probability tables for formation
         # (feedforward and lateral)
-        spec.write_value(data=self._ff_distance_probabilities.size)
+        spec.write_value(data=self.__ff_distance_probabilities.size)
         spec.write_array(
-            self._ff_distance_probabilities.view(dtype=np.uint16),
+            self.__ff_distance_probabilities.view(dtype=np.uint16),
             data_type=DataType.UINT16)
-        total_words_written += self._ff_distance_probabilities.size // 2 + 1
-        spec.write_value(data=self._lat_distance_probabilities.size,
+        total_words_written += self.__ff_distance_probabilities.size // 2 + 1
+        spec.write_value(data=self.__lat_distance_probabilities.size,
                          data_type=DataType.INT32)
         spec.write_array(
-            self._lat_distance_probabilities.view(dtype=np.uint16),
+            self.__lat_distance_probabilities.view(dtype=np.uint16),
             data_type=DataType.UINT16)
-        total_words_written += self._lat_distance_probabilities.size // 2 + 1
+        total_words_written += self.__lat_distance_probabilities.size // 2 + 1
 
         # Write post to pre table (inverse of synaptic matrix)
         self.__write_post_to_pre_table(spec, app_vertex, post_slice,
@@ -604,9 +595,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: None
         """
         # Setting up Post to Pre table
-        post_to_pre_table = np.ones((post_slice.n_atoms, self._s_max),
+        post_to_pre_table = np.ones((post_slice.n_atoms, self.__s_max),
                                     dtype=np.int32) * -1
-        for row in self._connections[post_slice.lo_atom]:
+        for row in self.__connections[post_slice.lo_atom]:
             if row[0].size > 0 and row[1].post_vertex is app_vertex:
                 for source, target, _weight, _delay, _syn_type in row[0]:
 
@@ -669,9 +660,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         relevant_edges = []
         for edge in machine_in_edges:
             for synapse_info in edge._synapse_information:
-                if synapse_info.synapse_dynamics is self._weight_dynamics:
+                if synapse_info.synapse_dynamics is self.__weight_dynamics:
                     relevant_edges.append(edge)
-        return int(self.fudge_factor * 4 * 12 * len(relevant_edges))
+        return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges):
@@ -688,15 +679,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: int
         """
         structure_size = 27 * 4 + 4 * 4  # parameters + rng seed
-        post_to_pre_table_size = n_neurons * self._s_max * 4
+        post_to_pre_table_size = n_neurons * self.__s_max * 4
         structure_size += post_to_pre_table_size
 
         initial_size = 0
         total_size = structure_size + initial_size
 
         # Approximation of the sizes of both probability vs distance tables
-        ff_lut = np.count_nonzero(self._ff_distance_probabilities) * 4
-        lat_lut = np.count_nonzero(self._lat_distance_probabilities) * 4
+        ff_lut = np.count_nonzero(self.__ff_distance_probabilities) * 4
+        lat_lut = np.count_nonzero(self.__lat_distance_probabilities) * 4
         total_size += ff_lut
         total_size += lat_lut
         # total_size += (80 * 4)
@@ -715,7 +706,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 if isinstance(edge, ProjectionApplicationEdge):
                     for synapse_info in edge.synapse_information:
                         if (synapse_info.synapse_dynamics is
-                                self._weight_dynamics):
+                                self.__weight_dynamics):
                             no_pre_vertices_estimate += (1 + np.ceil(
                                 edge.pre_vertex.n_atoms / 32.))
                     no_pre_vertices_estimate *= 2
@@ -725,35 +716,35 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         pop_size += int(50 * (no_pre_vertices_estimate + len(in_edges)))
 
-        return int(self.fudge_factor * (total_size + pop_size))  # bytes
+        return int(self.__fudge_factor * (total_size + pop_size))  # bytes
 
     def synaptic_data_update(self, connections,
                              post_vertex_slice,
                              app_edge, machine_edge):
         """ Get static synaptic data
         """
-        if post_vertex_slice.lo_atom not in self._connections.keys():
-            self._connections[post_vertex_slice.lo_atom] = []
-        self._connections[post_vertex_slice.lo_atom].append(
+        if post_vertex_slice.lo_atom not in self.__connections.keys():
+            self.__connections[post_vertex_slice.lo_atom] = []
+        self.__connections[post_vertex_slice.lo_atom].append(
             (connections, app_edge, machine_edge))
 
     def n_words_for_plastic_connections(self, value):
         """ Get size of plastic connections in words
         """
-        self._actual_row_max_length = value
+        self.__actual_row_max_length = value
 
     def n_words_for_static_connections(self, value):
         """ Get size of static connections in words
         """
-        self._actual_row_max_length = value
+        self.__actual_row_max_length = value
 
     def get_n_synapses_in_rows(self, pp_size, fp_size=None):
         """ Get number of synapses in a row.
         """
         if fp_size is not None:
-            return self._weight_dynamics. \
+            return self.__weight_dynamics. \
                 get_n_synapses_in_rows(pp_size, fp_size)
-        return self._weight_dynamics.get_n_synapses_in_rows(pp_size)
+        return self.__weight_dynamics.get_n_synapses_in_rows(pp_size)
 
     def get_vertex_executable_suffix(self):
         name = "_structural"
@@ -763,15 +754,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
-                self._f_rew == synapse_dynamics._f_rew and
-                self._s_max == synapse_dynamics._s_max and
-                np.isclose(self._sigma_form_forward,
-                           synapse_dynamics._sigma_form_forward) and
-                np.isclose(self._sigma_form_lateral,
-                           synapse_dynamics._sigma_form_lateral) and
-                np.isclose(self._p_form_forward,
-                           synapse_dynamics._p_form_forward) and
-                np.isclose(self._p_form_lateral,
-                           synapse_dynamics._p_form_lateral) and
-                np.isclose(self._p_elim_dep, synapse_dynamics._p_elim_dep) and
-                np.isclose(self._p_elim_pot, synapse_dynamics._p_elim_pot))
+                self.__f_rew == synapse_dynamics.f_rew and
+                self.__s_max == synapse_dynamics.s_max and
+                np.isclose(self.__sigma_form_forward,
+                           synapse_dynamics.sigma_form_forward) and
+                np.isclose(self.__sigma_form_lateral,
+                           synapse_dynamics.sigma_form_lateral) and
+                np.isclose(self.__p_form_forward,
+                           synapse_dynamics.p_form_forward) and
+                np.isclose(self.__p_form_lateral,
+                           synapse_dynamics.p_form_lateral) and
+                np.isclose(self.__p_elim_dep, synapse_dynamics.p_elim_dep) and
+                np.isclose(self.__p_elim_pot, synapse_dynamics.p_elim_pot))
