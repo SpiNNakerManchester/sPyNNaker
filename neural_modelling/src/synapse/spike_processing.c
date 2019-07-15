@@ -38,9 +38,9 @@ bool any_spike = false;
 
 
 
-extern uint32_t measurement_in[1000];
-extern uint32_t measurement_out[1000];
-extern uint32_t measurement_index;
+//extern uint32_t measurement_in[1000];
+//extern uint32_t measurement_out[1000];
+//extern uint32_t measurement_index;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -165,7 +165,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
 
-    measurement_in[measurement_index] = tc[T1_COUNT];
+//    measurement_in[measurement_index] = tc[T1_COUNT];
 
     // If there was space to add spike to incoming spike queue
 //    if (
@@ -244,8 +244,8 @@ void _dma_complete_callback(uint unused, uint tag) {
 //    } while (subsequent_spikes);
 
 
-        measurement_out[measurement_index] = tc[T1_COUNT];
-        measurement_index++;
+//        measurement_out[measurement_index] = tc[T1_COUNT];
+//        measurement_index++;
 }
 
 
