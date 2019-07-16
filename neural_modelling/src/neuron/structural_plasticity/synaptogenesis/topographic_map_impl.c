@@ -166,6 +166,10 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     validate_mars_kiss64_seed(rewiring_data.local_seed);
 
     log_debug("SR init complete.");
+    address_t addr = (address_t) sp_word;
+    addr = partner_init(addr);
+    addr = synaptogenesis_formation_init(addr);
+    addr = synaptogenesis_elimination_init(addr);
     return (address_t) sp_word;
 }
 
@@ -242,7 +246,8 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
         &(current_state.sp_data.offset));
 
     if (current_state.element_exists && search_hit) {
-        return synaptogenesis_dynamics_elimination_rule(time, row);
+        return synaptogenesis_elimination_rule(
+            &rewiring_data, &current_state, time, row);
     } else {
         // Can't form if the row is full
         uint no_elems = synapse_dynamics_n_connections_in_row(
@@ -251,7 +256,8 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             log_debug("row is full");
             return false;
         }
-        return synaptogenesis_dynamics_formation_rule(time, row);
+        return synaptogenesis_formation_rule(
+            &rewiring_data, &current_state, time, row);
     }
 }
 
