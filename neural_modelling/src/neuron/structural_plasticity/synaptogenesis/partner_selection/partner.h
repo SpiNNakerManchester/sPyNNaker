@@ -13,6 +13,8 @@
 // value to be returned when there is no valid partner selection
 #define INVALID_SELECTION ((spike_t) - 1)
 
+address_t partner_init(address_t data);
+
 static inline bool potential_presynaptic_partner(
         rewiring_data_t *rewiring_data, uint32_t* population_id,
         uint32_t *sub_population_id, uint32_t *neuron_id, spike_t *spike);

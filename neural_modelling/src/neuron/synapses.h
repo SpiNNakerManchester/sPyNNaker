@@ -2,7 +2,6 @@
 #define _SYNAPSES_H_
 
 #include <common/neuron-typedefs.h>
-#include <neuron/structural_plasticity/sp_structs.h>
 #include "synapse_row.h"
 #include "neuron.h"
 

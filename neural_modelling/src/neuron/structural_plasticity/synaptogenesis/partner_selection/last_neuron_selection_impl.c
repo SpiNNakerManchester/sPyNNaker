@@ -1,5 +1,9 @@
 #include "last_neuron_selection_impl.h"
 
+address_t partner_init(address_t data) {
+    return data;
+}
+
 //! after a set of rewiring attempts, update the indices in the circular buffer
 //! between which we will be looking at the next batch of attempts
 void update_goal_posts(uint32_t time) {

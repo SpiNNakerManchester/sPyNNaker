@@ -3,7 +3,6 @@
 
 #include <common/neuron-typedefs.h>
 #include <neuron/synapse_row.h>
-#include <neuron/structural_plasticity/sp_structs.h>
 
 address_t synapse_dynamics_initialise(
     address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
