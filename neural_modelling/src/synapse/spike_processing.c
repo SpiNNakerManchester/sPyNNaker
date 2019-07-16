@@ -213,8 +213,7 @@ void _dma_complete_callback(uint unused, uint tag) {
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
 
-    // Start the next DMA transfer, so it is complete when we are finished
-    _setup_synaptic_dma_read();
+
 
     // Process synaptic row repeatedly
     bool subsequent_spikes;
@@ -246,6 +245,8 @@ void _dma_complete_callback(uint unused, uint tag) {
         }
 //    } while (subsequent_spikes);
 
+      // Start the next DMA transfer, so it is complete when we are finished
+      _setup_synaptic_dma_read();
 
 //        measurement_out[measurement_index] = tc[T1_COUNT];
 //        measurement_index++;
