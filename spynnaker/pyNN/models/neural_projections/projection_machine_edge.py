@@ -59,10 +59,9 @@ class ProjectionMachineEdge(
                         pre_slices, post_slices)
                     split_list = synapse_info.connector.split_conn_list[
                         (pre_hi, post_hi)]
-                    if split_list.max() == 0:  # should this be max() or len()?
+                    if len(split_list) == 0:
                         n_filtered += 1
                 except ValueError:
-                    print("Value error")
                     n_filtered += 1
 
         return (n_filtered == len(self.__synapse_information))
