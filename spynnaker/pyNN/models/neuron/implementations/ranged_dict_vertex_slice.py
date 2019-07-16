@@ -48,8 +48,9 @@ class _RangedListVertexSlice(object):
 
             # Go through and set the data in ranges
             start_index = 0
+            off = self.__vertex_slice.lo_atom
             for end_index in itertools.chain(
                     changes, [self.__vertex_slice.n_atoms]):
                 self.__ranged_list.set_value_by_slice(
-                    start_index, end_index, value[start_index])
+                    start_index + off, end_index + off, value[start_index])
                 start_index = end_index

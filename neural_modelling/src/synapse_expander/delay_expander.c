@@ -184,11 +184,16 @@ void c_main(void) {
 
     // Get the addresses of the regions
     log_info("Starting To Build Delays");
-    address_t core_address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+    if (!data_specification_read_header(ds_regions)) {
+        log_info("!!!   Error reading data specification header   !!!");
+        rt_error(RTE_ABORT);
+    }
     address_t delay_params_address = data_specification_get_region(
-            DELAY_PARAMS, core_address);
+            DELAY_PARAMS, ds_regions);
     address_t params_address = data_specification_get_region(
-            EXPANDER_REGION, core_address);
+            EXPANDER_REGION, ds_regions);
     log_info("\tReading SDRAM delay params at 0x%08x,"
             " expander params at 0x%08x",
             delay_params_address, params_address);

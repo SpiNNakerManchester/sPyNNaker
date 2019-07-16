@@ -21,6 +21,11 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
 
     # Used at common level but depends on PyNN so individual implementations
     @abstractmethod
+    def get_random_distribution(self):
+        pass
+
+    # Used at common level but depends on PyNN so individual implementations
+    @abstractmethod
     def get_pynn_NumpyRNG(self):
         pass
 

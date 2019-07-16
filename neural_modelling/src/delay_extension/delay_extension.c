@@ -67,13 +67,6 @@ extern uint ticks;
 static uint32_t timer_period = 0;
 
 //---------------------------------------
-//! \brief Helper that makes getting a region easier
-static inline void *get_region(enum region_identifiers region_id) {
-    address_t address = data_specification_get_data_address();
-
-    return data_specification_get_region(region_id, address);
-}
-
 // Because we don't want to include string.h or strings.h for memset
 static inline void zero_spike_counters(uint8_t *location, uint32_t num_items)
 {
@@ -179,23 +172,29 @@ static void store_provenance_data(address_t provenance_region) {
 static bool initialize(void) {
     log_info("initialise: started");
 
+    // Get the address this core's DTCM data starts at from SRAM
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+
     // Validate the data specification header
-    if (!data_specification_read_header(
-            data_specification_get_data_address())) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            get_region(SYSTEM), APPLICATION_NAME_HASH,
-            &timer_period, &simulation_ticks, &infinite_run, SDP, DMA)) {
+            data_specification_get_region(SYSTEM, ds_regions),
+            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
-            store_provenance_data, get_region(PROVENANCE_REGION));
+            store_provenance_data,
+            data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // Get the parameters
-    if (!read_parameters(get_region(DELAY_PARAMS))) {
+    if (!read_parameters(data_specification_get_region(
+            DELAY_PARAMS, ds_regions))) {
         return false;
     }
 

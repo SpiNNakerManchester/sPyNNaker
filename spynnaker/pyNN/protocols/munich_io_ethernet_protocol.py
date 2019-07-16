@@ -12,23 +12,23 @@ class MunichIoEthernetProtocol(object):
 
     @staticmethod
     def enable_retina():
-        return "E+\n"
+        return "E+\n".encode("ascii")
 
     @staticmethod
     def disable_retina():
-        return "E-\n"
+        return "E-\n".encode("ascii")
 
     @staticmethod
     def set_retina_transmission(event_format):
-        return "!E{}\n".format(event_format)
+        return "!E{}\n".format(event_format).encode("ascii")
 
     @staticmethod
     def disable_motor():
-        return "!M-\n"
+        return "!M-\n".encode("ascii")
 
     @staticmethod
     def enable_motor():
-        return "!M+\n"
+        return "!M+\n".encode("ascii")
 
     @staticmethod
     def motor_0_permanent_velocity(velocity):
@@ -36,7 +36,7 @@ class MunichIoEthernetProtocol(object):
             velocity = 100
         if velocity < -100:
             velocity = -100
-        return "!MV0={}\n".format(velocity)
+        return "!MV0={}\n".format(velocity).encode("ascii")
 
     @staticmethod
     def motor_1_permanent_velocity(velocity):
@@ -44,7 +44,7 @@ class MunichIoEthernetProtocol(object):
             velocity = 100
         if velocity < -100:
             velocity = -100
-        return "!MV1={}\n".format(velocity)
+        return "!MV1={}\n".format(velocity).encode("ascii")
 
     @staticmethod
     def motor_0_leaky_velocity(velocity):
@@ -52,7 +52,7 @@ class MunichIoEthernetProtocol(object):
             velocity = 100
         if velocity < -100:
             velocity = -100
-        return "!MVD0={}\n".format(velocity)
+        return "!MVD0={}\n".format(velocity).encode("ascii")
 
     @staticmethod
     def motor_1_leaky_velocity(velocity):
@@ -60,48 +60,50 @@ class MunichIoEthernetProtocol(object):
             velocity = 100
         if velocity < -100:
             velocity = -100
-        return "!MVD1={}\n".format(velocity)
+        return "!MVD1={}\n".format(velocity).encode("ascii")
 
     @staticmethod
     def led_total_period(total_period):
-        return "!PC={}\n".format(total_period)
+        return "!PC={}\n".format(total_period).encode("ascii")
 
     @staticmethod
     def led_front_active_time(active_time):
-        return "!PC1={}\n".format(active_time)
+        return "!PC1={}\n".format(active_time).encode("ascii")
 
     @staticmethod
     def led_back_active_time(active_time):
-        return "!PC0={}\n".format(active_time)
+        return "!PC0={}\n".format(active_time).encode("ascii")
 
     @staticmethod
     def led_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
         return "!PC={}\n!PC0={}\n!PC1={}\n".format(
-            active_time, active_time // 2, active_time // 2)
+            active_time, active_time // 2, active_time // 2).encode("ascii")
 
     @staticmethod
     def speaker_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PB={}\n!PB0={}\n".format(active_time, active_time // 2)
+        return "!PB={}\n!PB0={}\n".format(
+            active_time, active_time // 2).encode("ascii")
 
     @staticmethod
     def speaker_total_period(total_period):
-        return "!PB={}\n".format(total_period)
+        return "!PB={}\n".format(total_period).encode("ascii")
 
     @staticmethod
     def speaker_active_time(active_time):
-        return "!PB0={}\n".format(active_time)
+        return "!PB0={}\n".format(active_time).encode("ascii")
 
     @staticmethod
     def laser_frequency(frequency):
         active_time = _active_time_for_frequency(frequency)
-        return "!PA={}\n!PA0={}\n".format(active_time, active_time // 2)
+        return "!PA={}\n!PA0={}\n".format(
+            active_time, active_time // 2).encode("ascii")
 
     @staticmethod
     def laser_total_period(total_period):
-        return "!PA={}\n".format(total_period)
+        return "!PA={}\n".format(total_period).encode("ascii")
 
     @staticmethod
     def laser_active_time(active_time):
-        return "!PA0={}\n".format(active_time)
+        return "!PA0={}\n".format(active_time).encode("ascii")

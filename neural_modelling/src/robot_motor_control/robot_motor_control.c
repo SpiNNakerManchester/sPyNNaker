@@ -34,6 +34,11 @@ static motor_control_parameters_t config;
 static uint32_t simulation_ticks;
 static uint32_t infinite_run;
 
+enum regions_e {
+    SYSTEM_REGION,
+    PARAMS_REGION
+};
+
 //! values for the priority for each callback
 enum callback_priorities {
     MC = -1,
@@ -193,23 +198,24 @@ static bool initialize(uint32_t *timer_period) {
     log_debug("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM, address),
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
 
     // Get the parameters
-    read_parameters(data_specification_get_region(CONFIGURATION, address));
+    read_parameters(data_specification_get_region(PARAMS_REGION, ds_regions));
 
     log_debug("initialise: completed successfully");
     return true;

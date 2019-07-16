@@ -43,12 +43,9 @@ typedef struct timed_out_spikes {
 enum region {
     SYSTEM,
     POISSON_PARAMS,
-    SPIKE_HISTORY_REGION,
-    PROVENANCE_REGION
+    SPIKE_HISTORY,
+    PROVENANCE
 };
-
-#define NUMBER_OF_REGIONS_TO_RECORD 1
-#define BYTE_TO_WORD_CONVERTER 4
 
 enum callback_priorities {
     MULTICAST = -1,
@@ -256,9 +253,10 @@ static bool read_poisson_parameters(sdram_globals_t *sdram_globals) {
 
 //! \brief Initialises the recording parts of the model
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(void) {
+static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     // Get the system region
-    address_t recording_region = get_region(SPIKE_HISTORY_REGION);
+    address_t recording_region = data_specification_get_region(
+            SPIKE_HISTORY, ds_regions);
 
     bool success = recording_initialize(recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
@@ -278,32 +276,37 @@ static bool initialize(void) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            get_region(SYSTEM), APPLICATION_NAME_HASH,
-            &timer_period, &simulation_ticks, &infinite_run, SDP, DMA)) {
+            data_specification_get_region(SYSTEM, ds_regions),
+            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
-    simulation_set_provenance_data_address(get_region(PROVENANCE_REGION));
+    simulation_set_provenance_data_address(
+            data_specification_get_region(PROVENANCE, ds_regions));
 
     // setup recording region
-    if (!initialise_recording()) {
+    if (!initialise_recording(ds_regions)) {
         return false;
     }
 
     // Setup regions that specify spike source array data
-    if (!read_global_parameters(get_region(POISSON_PARAMS))) {
+    if (!read_global_parameters(
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
-    if (!read_poisson_parameters(get_region(POISSON_PARAMS))) {
+    if (!read_poisson_parameters(
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
@@ -332,7 +335,11 @@ static bool initialize(void) {
 static void resume_callback(void) {
     recording_reset();
 
-    if (!read_poisson_parameters(get_region(POISSON_PARAMS))) {
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+
+    if (!read_poisson_parameters(
+            data_specification_get_region(POISSON_PARAMS, ds_regions))){
         log_error("failed to reread the Poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -359,7 +366,10 @@ static bool store_poisson_parameters(void) {
     log_info("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    sdram_globals_t *sdram_globals = get_region(POISSON_PARAMS);
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+    sdram_globals_t *sdram_globals =
+            data_specification_get_region(POISSON_PARAMS, ds_regions);
 
     // Copy the globals back to SDRAM
     spin1_memcpy(&sdram_globals->globals, &globals,

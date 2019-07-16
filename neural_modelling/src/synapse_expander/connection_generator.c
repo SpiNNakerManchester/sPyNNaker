@@ -11,6 +11,7 @@
 #include "connection_generators/connection_generator_all_to_all.h"
 #include "connection_generators/connection_generator_fixed_prob.h"
 #include "connection_generators/connection_generator_fixed_total.h"
+#include "connection_generators/connection_generator_kernel.h"
 
 // For now, hash is just an index agreed between Python and here
 enum connection_generator_hash {
@@ -18,6 +19,7 @@ enum connection_generator_hash {
     ALL_TO_ALL_GENERATOR,
     FIXED_PROBABILITY_GENERATOR,
     FIXED_TOTAL_NUMBER_GENERATOR,
+    KERNEL_GENERATOR,
     N_CONNECTION_GENERATORS
 };
 
@@ -111,7 +113,11 @@ const struct connection_generator_info connection_generators[] = {
     {FIXED_TOTAL_NUMBER_GENERATOR,
             connection_generator_fixed_total_initialise,
             connection_generator_fixed_total_generate,
-            connection_generator_fixed_total_free}
+            connection_generator_fixed_total_free},
+    {KERNEL_GENERATOR,
+            connection_generator_kernel_initialise,
+            connection_generator_kernel_generate,
+            connection_generator_kernel_free}
 };
 
 connection_generator_t connection_generator_init(

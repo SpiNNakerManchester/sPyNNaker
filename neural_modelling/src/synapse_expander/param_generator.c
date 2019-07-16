@@ -12,6 +12,7 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
+#include "param_generators/param_generator_kernel.h"
 
 enum param_generator_hash {
     // For now, hash is just an index agreed between Python and here
@@ -21,6 +22,7 @@ enum param_generator_hash {
     NORMAL_CLIPPED_PARAM,
     NORMAL_CLIPPED_BOUNDARY_PARAM,
     EXPONENTIAL_PARAM,
+    KERNEL_PARAM,
     /**
      *! \brief The number of known generators
      */
@@ -117,7 +119,11 @@ const struct param_generator_info param_generators[] = {
     {EXPONENTIAL_PARAM, // Exponentially distributed random values
             param_generator_exponential_initialize,
             param_generator_exponential_generate,
-            param_generator_exponential_free}
+            param_generator_exponential_free},
+    {KERNEL_PARAM,
+            param_generator_kernel_initialize,
+            param_generator_kernel_generate,
+            param_generator_kernel_free}
 };
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
