@@ -123,7 +123,7 @@ void _setup_synaptic_dma_read() {
         if (!setup_done) {
             finished = true;
         }
-        cpsr = spin1_int_disable();
+        cpsr = spin1_int_disable(); // remove this too?
     }
 
     // If the setup was not done, and there are no more spikes,
@@ -175,7 +175,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
-        	spin1_trigger_user_event(0, 0);
+        	spin1_trigger_user_event(0, 0); // could schedule _setup_synaptic_dma_read() directly
         	dma_busy = true;
 //            log_debug("Sending user event for new spike");
 //            if () {
