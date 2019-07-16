@@ -436,7 +436,7 @@ class SpikeSourcePoissonVertex(
 
         :param vertex_slice:
         """
-        n_rates = sum(len(self._data["rates"][i]) for i in range(
+        n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
         return (vertex_slice.n_atoms + (n_rates * PARAMS_WORDS_PER_NEURON)) * 4
 
@@ -608,7 +608,7 @@ class SpikeSourcePoissonVertex(
 
         # For each source, write the number of rates, followed by the rate data
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            spec.write_value(len(self._data["rates"][i]))
+            spec.write_value(len(self.__data["rates"][i]))
 
             # Convert start times to start time steps
             starts = self.__data["starts"][i].astype("float")
