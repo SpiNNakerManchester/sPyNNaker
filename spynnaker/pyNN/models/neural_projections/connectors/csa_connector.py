@@ -5,7 +5,7 @@ from .abstract_connector import AbstractConnector
 try:
     import csa
     csa_exception = False
-except ModuleNotFoundError as ex:
+except ModuleNotFoundError as ex: # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     csa_exception = ex
 
@@ -127,7 +127,3 @@ class CSAConnector(AbstractConnector):
     def __repr__(self):
         return "CSAConnector({})".format(
             self.__full_cset)
-
-
-if __name__ == "__main__":
-    CSAConnector()
