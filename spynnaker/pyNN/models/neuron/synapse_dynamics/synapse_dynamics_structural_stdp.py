@@ -187,3 +187,47 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                       self).get_parameter_names()
         names.extend(self.__common_sp.get_parameter_names())
         return names
+
+    @property
+    def weight_dynamics(self):
+        return self.__common_sp.weight_dynamics
+
+    @property
+    def f_rew(self):
+        return self.__common_sp.f_rew
+
+    @property
+    def s_max(self):
+        return self.__common_sp.s_max
+
+    @property
+    def sigma_form_forward(self):
+        return self.__common_sp.sigma_form_forward
+
+    @property
+    def sigma_form_lateral(self):
+        return self.__common_sp.sigma_form_lateral
+
+    @property
+    def p_elim_dep(self):
+        return self.__common_sp.p_elim_dep
+
+    @property
+    def p_elim_pot(self):
+        return self.__common_sp.p_elim_pot
+
+    @property
+    def p_form_forward(self):
+        return self.__common_sp.p_form_forward
+
+    @property
+    def p_form_lateral(self):
+        return self.__common_sp.p_form_lateral
+
+    @property
+    def sigma_form_forward(self):
+        return self.__common_sp.sigma_form_forward
+
+    @property
+    def sigma_form_lateral(self):
+        return self.__common_sp.sigma_form_lateral

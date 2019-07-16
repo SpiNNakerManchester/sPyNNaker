@@ -448,7 +448,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     if synapse_info.synapse_dynamics is self.__weight_dynamics:
                         exception_case = None
                         for mek in self.__manager.keys():
-                            if app_edge == mek.__projection_edge:
+                            if app_edge == mek._projection_edge:
                                 exception_case = self.__manager[mek]
                                 break
                         structural_application_edges.append(app_edge)
@@ -466,7 +466,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
             if isinstance(machine_edge, ProjectionMachineEdge):
-                for synapse_info in machine_edge._synapse_information:
+                for synapse_info in machine_edge.synapse_information:
                     if synapse_info.synapse_dynamics is self.__weight_dynamics:
                         structural_machine_edges.append(machine_edge)
                         # For each structurally plastic MACHINE edge find the
@@ -578,15 +578,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 spec.write_value(data=int(delay_hi), data_type=DataType.UINT16)
             else:
                 # the current connection has the default delay distribution
-                if isinstance(self._initial_delay, collections.Iterable):
-                    spec.write_value(data=int(self._initial_delay[0]),
+                if isinstance(self.__initial_delay, collections.Iterable):
+                    spec.write_value(data=int(self.__initial_delay[0]),
                                      data_type=DataType.UINT16)
-                    spec.write_value(data=int(self._initial_delay[1]),
+                    spec.write_value(data=int(self.__initial_delay[1]),
                                      data_type=DataType.UINT16)
                 else:
-                    spec.write_value(data=self._initial_delay,
+                    spec.write_value(data=self.__initial_delay,
                                      data_type=DataType.UINT16)
-                    spec.write_value(data=self._initial_delay,
+                    spec.write_value(data=self.__initial_delay,
                                      data_type=DataType.UINT16)
 
             if (exceptions and self.connectivity_exception_param.weight
@@ -602,7 +602,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 # scale the exception weight according to the
                 # appropriate weight scale
                 spec.write_value(
-                    data=int(round(self._initial_weight *
+                    data=int(round(self.__initial_weight *
                                    weight_scales[int(syn_type)])))
 
             # Write connection type
@@ -757,7 +757,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         relevant_edges = []
         for edge in machine_in_edges:
-            for synapse_info in edge._synapse_information:
+            for synapse_info in edge.synapse_information:
                 if synapse_info.synapse_dynamics is self.__weight_dynamics:
                     relevant_edges.append(edge)
         return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
@@ -865,3 +865,47 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                            synapse_dynamics.p_form_lateral) and
                 np.isclose(self.__p_elim_dep, synapse_dynamics.p_elim_dep) and
                 np.isclose(self.__p_elim_pot, synapse_dynamics.p_elim_pot))
+
+    @property
+    def weight_dynamics(self):
+        return self.__weight_dynamics
+
+    @property
+    def f_rew(self):
+        return self.__f_rew
+
+    @property
+    def s_max(self):
+        return self.__s_max
+
+    @property
+    def sigma_form_forward(self):
+        return self.__sigma_form_forward
+
+    @property
+    def sigma_form_lateral(self):
+        return self.__sigma_form_lateral
+
+    @property
+    def p_elim_dep(self):
+        return self.__p_elim_dep
+
+    @property
+    def p_elim_pot(self):
+        return self.__p_elim_pot
+
+    @property
+    def p_form_forward(self):
+        return self.__p_form_forward
+
+    @property
+    def p_form_lateral(self):
+        return self.__p_form_lateral
+
+    @property
+    def sigma_form_forward(self):
+        return self.__sigma_form_forward
+
+    @property
+    def sigma_form_lateral(self):
+        return self.__sigma_form_lateral

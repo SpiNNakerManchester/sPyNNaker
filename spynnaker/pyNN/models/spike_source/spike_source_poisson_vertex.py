@@ -356,8 +356,6 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_neuron_parameters_reload = True
 
     def _max_spikes_per_ts(self, machine_time_step):
-        if self.__max_rate == 0:
-            return 0
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         if float(self.__max_rate) / ts_per_second <= \
                 SLOW_RATE_PER_TICK_CUTOFF:
@@ -791,7 +789,7 @@ class SpikeSourcePoissonVertex(
             self.__data["rates"].set_value_by_id(
                 i,
                 spikes_per_tick *
-                (MICROSECONDS_PER_SECOND / float(self._machine_time_step)))
+                (MICROSECONDS_PER_SECOND / float(self.__machine_time_step)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded

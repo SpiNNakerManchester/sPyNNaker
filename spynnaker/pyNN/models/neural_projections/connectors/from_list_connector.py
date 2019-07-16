@@ -146,7 +146,7 @@ class FromListConnector(AbstractConnector):
         if sources.size == 0:
             return 0
         max_targets = numpy.max(numpy.bincount(
-            sources.astype('int32', copy=False)))
+            sources.astype('int64', copy=False)))
 
         # If no delays just return max targets as this is for all delays
         # If there are delays in the list, this was also handled above
@@ -165,7 +165,7 @@ class FromListConnector(AbstractConnector):
             return 0
         # pylint: disable=too-many-arguments
         return numpy.max(numpy.bincount(
-            self.__targets.astype('int32', copy=False)))
+            self.__targets.astype('int64', copy=False)))
 
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
