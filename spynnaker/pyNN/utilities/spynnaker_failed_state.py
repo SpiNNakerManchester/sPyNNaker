@@ -15,6 +15,9 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
     def get_current_time(self):
         raise ConfigurationException(FAILED_STATE_MSG)
 
+    def get_random_distribution(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
     def get_pynn_NumpyRNG(self):
         raise ConfigurationException(FAILED_STATE_MSG)
 
