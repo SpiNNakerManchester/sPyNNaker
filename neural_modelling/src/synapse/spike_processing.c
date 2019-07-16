@@ -206,7 +206,7 @@ void _multicast_packet_received_callback(uint key, uint payload) {
                 if (spin1_trigger_user_event(0, 0)) {
                     dma_busy = true;
                 } else {
-                    log_err("Could not trigger user event\n");
+                    log_error("Could not trigger user event\n");
                 }
             }
         } else {
