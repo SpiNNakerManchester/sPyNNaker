@@ -122,7 +122,7 @@ void _setup_synaptic_dma_read() {
         }
 
         if (!setup_done) {
-            finished = true;
+            finished = true; // finished trying for this spike
         }
         cpsr = spin1_int_disable(); // remove this too?
     }
@@ -165,30 +165,53 @@ void _multicast_packet_received_callback(uint key, uint payload) {
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
-
-//    measurement_in[measurement_index] = tc[T1_COUNT];
-
-    // If there was space to add spike to incoming spike queue
-//    if (
-    		in_spikes_add_spike(key);
-//			) {
-
-        // If we're not already processing synaptic DMAs,
-        // flag pipeline as busy and trigger a feed event
-        if (!dma_busy) {
-        	spin1_trigger_user_event(0, 0); // could schedule _setup_synaptic_dma_read() directly
-        	dma_busy = true;
-//            log_debug("Sending user event for new spike");
-//            if () {
 //
-//            } else {
-//                log_debug("Could not trigger user event\n");
-//            }
-        }
-//    } else {
-//        log_debug("Could not add spike");
-//    }
+////    measurement_in[measurement_index] = tc[T1_COUNT];
+//
+//    // If there was space to add spike to incoming spike queue
+////    if (
+//    		in_spikes_add_spike(key);
+////			) {
+//
+//        // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+//        if (!dma_busy) {
+//        	spin1_trigger_user_event(0, 0); // could schedule _setup_synaptic_dma_read() directly
+//        	dma_busy = true;
+////            log_debug("Sending user event for new spike");
+////            if () {
+////
+////            } else {
+////                log_debug("Could not trigger user event\n");
+////            }
+//        }
+////    } else {
+////        log_debug("Could not add spike");
+////    }
 
+
+
+
+
+
+        // **********
+        // If there was space to add spike to incoming spike queue
+        if (in_spikes_add_spike(key)) {
+
+            // If we're not already processing synaptic DMAs,
+            // flag pipeline as busy and trigger a feed event
+            if (!dma_busy) {
+
+                log_debug("Sending user event for new spike");
+                if (spin1_trigger_user_event(0, 0)) {
+                    dma_busy = true;
+                } else {
+                    log_err("Could not trigger user event\n");
+                }
+            }
+        } else {
+            log_debug("Could not add spike");
+        }
 }
 
 // Called when a user event is received
