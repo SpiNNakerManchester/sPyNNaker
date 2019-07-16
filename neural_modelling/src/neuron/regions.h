@@ -1,7 +1,7 @@
 #pragma once
 
 enum regions_e {
-    SYSTEM_REGION,            // 0
+    SYSTEM_R,            // 0
     NEURON_PARAMS_REGION,     // 1
     SYNAPSE_PARAMS_REGION,    // 2
     POPULATION_TABLE_REGION,  // 3

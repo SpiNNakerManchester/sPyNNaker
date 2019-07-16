@@ -134,7 +134,8 @@ static inline void *align_to_word(void *ptr) {
 }
 
 static void neuron_impl_load_neuron_parameters(
-        const void *ptr, uint32_t n_neurons) {
+        const void *address, uint32_t n_neurons) {
+    void *ptr = (void *) address;
     log_debug("reading parameters, address is 0x%08x, n_neurons is %u",
             ptr, n_neurons);
 

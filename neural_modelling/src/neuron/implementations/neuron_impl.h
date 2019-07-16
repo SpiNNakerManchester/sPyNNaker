@@ -19,7 +19,7 @@ static void neuron_impl_add_inputs(
 
 //! \brief Load in the neuron parameters from the buffer at the given pointer
 static void neuron_impl_load_neuron_parameters(
-        void *pointer, uint32_t n_neurons);
+        const void *pointer, uint32_t n_neurons);
 
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron_index The index of the neuron to update

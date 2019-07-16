@@ -35,7 +35,7 @@ static uint32_t simulation_ticks;
 static uint32_t infinite_run;
 
 enum regions_e {
-    SYSTEM_REGION,
+    SYSTEM_R,
     PARAMS_REGION
 };
 
@@ -208,7 +208,7 @@ static bool initialize(uint32_t *timer_period) {
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, ds_regions),
+            data_specification_get_region(SYSTEM_R, ds_regions),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
             &infinite_run, &time, SDP, DMA)) {
         return false;

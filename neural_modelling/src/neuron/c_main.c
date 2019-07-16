@@ -129,7 +129,7 @@ static bool initialise(void) {
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, ds_regions),
+            data_specification_get_region(SYSTEM_R, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
             &infinite_run, &time, SDP, DMA)) {
         return false;
