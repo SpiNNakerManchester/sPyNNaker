@@ -223,11 +223,3 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
     @property
     def p_form_lateral(self):
         return self.__common_sp.p_form_lateral
-
-    @property
-    def sigma_form_forward(self):
-        return self.__common_sp.sigma_form_forward
-
-    @property
-    def sigma_form_lateral(self):
-        return self.__common_sp.sigma_form_lateral
