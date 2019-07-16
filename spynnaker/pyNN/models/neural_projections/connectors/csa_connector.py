@@ -1,8 +1,13 @@
 import logging
-import csa
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+try:
+    import csa
+    csa_exception = False
+except ModuleNotFoundError as ex:
+    # Importing csa causes problems with readthedocs so allowing it to fail
+    csa_exception = ex
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +29,8 @@ class CSAConnector(AbstractConnector):
         :param '?' cset:
             A description of the connection set between populations
         """
+        if csa_exception:
+            raise csa_exception
         super(CSAConnector, self).__init__(safe, verbose)
         self.__cset = cset
 
@@ -120,3 +127,7 @@ class CSAConnector(AbstractConnector):
     def __repr__(self):
         return "CSAConnector({})".format(
             self.__full_cset)
+
+
+if __name__ == "__main__":
+    CSAConnector()
