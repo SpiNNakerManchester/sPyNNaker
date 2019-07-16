@@ -151,7 +151,7 @@ uint32_t connection_generator_fixed_total_generate(
         }
         n_conns = max_row_length;
     }
-    log_info("Generating %u of %u synapses",
+    log_debug("Generating %u of %u synapses",
         n_conns, params->params.n_connections);
 
     // Sample from the possible connections in this row n_conns times
