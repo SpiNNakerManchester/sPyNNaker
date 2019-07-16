@@ -26,7 +26,7 @@ uint32_t num_fixed_pre_synaptic_events_per_timestep = 0;
 
 extern uint32_t spikes_remaining_this_tick;
 spike_holder_t syn_rec;
-
+extern uint8_t kickstarts;
 
 // The number of neurons
 static uint32_t n_neurons;
@@ -474,6 +474,8 @@ static inline void write_recording(timer_t time) {
 
        syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
        syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
+       syn_rec.spikes_c = kickstarts;
+
 
        var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
 
@@ -511,6 +513,7 @@ void synapses_do_timestep_update(timer_t time) {
     if(is_recording) {
         write_recording(time);
         num_fixed_pre_synaptic_events_per_timestep = 0;
+        kickstarts = 0;
     }
 
     // Re-enable the interrupts
