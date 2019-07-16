@@ -36,6 +36,7 @@ static uint32_t single_fixed_synapse[4];
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 
+uint8_t kickstarts = 0;
 
 
 //extern uint32_t measurement_in[1000];
@@ -195,7 +196,9 @@ void _user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
 
+
     _setup_synaptic_dma_read();
+    kickstarts ++;
 }
 
 // Called when a DMA completes
