@@ -226,7 +226,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterate though the graph and look for changes.
         """
-        changed = super(AbstractSpiNNakerCommon, self).\
+        changed, data_changed = super(AbstractSpiNNakerCommon, self).\
             _detect_if_graph_has_changed(reset_flags)
 
         # Additionally check populations for changes
@@ -243,7 +243,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             if reset_flags:
                 projection.mark_no_changes()
 
-        return changed
+        return changed, data_changed
 
     @property
     def min_delay(self):
