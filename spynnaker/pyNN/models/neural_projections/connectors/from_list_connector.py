@@ -18,7 +18,6 @@ class FromListConnector(AbstractConnector):
     """
     __slots__ = [
         "__conn_list",
-        "__conn_matrix",
         "__column_names",
         "__sources",
         "__targets",
@@ -236,13 +235,9 @@ class FromListConnector(AbstractConnector):
     def conn_list(self):
         return self.__conn_list
 
-    @property
-    def split_conn_list(self):
-        return self.__split_conn_list
-
-#     @property
-#     def conn_matrix(self):
-#         return self.__conn_matrix
+    def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
+        self._split_connections(pre_slices, post_slices)
+        return len(self.__split_conn_list[(pre_hi, post_hi)])
 
     @conn_list.setter
     def conn_list(self, conn_list):

@@ -54,14 +54,9 @@ class ProjectionMachineEdge(
                 post_slices = graph_mapper.get_slices(post_app_vertex)
                 # run through connection list and check for any connections
                 # between the pre and post vertices that could be filtered
-                try:
-                    synapse_info.connector._split_connections(
-                        pre_slices, post_slices)
-                    split_list = synapse_info.connector.split_conn_list[
-                        (pre_hi, post_hi)]
-                    if len(split_list) == 0:
-                        n_filtered += 1
-                except ValueError:
+                n_connections = synapse_info.connector.get_n_connections(
+                    pre_slices, post_slices, pre_hi, post_hi)
+                if n_connections == 0:
                     n_filtered += 1
 
         return (n_filtered == len(self.__synapse_information))
