@@ -94,15 +94,15 @@ struct param_generator_info {
  *! \brief An Array of known generators
  */
 const struct param_generator_info param_generators[] = {
-    {CONSTANT_PARAM,    // Constant value
+    {CONSTANT_PARAM,            // Constant value
             param_generator_constant_initialize,
             param_generator_constant_generate,
             param_generator_constant_free},
-    {UNIFORM_PARAM,     // Uniform random values
+    {UNIFORM_PARAM,             // Uniform random values
             param_generator_uniform_initialize,
             param_generator_uniform_generate,
             param_generator_uniform_free},
-    {NORMAL_PARAM,      // Normally distributed random values
+    {NORMAL_PARAM,              // Normally distributed random values
             param_generator_normal_initialize,
             param_generator_normal_generate,
             param_generator_normal_free},
@@ -116,37 +116,41 @@ const struct param_generator_info param_generators[] = {
             param_generator_normal_clipped_boundary_initialize,
             param_generator_normal_clipped_boundary_generate,
             param_generator_normal_clipped_boundary_free},
-    {EXPONENTIAL_PARAM, // Exponentially distributed random values
+    {EXPONENTIAL_PARAM,         // Exponentially distributed random values
             param_generator_exponential_initialize,
             param_generator_exponential_generate,
             param_generator_exponential_free},
-    {KERNEL_PARAM,
+    {KERNEL_PARAM,              // Kernel values
             param_generator_kernel_initialize,
             param_generator_kernel_generate,
             param_generator_kernel_free}
 };
 
+static inline param_generator_t param_generator_new(
+        const struct param_generator_info *gen_type, address_t *in_region) {
+    // Prepare a space for the data
+    param_generator_t generator = spin1_malloc(sizeof(param_generator_t));
+    if (generator == NULL) {
+        log_error("Could not create generator");
+        return NULL;
+    }
+
+    // Store which type it is
+    generator->type_ptr = gen_type;
+
+    // Initialise the generator and store the data
+    generator->data = gen_type->initialize_fun(in_region);
+    return generator;
+}
+
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
+        const struct param_generator_info *gen_type = &param_generators[i];
 
         // If the hash requested matches the hash of the generator, use it
-        if (hash == param_generators[i].hash) {
-
-            // Prepare a space for the data
-            param_generator_t generator =
-                    spin1_malloc(sizeof(param_generator_t));
-            if (generator == NULL) {
-                log_error("Could not create generator");
-                return NULL;
-            }
-
-            // Store which type it is
-            generator->type_ptr = &param_generators[i];
-
-            // Initialise the generator and store the data
-            generator->data = generator->type_ptr->initialize_fun(in_region);
-            return generator;
+        if (hash == gen_type->hash) {
+            return param_generator_new(gen_type, in_region);
         }
     }
     log_error("Param generator with hash %u not found", hash);

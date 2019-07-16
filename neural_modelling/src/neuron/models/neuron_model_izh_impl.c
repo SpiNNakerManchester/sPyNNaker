@@ -11,8 +11,9 @@ static global_neuron_params_pointer_t global_params;
 static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
 
 /////////////////////////////////////////////////////////////
+#if 0
 // definition for Izhikevich neuron
-/*static inline void _neuron_ode(
+static inline void neuron_ode(
         REAL t, REAL stateVar[], REAL dstateVar_dt[],
         neuron_pointer_t neuron, REAL input_this_timestep) {
 
@@ -29,7 +30,8 @@ static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
 
     // Update U
     dstateVar_dt[2] = neuron->A * (neuron->B * V_now - U_now);
-} */
+}
+#endif
 
 /*!
  * \brief Midpoint is best balance between speed and accuracy so far from
@@ -39,8 +41,8 @@ static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
  * \param[in] neuron
  * \param[in] input_this_timestep
  */
-static inline void _rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
-                                        REAL input_this_timestep) {
+static inline void rk2_kernel_midpoint(REAL h, neuron_pointer_t neuron,
+                                       REAL input_this_timestep) {
     // to match Mathematica names
     REAL lastV1 = neuron->V;
     REAL lastU1 = neuron->U;
@@ -84,7 +86,7 @@ state_t neuron_model_state_update(
             + external_bias + neuron->I_offset;
 
     // the best AR update so far
-    _rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
+    rk2_kernel_midpoint(neuron->this_h, neuron, input_this_timestep);
     neuron->this_h = global_params->machine_timestep_ms;
 
     return neuron->V;

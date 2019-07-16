@@ -56,7 +56,7 @@ static void synapse_types_print_parameters(
 
 //! \brief prints the input for a neuron ID given the available inputs
 //! currently only executed when the models are in debug mode, as the prints
-//! are controlled from the synapses.c _print_inputs method.
+//! are controlled from the synapses.c print_inputs method.
 //! \param[in] parameters: the pointer to the parameters to print
 //! \return Nothing
 static void synapse_types_print_input(synapse_param_t *parameters);

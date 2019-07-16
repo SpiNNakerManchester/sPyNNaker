@@ -83,34 +83,37 @@ static void neuron_impl_add_inputs(
 }
 
 static void neuron_impl_load_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons) {
-    log_debug("writing parameters, next is %u, n_neurons is %u ",
-            next, n_neurons);
-    const char *ptr = (const char *) &address[next];
+        const void *ptr, uint32_t n_neurons) {
+    log_debug("writing parameters, address is 0x%08x, n_neurons is %u",
+            ptr, n_neurons);
 
     if (sizeof(neuron_t) > 0) {
         log_debug("reading neuron local parameters");
-        spin1_memcpy(neuron_array, ptr, n_neurons * sizeof(neuron_t));
-        ptr += n_neurons * sizeof(neuron_t);
+        const neuron_t *neuron_params = ptr;
+        spin1_memcpy(neuron_array, neuron_params, n_neurons * sizeof(neuron_t));
+        ptr = &neuron_params[n_neurons];
     }
 
     if (sizeof(input_type_current_semd_t) > 0) {
         log_debug("reading input type parameters");
-        spin1_memcpy(input_type_array, ptr,
+        const input_type_current_semd_t *input_params = ptr;
+        spin1_memcpy(input_type_array, input_params,
                 n_neurons * sizeof(input_type_current_semd_t));
-        ptr += n_neurons * sizeof(input_type_current_semd_t);
+        ptr = &input_params[n_neurons];
     }
 
     if (sizeof(threshold_type_t) > 0) {
         log_debug("reading threshold type parameters");
-        spin1_memcpy(threshold_type_array, ptr,
+        const threshold_type_t *threshold_params = ptr;
+        spin1_memcpy(threshold_type_array, threshold_params,
                n_neurons * sizeof(threshold_type_t));
-        ptr += n_neurons * sizeof(threshold_type_t);
+        ptr = &threshold_params[n_neurons];
     }
 
     if (sizeof(synapse_param_t) > 0) {
         log_debug("reading synapse parameters");
-        spin1_memcpy(neuron_synapse_shaping_params, ptr,
+        const synapse_param_t *synapse_params = ptr;
+        spin1_memcpy(neuron_synapse_shaping_params, synapse_params,
                n_neurons * sizeof(synapse_param_t));
     }
 }
@@ -196,33 +199,36 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store
 static void neuron_impl_store_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons) {
+        void *ptr, uint32_t n_neurons) {
     log_debug("writing parameters");
-    char *ptr = (char *) &address[next];
 
     if (sizeof(neuron_t) > 0) {
         log_debug("writing neuron local parameters");
-        spin1_memcpy(ptr, neuron_array, n_neurons * sizeof(neuron_t));
-        ptr += n_neurons * sizeof(neuron_t);
+        const neuron_t *params = ptr;
+        spin1_memcpy(params, neuron_array, n_neurons * sizeof(neuron_t));
+        ptr = &params[n_neurons];
     }
 
     if (sizeof(input_type_current_semd_t) > 0) {
         log_debug("writing input type parameters");
-        spin1_memcpy(ptr, input_type_array,
+        const input_type_current_semd_t *params = ptr;
+        spin1_memcpy(params, input_type_array,
                 n_neurons * sizeof(input_type_current_semd_t));
-        ptr += n_neurons * sizeof(input_type_current_semd_t);
+        ptr = &params[n_neurons];
     }
 
     if (sizeof(threshold_type_t) > 0) {
         log_debug("writing threshold type parameters");
-        spin1_memcpy(ptr, threshold_type_array,
+        const threshold_type_t *params = ptr;
+        spin1_memcpy(params, threshold_type_array,
                 n_neurons * sizeof(threshold_type_t));
-        ptr += n_neurons * sizeof(threshold_type_t);
+        ptr = &params[n_neurons];
     }
 
     if (sizeof(synapse_param_t) > 0) {
         log_debug("writing synapse parameters");
-        spin1_memcpy(ptr, neuron_synapse_shaping_params,
+        const synapse_param_t *params = ptr;
+        spin1_memcpy(params, neuron_synapse_shaping_params,
                 n_neurons * sizeof(synapse_param_t));
     }
 }

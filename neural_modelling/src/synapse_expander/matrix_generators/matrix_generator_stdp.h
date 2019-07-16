@@ -84,7 +84,7 @@ static void matrix_generator_stdp_free(void *data) {
  *! \param[in] synapse_index_bits The number of bits for the target neuron id
  *! \return A half-word fixed-plastic synapse
  */
-static uint16_t _build_fixed_plastic_half_word(
+static uint16_t build_fixed_plastic_half_word(
         uint16_t delay, uint32_t type,
         uint32_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
@@ -251,7 +251,7 @@ static void matrix_generator_stdp_write_row(
         struct delay_value delay = get_delay(delays[synapse], max_stage);
 
         // Build synaptic word
-        uint16_t fp_half_word = _build_fixed_plastic_half_word(
+        uint16_t fp_half_word = build_fixed_plastic_half_word(
                 delay.delay, synapse_type, post_index, synapse_type_bits,
                 synapse_index_bits);
 

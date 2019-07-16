@@ -11,8 +11,6 @@
 #include <data_specification.h>
 #include <debug.h>
 
-#define _unused(x) ((void)(x))
-
 struct expander_config_t {
     // the global parameters
     uint32_t n_in_edges;

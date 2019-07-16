@@ -125,26 +125,19 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
-//! \brief Helper that makes getting a region easier
-static inline void *get_region(enum region region_id) {
-    address_t address = data_specification_get_data_address();
-
-    return data_specification_get_region(region_id, address);
-}
-
 //! \brief ??????????????
 //! \param[in] n ?????????????????
 //! \return bit field of the ???????????????
-static inline bit_field_t _out_spikes(uint32_t n) {
+static inline bit_field_t out_spike_bitfield(uint32_t n) {
     return &spikes->out_spikes[n * n_spike_buffer_words];
 }
 
 //! \brief ??????????????
 //! \return None
-static inline void _reset_spikes(void) {
+static inline void reset_spikes(void) {
     spikes->n_buffers = 0;
     for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
-        clear_bit_field(_out_spikes(n - 1), n_spike_buffer_words);
+        clear_bit_field(out_spike_bitfield(n - 1), n_spike_buffer_words);
     }
 }
 
@@ -156,9 +149,8 @@ static inline void _reset_spikes(void) {
 //!         to occur
 static inline REAL get_slow_time_to_spike(
         REAL mean_inter_spike_interval_in_ticks) {
-    return exponential_dist_variate(
-            mars_kiss64_seed, globals.spike_source_seed)
-        * mean_inter_spike_interval_in_ticks;
+    return exponential_dist_variate(mars_kiss64_seed, globals.spike_source_seed)
+            * mean_inter_spike_interval_in_ticks;
 }
 
 //! \brief Determines how many spikes to transmit this timer tick.
@@ -339,7 +331,7 @@ static void resume_callback(void) {
             data_specification_get_data_address();
 
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, ds_regions))){
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         log_error("failed to reread the Poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -390,7 +382,7 @@ static bool store_poisson_parameters(void) {
 //! destination
 //! \param[in] spike_key: the key to transmit
 //! \return None
-static void _send_spike(uint spike_key, uint timer_count) {
+static void send_spike(uint spike_key, uint timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
         // Do Nothing
@@ -407,7 +399,7 @@ static void _send_spike(uint spike_key, uint timer_count) {
 //! \brief expand the space for storing spikes
 //! \param[in] n_spikes: the number of times a neuron has spiked
 //!
-static void _expand_spike_buffer(uint32_t n_spikes) {
+static void expand_spike_buffer(uint32_t n_spikes) {
     uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
 
     timed_out_spikes *new_spikes = spin1_malloc(new_size);
@@ -437,16 +429,16 @@ static void _expand_spike_buffer(uint32_t n_spikes) {
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
 //!
-static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
+static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     if (recording_flags > 0) {
         if (n_spike_buffers_allocated < n_spikes) {
-            _expand_spike_buffer(n_spikes);
+            expand_spike_buffer(n_spikes);
         }
         if (spikes->n_buffers < n_spikes) {
             spikes->n_buffers = n_spikes;
         }
         for (uint32_t n = n_spikes; n > 0; n--) {
-            bit_field_set(_out_spikes(n - 1), neuron_id);
+            bit_field_set(out_spike_bitfield(n - 1), neuron_id);
         }
     }
 }
@@ -457,7 +449,7 @@ static void recording_complete_callback(void) {
 
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
-static inline void _record_spikes(uint32_t timestamp) {
+static inline void record_spikes(uint32_t timestamp) {
     while (recording_in_progress) {
         spin1_wfi();
     }
@@ -467,7 +459,7 @@ static inline void _record_spikes(uint32_t timestamp) {
         recording_record_and_notify(
                 0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
                 recording_complete_callback);
-        _reset_spikes();
+        reset_spikes();
     }
 }
 
@@ -484,13 +476,13 @@ static inline void handle_fast_source(
     // If there are any
     if (num_spikes > 0) {
         // Write spike to out spikes
-        _mark_spike(s, num_spikes);
+        mark_spike(s, num_spikes);
 
         // only send spike to fabric if a key has been given
         if (globals.has_key) {
             const uint32_t spike_key = globals.key | s;
             for (uint32_t index = 0; index < num_spikes; index++) {
-                _send_spike(spike_key, timer_count);
+                send_spike(spike_key, timer_count);
             }
         }
     }
@@ -506,12 +498,12 @@ static inline void handle_slow_source(
     // If this spike source should spike now
     if (REAL_COMPARE(spike_source->time_to_spike_ticks, <=, REAL_CONST(0.0))) {
         // Write spike to out spikes
-        _mark_spike(s, 1);
+        mark_spike(s, 1);
 
         // if no key has been given, do not send spike to fabric.
         if (globals.has_key) {
             // Send packet
-            _send_spike(globals.key | s, timer_count);
+            send_spike(globals.key | s, timer_count);
         }
 
         // Update time to spike
@@ -579,7 +571,7 @@ static void timer_callback(uint timer_count, uint unused) {
 
     // Record output spikes if required
     if (recording_flags > 0) {
-        _record_spikes(time);
+        record_spikes(time);
     }
 
     if (recording_flags > 0) {
@@ -624,7 +616,7 @@ static void sdp_packet_callback(uint mailbox, uint port) {
     uint32_t n_items = payload->n_items;
     for (uint32_t item = 0; item < n_items; item++) {
         set_spike_source_rate(payload->data[item].id,
-                kbits(payload->data[item].rate));
+                payload->data[item].rate);
     }
     spin1_msg_free(msg);
 }

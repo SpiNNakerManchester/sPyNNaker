@@ -55,9 +55,6 @@ enum callback_priorities {
     TIMER = 2
 };
 
-//! The number of regions that are to be used for recording
-#define NUMBER_OF_REGIONS_TO_RECORD 4
-
 // Globals
 
 //! the current timer tick value

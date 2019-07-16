@@ -12,8 +12,6 @@
 #include <delay_extension/delay_extension.h>
 #include <bit_field.h>
 
-#define _unused(x) ((void)(x))
-
 struct expander_params_t {
     uint32_t n_out_edges;
     uint32_t pre_slice_start;

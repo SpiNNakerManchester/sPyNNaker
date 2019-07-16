@@ -26,12 +26,12 @@ static uint16_t items_to_go = 0;
 #define ADDRESS_MASK (0x7FFFFF00)
 #define LENGTH_MASK  (0x000000FF)
 
-static inline uint32_t _get_direct_address(address_and_row_length entry) {
+static inline uint32_t get_direct_address(address_and_row_length entry) {
     // Direct row address is just the direct address bit
     return (entry & ADDRESS_MASK) >> 8;
 }
 
-static inline uint32_t _get_address(address_and_row_length entry) {
+static inline uint32_t get_address(address_and_row_length entry) {
     // The address is in words and is the top 23-bits but 1, so this down
     // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift
     // by 4 with the given mask 0x7FFFFF00 to fully remove the row length.
@@ -40,39 +40,39 @@ static inline uint32_t _get_address(address_and_row_length entry) {
     return (entry & ADDRESS_MASK) >> 4;
 }
 
-static inline uint32_t _get_row_length(address_and_row_length entry) {
+static inline uint32_t get_row_length(address_and_row_length entry) {
     return entry & LENGTH_MASK;
 }
 
-static inline uint32_t _is_single(address_and_row_length entry) {
+static inline uint32_t is_single(address_and_row_length entry) {
     return entry & SINGLE_MASK;
 }
 
-static inline uint32_t _get_neuron_id(
+static inline uint32_t get_neuron_id(
         master_population_table_entry entry, spike_t spike) {
     return spike & ~entry.mask;
 }
 
-static inline void _print_master_population_table(void) {
+static inline void print_master_population_table(void) {
     log_info("master_population\n");
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            if (!_is_single(address_list[j])) {
+            if (!is_single(address_list[j])) {
                 log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                         " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
                         i, j, entry.key, entry.mask,
-                        _get_address(address_list[j]),
-                        _get_address(address_list[j]) +
+                        get_address(address_list[j]),
+                        get_address(address_list[j]) +
                             (uint32_t) synaptic_rows_base_address,
-                        _get_row_length(address_list[j]));
+                        get_row_length(address_list[j]));
             } else {
                 log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                         " offset: 0x%.8x, address: 0x%.8x, single",
                         i, j, entry.key, entry.mask,
-                        _get_direct_address(address_list[j]),
-                        _get_direct_address(address_list[j]) +
+                        get_direct_address(address_list[j]),
+                        get_direct_address(address_list[j]) +
                             (uint32_t) direct_rows_base_address);
             }
         }
@@ -143,7 +143,7 @@ bool population_table_initialise(
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
-    _print_master_population_table();
+    print_master_population_table();
     return true;
 }
 
@@ -162,7 +162,7 @@ bool population_table_get_first_address(
                         "table but count is 0", spike, spike);
             }
 
-            last_neuron_id = _get_neuron_id(entry, spike);
+            last_neuron_id = get_neuron_id(entry, spike);
             next_item = entry.start;
             items_to_go = entry.count;
 
@@ -198,9 +198,9 @@ bool population_table_get_next_address(
 
         // If the row is a direct row, indicate this by specifying the
         // n_bytes_to_transfer is 0
-        if (_is_single(item)) {
+        if (is_single(item)) {
             *row_address = (address_t) (
-                    _get_direct_address(item) +
+                    get_direct_address(item) +
                     (uint32_t) direct_rows_base_address +
                     (last_neuron_id * sizeof(uint32_t)));
             *n_bytes_to_transfer = 0;
@@ -208,10 +208,10 @@ bool population_table_get_next_address(
         }
 
         // Indirect row... but might be zero-length row
-        uint32_t row_length = _get_row_length(item);
+        uint32_t row_length = get_row_length(item);
         if (row_length > 0) {
             uint32_t block_address =
-                    _get_address(item) + (uint32_t) synaptic_rows_base_address;
+                    get_address(item) + (uint32_t) synaptic_rows_base_address;
             uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
             uint32_t neuron_offset =
                     last_neuron_id * stride * sizeof(uint32_t);

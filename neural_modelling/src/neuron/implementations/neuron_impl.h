@@ -17,9 +17,9 @@ static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
-//! \brief Load in the neuron parameters
+//! \brief Load in the neuron parameters from the buffer at the given pointer
 static void neuron_impl_load_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons);
+        void *pointer, uint32_t n_neurons);
 
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron_index The index of the neuron to update
@@ -30,9 +30,9 @@ static bool neuron_impl_do_timestep_update(
     index_t neuron_index, input_t external_bias,
     state_t *recorded_variable_values);
 
-//! \brief Store the neuron parameters to the given address
+//! \brief Store the neuron parameters to the given buffer at the given pointer
 static void neuron_impl_store_neuron_parameters(
-        address_t address, uint32_t next, uint32_t n_neurons);
+        void *pointer, uint32_t n_neurons);
 
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_impl_print_inputs(uint32_t n_neurons);

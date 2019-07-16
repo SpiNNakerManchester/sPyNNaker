@@ -98,50 +98,56 @@ struct connection_generator_info {
  *! \brief An Array of known generators
  */
 const struct connection_generator_info connection_generators[] = {
-    {ONE_TO_ONE_GENERATOR,
+    {ONE_TO_ONE_GENERATOR,          // One To One Connector
             connection_generator_one_to_one_initialise,
             connection_generator_one_to_one_generate,
             connection_generator_one_to_one_free},
-    {ALL_TO_ALL_GENERATOR,
+    {ALL_TO_ALL_GENERATOR,          // All To All Connector
             connection_generator_all_to_all_initialise,
             connection_generator_all_to_all_generate,
             connection_generator_all_to_all_free},
-    {FIXED_PROBABILITY_GENERATOR,
+    {FIXED_PROBABILITY_GENERATOR,   // Fixed-Probability Connector
             connection_generator_fixed_prob_initialise,
             connection_generator_fixed_prob_generate,
             connection_generator_fixed_prob_free},
-    {FIXED_TOTAL_NUMBER_GENERATOR,
+    {FIXED_TOTAL_NUMBER_GENERATOR,  // Fixed Total Number (Multapse) Connector
             connection_generator_fixed_total_initialise,
             connection_generator_fixed_total_generate,
             connection_generator_fixed_total_free},
-    {KERNEL_GENERATOR,
+    {KERNEL_GENERATOR,              // Kernel Connector (tried to cheat, failed)
             connection_generator_kernel_initialise,
             connection_generator_kernel_generate,
             connection_generator_kernel_free}
 };
 
+static inline connection_generator_t connection_generator_new(
+        const struct connection_generator_info *gen_type, address_t *in_region) {
+    // Prepare a space for the data
+    struct connection_generator *generator =
+            spin1_malloc(sizeof(struct connection_generator));
+    if (generator == NULL) {
+        log_error("Could not create generator");
+        return NULL;
+    }
+
+    // Store which type it is
+    generator->type_ptr = gen_type;
+
+    // Initialise the generator and store the data
+    generator->data = gen_type->initialize_fun(in_region);
+    return generator;
+}
+
 connection_generator_t connection_generator_init(
         uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
+        const struct connection_generator_info *gen_type =
+                &connection_generators[i];
 
         // If the hash requested matches the hash of the generator, use it
-        if (hash == connection_generators[i].hash) {
-
-            // Prepare a space for the data
-            struct connection_generator *generator =
-                    spin1_malloc(sizeof(struct connection_generator));
-            if (generator == NULL) {
-                log_error("Could not create generator");
-                return NULL;
-            }
-
-            // Store which type it is
-            generator->type_ptr = &connection_generators[i];
-
-            // Initialise the generator and store the data
-            generator->data = generator->type_ptr->initialize_fun(in_region);
-            return generator;
+        if (hash == gen_type->hash) {
+            return connection_generator_new(gen_type, in_region);
         }
     }
     log_error("Connection generator with hash %u not found", hash);

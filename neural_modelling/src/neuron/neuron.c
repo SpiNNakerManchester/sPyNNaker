@@ -90,7 +90,7 @@ struct basic_parameters_t {
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct basic_parameters_t) / sizeof(uint32_t))
 
-static void _reset_record_counter(void) {
+static void reset_record_counter(void) {
     if (spike_recording_rate == 0) {
         // Setting increment to zero means spike_index will never equal
         // spike_rate
@@ -120,44 +120,49 @@ static void _reset_record_counter(void) {
     }
 }
 
+typedef struct {
+    uint32_t rate;
+    uint32_t n_neurons;
+    uint8_t indices[];
+} recording_detail;
+
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
-static bool _neuron_load_neuron_parameters(address_t address) {
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
-
+static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
-    uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
+    recording_detail *detail = (recording_detail *)
+            &((struct basic_parameters_t *) address)[1];
+    uint32_t index_space = (n_neurons + 3) & ~0x3;
 
     // Load spike recording details
-    spike_recording_rate = address[next++];
-    uint32_t n_neurons_recording_spikes = address[next++];
+    spike_recording_rate = detail->rate;
+    uint32_t n_neurons_recording_spikes = detail->n_neurons;
     n_spike_recording_words = get_bit_field_size(n_neurons_recording_spikes);
-    spin1_memcpy(
-            spike_recording_indexes, &address[next], n_neurons * sizeof(uint8_t));
-    next += n_words_for_n_neurons;
+    spin1_memcpy(spike_recording_indexes, detail->indices,
+            n_neurons * sizeof(uint8_t));
+    detail = (recording_detail *) &detail->indices[index_space];
 
     // Load other variable recording details
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        var_recording_rate[i] = address[next++];
-        uint32_t n_neurons_recording_var = address[next++];
+        var_recording_rate[i] = detail->rate;
+        uint32_t n_neurons_recording_var = detail->n_neurons;
         var_recording_size[i] =
                 (n_neurons_recording_var + 1) * sizeof(uint32_t);
-        spin1_memcpy(
-                var_recording_indexes[i], &address[next],
+        spin1_memcpy(var_recording_indexes[i], detail->indices,
                 n_neurons * sizeof(uint8_t));
-        next += n_words_for_n_neurons;
+        detail = (recording_detail *) &detail->indices[index_space];
     }
 
     // call the neuron implementation functions to do the work
-    neuron_impl_load_neuron_parameters(address, next, n_neurons);
+    neuron_impl_load_neuron_parameters(detail, n_neurons);
     return true;
 }
 
 bool neuron_reload_neuron_parameters(address_t address) {
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return _neuron_load_neuron_parameters(address);
+    return neuron_load_neuron_parameters(address);
 }
 
 //! \brief Set up the neuron models
@@ -265,25 +270,24 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value,
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!_neuron_load_neuron_parameters(address)) {
+    if (!neuron_load_neuron_parameters(address)) {
         return false;
     }
 
-    _reset_record_counter();
-
+    reset_record_counter();
     return true;
 }
 
 //! \brief stores neuron parameter back into SDRAM
 //! \param[in] address: the address in SDRAM to start the store
 void neuron_store_neuron_parameters(address_t address) {
-    uint32_t next = START_OF_GLOBAL_PARAMETERS;
-
-    uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
-    next += (n_words_for_n_neurons + 2) * (n_recorded_vars + 1);
+    address_t ptr = (address_t)
+            &((struct basic_parameters_t *) address)[1];
+    // Skip over the recording control information
+    ptr += (((n_neurons + 3) >> 2) + 2) * (n_recorded_vars + 1);
 
     // call neuron implementation function to do the work
-    neuron_impl_store_neuron_parameters(address, next, n_neurons);
+    neuron_impl_store_neuron_parameters(ptr, n_neurons);
 }
 
 static void recording_done_callback(void) {

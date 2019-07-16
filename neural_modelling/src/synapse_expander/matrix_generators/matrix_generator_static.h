@@ -62,7 +62,7 @@ static void matrix_generator_static_free(void *data) {
  *! \param[in] synapse_index_bits The number of bits for the target neuron id
  *! \return a synaptic word
  */
-static uint32_t _build_static_word(
+static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
@@ -167,7 +167,7 @@ static void matrix_generator_static_write_row(
         }
 
         // Build synaptic word
-        uint32_t word = _build_static_word(
+        uint32_t word = build_static_word(
                 weight, delay.delay, synapse_type, post_index,
                 synapse_type_bits, synapse_index_bits);
 

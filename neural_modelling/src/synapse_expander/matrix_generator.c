@@ -117,37 +117,42 @@ struct matrix_generator_info {
  *! \brief An Array of known generators
  */
 const struct matrix_generator_info matrix_generators[] = {
-    {MATRIX_GENERATOR_STATIC_HASH,
+    {MATRIX_GENERATOR_STATIC_HASH,              // Static matrix
             matrix_generator_static_initialize,
             matrix_generator_static_write_row,
             matrix_generator_static_free},
-    {MATRIX_GENERATOR_PLASTIC_HASH,
+    {MATRIX_GENERATOR_PLASTIC_HASH,             // Plastic matrix
             matrix_generator_stdp_initialize,
             matrix_generator_stdp_write_row,
             matrix_generator_stdp_free}
 };
 
+static inline matrix_generator_t matrix_generator_new(
+        const struct matrix_generator_info *gen_type, address_t *in_region) {
+    // Prepare a space for the data
+    struct matrix_generator *generator =
+            spin1_malloc(sizeof(struct matrix_generator));
+    if (generator == NULL) {
+        log_error("Could not create generator");
+        return NULL;
+    }
+
+    // Store which type it is
+    generator->type_ptr = gen_type;
+
+    // Initialise the generator and store the data
+    generator->data = gen_type->initialize_fun(in_region);
+    return generator;
+}
+
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_MATRIX_GENERATORS; i++) {
+        const struct matrix_generator_info *gen_type = &matrix_generators[i];
 
         // If the hash requested matches the hash of the generator, use it
-        if (hash == matrix_generators[i].hash) {
-
-            // Prepare a space for the data
-            struct matrix_generator *generator =
-                    spin1_malloc(sizeof(struct matrix_generator));
-            if (generator == NULL) {
-                log_error("Could not create generator");
-                return NULL;
-            }
-
-            // Store which type it is
-            generator->type_ptr = &matrix_generators[i];
-
-            // Initialise the generator and store the data
-            generator->data = generator->type_ptr->initialize_fun(in_region);
-            return generator;
+        if (hash == gen_type->hash) {
+            return matrix_generator_new(gen_type, in_region);
         }
     }
     log_error("Matrix generator with hash %u not found", hash);

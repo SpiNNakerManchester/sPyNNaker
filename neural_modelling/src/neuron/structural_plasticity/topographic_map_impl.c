@@ -518,10 +518,11 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
             unpack_post_to_pre(value, &pre_app_pop, &pre_sub_pop, &choice);
 
     state.element_exists = element_exists;
-    spike_t _spike;
+    spike_t spike;
     if (element_exists) {
-        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
-                .key_atom_info[pre_sub_pop].key | choice;
+        subpopulation_info_t *preapppop_info =
+                &rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop];
+        spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
     } else if (rewiring_data.random_partner) {
         pre_app_pop = random_from_local(
                 rewiring_data.pre_pop_info_table.no_pre_pops);
@@ -536,26 +537,26 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         // Select a presynaptic neuron ID
         choice = random_from_local(
                 preapppop_info->key_atom_info[pre_sub_pop].n_atoms);
-        _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
+        spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
     } else {
         // Retrieve the last spike
-        _spike = select_last_spike();
-        if (_spike == ANY_SPIKE) {
+        spike = select_last_spike();
+        if (spike == ANY_SPIKE) {
             log_debug("No previous spikes");
             setup_synaptic_dma_read();
             return;
         }
 
         // unpack the spike into key and identifying information for the neuron
-        unpack_spike_to_neuron(_spike, &pre_app_pop, &pre_sub_pop, &choice);
+        unpack_spike_to_neuron(spike, &pre_app_pop, &pre_sub_pop, &choice);
     }
 
     address_t synaptic_row_address;
     size_t n_bytes;
 
-    if (!population_table_get_first_address(_spike, &synaptic_row_address,
+    if (!population_table_get_first_address(spike, &synaptic_row_address,
             &n_bytes)) {
-        log_error("FAIL@key %d", _spike);
+        log_error("FAIL@key %d", spike);
         rt_error(RTE_SWERR);
     }
 
