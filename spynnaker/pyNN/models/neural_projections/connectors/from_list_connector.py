@@ -52,14 +52,6 @@ class FromListConnector(AbstractConnector):
 
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
-#         try:
-#             self.__conn_matrix = numpy.zeros(
-#                 (int(self.conn_list[:, 0].max() + 1),
-#                  int(self.conn_list[:, 1].max() + 1)), dtype=bool)
-#         except IndexError:
-#             print("too many indices for array")
-#         for [pre, post, w, d] in self.conn_list:
-#             self.__conn_matrix[int(pre)][int(post)] = 1
 
         # The connection list split by pre/post vertex slices
         self.__split_conn_list = None
