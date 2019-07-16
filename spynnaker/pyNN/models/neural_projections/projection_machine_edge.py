@@ -44,15 +44,26 @@ class ProjectionMachineEdge(
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
+#                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
+#                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-            # run through connection list and return false if we find any
-            # connections between the pre and post vertices
+                # run through connection list and return false if we find
+                # any connections between the pre and post vertices
+#                 print('pre post vertex: ', self.pre_vertex, self.post_vertex)
+                pre_app_vertex = graph_mapper.get_application_vertex(
+                    self.pre_vertex)
+                post_app_vertex = graph_mapper.get_application_vertex(
+                    self.post_vertex)
+                pre_slices = graph_mapper.get_slices(pre_app_vertex)
+                post_slices = graph_mapper.get_slices(post_app_vertex)
                 try:
-                    cm = synapse_info.connector.conn_matrix
-                    if cm[pre_lo:pre_hi + 1, post_lo:post_hi + 1].max() == 0:
+#                     cm = synapse_info.connector.conn_matrix
+                    synapse_info.connector._split_connections(
+                        pre_slices, post_slices)
+                    split_list = synapse_info.connector.split_conn_list[
+                        (pre_hi, post_hi)]
+                    if split_list.max() == 0:  # should this be max() or len()?
                         n_filtered += 1
                 except ValueError:
                     print("Value error")
