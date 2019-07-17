@@ -196,6 +196,7 @@ class DelayExtensionVertex(
             region=_DELEXT_REGIONS.DELAY_PARAMS.value,
             size=delay_params_sz, label='delay_params')
 
+        # reserve region for provenance
         vertex.reserve_provenance_data_region(spec)
 
         self.write_setup_info(
@@ -313,7 +314,9 @@ class DelayExtensionVertex(
 
     def get_sdram_usage_for_atoms(self, out_edges):
         return (SYSTEM_BYTES_REQUIREMENT +
-                DelayExtensionMachineVertex.get_provenance_data_size(0) +
+                DelayExtensionMachineVertex.get_provenance_data_size(
+                    DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.
+                    N_PROVENANCE_DATA_ITEMS) +
                 self._get_size_of_generator_information(out_edges))
 
     def _get_edge_generator_size(self, synapse_info):
