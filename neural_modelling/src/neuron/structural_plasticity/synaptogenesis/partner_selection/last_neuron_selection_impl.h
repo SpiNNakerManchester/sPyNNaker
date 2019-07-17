@@ -4,35 +4,36 @@
 #include "partner.h"
 #include <neuron/spike_processing.h>
 
-
-// For last spike selection
-#include <circular_buffer.h>
-
 // Include debug header for log_info etc
 #include <debug.h>
 
-typedef struct {
-    // circular buffer indices
-    uint32_t my_cb_input, my_cb_output, no_spike_in_interval, cb_total_size;
-    // a local reference to the circular buffer
-    circular_buffer cb;
-} circular_buffer_info_t;
+extern spike_t* last_spikes_buffer[2];
+extern uint32_t n_spikes[2];
+extern uint32_t last_spikes_buffer_size;
+extern uint32_t last_time;
 
-
-// struct for keeping track of Circular buffer indices
-circular_buffer_info_t cb_info;
+static inline void partner_spike_received(uint32_t time, spike_t spike) {
+    uint32_t buffer = time & 0x1;
+    if (time != last_time) {
+        last_time = time;
+        n_spikes[buffer] = 0;
+    }
+    if (n_spikes[buffer] < last_spikes_buffer_size) {
+        last_spikes_buffer[buffer][n_spikes[buffer]++] = spike;
+    }
+}
 
 //! randomly (with uniform probability) select one of the last received spikes
 static inline bool potential_presynaptic_partner(
-        rewiring_data_t *rewiring_data, uint32_t *population_id,
+        uint32_t time, rewiring_data_t *rewiring_data, uint32_t *population_id,
         uint32_t *sub_population_id, uint32_t *neuron_id, spike_t *spike) {
-    if (!received_any_spike() || cb_info.no_spike_in_interval == 0) {
+    uint32_t buffer = (time - 1) & 0x1;
+    if (!n_spikes[buffer]) {
         return false;
     }
     uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data->local_seed)) *
-        cb_info.no_spike_in_interval;
-    *spike = circular_buffer_value_at_index(
-        cb_info.cb, (cb_info.my_cb_output + offset) & cb_info.cb_total_size);
+        n_spikes[buffer];
+    *spike = last_spikes_buffer[buffer][offset];
     return sp_structs_find_by_spike(rewiring_data, *spike, neuron_id,
             population_id, sub_population_id);
 }

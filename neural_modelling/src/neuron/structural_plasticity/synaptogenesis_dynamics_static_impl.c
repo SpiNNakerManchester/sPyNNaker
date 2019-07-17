@@ -49,6 +49,7 @@ bool synaptogenesis_is_fast() {
     return false;
 }
 
-void update_goal_posts(uint32_t time) {
+void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     use(time);
+    use(spike);
 }

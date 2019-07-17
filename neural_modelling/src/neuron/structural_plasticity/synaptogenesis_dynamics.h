@@ -71,8 +71,7 @@ int32_t synaptogenesis_rewiring_period();
 //! or after a number of timesteps.
 bool synaptogenesis_is_fast();
 
-//! after a set of rewiring attempts, update the indices in the circular buffer
-//! between which we will be looking at the next batch of attempts
-void update_goal_posts(uint32_t time);
+//! Indicates that a spike has been received
+void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

@@ -15,8 +15,10 @@
 
 address_t partner_init(address_t data);
 
+static inline void partner_spike_received(uint32_t time, spike_t spike);
+
 static inline bool potential_presynaptic_partner(
-        rewiring_data_t *rewiring_data, uint32_t* population_id,
+        uint32_t time, rewiring_data_t *rewiring_data, uint32_t* population_id,
         uint32_t *sub_population_id, uint32_t *neuron_id, spike_t *spike);
 
 #endif // _PARTNER_H_

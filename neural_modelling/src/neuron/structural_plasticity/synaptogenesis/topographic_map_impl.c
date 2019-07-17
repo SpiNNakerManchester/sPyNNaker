@@ -176,7 +176,6 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
 bool synaptogenesis_dynamics_rewire(
         uint32_t time, spike_t *spike, address_t *synaptic_row_address,
         uint32_t *n_bytes) {
-    use(time);
 
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) *
@@ -203,7 +202,7 @@ bool synaptogenesis_dynamics_rewire(
 
     current_state.element_exists = element_exists;
     if (!element_exists) {
-        if (!potential_presynaptic_partner(&rewiring_data, &pre_app_pop,
+        if (!potential_presynaptic_partner(time, &rewiring_data, &pre_app_pop,
                 &pre_sub_pop, &neuron_id, spike)) {
             return false;
         }
@@ -272,4 +271,8 @@ int32_t synaptogenesis_rewiring_period(void) {
 //! or after a number of timesteps.
 bool synaptogenesis_is_fast(void) {
     return rewiring_data.fast == 1;
+}
+
+void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
+    partner_spike_received(time, spike);
 }

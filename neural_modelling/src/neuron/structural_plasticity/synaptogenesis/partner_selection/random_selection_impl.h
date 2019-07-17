@@ -7,9 +7,15 @@
 // Include debug header for log_info etc
 #include <debug.h>
 
+static inline void partner_spike_received(uint32_t time, spike_t spike) {
+    use(time);
+    use(spike);
+}
+
 static inline bool potential_presynaptic_partner(
-        rewiring_data_t *rewiring_data, uint32_t *population_id,
+        uint32_t time, rewiring_data_t *rewiring_data, uint32_t *population_id,
         uint32_t *sub_population_id, uint32_t *neuron_id, spike_t *spike) {
+    use(time);
     *population_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
                 * rewiring_data.pre_pop_info_table.no_pre_pops;
     subpopulation_info_t *preapppop_info =

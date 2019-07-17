@@ -286,7 +286,6 @@ void timer_callback(uint timer_count, uint unused) {
     if (rewiring &&
         ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
                 || synaptogenesis_is_fast())) {
-        update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
         if (synaptogenesis_is_fast()) {

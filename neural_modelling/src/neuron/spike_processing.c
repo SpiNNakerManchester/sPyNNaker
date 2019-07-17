@@ -121,6 +121,7 @@ static inline bool _is_something_to_do(
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
                 *spike, row_address, n_bytes_to_transfer)) {
+            synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
         }
