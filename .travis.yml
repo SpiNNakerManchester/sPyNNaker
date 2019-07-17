@@ -1,14 +1,27 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 language: python
 python:
   - 2.7
   - 3.6
+  - 3.7
 dist: xenial
-matrix:
-  include:
-    - python: 3.7
-      sudo: true
 cache: pip
-
+env:
+  - MPLBACKEND=module://matplotlib.backends.backend_agg
 addons:
   apt:
     packages:
@@ -17,11 +30,14 @@ addons:
       - libxml2-utils
       - gcc-arm-none-eabi
       - libnewlib-arm-none-eabi
+      - openjdk-8-jre-headless
+      - ant
 
 before_install:
   # Work around ludicrous Travis bug
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
+  - support/rat.sh download
   # Bring pip up to date 
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
@@ -69,6 +85,8 @@ script:
   # C 
   - CFLAGS=-fdiagnostics-color make -C neural_modelling
   - support/run-vera.sh neural_modelling/src
+  # Copyright check
+  - support/rat.sh run
   # Docs
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
