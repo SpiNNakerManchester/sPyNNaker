@@ -136,6 +136,7 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
     _extract_iobuf(expander_cores, transceiver, provenance_file_path,
                    display=True)
 
+
 def _fill_in_connection_data(app_graph, graph_mapper, placements,
                              transceiver):
     """ Once expander has run, fill in the connection data
