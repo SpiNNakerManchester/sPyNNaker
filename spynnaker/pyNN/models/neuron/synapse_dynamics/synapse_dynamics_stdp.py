@@ -395,3 +395,8 @@ class SynapseDynamicsSTDP(
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
         return 3 * 4
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
+    def changes_during_run(self):
+        return True

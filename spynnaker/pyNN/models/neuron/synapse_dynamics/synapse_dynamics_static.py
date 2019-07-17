@@ -176,3 +176,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
     def gen_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value
+
+    @property
+    @overrides(AbstractSynapseDynamics.changes_during_run)
+    def changes_during_run(self):
+        return False

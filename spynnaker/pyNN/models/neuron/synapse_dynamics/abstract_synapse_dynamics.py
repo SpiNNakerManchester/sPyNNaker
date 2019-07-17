@@ -1,7 +1,8 @@
 import math
 import numpy
 from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -52,6 +53,13 @@ class AbstractSynapseDynamics(object):
 
         :param n_words: The number of words the synapses must fit in
         :rtype: int
+        """
+
+    @abstractproperty
+    def changes_during_run(self):
+        """ Determine if the synapses change during a run
+
+        :rtype: bool
         """
 
     def get_provenance_data(self, pre_population_label, post_population_label):

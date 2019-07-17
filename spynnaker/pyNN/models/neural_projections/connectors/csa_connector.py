@@ -1,8 +1,13 @@
 import logging
-import csa
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+try:
+    import csa
+    csa_exception = False
+except ModuleNotFoundError as ex:  # noqa: F821
+    # Importing csa causes problems with readthedocs so allowing it to fail
+    csa_exception = ex
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +29,8 @@ class CSAConnector(AbstractConnector):
         :param '?' cset:
             A description of the connection set between populations
         """
+        if csa_exception:
+            raise csa_exception
         super(CSAConnector, self).__init__(safe, verbose)
         self.__cset = cset
 
@@ -107,9 +114,9 @@ class CSAConnector(AbstractConnector):
         block["source"] = [x[0] for x in pair_list]
         block["target"] = [x[1] for x in pair_list]
         block["weight"] = self._generate_weights(
-            weights, n_connections, None)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
