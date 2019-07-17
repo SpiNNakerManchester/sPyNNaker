@@ -328,9 +328,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
-        print('before run')
         super(AbstractSpiNNakerCommon, self).run(run_time)
-        print('after run')
 
     @property
     def time_scale_factor(self):

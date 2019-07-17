@@ -191,12 +191,11 @@ class SynapticManager(object):
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
-        print('synapse_info, connector', synapse_info, synapse_info.connector)
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
-    def get_connection_holders(self, app_edge, synapse_info):
-        return self.__pre_run_connection_holders[app_edge, synapse_info]
+    def get_connection_holders(self):
+        return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
         # TODO: Calculate this correctly

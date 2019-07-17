@@ -144,20 +144,24 @@ def _fill_in_connection_data(app_graph, graph_mapper, placements,
     :rtype: None
     """
     ctl = globals_variables.get_simulator()
+    use_extra_monitors = False
     for app_edge in app_graph.edges:
         if isinstance(app_edge, ProjectionApplicationEdge):
-            synapse_info = app_edge.synapse_information
+            synapse_information = app_edge.synapse_information
             post_vertex = app_edge.post_vertex
-            conn_holders = post_vertex.get_connection_holders(
-                app_edge, synapse_info)
+            conn_holders = post_vertex.get_connection_holders()
             machine_edges = graph_mapper.get_machine_edges(app_edge)
 
-            for conn_holder in conn_holders:
-                for machine_edge in machine_edges:
-                    placement = placements.get_placement_of_vertex(
-                        machine_edge.post_vertex)
-                    connections = post_vertex.get_connections_from_machine(
-                        transceiver, placement, machine_edge, graph_mapper,
-                        ctl.routing_infos, synapse_info,
-                        ctl.machine_time_step, False)
-                    connection_holder.add_connections(connections)
+            for synapse_info in synapse_information:
+                if (app_edge, synapse_info) in conn_holders:
+                    for conn_holder in conn_holders[app_edge,
+                                                    synapse_info]:
+                        for machine_edge in machine_edges:
+                            placement = placements.get_placement_of_vertex(
+                                machine_edge.post_vertex)
+                            conns = post_vertex.get_connections_from_machine(
+                                transceiver, placement, machine_edge,
+                                graph_mapper, ctl.routing_infos,
+                                synapse_info, ctl.machine_time_step,
+                                use_extra_monitors)
+                            conn_holder.add_connections(conns)
