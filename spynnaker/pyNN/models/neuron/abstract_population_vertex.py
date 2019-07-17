@@ -736,6 +736,9 @@ class AbstractPopulationVertex(
         self.__synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 
+    def get_connection_holders(self, edge, synapse_info):
+        self.__synapse_manager.get_connection_holders(edge, synapse_info)
+
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,

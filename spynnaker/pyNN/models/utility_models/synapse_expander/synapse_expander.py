@@ -8,6 +8,7 @@ from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spinn_utilities.make_tools.replacer import Replacer
+from spinn_front_end_common.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +61,8 @@ def synapse_expander(
             [CPUState.FINISHED])
         progress.update()
         finished = True
-        _fill_in_connection_data(app_graph, graph_mapper)
+        _fill_in_connection_data(app_graph, graph_mapper, placements,
+                                 transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
     except Exception:
@@ -119,26 +121,28 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
     _extract_iobuf(expander_cores, transceiver, provenance_file_path,
                    display=True)
 
-def _fill_in_connection_data(app_graph, graph_mapper):
-    """ Once connection has run, fill in the connection data
+def _fill_in_connection_data(app_graph, graph_mapper, placements,
+                             transceiver):
+    """ Once expander has run, fill in the connection data
     :param app_graph
     :param graph_mapper
     :rtype: None
     """
+    ctl = globals_variables.get_simulator()
     for app_edge in app_graph.edges:
         if isinstance(app_edge, ProjectionApplicationEdge):
             synapse_info = app_edge.synapse_information
-            print('app_edge, synapse_info: ', app_edge, synapse_info)
+            post_vertex = app_edge.post_vertex
+            conn_holders = post_vertex.get_connection_holders(
+                app_edge, synapse_info)
+            machine_edges = graph_mapper.get_machine_edges(app_edge)
 
-    for app_vertex in app_graph.vertices:
-        if isinstance(app_edge, AbstractPopulationVertex):
-            print('app_vertex: ', app_vertex)
-#         if (app_edge, synapse_info) in self.__pre_run_connection_holders:
-#             for conn_holder in self.__pre_run_connection_holders[
-#                     app_edge, synapse_info]:
-#                 conn_holder.add_connections(self._read_synapses(
-#                     synapse_info, pre_vertex_slice, post_vertex_slice,
-#                     row_length, delayed_row_length, n_synapse_types,
-#                     weight_scales, row_data, delayed_row_data,
-#                     app_edge.n_delay_stages, machine_time_step))
-#                 conn_holder.finish()
+            for conn_holder in conn_holders:
+                for machine_edge in machine_edges:
+                    placement = placements.get_placement_of_vertex(
+                        machine_edge.post_vertex)
+                    connections = post_vertex.get_connections_from_machine(
+                        transceiver, placement, machine_edge, graph_mapper,
+                        ctl.routing_infos, synapse_info,
+                        ctl.machine_time_step, False)
+                    connection_holder.add_connections(connections)

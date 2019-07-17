@@ -180,6 +180,9 @@ class SynapticManager(object):
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
+    def get_connection_holders(self, app_edge, synapse_info):
+        return self.__pre_run_connection_holders[app_edge, synapse_info]
+
     def get_n_cpu_cycles(self):
         # TODO: Calculate this correctly
         return 0
@@ -596,7 +599,7 @@ class SynapticManager(object):
                 pre_vertex_slice = graph_mapper.get_slice(
                     machine_edge.pre_vertex)
                 pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
-                pre_slice_idx = graph_mapper.get_machine_vertex_index(
+                pre_slice_index = graph_mapper.get_machine_vertex_index(
                     machine_edge.pre_vertex)
 
                 for synapse_info in app_edge.synapse_information:
@@ -618,11 +621,11 @@ class SynapticManager(object):
                                 post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
-                            pre_slice_idx, app_edge, rinfo))
+                            pre_slice_index, app_edge, rinfo))
                     else:
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
-                            pre_slices, pre_slice_idx, post_slices,
+                            pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge,
                             self.__n_synapse_types,
@@ -638,11 +641,11 @@ class SynapticManager(object):
         # to the master population table
         generator_data = list()
         for gen_data in generate_on_machine:
-            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
+            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_index,
                 app_edge, rinfo) = gen_data
             block_addr, index = self.__generate_on_chip_data(
                 spec, synapse_info,
-                pre_slices, pre_slice_idx, post_slices,
+                pre_slices, pre_slice_index, post_slices,
                 post_slice_index, pre_vertex_slice,
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
@@ -781,14 +784,14 @@ class SynapticManager(object):
 
     def __write_block(
             self, spec, synaptic_matrix_region, synapse_info, pre_slices,
-            pre_slice_idx, post_slices, post_slice_index, pre_vertex_slice,
+            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             master_pop_table_region, weight_scales, machine_time_step,
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
-             synapse_info, pre_slices, pre_slice_idx, post_slices,
+             synapse_info, pre_slices, pre_slice_index, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
              app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
              weight_scales, machine_time_step,
@@ -1050,11 +1053,13 @@ class SynapticManager(object):
             key, master_pop_table_address, transceiver,
             placement.x, placement.y)
 
-    def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
-                       weight_scales, data1, data2, n_delays, timestep):
+    def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
+                       delayed_max_row_length, n_synapse_types, weight_scales,
+                       data, delayed_data, n_delays, timestep):
         return self.__synapse_io.read_synapses(
-            info, pre_slice, post_slice, len1, len2, len3, weight_scales,
-            data1, data2, n_delays, timestep)
+            info, pre_slice, post_slice, max_row_length,
+            delayed_max_row_length, n_synapse_types, weight_scales, data,
+            delayed_data, n_delays, timestep)
 
     def _retrieve_synaptic_block(
             self, txrx, placement, master_pop_table_address,
