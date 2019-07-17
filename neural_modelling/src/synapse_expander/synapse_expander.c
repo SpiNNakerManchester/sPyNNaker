@@ -129,14 +129,13 @@ static bool run_connection_builder_region(void **in_region,
 
 /**
  *! \brief Read the data for the expander and execute what was found
- *! \param[in] params_address The address of the expander parameters
+ *! \param[in] config The address of the expander parameters
  *! \param[in] synaptic_matrix_region The address of the synaptic matrices
  *! \return True if the expander finished correctly, False if there was an
  *!         error
  */
 static bool run_expander(
-        void *params_address, address_t synaptic_matrix_region) {
-    struct expander_config_t *config = params_address;
+        struct expander_config_t *config, address_t synaptic_matrix_region) {
     log_info("Generating %u edges for %u atoms starting at %u",
             config->n_in_edges, config->post_slice_count,
             config->post_slice_start);
@@ -173,9 +172,9 @@ void c_main(void) {
         log_info("!!!   Error reading data specification header   !!!");
         rt_error(RTE_ABORT);
     }
-    address_t params_address = data_specification_get_region(
+    void *params_address = data_specification_get_region(
             CONNECTOR_BUILDER_REGION, ds_regions);
-    address_t syn_mtx_addr = data_specification_get_region(
+    void *syn_mtx_addr = data_specification_get_region(
             SYNAPTIC_MATRIX_REGION, ds_regions);
     log_info("\tReading SDRAM at 0x%08x, writing to matrix at 0x%08x",
             params_address, syn_mtx_addr);

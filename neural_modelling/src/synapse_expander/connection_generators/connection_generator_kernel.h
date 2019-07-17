@@ -9,7 +9,7 @@
 /**
  *! \brief The parameters to be passed around for this connector
  */
-struct kernel {
+typedef struct kernel {
 	// put in the relevant kernel connector parameters here
     uint16_t m_commonWidth;
     uint16_t m_commonHeight;
@@ -34,33 +34,32 @@ struct kernel {
 
     // any further parameters required would go here
     // uint32_t allow_self_connections;
-};
+} kernel_connection_t;
 
-void *connection_generator_kernel_initialise(address_t *region) {
-
+static void *connection_generator_kernel_initialise(address_t *region) {
     // Allocate the data structure for parameters
-    struct kernel *params = (struct kernel *)
-        spin1_malloc(sizeof(struct kernel));
+    kernel_connection_t *params = spin1_malloc(sizeof(kernel_connection_t));
 
     // Copy the parameters into the data structure
-    address_t params_sdram = *region;
-    spin1_memcpy(params, params_sdram, sizeof(struct kernel));
-    params_sdram = &(params_sdram[sizeof(struct kernel) >> 2]);
+    kernel_connection_t *params_sdram = (kernel_connection_t *) *region;
+    spin1_memcpy(params, params_sdram, sizeof(kernel_connection_t));
     log_debug("Kernel connector, m_kernelWidth, m_kernelHeight = %u %u",
     		params->m_kernelWidth, params->m_kernelHeight);
 
-    *region = params_sdram;
+    *region = (address_t) &params_sdram[1];
     return params;
 }
 
-void connection_generator_kernel_free(void *data) {
+static void connection_generator_kernel_free(void *data) {
     sark_free(data);
 }
 
-uint32_t connection_generator_kernel_generate(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
+static uint32_t connection_generator_kernel_generate(
+        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
+    kernel_connection_t *params = data;
+
     use(pre_slice_start);
     use(pre_slice_count);
 
@@ -70,8 +69,6 @@ uint32_t connection_generator_kernel_generate(
     if (max_row_length < 1) {
     	return 0;
     }
-
-    struct kernel *params = (struct kernel *) data;
 
     // start n_conns at zero
     uint32_t n_conns = 0;
@@ -86,18 +83,17 @@ uint32_t connection_generator_kernel_generate(
         uint16_t post_r, post_c; //post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre
-        post_r = uidiv(post_slice_start + i,
-            params->m_postWidth, &post_c);
+        post_r = uidiv(post_slice_start + i, params->m_postWidth, &post_c);
 
         //move post coords into common coordinate system
         post_in_pre_world(post_r, post_c, params->m_startPostHeight,
-            params->m_startPostWidth, params->m_stepPostHeight,
-            params->m_stepPostWidth, &pac_r, &pac_c);
+                params->m_startPostWidth, params->m_stepPostHeight,
+                params->m_stepPostWidth, &pac_r, &pac_c);
 
         //move common to pre coords
         pre_in_post_world(
-            pac_r, pac_c, params->m_startPreHeight, params->m_startPreHeight,
-            params->m_stepPreHeight, params->m_stepPreWidth, &pap_r, &pap_c);
+                pac_r, pac_c, params->m_startPreHeight, params->m_startPreHeight,
+                params->m_stepPreHeight, params->m_stepPreWidth, &pap_r, &pap_c);
 
         int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;
         int16_t c_diff = (int16_t) pap_c - (int16_t) pre_c;
@@ -105,8 +101,8 @@ uint32_t connection_generator_kernel_generate(
         k_r = hlf_kh - r_diff;
         k_c = hlf_kw - c_diff;
 
-        if (0 <= k_r && k_r < params->m_kernelHeight && 0 <= k_c
-                && k_c < params->m_kernelWidth) {
+        if ((0 <= k_r) && (k_r < params->m_kernelHeight) && (0 <= k_c)
+                && (k_c < params->m_kernelWidth)) {
             indices[n_conns++] = i;
         }
     }

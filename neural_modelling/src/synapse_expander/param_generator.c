@@ -143,6 +143,15 @@ static inline param_generator_t param_generator_new(
     return generator;
 }
 
+/**
+ *! \brief Create and initialise a parameter generator; weights and delays for
+ *!        a connection each use their own generator.
+ *! \param[in] hash The code indicating the type of parameter generator to use
+ *! \param[in/out] in_region The address to read the parameters from.  Should be
+ *!                          updated to the position just after the parameters
+ *!                          after calling.
+ *! \return The parameter generator instance data reference
+ */
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {

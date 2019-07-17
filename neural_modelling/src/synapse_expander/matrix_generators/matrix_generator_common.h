@@ -26,7 +26,7 @@ struct delay_value {
  *! \param[in] The value to convert
  *! \param[in] The maximum delay stage allowed
  */
-struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
+static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
     uint16_t delay = delay_value;
 
     // Ensure delay is at least 1

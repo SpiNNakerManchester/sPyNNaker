@@ -45,7 +45,7 @@ struct delay_builder_t {
  *! \return True if the region was correctly generated, False if there was an
  *!         error
  */
-bool read_delay_builder_region(address_t *in_region,
+static bool read_delay_builder_region(address_t *in_region,
         bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
         uint32_t pre_slice_count) {
     struct delay_builder_t *region = (struct delay_builder_t *) *in_region;
@@ -129,19 +129,14 @@ bool read_delay_builder_region(address_t *in_region,
 
 /**
  *! \brief Read the data for the generator
- *! \param[in] delay_params_address The address of the delay extension
- *!                                 parameters
- *! \param[in] params_address The address of the expander parameters
+ *! \param[in] delay_params The address of the delay extension parameters
+ *! \param[in] expand_params The address of the expander parameters
  *! \return True if the expander finished correctly, False if there was an
  *!         error
  */
-bool read_sdram_data(
-        address_t delay_params_address, address_t params_address) {
-    struct delay_parameters_t *delay_params = (struct delay_parameters_t *)
-            delay_params_address;
-    struct expander_params_t *expand_params = (struct expander_params_t *)
-            params_address;
-
+static bool read_sdram_data(
+        struct delay_parameters_t *delay_params,
+        struct expander_params_t *expand_params) {
     // Read the global parameters from the delay extension
     uint32_t num_neurons = delay_params->n_atoms;
     uint32_t neuron_bit_field_words = get_bit_field_size(num_neurons);
@@ -188,16 +183,16 @@ void c_main(void) {
         log_info("!!!   Error reading data specification header   !!!");
         rt_error(RTE_ABORT);
     }
-    address_t delay_params_address = data_specification_get_region(
-            DELAY_PARAMS, ds_regions);
-    address_t params_address = data_specification_get_region(
-            EXPANDER_REGION, ds_regions);
+    void *delay_params =
+            data_specification_get_region(DELAY_PARAMS, ds_regions);
+    void *expand_params =
+            data_specification_get_region(EXPANDER_REGION, ds_regions);
     log_info("\tReading SDRAM delay params at 0x%08x,"
             " expander params at 0x%08x",
-            delay_params_address, params_address);
+            delay_params, expand_params);
 
     // Run the expander
-    if (!read_sdram_data(delay_params_address, params_address)) {
+    if (!read_sdram_data(delay_params, expand_params)) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);
     }

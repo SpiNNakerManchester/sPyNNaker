@@ -138,6 +138,14 @@ static inline connection_generator_t connection_generator_new(
     return generator;
 }
 
+/**
+ *! \brief Create and initialise the connection generator
+ *! \param[in] hash The code indicating the type of connection generator to use
+ *! \param[in/out] in_region The address to read the parameters from.  Should be
+ *!                          updated to the position just after the parameters
+ *!                          after calling.
+ *! \return The connection generator instance data reference
+ */
 connection_generator_t connection_generator_init(
         uint32_t hash, address_t *in_region) {
     // Look through the known generators
