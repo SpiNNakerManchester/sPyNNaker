@@ -41,19 +41,13 @@ typedef struct {
 //! parameters of the synaptic rewiring model
 typedef struct {
     uint32_t p_rew, fast, s_max, app_no_atoms,
-        machine_no_atoms, low_atom, high_atom,
-        size_ff_prob, size_lat_prob, grid_x, grid_y, p_elim_dep, p_elim_pot;
+        machine_no_atoms, low_atom, high_atom;
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed, local_seed;
     // information about all pre-synaptic sub-populations eligible for rewiring
     pre_pop_info_table_t pre_pop_info_table;
-    // distance dependent probabilities LUTs
-    uint16_t *ff_probabilities, *lat_probabilities;
     // inverse of synaptic matrix
     int32_t *post_to_pre_table;
-    // flags for synapse type of lateral connections and whether formations
-    // sample randomly from all available neurons
-    int32_t lateral_inhibition, random_partner, is_distance_dependent;
 } rewiring_data_t;
 
 //! function to unpack element from post to pre table into constituent bits

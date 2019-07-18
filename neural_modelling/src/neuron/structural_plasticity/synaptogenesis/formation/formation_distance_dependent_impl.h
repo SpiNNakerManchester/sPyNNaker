@@ -5,6 +5,19 @@
 
 #define MAX_SHORT 65535
 
+typedef struct formation_distance_dependent_params {
+    uint32_t grid_x;
+    uint32_t grid_y;
+    uint32_t ff_prob_size;
+    uint32_t lat_prob_size;
+    uint16_t prob_tables[];
+} form_dist_params;
+
+extern form_dist_params *form_dd_params;
+extern uint16_t *ff_probs;
+extern uint16_t *lat_probs;
+
+
 //! abs function
 static int my_abs(int a) {
     return a < 0 ? -a : a;
@@ -24,17 +37,17 @@ static inline bool synaptogenesis_formation_rule(rewiring_data_t *rewiring_data,
             .key_atom_info[current_state->subpop_index].lo_atom + current_state->pre_syn_id;
     post_global_id = current_state->post_syn_id + rewiring_data->low_atom;
 
-    if (rewiring_data->grid_x > 1) {
-        pre_x = pre_global_id / rewiring_data->grid_x;
-        post_x = post_global_id / rewiring_data->grid_x;
+    if (form_dd_params->grid_x > 1) {
+        pre_x = pre_global_id / form_dd_params->grid_x;
+        post_x = post_global_id / form_dd_params->grid_x;
     } else {
         pre_x = 0;
         post_x = 0;
     }
 
-    if (rewiring_data->grid_y > 1) {
-        pre_y = pre_global_id % rewiring_data->grid_y;
-        post_y = post_global_id % rewiring_data->grid_y;
+    if (form_dd_params->grid_y > 1) {
+        pre_y = pre_global_id % form_dd_params->grid_y;
+        post_y = post_global_id % form_dd_params->grid_y;
     } else {
         pre_y = 0;
         post_y = 0;
@@ -45,12 +58,12 @@ static inline bool synaptogenesis_formation_rule(rewiring_data_t *rewiring_data,
     delta_x = my_abs(pre_x - post_x);
     delta_y = my_abs(pre_y - post_y);
 
-    if (delta_x > rewiring_data->grid_x >> 1 && rewiring_data->grid_x > 1) {
-        delta_x -= rewiring_data->grid_x;
+    if (delta_x > form_dd_params->grid_x >> 1 && form_dd_params->grid_x > 1) {
+        delta_x -= form_dd_params->grid_x;
     }
 
-    if (delta_y > rewiring_data->grid_y >> 1 && rewiring_data->grid_y > 1) {
-        delta_y -= rewiring_data->grid_y;
+    if (delta_y > form_dd_params->grid_y >> 1 && form_dd_params->grid_y > 1) {
+        delta_y -= form_dd_params->grid_y;
     }
 
     uint32_t distance = delta_x * delta_x + delta_y * delta_y;
@@ -59,16 +72,16 @@ static inline bool synaptogenesis_formation_rule(rewiring_data_t *rewiring_data,
     uint16_t probability;
 
     if ((!(current_state->current_controls & IS_CONNECTION_LAT) &&
-            distance > rewiring_data->size_ff_prob)
+            distance > form_dd_params->ff_prob_size)
         || ((current_state->current_controls & IS_CONNECTION_LAT) &&
-            distance > rewiring_data->size_lat_prob)) {
+            distance > form_dd_params->lat_prob_size)) {
         return false;
     }
 
     if (!(current_state->current_controls & IS_CONNECTION_LAT)) {
-        probability = rewiring_data->ff_probabilities[distance];
+        probability = ff_probs[distance];
     } else {
-        probability = rewiring_data->lat_probabilities[distance];
+        probability = lat_probs[distance];
     }
     uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data->local_seed)) * MAX_SHORT;
     if (r > probability) {
