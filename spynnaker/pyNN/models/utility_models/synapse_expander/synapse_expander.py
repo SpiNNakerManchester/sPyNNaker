@@ -22,6 +22,10 @@ from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine)
 from spinn_utilities.make_tools.replacer import Replacer
 from spinn_front_end_common.utilities import globals_variables
 
@@ -154,15 +158,28 @@ def _fill_in_connection_data(app_graph, graph_mapper, placements,
             machine_edges = graph_mapper.get_machine_edges(app_edge)
 
             for synapse_info in synapse_information:
-                if (app_edge, synapse_info) in conn_holders:
-                    for conn_holder in conn_holders[app_edge,
-                                                    synapse_info]:
-                        for machine_edge in machine_edges:
-                            placement = placements.get_placement_of_vertex(
-                                machine_edge.post_vertex)
-                            conns = post_vertex.get_connections_from_machine(
-                                transceiver, placement, machine_edge,
-                                graph_mapper, ctl.routing_infos,
-                                synapse_info, ctl.machine_time_step,
-                                use_extra_monitors)
-                            conn_holder.add_connections(conns)
+                # Only do this if this synapse_info has been generated
+                # on the machine using the expander
+                connector = synapse_info.connector
+                dynamics = synapse_info.synapse_dynamics
+                connector_gen = isinstance(
+                    connector, AbstractGenerateConnectorOnMachine) and \
+                    connector.generate_on_machine(
+                        synapse_info.weight, synapse_info.delay)
+                synapse_gen = isinstance(
+                    dynamics, AbstractGenerateOnMachine)
+                if connector_gen and synapse_gen:
+                    if (app_edge, synapse_info) in conn_holders:
+                        for conn_holder in conn_holders[app_edge,
+                                                        synapse_info]:
+                            for machine_edge in machine_edges:
+                                placement = placements.\
+                                    get_placement_of_vertex(
+                                        machine_edge.post_vertex)
+                                conns = post_vertex.\
+                                    get_connections_from_machine(
+                                        transceiver, placement, machine_edge,
+                                        graph_mapper, ctl.routing_infos,
+                                        synapse_info, ctl.machine_time_step,
+                                        use_extra_monitors)
+                                conn_holder.add_connections(conns)
