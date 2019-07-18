@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 try:
     from collections.abc import defaultdict
 except ImportError:
@@ -910,7 +925,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step, placements):
+            graph_mapper, weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)

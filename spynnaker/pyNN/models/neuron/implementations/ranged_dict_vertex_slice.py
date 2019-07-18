@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import itertools
 import numpy
 from spinn_utilities.helpful_functions import is_singleton
@@ -48,8 +63,9 @@ class _RangedListVertexSlice(object):
 
             # Go through and set the data in ranges
             start_index = 0
+            off = self.__vertex_slice.lo_atom
             for end_index in itertools.chain(
                     changes, [self.__vertex_slice.n_atoms]):
                 self.__ranged_list.set_value_by_slice(
-                    start_index, end_index, value[start_index])
+                    start_index + off, end_index + off, value[start_index])
                 start_index = end_index
