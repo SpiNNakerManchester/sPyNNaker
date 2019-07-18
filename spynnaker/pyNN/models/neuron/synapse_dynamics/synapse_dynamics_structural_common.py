@@ -102,7 +102,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Projection specific manager
         "__manager",
         # Flag controlling whether rewiring cares about distance
-        "__is_distance_dependent"
+        "__is_distance_dependent",
+        # The partner selection rule
+        "__partner_selection",
+        # The formation rule
+        "__formation",
+        # The elimination rule
+        "__elimination"
 
     ]
 
@@ -120,6 +126,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     OFFSET_MASKED_SUB_POP = 16
 
     def __init__(self,
+                 partner_selection, formation, elimination,
                  stdp_model=default_parameters['stdp_model'],
                  f_rew=default_parameters['f_rew'],
                  weight=default_parameters['weight'],
@@ -137,6 +144,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  is_distance_dependent=default_parameters[
                      'is_distance_dependent'],
                  seed=None):
+        self.__partner_selection = partner_selection
+        self.__formation = formation
+        self.__elimination = elimination
         self.__f_rew = f_rew
         self.__p_rew = 1. / self.__f_rew
         self.__initial_weight = weight
@@ -183,6 +193,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                  'sigma_form_forward', 'sigma_form_lateral', 'p_form_forward',
                  'p_form_lateral', 'p_elim_dep', 'p_elim_pot', 'grid',
                  'random_partner']
+        names.extend(self.__partner_selection.get_parameter_names())
+        names.extend(self.__formation.get_parameter_names())
+        names.extend(self.__elimination.get_parameter_names())
         return names
 
     def distance(self, x0, x1, grid=np.asarray([16, 16]),
@@ -327,6 +340,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec, application_graph, machine_graph,
             app_vertex, post_slice, machine_vertex, graph_mapper,
             routing_info, weight_scales)
+
+        # Write information for the components
+        self.__partner_selection.write_parameters(spec)
+        self.__formation.write_parameters(spec)
+        self.__elimination.write_parameters(spec)
 
     def __write_common_rewiring_data(self, spec, app_vertex, post_slice,
                                      weight_scales, machine_time_step):
@@ -756,7 +774,12 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             for synapse_info in edge.synapse_information:
                 if synapse_info.synapse_dynamics is self.__weight_dynamics:
                     relevant_edges.append(edge)
-        return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
+        components_size = (
+            self.__partner_selection.get_parameters_sdram_usage_in_bytes() +
+            self.__formation.get_parameters_sdram_usage_in_bytes() +
+            self.__elimination.get_parameters_sdram_usage_in_bytes())
+        return (int(self.__fudge_factor * 4 * 12 * len(relevant_edges)) +
+                components_size)
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges):
@@ -843,12 +866,19 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     def get_vertex_executable_suffix(self):
         name = "_structural"
+        name += self.__partner_selection.vertex_executable_suffix
+        name += self.__formation.vertex_executable_suffix
+        name += self.__elimination.vertex_executable_suffix
         return name
 
     def is_same_as(self, synapse_dynamics):
         if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
             return False
         return (
+                self.__partner_selection.is_same_as(
+                    synapse_dynamics.partner_selection) and
+                self.__formation.is_same_as(synapse_dynamics.formation) and
+                self.__elimination.is_same_as(synapse_dynamics.elimination) and
                 self.__f_rew == synapse_dynamics.f_rew and
                 self.__s_max == synapse_dynamics.s_max and
                 np.isclose(self.__sigma_form_forward,
@@ -897,3 +927,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     @property
     def p_form_lateral(self):
         return self.__p_form_lateral
+
+    @property
+    def partner_selection(self):
+        return self.__partner_selection
+
+    @property
+    def formation(self):
+        return self.__formation
+
+    @property
+    def elimination(self):
+        return self.__elimination

@@ -223,3 +223,18 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
     @property
     def p_form_lateral(self):
         return self.__common_sp.p_form_lateral
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.partner_selection)
+    def partner_selection(self):
+        return self.__common_sp.partner_selection
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.formation)
+    def formation(self):
+        return self.__common_sp.formation
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.elimination)
+    def elimination(self):
+        return self.__common_sp.elimination

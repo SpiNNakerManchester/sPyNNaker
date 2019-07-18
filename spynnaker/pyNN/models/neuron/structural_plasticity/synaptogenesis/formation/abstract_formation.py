@@ -36,8 +36,3 @@ class AbstractFormation(object):
 
         :rtype: iterable(str)
         """
-
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        """ Get any provenance data
-        """
-        return list()
