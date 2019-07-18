@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *  \brief This file contains the main functions for a poisson spike generator.
@@ -269,11 +286,12 @@ static bool read_poisson_parameters(address_t address) {
 static bool initialise_recording(){
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Get the system region
     address_t recording_region = data_specification_get_region(
-        SPIKE_HISTORY_REGION, address);
+            SPIKE_HISTORY_REGION, ds_regions);
 
     bool success = recording_initialize(recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
@@ -293,22 +311,23 @@ static bool initialize() {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM, address),
+            data_specification_get_region(SYSTEM, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_data_address(
-        data_specification_get_region(PROVENANCE_REGION, address));
+            data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // setup recording region
     if (!initialise_recording()){
@@ -317,12 +336,12 @@ static bool initialize() {
 
     // Setup regions that specify spike source array data
     if (!read_global_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))) {
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))) {
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
@@ -354,10 +373,11 @@ static bool initialize() {
 void resume_callback() {
     recording_reset();
 
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))){
+            data_specification_get_region(POISSON_PARAMS, ds_regions))){
         log_error("failed to reread the Poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -385,20 +405,22 @@ bool store_poisson_parameters() {
     log_info("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
-    address = data_specification_get_region(POISSON_PARAMS, address);
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+    address_t param_store =
+            data_specification_get_region(POISSON_PARAMS, ds_regions);
 
     // Copy the global_parameters back to SDRAM
-    spin1_memcpy(address, &global_parameters, sizeof(global_parameters));
+    spin1_memcpy(param_store, &global_parameters, sizeof(global_parameters));
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
     if (global_parameters.n_spike_sources > 0) {
         uint32_t spikes_offset =
-            sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
+                sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
         spin1_memcpy(
-            &address[spikes_offset], poisson_parameters,
-            global_parameters.n_spike_sources * sizeof(spike_source_t));
+                &param_store[spikes_offset], poisson_parameters,
+                global_parameters.n_spike_sources * sizeof(spike_source_t));
     }
 
     log_info("stored_parameters : completed successfully");
