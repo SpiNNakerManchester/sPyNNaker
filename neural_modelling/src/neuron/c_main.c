@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*!\file
  *
  * SUMMARY
@@ -216,27 +233,28 @@ static bool initialise() {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, address),
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
-        c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, address));
+            c_main_store_provenance_data,
+            data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // setup recording region
     if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))){
+            data_specification_get_region(RECORDING_REGION, ds_regions))){
         return false;
     }
 
@@ -245,7 +263,7 @@ static bool initialise() {
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, address),
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &timer_offset)) {
         return false;
@@ -254,7 +272,7 @@ static bool initialise() {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
+            data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts)) {
         return false;
@@ -263,7 +281,7 @@ static bool initialise() {
     // set up direct synapses
     address_t direct_synapses_address;
     if (!direct_synapses_initialise(
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             &direct_synapses_address)){
         return false;
     }
@@ -271,14 +289,14 @@ static bool initialise() {
     // Set up the population table
     uint32_t row_max_n_words;
     if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, address),
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, address),
+            data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
             direct_synapses_address, &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
-        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
@@ -303,8 +321,7 @@ static bool initialise() {
     }
 
     // Setup profiler
-    profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+    profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_info("initialising the bit field region");
     if (!bit_field_filter_initialise(
@@ -322,10 +339,10 @@ void resume_callback() {
     recording_reset();
 
     // try reloading neuron parameters
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
     if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(
-                NEURON_PARAMS_REGION, address))) {
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -360,9 +377,10 @@ void timer_callback(uint timer_count, uint unused) {
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
-        address_t address = data_specification_get_data_address();
+        data_specification_metadata_t *ds_regions =
+                data_specification_get_data_address();
         neuron_store_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, address));
+                data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 

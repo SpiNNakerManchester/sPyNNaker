@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import os
@@ -278,7 +293,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def _detect_if_graph_has_changed(self, reset_flags=True):
         """ Iterate though the graph and look for changes.
         """
-        changed = super(AbstractSpiNNakerCommon, self).\
+        changed, data_changed = super(AbstractSpiNNakerCommon, self).\
             _detect_if_graph_has_changed(reset_flags)
 
         # Additionally check populations for changes
@@ -295,7 +310,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             if reset_flags:
                 projection.mark_no_changes()
 
-        return changed
+        return changed, data_changed
 
     @property
     def min_delay(self):
