@@ -281,7 +281,7 @@ static bool initialise() {
     // set up direct synapses
     address_t direct_synapses_address;
     if (!direct_synapses_initialise(
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             &direct_synapses_address)){
         return false;
     }
