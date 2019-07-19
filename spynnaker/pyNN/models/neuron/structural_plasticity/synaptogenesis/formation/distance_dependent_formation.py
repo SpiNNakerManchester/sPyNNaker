@@ -21,6 +21,20 @@ class DistanceDependentFormation(AbstractFormation):
     def __init__(
             self, grid, p_form_forward, sigma_form_forward, p_form_lateral,
             sigma_form_lateral):
+        """
+
+        :param grid: (x, y) dimensions of the grid of distance
+        :param p_form_forward:\
+            The peak probability of formation on feed-forward connections
+        :param sigma_form_forward:\
+            The spread of probability with distance of formation on\
+            feed-forward connections
+        :param p_form_lateral:\
+            The peak probability of formation on lateral connections
+        :param sigma_form_lateral:\
+            The spread of probability with distance of formation on\
+            lateral connections
+        """
         self._grid = numpy.asarray(grid, dtype=int)
         self._p_form_forward = p_form_forward
         self._sigma_form_forward = sigma_form_forward
