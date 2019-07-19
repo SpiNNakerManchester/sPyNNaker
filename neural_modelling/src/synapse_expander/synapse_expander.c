@@ -174,11 +174,6 @@ bool read_sdram_data(
 void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
 
-    // Register each of the components
-    register_matrix_generators();
-    register_connection_generators();
-    register_param_generators();
-
     // Get the addresses of the regions
     log_info("Starting To Build Connectors");
     data_specification_metadata_t *ds_regions =

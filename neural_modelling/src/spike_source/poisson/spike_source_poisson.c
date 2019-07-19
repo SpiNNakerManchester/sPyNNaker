@@ -33,7 +33,7 @@
 #include <bit_field.h>
 
 // Declare spin1_wfi
-extern void spin1_wfi();
+extern void spin1_wfi(void);
 
 // Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
@@ -248,7 +248,6 @@ static bool read_poisson_parameters(address_t address) {
             log_error("Failed to allocate poisson_parameters");
             return false;
         }
-
 
         // store spike source data into DTCM
         uint32_t spikes_offset = sizeof(params) / sizeof(uint32_t);

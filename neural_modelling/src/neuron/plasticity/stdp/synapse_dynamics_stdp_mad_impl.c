@@ -204,7 +204,12 @@ void synapse_dynamics_print_plastic_synapses(
 
 //---------------------------------------
 static inline index_t _sparse_axonal_delay(uint32_t x) {
+#if 1
+    use(x);
+    return 0;
+#else
     return (x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK;
+#endif
 }
 
 address_t synapse_dynamics_initialise(
@@ -291,7 +296,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Extract control-word components
         // **NOTE** cunningly, control word is just the same as lower
         // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_axonal = 0;    //_sparse_axonal_delay(control_word);
+        uint32_t delay_axonal = _sparse_axonal_delay(control_word);
         uint32_t delay_dendritic = synapse_row_sparse_delay(
                 control_word, synapse_type_index_bits);
         uint32_t type = synapse_row_sparse_type(

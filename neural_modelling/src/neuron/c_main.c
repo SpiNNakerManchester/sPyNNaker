@@ -133,7 +133,7 @@ void c_main_store_provenance_data(address_t provenance_region) {
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialise() {
+static bool initialise(void) {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM

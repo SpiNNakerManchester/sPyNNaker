@@ -204,7 +204,7 @@ static inline void _process_fixed_synapses(
 }
 
 //! private method for doing output debug data on the synapses
-static inline void _print_synapse_parameters() {
+static inline void _print_synapse_parameters(void) {
 //! only if the models are compiled in debug mode will this method contain
 //! said lines.
 #if LOG_LEVEL >= LOG_DEBUG

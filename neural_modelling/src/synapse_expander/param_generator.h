@@ -27,12 +27,6 @@
 typedef struct param_generator *param_generator_t;
 
 /**
- *! \brief Register any parameter generators to be used in the remaining
- *!        functions
- */
-void register_param_generators(void);
-
-/**
  *! \brief Initialise a specific parameter generator
  *! \param[in] hash The identifier of the generator to initialise
  *! \param[in/out] region The address to read data from - updated to position
