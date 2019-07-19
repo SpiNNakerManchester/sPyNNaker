@@ -24,13 +24,13 @@
 /**
  *! \brief Parameter generator "object"
  */
-typedef struct param_generator* param_generator_t;
+typedef struct param_generator *param_generator_t;
 
 /**
  *! \brief Register any parameter generators to be used in the remaining
  *!        functions
  */
-void register_param_generators();
+void register_param_generators(void);
 
 /**
  *! \brief Initialise a specific parameter generator
@@ -41,7 +41,7 @@ void register_param_generators();
  *!         functions, or NULL if it couldn't be initialised for any reason
  */
 param_generator_t param_generator_init(
-    uint32_t hash, address_t *region);
+        uint32_t hash, address_t *region);
 
 /**
  *! \brief Generate values with a parameter generator
@@ -54,8 +54,8 @@ param_generator_t param_generator_init(
  *!                       n_indices in size
  */
 void param_generator_generate(
-    param_generator_t generator, uint32_t n_indices,
-    uint32_t pre_neuron_index, uint16_t *indices, accum *values);
+        param_generator_t generator, uint32_t n_indices,
+        uint32_t pre_neuron_index, uint16_t *indices, accum *values);
 
 /**
  *! \brief Finish with a parameter generator

@@ -206,7 +206,7 @@ static inline multicast_packet munich_protocol_get_configure_master_key_command(
     };
 }
 
-static inline multicast_packet munich_protocol_get_set_mode_command() {
+static inline multicast_packet munich_protocol_get_set_mode_command(void) {
     return (multicast_packet) {
         .key = _CHANGE_MODE | _instance_key,
         .payload = (uint32_t) _mode,
@@ -216,7 +216,6 @@ static inline multicast_packet munich_protocol_get_set_mode_command() {
 
 static inline multicast_packet munich_protocol_set_retina_transmission_key(
         uint32_t new_key, uint32_t uart_id) {
-
     return (multicast_packet) {
         .key = (_ACTIVE_RETINA_EVENT_STREAMING_SET_KEY |
                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
@@ -236,7 +235,7 @@ static inline multicast_packet munich_protocol_disable_retina_event_streaming(
 }
 
 static inline multicast_packet
-    munich_protocol_master_slave_use_internal_counter(
+munich_protocol_master_slave_use_internal_counter(
         uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MASTER_SLAVE_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -257,7 +256,7 @@ static inline multicast_packet munich_protocol_master_slave_set_slave(
 }
 
 static inline multicast_packet
-    munich_protocol_master_slave_set_master_clock_not_started(
+munich_protocol_master_slave_set_master_clock_not_started(
         uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MASTER_SLAVE_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -268,7 +267,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_master_slave_set_master_clock_active(
+munich_protocol_master_slave_set_master_clock_active(
         uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MASTER_SLAVE_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
@@ -316,12 +315,12 @@ static inline multicast_packet munich_protocol_poll_sensors_once(
 }
 
 static inline multicast_packet
-    munich_protocol_poll_individual_sensor_continuously(
+munich_protocol_poll_individual_sensor_continuously(
         uint32_t sensor_id, uint32_t time_in_ms) {
     return (multicast_packet) {
         .key = _POLL_SENSORS_CONTINUOUSLY_KEY | _instance_key,
         .payload = ((sensor_id << _PAYLOAD_SENSOR_ID_OFFSET) |
-                      (time_in_ms << _PAYLOAD_OFFSET_FOR_SENSOR_TIME)),
+                (time_in_ms << _PAYLOAD_OFFSET_FOR_SENSOR_TIME)),
         .payload_flag = WITH_PAYLOAD
     };
 }
@@ -330,62 +329,62 @@ static inline multicast_packet munich_protocol_generic_motor_enable_disable(
         uint32_t enable_disable, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _DISABLE_MOTOR_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = enable_disable,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor_total_period_duration(
+munich_protocol_generic_motor_total_period_duration(
         uint32_t time_in_ms, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_RUN_FOR_PERIOD_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = time_in_ms,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor0_raw_output_permanent(
+munich_protocol_generic_motor0_raw_output_permanent(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_0_RAW_PERM_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = pwm_signal,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor1_raw_output_permanent(
+munich_protocol_generic_motor1_raw_output_permanent(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_1_RAW_PERM_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = pwm_signal,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor0_raw_output_leak_to_0(
+munich_protocol_generic_motor0_raw_output_leak_to_0(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_0_RAW_LEAK_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = pwm_signal,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_generic_motor1_raw_output_leak_to_0(
+munich_protocol_generic_motor1_raw_output_leak_to_0(
         uint32_t pwm_signal, uint32_t uart_id) {
     return (multicast_packet) {
         .key = _MOTOR_1_RAW_LEAK_KEY | (uart_id << _OFFSET_FOR_UART_ID) |
-               _instance_key,
+                _instance_key,
         .payload = pwm_signal,
         .payload_flag = WITH_PAYLOAD
     };
@@ -395,7 +394,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_a_duration(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_A_TOTAL_PERIOD_KEY |
-                  (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
@@ -405,7 +404,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_b_duration(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_B_TOTAL_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
@@ -415,79 +414,79 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_C_TOTAL_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
+munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
+munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
         uint32_t timer_period, uint32_t uart_id) {
     return (multicast_packet) {
         .key = (_MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY  |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = timer_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
-static inline multicast_packet munich_protocol_query_state_of_io_lines() {
+static inline multicast_packet munich_protocol_query_state_of_io_lines(void) {
     return (multicast_packet) {
         .key = _QUERY_STATES_LINES_KEY | _instance_key,
         .payload = 0,
@@ -505,7 +504,7 @@ static inline multicast_packet munich_protocol_set_output_pattern_for_payload(
 }
 
 static inline multicast_packet
-    munich_protocol_add_payload_logic_to_current_output(
+munich_protocol_add_payload_logic_to_current_output(
         uint32_t payload) {
     return (multicast_packet) {
         .key = _ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY | _instance_key,
@@ -515,7 +514,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_remove_payload_logic_to_current_output(
+munich_protocol_remove_payload_logic_to_current_output(
         uint32_t payload) {
     return (multicast_packet) {
         .key = _REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY | _instance_key,
@@ -525,7 +524,7 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_set_payload_pins_to_high_impedance(
+munich_protocol_set_payload_pins_to_high_impedance(
         uint32_t payload) {
     return (multicast_packet) {
         .key = _SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY | _instance_key,
@@ -535,34 +534,32 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_laser_config_total_period(
+munich_protocol_push_bot_laser_config_total_period(
         uint32_t total_period, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = total_period,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_laser_config_active_time(
+munich_protocol_push_bot_laser_config_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LASER_CONFIG_ACTIVE_TIME |
-                  (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = active_time,
         .payload_flag = WITH_PAYLOAD
     };
@@ -571,26 +568,24 @@ static inline multicast_packet
 static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
         uint32_t frequency, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LASER_FREQUENCY | _instance_key |
-                 (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
+                (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
         .payload = frequency,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_speaker_config_total_period(
+munich_protocol_push_bot_speaker_config_total_period(
         uint32_t total_period, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
@@ -602,12 +597,11 @@ static inline multicast_packet
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_speaker_config_active_time(
+munich_protocol_push_bot_speaker_config_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
@@ -621,14 +615,13 @@ static inline multicast_packet
 static inline multicast_packet munich_protocol_push_bot_speaker_set_tone(
         uint32_t frequency, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_SPEAKER_TONE_BEEP | _instance_key |
-                 (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
+                (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
         .payload = frequency,
         .payload_flag = WITH_PAYLOAD
     };
@@ -637,14 +630,13 @@ static inline multicast_packet munich_protocol_push_bot_speaker_set_tone(
 static inline multicast_packet munich_protocol_push_bot_speaker_set_melody(
         uint32_t melody, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_SPEAKER_TONE_MELODY | _instance_key |
-                 (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
+                (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
         .payload = melody,
         .payload_flag = WITH_PAYLOAD
     };
@@ -653,14 +645,13 @@ static inline multicast_packet munich_protocol_push_bot_speaker_set_melody(
 static inline multicast_packet munich_protocol_push_bot_led_total_period(
         uint32_t total_period, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LED_CONFIG_TOTAL_PERIOD |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = total_period,
         .payload_flag = WITH_PAYLOAD
     };
@@ -669,14 +660,13 @@ static inline multicast_packet munich_protocol_push_bot_led_total_period(
 static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = active_time,
         .payload_flag = WITH_PAYLOAD
     };
@@ -685,14 +675,13 @@ static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
 static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
         uint32_t active_time, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = active_time,
         .payload_flag = WITH_PAYLOAD
     };
@@ -701,14 +690,13 @@ static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
 static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
         uint32_t frequency, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_LED_FREQUENCY | _instance_key |
-                 (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
+                (uart_id << _PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER)),
         .payload = frequency,
         .payload_flag = WITH_PAYLOAD
     };
@@ -717,9 +705,8 @@ static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
 static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
         state_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
@@ -733,53 +720,49 @@ static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
 static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
         uint32_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = velocity,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_motor_0_leaking_towards_zero(
+munich_protocol_push_bot_motor_0_leaking_towards_zero(
         uint32_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_MOTOR_0_LEAKY_VELOCITY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = velocity,
         .payload_flag = WITH_PAYLOAD
     };
 }
 
 static inline multicast_packet
-    munich_protocol_push_bot_motor_1_leaking_towards_zero(
+munich_protocol_push_bot_motor_1_leaking_towards_zero(
         uint32_t velocity, uint32_t uart_id) {
     if (_mode != MUNICH_PROTOCOL_PUSH_BOT) {
-        log_error(
-            "The mode you configured is not the pushbot, and so this "
-            "message is invalid for mode %d", _mode);
+        log_error("The mode you configured is not the pushbot, "
+                "and so this message is invalid for mode %d", _mode);
     }
 
     return (multicast_packet) {
         .key = (_PUSH_BOT_MOTOR_1_LEAKY_VELOCITY |
-                 (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
         .payload = velocity,
         .payload_flag = WITH_PAYLOAD
     };
 }
-
 
 static inline multicast_packet _key_retina(
         uint32_t retina_pixels, uint32_t time_stamps, uint32_t uart_id) {
@@ -787,7 +770,7 @@ static inline multicast_packet _key_retina(
         // if fine, create message
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
-                      (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                    (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
             .payload = (time_stamps | _PAYLOAD_RETINA_NO_DOWN_SAMPLING),
             .payload_flag = WITH_PAYLOAD
         };
@@ -795,7 +778,7 @@ static inline multicast_packet _key_retina(
     if (retina_pixels == 64 * 64) {
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
-                      (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                    (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
             .payload = (time_stamps | _PAYLOAD_RETINA_64_DOWN_SAMPLING),
             .payload_flag = WITH_PAYLOAD
         };
@@ -803,16 +786,15 @@ static inline multicast_packet _key_retina(
     if (retina_pixels == 32 * 32) {
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
-                      (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                    (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
             .payload = (time_stamps | _PAYLOAD_RETINA_32_DOWN_SAMPLING),
             .payload_flag = WITH_PAYLOAD
         };
     }
     if (retina_pixels == 16 * 16) {
-
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
-                      (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                    (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
             .payload = (time_stamps | _PAYLOAD_RETINA_16_DOWN_SAMPLING),
             .payload_flag = WITH_PAYLOAD
         };
@@ -827,34 +809,30 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
         bool events_in_key, uint32_t retina_pixels,
         bool payload_holds_time_stamps, uint32_t size_of_time_stamp_in_bytes,
         uint32_t uart_id) {
-
     // if events in the key.
     if (events_in_key) {
         if (!payload_holds_time_stamps) {
-
             // not using payloads
             multicast_packet packet =
-                _key_retina(retina_pixels, _PAYLOAD_NO_TIMESTAMPS, uart_id);
+                    _key_retina(retina_pixels, _PAYLOAD_NO_TIMESTAMPS, uart_id);
             return packet;
         } else {
-
             // using payloads
             if (size_of_time_stamp_in_bytes == 0) {
                 return _key_retina(
-                    retina_pixels, _PAYLOAD_DELTA_TIMESTAMPS, uart_id);
+                        retina_pixels, _PAYLOAD_DELTA_TIMESTAMPS, uart_id);
             } else if (size_of_time_stamp_in_bytes == 2) {
                 return _key_retina(
-                    retina_pixels, _PAYLOAD_TWO_BYTE_TIME_STAMPS, uart_id);
+                        retina_pixels, _PAYLOAD_TWO_BYTE_TIME_STAMPS, uart_id);
             } else if (size_of_time_stamp_in_bytes == 3) {
                 return _key_retina(
-                    retina_pixels, _PAYLOAD_THREE_BYTE_TIME_STAMPS, uart_id);
+                        retina_pixels, _PAYLOAD_THREE_BYTE_TIME_STAMPS, uart_id);
             } else if (size_of_time_stamp_in_bytes == 4) {
                 return _key_retina(
-                    retina_pixels, _PAYLOAD_FOUR_BYTE_TIME_STAMPS, uart_id);
+                        retina_pixels, _PAYLOAD_FOUR_BYTE_TIME_STAMPS, uart_id);
             } else {
-                log_error(
-                    "Unknown size of timestamp in bytes: %d\n",
-                    size_of_time_stamp_in_bytes);
+                log_error("Unknown size of timestamp in bytes: %d\n",
+                        size_of_time_stamp_in_bytes);
                 rt_error(RTE_SWERR);
                 return (multicast_packet) {
                     .key = 0, .payload = 0, .payload_flag = 0
@@ -862,14 +840,12 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
             }
         }
     } else {
-
         // using payloads to hold all events
 
         // warn users about models
-        log_warning(
-            "The current SpyNNaker models do not support the reception of"
-            " packets with payloads, therefore you will need to add a "
-            "adaptor model between the device and spynnaker models.");
+        log_warning("The current SpyNNaker models do not support the reception "
+                "of packets with payloads, therefore you will need to add a "
+                "adaptor model between the device and spynnaker models.");
 
         // verify that its what the end user wants.
         if (payload_holds_time_stamps ||
@@ -883,9 +859,9 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
         // if fine, create message
         return (multicast_packet) {
             .key = (_ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION |
-                      (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
+                    (uart_id << _OFFSET_FOR_UART_ID) | _instance_key),
             .payload = (_PAYLOAD_NO_TIMESTAMPS |
-                          _PAYLOAD_RETINA_NO_DOWN_SAMPLING_IN_PAYLOAD),
+                    _PAYLOAD_RETINA_NO_DOWN_SAMPLING_IN_PAYLOAD),
             .payload_flag = WITH_PAYLOAD
         };
     }

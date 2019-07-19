@@ -32,7 +32,7 @@ struct rng {
 };
 
 rng_t rng_init(address_t *region) {
-    struct rng *rng = (struct rng *) spin1_malloc(sizeof(struct rng));
+    struct rng *rng = spin1_malloc(sizeof(struct rng));
     spin1_memcpy(rng->seed, *region, sizeof(mars_kiss64_seed_t));
     *region += sizeof(mars_kiss64_seed_t) >> 2;
     return rng;

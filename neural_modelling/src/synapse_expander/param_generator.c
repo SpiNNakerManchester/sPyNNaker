@@ -89,7 +89,7 @@ struct param_generator_info {
  */
 struct param_generator_info param_generators[N_PARAM_GENERATORS];
 
-void register_param_generators() {
+void register_param_generators(void) {
     // Register each of the known connection generators
     // For now, hash is just an index agreed between Python and here
 
@@ -139,17 +139,14 @@ void register_param_generators() {
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
-
         // If the hash requested matches the hash of the generator, use it
         if (hash == param_generators[i].hash) {
-
             // Prepare a space for the data
             address_t region = *in_region;
-            param_generator_t generator = spin1_malloc(
-                sizeof(param_generator_t));
+            param_generator_t generator =
+                    spin1_malloc(sizeof(param_generator_t));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;

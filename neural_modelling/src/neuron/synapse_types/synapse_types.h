@@ -42,22 +42,22 @@ static void synapse_types_shape_input(synapse_param_pointer_t parameter);
 //! \param[in] input: the inputs for that given synapse_type.
 //! \return None
 static void synapse_types_add_neuron_input(
-    index_t synapse_type_index, synapse_param_pointer_t parameter,
-    input_t input);
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
+        input_t input);
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //! for a given neuron ID
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of excitatory input buffers for a given neuron ID.
 static input_t* synapse_types_get_excitatory_input(
-    synapse_param_pointer_t parameter);
+        synapse_param_pointer_t parameter);
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given neuron ID
 //! \param[in]  parameters: the pointer to the parameters to use
 //! \return Pointer to array of inhibitory input buffers for a given neuron ID.
 static input_t* synapse_types_get_inhibitory_input(
-    synapse_param_pointer_t parameter);
+        synapse_param_pointer_t parameter);
 
 //! \brief returns a human readable character for the type of synapse.
 //! examples would be X = excitatory types, I = inhibitory types etc etc.
@@ -69,7 +69,7 @@ static const char *synapse_types_get_type_char(index_t synapse_type_index);
 //! \brief prints the parameters of the synapse type
 //! \param[in] parameters: the pointer to the parameters to print
 static void synapse_types_print_parameters(
-    synapse_param_pointer_t parameters);
+        synapse_param_pointer_t parameters);
 
 //! \brief prints the input for a neuron ID given the available inputs
 //! currently only executed when the models are in debug mode, as the prints

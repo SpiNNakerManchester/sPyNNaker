@@ -48,7 +48,6 @@ bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
         uint32_t n_synapse_index_bits, uint32_t *weight_scales) {
-
     // Read the per-connector parameters
     address_t region = *in_region;
     const uint32_t synaptic_matrix_offset = *region++;
@@ -72,13 +71,13 @@ bool read_connection_builder_region(address_t *in_region,
 
     // Get the matrix, connector, weight and delay parameter generators
     matrix_generator_t matrix_generator =
-        matrix_generator_init(matrix_type_hash, &region);
+            matrix_generator_init(matrix_type_hash, &region);
     connection_generator_t connection_generator =
-        connection_generator_init(connector_type_hash, &region);
+            connection_generator_init(connector_type_hash, &region);
     param_generator_t weight_generator =
-        param_generator_init(weight_type_hash, &region);
+            param_generator_init(weight_type_hash, &region);
     param_generator_t delay_generator =
-        param_generator_init(delay_type_hash, &region);
+            param_generator_init(delay_type_hash, &region);
 
     *in_region = region;
 
@@ -96,27 +95,27 @@ bool read_connection_builder_region(address_t *in_region,
     // Get the positions to which the data should be written in the matrix
     address_t synaptic_matrix = NULL;
     if (synaptic_matrix_offset != 0xFFFFFFFF) {
-        synaptic_matrix = &(synaptic_matrix_region[synaptic_matrix_offset]);
+        synaptic_matrix = &synaptic_matrix_region[synaptic_matrix_offset];
     }
     address_t delayed_synaptic_matrix = NULL;
     if (delayed_synaptic_matrix_offset != 0xFFFFFFFF) {
         delayed_synaptic_matrix =
-            &(synaptic_matrix_region[delayed_synaptic_matrix_offset]);
+                &synaptic_matrix_region[delayed_synaptic_matrix_offset];
     }
     log_debug("Generating matrix at 0x%08x, delayed at 0x%08x",
             synaptic_matrix, delayed_synaptic_matrix);
 
     // Do the generation
     bool status = matrix_generator_generate(
-        matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
-        max_row_n_words, max_delayed_row_n_words,
-        max_row_n_synapses, max_delayed_row_n_synapses,
-        n_synapse_type_bits, n_synapse_index_bits,
-        synapse_type, weight_scales,
-        post_slice_start, post_slice_count,
-        pre_slice_start, pre_slice_count,
-        connection_generator, delay_generator, weight_generator,
-        max_stage, timestep_per_delay);
+            matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
+            max_row_n_words, max_delayed_row_n_words,
+            max_row_n_synapses, max_delayed_row_n_synapses,
+            n_synapse_type_bits, n_synapse_index_bits,
+            synapse_type, weight_scales,
+            post_slice_start, post_slice_count,
+            pre_slice_start, pre_slice_count,
+            connection_generator, delay_generator, weight_generator,
+            max_stage, timestep_per_delay);
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);
@@ -143,7 +142,6 @@ bool read_connection_builder_region(address_t *in_region,
  */
 bool read_sdram_data(
         address_t params_address, address_t synaptic_matrix_region) {
-
     // Read in the global parameters
     uint32_t n_in_edges = *params_address++;
     uint32_t post_slice_start = *params_address++;
@@ -152,7 +150,7 @@ bool read_sdram_data(
     uint32_t n_synapse_type_bits = *params_address++;
     uint32_t n_synapse_index_bits = *params_address++;
     log_info("Generating %u edges for %u atoms starting at %u",
-        n_in_edges, post_slice_count, post_slice_start);
+            n_in_edges, post_slice_count, post_slice_start);
 
     // Read in the weight scales, one per synapse type
     uint32_t weight_scales[n_synapse_types];

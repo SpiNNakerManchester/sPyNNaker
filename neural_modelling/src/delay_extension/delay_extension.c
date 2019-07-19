@@ -30,7 +30,7 @@ typedef enum callback_priorities {
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
 } callback_priorities;
 
-typedef enum extra_provenance_data_region_entries{
+typedef enum extra_provenance_data_region_entries {
     N_PACKETS_RECEIVED = 0,
     N_PACKETS_PROCESSED = 1,
     N_PACKETS_ADDED = 2,
@@ -81,12 +81,12 @@ static uint32_t timer_period = 0;
 
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
-static inline void zero_spike_counters(void *location, uint32_t num_items)
-{
-    uint32_t i;
+static inline void zero_spike_counters(
+        void *location, uint32_t num_items) {
+    uint8_t *counters = location;
 
-    for (i = 0 ; i < num_items ; i++) {
-        ((uint8_t *) location)[i] = 0;
+    for (uint32_t i = 0 ; i < num_items ; i++) {
+        counters[i] = 0;
     }
 }
 
@@ -102,17 +102,15 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 }
 
 static bool read_parameters(address_t address) {
-
     log_debug("read_parameters: starting");
 
     key = address[KEY];
     incoming_key = address[INCOMING_KEY];
     incoming_mask = address[INCOMING_MASK];
     incoming_neuron_mask = ~incoming_mask;
-    log_debug(
-        "\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
-        "incoming key mask = 0x%08x",
-        key, incoming_key, incoming_mask, incoming_neuron_mask);
+    log_debug("\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
+            "incoming key mask = 0x%08x",
+            key, incoming_key, incoming_mask, incoming_neuron_mask);
 
     num_neurons = address[N_ATOMS];
     neuron_bit_field_words = get_bit_field_size(num_neurons);
@@ -126,51 +124,48 @@ static bool read_parameters(address_t address) {
     num_delay_slots_mask = (num_delay_slots_pot - 1);
 
     log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
-              " num delay stages = %u, num delay slots = %u (pot = %u),"
-              " num delay slots mask = %08x",
-              num_neurons, neuron_bit_field_words,
-              num_delay_stages, num_delay_slots, num_delay_slots_pot,
-              num_delay_slots_mask);
+            " num delay stages = %u, num delay slots = %u (pot = %u),"
+            " num delay slots mask = %08x",
+            num_neurons, neuron_bit_field_words,
+            num_delay_stages, num_delay_slots, num_delay_slots_pot,
+            num_delay_slots_mask);
 
-    log_debug(
-        "\t random back off = %u, time_between_spikes = %u",
-        timer_offset, time_between_spikes);
+    log_debug("\t random back off = %u, time_between_spikes = %u",
+            timer_offset, time_between_spikes);
 
     // Create array containing a bitfield specifying whether each neuron should
     // emit spikes after each delay stage
-    neuron_delay_stage_config = (bit_field_t*) spin1_malloc(
-        num_delay_stages * sizeof(bit_field_t));
+    neuron_delay_stage_config =
+            spin1_malloc(num_delay_stages * sizeof(bit_field_t));
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
         log_debug("\t delay stage %u", d);
 
         // Allocate bit-field
-        neuron_delay_stage_config[d] = (bit_field_t) spin1_malloc(
-            neuron_bit_field_words * sizeof(uint32_t));
+        neuron_delay_stage_config[d] =
+                spin1_malloc(neuron_bit_field_words * sizeof(uint32_t));
 
         // Copy delay stage configuration bits into delay stage configuration bit-field
         address_t neuron_delay_stage_config_data_address =
-            &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
+                &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
         spin1_memcpy(neuron_delay_stage_config[d],
-               neuron_delay_stage_config_data_address,
-               neuron_bit_field_words * sizeof(uint32_t));
+                neuron_delay_stage_config_data_address,
+                neuron_bit_field_words * sizeof(uint32_t));
 
         for (uint32_t w = 0; w < neuron_bit_field_words; w++) {
-            log_debug("\t\t delay stage config word %u = %08x", w,
-                      neuron_delay_stage_config[d][w]);
+            log_debug("\t\t delay stage config word %u = %08x",
+                    w, neuron_delay_stage_config[d][w]);
         }
     }
 
     // Allocate array of counters for each delay slot
-    spike_counters = (uint8_t**) spin1_malloc(
-        num_delay_slots_pot * sizeof(uint8_t*));
+    spike_counters = spin1_malloc(num_delay_slots_pot * sizeof(uint8_t*));
 
     for (uint32_t s = 0; s < num_delay_slots_pot; s++) {
-
         // Allocate an array of counters for each neuron and zero
-        spike_counters[s] = (uint8_t*) spin1_malloc(
-            num_neurons * sizeof(uint8_t));
+        spike_counters[s] =
+                spin1_malloc(num_neurons * sizeof(uint8_t));
         zero_spike_counters(spike_counters[s], num_neurons);
     }
 
@@ -178,7 +173,7 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
-void _store_provenance_data(address_t provenance_region){
+static void _store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
 
     // store the data into the provenance data region
@@ -191,7 +186,7 @@ void _store_provenance_data(address_t provenance_region){
     log_debug("finished other provenance data");
 }
 
-static bool initialize() {
+static bool initialize(void) {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -226,11 +221,11 @@ static bool initialize() {
 }
 
 // Callbacks
-void incoming_spike_callback(uint key, uint payload) {
+static void incoming_spike_callback(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x", key);
-    n_in_spikes += 1;
+    n_in_spikes++;
 
     // If there was space to add spike to incoming spike queue
     in_spikes_add_spike(key);
@@ -241,8 +236,7 @@ static inline key_t _key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
-static void spike_process() {
-
+static void spike_process(void) {
     // turn off interrupts as this function is critical for
     // keeping time in sync.
     uint state = spin1_int_disable();
@@ -250,26 +244,25 @@ static void spike_process() {
     // Get current time slot of incoming spike counters
     uint32_t current_time_slot = time & num_delay_slots_mask;
     uint8_t *current_time_slot_spike_counters =
-        spike_counters[current_time_slot];
+            spike_counters[current_time_slot];
 
     log_debug("Current time slot %u", current_time_slot);
 
     // While there are any incoming spikes
     spike_t s;
     while (in_spikes_get_next_spike(&s)) {
-        n_processed_spikes += 1;
+        n_processed_spikes++;
 
         if ((s & incoming_mask) == incoming_key) {
-
             // Mask out neuron ID
             uint32_t neuron_id = _key_n(s);
             if (neuron_id < num_neurons) {
-
                 // Increment counter
                 current_time_slot_spike_counters[neuron_id]++;
-                log_debug("Incrementing counter %u = %u\n", neuron_id,
-                          current_time_slot_spike_counters[neuron_id]);
-                n_spikes_added += 1;
+                log_debug("Incrementing counter %u = %u\n",
+                        neuron_id,
+                        current_time_slot_spike_counters[neuron_id]);
+                n_spikes_added++;
             } else {
                 log_debug("Invalid neuron ID %u", neuron_id);
             }
@@ -282,7 +275,7 @@ static void spike_process() {
     spin1_mode_restore(state);
 }
 
-void timer_callback(uint timer_count, uint unused1) {
+static void timer_callback(uint timer_count, uint unused1) {
     use(unused1);
 
     // Process all the spikes from the last timestep
@@ -294,21 +287,19 @@ void timer_callback(uint timer_count, uint unused1) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-
         // handle the pause and resume functionality
         simulation_handle_pause_resume(NULL);
 
-        log_debug(
-            "Delay extension finished at time %u, %u received spikes, "
-            "%u processed spikes, %u sent spikes, %u added spikes",
-            time, n_in_spikes, n_processed_spikes, n_spikes_sent,
-            n_spikes_added);
+        log_debug("Delay extension finished at time %u, %u received spikes, "
+                "%u processed spikes, %u sent spikes, %u added spikes",
+                time, n_in_spikes, n_processed_spikes, n_spikes_sent,
+                n_spikes_added);
 
         log_debug("Delayed %u times", n_delays);
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
-        time -= 1;
+        time--;
 
         simulation_ready_to_read();
         return;
@@ -319,55 +310,47 @@ void timer_callback(uint timer_count, uint unused1) {
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
-
         // If any neurons emit spikes after this delay stage
         bit_field_t delay_stage_config = neuron_delay_stage_config[d];
         if (nonempty_bit_field(delay_stage_config, neuron_bit_field_words)) {
-
             // Get key mask for this delay stage and it's time slot
             uint32_t delay_stage_delay = (d + 1) * DELAY_STAGE_LENGTH;
             uint32_t delay_stage_time_slot =
-                ((time - delay_stage_delay) & num_delay_slots_mask);
+                    (time - delay_stage_delay) & num_delay_slots_mask;
             uint8_t *delay_stage_spike_counters =
-                spike_counters[delay_stage_time_slot];
+                    spike_counters[delay_stage_time_slot];
 
             log_debug("%u: Checking time slot %u for delay stage %u",
-                      time, delay_stage_time_slot, d);
+                    time, delay_stage_time_slot, d);
 
             // Loop through neurons
             for (uint32_t n = 0; n < num_neurons; n++) {
-
                 // If this neuron emits a spike after this stage
                 if (bit_field_test(delay_stage_config, n)) {
-
                     // Calculate key all spikes coming from this neuron will be
                     // sent with
                     uint32_t spike_key = ((d * num_neurons) + n) + key;
 
                     if (delay_stage_spike_counters[n] > 0) {
                         log_debug("Neuron %u sending %u spikes after delay"
-                                  "stage %u with key %x",
-                                  n, delay_stage_spike_counters[n], d,
-                                  spike_key);
+                                "stage %u with key %x",
+                                n, delay_stage_spike_counters[n], d,
+                                spike_key);
                     }
 
                     // Loop through counted spikes and send
-                    for (uint32_t s = 0; s < delay_stage_spike_counters[n];
-                            s++) {
-                        while (!spin1_send_mc_packet(spike_key, 0,
-                                                     NO_PAYLOAD)) {
+                    for (uint32_t s = 0; s < delay_stage_spike_counters[n]; s++) {
+                        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
                             spin1_delay_us(1);
                         }
-                        n_spikes_sent += 1;
-
+                        n_spikes_sent++;
                     }
                 }
 
                 // Wait until the expected time to send
                 while ((ticks == timer_count) && tc[T1_COUNT] > expected_time) {
-
                     // Do Nothing
-                    n_delays += 1;
+                    n_delays++;
                 }
                 expected_time -= time_between_spikes;
             }
@@ -381,8 +364,7 @@ void timer_callback(uint timer_count, uint unused1) {
 
 // Entry point
 void c_main(void) {
-
-    if (!initialize(&timer_period)) {
+    if (!initialize()) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
@@ -392,7 +374,7 @@ void c_main(void) {
 
     // Initialise the incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(256)) {
-         rt_error(RTE_SWERR);
+        rt_error(RTE_SWERR);
     }
 
     // Set timer tick (in microseconds)

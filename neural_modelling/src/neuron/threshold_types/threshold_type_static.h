@@ -21,7 +21,6 @@
 #include "threshold_type.h"
 
 typedef struct threshold_type_t {
-
     // The value of the static threshold
     REAL threshold_value;
 } threshold_type_t;

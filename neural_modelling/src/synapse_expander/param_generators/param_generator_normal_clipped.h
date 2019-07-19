@@ -45,37 +45,31 @@ struct param_generator_normal_clipped {
     rng_t rng;
 };
 
-
-void *param_generator_normal_clipped_initialize(address_t *region) {
-
+static void *param_generator_normal_clipped_initialize(address_t *region) {
     // Allocate memory for the data
     struct param_generator_normal_clipped *params =
-        (struct param_generator_normal_clipped *)
             spin1_malloc(sizeof(struct param_generator_normal_clipped));
 
     // Copy the parameters in
-    spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_normal_clipped_params));
+    spin1_memcpy(&params->params, *region,
+            sizeof(struct param_generator_normal_clipped_params));
     *region += sizeof(struct param_generator_normal_clipped_params) >> 2;
-    log_debug(
-        "normal clipped mu = %k, sigma = %k, low = %k, high = %k",
-        params->params.mu, params->params.sigma, params->params.low,
-        params->params.high);
+    log_debug("normal clipped mu = %k, sigma = %k, low = %k, high = %k",
+            params->params.mu, params->params.sigma, params->params.low,
+            params->params.high);
 
     // Initialise the RNG for this generator
     params->rng = rng_init(region);
     return params;
 }
 
-void param_generator_normal_clipped_free(void *data) {
-    struct param_generator_normal_clipped *params =
-            (struct param_generator_normal_clipped *) data;
+static void param_generator_normal_clipped_free(void *data) {
+    struct param_generator_normal_clipped *params = data;
     rng_free(params->rng);
     sark_free(data);
 }
 
-void param_generator_normal_clipped_generate(
+static void param_generator_normal_clipped_generate(
         void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);
@@ -83,8 +77,7 @@ void param_generator_normal_clipped_generate(
 
     // For each index, generate a normally distributed random value, redrawing
     // if outside the given range
-    struct param_generator_normal_clipped *params =
-        (struct param_generator_normal_clipped *) data;
+    struct param_generator_normal_clipped *params = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
         do {
             accum value = rng_normal(params->rng);

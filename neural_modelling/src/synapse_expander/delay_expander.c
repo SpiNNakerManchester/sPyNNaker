@@ -48,7 +48,6 @@
 bool read_delay_builder_region(address_t *in_region,
         bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
         uint32_t pre_slice_count) {
-
     // Get the parameters
     address_t region = *in_region;
     const uint32_t max_row_n_synapses = *region++;
@@ -63,9 +62,9 @@ bool read_delay_builder_region(address_t *in_region,
     const uint32_t connector_type_hash = *region++;
     const uint32_t delay_type_hash = *region++;
     connection_generator_t connection_generator =
-        connection_generator_init(connector_type_hash, &region);
+            connection_generator_init(connector_type_hash, &region);
     param_generator_t delay_generator =
-        param_generator_init(delay_type_hash, &region);
+            param_generator_init(delay_type_hash, &region);
 
     *in_region = region;
 
@@ -78,26 +77,24 @@ bool read_delay_builder_region(address_t *in_region,
     uint32_t pre_slice_end = pre_slice_start + pre_slice_count;
     for (uint32_t pre_neuron_index = pre_slice_start;
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
-
         // Generate the connections
         uint32_t max_n_synapses =
-            max_row_n_synapses + max_delayed_row_n_synapses;
+                max_row_n_synapses + max_delayed_row_n_synapses;
         uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
-            connection_generator, pre_slice_start, pre_slice_count,
-            pre_neuron_index, post_slice_start, post_slice_count,
-            max_n_synapses, indices);
+                connection_generator, pre_slice_start, pre_slice_count,
+                pre_neuron_index, post_slice_start, post_slice_count,
+                max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
         // Generate delays for each index
         accum delay_params[n_indices];
         param_generator_generate(
-            delay_generator, n_indices, pre_neuron_index, indices,
-            delay_params);
+                delay_generator, n_indices, pre_neuron_index, indices,
+                delay_params);
 
         // Go through the delays
         for (uint32_t i = 0; i < n_indices; i++) {
-
             // Get the delay in timesteps
             accum delay = delay_params[i] * timestep_per_delay;
             if (delay < 0) {
@@ -111,11 +108,11 @@ bool read_delay_builder_region(address_t *in_region,
             }
 
             // Get the delay stage and update the data
-            struct delay_value delay_value = get_delay(
-                rounded_delay, max_stage);
+            struct delay_value delay_value =
+                    get_delay(rounded_delay, max_stage);
             if (delay_value.stage > 0) {
                 bit_field_set(neuron_delay_stage_config[delay_value.stage - 1],
-                    pre_neuron_index - pre_slice_start);
+                        pre_neuron_index - pre_slice_start);
             }
         }
     }
@@ -137,19 +134,18 @@ bool read_delay_builder_region(address_t *in_region,
  */
 bool read_sdram_data(
         address_t delay_params_address, address_t params_address) {
-
     // Read the global parameters from the delay extension
     uint32_t num_neurons = delay_params_address[N_ATOMS];
     uint32_t neuron_bit_field_words = get_bit_field_size(num_neurons);
     uint32_t n_stages = delay_params_address[N_DELAY_STAGES];
 
     // Set up the bit fields
-    bit_field_t *neuron_delay_stage_config = (bit_field_t*) spin1_malloc(
-        n_stages * sizeof(bit_field_t));
+    bit_field_t *neuron_delay_stage_config =
+            spin1_malloc(n_stages * sizeof(bit_field_t));
     for (uint32_t d = 0; d < n_stages; d++) {
-        neuron_delay_stage_config[d] = (bit_field_t)
-            &(delay_params_address[DELAY_BLOCKS])
-            + (d * neuron_bit_field_words);
+        neuron_delay_stage_config[d] =
+                ((bit_field_t) &delay_params_address[DELAY_BLOCKS])
+                + (d * neuron_bit_field_words);
         clear_bit_field(neuron_delay_stage_config[d], neuron_bit_field_words);
     }
 
@@ -159,7 +155,7 @@ bool read_sdram_data(
     uint32_t pre_slice_count = *params_address++;
 
     log_debug("Generating %u delay edges for %u atoms starting at %u",
-        n_out_edges, pre_slice_count, pre_slice_start);
+            n_out_edges, pre_slice_count, pre_slice_start);
 
     // Go through each connector and make the delay data
     for (uint32_t edge = 0; edge < n_out_edges; edge++) {

@@ -43,7 +43,7 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-typedef struct alpha_params_t{
+typedef struct alpha_params_t {
     // buffer for linear term
     input_t lin_buff;
 
@@ -58,7 +58,6 @@ typedef struct alpha_params_t{
 
     // Temporary value of
     input_t q_buff;
-
 }alpha_params_t;
 
 typedef struct synapse_param_t {
@@ -76,7 +75,7 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
-static inline void alpha_shaping(alpha_params_t* a_params){
+static inline void alpha_shaping(alpha_params_t* a_params) {
     a_params->lin_buff = a_params->lin_buff + (
     		a_params->q_buff * a_params->dt_divided_by_tau_sqr);
 
@@ -88,7 +87,7 @@ static inline void alpha_shaping(alpha_params_t* a_params){
 
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(
-		synapse_param_pointer_t parameter){
+		synapse_param_pointer_t parameter) {
     alpha_shaping(&parameter->exc);
     alpha_shaping(&parameter->inh);
 
@@ -103,27 +102,25 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void add_input_alpha(alpha_params_t* a_params, input_t input){
+static inline void add_input_alpha(alpha_params_t* a_params, input_t input) {
     a_params->q_buff = input;
 
 	a_params->exp_buff =
 			decay_s1615(a_params->exp_buff, a_params->decay) + ONE;
 
-    a_params->lin_buff = (a_params->lin_buff
-            + (input * a_params->dt_divided_by_tau_sqr))
-                    * (ONE - ONE/a_params->exp_buff);
+    a_params->lin_buff =
+            (a_params->lin_buff + (input * a_params->dt_divided_by_tau_sqr))
+            * (ONE - ONE/a_params->exp_buff);
 }
 
 // Add input from ring buffer - zero if no spikes, otherwise one or more weights
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index,
         synapse_param_pointer_t parameter,
-        input_t input){
-
-    if (input > ZERO){
+        input_t input) {
+    if (input > ZERO) {
         if (synapse_type_index == EXCITATORY) {
                 add_input_alpha(&parameter->exc, input);
-
         } else if (synapse_type_index == INHIBITORY) {
                 add_input_alpha(&parameter->inh, input);
         }

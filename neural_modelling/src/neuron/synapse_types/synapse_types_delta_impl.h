@@ -49,7 +49,7 @@
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
-typedef struct delta_params_t{
+typedef struct delta_params_t {
 	input_t synaptic_input_value;
 }delta_params_t;
 
@@ -74,13 +74,12 @@ typedef enum input_buffer_regions {
 //! to the neuron.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
-static inline void delta_shaping(delta_params_t* delta_params){
+static inline void delta_shaping(delta_params_t* delta_params) {
 	delta_params->synaptic_input_value = 0;
 }
 
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
-
 	delta_shaping(&parameter->exc);
 	delta_shaping(&parameter->inh);
 }
@@ -90,7 +89,8 @@ static inline void synapse_types_shape_input(
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \param[in] input the inputs to add.
 //! \return None
-static inline void add_input_delta(delta_params_t* delta_params, input_t input){
+static inline void add_input_delta(
+        delta_params_t* delta_params, input_t input) {
 	delta_params->synaptic_input_value += input;
 }
 
@@ -104,13 +104,10 @@ static inline void add_input_delta(delta_params_t* delta_params, input_t input){
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
-
     if (synapse_type_index == EXCITATORY) {
     	add_input_delta(&parameter->exc, input);
-
     } else if (synapse_type_index == INHIBITORY) {
     	add_input_delta(&parameter->inh, input);
-
     }
 }
 
@@ -158,11 +155,9 @@ static inline const char *synapse_types_get_type_char(
 //! \return Nothing
 static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
-    io_printf(
-        IO_BUF, "%12.6k - %12.6k",
-        parameter->exc.synaptic_input_value,
-        parameter->inh.synaptic_input_value
-		);
+    io_printf(IO_BUF, "%12.6k - %12.6k",
+            parameter->exc.synaptic_input_value,
+            parameter->inh.synaptic_input_value);
 }
 
 //! \brief printer call

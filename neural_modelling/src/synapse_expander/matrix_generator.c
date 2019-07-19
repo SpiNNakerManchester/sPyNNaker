@@ -137,16 +137,13 @@ void register_matrix_generators() {
 }
 
 matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_MATRIX_GENERATORS; i++) {
-
         // If the hash requested matches the hash of the generator, use it
         if (hash == matrix_generators[i].hash) {
-
             // Prepare a space for the data
-            struct matrix_generator *generator = spin1_malloc(
-                sizeof(struct matrix_generator));
+            struct matrix_generator *generator =
+                    spin1_malloc(sizeof(struct matrix_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;

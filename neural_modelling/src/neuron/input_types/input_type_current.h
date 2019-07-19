@@ -21,13 +21,13 @@
 #ifndef NUM_EXCITATORY_RECEPTORS
 #define NUM_EXCITATORY_RECEPTORS 1
 #error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
-       shaping include
+	shaping include
 #endif
 
 #ifndef NUM_INHIBITORY_RECEPTORS
 #define NUM_INHIBITORY_RECEPTORS 1
 #error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
-       shaping include
+	shaping include
 #endif
 
 #include "input_type.h"
@@ -39,8 +39,8 @@ static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
     for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i];  // NOTE: this will be edited in future to be
-                              //       multiplied by a scaling factor
+        value[i] = value[i];    // NOTE: this will be edited in future to be
+                                //       multiplied by a scaling factor
     }
     return &value[0];
 }

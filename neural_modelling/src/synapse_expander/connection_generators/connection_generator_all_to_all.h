@@ -29,16 +29,14 @@ struct all_to_all {
     uint32_t allow_self_connections;
 };
 
-void *connection_generator_all_to_all_initialise(address_t *region) {
-
+static void *connection_generator_all_to_all_initialise(address_t *region) {
     // Allocate the data structure for parameters
-    struct all_to_all *params = (struct all_to_all *)
-        spin1_malloc(sizeof(struct all_to_all));
+    struct all_to_all *params = spin1_malloc(sizeof(struct all_to_all));
 
     // Copy the parameters into the data structure
     address_t params_sdram = *region;
     spin1_memcpy(params, params_sdram, sizeof(struct all_to_all));
-    params_sdram = &(params_sdram[sizeof(struct all_to_all) >> 2]);
+    params_sdram = &params_sdram[sizeof(struct all_to_all) >> 2];
     log_debug("All to all connector, allow self connections = %u",
             params->allow_self_connections);
 
@@ -46,12 +44,12 @@ void *connection_generator_all_to_all_initialise(address_t *region) {
     return params;
 }
 
-void connection_generator_all_to_all_free(void *data) {
+static void connection_generator_all_to_all_free(void *data) {
     sark_free(data);
 }
 
-uint32_t connection_generator_all_to_all_generate(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
+static uint32_t connection_generator_all_to_all_generate(
+        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
@@ -69,10 +67,9 @@ uint32_t connection_generator_all_to_all_generate(
     // Add a connection to this pre-neuron for each post-neuron...
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
-
         // ... unless this is a self connection and these are disallowed
         if (!params->allow_self_connections &&
-                (pre_neuron_index == (post_slice_start + i))) {
+                (pre_neuron_index == post_slice_start + i)) {
             log_debug("Not generating for post %u", post_slice_start + i);
             continue;
         }

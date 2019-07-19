@@ -47,7 +47,6 @@ struct connection_generator {
  *! \brief A "class" for connection generators
  */
 struct connection_generator_info {
-
     /**
      *! \brief The hash of the generator
      */
@@ -82,9 +81,9 @@ struct connection_generator_info {
      *! \return The number of connections generated
      */
     uint32_t (*generate)(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
-        uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
+            void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+            uint32_t pre_neuron_index, uint32_t post_slice_start,
+            uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
 
     /**
      *! \brief Free any data for the generator
@@ -98,7 +97,7 @@ struct connection_generator_info {
  */
 struct connection_generator_info connection_generators[N_CONNECTION_GENERATORS];
 
-void register_connection_generators() {
+void register_connection_generators(void) {
     // Register each of the known connection generators
     // For now, hash is just an index agreed between Python and here
 
@@ -150,17 +149,14 @@ void register_connection_generators() {
 
 connection_generator_t connection_generator_init(
         uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
-
         // If the hash requested matches the hash of the generator, use it
         if (hash == connection_generators[i].hash) {
-
             // Prepare a space for the data
             address_t region = *in_region;
-            struct connection_generator *generator = spin1_malloc(
-                sizeof(struct connection_generator));
+            struct connection_generator *generator =
+                    spin1_malloc(sizeof(struct connection_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;

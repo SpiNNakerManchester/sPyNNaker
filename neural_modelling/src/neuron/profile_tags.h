@@ -16,8 +16,12 @@
  */
 
 // Profiler tags
-#define PROFILER_TIMER                    0
-#define PROFILER_DMA_READ                 1
-#define PROFILER_INCOMING_SPIKE           2
-#define PROFILER_PROCESS_FIXED_SYNAPSES   3
-#define PROFILER_PROCESS_PLASTIC_SYNAPSES 4
+#pragma once
+
+enum profiler_tags_e {
+    PROFILER_TIMER,                     // 0
+    PROFILER_DMA_READ,                  // 1
+    PROFILER_INCOMING_SPIKE,            // 2
+    PROFILER_PROCESS_FIXED_SYNAPSES,    // 3
+    PROFILER_PROCESS_PLASTIC_SYNAPSES   // 4
+};
