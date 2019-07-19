@@ -325,7 +325,8 @@ static bool initialise() {
 
     log_info("initialising the bit field region");
     if (!bit_field_filter_initialise(
-            data_specification_get_region(BIT_FIELD_FILTER_REGION, address))){
+            data_specification_get_region(
+                BIT_FIELD_FILTER_REGION, ds_regions))){
         return false;
     }
 
@@ -380,7 +381,8 @@ void timer_callback(uint timer_count, uint unused) {
         data_specification_metadata_t *ds_regions =
                 data_specification_get_data_address();
         neuron_store_neuron_parameters(
-                data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
+                data_specification_get_region(
+                    NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 

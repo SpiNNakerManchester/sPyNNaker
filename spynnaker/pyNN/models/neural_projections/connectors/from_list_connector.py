@@ -237,6 +237,7 @@ class FromListConnector(AbstractConnector):
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
+
         # check that conn_list has weights, if not then use the value passed in
         if self.__weights is None:
             if hasattr(weights, "__getitem__"):

@@ -51,8 +51,6 @@ static uint32_t max_n_words;
 
 static spike_t spike=-1;
 
-static uint32_t single_fixed_synapse[4];
-
 uint32_t number_of_rewires=0;
 bool any_spike = false;
 

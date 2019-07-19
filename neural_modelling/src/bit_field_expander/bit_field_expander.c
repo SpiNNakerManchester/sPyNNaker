@@ -61,7 +61,8 @@ uint32_t * row_data;
 void read_in_addresses(){
 
     // get the data (linked to sdram tag 2 and assume the app ids match)
-    address_t core_address = data_specification_get_data_address();
+    data_specification_metadata_t *core_address =
+        data_specification_get_data_address();
 
     master_pop_base_address = data_specification_get_region(
         POPULATION_TABLE_REGION, core_address);
