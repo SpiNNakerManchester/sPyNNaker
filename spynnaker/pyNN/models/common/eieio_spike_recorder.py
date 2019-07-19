@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import struct
 import numpy
@@ -14,33 +29,33 @@ class EIEIOSpikeRecorder(object):
     """ Records spikes using EIEIO format
     """
     __slots__ = [
-        "_record"]
+        "__record"]
 
     def __init__(self):
-        self._record = False
+        self.__record = False
 
     @property
     def record(self):
-        return self._record
+        return self.__record
 
     @record.setter
     def record(self, new_state):
         """ Old method assumed to be spikes """
-        self._record = new_state
+        self.__record = new_state
 
     def set_recording(self, new_state, sampling_interval=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
-        self._record = new_state
+        self.__record = new_state
 
     def get_dtcm_usage_in_bytes(self):
-        if not self._record:
+        if not self.__record:
             return 0
         return 4
 
     def get_n_cpu_cycles(self, n_neurons):
-        if not self._record:
+        if not self.__record:
             return 0
         return n_neurons * 4
 

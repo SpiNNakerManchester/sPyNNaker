@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 from setuptools import setup
 try:
@@ -18,11 +33,12 @@ install_requires = [
     'SpiNNaker_DataSpecification >= 1!4.0.1, < 1!5.0.0',
     'spalloc >= 1.0.1, < 2.0.0',
     'SpiNNFrontEndCommon >= 1!4.0.1, < 1!5.0.0',
-    'numpy', 'lxml', 'six', 'csa']
+    'numpy', 'lxml', 'six']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
     # scipy must be added in config.py as a mock
     install_requires.append('scipy')
+    install_requires.append('csa')
 
 
 # Build a list of all project modules, as well as supplementary files
@@ -52,5 +68,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/SpyNNaker",
     packages=packages,
     package_data=package_data,
-    install_requires=install_requires
+    install_requires=install_requires,
+    maintainer="SpiNNakerTeam",
+    maintainer_email="spinnakerusers@googlegroups.com"
 )

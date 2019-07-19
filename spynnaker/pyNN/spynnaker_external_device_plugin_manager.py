@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pacman.model.graphs.application import ApplicationEdge
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities import helpful_functions
@@ -15,6 +30,7 @@ from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 class SpynnakerExternalDevicePluginManager(object):
     """ User-level interface for the external device plugin manager.
     """
+    __slots__ = []
 
     @staticmethod
     def add_database_socket_address(
@@ -153,9 +169,9 @@ class SpynnakerExternalDevicePluginManager(object):
             or :py:class:`pacman.model.graphs.application.ApplicationVertex`
         """
         device_vertex = device
+        # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
-        # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
             population._get_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)

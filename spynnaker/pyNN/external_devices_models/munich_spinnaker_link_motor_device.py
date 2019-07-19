@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
@@ -45,13 +60,13 @@ class MunichMotorDevice(
         device vertex
     """
     __slots__ = [
-        "_continue_if_not_different",
-        "_delay_time",
-        "_delta_threshold",
-        "_dependent_vertices",
-        "_sample_time",
-        "_speed",
-        "_update_time"]
+        "__continue_if_not_different",
+        "__delay_time",
+        "__delta_threshold",
+        "__dependent_vertices",
+        "__sample_time",
+        "__speed",
+        "__update_time"]
 
     SYSTEM_REGION = 0
     PARAMS_REGION = 1
@@ -66,13 +81,13 @@ class MunichMotorDevice(
 
         super(MunichMotorDevice, self).__init__(label)
 
-        self._speed = speed
-        self._sample_time = sample_time
-        self._update_time = update_time
-        self._delay_time = delay_time
-        self._delta_threshold = delta_threshold
-        self._continue_if_not_different = bool(continue_if_not_different)
-        self._dependent_vertices = [
+        self.__speed = speed
+        self.__sample_time = sample_time
+        self.__update_time = update_time
+        self.__delay_time = delay_time
+        self.__delta_threshold = delta_threshold
+        self.__continue_if_not_different = bool(continue_if_not_different)
+        self.__dependent_vertices = [
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
     @property
@@ -139,12 +154,12 @@ class MunichMotorDevice(
         # write params to memory
         spec.switch_write_focus(region=self.PARAMS_REGION)
         spec.write_value(data=edge_key)
-        spec.write_value(data=self._speed)
-        spec.write_value(data=self._sample_time)
-        spec.write_value(data=self._update_time)
-        spec.write_value(data=self._delay_time)
-        spec.write_value(data=self._delta_threshold)
-        spec.write_value(data=int(self._continue_if_not_different))
+        spec.write_value(data=self.__speed)
+        spec.write_value(data=self.__sample_time)
+        spec.write_value(data=self.__update_time)
+        spec.write_value(data=self.__delay_time)
+        spec.write_value(data=self.__delta_threshold)
+        spec.write_value(data=int(self.__continue_if_not_different))
 
         # End-of-Spec:
         spec.end_specification()
@@ -176,7 +191,7 @@ class MunichMotorDevice(
     def dependent_vertices(self):
         """ Return the vertices which this vertex depends upon
         """
-        return self._dependent_vertices
+        return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.
                edge_partition_identifiers_for_dependent_vertex)

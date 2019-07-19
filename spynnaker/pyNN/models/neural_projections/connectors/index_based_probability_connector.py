@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import numpy
@@ -24,9 +39,9 @@ class IndexBasedProbabilityConnector(AbstractConnector):
     """
 
     __slots = [
-        "_allow_self_connections",
-        "_index_expression",
-        "_probs"]
+        "__allow_self_connections",
+        "__index_expression",
+        "__probs"]
 
     def __init__(
             self, index_expression, allow_self_connections=True, rng=None,
@@ -43,18 +58,18 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             Population.
         """
         super(IndexBasedProbabilityConnector, self).__init__(safe, verbose)
-        self._index_expression = index_expression
-        self._allow_self_connections = allow_self_connections
-
-        self._probs = None
+        self._rng = rng
+        self.__index_expression = index_expression
+        self.__allow_self_connections = allow_self_connections
+        self.__probs = None
 
     def _update_probs_from_index_expression(self):
         # note: this only needs to be done once
-        if self._probs is None:
+        if self.__probs is None:
             # numpy array of probabilities using the index_expression
-            self._probs = numpy.fromfunction(
+            self.__probs = numpy.fromfunction(
                 lambda i, j: _index_expr_context.eval(
-                    self._index_expression, i=i, j=j),
+                    self.__index_expression, i=i, j=j),
                 (self._n_pre_neurons, self._n_post_neurons))
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -63,7 +78,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
             self._n_pre_neurons * self._n_post_neurons,
-            numpy.amax(self._probs))
+            numpy.amax(self.__probs))
         return self._get_delay_maximum(delays, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
@@ -72,7 +87,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         self._update_probs_from_index_expression()
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            post_vertex_slice.n_atoms, numpy.amax(self._probs))
+            post_vertex_slice.n_atoms, numpy.amax(self.__probs))
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -86,7 +101,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         self._update_probs_from_index_expression()
         return utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons, numpy.amax(self._probs))
+            self._n_pre_neurons, numpy.amax(self.__probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
@@ -94,7 +109,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
             self._n_pre_neurons * self._n_post_neurons,
-            numpy.amax(self._probs))
+            numpy.amax(self.__probs))
         return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
@@ -106,7 +121,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         # setup probs here
         self._update_probs_from_index_expression()
 
-        probs = self._probs[
+        probs = self.__probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
 
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -114,7 +129,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
         # If self connections are not allowed, remove the possibility of self
         # connections by setting the probability to a value of infinity
-        if not self._allow_self_connections:
+        if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < probs
@@ -128,28 +143,28 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            weights, n_connections, None)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
     def __repr__(self):
         return "IndexBasedProbabilityConnector({})".format(
-            self._index_expression)
+            self.__index_expression)
 
     @property
     def allow_self_connections(self):
-        return self._allow_self_connections
+        return self.__allow_self_connections
 
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
-        self._allow_self_connections = new_value
+        self.__allow_self_connections = new_value
 
     @property
     def index_expression(self):
-        return self._index_expression
+        return self.__index_expression
 
     @index_expression.setter
     def index_expression(self, new_value):
-        self._index_expression = new_value
+        self.__index_expression = new_value

@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from data_specification.enums import DataType
 from spynnaker.pyNN.models.neuron.threshold_types import AbstractThresholdType
 from spinn_utilities.overrides import overrides
@@ -15,7 +30,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
     """ A threshold type that can send multicast keys with the value of\
         membrane voltage as the payload
     """
-    __slots__ = ["_device"]
+    __slots__ = ["__device"]
 
     def __init__(self, device):
         super(ThresholdTypeMulticastDeviceControl, self).__init__([
@@ -26,7 +41,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
             DataType.UINT32,   # time steps between sending
             DataType.UINT32,   # time steps until next send
             DataType.UINT32])  # type to send
-        self._device = device
+        self.__device = device
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -34,7 +49,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[DEVICE] = self._device
+        parameters[DEVICE] = self.__device
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):

@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -18,9 +33,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     """ A stochastic threshold
     """
     __slots__ = [
-        "_du_th",
-        "_tau_th",
-        "_v_thresh"]
+        "__du_th",
+        "__tau_th",
+        "__v_thresh"]
 
     def __init__(self, du_th, tau_th, v_thresh):
         super(ThresholdTypeMaassStochastic, self).__init__([
@@ -28,9 +43,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
             DataType.S1615,   # 1 / tau_th
             DataType.S1615,   # v_thresh
             DataType.S1615])  # ts / 10
-        self._du_th = du_th
-        self._tau_th = tau_th
-        self._v_thresh = v_thresh
+        self.__du_th = du_th
+        self.__tau_th = tau_th
+        self.__v_thresh = v_thresh
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -38,9 +53,9 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[DU_TH] = self._du_th
-        parameters[TAU_TH] = self._tau_th
-        parameters[V_THRESH] = self._v_thresh
+        parameters[DU_TH] = self.__du_th
+        parameters[TAU_TH] = self.__tau_th
+        parameters[V_THRESH] = self.__v_thresh
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -71,24 +86,24 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @property
     def v_thresh(self):
-        return self._v_thresh
+        return self.__v_thresh
 
     @v_thresh.setter
     def v_thresh(self, v_thresh):
-        self._v_thresh = v_thresh
+        self.__v_thresh = v_thresh
 
     @property
     def du_th(self):
-        return self._du_th
+        return self.__du_th
 
     @du_th.setter
     def du_th(self, du_th):
-        self._du_th = du_th
+        self.__du_th = du_th
 
     @property
     def tau_th(self):
-        return self._tau_th
+        return self.__tau_th
 
     @tau_th.setter
     def tau_th(self, tau_th):
-        self._tau_th = tau_th
+        self.__tau_th = tau_th

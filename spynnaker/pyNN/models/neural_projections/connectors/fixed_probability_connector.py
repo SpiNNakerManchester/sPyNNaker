@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import decimal
 import math
 import numpy
@@ -15,12 +30,12 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     """
 
     __slots__ = [
-        "_allow_self_connections",
+        "__allow_self_connections",
         "_p_connect"]
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False):
+            verbose=False, rng=None):
         """
         :param p_connect:
             a float between zero and one. Each potential connection is created\
@@ -37,8 +52,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         """
         super(FixedProbabilityConnector, self).__init__(safe, verbose)
         self._p_connect = p_connect
-        self._allow_self_connections = allow_self_connections
-
+        self.__allow_self_connections = allow_self_connections
+        self._rng = rng
         if not 0 <= self._p_connect <= 1:
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
@@ -97,7 +112,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
         # If self connections are not allowed, remove possibility the self
         # connections by setting them to a value of infinity
-        if not self._allow_self_connections:
+        if not self.__allow_self_connections:
             items[0:n_items:post_vertex_slice.n_atoms + 1] = numpy.inf
 
         present = items < self._p_connect
@@ -110,9 +125,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            weights, n_connections, None)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
@@ -131,7 +146,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         params = [
-            self.allow_self_connections,
+            self.__allow_self_connections,
             round(decimal.Decimal(
                 str(self._p_connect)) * DataType.U032.scale)]
         params.extend(self._get_connector_seed(

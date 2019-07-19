@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from types import NoneType
 
 from spinn_utilities.overrides import overrides
@@ -16,7 +31,7 @@ class ProjectionMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
     __slots__ = [
-        "_synapse_information"]
+        "__synapse_information"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
@@ -26,18 +41,18 @@ class ProjectionMachineEdge(
             pre_vertex, post_vertex, label=label,
             traffic_weight=traffic_weight)
 
-        self._synapse_information = synapse_information
+        self.__synapse_information = synapse_information
 
     @property
     def synapse_information(self):
-        return self._synapse_information
+        return self.__synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
         n_filtered = 0
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
@@ -45,24 +60,23 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
-                return n_filtered == len(self._synapse_information)
             elif isinstance(synapse_info.connector, FromListConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                # run through connection list and return false if we find any
-                #  connections between the pre and post vertices
-                try:
-                    if synapse_info.connector.conn_matrix is None:
-                        return False
-                    if synapse_info.connector.conn_matrix[
-                            pre_lo:pre_hi+1, post_lo:post_hi+1].max() > 0:
-                        return False
-                except (ValueError, NoneType, TypeError):
-                    print "Value error"
-                return True
-        return False
+                pre_app_vertex = graph_mapper.get_application_vertex(
+                    self.pre_vertex)
+                post_app_vertex = graph_mapper.get_application_vertex(
+                    self.post_vertex)
+                pre_slices = graph_mapper.get_slices(pre_app_vertex)
+                post_slices = graph_mapper.get_slices(post_app_vertex)
+                # run through connection list and check for any connections
+                # between the pre and post vertices that could be filtered
+                n_connections = synapse_info.connector.get_n_connections(
+                    pre_slices, post_slices, pre_hi, post_hi)
+                if n_connections == 0:
+                    n_filtered += 1
+
+        return (n_filtered == len(self.__synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
@@ -72,7 +86,7 @@ class ProjectionMachineEdge(
             self.pre_vertex)
 
         weight = 0
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             new_weight = synapse_info.connector.\
                 get_n_connections_to_post_vertex_maximum()
             new_weight *= pre_vertex_slice.n_atoms
@@ -93,7 +107,7 @@ class ProjectionMachineEdge(
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         prov_items = list()
-        for synapse_info in self._synapse_information:
+        for synapse_info in self.__synapse_information:
             prov_items.extend(
                 synapse_info.connector.get_provenance_data())
             prov_items.extend(
