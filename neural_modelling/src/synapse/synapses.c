@@ -23,6 +23,7 @@
 uint32_t num_fixed_pre_synaptic_events = 0;
 
 uint32_t num_fixed_pre_synaptic_events_per_timestep = 0;
+uint8_t zero_target_spikes_per_dt = 0;
 
 extern uint32_t spikes_remaining_this_tick;
 spike_holder_t syn_rec;
@@ -472,9 +473,10 @@ static inline void write_recording(timer_t time) {
     for(uint32_t i = 0; i < n_recorded_vars; i++) {
        uint32_t index = var_recording_indexes[i];
 
-       syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
-       syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
-       syn_rec.spikes_c = kickstarts;
+		syn_rec.spikes_a = num_fixed_pre_synaptic_events_per_timestep & 0xFF;
+		syn_rec.spikes_b = spikes_remaining_this_tick & 0xFF;
+		syn_rec.spikes_c = kickstarts;
+		syn_rec.spikes_d = zero_target_spikes_per_dt;
 
 
        var_recording_values[i]->states[index] = spike_profiling_get_spike_holder_as_accum(syn_rec);
@@ -510,11 +512,12 @@ void synapses_do_timestep_update(timer_t time) {
 
     _print_inputs();
 
-    if(is_recording) {
-        write_recording(time);
-        num_fixed_pre_synaptic_events_per_timestep = 0;
-        kickstarts = 0;
-    }
+	if (is_recording) {
+		write_recording(time);
+		num_fixed_pre_synaptic_events_per_timestep = 0;
+		kickstarts = 0;
+		zero_target_spikes_per_dt = 0;
+	}
 
     // Re-enable the interrupts
     //spin1_mode_restore(state);
