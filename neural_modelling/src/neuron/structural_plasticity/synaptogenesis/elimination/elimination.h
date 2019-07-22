@@ -3,10 +3,14 @@
 
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
-address_t synaptogenesis_elimination_init(address_t data);
+//! \brief Read and return an elimination parameter data structure from the
+//!        data stream
+//! \param[in/out] The data stream to read from, updated to the new position
+//!                after the read is done
+//! \return the read parameters data structure
+struct elimination_params *synaptogenesis_elimination_init(uint8_t **data);
 
 //! \brief Elimination rule for synaptogenesis
-//! \param[in] rewiring_data Pointer to rewiring data
 //! \param[in] current_state Pointer to current state
 //! \param[in] time Time of elimination
 //! \param[in] row The row to eliminate from

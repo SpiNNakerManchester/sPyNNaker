@@ -44,10 +44,10 @@ int32_t *post_to_pre_table;
 pre_pop_info_table_t pre_info;
 
 // The formation parameters per pre-population
-struct formation_params *formation_params;
+struct formation_params **formation_params;
 
 // The elimination parameters per pre-population
-struct elimination_params *elimination_params;
+struct elimination_params **elimination_params;
 
 //! function to unpack element from post to pre table into constituent bits
 static inline bool unpack_post_to_pre(int32_t value, uint32_t* pop_index,
@@ -95,13 +95,41 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
     pre_info.no_pre_pops = rewiring_data.no_pre_pops;
     pre_info.prepop_info = spin1_malloc(
             rewiring_data.no_pre_pops * sizeof(pre_info_t *));
+    if (pre_info.prepop_info == NULL) {
+        log_error("Could not initialise pre population info");
+        rt_error(RTE_SWERR);
+    }
     for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
         pre_info.prepop_info[i] = (pre_info_t *) data;
         uint32_t pre_size = (pre_info.prepop_info[i]->no_pre_vertices
                 * sizeof(key_atom_info_t)) + sizeof(pre_info_t);
         pre_info.prepop_info[i] = spin1_malloc(pre_size);
+        if (pre_info.prepop_info[i] == NULL) {
+            log_error("Could not initialise pre population info %d", i);
+            rt_error(RTE_SWERR);
+        }
         spin1_memcpy(pre_info.prepop_info[i], data, pre_size);
         data += pre_size;
+    }
+
+    formation_params = spin1_malloc(
+        rewiring_data.no_pre_pops * sizeof(struct formation_params *));
+    if (formation_params == NULL) {
+        log_error("Could not initialise formation parameters");
+        rt_error(RTE_SWERR);
+    }
+    for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
+        formation_params[i] = synaptogenesis_formation_init(&data);
+    }
+
+    elimination_params = spin1_malloc(
+        rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
+    if (elimination_params == NULL) {
+        log_error("Could not initialise elimination parameters");
+        rt_error(RTE_SWERR);
+    }
+    for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
+        elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
 
     return (address_t) data;
@@ -180,7 +208,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
 
     if (current_state.element_exists && search_hit) {
         return synaptogenesis_elimination_rule(&current_state,
-            &elimination_params[current_state.pre_population_index], time, row);
+            elimination_params[current_state.pre_population_index], time, row);
     } else {
         // Can't form if the row is full
         uint no_elems = synapse_dynamics_n_connections_in_row(
@@ -190,7 +218,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             return false;
         }
         return synaptogenesis_formation_rule(&current_state,
-            &formation_params[current_state.pre_population_index], time, row);
+            formation_params[current_state.pre_population_index], time, row);
     }
 }
 

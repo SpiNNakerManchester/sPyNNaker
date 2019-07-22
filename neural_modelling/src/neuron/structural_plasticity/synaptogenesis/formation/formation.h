@@ -3,7 +3,12 @@
 
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
-address_t synaptogenesis_formation_init(address_t address);
+//! \brief Read and return an formation parameter data structure from the
+//!        data stream
+//! \param[in/out] The data stream to read from, updated to the new position
+//!                after the read is done
+//! \return the read parameters data structure
+struct formation_params *synaptogenesis_formation_init(uint8_t **data);
 
 //! \brief Formation rule for synaptogenesis
 //! \param[in] rewiring_data Pointer to rewiring data
