@@ -35,7 +35,6 @@
 #define GSYN_INHIBITORY_RECORDING_INDEX 2
 
 typedef struct input_type_current_semd_t {
-
     // multiplicator
     REAL multiplicator[NUM_INHIBITORY_RECEPTORS];
 

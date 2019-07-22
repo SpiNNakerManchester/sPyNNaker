@@ -24,20 +24,25 @@
 #include <stdfix-full-iso.h>
 #include <random.h>
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_exponential_initialize;
+static free_func param_generator_exponential_free;
+static generate_param_func param_generator_exponential_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
  */
-struct param_generator_exponential_params {
+typedef struct param_generator_exponential_params {
     accum beta;
-};
+} param_generator_exponential_params;
 
 /**
  *! \brief The data structure to be passed around for this generator.  This
  *!        includes the parameters and an RNG.
  */
 struct param_generator_exponential {
-    struct param_generator_exponential_params params;
+    param_generator_exponential_params params;
     rng_t rng;
 };
 
@@ -47,9 +52,9 @@ static void *param_generator_exponential_initialize(address_t *region) {
             spin1_malloc(sizeof(struct param_generator_exponential));
 
     // Copy the parameters in
-    spin1_memcpy(&params->params, *region,
-            sizeof(struct param_generator_exponential_params));
-    *region += sizeof(struct param_generator_exponential_params) >> 2;
+    param_generator_exponential_params *params_sdram = (void *) *region;
+    params->params = *params_sdram++;
+    *region = (void *) params_sdram;
     log_debug("exponential beta = %k", params->params.beta);
 
     // Initialise the RNG for this generator

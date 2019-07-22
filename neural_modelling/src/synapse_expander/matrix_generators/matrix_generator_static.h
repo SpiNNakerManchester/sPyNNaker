@@ -24,6 +24,11 @@
 #include <debug.h>
 #include <delay_extension/delay_extension.h>
 #include "matrix_generator_common.h"
+#include <synapse_expander/generator_types.h>
+
+static initialize_func matrix_generator_static_initialize;
+static free_func matrix_generator_static_free;
+static generate_row_func matrix_generator_static_write_row;
 
 static void *matrix_generator_static_initialize(address_t *region) {
     use(region);
@@ -79,7 +84,7 @@ static void matrix_generator_static_free(void *data) {
  *! \param[in] synapse_index_bits The number of bits for the target neuron id
  *! \return a synaptic word
  */
-static uint32_t _build_static_word(
+static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
@@ -183,7 +188,7 @@ static void matrix_generator_static_write_row(
         }
 
         // Build synaptic word
-        uint32_t word = _build_static_word(
+        uint32_t word = build_static_word(
                 weight, delay.delay, synapse_type, post_index, synapse_type_bits,
                 synapse_index_bits);
 

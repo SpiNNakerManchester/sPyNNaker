@@ -24,11 +24,16 @@
 #include <stdfix-full-iso.h>
 #include <normal.h>
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_normal_initialize;
+static free_func param_generator_normal_free;
+static generate_param_func param_generator_normal_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
  */
-struct param_generator_normal_params {
+struct normal_params {
     accum mu;
     accum sigma;
 };
@@ -38,30 +43,31 @@ struct param_generator_normal_params {
  *!        includes the parameters and an RNG.
  */
 struct param_generator_normal {
-    struct param_generator_normal_params params;
+    struct normal_params params;
     rng_t rng;
 };
 
 static void *param_generator_normal_initialize(address_t *region) {
     // Allocate memory for the data
-    struct param_generator_normal *params =
+    struct param_generator_normal *obj =
             spin1_malloc(sizeof(struct param_generator_normal));
+    struct normal_params *params_sdram = (void *) *region;
 
     // Copy the parameters in
-    spin1_memcpy(&params->params, *region,
-            sizeof(struct param_generator_normal_params));
-    *region += sizeof(struct param_generator_normal_params) >> 2;
+    obj->params = *params_sdram++;
+    *region = (void *) params_sdram;
+
     log_debug("normal mu = %k, sigma = %k",
-            params->params.mu, params->params.sigma);
+            obj->params.mu, obj->params.sigma);
 
     // Initialise the RNG for this generator
-    params->rng = rng_init(region);
-    return params;
+    obj->rng = rng_init(region);
+    return obj;
 }
 
 static void param_generator_normal_free(void *data) {
-    struct param_generator_normal *params = data;
-    rng_free(params->rng);
+    struct param_generator_normal *obj = data;
+    rng_free(obj->rng);
     sark_free(data);
 }
 
@@ -72,9 +78,9 @@ static void param_generator_normal_generate(
     use(indices);
 
     // For each index, generate a normally distributed random value
-    struct param_generator_normal *params = data;
+    struct param_generator_normal *obj = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        accum value = rng_normal(params->rng);
-        values[i] = params->params.mu + (value * params->params.sigma);
+        accum value = rng_normal(obj->rng);
+        values[i] = obj->params.mu + (value * obj->params.sigma);
     }
 }

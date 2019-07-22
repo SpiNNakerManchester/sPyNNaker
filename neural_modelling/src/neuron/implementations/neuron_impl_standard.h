@@ -187,7 +187,6 @@ static void neuron_impl_load_neuron_parameters(
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
-
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 

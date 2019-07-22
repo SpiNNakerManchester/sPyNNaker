@@ -22,6 +22,7 @@
 #include "param_generator.h"
 #include <spin1_api.h>
 #include <debug.h>
+#include "generator_types.h"
 
 #include "param_generators/param_generator_constant.h"
 #include "param_generators/param_generator_uniform.h"
@@ -53,14 +54,14 @@ typedef struct param_generator_info {
      *! \brief The hash of the generator.
      *! For now, hash is just an index agreed between Python and here.
      */
-    uint32_t hash;
+    generator_hash_t hash;
     /**
      *! \brief Initialise the generator
      *! \param[in/out] region Region to read parameters from.  Should be updated
      *!                       to position just after parameters after calling.
      *! \return A data item to be passed in to other functions later on
      */
-    void* (*initialize)(address_t *region);
+    initialize_func *initialize;
     /**
      *! \brief Generate values with a parameter generator
      *! \param[in] data The data for the parameter generator, returned by the
@@ -72,14 +73,12 @@ typedef struct param_generator_info {
      *! \param[in/out] values An array into which to place the values; will be
      *!                       n_indices in size
      */
-    void (*generate)(
-            void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
-            uint16_t *indices, accum *values);
+    generate_param_func *generate;
     /**
      *! \brief Free any data for the generator
      *! \param[in] data The data to free
      */
-    void (*free)(void *data);
+    free_func *free;
 } param_generator_info;
 
 /**

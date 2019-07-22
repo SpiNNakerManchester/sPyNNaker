@@ -21,6 +21,11 @@
  */
 
 #include <stdbool.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func connection_generator_all_to_all_initialise;
+static free_func connection_generator_all_to_all_free;
+static generate_connection_func connection_generator_all_to_all_generate;
 
 /**
  *! \brief The parameters to be passed around for this connector
@@ -32,15 +37,15 @@ struct all_to_all {
 static void *connection_generator_all_to_all_initialise(address_t *region) {
     // Allocate the data structure for parameters
     struct all_to_all *params = spin1_malloc(sizeof(struct all_to_all));
+    struct all_to_all *params_sdram = (void *) *region;
 
     // Copy the parameters into the data structure
-    address_t params_sdram = *region;
-    spin1_memcpy(params, params_sdram, sizeof(struct all_to_all));
-    params_sdram = &params_sdram[sizeof(struct all_to_all) >> 2];
+    *params = *params_sdram++;
+    *region = (void *) params_sdram;
+
     log_debug("All to all connector, allow self connections = %u",
             params->allow_self_connections);
 
-    *region = params_sdram;
     return params;
 }
 
@@ -57,7 +62,7 @@ static uint32_t connection_generator_all_to_all_generate(
 
     log_debug("Generating for %u", pre_neuron_index);
 
-    struct all_to_all *params = (struct all_to_all *) data;
+    struct all_to_all *obj = data;
 
     // If no space, generate nothing
     if (max_row_length < 1) {
@@ -68,7 +73,7 @@ static uint32_t connection_generator_all_to_all_generate(
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
         // ... unless this is a self connection and these are disallowed
-        if (!params->allow_self_connections &&
+        if (!obj->allow_self_connections &&
                 (pre_neuron_index == post_slice_start + i)) {
             log_debug("Not generating for post %u", post_slice_start + i);
             continue;

@@ -21,6 +21,11 @@
  */
 #include <stdfix.h>
 #include <spin1_api.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_constant_initialize;
+static free_func param_generator_constant_free;
+static generate_param_func param_generator_constant_generate;
 
 /**
  *! \brief The data for the constant value generation
@@ -35,9 +40,10 @@ static void *param_generator_constant_initialize(address_t *region) {
             spin1_malloc(sizeof(struct param_generator_constant));
 
     // Read parameters from SDRAM
-    spin1_memcpy(&params->value, *region, sizeof(accum));
+    struct param_generator_constant *params_sdram = (void *) *region;
+    *params = *params_sdram++;
+    *region = (void *) params_sdram;
     log_debug("Constant value %k", params->value);
-    (*region)++;
     return params;
 }
 

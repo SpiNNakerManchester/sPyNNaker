@@ -20,6 +20,12 @@
  *! \brief One-to-One Connection generator implementation
  */
 
+#include <synapse_expander/generator_types.h>
+
+static initialize_func connection_generator_one_to_one_initialise;
+static free_func connection_generator_one_to_one_free;
+static generate_connection_func connection_generator_one_to_one_generate;
+
 static void *connection_generator_one_to_one_initialise(address_t *region) {
     use(region);
     log_debug("One to One connector");
@@ -45,7 +51,7 @@ static uint32_t connection_generator_one_to_one_generate(
 
     // If out of range, don't generate anything
     if ((pre_neuron_index < post_slice_start) ||
-            (pre_neuron_index >= (post_slice_start + post_slice_count))) {
+            (pre_neuron_index >= post_slice_start + post_slice_count)) {
         return 0;
     }
 

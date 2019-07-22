@@ -24,11 +24,16 @@
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_uniform_initialize;
+static free_func param_generator_uniform_free;
+static generate_param_func param_generator_uniform_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
  */
-struct param_generator_uniform_params {
+struct uniform_params {
     accum low;
     accum high;
 };
@@ -38,7 +43,7 @@ struct param_generator_uniform_params {
  *!        includes the parameters and an RNG.
  */
 struct param_generator_uniform {
-    struct param_generator_uniform_params params;
+    struct uniform_params params;
     rng_t rng;
 };
 
@@ -46,11 +51,12 @@ static void *param_generator_uniform_initialize(address_t *region) {
     // Allocate memory for the data
     struct param_generator_uniform *params =
             spin1_malloc(sizeof(struct param_generator_uniform));
+    struct uniform_params *params_sdram = (void *) *region;
 
     // Copy the parameters in
-    spin1_memcpy(&params->params, *region,
-            sizeof(struct param_generator_uniform_params));
-    *region += sizeof(struct param_generator_uniform_params) >> 2;
+    params->params = *params_sdram++;
+    *region = (void *) params_sdram;
+
     log_debug("Uniform low = %k, high = %k",
             params->params.low, params->params.high);
 
@@ -60,9 +66,8 @@ static void *param_generator_uniform_initialize(address_t *region) {
 }
 
 static void param_generator_uniform_free(void *data) {
-    struct param_generator_uniform *params =
-            (struct param_generator_uniform *) data;
-    rng_free(params->rng);
+    struct param_generator_uniform *obj = data;
+    rng_free(obj->rng);
     sark_free(data);
 }
 
@@ -73,10 +78,9 @@ static void param_generator_uniform_generate(
     use(indices);
 
     // For each index, generate a uniformly distributed value
-    struct param_generator_uniform *params = data;
-    accum range = params->params.high - params->params.low;
+    struct param_generator_uniform *obj = data;
+    accum range = obj->params.high - obj->params.low;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        values[i] = params->params.low
-                + (ulrbits(rng_generator(params->rng)) * range);
+        values[i] = obj->params.low + ulrbits(rng_generator(obj->rng)) * range;
     }
 }

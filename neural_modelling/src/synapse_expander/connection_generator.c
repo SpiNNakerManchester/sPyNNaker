@@ -23,6 +23,7 @@
 #include "connection_generator.h"
 #include <spin1_api.h>
 #include <debug.h>
+#include "generator_types.h"
 
 #include "connection_generators/connection_generator_one_to_one.h"
 #include "connection_generators/connection_generator_all_to_all.h"
@@ -50,7 +51,7 @@ typedef struct connection_generator_info {
      *! \brief The hash of the generator.
      *! For now, hash is just an index agreed between Python and here
      */
-    uint32_t hash;
+    generator_hash_t hash;
 
     /**
      *! \brief Initialise the generator
@@ -58,7 +59,7 @@ typedef struct connection_generator_info {
      *!                       to position just after parameters after calling.
      *! \return A data item to be passed in to other functions later on
      */
-    void* (*initialize)(address_t *region);
+    initialize_func *initialize;
 
     /**
      *! \brief Generate connections
@@ -80,16 +81,13 @@ typedef struct connection_generator_info {
      *!                        initialised to be max_row_length in size
      *! \return The number of connections generated
      */
-    uint32_t (*generate)(
-            void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
-            uint32_t pre_neuron_index, uint32_t post_slice_start,
-            uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices);
+    generate_connection_func *generate;
 
     /**
      *! \brief Free any data for the generator
      *! \param[in] data The data to free
      */
-    void (*free)(void *data);
+    free_func *free;
 } connection_generator_info;
 
 /**
@@ -131,6 +129,7 @@ connection_generator_t connection_generator_init(
     // Look through the known generators
     for (uint32_t i = 0; i < N_CONNECTION_GENERATORS; i++) {
         const connection_generator_info *type = &connection_generators[i];
+
         // If the hash requested matches the hash of the generator, use it
         if (hash == type->hash) {
             // Prepare a space for the data
