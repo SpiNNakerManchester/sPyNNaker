@@ -1,7 +1,7 @@
 #ifndef _FORMATION_H_
 #define _FORMATION_H_
 
-#include <neuron/structural_plasticity/sp_structs.h>
+#include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
 address_t synaptogenesis_formation_init(address_t address);
 
@@ -11,7 +11,8 @@ address_t synaptogenesis_formation_init(address_t address);
 //! \param[in] time Time of formation
 //! \param[in] row The row to form within
 //! \return if row was modified
-static inline bool synaptogenesis_formation_rule(rewiring_data_t *rewiring_data,
-        current_state_t *current_state, uint32_t time, address_t row);
+static inline bool synaptogenesis_formation_rule(
+        current_state_t *current_state, struct formation_params *params,
+        uint32_t time, address_t row);
 
 #endif // _FORMATION_H_

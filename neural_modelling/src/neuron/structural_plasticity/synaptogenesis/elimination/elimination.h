@@ -1,7 +1,7 @@
 #ifndef _ELIMINATION_H_
 #define _ELIMINATION_H_
 
-#include <neuron/structural_plasticity/sp_structs.h>
+#include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
 address_t synaptogenesis_elimination_init(address_t data);
 
@@ -11,7 +11,8 @@ address_t synaptogenesis_elimination_init(address_t data);
 //! \param[in] time Time of elimination
 //! \param[in] row The row to eliminate from
 //! \return if row was modified
-static inline bool synaptogenesis_elimination_rule(rewiring_data_t *rewiring_data,
-        current_state_t *current_state, uint32_t time, address_t row);
+static inline bool synaptogenesis_elimination_rule(
+        current_state_t *current_state, struct elimination_params *params,
+        uint32_t time, address_t row);
 
 #endif // _ELIMINATION_H_

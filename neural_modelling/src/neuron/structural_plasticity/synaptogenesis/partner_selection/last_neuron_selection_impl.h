@@ -11,6 +11,8 @@ extern spike_t* last_spikes_buffer[2];
 extern uint32_t n_spikes[2];
 extern uint32_t last_spikes_buffer_size;
 extern uint32_t last_time;
+extern rewiring_data_t rewiring_data;
+extern pre_pop_info_table_t pre_info;
 
 static inline void partner_spike_received(uint32_t time, spike_t spike) {
     uint32_t buffer = time & 0x1;
@@ -25,16 +27,16 @@ static inline void partner_spike_received(uint32_t time, spike_t spike) {
 
 //! randomly (with uniform probability) select one of the last received spikes
 static inline bool potential_presynaptic_partner(
-        uint32_t time, rewiring_data_t *rewiring_data, uint32_t *population_id,
-        uint32_t *sub_population_id, uint32_t *neuron_id, spike_t *spike) {
+        uint32_t time, uint32_t *population_id, uint32_t *sub_population_id,
+        uint32_t *neuron_id, spike_t *spike) {
     uint32_t buffer = (time - 1) & 0x1;
     if (!n_spikes[buffer]) {
         return false;
     }
-    uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data->local_seed)) *
+    uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
         n_spikes[buffer];
     *spike = last_spikes_buffer[buffer][offset];
-    return sp_structs_find_by_spike(rewiring_data, *spike, neuron_id,
+    return sp_structs_find_by_spike(&pre_info, *spike, neuron_id,
             population_id, sub_population_id);
 }
 
