@@ -145,7 +145,7 @@ static inline bit_field_t out_spikes_bitfield(uint32_t n) {
 
 //! \brief ??????????????
 //! \return None
-static inline void _reset_spikes(void) {
+static inline void reset_spikes(void) {
     spikes->n_buffers = 0;
     for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
         clear_bit_field(out_spikes_bitfield(n - 1), n_spike_buffer_words);
@@ -459,7 +459,7 @@ static void recording_complete_callback(void) {
 
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
-static inline void _record_spikes(uint32_t time) {
+static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
         spin1_wfi();
     }
@@ -469,7 +469,7 @@ static inline void _record_spikes(uint32_t time) {
         recording_record_and_notify(
                 0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
                 recording_complete_callback);
-        _reset_spikes();
+        reset_spikes();
     }
 }
 
@@ -574,7 +574,7 @@ static void timer_callback(uint timer_count, uint unused) {
 
     // Record output spikes if required
     if (recording_flags > 0) {
-        _record_spikes(time);
+        record_spikes(time);
     }
 
     if (recording_flags > 0) {

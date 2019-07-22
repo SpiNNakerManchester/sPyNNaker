@@ -22,6 +22,7 @@
 #include "connection_generator.h"
 #include "param_generator.h"
 #include "matrix_generators/matrix_generator_common.h"
+#include "common_mem.h"
 
 #include <spin1_api.h>
 #include <data_specification.h>
@@ -29,7 +30,18 @@
 #include <delay_extension/delay_extension.h>
 #include <bit_field.h>
 
-#define _unused(x) ((void)(x))
+struct delay_builder_config {
+    // the parameters
+    uint32_t max_row_n_synapses;
+    uint32_t max_delayed_row_n_synapses;
+    uint32_t post_slice_start;
+    uint32_t post_slice_count;
+    uint32_t max_stage;
+    accum timestep_per_delay;
+    // the connector and delay parameter generators
+    uint32_t connector_type;
+    uint32_t delay_type;
+};
 
 /**
  *! \brief Generate the data for a single connector
@@ -45,27 +57,19 @@
  *! \return True if the region was correctly generated, False if there was an
  *!         error
  */
-bool read_delay_builder_region(address_t *in_region,
+static bool read_delay_builder_region(address_t *in_region,
         bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start,
         uint32_t pre_slice_count) {
     // Get the parameters
     address_t region = *in_region;
-    const uint32_t max_row_n_synapses = *region++;
-    const uint32_t max_delayed_row_n_synapses = *region++;
-    const uint32_t post_slice_start = *region++;
-    const uint32_t post_slice_count = *region++;
-    const uint32_t max_stage = *region++;
-    accum timestep_per_delay;
-    spin1_memcpy(&timestep_per_delay, region++, sizeof(accum));
-
+    struct delay_builder_config config;
+    fast_memcpy(&config, region, sizeof(config));
+    region += sizeof(config) / sizeof(uint32_t);
     // Get the connector and delay parameter generators
-    const uint32_t connector_type_hash = *region++;
-    const uint32_t delay_type_hash = *region++;
     connection_generator_t connection_generator =
-            connection_generator_init(connector_type_hash, &region);
+            connection_generator_init(config.connector_type, &region);
     param_generator_t delay_generator =
-            param_generator_init(delay_type_hash, &region);
-
+            param_generator_init(config.delay_type, &region);
     *in_region = region;
 
     // If any components couldn't be created return false
@@ -79,11 +83,11 @@ bool read_delay_builder_region(address_t *in_region,
             pre_neuron_index < pre_slice_end; pre_neuron_index++) {
         // Generate the connections
         uint32_t max_n_synapses =
-                max_row_n_synapses + max_delayed_row_n_synapses;
+                config.max_row_n_synapses + config.max_delayed_row_n_synapses;
         uint16_t indices[max_n_synapses];
         uint32_t n_indices = connection_generator_generate(
                 connection_generator, pre_slice_start, pre_slice_count,
-                pre_neuron_index, post_slice_start, post_slice_count,
+                pre_neuron_index, config.post_slice_start, config.post_slice_count,
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
@@ -96,7 +100,7 @@ bool read_delay_builder_region(address_t *in_region,
         // Go through the delays
         for (uint32_t i = 0; i < n_indices; i++) {
             // Get the delay in timesteps
-            accum delay = delay_params[i] * timestep_per_delay;
+            accum delay = delay_params[i] * config.timestep_per_delay;
             if (delay < 0) {
                 delay = 1;
             }
@@ -109,7 +113,7 @@ bool read_delay_builder_region(address_t *in_region,
 
             // Get the delay stage and update the data
             struct delay_value delay_value =
-                    get_delay(rounded_delay, max_stage);
+                    get_delay(rounded_delay, config.max_stage);
             if (delay_value.stage > 0) {
                 bit_field_set(neuron_delay_stage_config[delay_value.stage - 1],
                         pre_neuron_index - pre_slice_start);
@@ -132,7 +136,7 @@ bool read_delay_builder_region(address_t *in_region,
  *! \return True if the expander finished correctly, False if there was an
  *!         error
  */
-bool read_sdram_data(
+static bool run_delay_expander(
         address_t delay_params_address, address_t params_address) {
     // Read the global parameters from the delay extension
     uint32_t num_neurons = delay_params_address[N_ATOMS];
@@ -185,7 +189,7 @@ void c_main(void) {
             delay_params_address, params_address);
 
     // Run the expander
-    if (!read_sdram_data(
+    if (!run_delay_expander(
             (address_t) delay_params_address, (address_t) params_address)) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);

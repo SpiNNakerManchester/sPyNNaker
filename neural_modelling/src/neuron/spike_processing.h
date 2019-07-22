@@ -66,7 +66,7 @@ bool get_dma_busy(void);
 bool do_rewiring(int number_of_rew);
 
 //! exposing this so that other classes can call it
-void _setup_synaptic_dma_read(void);
+void setup_synaptic_dma_read(void);
 
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool

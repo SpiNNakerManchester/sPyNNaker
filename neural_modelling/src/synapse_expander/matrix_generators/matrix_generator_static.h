@@ -88,10 +88,11 @@ static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,
         uint16_t post_index, uint32_t synapse_type_bits,
         uint32_t synapse_index_bits) {
-    uint32_t synapse_index_mask = ((1 << synapse_index_bits) - 1);
+    uint32_t synapse_index_mask = (1 << synapse_index_bits) - 1;
+    uint32_t synapse_type_mask = (1 << synapse_type_bits) - 1;
 
     uint32_t wrd  = post_index & synapse_index_mask;
-    wrd |= (type & ((1 << synapse_type_bits) - 1)) << synapse_index_bits;
+    wrd |= (type & synapse_type_mask) << synapse_index_bits;
     wrd |= (delay & SYNAPSE_DELAY_MASK) <<
             (synapse_index_bits + synapse_type_bits);
     wrd |= (weight & SYNAPSE_WEIGHT_MASK) << SYNAPSE_WEIGHT_SHIFT;
@@ -134,7 +135,7 @@ static void matrix_generator_static_write_row(
         uint32_t single_matrix_size =
                 n_pre_neurons * (max_delayed_row_n_words + 3);
         for (uint32_t i = 1; i < max_stage; i++) {
-            row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
+            row_address[i] = &delayed_address[single_matrix_size * (i - 1)];
             space[i] = max_delayed_row_n_words;
             log_debug("row[%u] = 0x%08x", i, row_address[i]);
         }
@@ -155,7 +156,7 @@ static void matrix_generator_static_write_row(
             row_address[i][STATIC_FIXED_FIXED_SIZE] = 0;
             row_address[i][STATIC_PLASTIC_PLASTIC_SIZE] = 0;
             row_address[i][STATIC_FIXED_PLASTIC_SIZE] = 0;
-            write_address[i] = &(row_address[i][STATIC_FIXED_FIXED_OFFSET]);
+            write_address[i] = &row_address[i][STATIC_FIXED_FIXED_OFFSET];
         } else {
             write_address[i] = NULL;
         }

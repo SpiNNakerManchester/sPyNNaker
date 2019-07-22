@@ -116,7 +116,7 @@ static uint16_t build_fixed_plastic_half_word(
     wrd |= (type & synapse_type_mask) << synapse_index_bits;
     wrd |= (delay & SYNAPSE_DELAY_MASK) <<
             (synapse_index_bits + synapse_type_bits);
-    // wrd |= ((delay & SYNAPSE_DELAY_MASK) << synapse_type_bits);
+    // wrd |= (delay & SYNAPSE_DELAY_MASK) << synapse_type_bits;
 
     return wrd;
 }
@@ -155,7 +155,7 @@ void matrix_generator_stdp_write_row(
                 &delayed_synaptic_matrix[pre_neuron_index * n_delay_row_words];
         uint32_t single_matrix_size = n_pre_neurons * n_delay_row_words;
         for (uint32_t i = 1; i < max_stage; i++) {
-            row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
+            row_address[i] = &delayed_address[single_matrix_size * (i - 1)];
             space_half_words[i] = max_delayed_row_n_words * 2;
         }
     } else {

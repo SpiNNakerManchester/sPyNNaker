@@ -173,7 +173,7 @@ static bool read_parameters(address_t address) {
     return true;
 }
 
-static void _store_provenance_data(address_t provenance_region) {
+static void store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
 
     // store the data into the provenance data region
@@ -206,7 +206,7 @@ static bool initialize(void) {
         return false;
     }
     simulation_set_provenance_function(
-            _store_provenance_data,
+            store_provenance_data,
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // Get the parameters
@@ -232,7 +232,7 @@ static void incoming_spike_callback(uint key, uint payload) {
 }
 
 // Gets the neuron ID of the incoming spike
-static inline key_t _key_n(key_t k) {
+static inline key_t key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
@@ -255,7 +255,7 @@ static void spike_process(void) {
 
         if ((s & incoming_mask) == incoming_key) {
             // Mask out neuron ID
-            uint32_t neuron_id = _key_n(s);
+            uint32_t neuron_id = key_n(s);
             if (neuron_id < num_neurons) {
                 // Increment counter
                 current_time_slot_spike_counters[neuron_id]++;

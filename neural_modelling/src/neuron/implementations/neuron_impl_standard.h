@@ -335,7 +335,7 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
 	log_debug("-------------------------------------\n");
 	for (index_t n = 0; n < n_neurons; n++) {
-	    synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
+	    synapse_types_print_parameters(&neuron_synapse_shaping_params[n]);
 	}
 	log_debug("-------------------------------------\n");
 }

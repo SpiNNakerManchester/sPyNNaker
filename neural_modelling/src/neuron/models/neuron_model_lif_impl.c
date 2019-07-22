@@ -20,7 +20,7 @@
 #include <debug.h>
 
 // simple Leaky I&F ODE
-static inline void _lif_neuron_closed_form(
+static inline void lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
@@ -56,7 +56,7 @@ state_t neuron_model_state_update(
         input_t input_this_timestep =
                 total_exc - total_inh + external_bias + neuron->I_offset;
 
-        _lif_neuron_closed_form(
+        lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);
     } else {
         // countdown refractory timer

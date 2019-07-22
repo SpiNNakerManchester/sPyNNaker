@@ -27,8 +27,36 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
+#include "common_mem.h"
 
-#define _unused(x) ((void)(x))
+struct connection_builder_config {
+    // the per-connector parameters
+    uint32_t offset;
+    uint32_t delayed_offset;
+    uint32_t max_row_n_words;
+    uint32_t max_delayed_row_n_words;
+    uint32_t max_row_n_synapses;
+    uint32_t max_delayed_row_n_synapses;
+    uint32_t pre_slice_start;
+    uint32_t pre_slice_count;
+    uint32_t max_stage;
+    accum timestep_per_delay;
+    uint32_t synapse_type;
+    // The types of the various components
+    uint32_t matrix_type;
+    uint32_t connector_type;
+    uint32_t weight_type;
+    uint32_t delay_type;
+};
+
+struct expander_config {
+    uint32_t n_in_edges;
+    uint32_t post_slice_start;
+    uint32_t post_slice_count;
+    uint32_t n_synapse_types;
+    uint32_t n_synapse_type_bits;
+    uint32_t n_synapse_index_bits;
+};
 
 /**
  *! \brief Generate the synapses for a single connector
@@ -44,40 +72,24 @@
  *! \param[in] weight_scales An array of weight scales, one for each synapse
  *!                          type
  */
-bool read_connection_builder_region(address_t *in_region,
+static bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t n_synapse_type_bits,
         uint32_t n_synapse_index_bits, uint32_t *weight_scales) {
-    // Read the per-connector parameters
     address_t region = *in_region;
-    const uint32_t synaptic_matrix_offset = *region++;
-    const uint32_t delayed_synaptic_matrix_offset = *region++;
-    const uint32_t max_row_n_words = *region++;
-    const uint32_t max_delayed_row_n_words = *region++;
-    const uint32_t max_row_n_synapses = *region++;
-    const uint32_t max_delayed_row_n_synapses = *region++;
-    const uint32_t pre_slice_start = *region++;
-    const uint32_t pre_slice_count = *region++;
-    const uint32_t max_stage = *region++;
-    accum timestep_per_delay;
-    spin1_memcpy(&timestep_per_delay, region++, sizeof(accum));
-    const uint32_t synapse_type = *region++;
-
-    // Read the types of the various components
-    const uint32_t matrix_type_hash = *region++;
-    const uint32_t connector_type_hash = *region++;
-    const uint32_t weight_type_hash = *region++;
-    const uint32_t delay_type_hash = *region++;
+    struct connection_builder_config config;
+    fast_memcpy(&config, region, sizeof(config));
+    region += sizeof(config) / sizeof(uint32_t);
 
     // Get the matrix, connector, weight and delay parameter generators
     matrix_generator_t matrix_generator =
-            matrix_generator_init(matrix_type_hash, &region);
+            matrix_generator_init(config.matrix_type, &region);
     connection_generator_t connection_generator =
-            connection_generator_init(connector_type_hash, &region);
+            connection_generator_init(config.connector_type, &region);
     param_generator_t weight_generator =
-            param_generator_init(weight_type_hash, &region);
+            param_generator_init(config.weight_type, &region);
     param_generator_t delay_generator =
-            param_generator_init(delay_type_hash, &region);
+            param_generator_init(config.delay_type, &region);
 
     *in_region = region;
 
@@ -88,19 +100,18 @@ bool read_connection_builder_region(address_t *in_region,
     }
 
     log_debug("Synaptic matrix offset = %u, delayed offset = %u",
-            synaptic_matrix_offset, delayed_synaptic_matrix_offset);
+            config.offset, config.delayed_offset);
     log_debug("Max row synapses = %u, max delayed row synapses = %u",
-            max_row_n_synapses, max_delayed_row_n_synapses);
+            config.max_row_n_synapses, config.max_delayed_row_n_synapses);
 
     // Get the positions to which the data should be written in the matrix
     address_t synaptic_matrix = NULL;
-    if (synaptic_matrix_offset != 0xFFFFFFFF) {
-        synaptic_matrix = &synaptic_matrix_region[synaptic_matrix_offset];
+    if (config.offset != 0xFFFFFFFF) {
+        synaptic_matrix = &synaptic_matrix_region[config.offset];
     }
     address_t delayed_synaptic_matrix = NULL;
-    if (delayed_synaptic_matrix_offset != 0xFFFFFFFF) {
-        delayed_synaptic_matrix =
-                &synaptic_matrix_region[delayed_synaptic_matrix_offset];
+    if (config.delayed_offset != 0xFFFFFFFF) {
+        delayed_synaptic_matrix = &synaptic_matrix_region[config.delayed_offset];
     }
     log_debug("Generating matrix at 0x%08x, delayed at 0x%08x",
             synaptic_matrix, delayed_synaptic_matrix);
@@ -108,14 +119,14 @@ bool read_connection_builder_region(address_t *in_region,
     // Do the generation
     bool status = matrix_generator_generate(
             matrix_generator, synaptic_matrix, delayed_synaptic_matrix,
-            max_row_n_words, max_delayed_row_n_words,
-            max_row_n_synapses, max_delayed_row_n_synapses,
+            config.max_row_n_words, config.max_delayed_row_n_words,
+            config.max_row_n_synapses, config.max_delayed_row_n_synapses,
             n_synapse_type_bits, n_synapse_index_bits,
-            synapse_type, weight_scales,
+            config.synapse_type, weight_scales,
             post_slice_start, post_slice_count,
-            pre_slice_start, pre_slice_count,
+            config.pre_slice_start, config.pre_slice_count,
             connection_generator, delay_generator, weight_generator,
-            max_stage, timestep_per_delay);
+            config.max_stage, config.timestep_per_delay);
 
     // Free the neuron four!
     matrix_generator_free(matrix_generator);
@@ -140,30 +151,28 @@ bool read_connection_builder_region(address_t *in_region,
  *! \return True if the expander finished correctly, False if there was an
  *!         error
  */
-bool read_sdram_data(
+static bool run_synapse_expander(
         address_t params_address, address_t synaptic_matrix_region) {
     // Read in the global parameters
-    uint32_t n_in_edges = *params_address++;
-    uint32_t post_slice_start = *params_address++;
-    uint32_t post_slice_count = *params_address++;
-    uint32_t n_synapse_types = *params_address++;
-    uint32_t n_synapse_type_bits = *params_address++;
-    uint32_t n_synapse_index_bits = *params_address++;
+    struct expander_config config;
+    fast_memcpy(&config, params_address, sizeof(config));
+    params_address += sizeof(config) / sizeof(uint32_t);
     log_info("Generating %u edges for %u atoms starting at %u",
-            n_in_edges, post_slice_count, post_slice_start);
+            config.n_in_edges, config.post_slice_count, config.post_slice_start);
 
     // Read in the weight scales, one per synapse type
-    uint32_t weight_scales[n_synapse_types];
-    for (uint32_t i = 0; i < n_synapse_types; i++) {
-        weight_scales[i] = *params_address++;
-    }
+    uint32_t weight_scales[config.n_synapse_types];
+    fast_memcpy(weight_scales, params_address,
+            sizeof(uint32_t) * config.n_synapse_types);
+    params_address += config.n_synapse_types;
 
     // Go through each connector and generate
-    for (uint32_t edge = 0; edge < n_in_edges; edge++) {
+    for (uint32_t edge = 0; edge < config.n_in_edges; edge++) {
         if (!read_connection_builder_region(
                 &params_address, synaptic_matrix_region,
-                post_slice_start, post_slice_count, n_synapse_type_bits,
-                n_synapse_index_bits, weight_scales)) {
+                config.post_slice_start, config.post_slice_count,
+                config.n_synapse_type_bits,
+                config.n_synapse_index_bits, weight_scales)) {
             return false;
         }
     }
@@ -186,7 +195,7 @@ void c_main(void) {
             params_address, syn_mtx_addr);
 
     // Run the expander
-    if (!read_sdram_data(
+    if (!run_synapse_expander(
             (address_t) params_address, (address_t) syn_mtx_addr)) {
         log_info("!!!   Error reading SDRAM data   !!!");
         rt_error(RTE_ABORT);

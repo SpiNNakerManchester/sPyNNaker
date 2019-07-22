@@ -364,7 +364,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom ||
             post_id > rewiring_data.high_atom) {
-        _setup_synaptic_dma_read();
+        setup_synaptic_dma_read();
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -385,15 +385,15 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
             unpack_post_to_pre(value, &pre_app_pop, &pre_sub_pop, &choice);
 
     current_state.element_exists = element_exists;
-    spike_t _spike = ANY_SPIKE;
+    spike_t spike = ANY_SPIKE;
     if (!element_exists && !rewiring_data.random_partner) {
         // Retrieve the last spike
         if (received_any_spike()) {
-            _spike = select_last_spike();
+            spike = select_last_spike();
         }
-        if (_spike == ANY_SPIKE) {
+        if (spike == ANY_SPIKE) {
             log_debug("No previous spikes");
-            _setup_synaptic_dma_read();
+            setup_synaptic_dma_read();
             return;
         }
 
@@ -412,10 +412,10 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
                     subpop_index++) {
                 key_atom_info_t *kai =
                         &preapppop_info->key_atom_info[subpop_index];
-                if ((_spike & kai->mask) == kai->key) {
+                if ((spike & kai->mask) == kai->key) {
                     pre_app_pop = i;
                     pre_sub_pop = subpop_index;
-                    choice = _spike & ~kai->mask;
+                    choice = spike & ~kai->mask;
                 }
             }
         }
@@ -442,18 +442,18 @@ void synaptogenesis_dynamics_rewire(uint32_t time) {
         choice = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
                 preapppop_info->key_atom_info[pre_sub_pop].n_atoms;
 
-        _spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
+        spike = preapppop_info->key_atom_info[pre_sub_pop].key | choice;
     } else {
-        _spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
+        spike = rewiring_data.pre_pop_info_table.subpop_info[pre_app_pop]
                 .key_atom_info[pre_sub_pop].key | choice;
     }
 
     address_t synaptic_row_address;
     size_t n_bytes;
 
-    if (!population_table_get_first_address(_spike, &synaptic_row_address,
+    if (!population_table_get_first_address(spike, &synaptic_row_address,
             &n_bytes)) {
-        log_error("FAIL@key %d", _spike);
+        log_error("FAIL@key %d", spike);
         rt_error(RTE_SWERR);
     }
 
@@ -539,7 +539,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag) {
         synaptogenesis_dynamics_formation_rule();
     }
     // service the next event (either rewiring or synaptic)
-    _setup_synaptic_dma_read();
+    setup_synaptic_dma_read();
 }
 
 // Trivial helper; has to be macro because uses log_error()
@@ -621,8 +621,7 @@ bool synaptogenesis_dynamics_formation_rule(void) {
     } else {
         probability = rewiring_data.lat_probabilities[current_state.distance];
     }
-    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-            MAX_SHORT;
+    uint16_t r = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) * MAX_SHORT;
     if (r > probability) {
         return false;
     }

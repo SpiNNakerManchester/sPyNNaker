@@ -106,7 +106,7 @@ typedef enum parameters_in_neuron_parameter_data_region {
     START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
-static void _reset_record_counter(void) {
+static void reset_record_counter(void) {
     if (spike_recording_rate == 0) {
         // Setting increment to zero means spike_index will never equal
         // spike_rate
@@ -140,7 +140,7 @@ static void _reset_record_counter(void) {
 //! \param[in] address: the address where the neuron parameters are stored
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
-static bool _neuron_load_neuron_parameters(address_t address) {
+static bool neuron_load_neuron_parameters(address_t address) {
     uint32_t next = START_OF_GLOBAL_PARAMETERS;
 
     log_debug("loading parameters");
@@ -173,7 +173,7 @@ static bool _neuron_load_neuron_parameters(address_t address) {
 
 bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
     log_debug("neuron_reloading_neuron_parameters: starting");
-    return _neuron_load_neuron_parameters(address);
+    return neuron_load_neuron_parameters(address);
 }
 
 //! \brief Set up the neuron models
@@ -281,11 +281,11 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!_neuron_load_neuron_parameters(address)) {
+    if (!neuron_load_neuron_parameters(address)) {
         return false;
     }
 
-    _reset_record_counter();
+    reset_record_counter();
 
     return true;
 }
