@@ -16,18 +16,18 @@
 import logging
 import os
 from spinn_utilities.progress_bar import ProgressBar
+from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
-from spinn_utilities.make_tools.replacer import Replacer
-from spinn_front_end_common.utilities import globals_variables
 
 logger = logging.getLogger(__name__)
 
