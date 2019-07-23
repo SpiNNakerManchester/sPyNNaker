@@ -125,7 +125,7 @@ void _setup_synaptic_dma_read() {
         if (!setup_done) {
             finished = true; // finished trying for this spike
         }
-        cpsr = spin1_int_disable(); // remove this too?
+//        cpsr = spin1_int_disable(); // remove this too?
     }
 
     // If the setup was not done, and there are no more spikes,
@@ -169,26 +169,17 @@ void _multicast_packet_received_callback(uint key, uint payload) {
 //
 ////    measurement_in[measurement_index] = tc[T1_COUNT];
 //
-    // If there was space to add spike to incoming spike queue
-//    if (
-    		in_spikes_add_spike(key);
-//			) {
+    	in_spikes_add_spike(key);
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
-        	spin1_trigger_user_event(0, 0); // could schedule _setup_synaptic_dma_read() directly
-        	dma_busy = true;
-//            log_debug("Sending user event for new spike");
-//            if () {
-//
-//            } else {
-//                log_debug("Could not trigger user event\n");
-//            }
+        	// need this if to negate hazard of user event not being raised if
+        	// one is already executing, and setup_dma_read had set dma_busy to false
+        	if (spin1_trigger_user_event(0, 0)) {
+        		dma_busy = true;
+        	}
         }
-//    } else {
-//        log_debug("Could not add spike");
-//    }
 
 
 
