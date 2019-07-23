@@ -231,6 +231,10 @@ static inline void _process_fixed_synapses(
     num_fixed_pre_synaptic_events += 1; // count processed spikes instead
     num_fixed_pre_synaptic_events_per_timestep++;
 
+    if (!fixed_synapse){
+    	// packet targets zero spikes
+    	zero_target_spikes_per_dt++;
+    } else {
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
@@ -265,6 +269,7 @@ static inline void _process_fixed_synapses(
         // Store saturated value back in ring-buffer
 
         ring_buffers[ring_buffer_index] = accumulation;
+    }
     }
 }
 
