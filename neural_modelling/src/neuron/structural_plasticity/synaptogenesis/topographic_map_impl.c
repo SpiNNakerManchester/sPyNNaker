@@ -203,8 +203,8 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
     // find the offset of the neuron in the current row
     bool search_hit = synapse_dynamics_find_neuron(
         current_state.post_syn_id, row,
-        &(current_state.sp_data.weight), &(current_state.sp_data.delay),
-        &(current_state.sp_data.offset));
+        &(current_state.weight), &(current_state.delay),
+        &(current_state.offset));
 
     if (current_state.element_exists && search_hit) {
         return synaptogenesis_elimination_rule(&current_state,

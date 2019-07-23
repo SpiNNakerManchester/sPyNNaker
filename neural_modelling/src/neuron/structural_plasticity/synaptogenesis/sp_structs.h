@@ -11,18 +11,12 @@ struct formation_params;
 
 #define IS_CONNECTION_LAT 1
 
-typedef struct {
-    weight_t weight;
-    uint32_t delay;
-    uint32_t offset;
-} structural_plasticity_data_t;
-
 //! information per atom
 typedef struct {
     uint32_t key;
+    uint32_t mask;
     uint32_t n_atoms;
     uint32_t lo_atom;
-    uint32_t mask;
 } key_atom_info_t;
 
 //! individual pre-synaptic sub-population information
@@ -45,8 +39,8 @@ typedef struct {
 
 //! parameters of the synaptic rewiring model
 typedef struct {
-    uint32_t p_rew;
     uint32_t fast;
+    uint32_t p_rew;
     uint32_t s_max;
     uint32_t app_no_atoms;
     uint32_t machine_no_atoms;
@@ -68,15 +62,19 @@ typedef struct {
     uint32_t pre_syn_id;
     uint32_t post_syn_id;
     // does the connection already exist
-    bool element_exists;
+    uint32_t element_exists;
     // information extracted from the post to pre table
     int32_t *post_to_pre_table_entry;
     pre_info_t *pre_population_info;
     key_atom_info_t *key_atom_info;
     uint32_t packed_index;
     uint32_t pre_population_index;
-    // weight, delay and offset information
-    structural_plasticity_data_t sp_data;
+    // offset in synaptic row (if exists)
+    uint32_t offset;
+    // current delay (if exists)
+    uint16_t delay;
+    // current weight (if exists)
+    uint16_t weight;
 } current_state_t;
 
 // \!brief unpack the spike into key and identifying information for the neuron;
@@ -129,7 +127,7 @@ static inline bool sp_structs_get_sub_pop_info(
 
 static inline bool sp_structs_remove_synapse(
         current_state_t *current_state, address_t row) {
-    if (!synapse_dynamics_remove_neuron(current_state->sp_data.offset, row)) {
+    if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
     *(current_state->post_to_pre_table_entry) = -1;

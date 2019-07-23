@@ -18,13 +18,13 @@ static inline bool synaptogenesis_elimination_rule(
     uint32_t r = mars_kiss64_seed(*(current_state->local_seed));
 
     // Is weight depressed?
-    if (current_state->sp_data.weight < params->mid_weight &&
+    if (current_state->weight < params->mid_weight &&
             r > params->prob_elim_depression) {
         return false;
     }
 
     // Is weight potentiated or unchanged?
-    if (current_state->sp_data.weight >= params->mid_weight &&
+    if (current_state->weight >= params->mid_weight &&
             r > params->prob_elim_potentiation) {
         return false;
     }
