@@ -110,34 +110,34 @@ static bool initialise() {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+	data_specification_metadata_t *ds_regions = data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, address),
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
             &infinite_run, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
         c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, address));
+        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // setup recording region
     if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))){
+            data_specification_get_region(RECORDING_REGION, ds_regions))){
         return false;
     }
 
 
     // Set up the neurons
     if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, address),
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             &timer_offset)) {
         return false;
     }
@@ -147,7 +147,7 @@ static bool initialise() {
 
     // Setup profiler
     profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+        data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_debug("Initialise: finished");
     return true;
@@ -159,10 +159,10 @@ void resume_callback() {
     recording_reset();
 
     // try reloading neuron parameters
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions = data_specification_get_data_address();
     if (!neuron_reload_neuron_parameters(
             data_specification_get_region(
-                NEURON_PARAMS_REGION, address))) {
+                NEURON_PARAMS_REGION, ds_regions))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -206,9 +206,9 @@ void timer_callback(uint timer_count, uint unused) {
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
-        address_t address = data_specification_get_data_address();
+        data_specification_metadata_t *ds_regions = data_specification_get_data_address();
         neuron_store_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, address));
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
