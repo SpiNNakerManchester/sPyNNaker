@@ -92,19 +92,19 @@ static uint32_t expected_time;
 //! The number of recordings outstanding
 static uint32_t n_recordings_outstanding = 0;
 
-//! parameters that reside in the neuron_parameter_data_region in human
-//! readable form
-typedef enum parameters_in_neuron_parameter_data_region {
-    TIMER_START_OFFSET,
-    TIME_BETWEEN_SPIKES,
-    HAS_KEY,
-    TRANSMISSION_KEY,
-    N_NEURONS_TO_SIMULATE,
-    N_SYNAPSE_TYPES,
-    INCOMING_SPIKE_BUFFER_SIZE,
-    N_RECORDED_VARIABLES,
-    START_OF_GLOBAL_PARAMETERS,
-} parameters_in_neuron_parameter_data_region;
+//! parameters that reside in the neuron_parameter_data_region
+struct neuron_parameters {
+    uint32_t timer_start_offset;
+    uint32_t time_between_spikes;
+    uint32_t has_key;
+    uint32_t transmission_key;
+    uint32_t n_neurons_to_simulate;
+    uint32_t n_synapse_types;
+    uint32_t incoming_spike_buffer_size;
+    uint32_t n_recorded_variables;
+};
+#define START_OF_GLOBAL_PARAMETERS \
+    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
 static void reset_record_counter(void) {
     if (spike_recording_rate == 0) {
@@ -187,17 +187,18 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset) {
     log_debug("neuron_initialise: starting");
+    struct neuron_parameters *params = (void *) address;
 
-    *timer_offset = address[TIMER_START_OFFSET];
-    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
+    *timer_offset = params->timer_start_offset;
+    time_between_spikes = params->time_between_spikes * sv->cpu_clk;
     log_debug("\t back off = %u, time between spikes %u",
             *timer_offset, time_between_spikes);
 
     // Check if there is a key to use
-    use_key = address[HAS_KEY];
+    use_key = params->has_key;
 
     // Read the spike key to use
-    key = address[TRANSMISSION_KEY];
+    key = params->transmission_key;
 
     // output if this model is expecting to transmit
     if (!use_key) {
@@ -207,15 +208,15 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
     }
 
     // Read the neuron details
-    n_neurons = address[N_NEURONS_TO_SIMULATE];
+    n_neurons = params->n_neurons_to_simulate;
     *n_neurons_value = n_neurons;
-    *n_synapse_types_value = address[N_SYNAPSE_TYPES];
+    *n_synapse_types_value = params->n_synapse_types;
 
     // Read the size of the incoming spike buffer to use
-    *incoming_spike_buffer_size = address[INCOMING_SPIKE_BUFFER_SIZE];
+    *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
 
     // Read number of recorded variables
-    n_recorded_vars = address[N_RECORDED_VARIABLES];
+    n_recorded_vars = params->n_recorded_variables;
 
     log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
             *incoming_spike_buffer_size);

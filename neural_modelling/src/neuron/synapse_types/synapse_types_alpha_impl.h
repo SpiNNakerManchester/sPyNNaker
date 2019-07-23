@@ -120,9 +120,9 @@ static inline void synapse_types_add_neuron_input(
         input_t input) {
     if (input > ZERO) {
         if (synapse_type_index == EXCITATORY) {
-                add_input_alpha(&parameter->exc, input);
+            add_input_alpha(&parameter->exc, input);
         } else if (synapse_type_index == INHIBITORY) {
-                add_input_alpha(&parameter->inh, input);
+            add_input_alpha(&parameter->inh, input);
         }
     }
 }
