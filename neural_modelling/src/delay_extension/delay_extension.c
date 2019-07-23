@@ -30,14 +30,14 @@ typedef enum callback_priorities {
     MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
 } callback_priorities;
 
-typedef enum extra_provenance_data_region_entries {
-    N_PACKETS_RECEIVED = 0,
-    N_PACKETS_PROCESSED = 1,
-    N_PACKETS_ADDED = 2,
-    N_PACKETS_SENT = 3,
-    N_BUFFER_OVERFLOWS = 4,
-    N_DELAYS = 5
-} extra_provenance_data_region_entries;
+struct delay_extension_provenance {
+    uint32_t n_packets_received;
+    uint32_t n_packets_processed;
+    uint32_t n_packets_added;
+    uint32_t n_packets_sent;
+    uint32_t n_buffer_overflows;
+    uint32_t n_delays;
+};
 
 // Globals
 static uint32_t key = 0;
@@ -82,9 +82,7 @@ static uint32_t timer_period = 0;
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
 static inline void zero_spike_counters(
-        void *location, uint32_t num_items) {
-    uint8_t *counters = location;
-
+        uint8_t *counters, uint32_t num_items) {
     for (uint32_t i = 0 ; i < num_items ; i++) {
         counters[i] = 0;
     }
@@ -101,27 +99,27 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
     return v;
 }
 
-static bool read_parameters(address_t address) {
+static bool read_parameters(struct delay_parameters *params) {
     log_debug("read_parameters: starting");
 
-    key = address[KEY];
-    incoming_key = address[INCOMING_KEY];
-    incoming_mask = address[INCOMING_MASK];
+    key = params->key;
+    incoming_key = params->incoming_key;
+    incoming_mask = params->incoming_mask;
     incoming_neuron_mask = ~incoming_mask;
     log_debug("\t key = 0x%08x, incoming key = 0x%08x, incoming mask = 0x%08x,"
             "incoming key mask = 0x%08x",
             key, incoming_key, incoming_mask, incoming_neuron_mask);
 
-    num_neurons = address[N_ATOMS];
+    num_neurons = params->n_atoms;
     neuron_bit_field_words = get_bit_field_size(num_neurons);
 
-    num_delay_stages = address[N_DELAY_STAGES];
-    timer_offset = address[RANDOM_BACKOFF];
-    time_between_spikes = address[TIME_BETWEEN_SPIKES] * sv->cpu_clk;
+    num_delay_stages = params->n_delay_stages;
+    timer_offset = params->random_backoff;
+    time_between_spikes = params->time_between_spikes * sv->cpu_clk;
 
     uint32_t num_delay_slots = num_delay_stages * DELAY_STAGE_LENGTH;
     uint32_t num_delay_slots_pot = round_to_next_pot(num_delay_slots);
-    num_delay_slots_mask = (num_delay_slots_pot - 1);
+    num_delay_slots_mask = num_delay_slots_pot - 1;
 
     log_debug("\t parrot neurons = %u, neuron bit field words = %u,"
             " num delay stages = %u, num delay slots = %u (pot = %u),"
@@ -146,11 +144,10 @@ static bool read_parameters(address_t address) {
         neuron_delay_stage_config[d] =
                 spin1_malloc(neuron_bit_field_words * sizeof(uint32_t));
 
-        // Copy delay stage configuration bits into delay stage configuration bit-field
-        address_t neuron_delay_stage_config_data_address =
-                &address[DELAY_BLOCKS] + (d * neuron_bit_field_words);
+        // Copy delay stage configuration bits into delay stage configuration
+        // bit-field
         spin1_memcpy(neuron_delay_stage_config[d],
-                neuron_delay_stage_config_data_address,
+                &params->delay_blocks[d * neuron_bit_field_words],
                 neuron_bit_field_words * sizeof(uint32_t));
 
         for (uint32_t w = 0; w < neuron_bit_field_words; w++) {
@@ -164,8 +161,7 @@ static bool read_parameters(address_t address) {
 
     for (uint32_t s = 0; s < num_delay_slots_pot; s++) {
         // Allocate an array of counters for each neuron and zero
-        spike_counters[s] =
-                spin1_malloc(num_neurons * sizeof(uint8_t));
+        spike_counters[s] = spin1_malloc(num_neurons * sizeof(uint8_t));
         zero_spike_counters(spike_counters[s], num_neurons);
     }
 
@@ -175,14 +171,15 @@ static bool read_parameters(address_t address) {
 
 static void store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
+    struct delay_extension_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    provenance_region[N_PACKETS_RECEIVED] = n_in_spikes;
-    provenance_region[N_PACKETS_PROCESSED] = n_processed_spikes;
-    provenance_region[N_PACKETS_ADDED] = n_spikes_added;
-    provenance_region[N_PACKETS_SENT] = n_spikes_sent;
-    provenance_region[N_BUFFER_OVERFLOWS] = in_spikes_get_n_buffer_overflows();
-    provenance_region[N_DELAYS] = n_delays;
+    prov->n_packets_received = n_in_spikes;
+    prov->n_packets_processed = n_processed_spikes;
+    prov->n_packets_added = n_spikes_added;
+    prov->n_packets_sent = n_spikes_sent;
+    prov->n_buffer_overflows = in_spikes_get_n_buffer_overflows();
+    prov->n_delays = n_delays;
     log_debug("finished other provenance data");
 }
 
@@ -348,7 +345,7 @@ static void timer_callback(uint timer_count, uint unused1) {
                 }
 
                 // Wait until the expected time to send
-                while ((ticks == timer_count) && tc[T1_COUNT] > expected_time) {
+                while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
                     // Do Nothing
                     n_delays++;
                 }

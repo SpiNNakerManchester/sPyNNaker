@@ -137,19 +137,19 @@ static bool read_delay_builder_region(address_t *in_region,
  *!         error
  */
 static bool run_delay_expander(
-        address_t delay_params_address, address_t params_address) {
+        void *delay_params_address, address_t params_address) {
     // Read the global parameters from the delay extension
-    uint32_t num_neurons = delay_params_address[N_ATOMS];
+    struct delay_parameters *delay_params = delay_params_address;
+    uint32_t num_neurons = delay_params->n_atoms;
     uint32_t neuron_bit_field_words = get_bit_field_size(num_neurons);
-    uint32_t n_stages = delay_params_address[N_DELAY_STAGES];
+    uint32_t n_stages = delay_params->n_delay_stages;
 
     // Set up the bit fields
     bit_field_t *neuron_delay_stage_config =
             spin1_malloc(n_stages * sizeof(bit_field_t));
     for (uint32_t d = 0; d < n_stages; d++) {
         neuron_delay_stage_config[d] =
-                ((bit_field_t) &delay_params_address[DELAY_BLOCKS])
-                + (d * neuron_bit_field_words);
+                &delay_params->delay_blocks[d * neuron_bit_field_words];
         clear_bit_field(neuron_delay_stage_config[d], neuron_bit_field_words);
     }
 
