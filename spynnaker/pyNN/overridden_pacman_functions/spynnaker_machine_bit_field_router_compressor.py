@@ -26,7 +26,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor,
-            no_sync_changes, threshold_percentage,
+            no_sync_changes, threshold_percentage, executable_targets,
             compress_only_when_needed=True,
             compress_as_much_as_possible=False,  provenance_data_objects=None):
         """ entrance for routing table compression with bit field
@@ -70,7 +70,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
                 compress_only_when_needed=compress_only_when_needed,
-                compress_as_much_as_possible=compress_as_much_as_possible)
+                compress_as_much_as_possible=compress_as_much_as_possible,
+                executable_targets=executable_targets)
 
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_synaptic_expander_cores(
