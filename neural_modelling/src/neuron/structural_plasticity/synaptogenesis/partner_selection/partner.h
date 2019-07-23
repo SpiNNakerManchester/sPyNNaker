@@ -13,7 +13,7 @@
 // value to be returned when there is no valid partner selection
 #define INVALID_SELECTION ((spike_t) - 1)
 
-address_t partner_init(address_t data);
+void partner_init(uint8_t **data);
 
 static inline void partner_spike_received(uint32_t time, spike_t spike);
 

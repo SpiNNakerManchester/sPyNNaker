@@ -47,7 +47,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count();
 //! \param[out] offset: address to contain the offset of the connection
 //! \return bool: was the search successful?
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, weight_t *weight, uint32_t *delay,
+        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row

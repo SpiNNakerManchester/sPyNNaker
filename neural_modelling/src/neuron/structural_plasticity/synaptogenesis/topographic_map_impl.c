@@ -112,6 +112,8 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         data += pre_size;
     }
 
+    partner_init(&data);
+
     formation_params = spin1_malloc(
         rewiring_data.no_pre_pops * sizeof(struct formation_params *));
     if (formation_params == NULL) {

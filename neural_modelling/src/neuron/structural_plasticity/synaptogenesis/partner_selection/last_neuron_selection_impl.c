@@ -5,8 +5,8 @@ uint32_t n_spikes[2];
 uint32_t last_spikes_buffer_size;
 uint32_t last_time;
 
-address_t partner_init(address_t data) {
-    last_spikes_buffer_size = data[0];
+void partner_init(uint8_t **data) {
+    last_spikes_buffer_size = ((uint32_t *) *data)[0];
     for (uint32_t i = 0; i < 2; i++) {
         last_spikes_buffer[i] = (spike_t *) spin1_malloc(
             last_spikes_buffer_size * sizeof(spike_t));
@@ -15,5 +15,5 @@ address_t partner_init(address_t data) {
             rt_error(RTE_SWERR);
         }
     }
-    return &data[1];
+    *data += sizeof(uint32_t);
 }

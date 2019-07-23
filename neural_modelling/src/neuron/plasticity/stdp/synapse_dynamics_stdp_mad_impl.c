@@ -355,7 +355,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(){
 }
 
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, weight_t *weight, uint32_t *delay,
+        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset) {
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
