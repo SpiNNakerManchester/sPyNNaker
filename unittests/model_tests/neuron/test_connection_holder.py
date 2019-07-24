@@ -1,10 +1,24 @@
-import numpy
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
 import pytest
-
-from spynnaker.pyNN.models.neuron.connection_holder import ConnectionHolder
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractSynapseDynamics
+import numpy
+from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamics)
 
 
 @pytest.fixture(

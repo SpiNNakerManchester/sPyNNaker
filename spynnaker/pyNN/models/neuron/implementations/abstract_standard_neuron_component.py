@@ -1,24 +1,37 @@
-from six import add_metaclass
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
-@add_metaclass(AbstractBase)
-class AbstractStandardNeuronComponent(object):
+class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
     """ Represents a component of a standard neural model
     """
 
-    __slots__ = ("_struct")
+    __slots__ = ["__struct"]
 
     def __init__(self, data_types):
         """
-
         :param data_types:\
             A list of data types in the component structure, in the order that\
             they appear
         """
-        self._struct = Struct(data_types)
+        self.__struct = Struct(data_types)
 
     @property
     def struct(self):
@@ -27,7 +40,7 @@ class AbstractStandardNeuronComponent(object):
         :rtype:\
             :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
         """
-        return self._struct
+        return self.__struct
 
     @abstractmethod
     def get_n_cpu_cycles(self, n_neurons):
