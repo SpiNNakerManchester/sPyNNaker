@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief Generate data for delay extensions
@@ -165,11 +182,12 @@ void c_main(void) {
 
     // Get the addresses of the regions
     log_info("Starting To Build Delays");
-    address_t core_address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
     address_t delay_params_address = data_specification_get_region(
-        DELAY_PARAMS, core_address);
+            DELAY_PARAMS, ds_regions);
     address_t params_address = data_specification_get_region(
-        EXPANDER_REGION, core_address);
+            EXPANDER_REGION, ds_regions);
     log_info("\tReading SDRAM delay params at 0x%08x,"
             " expander params at 0x%08x",
             delay_params_address, params_address);

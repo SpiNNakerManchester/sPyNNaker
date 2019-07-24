@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import decimal
 from distutils.version import StrictVersion
 from enum import Enum
@@ -35,6 +50,8 @@ PARAM_TYPE_BY_NAME = {
     "exponential": 5
 }
 
+PARAM_TYPE_KERNEL = 6
+
 
 # Hashes of the connection generators supported by the synapse expander
 class ConnectorIDs(Enum):
@@ -42,6 +59,7 @@ class ConnectorIDs(Enum):
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
+    KERNEL_CONNECTOR = 4
 
 
 class AbstractGenerateConnectorOnMachine(with_metaclass(

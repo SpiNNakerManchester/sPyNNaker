@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import re
@@ -40,7 +55,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         "__safe",
         "__space",
         "__verbose",
-        "_weights"]
+        "_weights",
+        "__param_seeds"]
 
     def __init__(self, safe=True, verbose=False, rng=None):
         self.__safe = safe
@@ -55,6 +71,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
         self.__n_clipped_delays = 0
         self.__min_delay = 0
+        self.__param_seeds = dict()
 
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
@@ -70,7 +87,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
-        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG())
+        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
@@ -240,12 +257,26 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         regexpr = re.compile(r'.*d\[\d*\].*')
         return regexpr.match(d_expression)
 
-    def _generate_values(self, values, n_connections, connection_slices):
+    def _generate_random_values(
+            self, values, n_connections, pre_vertex_slice, post_vertex_slice):
+        key = (id(pre_vertex_slice), id(post_vertex_slice), id(values))
+        seed = self.__param_seeds.get(key, None)
+        if seed is None:
+            seed = int(values.rng.next() * 0x7FFFFFFF)
+            self.__param_seeds[key] = seed
+        new_rng = get_simulator().get_pynn_NumpyRNG()(seed)
+        copy_rd = get_simulator().get_random_distribution()(
+            values.name, parameters_pos=None, rng=new_rng,
+            **values.parameters)
+        if n_connections == 1:
+            return numpy.array([copy_rd.next(1)], dtype="float64")
+        return copy_rd.next(n_connections)
+
+    def _generate_values(self, values, n_connections, connection_slices,
+                         pre_slice, post_slice):
         if get_simulator().is_a_pynn_random(values):
-            if n_connections == 1:
-                return numpy.array([values.next(n_connections)],
-                                   dtype="float64")
-            return values.next(n_connections)
+            return self._generate_random_values(
+                values, n_connections, pre_slice, post_slice)
         elif numpy.isscalar(values):
             return numpy.repeat([values], n_connections).astype("float64")
         elif hasattr(values, "__getitem__"):
@@ -272,16 +303,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return values(d)
         raise Exception("what on earth are you giving me?")
 
-    def _generate_weights(self, values, n_connections, connection_slices):
+    def _generate_weights(self, values, n_connections, connection_slices,
+                          pre_slice, post_slice):
         """ Generate weight values.
         """
         weights = self._generate_values(
-            values, n_connections, connection_slices)
+            values, n_connections, connection_slices, pre_slice, post_slice)
         if self.__safe:
             if not weights.size:
                 logger_utils.warn_once(logger,
                                        "No connection in " + str(self))
-#                logger.warning("No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"
@@ -306,12 +337,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
-    def _generate_delays(self, values, n_connections, connection_slices):
+    def _generate_delays(self, values, n_connections, connection_slices,
+                         pre_slice, post_slice):
         """ Generate valid delay values.
         """
 
         delays = self._generate_values(
-            values, n_connections, connection_slices)
+            values, n_connections, connection_slices, pre_slice, post_slice)
 
         return self._clip_delays(delays)
 
