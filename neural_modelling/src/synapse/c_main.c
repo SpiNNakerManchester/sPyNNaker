@@ -158,22 +158,24 @@ static bool initialise(uint32_t *timer_period) {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+   data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, address),
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
         c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, address));
+        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     if(!initialise_recording(
            data_specification_get_region(RECORDING_REGION, address))) {
@@ -183,12 +185,12 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
     address_t indirect_synapses_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, address);
+        SYNAPTIC_MATRIX_REGION, ds_regions);
 
     address_t direct_synapses_address;
     if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
+            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             &n_neurons, &n_synapse_types,
             &incoming_spike_buffer_size,
             &ring_buffer_to_input_buffer_left_shifts,
@@ -199,14 +201,14 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the population table
     uint32_t row_max_n_words;
     if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, address),
+            data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
-        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
@@ -229,7 +231,7 @@ static bool initialise(uint32_t *timer_period) {
 
     // Setup profiler
     profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+        data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_debug("Initialise: finished");
 
