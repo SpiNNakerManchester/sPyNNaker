@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "synapse_row.h"
@@ -63,6 +80,52 @@ static inline void _do_direct_row(address_t row_address) {
     synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
 }
 
+// Check if there is anything to do - if not, DMA is not busy
+static inline bool _is_something_to_do(
+        address_t *row_address, size_t *n_bytes_to_transfer) {
+
+    // Disable interrupts here as check and dma_busy modification is a
+    // critical section
+    uint cpsr = spin1_int_disable();
+    bool something_to_do = false;
+
+    // Synaptic rewiring needs to be done?
+    if (number_of_rewires) {
+        something_to_do = true;
+
+    // Is there another address in the population table?
+    // Note, this is fairly quick to check, so leave interrupts disabled
+    } else if (population_table_get_next_address(
+            row_address, n_bytes_to_transfer)) {
+        something_to_do = true;
+    } else {
+
+        // Are there any more spikes to process?
+        while (!something_to_do && in_spikes_get_next_spike(&spike)) {
+
+            // Enable interrupts while looking up in the master pop table,
+            // as this can be slow
+            spin1_mode_restore(cpsr);
+            if (population_table_get_first_address(
+                    spike, row_address, n_bytes_to_transfer)) {
+                something_to_do = true;
+            }
+
+            // Disable interrupts before checking if there is another spike
+            cpsr = spin1_int_disable();
+        }
+    }
+
+    // If nothing to do, the DMA is not busy
+    if (!something_to_do) {
+        dma_busy = false;
+    }
+
+    // Restore interrupts
+    spin1_mode_restore(cpsr);
+    return something_to_do;
+}
+
 void _setup_synaptic_dma_read() {
 
     // Set up to store the DMA location and size to read
@@ -70,62 +133,19 @@ void _setup_synaptic_dma_read() {
     size_t n_bytes_to_transfer;
 
     bool setup_done = false;
-    bool finished = false;
-    uint cpsr = 0;
-    while (!setup_done && !finished) {
+    while (!setup_done && _is_something_to_do(
+            &row_address, &n_bytes_to_transfer)) {
         if (number_of_rewires) {
             number_of_rewires--;
             synaptogenesis_dynamics_rewire(time);
             setup_done = true;
+        } else if (n_bytes_to_transfer == 0) {
+            _do_direct_row(row_address);
+        } else {
+            _do_dma_read(row_address, n_bytes_to_transfer);
+            setup_done = true;
         }
-
-        // If there's more rows to process from the previous spike
-        while (!setup_done && population_table_get_next_address(
-                &row_address, &n_bytes_to_transfer)) {
-
-            // This is a direct row to process
-            if (n_bytes_to_transfer == 0) {
-                _do_direct_row(row_address);
-            } else {
-                _do_dma_read(row_address, n_bytes_to_transfer);
-                setup_done = true;
-            }
-        }
-
-        // If there's more incoming spikes
-        cpsr = spin1_int_disable();
-        while (!setup_done && in_spikes_get_next_spike(&spike)) {
-            spin1_mode_restore(cpsr);
-            log_debug("Checking for row for spike 0x%.8x\n", spike);
-
-            // Decode spike to get address of destination synaptic row
-            if (population_table_get_first_address(
-                    spike, &row_address, &n_bytes_to_transfer)) {
-
-                // This is a direct row to process
-                if (n_bytes_to_transfer == 0) {
-                    _do_direct_row(row_address);
-                } else {
-                    _do_dma_read(row_address, n_bytes_to_transfer);
-                    setup_done = true;
-                }
-            }
-            cpsr = spin1_int_disable();
-        }
-
-        if (!setup_done) {
-            finished = true;
-        }
-        cpsr = spin1_int_disable();
     }
-
-    // If the setup was not done, and there are no more spikes,
-    // stop trying to set up synaptic DMAs
-    if (!setup_done) {
-        log_debug("DMA not busy");
-        dma_busy = false;
-    }
-    spin1_mode_restore(cpsr);
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
@@ -187,7 +207,7 @@ void _user_event_callback(uint unused0, uint unused1) {
 void _dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
-    log_debug("DMA transfer complete with tag %u", tag);
+    log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;

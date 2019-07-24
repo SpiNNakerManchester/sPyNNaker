@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *  \brief This file contains the main functions for a poisson spike generator.
@@ -17,6 +34,9 @@
 
 // Declare spin1_wfi
 extern void spin1_wfi();
+
+// Spin1 API ticks - to know when the timer wraps
+extern uint ticks;
 
 //! data structure for poisson sources
 typedef struct spike_source_t {
@@ -62,8 +82,8 @@ struct global_parameters {
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
 
-    //! The random backoff between timer ticks to desynchronize sources
-    uint32_t random_backoff_us;
+    //! The offset of the timer ticks to desynchronize sources
+    uint32_t timer_offset;
 
     //! The expected time to wait between spikes
     uint32_t time_between_spikes;
@@ -92,9 +112,6 @@ static struct global_parameters global_parameters;
 
 //! global variable which contains all the data for neurons
 static spike_source_t *poisson_parameters = NULL;
-
-//! The number of clock ticks between sending each spike
-static uint32_t time_between_spikes;
 
 //! The expected current clock tick of timer_1
 static uint32_t expected_time;
@@ -126,6 +143,9 @@ static uint32_t spike_buffer_size;
 
 //! True if DMA recording is currently in progress
 static bool recording_in_progress = false;
+
+//! The timer period
+static uint32_t timer_period;
 
 //! \brief ??????????????
 //! \param[in] n ?????????????????
@@ -201,9 +221,9 @@ bool read_global_parameters(address_t address) {
     spin1_memcpy(&global_parameters, address, sizeof(global_parameters));
 
     log_info(
-        "\t key = %08x, set rate mask = %08x, back off = %u",
+        "\t key = %08x, set rate mask = %08x, timer offset = %u",
         global_parameters.key, global_parameters.set_rate_neuron_id_mask,
-        global_parameters.random_backoff_us);
+        global_parameters.timer_offset);
 
     log_info("\t seed = %u %u %u %u", global_parameters.spike_source_seed[0],
         global_parameters.spike_source_seed[1],
@@ -266,11 +286,12 @@ static bool read_poisson_parameters(address_t address) {
 static bool initialise_recording(){
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Get the system region
     address_t recording_region = data_specification_get_region(
-        SPIKE_HISTORY_REGION, address);
+            SPIKE_HISTORY_REGION, ds_regions);
 
     bool success = recording_initialize(recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
@@ -286,26 +307,27 @@ static bool initialise_recording(){
 //!             updates
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
-static bool initialize(uint32_t *timer_period) {
+static bool initialize() {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            data_specification_get_region(SYSTEM, ds_regions),
+            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_data_address(
-        data_specification_get_region(PROVENANCE_REGION, address));
+            data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // setup recording region
     if (!initialise_recording()){
@@ -314,12 +336,12 @@ static bool initialize(uint32_t *timer_period) {
 
     // Setup regions that specify spike source array data
     if (!read_global_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))) {
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))) {
+            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
         return false;
     }
 
@@ -351,13 +373,26 @@ static bool initialize(uint32_t *timer_period) {
 void resume_callback() {
     recording_reset();
 
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, address))){
+            data_specification_get_region(POISSON_PARAMS, ds_regions))){
         log_error("failed to reread the Poisson parameters from SDRAM");
         rt_error(RTE_SWERR);
     }
+
+    // Loop through slow spike sources and initialise 1st time to spike
+    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
+        if (!poisson_parameters[s].is_fast_source &&
+                poisson_parameters[s].time_to_spike_ticks == 0) {
+            poisson_parameters[s].time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(
+                    poisson_parameters[s].mean_isi_ticks);
+        }
+    }
+
+    log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
     // print_spike_sources();
@@ -370,20 +405,22 @@ bool store_poisson_parameters() {
     log_info("stored_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
-    address = data_specification_get_region(POISSON_PARAMS, address);
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
+    address_t param_store =
+            data_specification_get_region(POISSON_PARAMS, ds_regions);
 
     // Copy the global_parameters back to SDRAM
-    spin1_memcpy(address, &global_parameters, sizeof(global_parameters));
+    spin1_memcpy(param_store, &global_parameters, sizeof(global_parameters));
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
     if (global_parameters.n_spike_sources > 0) {
         uint32_t spikes_offset =
-            sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
+                sizeof(global_parameters) / BYTE_TO_WORD_CONVERTER;
         spin1_memcpy(
-            &address[spikes_offset], poisson_parameters,
-            global_parameters.n_spike_sources * sizeof(spike_source_t));
+                &param_store[spikes_offset], poisson_parameters,
+                global_parameters.n_spike_sources * sizeof(spike_source_t));
     }
 
     log_info("stored_parameters : completed successfully");
@@ -394,14 +431,14 @@ bool store_poisson_parameters() {
 //! destination
 //! \param[in] spike_key: the key to transmit
 //! \return None
-void _send_spike(uint spike_key) {
+void _send_spike(uint spike_key, uint timer_count) {
 
     // Wait until the expected time to send
-    while (tc[T1_COUNT] > expected_time) {
+    while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
 
         // Do Nothing
     }
-    expected_time -= time_between_spikes;
+    expected_time -= global_parameters.time_between_spikes;
 
     // Send the spike
     log_debug("Sending spike packet %x at %d\n", spike_key, time);
@@ -474,7 +511,6 @@ static inline void _record_spikes(uint32_t time) {
 //!            is set to 0
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
-    use(timer_count);
     use(unused);
     time++;
 
@@ -505,11 +541,8 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    // Sleep for a random time
-    spin1_delay_us(global_parameters.random_backoff_us);
-
     // Set the next expected time to wait for between spike sending
-    expected_time = tc[T1_COUNT] - time_between_spikes;
+    expected_time = sv->cpu_clk * timer_period;
 
     // Loop through spike sources
     for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
@@ -539,7 +572,7 @@ void timer_callback(uint timer_count, uint unused) {
                         // Send spikes
                         const uint32_t spike_key = global_parameters.key | s;
                         for (uint32_t index = 0; index < num_spikes; index++) {
-                            _send_spike(spike_key);
+                            _send_spike(spike_key, timer_count);
                         }
                     }
                 }
@@ -563,7 +596,7 @@ void timer_callback(uint timer_count, uint unused) {
                     if (global_parameters.has_key) {
 
                         // Send package
-                        _send_spike(global_parameters.key | s);
+                        _send_spike(global_parameters.key | s, timer_count);
                     }
 
                     // Update time to spike
@@ -633,8 +666,7 @@ void multicast_packet_callback(uint key, uint payload) {
 void c_main(void) {
 
     // Load DTCM data
-    uint32_t timer_period;
-    if (!initialize(&timer_period)) {
+    if (!initialize()) {
         log_error("Error in initialisation - exiting!");
         rt_error(RTE_SWERR);
     }
@@ -643,7 +675,8 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick(timer_period);
+    spin1_set_timer_tick_and_phase(
+        timer_period, global_parameters.timer_offset);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

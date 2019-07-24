@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _NEURON_IMPL_SEMD_H_
 #define _NEURON_IMPL_SEMD_H_
 
@@ -214,5 +231,49 @@ static void neuron_impl_store_neuron_parameters(
     spin1_memcpy(&address[next], neuron_synapse_shaping_params,
             n_neurons * sizeof(synapse_param_t));
 }
+
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_impl_print_inputs(uint32_t n_neurons) {
+	bool empty = true;
+	for (index_t i = 0; i < n_neurons; i++) {
+		empty = empty
+				&& (bitsk(synapse_types_get_excitatory_input(
+						&(neuron_synapse_shaping_params[i]))
+					- synapse_types_get_inhibitory_input(
+						&(neuron_synapse_shaping_params[i]))) == 0);
+	}
+
+	if (!empty) {
+		log_debug("-------------------------------------\n");
+
+		for (index_t i = 0; i < n_neurons; i++) {
+			input_t input =
+				synapse_types_get_excitatory_input(
+					&(neuron_synapse_shaping_params[i]))
+				- synapse_types_get_inhibitory_input(
+					&(neuron_synapse_shaping_params[i]));
+			if (bitsk(input) != 0) {
+				log_debug("%3u: %12.6k (= ", i, input);
+				synapse_types_print_input(
+					&(neuron_synapse_shaping_params[i]));
+				log_debug(")\n");
+			}
+		}
+		log_debug("-------------------------------------\n");
+	}
+}
+
+void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
+	log_debug("-------------------------------------\n");
+	for (index_t n = 0; n < n_neurons; n++) {
+	    synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
+	}
+	log_debug("-------------------------------------\n");
+}
+
+const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
+	return synapse_types_get_type_char(synapse_type);
+}
+#endif // LOG_LEVEL >= LOG_DEBUG
 
 #endif // _NEURON_IMPL_SEMD_H_

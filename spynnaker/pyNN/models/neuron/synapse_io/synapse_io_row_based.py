@@ -1,21 +1,31 @@
-import numpy
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
+import numpy
 from six import raise_from
 from spinn_utilities.overrides import overrides
-
-from spynnaker.pyNN.models.neural_projections.connectors \
-    import AbstractConnector
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from spynnaker.pyNN.models.neuron.synapse_dynamics import \
-    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP
 from .abstract_synapse_io import AbstractSynapseIO
 from .max_row_info import MaxRowInfo
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import AbstractSynapseDynamics
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP,
+    AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
+    SynapseDynamicsSTDP, AbstractSynapseDynamics)
 
 _N_HEADER_WORDS = 3
 
@@ -69,14 +79,14 @@ class SynapseIORowBased(AbstractSynapseIO):
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                post_vertex_slice, 0, max_delay_supported)
+                synapse_info.delay, post_vertex_slice, 0, max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
         if n_delay_stages > 0:
             max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    post_vertex_slice,
+                    synapse_info.delay, post_vertex_slice,
                     min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
@@ -190,7 +200,6 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
-
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
@@ -198,9 +207,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_info.synapse_type)
+            synapse_info.weight, synapse_info.delay, pre_slices,
+            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
+            post_vertex_slice, synapse_info.synapse_type)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(

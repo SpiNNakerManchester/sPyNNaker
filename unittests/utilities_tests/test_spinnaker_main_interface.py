@@ -1,16 +1,30 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 import sys
 import unittest
-
-import spinn_front_end_common.interface.abstract_spinnaker_base as base
-from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.interface.abstract_spinnaker_base \
-    import AbstractSpinnakerBase
+from spinn_front_end_common.interface.config_handler import CONFIG_FILE
+from spinn_front_end_common.interface.abstract_spinnaker_base import (
+    AbstractSpinnakerBase)
 from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spynnaker.pyNN.utilities.spynnaker_failed_state \
-    import SpynnakerFailedState
+from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
+from spynnaker.pyNN.utilities.spynnaker_failed_state import (
+    SpynnakerFailedState)
 
 
 class Close_Once(object):
@@ -38,6 +52,9 @@ class MainInterfaceImpl(AbstractSpiNNakerCommon):
     def is_a_pynn_random(self, thing):
         return True
 
+    def get_random_distribution(self):
+        return None
+
 
 class TestSpinnakerMainInterface(unittest.TestCase):
 
@@ -51,14 +68,14 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
         print(path)
-        AbstractSpinnakerBase(base.CONFIG_FILE, ExecutableFinder())
+        AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
 
     def test_stop_init(self):
         class_file = sys.modules[self.__module__].__file__
         path = os.path.dirname(os.path.abspath(class_file))
         os.chdir(path)
 
-        interface = AbstractSpinnakerBase(base.CONFIG_FILE, ExecutableFinder())
+        interface = AbstractSpinnakerBase(CONFIG_FILE, ExecutableFinder())
         mock_contoller = Close_Once()
         interface._machine_allocation_controller = mock_contoller
         self.assertFalse(mock_contoller.closed)

@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _THRESHOLD_TYPE_STOCHASTIC_H_
 #define _THRESHOLD_TYPE_STOCHASTIC_H_
 
@@ -20,8 +37,8 @@ typedef struct threshold_type_t {
     // soft threshold value  [mV]
     REAL     v_thresh;
 
-    //
-    REAL     machine_time_step_ms_div_10;
+    // time step scaling factor
+    REAL     neg_machine_time_step_ms_div_10;
 
 } threshold_type_t;
 
@@ -38,8 +55,8 @@ static inline bool threshold_type_is_above_threshold(state_t value,
     UREAL result;
     if (exponent < 5.0k) {
         REAL hazard = expk(exponent) * threshold_type->tau_th_inv;
-        result = (1. - expk(-hazard *
-                            threshold_type->machine_time_step_ms_div_10)) *
+        result = (1. - expk(hazard *
+                            threshold_type->neg_machine_time_step_ms_div_10)) *
                   PROB_SATURATION;
 
     } else {

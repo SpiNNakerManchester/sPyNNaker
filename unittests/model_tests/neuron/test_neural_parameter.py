@@ -1,16 +1,29 @@
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-from spynnaker.pyNN.models.neural_properties.neural_parameter \
-    import _Range_Iterator, _Get_Iterator, _SingleValue_Iterator
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
-from data_specification.enums import DataType
-from data_specification import DataSpecificationGenerator
-from spinn_storage_handlers.file_data_writer import FileDataWriter
-
-from unittests.mocks import MockSimulator
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
 import struct
 from six.moves import xrange
+from spinn_storage_handlers import FileDataWriter
+from data_specification.enums import DataType
+from data_specification import DataSpecificationGenerator
+from spynnaker.pyNN.models.neural_properties import NeuronParameter
+from spynnaker.pyNN.models.neural_properties.neural_parameter import (
+    _Range_Iterator, _Get_Iterator, _SingleValue_Iterator)
+from spynnaker.pyNN.utilities.ranged import SpynnakerRangedList
+from unittests.mocks import MockSimulator
 
 
 def _iterate_parameter_values(iterator, data_type):

@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief Static synaptic matrix implementation
@@ -87,6 +104,8 @@ void matrix_generator_static_write_row(
         uint32_t max_stage) {
     use(data);
 
+    log_debug("Max stage = %u", max_stage);
+
     // Row address and position for each possible delay stage (including no
     // delay stage)
     address_t row_address[max_stage];
@@ -101,6 +120,7 @@ void matrix_generator_static_write_row(
         row_address[0] =
             &(synaptic_matrix[pre_neuron_index * (max_row_n_words + 3)]);
     }
+    log_debug("row[0] = 0x%08x", row_address[0]);
 
     // The delayed row positions and space available
     if (delayed_synaptic_matrix != NULL) {
@@ -112,11 +132,13 @@ void matrix_generator_static_write_row(
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = &(delayed_address[single_matrix_size * (i - 1)]);
             space[i] = max_delayed_row_n_words;
+            log_debug("row[%u] = 0x%08x", i, row_address[i]);
         }
     } else {
         for (uint32_t i = 1; i < max_stage; i++) {
             row_address[i] = NULL;
             space[i] = 0;
+            log_debug("row[%u] = 0x%08x", i, row_address[i]);
         }
     }
 
@@ -134,6 +156,7 @@ void matrix_generator_static_write_row(
         } else {
             write_address[i] = NULL;
         }
+        log_debug("write[%u] = 0x%08x", i, write_address[i]);
     }
 
 
@@ -149,13 +172,16 @@ void matrix_generator_static_write_row(
         // Work out the delay stage and final value
         struct delay_value delay = get_delay(delays[synapse], max_stage);
         if (write_address[delay.stage] == NULL) {
-            log_error("Delay stage %u has not been initialised", delay.stage);
+            log_error("Delay stage %u has not been initialised; raw delay = %u,"
+                " delay = %u, max stage = %u", delay.stage, delays[synapse],
+                delay.delay, max_stage);
             rt_error(RTE_SWERR);
         }
 
         // Avoid errors when rows are full
         if (space[delay.stage] == 0) {
-            log_warning("Row for delay stage %u is full - word not added!");
+            log_warning("Row for delay stage %u is full - word not added!",
+                delay.stage);
             continue;
         }
 

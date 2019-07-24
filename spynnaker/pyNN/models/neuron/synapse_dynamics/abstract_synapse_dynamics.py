@@ -1,8 +1,23 @@
-from six import add_metaclass
-import numpy
-import math
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+import math
+import numpy
+from six import add_metaclass
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -55,39 +70,46 @@ class AbstractSynapseDynamics(object):
         :rtype: int
         """
 
+    @abstractproperty
+    def changes_during_run(self):
+        """ Determine if the synapses change during a run
+
+        :rtype: bool
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """
         return list()
 
-    def get_delay_maximum(self, connector):
+    def get_delay_maximum(self, connector, delays):
         """ Get the maximum delay for the synapses
         """
-        return connector.get_delay_maximum()
+        return connector.get_delay_maximum(delays)
 
-    def get_delay_variance(self, connector):
+    def get_delay_variance(self, connector, delays):
         """ Get the variance in delay for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance()
+        return connector.get_delay_variance(delays)
 
-    def get_weight_mean(self, connector):
+    def get_weight_mean(self, connector, weights):
         """ Get the mean weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean()
+        return connector.get_weight_mean(weights)
 
-    def get_weight_maximum(self, connector):
+    def get_weight_maximum(self, connector, weights):
         """ Get the maximum weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_maximum()
+        return connector.get_weight_maximum(weights)
 
-    def get_weight_variance(self, connector):
+    def get_weight_variance(self, connector, weights):
         """ Get the variance in weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance()
+        return connector.get_weight_variance(weights)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

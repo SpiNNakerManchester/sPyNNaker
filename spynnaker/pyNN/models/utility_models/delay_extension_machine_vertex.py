@@ -1,19 +1,30 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
-
-# front end common imports
-from spinn_front_end_common.interface.provenance \
-    import ProvidesProvenanceDataFromMachineImpl
+from spinn_front_end_common.interface.provenance import (
+    ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-
-# general imports
-from enum import Enum
 
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl):
     __slots__ = [
-        "_resources"]
+        "__resources"]
 
     _DELAY_EXTENSION_REGIONS = Enum(
         value="DELAY_EXTENSION_REGIONS",
@@ -34,7 +45,7 @@ class DelayExtensionMachineVertex(
     def __init__(self, resources_required, label, constraints=None):
         super(DelayExtensionMachineVertex, self).__init__(
             label, constraints=constraints)
-        self._resources = resources_required
+        self.__resources = resources_required
 
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._provenance_region_id)
@@ -50,7 +61,7 @@ class DelayExtensionMachineVertex(
     @property
     @overrides(MachineVertex.resources_required)
     def resources_required(self):
-        return self._resources
+        return self.__resources
 
     @overrides(ProvidesProvenanceDataFromMachineImpl.
                get_provenance_data_from_machine)

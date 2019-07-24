@@ -1,25 +1,39 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import numpy
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
-from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-import numpy
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class Struct(object):
     """ Represents a C code structure
     """
 
-    __slots__ = ("_field_types")
+    __slots__ = ["__field_types"]
 
     def __init__(self, field_types):
         """
-
         :param field_types:\
             The types of the fields, ordered as they appear in the struct
         :type field_types:\
             list of :py:class:`data_specification.enums.data_type.DataType`
         """
-        self._field_types = field_types
+        self.__field_types = field_types
 
     @property
     def field_types(self):
@@ -27,7 +41,7 @@ class Struct(object):
 
         :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
         """
-        return self._field_types
+        return self.__field_types
 
     @property
     def numpy_dtype(self):
@@ -105,6 +119,9 @@ class Struct(object):
         :return:\
             a list of lists of data values, one list for each struct element
         """
+        if self.numpy_dtype.itemsize == 0:
+            return numpy.zeros(0, dtype=self.numpy_dtype)
+
         # Prepare items to return
         items_to_return = list()
 
