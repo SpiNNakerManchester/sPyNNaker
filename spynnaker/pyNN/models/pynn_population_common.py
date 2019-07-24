@@ -83,10 +83,10 @@ class PyNNPopulationCommon(object):
                 size, label, constraints, **population_parameters)
 
             # Here looks like a good place to add the BPTT vertex to the graph
-            if isinstance(model, IFCurrDeltaGrazAdaptive):
-                # add BPTT vertex to graph
-                self._vertex_BPTT = BPTT.create_vertex(size, label,
-                    constraints, **population_parameters)
+            # if isinstance(model, IFCurrDeltaGrazAdaptive):
+            #     # add BPTT vertex to graph
+            #     self._vertex_BPTT = BPTT.create_vertex(size, label,
+            #         constraints, **population_parameters)
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):
@@ -135,7 +135,7 @@ class PyNNPopulationCommon(object):
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
         self.__spinnaker_control.add_application_vertex(self.__vertex)
-        self.__spinnaker_control.add_application_vertex(self.__vertex_BPTT)
+        # self.__spinnaker_control.add_application_vertex(self.__vertex_BPTT)
 
         # initialise common stuff
         self._size = size

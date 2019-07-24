@@ -87,7 +87,7 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
-		input_t external_bias, neuron_pointer_t neuron, input_t temp) {
+		input_t external_bias, neuron_pointer_t neuron) {
 
 		REAL total_exc = 0;
 		REAL total_inh = 0;
@@ -109,8 +109,7 @@ state_t neuron_model_state_update(
     return neuron->V;
 }
 
-void neuron_model_has_spiked(neuron_pointer_t neuron,
-		threshold_type_pointer_t threshold_type) {
+void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset membrane voltage
     neuron->V = neuron->C;
