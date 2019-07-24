@@ -1,10 +1,23 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import struct
-import sys
 import numpy
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.application import ApplicationVertex
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -67,11 +80,15 @@ class _MasterPopEntry(object):
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
+        index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append(
             (address, row_length, is_single, True))
+        return index
 
     def append_invalid(self):
+        index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append((0, 0, 0, False))
+        return index
 
     @property
     def routing_key(self):
@@ -141,13 +158,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = sys.maxsize
-                edge_pre_vertex = in_edge.pre_vertex
-                if (isinstance(edge_pre_vertex, ApplicationVertex) and
-                        isinstance(
-                            edge_pre_vertex, ApplicationVertex)):
-
-                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:
                     max_atoms = in_edge.pre_vertex.n_atoms
 
@@ -244,9 +255,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             raise SynapticConfigurationException(
                 "Row length {} is outside of allowed range for this table",
                 row_length)
-        self.__entries[key_and_mask.key].append(
+        index = self.__entries[key_and_mask.key].append(
             start_addr, row_length - 1, is_single)
         self.__n_addresses += 1
+
+        return index
 
     @overrides(AbstractMasterPopTableFactory.add_invalid_entry)
     def add_invalid_entry(
@@ -256,8 +269,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
-        self.__entries[key_and_mask.key].append_invalid()
+        index = self.__entries[key_and_mask.key].append_invalid()
         self.__n_addresses += 1
+
+        return index
 
     @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):

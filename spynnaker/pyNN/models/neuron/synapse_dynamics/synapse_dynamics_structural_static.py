@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -198,6 +213,11 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
                       self).get_parameter_names()
         names.extend(self.__common_sp.get_parameter_names())
         return names
+
+    @property
+    @overrides(SynapseDynamicsStatic.changes_during_run)
+    def changes_during_run(self):
+        return True
 
     @overrides(SynapseDynamicsStatic.get_max_synapses)
     def get_max_synapses(self, n_words):
