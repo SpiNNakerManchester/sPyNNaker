@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
@@ -5,7 +20,7 @@ from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
+    OneToOneConnector, FromListConnector)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractWeightUpdatable, AbstractFilterableEdge)
 
@@ -42,6 +57,21 @@ class ProjectionMachineEdge(
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
+                    n_filtered += 1
+            elif isinstance(synapse_info.connector, FromListConnector):
+                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                pre_app_vertex = graph_mapper.get_application_vertex(
+                    self.pre_vertex)
+                post_app_vertex = graph_mapper.get_application_vertex(
+                    self.post_vertex)
+                pre_slices = graph_mapper.get_slices(pre_app_vertex)
+                post_slices = graph_mapper.get_slices(post_app_vertex)
+                # run through connection list and check for any connections
+                # between the pre and post vertices that could be filtered
+                n_connections = synapse_info.connector.get_n_connections(
+                    pre_slices, post_slices, pre_hi, post_hi)
+                if n_connections == 0:
                     n_filtered += 1
 
         return (n_filtered == len(self.__synapse_information))
