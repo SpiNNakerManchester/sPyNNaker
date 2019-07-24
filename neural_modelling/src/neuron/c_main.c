@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*!\file
  *
  * SUMMARY
@@ -110,7 +127,8 @@ static bool initialise() {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-	data_specification_metadata_t *ds_regions = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
     if (!data_specification_read_header(ds_regions)) {
@@ -121,12 +139,12 @@ static bool initialise() {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
-        c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
+            c_main_store_provenance_data,
+            data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // setup recording region
     if (!initialise_recording(
@@ -147,7 +165,7 @@ static bool initialise() {
 
     // Setup profiler
     profiler_init(
-        data_specification_get_region(PROFILER_REGION, ds_regions));
+            data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_debug("Initialise: finished");
     return true;
@@ -159,10 +177,10 @@ void resume_callback() {
     recording_reset();
 
     // try reloading neuron parameters
-    data_specification_metadata_t *ds_regions = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
     if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(
-                NEURON_PARAMS_REGION, ds_regions))) {
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
         log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
@@ -206,9 +224,10 @@ void timer_callback(uint timer_count, uint unused) {
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
-        data_specification_metadata_t *ds_regions = data_specification_get_data_address();
+        data_specification_metadata_t *ds_regions =
+                data_specification_get_data_address();
         neuron_store_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
+                data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
