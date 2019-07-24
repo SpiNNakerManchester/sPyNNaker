@@ -178,7 +178,7 @@ static bool initialise(uint32_t *timer_period) {
         data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     if(!initialise_recording(
-           data_specification_get_region(RECORDING_REGION, address))) {
+           data_specification_get_region(RECORDING_REGION, ds_regions))) {
         return false;
     }
 
