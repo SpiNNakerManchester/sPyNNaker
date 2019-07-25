@@ -42,8 +42,7 @@ class FromListConnector(AbstractConnector):
         "__extra_parameter_names",
         "__split_conn_list",
         "__split_pre_slices",
-        "__split_post_slices",
-        "_conn_matrix"]
+        "__split_post_slices"]
 
     def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
         """
@@ -67,23 +66,11 @@ class FromListConnector(AbstractConnector):
 
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
-        try:
-            self._conn_matrix = numpy.zeros(
-                (int(self.conn_list[:, 0].max() + 1),
-                 int(self.conn_list[:, 1].max() + 1)), dtype=bool)
-        except IndexError:
-            print("too many indices for array")
-        for [pre, post] in self.conn_list:
-            self._conn_matrix[int(pre)][int(post)] = 1
 
         # The connection list split by pre/post vertex slices
         self.__split_conn_list = None
         self.__split_pre_slices = None
         self.__split_post_slices = None
-
-    @property
-    def conn_matrix(self):
-        return self._conn_matrix
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):
@@ -227,17 +214,11 @@ class FromListConnector(AbstractConnector):
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
-        try:
-            indices = self.__split_conn_list[
-                (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
-        except Exception as e:
-            a = 1 + 1
-            print("WTF")
-            print(e)
+        indices = self.__split_conn_list[
+            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
-
         # check that conn_list has weights, if not then use the value passed in
         if self.__weights is None:
             if hasattr(weights, "__getitem__"):
