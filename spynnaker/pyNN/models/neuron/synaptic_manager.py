@@ -327,7 +327,8 @@ class SynapticManager(object):
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
-            machine_graph, all_syn_block_sz, graph_mapper):
+            machine_graph, all_syn_block_sz, graph_mapper,
+            application_graph, application_vertex):
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
@@ -345,10 +346,8 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 size=all_syn_block_sz, label='SynBlocks')
 
-        synapse_dynamics_sz = \
-            self._get_synapse_dynamics_parameter_size(
-                vertex_slice,
-                machine_graph.get_edges_ending_at_vertex(machine_vertex))
+        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
+            vertex_slice, application_graph, application_vertex)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
@@ -951,7 +950,8 @@ class SynapticManager(object):
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, graph_mapper)
+            all_syn_block_sz, graph_mapper, application_graph,
+            application_vertex)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_vertex, application_graph, machine_time_step,
