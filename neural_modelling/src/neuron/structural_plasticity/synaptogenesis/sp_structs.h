@@ -11,6 +11,12 @@ struct formation_params;
 
 #define IS_CONNECTION_LAT 1
 
+typedef struct post_to_pre_entry {
+    uint16_t neuron_index;
+    uint8_t sub_pop_index;
+    uint8_t pop_index;
+} post_to_pre_entry;
+
 //! information per atom
 typedef struct {
     uint32_t key;
@@ -64,11 +70,10 @@ typedef struct {
     // does the connection already exist
     uint32_t element_exists;
     // information extracted from the post to pre table
-    int32_t *post_to_pre_table_entry;
+    post_to_pre_entry *post_to_pre_table_entry;
     pre_info_t *pre_population_info;
     key_atom_info_t *key_atom_info;
-    uint32_t packed_index;
-    uint32_t pre_population_index;
+    post_to_pre_entry post_to_pre;
     // offset in synaptic row (if exists)
     uint32_t offset;
     // current delay (if exists)
@@ -130,7 +135,7 @@ static inline bool sp_structs_remove_synapse(
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
-    *(current_state->post_to_pre_table_entry) = -1;
+    current_state->post_to_pre_table_entry->neuron_index = 0xFFFF;
     return true;
 }
 
@@ -150,7 +155,7 @@ static inline bool sp_structs_add_synapse(
         return false;
     }
 
-    *(current_state->post_to_pre_table_entry) = current_state->packed_index;
+    *(current_state->post_to_pre_table_entry) = current_state->post_to_pre;
     return true;
 
 }

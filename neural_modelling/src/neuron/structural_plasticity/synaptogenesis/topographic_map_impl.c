@@ -38,7 +38,7 @@ rewiring_data_t rewiring_data;
 current_state_t current_state;
 
 // inverse of synaptic matrix
-int32_t *post_to_pre_table;
+post_to_pre_entry *post_to_pre_table;
 
 // pre-population information table
 pre_pop_info_table_t pre_info;
@@ -48,31 +48,6 @@ struct formation_params **formation_params;
 
 // The elimination parameters per pre-population
 struct elimination_params **elimination_params;
-
-//! function to unpack element from post to pre table into constituent bits
-static inline bool unpack_post_to_pre(int32_t value, uint32_t* pop_index,
-        uint32_t* subpop_index, uint32_t* neuron_index) {
-    if (value == -1) {
-        return false;
-    }
-    *neuron_index = (value      ) & 0xFFFF;
-    *subpop_index = (value >> 16) & 0xFF;
-    *pop_index    = (value >> 24) & 0xFF;
-    return true;
-}
-
-//! opposite function of unpack. packs up different bits into a word to be
-//! placed into the post to pre table
-static inline int pack(uint32_t pop_index, uint32_t subpop_index,
-        uint32_t neuron_index) {
-    uint32_t masked_pop_index    = pop_index    & 0xFF;
-    uint32_t masked_subpop_index = subpop_index & 0xFF;
-    uint32_t masked_neuron_index = neuron_index & 0xFFFF;
-    uint32_t value = (masked_pop_index << 24) |
-            (masked_subpop_index << 16) |
-             masked_neuron_index;
-    return (int) value;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -111,6 +86,10 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
         spin1_memcpy(pre_info.prepop_info[i], data, pre_size);
         data += pre_size;
     }
+
+    post_to_pre_table = (post_to_pre_entry *) data;
+    uint32_t n_elements = rewiring_data.s_max * rewiring_data.machine_no_atoms;
+    data = (uint8_t *) &post_to_pre_table[n_elements];
 
     partner_init(&data);
 
@@ -157,20 +136,21 @@ bool synaptogenesis_dynamics_rewire(
     uint column_offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
         rewiring_data.s_max;
     uint total_offset = row_offset + column_offset;
-    int32_t value = post_to_pre_table[total_offset];
-
+    post_to_pre_entry entry = post_to_pre_table[total_offset];
     uint32_t pre_app_pop = 0, pre_sub_pop = 0, neuron_id = 0;
-    bool element_exists = unpack_post_to_pre(value, &pre_app_pop,
-        &pre_sub_pop, &neuron_id);
-    pre_info_t *prepop_info =
-            pre_info.prepop_info[pre_app_pop];
-    key_atom_info_t *key_atom_info = &prepop_info->key_atom_info[pre_sub_pop];
-    if (!element_exists) {
+    if (entry.neuron_index == 0xFFFF) {
         if (!potential_presynaptic_partner(time, &pre_app_pop, &pre_sub_pop,
                 &neuron_id, spike)) {
             return false;
         }
     } else {
+        pre_app_pop = entry.pop_index;
+        pre_sub_pop = entry.sub_pop_index;
+        neuron_id = entry.neuron_index;
+    }
+    pre_info_t *prepop_info = pre_info.prepop_info[pre_app_pop];
+    key_atom_info_t *key_atom_info = &prepop_info->key_atom_info[pre_sub_pop];
+    if (entry.neuron_index != 0xFFFF) {
         *spike = key_atom_info->key | neuron_id;
     }
 
@@ -182,12 +162,13 @@ bool synaptogenesis_dynamics_rewire(
     // Saving current state
     current_state.pre_syn_id = neuron_id;
     current_state.post_syn_id = post_id;
-    current_state.element_exists = element_exists;
+    current_state.element_exists = entry.neuron_index == 0xFFFF;
     current_state.post_to_pre_table_entry = &post_to_pre_table[total_offset];
     current_state.pre_population_info = prepop_info;
     current_state.key_atom_info = key_atom_info;
-    current_state.packed_index = pack(pre_app_pop, pre_sub_pop, neuron_id);
-    current_state.pre_population_index = pre_app_pop;
+    current_state.post_to_pre.neuron_index = neuron_id;
+    current_state.post_to_pre.pop_index = pre_app_pop;
+    current_state.post_to_pre.sub_pop_index = pre_sub_pop;
 
     current_state.local_seed = &rewiring_data.local_seed;
     current_state.post_low_atom = rewiring_data.low_atom;
@@ -210,7 +191,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
 
     if (current_state.element_exists && search_hit) {
         return synaptogenesis_elimination_rule(&current_state,
-            elimination_params[current_state.pre_population_index], time, row);
+            elimination_params[current_state.post_to_pre.pop_index], time, row);
     } else {
         // Can't form if the row is full
         uint no_elems = synapse_dynamics_n_connections_in_row(
@@ -220,7 +201,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             return false;
         }
         return synaptogenesis_formation_rule(&current_state,
-            formation_params[current_state.pre_population_index], time, row);
+            formation_params[current_state.post_to_pre.pop_index], time, row);
     }
 }
 
