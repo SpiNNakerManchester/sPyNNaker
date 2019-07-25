@@ -74,7 +74,8 @@ POPULATION_BASED_REGIONS = Enum(
            ('CONNECTOR_BUILDER', 9),
            ('DIRECT_MATRIX', 10),
            ('BIT_FIELD_FILTER', 11),
-           ('BIT_FIELD_BUILDER', 12)])
+           ('BIT_FIELD_BUILDER', 12),
+           ('BIT_FIELD_KEY_MAP', 13)])
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

@@ -20,7 +20,6 @@
 #include <spin1_api.h>
 #include <data_specification.h>
 #include <debug.h>
-#include <neuron/regions.h>
 #include <neuron/population_table/population_table.h>
 #include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
@@ -74,22 +73,41 @@ bit_field_t* fake_bit_fields;
 //! \brief used to hold sdram read row
 uint32_t * row_data;
 
+//! \brief struct for builder region
+typedef struct builder_region_struct{
+    int master_pop_region_id;
+    int synaptic_matrix_region_id;
+    int direct_matrix_region_id;
+    int bit_field_region_id;
+    int bit_field_key_map_region_id;
+} builder_region_struct;
+
 //! \brief reads in the vertex region addresses
 void read_in_addresses(){
 
     // get the data (linked to sdram tag 2 and assume the app ids match)
-    address_t core_address = data_specification_get_data_address();
+    data_specification_metadata_t *core_address =
+        data_specification_get_data_address();
+
+    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
+    uint core = spin1_get_core_id();
+    builder_region_struct *builder_base_address =
+        (builder_region_struct*) sark_virtual_processor_info[core].user1;
+    builder_region_struct builder_data;
+    spin1_memcpy(
+        &builder_data, builder_base_address, sizeof(builder_region_struct));
 
     master_pop_base_address = data_specification_get_region(
-        POPULATION_TABLE_REGION, core_address);
+        builder_data.master_pop_region_id, core_address);
     synaptic_matrix_base_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, core_address);
+        builder_data.synaptic_matrix_region_id, core_address);
     bit_field_base_address = (filter_region_t*)
-        data_specification_get_region(BIT_FIELD_FILTER_REGION, core_address);
+        data_specification_get_region(
+            builder_data.bit_field_region_id, core_address);
     direct_matrix_region_base_address = data_specification_get_region(
-        DIRECT_MATRIX_REGION, core_address);
+        builder_data.direct_matrix_region_id, core_address);
     keys_to_max_atoms = (key_atom_data_t*) data_specification_get_region(
-        BIT_FIELD_BUILDER, core_address);
+        builder_data.bit_field_key_map_region_id, core_address);
 
     // printer
     log_debug("master_pop_table_base_address = %0x", master_pop_base_address);
@@ -136,7 +154,7 @@ uint32_t _n_neurons_from_key(uint32_t key){
 
     log_error("did not find the key %x in the map. WTF!", key);
     log_error("n pairs is %d", keys_to_max_atoms->n_pairs);
-    for (int pair_id = 0; pair_id < keys_to_max_atoms->n_pairs; pair_id++){
+    for (int pair_id = 0; pair_id < keys_to_max_atoms->n_pairs; pair_id++) {
         key_atom_pair_t entry = keys_to_max_atoms->pairs[key_index];
         log_error(
             "key at index %d is %x and equal = %d",

@@ -17,9 +17,6 @@ import logging
 import os
 import math
 
-from pacman.utilities.algorithm_utilities.\
-    partition_algorithm_utilities import determine_max_atoms_for_vertex
-from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -31,8 +28,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractSupportsBitFieldRoutingCompression, AbstractCanReset,
-    AbstractSupportsBitFieldGeneration)
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -42,13 +38,11 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
@@ -82,10 +76,9 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractSupportsBitFieldGeneration,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractSupportsBitFieldRoutingCompression, AbstractCanReset):
+        AbstractChangableAfterRun, AbstractRewritesDataSpecification,
+        AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
+        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -120,20 +113,6 @@ class AbstractPopulationVertex(
 
     # 8 elements before the start of global parameters
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
-
-    # number of elements
-    ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
-
-    ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2  # n bitfields,  pointer for array
-
-    # n elements in each key to n atoms map for bitfield (key, n atoms)
-    _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
-
-    # n key to n neurons maps size in words
-    _N_KEYS_DATA_SET_IN_WORDS = 1
-
-    # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
-    BIT_IN_A_WORD = 32.0
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -315,90 +294,12 @@ class AbstractPopulationVertex(
                 machine_time_step) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
-            self._get_estimated_sdram_for_bit_field_region(
-                graph.get_edges_ending_at_vertex(self)) +
-            self._get_estimated_sdram_for_bit_field_builder_region(graph))
-
+            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
+                graph, self) +
+            bit_field_utilities.get_estimated_sdram_for_key_region(
+                graph, self) +
+            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
-
-    def _get_estimated_sdram_for_bit_field_builder_region(self, app_graph):
-        """ gets an estimate of the bitfield builder region
-
-        :param app_graph: the app graph
-        :return: sdram needed
-        """
-
-        # basic sdram
-        sdram = self._N_KEYS_DATA_SET_IN_WORDS * WORD_TO_BYTE_MULTIPLIER
-        for in_edge in app_graph.get_edges_ending_at_vertex(self):
-
-            # Get the number of likely vertices
-            edge_pre_vertex = in_edge.pre_vertex
-            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-            if in_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = in_edge.pre_vertex.n_atoms
-            n_edge_vertices = int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
-            sdram += (n_edge_vertices *
-                      self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                      WORD_TO_BYTE_MULTIPLIER)
-        return sdram
-
-    def _get_estimated_sdram_for_bit_field_region(self, incoming_edges):
-        """ estimates the sdram for the bit field region
-        :param incoming_edges: the application edges entering this vertex
-        :rtype: int
-        :return: the estimated number of bytes used by the bit field region
-        """
-        sdram = 0
-        for incoming_edge in incoming_edges:
-            if isinstance(incoming_edge, ProjectionApplicationEdge):
-                edge_pre_vertex = incoming_edge.pre_vertex
-                max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-                if incoming_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = incoming_edge.pre_vertex.n_atoms
-
-                # Get the number of likely vertices
-                n_machine_vertices = int(math.ceil(
-                    float(incoming_edge.pre_vertex.n_atoms) /
-                    float(max_atoms)))
-                n_atoms_per_machine_vertex = int(math.ceil(
-                    float(incoming_edge.pre_vertex.n_atoms) /
-                    n_machine_vertices))
-                if isinstance(edge_pre_vertex, DelayExtensionVertex):
-                    n_atoms_per_machine_vertex *= \
-                        edge_pre_vertex.n_delay_stages
-                n_words_for_atoms = int(math.ceil(
-                    n_atoms_per_machine_vertex / self.BIT_IN_A_WORD))
-                sdram += (
-                    (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + (
-                        n_words_for_atoms * n_machine_vertices)) *
-                    WORD_TO_BYTE_MULTIPLIER)
-        return sdram
-
-    def _exact_sdram_for_bit_field_region(
-            self, machine_graph, vertex, n_key_map):
-        """ calculates the correct sdram for the bitfield region based off \
-            the machine graph and graph mapper
-
-        :param machine_graph: machine graph
-        :param vertex: the machine vertex
-        :param n_key_map: n keys map
-        :return: sdram in bytes
-        """
-        sdram = (self.ELEMENTS_USED_IN_BIT_FIELD_HEADER *
-                 WORD_TO_BYTE_MULTIPLIER)
-        for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
-
-            n_keys = n_key_map.n_keys_for_partition(
-                machine_graph.get_outgoing_partition_for_edge(incoming_edge))
-            n_words_for_atoms = int(math.ceil(
-                n_keys / self.BIT_IN_A_WORD))
-
-            sdram += (
-                (self.ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-                WORD_TO_BYTE_MULTIPLIER)
-        return sdram
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, n_key_map):
@@ -432,11 +333,11 @@ class AbstractPopulationVertex(
             self.__n_profile_samples)
 
         # reserve bit field region
-        spec.reserve_memory_region(
-            region=constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            size=self._exact_sdram_for_bit_field_region(
-                machine_graph, vertex, n_key_map),
-            label="bit_field region")
+        bit_field_utilities.reserve_bit_field_regions(
+            spec, machine_graph, n_key_map, vertex,
+            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -624,15 +525,13 @@ class AbstractPopulationVertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the setup region
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Write the recording region
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.RECORDING.value)
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.RECORDING.value)
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
@@ -642,7 +541,7 @@ class AbstractPopulationVertex(
 
         # write profile data
         profile_utils.write_profile_region_data(
-            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
         # Get the weight_scale value from the appropriate location
@@ -653,54 +552,22 @@ class AbstractPopulationVertex(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
             weight_scale, machine_time_step)
+        vertex.set_on_chip_generatable_area(
+            self.__synapse_manager.host_written_matrix_size,
+            self.__synapse_manager.on_chip_written_matrix_size)
 
         # write up the bitfield builder data
-        self._write_bitfield_init_data(
-            spec, vertex, machine_graph, routing_info, graph_mapper,
-            n_key_map)
+        bit_field_utilities.write_bitfield_init_data(
+            spec, vertex, machine_graph, routing_info,
+            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         # End the writing of this specification:
         spec.end_specification()
-
-    def _write_bitfield_init_data(
-            self, spec, machine_vertex, machine_graph, routing_info,
-            graph_mapper, n_key_map):
-        """ writes the init data needed for the bitfield generator
-
-        :param spec: data spec writer
-        :param machine_vertex: machine vertex
-        :param machine_graph: machine graph
-        :param routing_info: keys
-        :param graph_mapper: mapping between graphs
-        :param n_key_map: map for edge to n keys
-        :rtype: None
-        """
-        # deduce sdram for the truer setup
-        sdram = (
-            self._N_KEYS_DATA_SET_IN_WORDS +
-            len(machine_graph.get_edges_ending_at_vertex(machine_vertex)) *
-            self._N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
-
-        # reserve memory region
-        spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            size=sdram, label="bitfield setup data")
-        spec.switch_write_focus(
-            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
-
-        # write n keys max atom map
-        spec.write_value(
-            len(machine_graph.get_edges_ending_at_vertex(machine_vertex)))
-
-        # load in key to max atoms map
-        for in_coming_edge in machine_graph.get_edges_ending_at_vertex(
-                machine_vertex):
-            out_going_partition = \
-                machine_graph.get_outgoing_partition_for_edge(in_coming_edge)
-            spec.write_value(
-                routing_info.get_first_key_from_partition(out_going_partition))
-            spec.write_value(
-                n_key_map.n_keys_for_partition(out_going_partition))
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -858,8 +725,7 @@ class AbstractPopulationVertex(
         # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
-                placement,
-                constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
                 transceiver)
 
         # shift past the extra stuff before neuron parameters that we don't
@@ -994,33 +860,6 @@ class AbstractPopulationVertex(
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
-
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
-    def bit_field_base_address(self, transceiver, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(
-            self, transceiver, placement):
-        synaptic_matrix_base_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement=placement, transceiver=transceiver,
-                region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
-        on_chip_begins_at = (
-            synaptic_matrix_base_address +
-            self.__synapse_manager.host_written_matrix_size)
-        return [(on_chip_begins_at,
-                 self.__synapse_manager.on_chip_written_matrix_size)]
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               key_to_atom_map_region_base_address)
-    def key_to_atom_map_region_base_address(self, transceiver, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):

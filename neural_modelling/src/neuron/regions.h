@@ -30,6 +30,7 @@ typedef enum regions_e {
     CONNECTOR_BUILDER_REGION, // 9
     DIRECT_MATRIX_REGION,     // 10
     BIT_FIELD_FILTER_REGION,  // 11
-    BIT_FIELD_BUILDER         // 12
+    BIT_FIELD_BUILDER,        // 12
+    BIT_FIELD_KEY_MAP         // 13
 
 } regions_e;
