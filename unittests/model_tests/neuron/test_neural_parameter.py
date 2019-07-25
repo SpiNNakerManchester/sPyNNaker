@@ -65,7 +65,8 @@ def test_range_list_as_list():
     with tempfile.NamedTemporaryFile() as temp:
         spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
         try:
-            value = SpynnakerRangedList(size=10, value=_generator(10), key="test")
+            value = SpynnakerRangedList(
+                size=10, value=_generator(10), key="test")
             param = NeuronParameter(value, DataType.S1615)
             iterator = param.iterator_by_slice(0, 5, spec)
             values = _iterate_parameter_values(iterator, DataType.S1615)
