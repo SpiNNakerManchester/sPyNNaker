@@ -966,6 +966,10 @@ class SynapticManager(object):
             direct_matrix_region, synapse_dynamics_region,
             connection_builder_region):
 
+        # reset for this machine vertex
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
+
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)

@@ -14,6 +14,11 @@ ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2  # n bitfields,  pointer for array
 # n elements in each key to n atoms map for bitfield (key, n atoms)
 N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
 
+# the regions addresses needed (
+#  pop table, synaptic matrix, direct matrix, bit_field, bit field builder,
+# bit_field_key)
+N_REGIONS_ADDRESSES = 5
+
 # n key to n neurons maps size in words
 N_KEYS_DATA_SET_IN_WORDS = 1
 
@@ -54,7 +59,7 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     return sdram
 
 
-def get_estimated_sdram_for_builder_region(app_graph, vertex):
+def get_estimated_sdram_for_key_region(app_graph, vertex):
     """ gets an estimate of the bitfield builder region
 
     :param app_graph: the app graph
@@ -78,7 +83,7 @@ def get_estimated_sdram_for_builder_region(app_graph, vertex):
     return sdram
 
 
-def exact_sdram_for_bit_field_region(
+def _exact_sdram_for_bit_field_region(
         machine_graph, vertex, n_key_map):
     """ calculates the correct sdram for the bitfield region based off \
         the machine graph and graph mapper
@@ -100,40 +105,60 @@ def exact_sdram_for_bit_field_region(
     return sdram
 
 
+def exact_sdram_for_bit_field_builder_region():
+    """
+    :return: 
+    """
+    return N_REGIONS_ADDRESSES * WORD_TO_BYTE_MULTIPLIER
+
+
+def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
+    return (
+       N_KEYS_DATA_SET_IN_WORDS +
+       len(machine_graph.get_edges_ending_at_vertex(vertex)) *
+       N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
+
+
 def reserve_bit_field_regions(
-        spec, machine_graph, graph_mapper, vertex, bit_field_builder_region,
-        bit_filter_region):
+        spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
+        bit_filter_region, bit_field_key_region):
     """
     
     :param spec: 
     :param machine_graph: 
-    :param graph_mapper: 
+    :param n_key_map: 
     :param vertex: 
     :param bit_field_builder_region: 
     :param bit_filter_region: 
+    :param bit_field_key_region:
     :return: 
     """
-    # deduce sdram for the truer setup
-    sdram_for_builder_region = (
-        N_KEYS_DATA_SET_IN_WORDS +
-        len(machine_graph.get_edges_ending_at_vertex(vertex)) *
-        N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
 
+    # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
-        size=exact_sdram_for_bit_field_region(
-            machine_graph, graph_mapper, vertex),
+        size=_exact_sdram_for_bit_field_region(
+            machine_graph, vertex, n_key_map),
         label="bit_field region")
 
-    # reserve memory region
+    # reserve region for the bitfield builder
     spec.reserve_memory_region(
-        region=bit_field_builder_region, size=sdram_for_builder_region,
-        label="bitfield setup data")
+        region=bit_field_builder_region,
+        size=exact_sdram_for_bit_field_builder_region(),
+        label="bit field builder region")
+
+    # reserve memory region for the key region
+    spec.reserve_memory_region(
+        region=bit_field_key_region,
+        size=_exact_sdram_for_bit_field_key_region(machine_graph, vertex),
+        label="bit field key data")
 
 
 def write_bitfield_init_data(
         spec, machine_vertex, machine_graph, routing_info, n_key_map,
-        bit_field_builder_region):
+        bit_field_builder_region, master_pop_region_id,
+        synaptic_matrix_region_id, direct_matrix_region_id,
+        bit_field_region_id, bit_field_key_map_region_id):
     """ writes the init data needed for the bitfield generator
 
     :param spec: data spec writer
@@ -142,10 +167,23 @@ def write_bitfield_init_data(
     :param routing_info: keys
     :param n_key_map: map for edge to n keys
     :param bit_field_builder_region: the region id for the bitfield builder
+    :param master_pop_region_id:
+    :param synaptic_matrix_region_id:
+    :param direct_matrix_region_id:
+    :param bit_field_region_id:
+    :param bit_field_key_map_region_id:
     :rtype: None
     """
 
     spec.switch_write_focus(bit_field_builder_region)
+
+    spec.write_value(master_pop_region_id)
+    spec.write_value(synaptic_matrix_region_id)
+    spec.write_value(direct_matrix_region_id)
+    spec.write_value(bit_field_region_id)
+    spec.write_value(bit_field_key_map_region_id)
+
+    spec.switch_write_focus(bit_field_key_map_region_id)
 
     # write n keys max atom map
     spec.write_value(

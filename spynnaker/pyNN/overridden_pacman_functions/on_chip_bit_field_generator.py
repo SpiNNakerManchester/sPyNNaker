@@ -1,7 +1,24 @@
+# Copyright (c) 2019-2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import functools
 import math
 from collections import defaultdict
 
+from spinn_front_end_common.abstract_models import \
+    AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.interface.interface_functions import \
     ChipIOBufExtractor
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
@@ -31,7 +48,7 @@ class OnChipBitFieldGenerator(object):
     _SUCCESS = 0
 
     # the number of bytes needed to read the user2 register
-    _USER_2_BYTES = 4
+    _USER_BYTES = 4
 
     # n key to n neurons maps size in words
     _N_KEYS_DATA_SET_IN_WORDS = 1
@@ -52,6 +69,8 @@ class OnChipBitFieldGenerator(object):
     _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
 
     _BYTES_PER_FILTER = 12
+
+    _ONE_WORDS = struct.Struct("<I")
 
     # bit field report file name
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
@@ -92,7 +111,8 @@ class OnChipBitFieldGenerator(object):
 
         # get data
         expander_cores = self._calculate_core_data(
-            app_graph, graph_mapper, placements, progress, executable_finder)
+            app_graph, graph_mapper, placements, progress, executable_finder,
+            transceiver)
 
         # load data
         bit_field_app_id = transceiver.app_id_tracker.get_new_id()
@@ -148,20 +168,21 @@ class OnChipBitFieldGenerator(object):
 
         # read in for each app vertex that would have a bitfield
         for app_vertex in progress.over(app_graph.vertices):
-            if isinstance(app_vertex, AbstractPopulationVertex):
 
-                local_total = 0
-                local_redundant = 0
+            local_total = 0
+            local_redundant = 0
 
-                machine_verts = graph_mapper.get_machine_vertices(app_vertex)
+            machine_verts = graph_mapper.get_machine_vertices(app_vertex)
 
-                # get machine verts
-                for machine_vertex in machine_verts:
+            # get machine verts
+            for machine_vertex in machine_verts:
+                if isinstance(
+                        machine_vertex, AbstractSupportsBitFieldGeneration):
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
 
                     # get bitfield address
-                    bit_field_address = app_vertex.bit_field_base_address(
+                    bit_field_address = machine_vertex.bit_field_base_address(
                         transceiver, placement)
 
                     # read how many bitfields there are
@@ -257,11 +278,12 @@ class OnChipBitFieldGenerator(object):
 
         # read in for each app vertex that would have a bitfield
         for app_vertex in progress.over(app_graph.vertices):
-            if isinstance(app_vertex, AbstractPopulationVertex):
-                machine_verts = graph_mapper.get_machine_vertices(app_vertex)
+            machine_verts = graph_mapper.get_machine_vertices(app_vertex)
 
-                # get machine verts
-                for machine_vertex in machine_verts:
+            # get machine verts
+            for machine_vertex in machine_verts:
+                if isinstance(
+                        machine_vertex, AbstractSupportsBitFieldGeneration):
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
                     output.write(
@@ -323,7 +345,7 @@ class OnChipBitFieldGenerator(object):
 
     def _calculate_core_data(
             self, app_graph, graph_mapper, placements, progress,
-            executable_finder):
+            executable_finder, transceiver):
         """ gets the data needed for the bit field expander for the machine
 
         :param app_graph: app graph
@@ -331,6 +353,7 @@ class OnChipBitFieldGenerator(object):
         :param placements: placements
         :param progress: progress bar
         :param executable_finder: where to find the executable
+        :param transceiver: spinnman instance
         :return: data and expander cores
         """
 
@@ -343,9 +366,10 @@ class OnChipBitFieldGenerator(object):
 
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
-            if isinstance(app_vertex, AbstractPopulationVertex):
-                machine_verts = graph_mapper.get_machine_vertices(app_vertex)
-                for machine_vertex in machine_verts:
+            machine_verts = graph_mapper.get_machine_vertices(app_vertex)
+            for machine_vertex in machine_verts:
+                if isinstance(
+                        machine_vertex, AbstractSupportsBitFieldGeneration):
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
 
@@ -353,6 +377,18 @@ class OnChipBitFieldGenerator(object):
                     expander_cores.add_processor(
                         bit_field_expander_path, placement.x, placement.y,
                         placement.p)
+
+                    bit_field_builder_region = \
+                        machine_vertex.bit_field_builder_region(
+                            transceiver, placement)
+                    # update user 1 with location
+                    user_1_base_address = \
+                        transceiver.get_user_1_register_address_from_core(
+                            placement.p)
+                    transceiver.write_memory(
+                        placement.x, placement.y, user_1_base_address,
+                        self._ONE_WORDS.pack(bit_field_builder_region),
+                        self._USER_BYTES)
 
         return expander_cores
 
@@ -379,7 +415,7 @@ class OnChipBitFieldGenerator(object):
                     transceiver.get_user_2_register_address_from_core(p)
                 result = struct.unpack(
                     "<I", transceiver.read_memory(
-                        x, y, user_2_base_address, self._USER_2_BYTES))[0]
+                        x, y, user_2_base_address, self._USER_BYTES))[0]
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:

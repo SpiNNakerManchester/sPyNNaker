@@ -30,8 +30,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractSupportsBitFieldRoutingCompression,
-    AbstractSupportsBitFieldGeneration, AbstractCanReset)
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -81,11 +80,10 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun, AbstractSupportsBitFieldGeneration,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, AbstractSendsOutgoingSynapses,
-        ProvidesKeyToAtomMappingImpl, AbstractCanReset,
-        AbstractSupportsBitFieldRoutingCompression, SplitterByAtoms):
+        AbstractChangableAfterRun, AbstractRewritesDataSpecification,
+        AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
+        AbstractSendsOutgoingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractCanReset, SplitterByAtoms):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -311,13 +309,13 @@ class AbstractPopulationVertex(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
                 graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_builder_region(
-                graph, self))
-
+            bit_field_utilities.get_estimated_sdram_for_key_region(
+                graph, self) +
+            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
 
     def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, graph_mapper):
+            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
         """ reserves the dsg memory regions
 
         :param spec: the data spec object
@@ -348,9 +346,10 @@ class AbstractPopulationVertex(
 
         # reserve bit field region
         bit_field_utilities.reserve_bit_field_regions(
-            spec, machine_graph, graph_mapper, vertex,
+            spec, machine_graph, n_key_map, vertex,
             POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -526,7 +525,7 @@ class AbstractPopulationVertex(
 
         # Reserve memory regions
         self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, graph_mapper)
+            spec, vertex_slice, vertex, machine_graph, n_key_map)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -570,11 +569,19 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
             POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
+        vertex.set_on_chip_generatable_area(
+            self.__synapse_manager.host_written_matrix_size,
+            self.__synapse_manager.on_chip_written_matrix_size)
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
             spec, vertex, machine_graph, routing_info,
-            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
+            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -873,33 +880,6 @@ class AbstractPopulationVertex(
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)
-
-    @overrides(AbstractSupportsBitFieldGeneration.bit_field_base_address)
-    def bit_field_base_address(self, transceiver, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value)
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(
-            self, transceiver, placement):
-        synaptic_matrix_base_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement=placement, transceiver=transceiver,
-                region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
-        on_chip_begins_at = (
-            synaptic_matrix_base_address +
-            self._synapse_manager.host_written_matrix_size)
-        return [(on_chip_begins_at,
-                 self._synapse_manager.on_chip_written_matrix_size)]
-
-    @overrides(AbstractSupportsBitFieldRoutingCompression.
-               key_to_atom_map_region_base_address)
-    def key_to_atom_map_region_base_address(self, transceiver, placement):
-        return helpful_functions.locate_memory_region_for_placement(
-            placement=placement, transceiver=transceiver,
-            region=POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value)
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):
