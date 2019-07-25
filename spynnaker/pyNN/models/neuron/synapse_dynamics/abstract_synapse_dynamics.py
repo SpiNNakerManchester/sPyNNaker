@@ -87,6 +87,15 @@ class AbstractSynapseDynamics(object):
         """ The delay of connections
         """
 
+    @abstractmethod
+    def set_delay(self, delay):
+        """ Set the delay
+        """
+
+    @delay.setter
+    def delay(self, delay):
+        self.set_delay(delay)
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """

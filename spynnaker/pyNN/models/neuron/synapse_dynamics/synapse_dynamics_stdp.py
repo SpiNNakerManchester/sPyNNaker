@@ -431,3 +431,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
+
+    @overrides(AbstractPlasticSynapseDynamics.set_delay)
+    def set_delay(self, delay):
+        self.__delay = delay
