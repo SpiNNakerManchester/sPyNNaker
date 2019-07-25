@@ -273,8 +273,7 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
+                vertex_slice, machine_time_step, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 

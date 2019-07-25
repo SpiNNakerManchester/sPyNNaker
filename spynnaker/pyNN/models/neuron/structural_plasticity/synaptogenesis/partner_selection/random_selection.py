@@ -8,10 +8,6 @@ class RandomSelection(AbstractPartnerSelection):
 
     __slots__ = []
 
-    @overrides(AbstractPartnerSelection.is_same_as)
-    def is_same_as(self, other):
-        return isinstance(other, RandomSelection)
-
     @property
     @overrides(AbstractPartnerSelection.vertex_executable_suffix)
     def vertex_executable_suffix(self):

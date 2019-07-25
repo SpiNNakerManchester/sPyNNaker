@@ -31,15 +31,6 @@ class RandomByWeightElimination(AbstractElimination):
         self._prob_elim_potentiation = prob_elim_potentiation
         self._mid_weight = mid_weight
 
-    @overrides(AbstractElimination.is_same_as)
-    def is_same_as(self, other):
-        if not isinstance(other, RandomByWeightElimination):
-            return False
-        return (
-            self._prob_elim_depression == other._prob_elim_depression and
-            self._prob_elim_potentiation == other._prob_elim_potentiation and
-            self._mid_weight == other._mid_weight)
-
     @property
     @overrides(AbstractElimination.vertex_executable_suffix)
     def vertex_executable_suffix(self):

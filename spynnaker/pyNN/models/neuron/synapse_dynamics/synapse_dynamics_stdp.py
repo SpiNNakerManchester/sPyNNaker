@@ -29,17 +29,23 @@ class SynapseDynamicsSTDP(
         # weight dependence to use for the STDP rule
         "__weight_dependence",
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length"]
+        "__pad_to_length",
+        # Weight of connections formed by connector
+        "__weight",
+        # Delay of connections formed by connector
+        "__delay"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            pad_to_length=None):
+            weight=0.0, delay=1.0, pad_to_length=None):
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__change_requires_mapping = True
         self.__pad_to_length = pad_to_length
+        self.__weight = weight
+        self.__delay = delay
 
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
@@ -400,3 +406,13 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return True
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.weight)
+    def weight(self):
+        return self.__weight
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.delay)
+    def delay(self):
+        return self.__delay

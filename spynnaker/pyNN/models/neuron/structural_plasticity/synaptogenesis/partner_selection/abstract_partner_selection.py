@@ -10,11 +10,6 @@ class AbstractPartnerSelection(object):
 
     __slots__ = ()
 
-    @abstractmethod
-    def is_same_as(self, other):
-        """ Determine if this partner selection is the same as another
-        """
-
     @abstractproperty
     def vertex_executable_suffix(self):
         """ The suffix to be appended to the vertex executable for this rule

@@ -280,27 +280,30 @@ class SynapticManager(object):
             size += self.__n_synapse_types * 4
         return size
 
-    def _get_synapse_dynamics_parameter_size(self, vertex_slice,
-                                             in_edges=None):
+    def _get_synapse_dynamics_parameter_size(
+            self, vertex_slice, application_graph, app_vertex):
         """ Get the size of the synapse dynamics region
         """
         # Does the size of the parameters area depend on presynaptic
         # connections in any way?
         if isinstance(self.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
-            return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self.__n_synapse_types,
-                in_edges=in_edges)
+            return self.__synapse_dynamics\
+                .get_structural_parameters_sdram_usage_in_bytes(
+                     self, application_graph, app_vertex, vertex_slice.n_atoms,
+                     self.__n_synapse_types)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self.__n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, vertex_slice, in_edges, machine_time_step):
+            self, vertex_slice, machine_time_step, application_graph,
+            app_vertex):
+        in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         return (
             self._get_synapse_params_size() +
-            self._get_synapse_dynamics_parameter_size(vertex_slice,
-                                                      in_edges=in_edges) +
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, application_graph, app_vertex) +
             self._get_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
             self.__poptable_type.get_master_population_table_size(

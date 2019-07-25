@@ -48,16 +48,6 @@ class DistanceDependentFormation(AbstractFormation):
             self.generate_distance_probability_array(
                 self.__p_form_lateral, self.__sigma_form_lateral)
 
-    @overrides(AbstractFormation.is_same_as)
-    def is_same_as(self, other):
-        if not isinstance(other, DistanceDependentFormation):
-            return False
-        return (self._grid == other._grid and
-                self._p_form_forward == other._p_form_forward and
-                self._sigma_form_forward == other._sigma_form_forward and
-                self._p_form_lateral == other._p_form_lateral and
-                self._sigma_form_lateral == other.sigma_form_lateral)
-
     @property
     @overrides(AbstractFormation.vertex_executable_suffix)
     def vertex_executable_suffix(self):
@@ -67,6 +57,79 @@ class DistanceDependentFormation(AbstractFormation):
     def get_parameters_sdram_usage_in_bytes(self):
         return (4 + 4 + 4 + 4 + len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
+
+    def generate_distance_probability_array(self, probability, sigma):
+        """ Generate the exponentially decaying probability LUTs.
+
+        :param probability: peak probability
+        :type probability: float
+        :param sigma: spread
+        :type sigma: float
+        :return: distance-dependent probabilities
+        :rtype: numpy.ndarray(float)
+        """
+        euclidian_distances = numpy.ones(self._grid ** 2) * numpy.nan
+        for row in range(euclidian_distances.shape[0]):
+            for column in range(euclidian_distances.shape[1]):
+                if self._grid[0] > 1:
+                    pre = (row // self._grid[0], row % self._grid[1])
+                    post = (column // self._grid[0], column % self._grid[1])
+                else:
+                    pre = (0, row % self._grid[1])
+                    post = (0, column % self._grid[1])
+
+                # TODO Make distance metric "type" controllable
+                euclidian_distances[row, column] = self.distance(
+                    pre, post, type='euclidian')
+        largest_squared_distance = numpy.max(euclidian_distances ** 2)
+        squared_distances = numpy.arange(largest_squared_distance)
+        raw_probabilities = probability * (
+            numpy.exp(-squared_distances / (2 * sigma ** 2)))
+        quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
+        # Quantize probabilities and cast as uint16 / short
+        unfiltered_probabilities = quantised_probabilities.astype(
+            dtype="uint16")
+        # Only return probabilities which are non-zero
+        filtered_probabilities = unfiltered_probabilities[
+            unfiltered_probabilities > 0]
+        if filtered_probabilities.size % 2 != 0:
+            filtered_probabilities = numpy.concatenate(
+                (filtered_probabilities,
+                 numpy.zeros(filtered_probabilities.size % 2, dtype="uint16")))
+
+        return filtered_probabilities
+
+    def distance(self, x0, x1, type):  # @ReservedAssignment
+        """ Compute the distance between points x0 and x1 place on the grid\
+            using periodic boundary conditions.
+
+        :param x0: first point in space
+        :type x0: np.ndarray of ints
+        :param x1: second point in space
+        :type x1: np.ndarray of ints
+        :param grid: shape of grid
+        :type grid: np.ndarray of ints
+        :param type: distance metric, i.e. euclidian or manhattan
+        :type type: str
+        :return: the distance
+        :rtype: float
+        """
+        x0 = numpy.asarray(x0)
+        x1 = numpy.asarray(x1)
+        delta = numpy.abs(x0 - x1)
+        if (delta[0] > self._grid[0] * .5) and self._grid[0] > 0:
+            delta[0] -= self._grid[0]
+
+        if (delta[1] > self._grid[1] * .5) and self._grid[1] > 0:
+            delta[1] -= self._grid[1]
+
+        if type == 'manhattan':
+            return numpy.abs(delta).sum(axis=-1)
+        elif type == 'equidistant':
+            p = 4
+            exponents = numpy.power(delta, [p] * delta.size)
+            return numpy.floor(numpy.power(exponents.sum(axis=-1), [1. / p]))
+        return numpy.sqrt((delta ** 2).sum(axis=-1))
 
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):

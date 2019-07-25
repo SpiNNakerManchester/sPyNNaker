@@ -62,6 +62,16 @@ class AbstractSynapseDynamics(object):
         :rtype: bool
         """
 
+    @abstractproperty
+    def weight(self):
+        """ The weight of connections
+        """
+
+    @abstractproperty
+    def delay(self):
+        """ The delay of connections
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """

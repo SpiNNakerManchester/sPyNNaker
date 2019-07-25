@@ -16,10 +16,6 @@ class LastNeuronSelection(AbstractPartnerSelection):
         """
         self.__spike_buffer_size = spike_buffer_size
 
-    @overrides(AbstractPartnerSelection.is_same_as)
-    def is_same_as(self, other):
-        return isinstance(other, LastNeuronSelection)
-
     @property
     @overrides(AbstractPartnerSelection.vertex_executable_suffix)
     def vertex_executable_suffix(self):
