@@ -314,7 +314,7 @@ void timer_callback(uint timer_count, uint unused) {
     if(infinite_run != TRUE && time >= simulation_ticks) {
 
         // Enable DMA_DONE interrupt when the simulation ends
-        dma_int_enable();
+        vic[VIC_ENABLE] = (1 << DMA_DONE_INT);
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
