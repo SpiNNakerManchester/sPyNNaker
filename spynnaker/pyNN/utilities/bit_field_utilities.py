@@ -28,7 +28,7 @@ BIT_IN_A_WORD = 32.0
 def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     """ estimates the sdram for the bit field region
     :param app_graph: the app graph
-    :param vertex: 
+    :param vertex: machine vertex
     :return: the estimated number of bytes used by the bit field region
     """
     sdram = 0
@@ -62,7 +62,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     """ gets an estimate of the bitfield builder region
 
     :param app_graph: the app graph
-    :param vertex: 
+    :param vertex: machien vertex
     :return: sdram needed
     """
 
@@ -105,13 +105,19 @@ def _exact_sdram_for_bit_field_region(
 
 
 def exact_sdram_for_bit_field_builder_region():
-    """
-    :return: 
+    """ returns the sdram requirement for the builder region
+    :return: returns the sdram requirement for the builder region
     """
     return N_REGIONS_ADDRESSES * WORD_TO_BYTE_MULTIPLIER
 
 
 def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
+    """ calcs the exact sdram for the bitfield key region
+
+    :param machine_graph: machine graph
+    :param vertex: machine vertex
+    :return: bytes
+    """
     return (
                N_KEYS_DATA_SET_IN_WORDS +
                len(machine_graph.get_edges_ending_at_vertex(vertex)) *
@@ -121,16 +127,16 @@ def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
 def reserve_bit_field_regions(
         spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
         bit_filter_region, bit_field_key_region):
-    """
+    """ reserves the regions for the bitfields
 
-    :param spec: 
-    :param machine_graph: 
-    :param n_key_map: 
-    :param vertex: 
-    :param bit_field_builder_region: 
-    :param bit_filter_region: 
-    :param bit_field_key_region:
-    :return: 
+    :param spec: dsg file
+    :param machine_graph: machine graph
+    :param n_key_map: map between partitions and n keys
+    :param vertex: machine vertex
+    :param bit_field_builder_region: region id for the builder region
+    :param bit_filter_region: region id for the bitfield region
+    :param bit_field_key_region: region id for the key map
+    :rtype: None
     """
 
     # reserve the final destination for the bitfields
