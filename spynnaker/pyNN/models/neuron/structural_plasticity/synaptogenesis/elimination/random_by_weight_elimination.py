@@ -28,19 +28,20 @@ class RandomByWeightElimination(AbstractElimination):
     ]
 
     def __init__(
-            self, prob_elim_depression, prob_elim_potentiation, mid_weight):
+            self, mid_weight, prob_elim_depression=0.0245,
+            prob_elim_potentiation=1.36 * 10 ** -4):
         """
 
+        :param mid_weight:\
+            Below this weight is considered depression, above or equal to this\
+            weight is considered potentiation (or the static weight of the\
+            connection on static weight connections)
         :param prob_elim_depression:\
             The probability of elimination if the weight has been depressed\
             (ignored on static weight connections)
         :param prob_elim_potentiation:\
             The probability of elimination of the weight has been potentiated\
             or has not changed (and also used on static weight connections)
-        :param mid_weight:\
-            Below this weight is considered depression, above or equal to this\
-            weight is considered potentiation (or the static weight of the\
-            connection on static weight connections)
         """
         self._prob_elim_depression = prob_elim_depression
         self._prob_elim_potentiation = prob_elim_potentiation

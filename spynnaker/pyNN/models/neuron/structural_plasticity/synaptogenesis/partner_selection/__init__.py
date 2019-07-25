@@ -15,5 +15,7 @@
 
 from .abstract_partner_selection import AbstractPartnerSelection
 from .last_neuron_selection import LastNeuronSelection
+from .random_selection import RandomSelection
 
-__all__ = ["AbstractPartnerSelection", "LastNeuronSelection"]
+__all__ = ["AbstractPartnerSelection", "LastNeuronSelection",
+           "RandomSelection"]
