@@ -373,7 +373,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom ||
         post_id > rewiring_data.high_atom) {
-        _setup_synaptic_dma_read();
+        _setup_synaptic_dma_read(0, 0);
         return;
     }
     post_id -= rewiring_data.low_atom;
@@ -402,7 +402,7 @@ void synaptogenesis_dynamics_rewire(uint32_t time)
         }
         if (_spike == ANY_SPIKE) {
             log_debug("No previous spikes");
-            _setup_synaptic_dma_read();
+            _setup_synaptic_dma_read(0, 0);
             return;
         }
 
@@ -550,7 +550,7 @@ void synaptic_row_restructure(uint dma_id, uint dma_tag)
         synaptogenesis_dynamics_formation_rule();
     }
     // service the next event (either rewiring or synaptic)
-    _setup_synaptic_dma_read();
+    _setup_synaptic_dma_read(0, 0);
 }
 
 // Trivial helper; has to be macro because uses log_error()

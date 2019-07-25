@@ -24,7 +24,7 @@
 
 bool spike_processing_initialise(
     size_t row_max_n_bytes, uint mc_packet_callback_priority,
-    uint user_event_priority, uint incoming_spike_buffer_size);
+    uint incoming_spike_buffer_size);
 
 void spike_processing_finish_write(uint32_t process_id);
 
@@ -69,8 +69,8 @@ bool get_dma_busy();
 bool do_rewiring(int number_of_rew);
 
 
-//! exposing this so that other classes can call it
-void _setup_synaptic_dma_read();
+//! exposing this so that others can call it
+void _setup_synaptic_dma_read(uint arg1, uint arg2);
 
 //! \brief has this core received any spikes since the last batch of rewires?
 //! \return bool
@@ -79,5 +79,8 @@ bool received_any_spike();
 //! \brief flush input buffer
 //! \return number of flushed spikes
 uint32_t spike_processing_flush_in_buffer();
+
+void dma_int_enable();
+void dma_int_disable();
 
 #endif // _SPIKE_PROCESSING_H_

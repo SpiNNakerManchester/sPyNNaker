@@ -127,6 +127,8 @@ void write_contributions(uint unused1, uint unused2) {
 
         uint32_t state = spin1_int_disable();
 
+        spin1_dma_flush();
+
         cb_calls++;
 
         spikes_remaining_this_tick = spike_processing_flush_in_buffer();
@@ -229,7 +231,7 @@ static bool initialise(uint32_t *timer_period) {
     }
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER,
+            row_max_n_words, MC,
             incoming_spike_buffer_size)) {
         return false;
     }
@@ -247,6 +249,10 @@ static bool initialise(uint32_t *timer_period) {
 
 //    io_printf(IO_BUF, "timer period: %u\n", *timer_period);
 
+    // Clear all the DMAs when the simulation starts
+    spin1_dma_flush();
+    dma[DMA_CTRL] = 0x08;
+
     return true;
 }
 
@@ -263,6 +269,9 @@ void timer_callback(uint timer_count, uint unused) {
 
 //	io_printf(IO_BUF, "t_c s: %u, %u\n", tc[T1_COUNT], tc[T2_COUNT]);
 //	io_printf(IO_BUF, "t_c s: %u\n", timer_period-40);
+
+    // Disable DMA_DONE interrupts for the simulation
+    vic[VIC_DISABLE] = (1 << DMA_DONE_INT);
 
 	use(timer_count);
     use(unused);
@@ -303,6 +312,9 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     if(infinite_run != TRUE && time >= simulation_ticks) {
+
+        // Enable DMA_DONE interrupt when the simulation ends
+        dma_int_enable();
 
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
