@@ -78,7 +78,7 @@ void start_dma_transfer(void *system_address, void *tcm_address,
 /* PRIVATE FUNCTIONS - static for inlining */
 
 // Called when a DMA completes
-static void _dma_complete() {
+static inline void _dma_complete() {
 
 
     // Get pointer to current buffer
@@ -117,7 +117,7 @@ static void _dma_complete() {
 //    } while (subsequent_spikes);
 
       // Start the next DMA transfer, so it is complete when we are finished
-      _setup_synaptic_dma_read(0, 0);
+     // _setup_synaptic_dma_read(0, 0);
 
 //        measurement_out[measurement_index] = tc[T1_COUNT];
 //        measurement_index++;
@@ -170,13 +170,13 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
     address_t row_address;
     size_t n_bytes_to_transfer;
 
-    bool setup_done = false;
-    bool finished = false;
+    //bool setup_done = false;
+    //bool finished = false;
     uint cpsr = 0;
 
 //    cpsr = spin1_int_disable();
 
-    while (!setup_done && !finished) {
+    //while (!finished) {
 
 //        spin1_mode_restore(cpsr);
 //        if (number_of_rewires) {
@@ -201,7 +201,7 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
         // If there's more incoming spikes
         cpsr = spin1_int_disable();
 
-        while (!setup_done && in_spikes_get_next_spike(&spike)) {
+        while (in_spikes_get_next_spike(&spike)) {
 
             spin1_mode_restore(cpsr);
 
@@ -216,7 +216,13 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
 //                    _do_direct_row(row_address);
 //                } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
-                    setup_done = true;
+                    //setup_done = true;
+                    // Protection against T2 event during the dma for this spike
+                    if(!end_of_timestep) {
+
+                        dma[DMA_CTRL] = 0x08;
+                        _dma_complete();
+                    }
 //                }
             }
 
@@ -224,26 +230,19 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
         }
         // potentially restore here?
 
-        if (!setup_done) {
-            finished = true; // finished trying for this spike
-        }
+        //if (!setup_done) {
+        //    finished = true; // finished trying for this spike
+        //}
 //        cpsr = spin1_int_disable(); // remove this too?
-    }
+    //}
 
     // If the setup was not done, and there are no more spikes,
     // stop trying to set up synaptic DMAs
-    if (!setup_done) {
-        log_debug("DMA not busy");
-        dma_busy = false;
-    }
+    //if (!setup_done) {
+    //    log_debug("DMA not busy");
+    dma_busy = false;
+    //}
     spin1_mode_restore(cpsr);
-
-    // Protection against T2 event during the dma for this spike
-    if(!end_of_timestep && setup_done) {
-
-        dma[DMA_CTRL] = 0x08;
-        _dma_complete();
-    }
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {

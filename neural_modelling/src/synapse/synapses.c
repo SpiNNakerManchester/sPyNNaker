@@ -277,11 +277,11 @@ static inline void _process_fixed_synapses(
         // **NOTE** 0x10000 can be expressed as an ARM literal,
         //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
         //          to obtain this value
-//        uint32_t sat_test = accumulation & 0x10000;
-//        if (sat_test) {
-//            accumulation = sat_test - 1;
-//            saturation_count += 1;
-//        }
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test) {
+            accumulation = sat_test - 1;
+            saturation_count += 1;
+        }
 
         // Store saturated value back in ring-buffer
 
