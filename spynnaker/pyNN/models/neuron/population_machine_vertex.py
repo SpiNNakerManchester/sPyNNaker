@@ -15,6 +15,8 @@
 
 from enum import Enum
 
+from spinn_front_end_common.abstract_models.impl.supports_auto_pause_and_resume import \
+    SupportsAutoPauseAndResume
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
@@ -38,7 +40,8 @@ class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData, AbstractSupportsBitFieldGeneration,
-        AbstractSupportsBitFieldRoutingCompression):
+        AbstractSupportsBitFieldRoutingCompression,
+        SupportsAutoPauseAndResume):
 
     __slots__ = [
         "__recorded_region_ids",
@@ -99,6 +102,7 @@ class PopulationMachineVertex(
         MachineVertex.__init__(self, label, constraints)
         AbstractSupportsBitFieldGeneration.__init__(self)
         AbstractRecordable.__init__(self)
+        SupportsAutoPauseAndResume.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
         self.__on_chip_generatable_offset = None
