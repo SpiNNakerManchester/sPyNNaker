@@ -34,7 +34,6 @@ import struct
 import logging
 import os
 
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 logger = logging.getLogger(__name__)
 
 

@@ -31,6 +31,10 @@
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
             <parameter>
+                <param_name>executable_targets</param_name>
+                <param_type>ExecutableTargets</param_type>
+            </parameter>
+            <parameter>
                 <param_name>threshold_percentage</param_name>
                 <param_type>RouterCompressorBitFieldPercentageThreshold</param_type>
             </parameter>

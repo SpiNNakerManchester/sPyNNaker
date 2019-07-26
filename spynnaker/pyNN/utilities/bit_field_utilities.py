@@ -1,6 +1,21 @@
+# Copyright (c) 2019-2020 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
 from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
-from pacman.utilities.algorithm_utilities.\
+from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
@@ -29,7 +44,7 @@ BIT_IN_A_WORD = 32.0
 def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
     """ estimates the sdram for the bit field region
     :param app_graph: the app graph
-    :param vertex: 
+    :param vertex: machine vertex
     :return: the estimated number of bytes used by the bit field region
     """
     sdram = 0
@@ -63,7 +78,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     """ gets an estimate of the bitfield builder region
 
     :param app_graph: the app graph
-    :param vertex: 
+    :param vertex: machine vertex
     :return: sdram needed
     """
 
@@ -106,32 +121,38 @@ def _exact_sdram_for_bit_field_region(
 
 
 def exact_sdram_for_bit_field_builder_region():
-    """
-    :return: 
+    """ returns the sdram requirement for the builder region
+    :return: returns the sdram requirement for the builder region
     """
     return N_REGIONS_ADDRESSES * WORD_TO_BYTE_MULTIPLIER
 
 
 def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
+    """ calcs the exact sdram for the bitfield key region
+
+    :param machine_graph: machine graph
+    :param vertex: machine vertex
+    :return: bytes
+    """
     return (
-       N_KEYS_DATA_SET_IN_WORDS +
-       len(machine_graph.get_edges_ending_at_vertex(vertex)) *
-       N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
+               N_KEYS_DATA_SET_IN_WORDS +
+               len(machine_graph.get_edges_ending_at_vertex(vertex)) *
+               N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
 
 
 def reserve_bit_field_regions(
         spec, machine_graph, n_key_map, vertex, bit_field_builder_region,
         bit_filter_region, bit_field_key_region):
-    """
-    
-    :param spec: 
-    :param machine_graph: 
-    :param n_key_map: 
-    :param vertex: 
-    :param bit_field_builder_region: 
-    :param bit_filter_region: 
-    :param bit_field_key_region:
-    :return: 
+    """ reserves the regions for the bitfields
+
+    :param spec: dsg file
+    :param machine_graph: machine graph
+    :param n_key_map: map between partitions and n keys
+    :param vertex: machine vertex
+    :param bit_field_builder_region: region id for the builder region
+    :param bit_filter_region: region id for the bitfield region
+    :param bit_field_key_region: region id for the key map
+    :rtype: None
     """
 
     # reserve the final destination for the bitfields
