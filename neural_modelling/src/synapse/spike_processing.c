@@ -87,7 +87,7 @@ static void _dma_complete() {
 
 
     // Process synaptic row repeatedly
-    bool subsequent_spikes;
+    bool subsequent_spikes = 0;
 //    do {
 
 //        // Are there any more incoming spikes from the same pre-synaptic
