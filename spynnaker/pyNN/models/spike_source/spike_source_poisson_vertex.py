@@ -126,7 +126,8 @@ class SpikeSourcePoissonVertex(
         "__n_data_specs",
         "__max_rate",
         "__rate_change",
-        "__data"]
+        "__data",
+        "__is_variable_rate"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -168,6 +169,7 @@ class SpikeSourcePoissonVertex(
             raise Exception("One of rate or rates must be specified")
 
         # Normalise the parameters
+        self.__is_variable_rate = rates is not None
         if rates is None:
             if hasattr(rate, "__len__"):
                 # Single rate per neuron for whole simulation
@@ -285,12 +287,16 @@ class SpikeSourcePoissonVertex(
 
     @property
     def rate(self):
-        return self.__data["rates"]
+        if self.__is_variable_rate:
+            raise Exception("Get variable rate poisson rates with .rates")
+        return _flatten(self.__data["rates"])
 
     @rate.setter
     def rate(self, rate):
-        # TODO Fix _rate_change
-        self.__rate_change = rate - self.__data["rates"]
+        if self.__is_variable_rate:
+            raise Exception("Cannot set rate of a variable rate poisson")
+        self.__rate_change = rate - numpy.array(
+            list(_flatten(self.__data["rates"])))
         # Normalise parameter
         if hasattr(rate, "__len__"):
             # Single rate per neuron for whole simulation
@@ -666,7 +672,7 @@ class SpikeSourcePoissonVertex(
             # Get the time to spike value
             time_to_spike = self.__data["time_to_spike"][i]
             if self.__rate_change[i]:
-                time_to_spike = 0.0
+                time_to_spike = numpy.array([0.0])
 
             # Merge the arrays as parameters per atom
             data = numpy.dstack((
