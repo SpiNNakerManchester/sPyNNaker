@@ -14,6 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
+
+from spinn_front_end_common.abstract_models.impl.\
+    supports_auto_pause_and_resume import SupportsAutoPauseAndResume
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
@@ -22,7 +25,8 @@ from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 
 class DelayExtensionMachineVertex(
-        MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+        MachineVertex, ProvidesProvenanceDataFromMachineImpl,
+        SupportsAutoPauseAndResume):
     __slots__ = [
         "__resources"]
 
