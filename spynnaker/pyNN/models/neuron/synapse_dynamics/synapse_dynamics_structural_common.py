@@ -382,13 +382,11 @@ class SynapseDynamicsStructuralCommon(object):
             param_sizes += dynamics.elimination\
                 .get_parameters_sdram_usage_in_bytes()
 
-        size = (self.REWIRING_DATA_SIZE +
+        return (self.REWIRING_DATA_SIZE +
                 (self.PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
                 (self.KEY_ATOM_INFO_SIZE * n_sub_edges) +
                 (self.POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
                 param_sizes)
-        print "Size expected = {}".format(size)
-        return size
 
     def synaptic_data_update(
             self, connections, post_vertex_slice, app_edge, synapse_info,
