@@ -36,6 +36,7 @@ extern uint8_t end_of_timestep;
 
 // True if the DMA "loop" is currently running
 static bool dma_busy;
+static uint32_t start;
 
 // The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
@@ -65,6 +66,12 @@ uint8_t kickstarts = 0;
 void start_dma_transfer(void *system_address, void *tcm_address,
     uint direction, uint length) {
 
+    uint cpsr;
+
+    cpsr = spin1_int_disable();
+
+    start = time;
+
     uint desc = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | direction << 19 | length;
 
     // Be careful, this transfer is done with no checks for maximum performances!
@@ -72,6 +79,8 @@ void start_dma_transfer(void *system_address, void *tcm_address,
     dma[DMA_ADRS] = (uint) system_address;
     dma[DMA_ADRT] = (uint) tcm_address;
     dma[DMA_DESC] = desc;
+
+    spin1_mode_restore(cpsr);
 }
 
 
@@ -149,7 +158,8 @@ static inline void _do_dma_read(
         next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 
         // Busy wait for DMA completion
-        while((!end_of_timestep) && (!(dma[DMA_STAT] & 0x400)));
+        // Checks that T2 has not interrupted and that we are not in a new timestep
+        while((!end_of_timestep) && (start == time) && (!(dma[DMA_STAT] & 0x400)));
 
     }
 
@@ -217,6 +227,7 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
 //                } else {
                     _do_dma_read(row_address, n_bytes_to_transfer);
                     //setup_done = true;
+
                     // Protection against T2 event during the dma for this spike
                     if(!end_of_timestep) {
 
