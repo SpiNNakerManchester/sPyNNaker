@@ -59,10 +59,10 @@ class DistanceDependentFormation(AbstractFormation):
 
         self.__ff_distance_probabilities = \
             self.generate_distance_probability_array(
-                self.__p_form_forward, self.__sigma_form_forward)
+                self._p_form_forward, self._sigma_form_forward)
         self.__lat_distance_probabilities = \
             self.generate_distance_probability_array(
-                self.__p_form_lateral, self.__sigma_form_lateral)
+                self._p_form_lateral, self._sigma_form_lateral)
 
     @property
     @overrides(AbstractFormation.vertex_executable_suffix)

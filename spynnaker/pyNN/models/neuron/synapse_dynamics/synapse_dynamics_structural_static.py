@@ -17,8 +17,7 @@ from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as
-    CommonSP)
+    SynapseDynamicsStructuralCommon as CommonSP)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 
 
@@ -78,7 +77,7 @@ class SynapseDynamicsStructuralStatic(
             weight=0.0, delay=1.0):
 
         super(SynapseDynamicsStructuralStatic, self).__init__(
-            self, weight=weight, delay=delay, pad_to_length=s_max)
+            weight=weight, delay=delay, pad_to_length=s_max)
 
         self.__common_sp = CommonSP(
             partner_selection, formation, elimination, f_rew, initial_weight,
@@ -130,9 +129,11 @@ class SynapseDynamicsStructuralStatic(
 
     @overrides(AbstractSynapseDynamicsStructural.set_connections)
     def set_connections(
-            self, connections, post_vertex_slice, app_edge, machine_edge):
+            self, connections, post_vertex_slice, app_edge, synapse_info,
+            machine_edge):
         self.__common_sp.synaptic_data_update(
-            connections, post_vertex_slice, app_edge, machine_edge)
+            connections, post_vertex_slice, app_edge, synapse_info,
+            machine_edge)
 
     @overrides(SynapseDynamicsStatic.get_parameter_names)
     def get_parameter_names(self):
@@ -155,6 +156,16 @@ class SynapseDynamicsStructuralStatic(
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__common_sp.s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.initial_weight)
+    def initial_weight(self):
+        return self.__common_sp.initial_weight
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.initial_delay)
+    def initial_delay(self):
+        return self.__common_sp.initial_delay
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.partner_selection)

@@ -305,7 +305,7 @@ class SynapticManager(object):
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
-                     self, application_graph, app_vertex, vertex_slice.n_atoms,
+                     application_graph, app_vertex, vertex_slice.n_atoms,
                      self.__n_synapse_types)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
@@ -969,15 +969,11 @@ class SynapticManager(object):
 
         if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
-            self.__synapse_dynamics.write_parameters(
-                spec,
-                POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                machine_time_step, weight_scales,
-                application_graph=application_graph,
-                machine_graph=machine_graph,
-                app_vertex=application_vertex, post_slice=post_vertex_slice,
-                machine_vertex=machine_vertex,
-                graph_mapper=graph_mapper, routing_info=routing_info)
+            self.__synapse_dynamics.write_structural_parameters(
+                spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales, application_graph,
+                application_vertex, post_vertex_slice, graph_mapper,
+                routing_info)
         else:
             self.__synapse_dynamics.write_parameters(
                 spec,

@@ -20,11 +20,10 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.utilities import constants
-from numpy.lib.recfunctions import merge_arrays
 import math
 
 
-class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
+class SynapseDynamicsStructuralCommon(object):
     """ Common class that enables synaptic rewiring. It acts as a wrapper\
         around SynapseDynamicsStatic or SynapseDynamicsSTDP.\
         This means rewiring can operate in parallel with these\
@@ -194,10 +193,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self.__partner_selection.write_parameters(spec)
         for _, synapse_info in structural_edges:
             dynamics = synapse_info.synapse_dynamics
-            dynamics.formation_rule.write_parameters(spec)
+            dynamics.formation.write_parameters(spec)
         for _, synapse_info in structural_edges:
             dynamics = synapse_info.synapse_dynamics
-            dynamics.elimination_rule.write_parameters(spec)
+            dynamics.elimination.write_parameters(spec)
 
     def __get_structural_edges(self, application_graph, app_vertex):
         structural_application_edges = list()
@@ -275,7 +274,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         pop_index = dict()
         index = 0
         for app_edge, synapse_info in structural_edges:
-            pop_index[app_edge, synapse_info] = index
+            pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
             machine_edges = graph_mapper.get_machine_edges(app_edge)
             dynamics = synapse_info.synapse_dynamics
@@ -286,11 +285,15 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
             if isinstance(dynamics.initial_delay, collections.Iterable):
-                spec.write_value(dynamics.initial_delay[0])
-                spec.write_value(dynamics.initial_delay[1])
+                spec.write_value(dynamics.initial_delay[0],
+                                 data_type=DataType.UINT16)
+                spec.write_value(dynamics.initial_delay[1],
+                                 data_type=DataType.UINT16)
             else:
-                spec.write_value(dynamics.initial_delay)
-                spec.write_value(dynamics.initial_delay)
+                spec.write_value(dynamics.initial_delay,
+                                 data_type=DataType.UINT16)
+                spec.write_value(dynamics.initial_delay,
+                                 data_type=DataType.UINT16)
             # Weight
             spec.write_value(dynamics.initial_weight *
                              weight_scales[synapse_info.synapse_type])
@@ -316,38 +319,40 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Get connections for this post slice
         slice_conns = self.__connections[post_slice.lo_atom]
         # Make a single large array of connections
-        connections = numpy.concatenate([conn for (conn, _, _) in slice_conns])
+        connections = numpy.concatenate(
+            [conn for (conn, _, _, _) in slice_conns])
         # Make a single large array of population index
-        conn_lens = [len(conn) for (conn, _, _) in slice_conns]
+        conn_lens = [len(conn) for (conn, _, _, _) in slice_conns]
         pop_indices = numpy.repeat(
-            [pop_index[a_edge.pre_vertex] for (_, a_edge, _) in slice_conns],
-            conn_lens)
+            [pop_index[a_edge.pre_vertex, s_info]
+             for (_, a_edge, _, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.repeat(
-            [graph_mapper.get_index(m_edge.pre_vertex)
-             for (_, _, m_edge) in slice_conns], conn_lens)
+            [graph_mapper.get_machine_vertex_index(m_edge.pre_vertex)
+             for (_, _, m_edge, _) in slice_conns], conn_lens)
         # Get the low atom for each source and subtract
         lo_atoms = numpy.repeat(
             [graph_mapper.get_slice(m_edge.pre_vertex).lo_atom
-             for (_, _, m_edge) in slice_conns], conn_lens)
+             for (_, _, m_edge, _) in slice_conns], conn_lens)
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - post_slice.lo_atom
 
         # Make an array of all data required
-        conn_data = merge_arrays((connections["source"], connections["target"],
-                                  subpop_indices, pop_indices))
+        conn_data = numpy.dstack(
+            (pop_indices, subpop_indices, connections["target"]))[0]
 
-        # Break data into rows based on target
-        rows = [conn_data[conn_data["target"] == i][["source", "f1", "f2"]]
+        # Break data into rows based on target and strip target out
+        rows = [conn_data[connections["source"] == i]
                 for i in range(0, post_slice.n_atoms)]
 
         # Make each row the required length through padding with 0xFFFF
-        padded_rows = [numpy.pad(row, (self.__s_max - len(row), 0), "constant",
-                                 constant_values="0xFFFF") for row in rows]
+        padded_rows = [numpy.pad(row, [(self.__s_max - len(row), 0), (0, 0)],
+                                 "constant", constant_values=0xFFFF)
+                       for row in rows]
 
         # Finally make the table and write it out
-        post_to_pre = numpy.concatenate(padded_rows).astype(
-            [("source", "u16"), ("f1", "u8"), ("f2", "u8")]).view("u4")
+        post_to_pre = numpy.core.records.fromarrays(
+            numpy.concatenate(padded_rows).T, formats="u2, u1, u1").view("u4")
         spec.write_array(post_to_pre)
 
     def get_parameters_sdram_usage_in_bytes(
@@ -377,20 +382,26 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             param_sizes += dynamics.elimination\
                 .get_parameters_sdram_usage_in_bytes()
 
-        return (self.REWIRING_DATA_SIZE +
+        size = (self.REWIRING_DATA_SIZE +
                 (self.PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
                 (self.KEY_ATOM_INFO_SIZE * n_sub_edges) +
                 (self.POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
                 param_sizes)
+        print "Size expected = {}".format(size)
+        return size
 
     def synaptic_data_update(
-            self, connections, post_vertex_slice, app_edge, machine_edge):
-        """ Get static synaptic data
+            self, connections, post_vertex_slice, app_edge, synapse_info,
+            machine_edge):
+        """ Set synaptic data
         """
+        if not isinstance(synapse_info.synapse_dynamics,
+                          AbstractSynapseDynamicsStructural):
+            return
         if post_vertex_slice.lo_atom not in self.__connections.keys():
             self.__connections[post_vertex_slice.lo_atom] = []
         self.__connections[post_vertex_slice.lo_atom].append(
-            (connections, app_edge, machine_edge))
+            (connections, app_edge, machine_edge, synapse_info))
 
     def n_words_for_plastic_connections(self, value):
         """ Set size of plastic connections in words

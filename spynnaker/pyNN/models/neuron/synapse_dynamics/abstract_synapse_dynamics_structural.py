@@ -37,7 +37,8 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def set_connections(
-            self, connections, post_vertex_slice, app_edge, machine_edge):
+            self, connections, post_vertex_slice, app_edge, synapse_info,
+            machine_edge):
         """ Set connections for structural plasticity
         """
 
@@ -49,6 +50,16 @@ class AbstractSynapseDynamicsStructural(object):
     @abstractproperty
     def s_max(self):
         """ The maximum number of synapses
+        """
+
+    @abstractproperty
+    def initial_weight(self):
+        """ The weight of a formed connection
+        """
+
+    @abstractproperty
+    def initial_delay(self):
+        """ The delay of a formed connection
         """
 
     @abstractproperty

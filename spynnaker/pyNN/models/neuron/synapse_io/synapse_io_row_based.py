@@ -205,7 +205,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         if isinstance(synapse_info.synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             synapse_info.synapse_dynamics.set_connections(
-                connections, post_vertex_slice, app_edge, machine_edge)
+                connections, post_vertex_slice, app_edge, synapse_info,
+                machine_edge)
 
         # Split the connections up based on the delays
         if max_delay is not None:
