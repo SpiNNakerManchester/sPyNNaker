@@ -67,8 +67,12 @@ static uint32_t single_fixed_synapse[4];
 
 static uint32_t rewires_to_do = 0;
 
+// The number of rewires to do when the DMA completes.  When a DMA is first set
+// up, only this or dma_n_spikes can be 1 with the other being 0.
 static uint32_t dma_n_rewires;
 
+// The number of rewires to do when the DMA completes.  When a DMA is first set
+// up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
 bool any_spike = false;
@@ -163,6 +167,7 @@ static inline bool _is_something_to_do(
 void _setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
 
+    // Repeatedly read the buffer while the next spike has the same value
     if (current_buffer != NULL) {
         while (in_spikes_is_next_spike_equal(
                 current_buffer->originating_spike)) {
@@ -182,6 +187,8 @@ void _setup_synaptic_dma_read(dma_buffer *current_buffer,
         if (current_buffer != NULL &&
                 current_buffer->originating_spike == spike) {
             // If we can reuse the row, add on what we can use it for
+            // Note that only one of these will have a value of 1 with the
+            // other being set to 0, but we add both as it is simple
             *n_rewires += dma_n_rewires;
             *n_synapse_processes += dma_n_spikes;
         } else if (n_bytes_to_transfer == 0) {
@@ -261,9 +268,15 @@ void _dma_complete_callback(uint unused, uint tag) {
     dma_buffer *current_buffer = &dma_buffers[current_buffer_index];
 
     // Start the next DMA transfer and get a count of the rewires and spikes
-    // that can be done on this row now
+    // that can be done on this row now (there might be more while the DMA
+    // was in progress).  Note that either dma_n_rewires or dma_n_spikes is set
+    // to 1 here, with the other being 0.  We take a copy of the count and this
+    // is the value added to for this processing, as setup_synaptic_dma will
+    // count repeats of the current spike
     uint32_t n_rewires = dma_n_rewires;
+    dma_n_rewires = 0;
     uint32_t n_spikes = dma_n_spikes;
+    dma_n_spikes = 0;
     _setup_synaptic_dma_read(current_buffer, &n_rewires, &n_spikes);
 
     // Assume no write back but assume any write back is plastic only
