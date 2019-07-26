@@ -528,9 +528,11 @@ void synapses_do_timestep_update(timer_t time) {
                 synapse_index_bits);
 
     // Start the transfer
-    spin1_dma_transfer(
-        DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
-        DMA_WRITE, size_to_be_transferred);
+    start_dma_transfer(
+        synaptic_region, &ring_buffers[ring_buffer_index], DMA_WRITE, size_to_be_transferred);
+//    spin1_dma_transfer(
+//        DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
+//        DMA_WRITE, size_to_be_transferred);
 
     _print_inputs();
 

@@ -83,4 +83,7 @@ uint32_t spike_processing_flush_in_buffer();
 void dma_int_enable();
 void dma_int_disable();
 
+void start_dma_transfer(void *system_address, void *tcm_address,
+    uint direction, uint length);
+
 #endif // _SPIKE_PROCESSING_H_

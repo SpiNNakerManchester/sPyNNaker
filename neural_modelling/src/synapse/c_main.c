@@ -63,6 +63,8 @@ typedef enum callback_priorities{
 //! the timer tick callback returning the same value.
 uint32_t time;
 
+volatile uint8_t end_of_timestep;
+
 //! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
 
@@ -147,6 +149,8 @@ void write_contributions(uint unused1, uint unused2) {
             max_spikes_remaining = spikes_remaining_this_tick;
             max_time = time;
         }
+
+        end_of_timestep = true;
 
         spin1_mode_restore(state);
 }
@@ -253,6 +257,8 @@ static bool initialise(uint32_t *timer_period) {
     spin1_dma_flush();
     dma[DMA_CTRL] = 0x08;
 
+    end_of_timestep = false;
+
     return true;
 }
 
@@ -273,9 +279,7 @@ void timer_callback(uint timer_count, uint unused) {
     // Disable DMA_DONE interrupts for the simulation
     vic[VIC_DISABLE] = (1 << DMA_DONE_INT);
 
-	use(timer_count);
-    use(unused);
-
+    end_of_timestep = false;
 
 //    if(!timer_schedule_proc(write_contributions, 0, 0, timer_period-40)) {
 //
@@ -355,6 +359,12 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
+    use(timer_count);
+    use(unused);
+
+    // Clear DMA controller from T2 DMA write
+    dma[DMA_CTRL] = 0x08;
 }
 
 //! \brief The entry point for this model.

@@ -32,6 +32,7 @@
 #define DMA_TAG_WRITE_PLASTIC_REGION 1
 
 extern uint32_t time;
+extern uint8_t end_of_timestep;
 
 // True if the DMA "loop" is currently running
 static bool dma_busy;
@@ -61,7 +62,7 @@ uint8_t kickstarts = 0;
 //extern uint32_t measurement_out[1000];
 //extern uint32_t measurement_index;
 
-void _start_dma_transfer(void *system_address, void *tcm_address,
+void start_dma_transfer(void *system_address, void *tcm_address,
     uint direction, uint length) {
 
     uint desc = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | direction << 19 | length;
@@ -132,6 +133,7 @@ static inline void _do_dma_read(
     next_buffer->originating_spike = spike;
     next_buffer->n_bytes_transferred = n_bytes_to_transfer;
 
+
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
     buffer_being_read = next_buffer_to_fill;
@@ -139,16 +141,17 @@ static inline void _do_dma_read(
 //        DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
 //        n_bytes_to_transfer);
 
-    _start_dma_transfer(
-        row_address, next_buffer->row, DMA_READ, n_bytes_to_transfer);
-    next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
+    // Avoid DMA transfer if T2 cb has alredy completed
+    if(!end_of_timestep) {
 
-    // Busy wait for DMA completion
-    while(!(dma[DMA_STAT] & 0x400));
+        start_dma_transfer(
+            row_address, next_buffer->row, DMA_READ, n_bytes_to_transfer);
+        next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 
-    dma[DMA_CTRL] = 0x08;
+        // Busy wait for DMA completion
+        while((!end_of_timestep) && (!(dma[DMA_STAT] & 0x400)));
 
-    _dma_complete();
+    }
 
 }
 
@@ -234,6 +237,13 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
         dma_busy = false;
     }
     spin1_mode_restore(cpsr);
+
+    // Protection against T2 event during the dma for this spike
+    if(!end_of_timestep && setup_done) {
+
+        dma[DMA_CTRL] = 0x08;
+        _dma_complete();
+    }
 }
 
 static inline void _setup_synaptic_dma_write(uint32_t dma_buffer_index) {
@@ -277,8 +287,6 @@ void _multicast_packet_received_callback(uint key, uint payload) {
         	// one is already executing, and setup_dma_read had set dma_busy to false
         	if (spin1_schedule_callback(_setup_synaptic_dma_read, 0, 0, 1)) {
         		dma_busy = true;
-        		// Clear DMA controller from T2 DMA write
-        		dma[DMA_CTRL] = 0x08;
         	}
         }
 
