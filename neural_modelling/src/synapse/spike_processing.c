@@ -176,7 +176,7 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
 
     use(arg1);
     use(arg2);
-
+    kickstarts++;
     // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;
