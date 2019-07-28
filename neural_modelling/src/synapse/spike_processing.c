@@ -151,7 +151,7 @@ static inline void _do_dma_read(
 //        n_bytes_to_transfer);
 
     // Avoid DMA transfer if T2 cb has alredy completed
-    if(!end_of_timestep) {
+//    if(!end_of_timestep) {
 
         start_dma_transfer(
             row_address, next_buffer->row, DMA_READ, n_bytes_to_transfer);
@@ -159,9 +159,10 @@ static inline void _do_dma_read(
 
         // Busy wait for DMA completion
         // Checks that T2 has not interrupted and that we are not in a new timestep
-        while((!end_of_timestep) && (start == time) && (!(dma[DMA_STAT] & 0x400)));
+//        while((!end_of_timestep) && (start == time) && (!(dma[DMA_STAT] & 0x400)));
+        while(!(dma[DMA_STAT] & 0x400));
 
-    }
+//    }
 
 }
 
@@ -225,15 +226,18 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
 //                if (n_bytes_to_transfer == 0) {
 //                    _do_direct_row(row_address);
 //                } else {
-                    _do_dma_read(row_address, n_bytes_to_transfer);
+            		cpsr = spin1_irq_disable();
+                    if(!end_of_timestep) {
+                    	_do_dma_read(row_address, n_bytes_to_transfer);
                     //setup_done = true;
 
                     // Protection against T2 event during the dma for this spike
-                    if(!end_of_timestep) {
+//                    if(!end_of_timestep) {
 
                         dma[DMA_CTRL] = 0x08;
                         _dma_complete();
                     }
+                    spin1_mode_restore(cpsr);
 //                }
             }
 
