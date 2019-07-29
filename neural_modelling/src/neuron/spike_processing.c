@@ -23,8 +23,6 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
-#include <profiler.h>
-#include "profile_tags.h"
 
 // The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2

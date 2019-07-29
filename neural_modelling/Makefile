@@ -19,6 +19,7 @@ BUILDS = synapse_expander \
          delay_extension \
          neuron \
          robot_motor_control
+
 DIRS = $(BUILDS:%=makefiles/%)
 
 all: $(DIRS)
