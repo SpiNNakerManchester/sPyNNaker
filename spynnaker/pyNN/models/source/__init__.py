@@ -13,11 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BUILDS = spike_source/poisson source delay_extension neuron robot_motor_control synapse_expander
-DIRS = $(BUILDS:%=makefiles/%)
+from .poisson_source import PoissonSource
 
-all: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
-
-clean: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+__all__ = ["PoissonSource"]
