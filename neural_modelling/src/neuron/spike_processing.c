@@ -328,12 +328,14 @@ void _user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
 
+    // Reset the counters as this is a new process
+    dma_n_rewires = 0;
+    dma_n_spikes = 0;
+
     if (buffer_being_read < N_DMA_BUFFERS) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
         // next data to be used, as this might be able to make use of the buffer
         // without transferring data
-        dma_n_rewires = 0;
-        dma_n_spikes = 0;
         _dma_complete_callback(0, DMA_TAG_READ_SYNAPTIC_ROW);
     } else {
         // If the DMA buffer is invalid, just do the first transfer possible
