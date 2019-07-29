@@ -13,11 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BUILDS = spike_source/poisson source delay_extension neuron robot_motor_control synapse_expander
-DIRS = $(BUILDS:%=makefiles/%)
+APP = poisson_source
+SOURCES = source/poisson_source.c
 
-all: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
+include ../neural_support.mk
 
-clean: $(DIRS)
-	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
