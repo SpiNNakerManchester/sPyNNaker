@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "partner.h"
+#include "random_selection_impl.h"
 
-void synaptogenesis_partner_init(uint8_t **data) {
-    // Do Nothing
+void partner_init(uint8_t **data) {
+    use(data);
 }
