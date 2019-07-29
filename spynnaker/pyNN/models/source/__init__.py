@@ -13,6 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .poisson_source_poisson import PoissonSource
+from .poisson_source import PoissonSource
 
 __all__ = ["PoissonSource"]
