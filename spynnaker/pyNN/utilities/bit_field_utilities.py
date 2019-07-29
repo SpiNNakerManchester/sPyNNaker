@@ -219,3 +219,7 @@ def write_bitfield_init_data(
             routing_info.get_first_key_from_partition(out_going_partition))
         spec.write_value(
             n_key_map.n_keys_for_partition(out_going_partition))
+
+    # ensure if nothing else that n bitfields in bitfield region set to 0
+    spec.switch_write_focus(bit_field_region_id)
+    spec.write_value(0)
