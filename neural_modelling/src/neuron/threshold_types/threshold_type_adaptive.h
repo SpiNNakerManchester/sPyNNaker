@@ -13,9 +13,11 @@ typedef struct threshold_type_t {
     decay_t e_to_dt_on_tau_a; // rho
     REAL beta;
     decay_t adpt; // (1-rho)
+    REAL scalar;
 
 } threshold_type_t;
 
+static REAL var_scal = 1;
 
 static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 	io_printf(IO_BUF, "B: %k, "
@@ -23,13 +25,15 @@ static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 			"b_0: %k, "
 			"e_to_dt_on_tau_a: %u, "
 			"beta: %k, "
-			"adpt: %u, \n",
+			"adpt: %u, \n"
+			"scalar: %k, \n\n",
 			threshold_type->B,
 			threshold_type->b,
 			threshold_type->b_0,
 			threshold_type->e_to_dt_on_tau_a,
 			threshold_type->beta,
-			threshold_type->adpt
+			threshold_type->adpt,
+			threshold_type->scalar
 			);
 }
 
@@ -49,13 +53,21 @@ static inline void threshold_type_update_threshold(state_t z,
 
 //	_print_threshold_params(threshold_type);
 
-	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
-	// Update small b (same regardless of spike - uses z from previous timestep)
-	threshold_type->b =
-			decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a)
-			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
-			* z; // stored on neuron
 
+	s1615 temp1 = decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a);
+	s1615 temp2 = decay_s1615(threshold_type->scalar, threshold_type->adpt) * z;
+
+	threshold_type->b = temp1
+			+ temp2;
+
+
+//	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
+//	// Update small b (same regardless of spike - uses z from previous timestep)
+//	threshold_type->b =
+//			decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a)
+//			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
+//			* z; // stored on neuron
+//
 	// Update large B
 	threshold_type->B = threshold_type->b_0 +
 			threshold_type->beta*threshold_type->b;

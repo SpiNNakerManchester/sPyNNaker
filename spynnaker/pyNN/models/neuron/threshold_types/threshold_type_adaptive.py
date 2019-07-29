@@ -11,6 +11,7 @@ SMALL_B_0 = "small_b_0"
 TAU_A = "tau_a"
 BETA = "beta"
 ADPT = "adpt"
+SCALAR = "scalar"
 
 UNITS = {
          BIG_B: "mV",
@@ -19,6 +20,7 @@ UNITS = {
          TAU_A: "ms",
          BETA: "N/A",
 #          ADPT: "mV"
+         SCALAR: "dimensionless"
          }
 
 
@@ -35,6 +37,7 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
         "_tau_a",
         "_beta",
 #         "_adpt"
+        "_scalar"
         ]
 
     def __init__(self,  B, small_b, small_b_0, tau_a, beta):
@@ -44,13 +47,15 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
             DataType.S1615,
             DataType.UINT32,
             DataType.S1615,
-            DataType.UINT32
+            DataType.UINT32,
+            DataType.S1615
             ])
         self._B = B
         self._small_b = small_b
         self._small_b_0 = small_b_0
         self._tau_a = tau_a
         self._beta = beta
+        self._scalar = 1000
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -62,6 +67,7 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
         parameters[SMALL_B_0] = self._small_b_0
         parameters[TAU_A] = self._tau_a
         parameters[BETA] = self._beta
+        parameters[SCALAR] = self._scalar
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -93,14 +99,15 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
             parameters[BETA],
             parameters[TAU_A].apply_operation(
                 operation=lambda x: (1 - numpy.exp(
-                float(-ts) / (1000.0 * x))) * ulfract) # ADPT
+                float(-ts) / (1000.0 * x))) * ulfract), # ADPT
+            parameters[SCALAR]
             ]
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, ) = values
+        (big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar) = values
 
         state_variables[BIG_B] = big_b
         state_variables[SMALL_B] = small_b
