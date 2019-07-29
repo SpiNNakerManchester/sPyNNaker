@@ -150,8 +150,8 @@ static bool neuron_load_neuron_parameters(address_t address) {
     spike_recording_rate = address[next++];
     uint32_t n_neurons_recording_spikes = address[next++];
     n_spike_recording_words = get_bit_field_size(n_neurons_recording_spikes);
-    spin1_memcpy(
-        spike_recording_indexes, &address[next], n_neurons * sizeof(uint8_t));
+    spin1_memcpy(spike_recording_indexes, &address[next],
+            n_neurons * sizeof(uint8_t));
     next += n_words_for_n_neurons;
 
     // Load other variable recording details
@@ -159,10 +159,9 @@ static bool neuron_load_neuron_parameters(address_t address) {
         var_recording_rate[i] = address[next++];
         uint32_t n_neurons_recording_var = address[next++];
         var_recording_size[i] =
-            (n_neurons_recording_var + 1) * sizeof(uint32_t);
-        spin1_memcpy(
-            var_recording_indexes[i], &address[next],
-            n_neurons * sizeof(uint8_t));
+                (n_neurons_recording_var + 1) * sizeof(uint32_t);
+        spin1_memcpy(var_recording_indexes[i], &address[next],
+                n_neurons * sizeof(uint8_t));
         next += n_words_for_n_neurons;
     }
 
