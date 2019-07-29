@@ -20,30 +20,20 @@ import scipy.stats
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.constraints.key_allocator_constraints import (
-    ContiguousKeyRangeContraint)
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
-    AbstractRewritesDataSpecification)
-from spinn_front_end_common.abstract_models.impl import (
-    ProvidesKeyToAtomMappingImpl)
+    AbstractChangableAfterRun, AbstractGeneratesDataSpecification,
+    AbstractHasAssociatedBinary, AbstractRewritesDataSpecification)
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.utilities import constants, utility_calls
+from spynnaker.pyNN.models.common import SimplePopulationSettable
+from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.models.neuron.implementations import Struct
@@ -433,7 +423,8 @@ class PoissonSourceVertex(
         isi_val[elements] = (1.0 / sources_per_tick[elements]).astype(int)
 
         # Get the time to spike value
-        time_to_source = self.__time_to_source[vertex_slice.as_slice].astype(int)
+        time_to_source = self.__time_to_source[
+            vertex_slice.as_slice].astype(int)
         changed_rates = (
             self.__rate_change[vertex_slice.as_slice].astype("bool") &
             elements)
@@ -464,27 +455,6 @@ class PoissonSourceVertex(
     def _convert_n_timesteps_to_ms(value, machine_time_step):
         return (
             value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
-
-    @overrides(AbstractSpikeRecordable.is_recording_spikes)
-    def is_recording_spikes(self):
-        return self.__spike_recorder.record
-
-    @overrides(AbstractSpikeRecordable.set_recording_spikes)
-    def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
-        if sampling_interval is not None:
-            logger.warning("Sampling interval currently not supported for "
-                           "PoissonSource so being ignored")
-        if indexes is not None:
-            logger.warning("indexes not supported for "
-                           "PoissonSource so being ignored")
-        if new_state and not self.__spike_recorder.record:
-            self.__change_requires_mapping = True
-        self.__spike_recorder.record = new_state
-
-    @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
