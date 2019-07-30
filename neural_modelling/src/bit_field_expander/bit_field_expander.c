@@ -325,7 +325,7 @@ bool generate_bit_field(){
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("searching neuron ids");
-        for (uint32_t neuron_id =0; neuron_id < n_neurons; neuron_id++){
+        for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++){
 
             // update key with neuron id
             spike_t new_key = (spike_t) (key + neuron_id);
@@ -338,9 +338,9 @@ bool generate_bit_field(){
             // not going to be used in reality.
             address_t row_address;
             bool bit_found = false;
-            bool something_to_do = true;
-            while (something_to_do && population_table_get_first_address(
-                        new_key, &row_address, &n_bytes_to_transfer)){
+            if (population_table_get_first_address(
+                    new_key, &row_address, &n_bytes_to_transfer)){
+                log_info("%d", neuron_id);
 
                 // This is a direct row to process, so will have 1 target, so
                 // no need to go further
@@ -350,14 +350,26 @@ bool generate_bit_field(){
                 } else {
                     // sdram read (faking dma transfer)
                     log_debug("dma read synapse");
-                    if (_do_sdram_read_and_test(
-                            row_address, n_bytes_to_transfer)){
-                        bit_found = true;
-                    }
+                    bit_found = _do_sdram_read_and_test(
+                        row_address, n_bytes_to_transfer);
                 }
+            }
 
-                something_to_do = population_table_get_next_address(
-                    row_address, n_bytes_to_transfer);
+            while (!bit_found && population_table_get_next_address(
+                    &row_address, &n_bytes_to_transfer)){
+                log_info("%d", neuron_id);
+
+                // This is a direct row to process, so will have 1 target, so
+                // no need to go further
+                if (n_bytes_to_transfer == 0) {
+                    log_debug("direct synapse");
+                    bit_found = true;
+                } else {
+                    // sdram read (faking dma transfer)
+                    log_debug("dma read synapse");
+                    bit_found = _do_sdram_read_and_test(
+                        row_address, n_bytes_to_transfer);
+                }
             }
 
             // if returned false, then the bitfield should be set to 0.
