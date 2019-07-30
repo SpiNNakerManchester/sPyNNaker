@@ -70,7 +70,7 @@ PARAMS_WORDS_PER_NEURON = 7
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 1.0
+SLOW_RATE_PER_TICK_CUTOFF = 0.01
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -286,8 +286,8 @@ class SpikeSourcePoissonVertex(
     @rate.setter
     def rate(self, rate):
         # TODO Fix _rate_change
-        self.__rate_change = rate - numpy.asarray(
-            list(_flatten(self._data["rates"])))
+        # scalar - array TODO FIX THIS
+        self.__rate_change = rate - list(_flatten(self._data["rates"]))
         # Normalise parameter
         if hasattr(rate, "__len__"):
             # Single rate per neuron for whole simulation
@@ -665,7 +665,7 @@ class SpikeSourcePoissonVertex(
             # Get the time to spike value
             time_to_spike = self._data["time_to_spike"][i]
             if self.__rate_change[i]:
-                time_to_spike = numpy.asarray(0.0)
+                time_to_spike = 0.0
 
             # Merge the arrays as parameters per atom
             data = numpy.dstack((

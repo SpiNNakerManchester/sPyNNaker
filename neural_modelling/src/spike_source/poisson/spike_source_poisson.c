@@ -470,15 +470,14 @@ void resume_callback() {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
 
-    // Setup regions that specify spike source array data
-    if (!read_global_parameters(
-            data_specification_get_region(POISSON_PARAMS, ds_regions))) {
-        log_error("failed to reread the Poisson parameters from SDRAM");
-        rt_error(RTE_SWERR);
-    }
+//    if (!read_poisson_parameters(
+//            data_specification_get_region(POISSON_PARAMS, ds_regions))){
+//        log_error("failed to reread the Poisson parameters from SDRAM");
+//        rt_error(RTE_SWERR);
+//    }
 
     if (!read_rates(
-            data_specification_get_region(RATES, address))){
+            data_specification_get_region(RATES, ds_regions))){
         log_error("failed to reread the Poisson rates from SDRAM");
         rt_error(RTE_SWERR);
     }
@@ -723,6 +722,7 @@ void timer_callback(uint timer_count, uint unused) {
         recording_do_timestep_update(time);
     }
 }
+
 
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
