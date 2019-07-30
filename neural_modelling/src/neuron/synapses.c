@@ -369,6 +369,8 @@ uint32_t synapses_get_saturation_count() {
 //! returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events() {
+    log_info("fixed = %d", num_fixed_pre_synaptic_events);
+    log_info("plastic = %d", synapse_dynamics_get_plastic_pre_synaptic_events());
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
