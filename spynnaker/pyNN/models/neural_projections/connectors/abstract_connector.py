@@ -87,7 +87,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
-        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
+        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):

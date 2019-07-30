@@ -470,11 +470,11 @@ void resume_callback() {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
 
-    if (!read_poisson_parameters(
-            data_specification_get_region(POISSON_PARAMS, ds_regions))){
-        log_error("failed to reread the Poisson parameters from SDRAM");
-        rt_error(RTE_SWERR);
-    }
+//    if (!read_poisson_parameters(
+//            data_specification_get_region(POISSON_PARAMS, ds_regions))){
+//        log_error("failed to reread the Poisson parameters from SDRAM");
+//        rt_error(RTE_SWERR);
+//    }
 
     if (!read_rates(
             data_specification_get_region(RATES, ds_regions))){
@@ -723,26 +723,6 @@ void timer_callback(uint timer_count, uint unused) {
     }
 }
 
-
-// TODO Make sure this also works for setting a set of rates
-void set_spike_source_rate(uint32_t id, REAL rate) {
-    if ((id >= global_parameters.first_source_id) &&
-            ((id - global_parameters.first_source_id) <
-             global_parameters.n_spike_sources)) {
-        uint32_t sub_id = id - global_parameters.first_source_id;
-        log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
-        REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        if (rate > global_parameters.slow_rate_per_tick_cutoff) {
-            poisson_parameters[sub_id].is_fast_source = true;
-            poisson_parameters[sub_id].exp_minus_lambda =
-                (UFRACT) EXP(-rate_per_tick);
-        } else {
-            poisson_parameters[sub_id].is_fast_source = false;
-            poisson_parameters[sub_id].mean_isi_ticks =
-                rate * global_parameters.ticks_per_second;
-        }
-    }
-}
 
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
