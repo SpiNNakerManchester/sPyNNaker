@@ -290,7 +290,7 @@ class OnChipBitFieldGenerator(object):
                             placement.x, placement.y, placement.p))
 
                     # get bitfield address
-                    bit_field_address = app_vertex.bit_field_base_address(
+                    bit_field_address = machine_vertex.bit_field_base_address(
                         transceiver, placement)
 
                     # read how many bitfields there are
