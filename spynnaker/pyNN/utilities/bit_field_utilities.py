@@ -77,7 +77,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     """ gets an estimate of the bitfield builder region
 
     :param app_graph: the app graph
-    :param vertex: machien vertex
+    :param vertex: machine vertex
     :return: sdram needed
     """
 
@@ -218,3 +218,7 @@ def write_bitfield_init_data(
             routing_info.get_first_key_from_partition(out_going_partition))
         spec.write_value(
             n_key_map.n_keys_for_partition(out_going_partition))
+
+    # ensure if nothing else that n bitfields in bitfield region set to 0
+    spec.switch_write_focus(bit_field_region_id)
+    spec.write_value(0)
