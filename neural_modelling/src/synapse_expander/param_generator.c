@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief The implementation of a parameter generator
@@ -12,11 +29,12 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
+#include "param_generators/param_generator_kernel.h"
 
 /**
  *! \brief The number of known generators
  */
-#define N_PARAM_GENERATORS 6
+#define N_PARAM_GENERATORS 7
 
 /**
  *! \brief The data for a parameter generator
@@ -112,6 +130,12 @@ void register_param_generators() {
     param_generators[5].initialize = param_generator_exponential_initialize;
     param_generators[5].generate = param_generator_exponential_generate;
     param_generators[5].free = param_generator_exponential_free;
+
+    // Kernel values
+    param_generators[6].hash = 6;
+    param_generators[6].initialize = param_generator_kernel_initialize;
+    param_generators[6].generate = param_generator_kernel_generate;
+    param_generators[6].free = param_generator_kernel_free;
 }
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
