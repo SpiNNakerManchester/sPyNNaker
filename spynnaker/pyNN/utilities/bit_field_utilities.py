@@ -20,7 +20,6 @@ from pacman.utilities.algorithm_utilities. \
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 
-
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
 

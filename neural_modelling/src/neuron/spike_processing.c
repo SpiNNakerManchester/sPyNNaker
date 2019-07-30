@@ -142,7 +142,10 @@ void _setup_synaptic_dma_read() {
             synaptogenesis_dynamics_rewire(time);
             setup_done = true;
         } else if (n_bytes_to_transfer == 0) {
-            direct_synapses_get_direct_synapse(row_address);
+            synaptic_row_t single_fixed_synapse =
+                direct_synapses_get_direct_synapse(row_address);
+            synapses_process_synaptic_row(
+                time, single_fixed_synapse, false, 0);
         } else {
             _do_dma_read(row_address, n_bytes_to_transfer);
             setup_done = true;
