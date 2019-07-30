@@ -337,29 +337,35 @@ bool generate_bit_field(){
             // used to store the row from the master pop / synaptic matrix,
             // not going to be used in reality.
             address_t row_address;
-            if (population_table_get_first_address(
-                    new_key, &row_address, &n_bytes_to_transfer)){
+            bool bit_found = false;
+            bool something_to_do = true;
+            while (something_to_do && population_table_get_first_address(
+                        new_key, &row_address, &n_bytes_to_transfer)){
 
-                log_debug("after got address");
+                log_info("after got address");
                 // This is a direct row to process, so will have 1 target, so
                 // no need to go further
                 if (n_bytes_to_transfer == 0) {
                     log_debug("direct synapse");
-                    bit_field_set(bit_field, neuron_id);
+                    bit_found = true;
                 } else {
                     // sdram read (faking dma transfer)
                     log_debug("dma read synapse");
                     if (_do_sdram_read_and_test(
                             row_address, n_bytes_to_transfer)){
-                        bit_field_set(bit_field, neuron_id);
+                        bit_found = true;
                     }
                 }
+
+                something_to_do = population_table_get_next_address(
+                    row_address, n_bytes_to_transfer);
             }
-            else{
-                // atom has no entry.....
-            }
+
             // if returned false, then the bitfield should be set to 0.
             // Which its by default already set to. so do nothing. so no else.
+            if (bit_found) {
+                bit_field_set(bit_field, neuron_id);
+            }
         }
 
         // write bitfield to sdram.
