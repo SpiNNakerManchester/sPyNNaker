@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <common/neuron-typedefs.h>
 #include <common/in_spikes.h>
 
@@ -29,6 +46,10 @@ static uint32_t continue_if_not_different;
 static uint32_t simulation_ticks;
 static uint32_t infinite_run;
 
+enum regions_e {
+    SYSTEM_REGION,
+    PARAMS_REGION
+};
 
 //! values for the priority for each callback
 typedef enum callback_priorities{
@@ -181,23 +202,24 @@ static bool initialize(uint32_t *timer_period) {
     log_info("initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(0, address),
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
             APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
 
     // Get the parameters
-    read_parameters(data_specification_get_region(1, address));
+    read_parameters(data_specification_get_region(PARAMS_REGION, ds_regions));
 
     log_info("initialise: completed successfully");
 

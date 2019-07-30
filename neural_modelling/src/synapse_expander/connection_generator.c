@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  * \brief The implementation of the functions in connection_generator.h
@@ -11,11 +28,12 @@
 #include "connection_generators/connection_generator_all_to_all.h"
 #include "connection_generators/connection_generator_fixed_prob.h"
 #include "connection_generators/connection_generator_fixed_total.h"
+#include "connection_generators/connection_generator_kernel.h"
 
 /**
  *! \brief The number of known generators
  */
-#define N_CONNECTION_GENERATORS 4
+#define N_CONNECTION_GENERATORS 5
 
 /**
  *! \brief The data for a connection generator
@@ -119,6 +137,15 @@ void register_connection_generators() {
         connection_generator_fixed_total_generate;
     connection_generators[3].free =
         connection_generator_fixed_total_free;
+
+    // Kernel Connector (tried to cheat, failed)
+    connection_generators[4].hash = 4;
+    connection_generators[4].initialize =
+        connection_generator_kernel_initialise;
+    connection_generators[4].generate =
+        connection_generator_kernel_generate;
+    connection_generators[4].free =
+        connection_generator_kernel_free;
 }
 
 connection_generator_t connection_generator_init(
