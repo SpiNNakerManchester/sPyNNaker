@@ -443,26 +443,6 @@ class NeuronRecorder(object):
             return self.N_BYTES_FOR_TIMESTAMP + \
                         n_neurons * self.N_BYTES_PER_VALUE
 
-    def get_buffered_sdram_per_timestep(self, variable, vertex_slice):
-        """ Return the SDRAM used per timestep.
-
-        In the case where sampling is used it returns the average\
-        for recording and none recording based on the recording rate
-
-        :param variable:
-        :param vertex_slice:
-        :return:
-        """
-        rate = self.__sampling_rates[variable]
-        if rate == 0:
-            return 0
-
-        data_size = self.get_buffered_sdram_per_record(variable, vertex_slice)
-        if rate == 1:
-            return data_size
-        else:
-            return data_size // rate
-
     def get_sampling_overflow_sdram(self, vertex_slice):
         """ Get the extra SDRAM that should be reserved if using per_timestep
 

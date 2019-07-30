@@ -237,16 +237,6 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    # CB: May be dead code
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        values = [self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                    variable, vertex_slice))
-        return values
-
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         values = [self.__neuron_recorder.get_buffered_sdram(
                 "spikes", vertex_slice, n_machine_time_steps)]
