@@ -342,7 +342,6 @@ bool generate_bit_field(){
             while (something_to_do && population_table_get_first_address(
                         new_key, &row_address, &n_bytes_to_transfer)){
 
-                log_info("after got address");
                 // This is a direct row to process, so will have 1 target, so
                 // no need to go further
                 if (n_bytes_to_transfer == 0) {
@@ -370,7 +369,7 @@ bool generate_bit_field(){
 
         // write bitfield to sdram.
         log_debug("writing bitfield to sdram for core use");
-        log_info("writing to address %0x, %d words to write",
+        log_debug("writing to address %0x, %d words to write",
                   &bit_field_words_location[position], n_words);
         spin1_memcpy(
             &bit_field_words_location[position], bit_field,
