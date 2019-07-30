@@ -250,13 +250,18 @@ class OnChipBitFieldGenerator(object):
 
             total_packets += chip_packet_count[(x, y)]
             total_redundant_packets += chip_redundant_count[(x, y)]
+
+        percentage = 0
+        if total_packets != 0:
+            percentage = (
+                (100.0 / float(total_packets)) *
+                float(total_redundant_packets))
+
         output.write(
             "overall the application has estimated {} packets flying around "
             "of which {} are redundant at reception. this is a {} percentage "
             "of the packets".format(
-                total_packets, total_redundant_packets,
-                ((100.0 / float(total_packets)) *
-                 float(total_redundant_packets))))
+                total_packets, total_redundant_packets, percentage))
         output.flush()
         output.close()
 
