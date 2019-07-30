@@ -217,14 +217,20 @@ class OnChipBitFieldGenerator(object):
                                 local_redundant += 1
                             chip_packet_count[(placement.x, placement.y)] += 1
                             local_total += 1
+
+                    redundant_packet_percentage = 0
+                    if local_total != 0:
+                        redundant_packet_percentage = (
+                            (100.0 / float(local_total)) *
+                            float(local_redundant))
+
                     output.write(
                         "vertex on {}:{}:{} has total incoming packet count of"
                         " {} and a redundant packet count of {}. Making a "
                         "redundant packet percentage of {}\n".format(
                             placement.x, placement.y, placement.p,
                             local_total, local_redundant,
-                            ((100.0 / float(local_total)) * float(
-                                local_redundant))))
+                            redundant_packet_percentage))
                     output.flush()
 
         output.write("\n\n\n")

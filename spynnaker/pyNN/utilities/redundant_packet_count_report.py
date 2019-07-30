@@ -44,6 +44,7 @@ class RedundantPacketCountReport(object):
 
         for provenance_item in provenance_items:
             last_name = provenance_item.names[-1]
+            key = provenance_item.names[0]
             if ((last_name == PopulationMachineVertex.GHOST_SEARCHES) or
                     (last_name ==
                         PopulationMachineVertex.BIT_FIELD_FILTERED_PACKETS) or
@@ -52,12 +53,10 @@ class RedundantPacketCountReport(object):
                     (last_name == PopulationMachineVertex.SPIKES_PROCESSED)):
 
                 # add to store
-                data[provenance_item.names[0]][last_name] = \
-                    provenance_item.value
+                data[key][last_name] = provenance_item.value
 
                 # accum enough data on a core to do summary
-                if len(data[provenance_item.names[0]].keys()) == 4:
-                    key = provenance_item[0]
+                if len(data[key].keys()) == 4:
 
                     # total packets received
                     total = (
@@ -86,8 +85,7 @@ class RedundantPacketCountReport(object):
                         "packets which we should not have received in the "
                         "first place. Overall this makes a redundant "
                         "percentage of {}".format(
-                            provenance_item[0],
-                            total,
+                            key, total,
                             data[key][
                                 PopulationMachineVertex.
                                 BIT_FIELD_FILTERED_PACKETS],
