@@ -68,6 +68,8 @@ void *connection_generator_fixed_post_initialise(address_t *region) {
 }
 
 void connection_generator_fixed_post_free(void *data) {
+    struct fixed_post *params = (struct fixed_post *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

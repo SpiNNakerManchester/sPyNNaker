@@ -72,6 +72,8 @@ void *connection_generator_fixed_pre_initialise(address_t *region) {
 }
 
 void connection_generator_fixed_pre_free(void *data) {
+    struct fixed_pre *params = (struct fixed_pre *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

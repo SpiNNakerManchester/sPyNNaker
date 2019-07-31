@@ -62,6 +62,8 @@ void *connection_generator_fixed_prob_initialise(address_t *region) {
 }
 
 void connection_generator_fixed_prob_free(void *data) {
+    struct fixed_prob *params = (struct fixed_prob *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 
