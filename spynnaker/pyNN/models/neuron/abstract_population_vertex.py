@@ -121,7 +121,6 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "_atoms_offset",
         "_slice_list",
-        "__poisson_vertex",
         "__atoms_per_core",
         "__has_poisson_source"]
 
@@ -169,7 +168,6 @@ class AbstractPopulationVertex(
         self._slice_list = None
         self.__initial_state_variables = None
         self.__updated_state_variables = set()
-        self.__poisson_vertex = None
         self.__has_poisson_source = False
 
         # Set up for recording
@@ -266,14 +264,6 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
-
-    @property
-    def poisson_vertex(self):
-        return self.__poisson_vertex
-
-    @poisson_vertex.setter
-    def poisson_vertex(self, vertex):
-        self.__poisson_vertex = vertex
 
     def add_poisson_source(self):
         self.__has_poisson_source = True

@@ -137,6 +137,7 @@ static weight_t *synaptic_region;
 
 //! Offset for the second exc synaptic contribution
 static uint32_t contribution_offset;
+static uint32_t poisson_offset;
 
 //! Placeholder for synaptic contributions sum
 static uint32_t sum;

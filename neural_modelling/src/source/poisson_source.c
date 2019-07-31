@@ -33,6 +33,9 @@
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
+#include <utils.h>
+#include "spin1_api_params.h"
+
 
 // Declare spin1_wfi
 extern void spin1_wfi();
@@ -128,7 +131,7 @@ static REAL* source_buffer;
 //! The timer period
 static uint32_t timer_period;
 
-static weight_t *poisson_region;
+static uint16_t *poisson_region;
 static uint32_t contribution_offset;
 static uint32_t memory_index;
 static uint32_t dma_size;
@@ -212,8 +215,6 @@ void start_dma_transfer(void *system_address, void *tcm_address,
 
     cpsr = spin1_int_disable();
 
-    start = time;
-
     uint desc = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | direction << 19 | length;
 
     // Be careful, this transfer is done with no checks for maximum performances!
@@ -274,7 +275,7 @@ bool read_global_parameters(address_t address) {
     }
 
     contribution_offset = log_n_atoms;
-    dma_size = global_parameters.n_sources * sizeof(REAL);
+    dma_size = global_parameters.n_sources * sizeof(uint16_t);
 
     log_info("read_global_parameters: completed successfully");
     return true;

@@ -38,7 +38,6 @@ class PoissonSourcePartition(
             atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
                 else self._n_atoms - (self._offset * i)
 
-            # Add the "offset" argument??????????????????????????????????????????????
             self._application_vertices.append(PoissonSourceVertex(
                 atoms, constraints, label + "_p" + str(i) + "_poisson_vertex", rate, max_rate, start,
                 duration, seed, DEFAULT_MAX_ATOMS_PER_CORE, model, poisson_weight, self._offset*i))

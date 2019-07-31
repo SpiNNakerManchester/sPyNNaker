@@ -381,13 +381,13 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._poisson_vertices = vertex.get_application_vertices()
 
         for p in range(self._n_partitions):
+            # Is this enough to avoid doulbe partitioning or should I add another check or just remove this constraint?
             self._poisson_vertices[p].add_constraint(
-                SameAtomsAsVertexConstraint(self._neuron_vertices[p]))
+                SameAtomsAsVertexConstraint(self._synapse_vertices[p][0]))
 
-            #self._poisson_vertices[p].associated_neuron_vertex = self._neuron_vertices[p]
             self._poisson_vertices[p].connected_app_vertices = [self._neuron_vertices[p]]
-            #self._neuron_vertices[p].poisson_vertex = self._poisson_vertices[p]
             self._neuron_vertices[p].append_app_vertex(self._poisson_vertices[p])
+            self._neuron_vertices[p].add_poisson_source()
 
             for syn_vertex in self._synapse_vertices[p]:
                 syn_vertex.append_app_vertex(self._poisson_vertices[p])

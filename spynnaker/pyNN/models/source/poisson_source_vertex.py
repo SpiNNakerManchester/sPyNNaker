@@ -107,7 +107,6 @@ class PoissonSourceVertex(
         "__n_data_specs",
         "__max_rate",
         "__rate_change",
-        "__associated_neuron_vertex",
         "_connected_app_vertices",
         "_machine_vertices",
         "_atoms_offset",
@@ -131,7 +130,6 @@ class PoissonSourceVertex(
         self.__rng = None
         self.__n_subvertices = 0
         self.__n_data_specs = 0
-        self.__associated_neuron_vertex = None
         self._atoms_offset = offset
         self.__atoms_per_core = max_atoms_per_core
 
@@ -197,6 +195,10 @@ class PoissonSourceVertex(
     @property
     def n_atoms(self):
         return self.__n_atoms
+
+    @property
+    def atoms_offset(self):
+        return self._atoms_offset
 
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
@@ -287,14 +289,6 @@ class PoissonSourceVertex(
         self.__seed = seed
         self.__kiss_seed = dict()
         self.__rng = None
-
-    @property
-    def associated_neuron_vertex(self):
-        return self.__associated_neuron_vertex
-
-    @associated_neuron_vertex.setter
-    def associated_neuron_vertex(self, vertex):
-        self.__associated_neuron_vertex = vertex
 
     @staticmethod
     def get_params_bytes(vertex_slice):
