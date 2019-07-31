@@ -217,14 +217,20 @@ class OnChipBitFieldGenerator(object):
                                 local_redundant += 1
                             chip_packet_count[(placement.x, placement.y)] += 1
                             local_total += 1
+
+                    redundant_packet_percentage = 0
+                    if local_total != 0:
+                        redundant_packet_percentage = (
+                            (100.0 / float(local_total)) *
+                            float(local_redundant))
+
                     output.write(
                         "vertex on {}:{}:{} has total incoming packet count of"
                         " {} and a redundant packet count of {}. Making a "
                         "redundant packet percentage of {}\n".format(
                             placement.x, placement.y, placement.p,
                             local_total, local_redundant,
-                            ((100.0 / float(local_total)) * float(
-                                local_redundant))))
+                            redundant_packet_percentage))
                     output.flush()
 
         output.write("\n\n\n")
@@ -244,13 +250,18 @@ class OnChipBitFieldGenerator(object):
 
             total_packets += chip_packet_count[(x, y)]
             total_redundant_packets += chip_redundant_count[(x, y)]
+
+        percentage = 0
+        if total_packets != 0:
+            percentage = (
+                (100.0 / float(total_packets)) *
+                float(total_redundant_packets))
+
         output.write(
             "overall the application has estimated {} packets flying around "
             "of which {} are redundant at reception. this is a {} percentage "
             "of the packets".format(
-                total_packets, total_redundant_packets,
-                ((100.0 / float(total_packets)) *
-                 float(total_redundant_packets))))
+                total_packets, total_redundant_packets, percentage))
         output.flush()
         output.close()
 
