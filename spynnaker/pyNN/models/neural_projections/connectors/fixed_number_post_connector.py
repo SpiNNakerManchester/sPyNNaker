@@ -67,7 +67,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
-        self.__post_connector_seed = None
+        self.__post_connector_seed = dict()
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -247,8 +247,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # The same seed needs to be sent to each of the slices
-        if self.__post_connector_seed is None:
-            self.__post_connector_seed = [
+        key = (id(pre_slices), id(post_slices))
+        if key not in self.__post_connector_seed:
+            self.__post_connector_seed[key] = [
                 int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
 
         # Only deal with self-connections if the two populations are the same
@@ -261,7 +262,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self.__with_replacement,
             self.__n_post,
             self._n_post_neurons]
-        params.extend(self.__post_connector_seed)
+        params.extend(self.__post_connector_seed[key])
         return numpy.array(params, dtype="uint32")
 
     @property
