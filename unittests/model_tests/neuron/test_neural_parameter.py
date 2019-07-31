@@ -42,7 +42,10 @@ def _iterate_parameter_values(iterator, data_type):
 def test_range_list():
     MockSimulator().setup()
 
-    spec_writer = FileDataWriter("test.dat")
+    location = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    spec_writer = FileDataWriter(os.path.join(location, "test.dat"))
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
         value = SpynnakerRangedList(size=10, value=1.0, key="test")
@@ -54,7 +57,7 @@ def test_range_list():
         assert isinstance(iterator, _Range_Iterator)
     finally:
         spec.end_specification()
-        os.remove("test.dat")
+        os.remove(os.path.join(location, "test.dat"))
 
 
 def _generator(size):
@@ -65,7 +68,10 @@ def _generator(size):
 def test_range_list_as_list():
     MockSimulator.setup()
 
-    spec_writer = FileDataWriter("test.dat")
+    location = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    spec_writer = FileDataWriter(os.path.join(location, "test.dat"))
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
         value = SpynnakerRangedList(size=10, value=_generator(10), key="test")
@@ -76,13 +82,16 @@ def test_range_list_as_list():
         assert isinstance(iterator, _Range_Iterator)
     finally:
         spec.end_specification()
-        os.remove("test.dat")
+        os.remove(os.path.join(location, "test.dat"))
 
 
 def test_real_list():
     MockSimulator.setup()
 
-    spec_writer = FileDataWriter("test.dat")
+    location = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    spec_writer = FileDataWriter(os.path.join(location, "test.dat"))
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
         value = range(10)
@@ -93,13 +102,16 @@ def test_real_list():
         assert isinstance(iterator, _Get_Iterator)
     finally:
         spec.end_specification()
-        os.remove("test.dat")
+        os.remove(os.path.join(location, "test.dat"))
 
 
 def test_single_value():
     MockSimulator.setup()
 
-    spec_writer = FileDataWriter("test.dat")
+    location = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+    spec_writer = FileDataWriter(os.path.join(location, "test.dat"))
     spec = DataSpecificationGenerator(spec_writer, None)
     try:
         value = 1.0
@@ -110,4 +122,4 @@ def test_single_value():
         assert isinstance(iterator, _SingleValue_Iterator)
     finally:
         spec.end_specification()
-        os.remove("test.dat")
+        os.remove(os.path.join(location, "test.dat"))
