@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief Fixed-Number-Post (fan-out) Connection generator implementation
@@ -46,7 +63,7 @@ void *connection_generator_fixed_post_initialise(address_t *region) {
         "with replacement = %u, n_post = %u, "
         "n post neurons = %u", params->params.allow_self_connections,
         params->params.with_replacement, params->params.n_post,
-		params->params.n_post_neurons);
+        params->params.n_post_neurons);
     return params;
 }
 
@@ -81,78 +98,78 @@ uint32_t connection_generator_fixed_post_generate(
     // Sample from the possible connections in this section n_conns times
     if (params->params.with_replacement) {
         // Sample them with replacement
-    	if (params->params.allow_self_connections) {
-    		// self connections are allowed so sample
-    		for (unsigned int i = 0; i < n_conns; i++) {
-        		uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
-        		uint32_t j = (u01 * n_values) >> 15;
-        		full_indices[i] = j;
-        	}
-    	} else {
-    		// self connections are not allowed (on this slice)
-    		for (unsigned int i = 0; i < n_conns; i++) {
-    			// Set j to the disallowed value, then test against it
-    			uint32_t j = pre_neuron_index;
+        if (params->params.allow_self_connections) {
+            // self connections are allowed so sample
+            for (unsigned int i = 0; i < n_conns; i++) {
+                uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
+                uint32_t j = (u01 * n_values) >> 15;
+                full_indices[i] = j;
+            }
+        } else {
+            // self connections are not allowed (on this slice)
+            for (unsigned int i = 0; i < n_conns; i++) {
+                // Set j to the disallowed value, then test against it
+                uint32_t j = pre_neuron_index;
 
-    			do {
-    				uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
-    				j = (u01 * n_values) >> 15;
-    			} while (j == pre_neuron_index);
+                do {
+                    uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
+                    j = (u01 * n_values) >> 15;
+                } while (j == pre_neuron_index);
 
-    			full_indices[i] = j;
-    		}
+                full_indices[i] = j;
+            }
         }
     } else {
         // Sample them without replacement using reservoir sampling
-    	if (params->params.allow_self_connections) {
-    		// Self-connections are allowed so do this normally
-    		for (unsigned int i = 0; i < n_conns; i++) {
-    			full_indices[i] = i;
-    		}
-    		// And now replace values if chosen at random to be replaced
-    		for (unsigned int i = n_conns; i < n_values; i++) {
-    			// j = random(0, i) (inclusive)
-    			const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
-    			const unsigned int j = (u01 * (i + 1)) >> 15;
-    			if (j < n_conns) {
-    				full_indices[j] = i;
-    			}
-    		}
-    	} else {
-    		// Self-connections are not allowed
-    		unsigned int replace_start = n_conns;
-    		for (unsigned int i = 0; i < n_conns; i++) {
-    			if (i == pre_neuron_index) {
-    				// set to a value not equal to i for now
-    				full_indices[i] = n_conns;
-    				replace_start = n_conns + 1;
-    			} else {
-    				full_indices[i] = i;
-    			}
-    		}
-    		// And now "replace" values if chosen at random to be replaced
-    		for (unsigned int i = replace_start; i < n_values; i++) {
-    			if (i != pre_neuron_index) {
-        			// j = random(0, i) (inclusive)
-    				const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
-    				const unsigned int j = (u01 * (i + 1)) >> 15;
+        if (params->params.allow_self_connections) {
+            // Self-connections are allowed so do this normally
+            for (unsigned int i = 0; i < n_conns; i++) {
+                full_indices[i] = i;
+            }
+            // And now replace values if chosen at random to be replaced
+            for (unsigned int i = n_conns; i < n_values; i++) {
+                // j = random(0, i) (inclusive)
+                const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
+                const unsigned int j = (u01 * (i + 1)) >> 15;
+                if (j < n_conns) {
+                    full_indices[j] = i;
+                }
+            }
+        } else {
+            // Self-connections are not allowed
+            unsigned int replace_start = n_conns;
+            for (unsigned int i = 0; i < n_conns; i++) {
+                if (i == pre_neuron_index) {
+                    // set to a value not equal to i for now
+                    full_indices[i] = n_conns;
+                    replace_start = n_conns + 1;
+                } else {
+                    full_indices[i] = i;
+                }
+            }
+            // And now "replace" values if chosen at random to be replaced
+            for (unsigned int i = replace_start; i < n_values; i++) {
+                if (i != pre_neuron_index) {
+                    // j = random(0, i) (inclusive)
+                    const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
+                    const unsigned int j = (u01 * (i + 1)) >> 15;
 
-        			if (j < n_conns) {
-        				full_indices[j] = i;
-        			}
-    			}
-    		}
-    	}
+                    if (j < n_conns) {
+                        full_indices[j] = i;
+                    }
+                }
+            }
+        }
     }
 
     // Loop over the full indices array, and only keep indices on this post-slice
     uint32_t count_indices = 0;
     for (unsigned int i = 0; i < n_conns; i++) {
-    	uint32_t j = full_indices[i];
-    	if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
-    		indices[count_indices] = j - post_slice_start; // On this slice!
-    		count_indices += 1;
-    	}
+        uint32_t j = full_indices[i];
+        if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
+            indices[count_indices] = j - post_slice_start; // On this slice!
+            count_indices += 1;
+        }
     }
 
 //    // Double-check for debug purposes
