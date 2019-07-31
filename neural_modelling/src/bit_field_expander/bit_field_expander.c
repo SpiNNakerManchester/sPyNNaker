@@ -73,6 +73,9 @@ bit_field_t* fake_bit_fields;
 //! \brief used to hold sdram read row
 uint32_t * row_data;
 
+//! \brief bool holder saying if we should run
+bool can_run = true;
+
 //! \brief struct for builder region
 typedef struct builder_region_struct{
     int master_pop_region_id;
@@ -81,6 +84,22 @@ typedef struct builder_region_struct{
     int bit_field_region_id;
     int bit_field_key_map_region_id;
 } builder_region_struct;
+
+
+void fail_shut_down(void){
+    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
+    uint core = spin1_get_core_id();
+    sark_virtual_processor_info[core].user2 = 1;
+    bit_field_base_address->n_filters = 0;
+}
+
+
+void success_shut_down(void){
+    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
+    uint core = spin1_get_core_id();
+    sark_virtual_processor_info[core].user2 = 0;
+}
+
 
 //! \brief reads in the vertex region addresses
 void read_in_addresses(){
@@ -209,6 +228,13 @@ bool initialise(){
 
     log_info(" elements in master pop table is %d \n and max rows is %d",
              population_table_length(), row_max_n_words);
+
+    if (population_table_length() == 0){
+         success_shut_down();
+         log_info("successfully processed the bitfields as there wasnt any");
+         can_run = false;
+         return true;
+    }
 
     // read in the correct key to max atom map
     //_print_key_to_max_atom_map();
@@ -401,19 +427,6 @@ bool generate_bit_field(){
     return true;
 }
 
-void fail_shut_down(void){
-    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
-    uint core = spin1_get_core_id();
-    sark_virtual_processor_info[core].user2 = 1;
-    bit_field_base_address->n_filters = 0;
-}
-
-void success_shut_down(void){
-    vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
-    uint core = spin1_get_core_id();
-    sark_virtual_processor_info[core].user2 = 0;
-}
-
 void c_main(void) {
     // set to running state
     sark_cpu_state(CPU_STATE_RUN);
@@ -428,13 +441,15 @@ void c_main(void) {
         log_error("failed to init the master pop and synaptic matrix");
         fail_shut_down();
     }
-    log_info("generating bit field");
-    if (!generate_bit_field()){
-        log_error("failed to generate bitfield");
-        fail_shut_down();
-    }
-    else{
-        success_shut_down();
-        log_info("successfully processed the bitfield");
+    if (can_run) {
+        log_info("generating bit field");
+        if (!generate_bit_field()){
+            log_error("failed to generate bitfield");
+            fail_shut_down();
+        }
+        else{
+            success_shut_down();
+            log_info("successfully processed the bitfield");
+        }
     }
 }
