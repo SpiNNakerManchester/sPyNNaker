@@ -23,10 +23,6 @@
         <python_class>SpynnakerMachineBitFieldRouterCompressor</python_class>
         <input_definitions>
             <parameter>
-                <param_name>executable_targets</param_name>
-                <param_type>ExecutableTargets</param_type>
-            </parameter>
-            <parameter>
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
