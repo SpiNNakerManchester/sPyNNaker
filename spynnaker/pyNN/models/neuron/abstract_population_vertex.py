@@ -66,6 +66,7 @@ from spynnaker.pyNN.utilities.ranged import (
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.utilities.utility_calls import get_maximum_probable_value
 from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
+from spynnaker.pyNN.models.neuron.synaptic_manager import SynapticManager
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +120,10 @@ class AbstractPopulationVertex(
         "__updated_state_variables",
         "__n_data_specs",
         "_atoms_offset",
-        "_slice_list"]
+        "_slice_list",
+        "__poisson_vertex",
+        "__atoms_per_core",
+        "__has_poisson_source"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -129,8 +133,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 9 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 36
+    # 10 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 40
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -148,6 +152,7 @@ class AbstractPopulationVertex(
         self.__n_subvertices = 0
         self.__n_data_specs = 0
         self._atoms_offset = atoms_offset
+        self.__atoms_per_core = max_atoms_per_core
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -164,6 +169,8 @@ class AbstractPopulationVertex(
         self._slice_list = None
         self.__initial_state_variables = None
         self.__updated_state_variables = set()
+        self.__poisson_vertex = None
+        self.__has_poisson_source = False
 
         # Set up for recording
         recordables = ["spikes"]
@@ -236,6 +243,12 @@ class AbstractPopulationVertex(
     def connected_app_vertices(self, connected_app_vertices):
         self._connected_app_vertices = connected_app_vertices
 
+    def append_app_vertex(self, vertex):
+        connected_app_vertices = list()
+        connected_app_vertices.extend(self._connected_app_vertices)
+        connected_app_vertices.append(vertex)
+        self._connected_app_vertices = connected_app_vertices
+
     @property
     def slice_list(self):
         return self._slice_list
@@ -253,6 +266,17 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
+
+    @property
+    def poisson_vertex(self):
+        return self.__poisson_vertex
+
+    @poisson_vertex.setter
+    def poisson_vertex(self, vertex):
+        self.__poisson_vertex = vertex
+
+    def add_poisson_source(self):
+        self.__has_poisson_source = True
 
     # CB: May be dead code
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
@@ -290,12 +314,20 @@ class AbstractPopulationVertex(
         self._machine_vertices[self.__n_subvertices] = vertex
 
         for app_vertex in self._connected_app_vertices:
-            out_vertices =\
-                app_vertex.get_machine_vertex_at(
-                    vertex_slice.lo_atom, vertex_slice.hi_atom)
-            if len(out_vertices)> 0:
-                for out_vertex in out_vertices:
+            if isinstance(app_vertex, SynapticManager):
+                out_vertices =\
+                    app_vertex.get_machine_vertex_at(
+                        vertex_slice.lo_atom, vertex_slice.hi_atom)
+                if len(out_vertices)> 0:
+                    for out_vertex in out_vertices:
+                        vertex.add_constraint(SameChipAsConstraint(out_vertex))
+            else:
+                out_vertex = \
+                    app_vertex.get_machine_vertex_at(
+                        (vertex_slice.hi_atom - self._atoms_offset) // self.__atoms_per_core)
+                if out_vertex is not None:
                     vertex.add_constraint(SameChipAsConstraint(out_vertex))
+
         self.__n_subvertices += 1
 
         return vertex
@@ -556,7 +588,8 @@ class AbstractPopulationVertex(
             self._ring_buffer_shifts = []
             previous_syn_type = -1
             for vertex in self._connected_app_vertices:
-                if vertex.synapse_index != previous_syn_type:
+                if isinstance(vertex, SynapticManager) and \
+                        vertex.synapse_index != previous_syn_type:
                     # self._ring_buffer_shifts.extend(
                     #     self._get_ring_buffer_to_input_left_shifts(
                     #         vertex, application_graph,
@@ -648,6 +681,12 @@ class AbstractPopulationVertex(
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
+
+        # Write flag to tell if we have a poisson vertex or not
+        if self.__has_poisson_source:
+            spec.write_value(data=1)
+        else:
+            spec.write_value(data=0)
 
         # Write the number of variables that can be recorded
         spec.write_value(

@@ -35,6 +35,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
     __slots__ = [
         "_neuron_vertices",
         "_synapse_vertices",  # List of lists, each list corresponds to a neuron vertex
+        "_poisson_vertices",
         "_n_atoms",
         "_n_syn_types",
         "_offset",
@@ -52,6 +53,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         self._neuron_vertices = list()
         self._synapse_vertices = list()
+        self._poisson_vertices = None
         self._n_syn_types = neuron_model.get_n_synapse_types()
 
         self._offset = self._compute_partition_and_offset_size()
@@ -63,7 +65,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 else self._n_atoms - (self._offset * i)
 
             self._neuron_vertices.append(AbstractPopulationVertex(
-                atoms, self._offset*i, label + "_" + str(i) + "_neuron_vertex",
+                atoms, self._offset*i, label + "_p" + str(i) + "_neuron_vertex",
                 constraints, max_atoms_neuron_core, spikes_per_second,
                 ring_buffer_sigma, neuron_model, pynn_model))
 
@@ -127,7 +129,6 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         for i in range(self._n_partitions):
             self._neuron_vertices[i].slice_list = self._neuron_vertices
-
 
     def _compute_partition_and_offset_size(self):
         return -((-self._n_atoms / self._n_partitions) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
@@ -200,7 +201,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 placement = globals_variables.get_simulator().placements. \
                     get_placement_of_vertex(machine_vertex)
 
-                self.neuron_vertices[i].read_parameters_from_machine(
+                self._neuron_vertices[i].read_parameters_from_machine(
                     globals_variables.get_simulator().transceiver, placement,
                     globals_variables.get_simulator().graph_mapper.get_slice(
                         machine_vertex))
@@ -302,7 +303,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
     @overrides(AbstractSynapseRecordable.set_synapse_recording)
     def set_synapse_recording(self, variable, new_state=True, sampling_interval=None,
-                      indexes=None):
+                              indexes=None):
         for partition in self._synapse_vertices:
             for vertex in partition:
                 vertex.set_synapse_recording(
@@ -374,6 +375,24 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
                 in_spikes.update(data)
 
         return (in_spikes, index, sampling_interval)
+
+    def add_poisson_source(self, vertex):
+
+        self._poisson_vertices = vertex.get_application_vertices()
+
+        for p in range(self._n_partitions):
+            self._poisson_vertices[p].add_constraint(
+                SameAtomsAsVertexConstraint(self._neuron_vertices[p]))
+
+            #self._poisson_vertices[p].associated_neuron_vertex = self._neuron_vertices[p]
+            self._poisson_vertices[p].connected_app_vertices = [self._neuron_vertices[p]]
+            #self._neuron_vertices[p].poisson_vertex = self._poisson_vertices[p]
+            self._neuron_vertices[p].append_app_vertex(self._poisson_vertices[p])
+
+            for syn_vertex in self._synapse_vertices[p]:
+                syn_vertex.append_app_vertex(self._poisson_vertices[p])
+                self._poisson_vertices[p].append_app_vertex(syn_vertex)
+
 
 
     # def add_pre_run_connection_holder(

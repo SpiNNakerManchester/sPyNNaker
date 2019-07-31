@@ -18,6 +18,7 @@ from spinn_front_end_common.interface.interface_functions import (
 from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
 from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+from spynnaker.pyNN.models.source import PoissonSourceVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -35,6 +36,7 @@ class SpynnakerDataSpecificationWriter(
 
         delay_extensions = list()
         syn_vertices = list()
+        poisson_vertices = list()
         neuron_vertices = list()
         placement_order = list()
         for placement in placements.placements:
@@ -45,12 +47,15 @@ class SpynnakerDataSpecificationWriter(
                 delay_extensions.append(placement)
             elif isinstance(associated_vertex, SynapticManager):
                 syn_vertices.append(placement)
+            elif isinstance(associated_vertex, PoissonSourceVertex):
+                poisson_vertices.append(placement)
             elif isinstance(associated_vertex, AbstractPopulationVertex):
                 neuron_vertices.append(placement)
             else:
                 placement_order.append(placement)
         placement_order.extend(neuron_vertices)
         placement_order.extend(syn_vertices)
+        placement_order.extend(poisson_vertices)
         placement_order.extend(delay_extensions)
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(

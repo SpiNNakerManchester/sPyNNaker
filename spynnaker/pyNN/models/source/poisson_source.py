@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .poisson_source_vertex import PoissonSourceVertex
+from .poisson_source_partition import PoissonSourcePartition
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from spinn_utilities.overrides import overrides
 
@@ -50,7 +50,10 @@ class PoissonSource(AbstractPyNNModel):
     @overrides(AbstractPyNNModel.create_vertex, additional_arguments=[
         "seed", "max_rate"])
     def create_vertex(self, n_neurons, label, constraints, seed, max_rate):
-        max_atoms = self.get_max_atoms_per_core()
-        return PoissonSourceVertex(
+        # max_atoms = self.get_max_atoms_per_core()
+        return PoissonSourcePartition(
             n_neurons, constraints, label, self.__rate, max_rate, self.__start,
-            self.__duration, seed, max_atoms, self, self.__poisson_weight)
+            self.__duration, seed, self, self.__poisson_weight)
+        # return PoissonSourceVertex(
+        #     n_neurons, constraints, label, self.__rate, max_rate, self.__start,
+        #     self.__duration, seed, max_atoms, self, self.__poisson_weight)

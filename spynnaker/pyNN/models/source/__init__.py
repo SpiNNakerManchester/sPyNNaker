@@ -14,5 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .poisson_source import PoissonSource
+from .poisson_source_partition import PoissonSourcePartition
+from .poisson_source_vertex import PoissonSourceVertex
+from .poisson_source_machine_vertex import PoissonSourceMachineVertex
 
-__all__ = ["PoissonSource"]
+__all__ = ["PoissonSource", "PoissonSourcePartition", "PoissonSourceVertex", "PoissonSourceMachineVertex"]

@@ -34,6 +34,7 @@ from spynnaker.pyNN.models.abstract_models \
     import AbstractPopulationInitializable, AbstractPopulationSettable
 from .abstract_pynn_model import AbstractPyNNModel
 from .neuron.pynn_partition_vertex import PyNNPartitionVertex
+from spynnaker.pyNN.models.source import PoissonSourcePartition
 
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
@@ -633,3 +634,10 @@ class PyNNPopulationCommon(object):
         raise ConfigurationException(
             "Size of a population with label {} must be an int,"
             " received {}".format(self.label, size))
+
+    def add_poisson_source(self, poisson_vertex):
+        if isinstance(self.__vertex[0], PyNNPartitionVertex) and \
+                isinstance(poisson_vertex, PoissonSourcePartition):
+            self.__vertex[0].add_poisson_source(poisson_vertex)
+        else:
+            raise Exception("Cannot add poisson source to population. Wrong types!")

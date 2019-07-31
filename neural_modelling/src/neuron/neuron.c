@@ -141,13 +141,15 @@ static uint32_t contribution_offset;
 //! Placeholder for synaptic contributions sum
 static uint32_t sum;
 
+static uint32_t has_poisson;
+
 
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
 typedef enum parameters_in_neuron_parameter_data_region {
     TIMER_START_OFFSET, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    MEM_INDEX, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
+    MEM_INDEX, POISSON_FLAG, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {
@@ -303,16 +305,20 @@ bool neuron_do_timestep_update(
 
                 sum = synaptic_contributions[buff_index];
             }
-            else {
-
+            else if (!has_poisson) {
+                //Removed sat check since we don't saturate. this if should keep the case without
+                //poisson sources at higher efficiency
                 sum =
                     synaptic_contributions[buff_index] +
                     synaptic_contributions[buff_index + contribution_offset];
 
-                if(sum & 0x10000) {
-
-                    sum = SAT_VALUE;
-                }
+            }
+            else {
+                //Poisson source case
+                sum =
+                    synaptic_contributions[buff_index] +
+                    synaptic_contributions[buff_index + contribution_offset] +
+                    synaptic_contributions[buff_index + poisson_offset];
             }
 
             neuron_impl_add_inputs(
@@ -451,6 +457,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     memory_index = address[MEM_INDEX];
 
+    has_poisson = address[POISSON_FLAG];
+
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
@@ -474,9 +482,10 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     uint32_t contribution_bits =
         log_n_neurons + log_n_synapse_types;
-    uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
+    uint32_t contribution_size = (1 << (contribution_bits)) + (n_neurons_power_2 << has_poisson);
 
     contribution_offset = 2 * n_neurons_power_2;
+    poisson_offset = 3 * n_neurons_power_2;
 
     dma_size = contribution_size * sizeof(weight_t);
 

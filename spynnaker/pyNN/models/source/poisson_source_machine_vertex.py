@@ -33,7 +33,8 @@ class PoissonSourceMachineVertex(
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__minimum_buffer_sdram",
-        "__resources"]
+        "__resources",
+        "_vertex_index"]
 
     POISSON_SOURCE_REGIONS = Enum(
         value="POISSON_SOURCE_REGIONS",
@@ -48,6 +49,7 @@ class PoissonSourceMachineVertex(
         super(PoissonSourceMachineVertex, self).__init__(
             label, constraints=constraints)
         self.__resources = resources_required
+        self._vertex_index = None
 
     @property
     @overrides(MachineVertex.resources_required)
@@ -64,6 +66,14 @@ class PoissonSourceMachineVertex(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
         return 0
+
+    @property
+    def vertex_index(self):
+        return self._vertex_index
+
+    @vertex_index.setter
+    def vertex_index(self, vertex_index):
+        self._vertex_index = vertex_index
 
     @inject_items({"graph": "MemoryMachineGraph"})
     @overrides(

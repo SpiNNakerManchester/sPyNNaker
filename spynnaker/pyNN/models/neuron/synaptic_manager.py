@@ -59,7 +59,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron import PopulationMachineVertex
+from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine)
@@ -78,6 +78,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.common import (
     AbstractSynapseRecordable, SynapseRecorder)
 from .synapse_machine_vertex import SynapseMachineVertex
+from spynnaker.pyNN.models.source import PoissonSourceMachineVertex
 from .key_space_tracker import KeySpaceTracker
 
 TIME_STAMP_BYTES = 4
@@ -343,6 +344,12 @@ class SynapticManager(
 
     @connected_app_vertices.setter
     def connected_app_vertices(self, connected_app_vertices):
+        self._connected_app_vertices = connected_app_vertices
+
+    def append_app_vertex(self, vertex):
+        connected_app_vertices = list()
+        connected_app_vertices.extend(self._connected_app_vertices)
+        connected_app_vertices.append(vertex)
         self._connected_app_vertices = connected_app_vertices
 
     @property
@@ -1604,6 +1611,13 @@ class SynapticManager(
             for c in vertex.constraints:
                 if isinstance(c, SameChipAsConstraint) and isinstance(c.vertex, PopulationMachineVertex):
                     vertex.vertex_index = c.vertex.vertex_index
+
+        # Once index is assigned check if we have poisson vertices with no index
+        for c in vertex.constraints:
+            if isinstance(c, SameChipAsConstraint) and \
+                    isinstance(c.vertex, PoissonSourceMachineVertex) and \
+                        c.vertex.vertex_index is None:
+                c.vertex.vertex_index = vertex.vertex_index
 
         self._write_synapse_parameters(
             spec, vertex_slice, application_graph, machine_time_step,

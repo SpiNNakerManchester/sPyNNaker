@@ -23,6 +23,8 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.model.constraints.placer_constraints\
+    import SameChipAsConstraint
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractGeneratesDataSpecification,
     AbstractHasAssociatedBinary, AbstractRewritesDataSpecification)
@@ -37,6 +39,8 @@ from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.models.neuron.implementations import Struct
+from spynnaker.pyNN.models.neuron.synapse_machine_vertex import SynapseMachineVertex
+from spynnaker.pyNN.models.neuron.population_machine_vertex import PopulationMachineVertex
 from .poisson_source_machine_vertex import (
     PoissonSourceMachineVertex)
 
@@ -47,7 +51,8 @@ logger = logging.getLogger(__name__)
 # REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
 # uint32_t first_source_id; uint32_t n_spike_sources;
 # mars_kiss64_seed_t (uint[4]) spike_source_seed;
-PARAMS_BASE_WORDS = 12
+# uint32_t memory tag;
+PARAMS_BASE_WORDS = 13
 
 # start_scaled, end_scaled, is_fast_source, exp_minus_lambda, sqrt_lambda,
 # isi_val, time_to_source, poisson_weight
@@ -101,13 +106,18 @@ class PoissonSourceVertex(
         "__n_subvertices",
         "__n_data_specs",
         "__max_rate",
-        "__rate_change"]
+        "__rate_change",
+        "__associated_neuron_vertex",
+        "_connected_app_vertices",
+        "_machine_vertices",
+        "_atoms_offset",
+        "__atoms_per_core"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
             self, n_neurons, constraints, label, rate, max_rate, start,
-            duration, seed, max_atoms_per_core, model, poisson_weight):
+            duration, seed, max_atoms_per_core, model, poisson_weight, offset):
         # pylint: disable=too-many-arguments
         super(PoissonSourceVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -121,6 +131,9 @@ class PoissonSourceVertex(
         self.__rng = None
         self.__n_subvertices = 0
         self.__n_data_specs = 0
+        self.__associated_neuron_vertex = None
+        self._atoms_offset = offset
+        self.__atoms_per_core = max_atoms_per_core
 
         # check for changes parameters
         self.__change_requires_mapping = True
@@ -138,6 +151,9 @@ class PoissonSourceVertex(
         self.__machine_time_step = None
 
         self.__poisson_weight = self.convert_weight(poisson_weight)
+
+        self._connected_app_vertices = list()
+        self._machine_vertices = dict()
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -186,9 +202,32 @@ class PoissonSourceVertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
         # pylint: disable=too-many-arguments, arguments-differ
-        self.__n_subvertices += 1
-        return PoissonSourceMachineVertex(
+
+        vertex = PoissonSourceMachineVertex(
             resources_required, constraints, label)
+
+        self._machine_vertices[self.__n_subvertices] = vertex
+
+        for app_vertex in self._connected_app_vertices:
+            # TMP workaraound
+            if app_vertex.__class__.__name__ == "SynapticManager":
+                # if isinstance(app_vertex, SynapticManager):
+                out_vertices =\
+                    app_vertex.get_machine_vertex_at(
+                        vertex_slice.lo_atom, vertex_slice.hi_atom)
+                if len(out_vertices)> 0:
+                    for out_vertex in out_vertices:
+                        vertex.add_constraint(SameChipAsConstraint(out_vertex))
+            else:
+                out_vertex = \
+                    app_vertex.get_machine_vertex_at(
+                        (vertex_slice.hi_atom - self._atoms_offset) // self.__atoms_per_core)
+                if out_vertex is not None:
+                    vertex.add_constraint(SameChipAsConstraint(out_vertex))
+
+        self.__n_subvertices += 1
+
+        return vertex
 
     @property
     def rate(self):
@@ -249,6 +288,14 @@ class PoissonSourceVertex(
         self.__kiss_seed = dict()
         self.__rng = None
 
+    @property
+    def associated_neuron_vertex(self):
+        return self.__associated_neuron_vertex
+
+    @associated_neuron_vertex.setter
+    def associated_neuron_vertex(self, vertex):
+        self.__associated_neuron_vertex = vertex
+
     @staticmethod
     def get_params_bytes(vertex_slice):
         """ Gets the size of the poisson parameters in bytes
@@ -292,8 +339,8 @@ class PoissonSourceVertex(
                 placement.vertex)), label='PoissonParams')
 
     def _write_poisson_parameters(
-            self, spec, graph, placement,
-            vertex_slice, machine_time_step, time_scale_factor):
+            self, spec, graph, placement, vertex_slice,
+            machine_time_step, time_scale_factor, index):
         """ Generate Neuron Parameter data for Poisson spike sources
         :param spec: the data specification writer
         :param vertex_slice:\
@@ -302,6 +349,8 @@ class PoissonSourceVertex(
         :param machine_time_step: the time between timer tick updates.
         :param time_scale_factor:\
             the scaling between machine time step and real time
+        :param index:\
+            memory tag for the contributions
         :return: None
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -375,6 +424,8 @@ class PoissonSourceVertex(
                 for _ in range(4)]
         for value in self.__kiss_seed[kiss_key]:
             spec.write_value(data=value)
+
+        spec.write_value(data=index)
 
         # Compute the start times in machine time steps
         start = self.__start[vertex_slice.as_slice]
@@ -596,10 +647,17 @@ class PoissonSourceVertex(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
+        if vertex.vertex_index is None:
+            for c in vertex.constraints:
+                if isinstance(c, SameChipAsConstraint) and \
+                        (isinstance(c.vertex, PopulationMachineVertex) or
+                            isinstance(c.vertex, SynapseMachineVertex)):
+                    vertex.vertex_index = c.vertex.vertex_index
+
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, vertex_slice,
-            machine_time_step, time_scale_factor)
+            machine_time_step, time_scale_factor, vertex.vertex_index)
 
         # End-of-Spec:
         spec.end_specification()
@@ -637,3 +695,23 @@ class PoissonSourceVertex(
     @property
     def max_rate(self):
         return self.__max_rate
+
+    @property
+    def connected_app_vertices(self):
+        return self._connected_app_vertices
+
+    @connected_app_vertices.setter
+    def connected_app_vertices(self, connected_app_vertices):
+        self._connected_app_vertices = connected_app_vertices
+
+    def append_app_vertex(self, vertex):
+        connected_app_vertices = list()
+        connected_app_vertices.extend(self._connected_app_vertices)
+        connected_app_vertices.append(vertex)
+        self._connected_app_vertices = connected_app_vertices
+
+    def get_machine_vertex_at(self, index):
+
+        if index in self._machine_vertices:
+            return self._machine_vertices[index]
+        return None

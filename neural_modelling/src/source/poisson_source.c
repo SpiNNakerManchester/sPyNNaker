@@ -128,6 +128,11 @@ static REAL* source_buffer;
 //! The timer period
 static uint32_t timer_period;
 
+static weight_t *poisson_region;
+static uint32_t contribution_offset;
+static uint32_t memory_index;
+static uint32_t dma_size;
+
 //! \brief deduces the time in timer ticks multiplied by ISI_SCALE_FACTOR
 //!        until the next source is to occur given the mean inter-source interval
 //! \param[in] mean_inter_source_interval_in_ticks The mean number of ticks
@@ -200,9 +205,29 @@ void print_sources(){
     }
 }
 
+void start_dma_transfer(void *system_address, void *tcm_address,
+    uint direction, uint length) {
+
+    uint cpsr;
+
+    cpsr = spin1_int_disable();
+
+    start = time;
+
+    uint desc = DMA_WIDTH << 24 | DMA_BURST_SIZE << 21 | direction << 19 | length;
+
+    // Be careful, this transfer is done with no checks for maximum performances!
+    // OK ONLY FOR STATIC NETWORK IN WHICH WE ARE SURE THAT WE HAVE NO MORE THAN 2 TRANSFERS AT A TIME
+    dma[DMA_ADRS] = (uint) system_address;
+    dma[DMA_ADRT] = (uint) tcm_address;
+    dma[DMA_DESC] = desc;
+
+    spin1_mode_restore(cpsr);
+}
+
 //! \brief entry method for reading the global parameters stored in Poisson
 //!        parameter region
-//! \param[in] address the absolute SDRAm memory address to which the
+//! \param[in] address the absolute SDRAM memory address to which the
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
@@ -237,6 +262,20 @@ bool read_global_parameters(address_t address) {
         "fast_rate_per_tick_cutoff = %k\n",
         global_parameters.fast_rate_per_tick_cutoff);
 
+    memory_index = *(address + (sizeof(global_parameters) / 4));
+
+    uint32_t n_atoms_power_2 = global_parameters.n_sources;
+    uint32_t log_n_atoms = 1;
+    if (global_parameters.n_sources != 1) {
+        if (!is_power_of_2(global_parameters.n_sources)) {
+            n_atoms_power_2 = next_power_of_2(global_parameters.n_sources);
+        }
+        log_n_atoms = ilog_2(n_atoms_power_2);
+    }
+
+    contribution_offset = log_n_atoms;
+    dma_size = global_parameters.n_sources * sizeof(REAL);
+
     log_info("read_global_parameters: completed successfully");
     return true;
 }
@@ -265,7 +304,7 @@ static bool read_poisson_parameters(address_t address) {
         }
 
         // store spike source data into DTCM
-        uint32_t spikes_offset = sizeof(global_parameters) / 4;
+        uint32_t spikes_offset = (sizeof(global_parameters) / 4) + 1;
         spin1_memcpy(
             poisson_parameters, &address[spikes_offset],
             global_parameters.n_sources * sizeof(poisson_source_t));
@@ -406,6 +445,12 @@ static inline void _add_weight(uint32_t neuron_id, uint32_t n) {
 	source_buffer[neuron_id] += n * poisson_parameters[neuron_id].poisson_weight;
 }
 
+static inline void _set_contribution_region() {
+
+    poisson_region = sark_tag_ptr(memory_index, 0);
+    poisson_region += (3 << contribution_offset);
+}
+
 //! \brief Timer interrupt callback
 //! \param[in] timer_count the number of times this call back has been
 //!            executed since start of simulation
@@ -417,12 +462,23 @@ void timer_callback(uint timer_count, uint unused) {
 	use(timer_count);
     use(unused);
 
+    // Disable DMA_DONE interrupts for the simulation
+    vic[VIC_DISABLE] = (1 << DMA_DONE_INT);
+
     time++;
+
+    if(time == 0) {
+
+        _set_contribution_region();
+    }
 
     log_debug("Timer tick %u", time);
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
+
+        // Enable DMA_DONE interrupt when the simulation ends
+        vic[VIC_ENABLE] = (1 << DMA_DONE_INT);
 
         // go into pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
@@ -499,10 +555,14 @@ void timer_callback(uint timer_count, uint unused) {
         }
     }
 
+    start_dma_transfer(poisson_region, source_buffer, DMA_WRITE, dma_size);
+
+    while(!(dma[DMA_STAT] & 0x400));
+    dma[DMA_CTRL] = 0x08;
+
     // at this point we have looped over all the sources, so we can write the array
     // to wherever it needs to go; for now I'm just printing it
     for (index_t s = 0; s < global_parameters.n_sources; s++) {
-    	log_info("source_buffer[%u] = %k", s, source_buffer[s]);
     	source_buffer[s] = REAL_CONST(0.0);
     }
 
