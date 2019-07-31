@@ -631,7 +631,7 @@ class SpikeSourcePoissonVertex(
 
             # Convert durations to end time steps
             durations = self._data["durations"][i].astype("float")
-            ends_scaled = numpy.zeros(len(durations), dtype="uint32")
+            ends_scaled = numpy.zeros(durations.shape, dtype="uint32")
             none_positions = numpy.isnan(durations)
             positions = numpy.invert(none_positions)
             ends_scaled[none_positions] = 0xFFFFFFFF
