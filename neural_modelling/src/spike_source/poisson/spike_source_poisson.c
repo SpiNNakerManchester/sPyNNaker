@@ -67,7 +67,7 @@ typedef enum region {
     SYSTEM, POISSON_PARAMS,
     SPIKE_HISTORY_REGION,
     PROVENANCE_REGION,
-	PROFILER_REGION
+    PROFILER_REGION
 } region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
@@ -182,14 +182,14 @@ static inline void _reset_spikes() {
 //! \return a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR
 //!         until the next spike occurs
 static inline uint32_t slow_spike_source_get_time_to_spike(
-	    uint32_t mean_inter_spike_interval_in_ticks) {
-	// Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
-	int nbits = 15;
-	uint32_t value = (uint32_t) roundk(exponential_dist_variate(
-			mars_kiss64_seed, global_parameters.spike_source_seed) * ISI_SCALE_FACTOR, nbits);
-	// Now multiply by the mean ISI
-	uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
-	// Note that this will be compared to ISI_SCALE_FACTOR in the main loop!
+        uint32_t mean_inter_spike_interval_in_ticks) {
+    // Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
+    int nbits = 15;
+    uint32_t value = (uint32_t) roundk(exponential_dist_variate(
+            mars_kiss64_seed, global_parameters.spike_source_seed) * ISI_SCALE_FACTOR, nbits);
+    // Now multiply by the mean ISI
+    uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
+    // Note that this will be compared to ISI_SCALE_FACTOR in the main loop!
     return exp_variate;
 }
 
@@ -200,8 +200,8 @@ static inline uint32_t slow_spike_source_get_time_to_spike(
 //!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
-	// If the value of exp_minus_lambda is very small then it's not worth
-	// using the algorithm, so just return 0
+    // If the value of exp_minus_lambda is very small then it's not worth
+    // using the algorithm, so just return 0
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
@@ -222,8 +222,8 @@ static inline uint32_t faster_spike_source_get_num_spikes(
         REAL sqrt_lambda) {
     // First we do x = (invgausscdf(U(0,1)) * 0.5) + sqrt(lambda)
     REAL x = (gaussian_dist_variate(
-			mars_kiss64_seed,
-			global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
+            mars_kiss64_seed,
+            global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
     // Then we return int(roundk(x^2))
     int nbits = 15;
     return (uint32_t) roundk(x * x, nbits);
@@ -395,7 +395,7 @@ static bool initialize() {
     }
 
     // print spike sources for debug purposes
-    print_spike_sources();
+    // print_spike_sources();
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
@@ -439,7 +439,7 @@ void resume_callback() {
     log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
-    print_spike_sources();
+    // print_spike_sources();
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
@@ -608,20 +608,20 @@ void timer_callback(uint timer_count, uint unused) {
                     && time < spike_source->end_ticks) {
 
                 // Get number of spikes to send this tick
-            	uint32_t num_spikes = 0;
-            	// If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
-            	if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
-            	    num_spikes = faster_spike_source_get_num_spikes(
-            				spike_source->sqrt_lambda);
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
-            	} else {
-            		// Call the fast source Poisson algorithm
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
-            		num_spikes = fast_spike_source_get_num_spikes(
-            				spike_source->exp_minus_lambda);
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
-            	}
+                uint32_t num_spikes = 0;
+                // If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
+                if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+                    num_spikes = faster_spike_source_get_num_spikes(
+                            spike_source->sqrt_lambda);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+                } else {
+                    // Call the fast source Poisson algorithm
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+                    num_spikes = fast_spike_source_get_num_spikes(
+                            spike_source->exp_minus_lambda);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+                }
 
                 log_debug("Generating %d spikes", num_spikes);
 
@@ -631,14 +631,14 @@ void timer_callback(uint timer_count, uint unused) {
                     // Write spikes to out spikes
                     _mark_spike(s, num_spikes);
 
-					// If no key has been given, do not send spikes to fabric
-					if (global_parameters.has_key) {
+                    // If no key has been given, do not send spikes to fabric
+                    if (global_parameters.has_key) {
 
-						// Send spikes
-						const uint32_t spike_key = global_parameters.key | s;
-						for (uint32_t index = 0; index < num_spikes; index++) {
-							_send_spike(spike_key, timer_count);
-						}
+                        // Send spikes
+                        const uint32_t spike_key = global_parameters.key | s;
+                        for (uint32_t index = 0; index < num_spikes; index++) {
+                            _send_spike(spike_key, timer_count);
+                        }
                     }
                 }
             }
@@ -663,11 +663,11 @@ void timer_callback(uint timer_count, uint unused) {
 
                     // Update time to spike (note, this might not get us back above
                     // the scale factor, particularly if the mean_isi is smaller)
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
                     spike_source->time_to_spike_ticks +=
                         slow_spike_source_get_time_to_spike(
                             spike_source->mean_isi_ticks);
-            	    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
                 }
 
                 // Now we have finished for this tick, subtract the scale factor
@@ -703,11 +703,11 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
             if (rate >= global_parameters.fast_rate_per_tick_cutoff) {
-            	poisson_parameters[sub_id].sqrt_lambda =
-            			SQRT(rate_per_tick); // warning: sqrtk is untested...
+                poisson_parameters[sub_id].sqrt_lambda =
+                        SQRT(rate_per_tick); // warning: sqrtk is untested...
             } else {
-            	poisson_parameters[sub_id].exp_minus_lambda =
-            			(UFRACT) EXP(-rate_per_tick);
+                poisson_parameters[sub_id].exp_minus_lambda =
+                        (UFRACT) EXP(-rate_per_tick);
             }
         } else {
             poisson_parameters[sub_id].is_fast_source = false;
