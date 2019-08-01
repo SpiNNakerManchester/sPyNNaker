@@ -41,6 +41,7 @@ class DelayExtensionMachineVertex(
                ("N_PACKETS_SENT", 3),
                ("N_BUFFER_OVERFLOWS", 4),
                ("N_DELAYS", 5)])
+    N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(self, resources_required, label, constraints=None):
         super(DelayExtensionMachineVertex, self).__init__(
@@ -56,7 +57,7 @@ class DelayExtensionMachineVertex(
     @overrides(
         ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return 6
+        return self.N_EXTRA_PROVENANCE_DATA_ENTRIES
 
     @property
     @overrides(MachineVertex.resources_required)
