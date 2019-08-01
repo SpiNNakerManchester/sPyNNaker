@@ -328,11 +328,11 @@ class DelayExtensionVertex(
         return 128 * n_atoms
 
     def get_sdram_usage_for_atoms(self, out_edges):
-        return (SYSTEM_BYTES_REQUIREMENT +
-                DelayExtensionMachineVertex.get_provenance_data_size(
-                    DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES.
-                    N_PROVENANCE_DATA_ITEMS) +
-                self._get_size_of_generator_information(out_edges))
+        return (
+            SYSTEM_BYTES_REQUIREMENT +
+            DelayExtensionMachineVertex.get_provenance_data_size(
+                DelayExtensionMachineVertex.N_EXTRA_PROVENANCE_DATA_ENTRIES) +
+            self._get_size_of_generator_information(out_edges))
 
     def _get_edge_generator_size(self, synapse_info):
         """ Get the size of the generator data for a given synapse info object
