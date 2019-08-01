@@ -247,7 +247,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # The same seed needs to be sent to each of the slices
-        key = (id(pre_slices), id(post_slices))
+        key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
             self.__post_connector_seed[key] = [
                 int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
