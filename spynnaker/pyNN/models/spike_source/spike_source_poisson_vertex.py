@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import numpy
@@ -25,6 +40,7 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants, utility_calls
@@ -39,18 +55,20 @@ logger = logging.getLogger(__name__)
 # bool has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
 # uint32_t random_backoff_us; uint32_t time_between_spikes;
 # UFRACT seconds_per_tick; REAL ticks_per_second;
-# REAL slow_rate_per_tick_cutoff; uint32_t first_source_id;
-# uint32_t n_spike_sources; mars_kiss64_seed_t (uint[4]) spike_source_seed;
-PARAMS_BASE_WORDS = 14
+# REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
+# uint32_t first_source_id; uint32_t n_spike_sources;
+# mars_kiss64_seed_t (uint[4]) spike_source_seed;
+PARAMS_BASE_WORDS = 15
 
-# start_scaled, end_scaled, is_fast_source, exp_minus_lambda, isi_val,
-# time_to_spike
-PARAMS_WORDS_PER_NEURON = 6
+# start_scaled, end_scaled, is_fast_source, exp_minus_lambda, sqrt_lambda,
+# isi_val, time_to_spike
+PARAMS_WORDS_PER_NEURON = 7
 
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 1.0
+SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
+FAST_RATE_PER_TICK_CUTOFF = 10  # between Knuth algorithm and Gaussian approx.
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -62,9 +80,10 @@ _PoissonStruct = Struct([
     DataType.UINT32,  # Start Scaled
     DataType.UINT32,  # End Scaled
     DataType.UINT32,  # is_fast_source
-    DataType.U032,    # exp^(-rate)
-    DataType.S1615,   # inter-spike-interval
-    DataType.S1615])  # timesteps to next spike
+    DataType.U032,    # exp^(-spikes_per_tick)
+    DataType.S1615,   # sqrt(spikes_per_tick)
+    DataType.UINT32,   # inter-spike-interval
+    DataType.UINT32])  # timesteps to next spike
 
 
 class SpikeSourcePoissonVertex(
@@ -94,7 +113,8 @@ class SpikeSourcePoissonVertex(
         "__n_subvertices",
         "__n_data_specs",
         "__max_rate",
-        "__rate_change"]
+        "__rate_change",
+        "__n_profile_samples"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -119,7 +139,6 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
 
-        # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
 
         # Store the parameters
@@ -132,6 +151,11 @@ class SpikeSourcePoissonVertex(
         self.__time_to_spike = utility_calls.convert_param_to_numpy(
             0, n_neurons)
         self.__machine_time_step = None
+
+        # get config from simulator
+        config = globals_variables.get_simulator().config
+        self.__n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
 
         # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
@@ -153,11 +177,11 @@ class SpikeSourcePoissonVertex(
     def _max_spikes_per_ts(self, machine_time_step):
 
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
-        if float(self.__max_rate) / ts_per_second <= \
+        if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
-        # experiement show at 1000 is result is typically higher than actual
+        # Experiments show at 1000 this result is typically higher than actual
         chance_ts = 1000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
@@ -187,10 +211,11 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
-            recording_utilities.get_recording_data_constant_size(1))
+            recording_utilities.get_recording_data_constant_size(1) +
+            profile_utils.get_profile_region_size(self.__n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
-            vertex_slice,  machine_time_step)
+            vertex_slice, machine_time_step)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
@@ -298,6 +323,10 @@ class SpikeSourcePoissonVertex(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
+
+        profile_utils.reserve_profile_region(
+            spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
+
         placement.vertex.reserve_provenance_data_region(spec)
 
     def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
@@ -394,14 +423,17 @@ class SpikeSourcePoissonVertex(
             data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
             data_type=DataType.U032)
 
-        # Write the number of timesteps per second (accum)
+        # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=MICROSECONDS_PER_SECOND / float(machine_time_step),
-            data_type=DataType.S1615)
+            data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
             data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+
+        # Write the fast-rate-per-tick-cutoff (accum)
+        spec.write_value(
+            data=FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
         # Write the lo_atom id
         spec.write_value(data=vertex_slice.lo_atom)
@@ -443,7 +475,8 @@ class SpikeSourcePoissonVertex(
             rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
         # Determine which sources are fast and which are slow
-        is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
+        is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
+        is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
 
         # Compute the e^-(spikes_per_tick) for fast sources to allow fast
         # computation of the Poisson distribution to get the number of spikes
@@ -451,18 +484,26 @@ class SpikeSourcePoissonVertex(
         exp_minus_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
         exp_minus_lambda[is_fast_source] = numpy.exp(
             -1.0 * spikes_per_tick[is_fast_source])
+
+        # Compute sqrt(lambda) for "faster" sources to allow Gaussian
+        # approximation of the Poisson distribution to get the number of
+        # spikes per timestep
+        sqrt_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
+        sqrt_lambda[is_faster_source] = numpy.sqrt(
+            spikes_per_tick[is_faster_source])
+
         # Compute the inter-spike-interval for slow sources to get the average
         # number of timesteps between spikes
-        isi_val = numpy.zeros(len(spikes_per_tick), dtype="float")
+        isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
         elements = numpy.logical_not(is_fast_source) & (spikes_per_tick > 0)
-        isi_val[elements] = 1.0 / spikes_per_tick[elements]
+        isi_val[elements] = (1.0 / spikes_per_tick[elements]).astype(int)
 
         # Get the time to spike value
-        time_to_spike = self.__time_to_spike[vertex_slice.as_slice]
+        time_to_spike = self.__time_to_spike[vertex_slice.as_slice].astype(int)
         changed_rates = (
             self.__rate_change[vertex_slice.as_slice].astype("bool") &
             elements)
-        time_to_spike[changed_rates] = 0.0
+        time_to_spike[changed_rates] = 0
 
         # Merge the arrays as parameters per atom
         data = numpy.dstack((
@@ -470,8 +511,9 @@ class SpikeSourcePoissonVertex(
             end_scaled.astype("uint32"),
             is_fast_source.astype("uint32"),
             (exp_minus_lambda * (2 ** 32)).astype("uint32"),
-            (isi_val * (2 ** 15)).astype("uint32"),
-            (time_to_spike * (2 ** 15)).astype("uint32")
+            (sqrt_lambda * (2 ** 15)).astype("uint32"),
+            isi_val.astype("uint32"),
+            time_to_spike.astype("uint32")
         ))[0]
 
         spec.write_array(data)
@@ -579,7 +621,7 @@ class SpikeSourcePoissonVertex(
             poisson_parameter_parameters_sdram_address, size_of_region)
 
         # Convert the data to parameter values
-        (start, end, is_fast_source, exp_minus_lambda, isi,
+        (start, end, is_fast_source, exp_minus_lambda, sqrt_lambda, isi,
          time_to_next_spike) = _PoissonStruct.read_data(
              byte_array, 0, vertex_slice.n_atoms)
 
@@ -592,12 +634,15 @@ class SpikeSourcePoissonVertex(
             self._convert_n_timesteps_to_ms(end, self.__machine_time_step) -
             self.__start[vertex_slice.as_slice])
 
-        # Work out the spikes per tick depending on if the source is slow
-        # or fast
+        # Work out the spikes per tick depending on if the source is
+        # slow (isi), fast (exp) or faster (sqrt)
         is_fast_source = is_fast_source == 1.0
         spikes_per_tick = numpy.zeros(len(is_fast_source), dtype="float")
         spikes_per_tick[is_fast_source] = numpy.log(
             exp_minus_lambda[is_fast_source]) * -1.0
+        is_faster_source = sqrt_lambda > 0
+        spikes_per_tick[is_faster_source] = numpy.square(
+            sqrt_lambda[is_faster_source])
         slow_elements = isi > 0
         spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 
@@ -656,6 +701,11 @@ class SpikeSourcePoissonVertex(
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
             machine_time_step, time_scale_factor)
+
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, _REGIONS.PROFILER_REGION.value,
+            self.__n_profile_samples)
 
         # End-of-Spec:
         spec.end_specification()

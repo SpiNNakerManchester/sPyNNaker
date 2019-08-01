@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 try:
     from collections.abc import defaultdict
 except ImportError:
@@ -24,7 +39,7 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (
@@ -178,6 +193,9 @@ class SynapticManager(object):
             self, connection_holder, edge, synapse_info):
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
+
+    def get_connection_holders(self):
+        return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
         # TODO: Calculate this correctly
@@ -595,7 +613,7 @@ class SynapticManager(object):
                 pre_vertex_slice = graph_mapper.get_slice(
                     machine_edge.pre_vertex)
                 pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
-                pre_slice_idx = graph_mapper.get_machine_vertex_index(
+                pre_slice_index = graph_mapper.get_machine_vertex_index(
                     machine_edge.pre_vertex)
 
                 for synapse_info in app_edge.synapse_information:
@@ -617,11 +635,11 @@ class SynapticManager(object):
                                 post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
-                            pre_slice_idx, app_edge, rinfo))
+                            pre_slice_index, app_edge, rinfo))
                     else:
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
-                            pre_slices, pre_slice_idx, post_slices,
+                            pre_slices, pre_slice_index, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge,
                             self.__n_synapse_types,
@@ -637,11 +655,11 @@ class SynapticManager(object):
         # to the master population table
         generator_data = list()
         for gen_data in generate_on_machine:
-            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
+            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_index,
                 app_edge, rinfo) = gen_data
             block_addr, index = self.__generate_on_chip_data(
                 spec, synapse_info,
-                pre_slices, pre_slice_idx, post_slices,
+                pre_slices, pre_slice_index, post_slices,
                 post_slice_index, pre_vertex_slice,
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
@@ -780,14 +798,14 @@ class SynapticManager(object):
 
     def __write_block(
             self, spec, synaptic_matrix_region, synapse_info, pre_slices,
-            pre_slice_idx, post_slices, post_slice_index, pre_vertex_slice,
+            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             master_pop_table_region, weight_scales, machine_time_step,
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
-             synapse_info, pre_slices, pre_slice_idx, post_slices,
+             synapse_info, pre_slices, pre_slice_index, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
              app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
              weight_scales, machine_time_step,
@@ -910,7 +928,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step, placements):
+            graph_mapper, weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)
@@ -1049,11 +1067,13 @@ class SynapticManager(object):
             key, master_pop_table_address, transceiver,
             placement.x, placement.y)
 
-    def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
-                       weight_scales, data1, data2, n_delays, timestep):
+    def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
+                       delayed_max_row_length, n_synapse_types, weight_scales,
+                       data, delayed_data, n_delays, timestep):
         return self.__synapse_io.read_synapses(
-            info, pre_slice, post_slice, len1, len2, len3, weight_scales,
-            data1, data2, n_delays, timestep)
+            info, pre_slice, post_slice, max_row_length,
+            delayed_max_row_length, n_synapse_types, weight_scales, data,
+            delayed_data, n_delays, timestep)
 
     def _retrieve_synaptic_block(
             self, txrx, placement, master_pop_table_address,

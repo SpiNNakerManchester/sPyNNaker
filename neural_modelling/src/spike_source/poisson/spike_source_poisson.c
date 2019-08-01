@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *  \brief This file contains the main functions for a poisson spike generator.
@@ -14,6 +31,11 @@
 #include <simulation.h>
 #include <spin1_api.h>
 #include <bit_field.h>
+#include <stdfix-full-iso.h>
+#include <limits.h>
+
+#include "profile_tags.h"
+#include <profiler.h>
 
 // Declare spin1_wfi
 extern void spin1_wfi();
@@ -28,8 +50,9 @@ typedef struct spike_source_t {
     bool is_fast_source;
 
     UFRACT exp_minus_lambda;
-    REAL mean_isi_ticks;
-    REAL time_to_spike_ticks;
+    REAL sqrt_lambda;
+    uint32_t mean_isi_ticks;
+    uint32_t time_to_spike_ticks;
 } spike_source_t;
 
 //! \brief data structure for recording spikes
@@ -43,11 +66,14 @@ typedef struct timed_out_spikes{
 typedef enum region {
     SYSTEM, POISSON_PARAMS,
     SPIKE_HISTORY_REGION,
-    PROVENANCE_REGION
+    PROVENANCE_REGION,
+    PROFILER_REGION
 } region;
 
 #define NUMBER_OF_REGIONS_TO_RECORD 1
 #define BYTE_TO_WORD_CONVERTER 4
+//! A scale factor to allow the use of integers for "inter-spike intervals"
+#define ISI_SCALE_FACTOR 1000
 
 typedef enum callback_priorities{
     MULTICAST = -1, SDP = 0, TIMER = 2, DMA = 1
@@ -75,10 +101,13 @@ struct global_parameters {
     UFRACT seconds_per_tick;
 
     //! The number of ticks per second for setting the rate
-    REAL ticks_per_second;
+    uint32_t ticks_per_second;
 
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
+
+    //! The border rate between fast and faster sources
+    REAL fast_rate_per_tick_cutoff;
 
     //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
@@ -130,14 +159,14 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
-//! \brief ??????????????
-//! \param[in] n ?????????????????
-//! \return bit field of the ???????????????
+//! \brief Set specific spikes for recording
+//! \param[in] n is the spike array index
+//! \return bit field at the location n
 static inline bit_field_t _out_spikes(uint32_t n) {
     return &(spikes->out_spikes[n * n_spike_buffer_words]);
 }
 
-//! \brief ??????????????
+//! \brief Reset the spike buffer by clearing the bit field
 //! \return None
 static inline void _reset_spikes() {
     spikes->n_buffers = 0;
@@ -146,26 +175,33 @@ static inline void _reset_spikes() {
     }
 }
 
-//! \brief deduces the time in timer ticks until the next spike is to occur
-//!        given the mean inter-spike interval
+//! \brief deduces the time in timer ticks multiplied by ISI_SCALE_FACTOR
+//!        until the next spike is to occur given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
-//! \return a real which represents time in timer ticks until the next spike is
-//!         to occur
-static inline REAL slow_spike_source_get_time_to_spike(
-        REAL mean_inter_spike_interval_in_ticks) {
-    return exponential_dist_variate(
-            mars_kiss64_seed, global_parameters.spike_source_seed)
-        * mean_inter_spike_interval_in_ticks;
+//! \return a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR
+//!         until the next spike occurs
+static inline uint32_t slow_spike_source_get_time_to_spike(
+        uint32_t mean_inter_spike_interval_in_ticks) {
+    // Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
+    int nbits = 15;
+    uint32_t value = (uint32_t) roundk(exponential_dist_variate(
+            mars_kiss64_seed, global_parameters.spike_source_seed) * ISI_SCALE_FACTOR, nbits);
+    // Now multiply by the mean ISI
+    uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
+    // Note that this will be compared to ISI_SCALE_FACTOR in the main loop!
+    return exp_variate;
 }
 
-//! \brief Determines how many spikes to transmit this timer tick.
-//! \param[in] exp_minus_lambda The amount of spikes expected to be produced
-//!            this timer interval (timer tick in real time)
+//! \brief Determines how many spikes to transmit this timer tick, for a fast source
+//! \param[in] exp_minus_lambda exp(-lambda), lambda is amount of spikes expected to be
+//!            produced this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
 //!         this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
+    // If the value of exp_minus_lambda is very small then it's not worth
+    // using the algorithm, so just return 0
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
@@ -176,6 +212,23 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     }
 }
 
+//! \brief Determines how many spikes to transmit this timer tick, for a faster source
+//!        (where lambda is large enough that a Gaussian can be used instead of a Poisson)
+//! \param[in] sqrt_lambda Square root of the amount of spikes expected to be produced
+//!            this timer interval (timer tick in real time)
+//! \return a uint32_t which represents the number of spikes to transmit
+//!         this timer tick
+static inline uint32_t faster_spike_source_get_num_spikes(
+        REAL sqrt_lambda) {
+    // First we do x = (invgausscdf(U(0,1)) * 0.5) + sqrt(lambda)
+    REAL x = (gaussian_dist_variate(
+            mars_kiss64_seed,
+            global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
+    // Then we return int(roundk(x^2))
+    int nbits = 15;
+    return (uint32_t) roundk(x * x, nbits);
+}
+
 void print_spike_sources(){
     for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
         log_info("atom %d", s);
@@ -183,11 +236,12 @@ void print_spike_sources(){
         log_info("scaled end = %u", poisson_parameters[s].end_ticks);
         log_info("is_fast_source = %d", poisson_parameters[s].is_fast_source);
         log_info(
-            "exp_minus_lamda = %k",
+            "exp_minus_lambda = %k",
             (REAL)(poisson_parameters[s].exp_minus_lambda));
-        log_info("isi_val = %k", poisson_parameters[s].mean_isi_ticks);
+        log_info("sqrt_lambda = %k", poisson_parameters[s].sqrt_lambda);
+        log_info("isi_val = %u", poisson_parameters[s].mean_isi_ticks);
         log_info(
-            "time_to_spike = %k", poisson_parameters[s].time_to_spike_ticks);
+            "time_to_spike = %u", poisson_parameters[s].time_to_spike_ticks);
     }
 }
 
@@ -221,10 +275,13 @@ bool read_global_parameters(address_t address) {
     log_info(
         "seconds_per_tick = %k\n",
         (REAL)(global_parameters.seconds_per_tick));
-    log_info("ticks_per_second = %k\n", global_parameters.ticks_per_second);
+    log_info("ticks_per_second = %u\n", global_parameters.ticks_per_second);
     log_info(
         "slow_rate_per_tick_cutoff = %k\n",
         global_parameters.slow_rate_per_tick_cutoff);
+    log_info(
+        "fast_rate_per_tick_cutoff = %k\n",
+        global_parameters.fast_rate_per_tick_cutoff);
 
     log_info("read_global_parameters: completed successfully");
     return true;
@@ -306,7 +363,7 @@ static bool initialize() {
     if (!simulation_initialise(
             data_specification_get_region(SYSTEM, ds_regions),
             APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_data_address(
@@ -345,6 +402,10 @@ static bool initialize() {
     n_spike_buffer_words = get_bit_field_size(
         global_parameters.n_spike_sources);
     spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
+
+    // Setup profiler
+    profiler_init(
+        data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_info("Initialise: completed successfully");
 
@@ -466,6 +527,7 @@ static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     }
 }
 
+//! \brief callback for completed recording
 void recording_complete_callback() {
     recording_in_progress = false;
 }
@@ -495,6 +557,9 @@ static inline void _record_spikes(uint32_t time) {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
+
     time++;
 
     log_debug("Timer tick %u", time);
@@ -511,11 +576,15 @@ void timer_callback(uint timer_count, uint unused) {
             rt_error(RTE_SWERR);
         }
 
+        profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
+
         // Finalise any recordings that are in progress, writing back the final
         // amounts of samples recorded to SDRAM
         if (recording_flags > 0) {
             recording_finalise();
         }
+
+        profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
@@ -533,24 +602,37 @@ void timer_callback(uint timer_count, uint unused) {
         // If this spike source is active this tick
         spike_source_t *spike_source = &poisson_parameters[s];
 
-        // handle fast spike sources
+        // Choose between fast or slow spike sources
         if (spike_source->is_fast_source) {
             if (time >= spike_source->start_ticks
                     && time < spike_source->end_ticks) {
 
                 // Get number of spikes to send this tick
-                uint32_t num_spikes = fast_spike_source_get_num_spikes(
-                    spike_source->exp_minus_lambda);
+                uint32_t num_spikes = 0;
+                // If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
+                if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+                    num_spikes = faster_spike_source_get_num_spikes(
+                            spike_source->sqrt_lambda);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+                } else {
+                    // Call the fast source Poisson algorithm
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+                    num_spikes = fast_spike_source_get_num_spikes(
+                            spike_source->exp_minus_lambda);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+                }
+
                 log_debug("Generating %d spikes", num_spikes);
 
                 // If there are any
                 if (num_spikes > 0) {
 
-                    // Write spike to out spikes
+                    // Write spikes to out spikes
                     _mark_spike(s, num_spikes);
 
-                    // if no key has been given, do not send spike to fabric.
-                    if (global_parameters.has_key){
+                    // If no key has been given, do not send spikes to fabric
+                    if (global_parameters.has_key) {
 
                         // Send spikes
                         const uint32_t spike_key = global_parameters.key | s;
@@ -561,18 +643,15 @@ void timer_callback(uint timer_count, uint unused) {
                 }
             }
         } else {
-
-            // handle slow sources
+            // Handle slow sources
             if ((time >= spike_source->start_ticks)
                     && (time < spike_source->end_ticks)
                     && (spike_source->mean_isi_ticks != 0)) {
 
-                // If this spike source should spike now
-                if (REAL_COMPARE(
-                        spike_source->time_to_spike_ticks, <=,
-                        REAL_CONST(0.0))) {
+                // Mark a spike while the "timer" is below the scale factor value
+                while (spike_source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
 
-                    // Write spike to out spikes
+                    // Write spike to out_spikes
                     _mark_spike(s, 1);
 
                     // if no key has been given, do not send spike to fabric.
@@ -582,18 +661,22 @@ void timer_callback(uint timer_count, uint unused) {
                         _send_spike(global_parameters.key | s, timer_count);
                     }
 
-                    // Update time to spike
+                    // Update time to spike (note, this might not get us back above
+                    // the scale factor, particularly if the mean_isi is smaller)
+                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
                     spike_source->time_to_spike_ticks +=
                         slow_spike_source_get_time_to_spike(
                             spike_source->mean_isi_ticks);
+                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
                 }
 
-                // Subtract tick
-                spike_source->time_to_spike_ticks -= REAL_CONST(1.0);
-
+                // Now we have finished for this tick, subtract the scale factor
+                spike_source->time_to_spike_ticks -= ISI_SCALE_FACTOR;
             }
         }
     }
+
+    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
     // Record output spikes if required
     if (recording_flags > 0) {
@@ -603,8 +686,13 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
+
 }
 
+//! \brief set the spike source rate as required
+//! \param[in] id, the ID of the source to be updated
+//! \param[in] rate, the REAL-valued rate in Hz, to be multiplied
+//!            to get per_tick values
 void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id >= global_parameters.first_source_id) &&
             ((id - global_parameters.first_source_id) <
@@ -612,18 +700,24 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        if (rate > global_parameters.slow_rate_per_tick_cutoff) {
+        if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
-            poisson_parameters[sub_id].exp_minus_lambda =
-                (UFRACT) EXP(-rate_per_tick);
+            if (rate >= global_parameters.fast_rate_per_tick_cutoff) {
+                poisson_parameters[sub_id].sqrt_lambda =
+                        SQRT(rate_per_tick); // warning: sqrtk is untested...
+            } else {
+                poisson_parameters[sub_id].exp_minus_lambda =
+                        (UFRACT) EXP(-rate_per_tick);
+            }
         } else {
             poisson_parameters[sub_id].is_fast_source = false;
             poisson_parameters[sub_id].mean_isi_ticks =
-                rate * global_parameters.ticks_per_second;
+                (uint32_t) rate * global_parameters.ticks_per_second;
         }
     }
 }
 
+// Is this function actually used any more?
 void sdp_packet_callback(uint mailbox, uint port) {
     use(port);
     sdp_msg_t *msg = (sdp_msg_t *) mailbox;
@@ -639,6 +733,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
     spin1_msg_free(msg);
 }
 
+//! multicast callback used to set rate when injected in a live example
 void multicast_packet_callback(uint key, uint payload) {
     uint32_t id = key & global_parameters.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);

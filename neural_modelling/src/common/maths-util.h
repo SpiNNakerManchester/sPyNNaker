@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 2013-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
 
  maths-util.h -  first created 7/10/2013  version 0.1
 
@@ -65,6 +82,7 @@ static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 #include <stdfix.h>
 #include <stdfix-full-iso.h>
 #include <stdfix-exp.h>
+#include <sqrt.h>
 
 typedef accum			REAL;
 typedef unsigned accum		UREAL;
@@ -80,7 +98,7 @@ typedef unsigned long fract	UFRACT;
 #define ZERO		REAL_CONST(0.0000)
 #define ACS_DBL_TINY	REAL_CONST(0.000001)
 
-//#define SQRT(x)	sqrtfx(x)
+#define SQRT(x)	    sqrtk(x)
 #define EXP(x)		expk(x)
 //#define LN(x)		lnfx(x)
 //#define POW(x, p)	powfx(x, p)   // strictly positive x only

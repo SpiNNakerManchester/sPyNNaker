@@ -1,16 +1,33 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import print_function
 import logging
 import math
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPostConnector(AbstractConnector):
+class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -20,7 +37,8 @@ class FixedNumberPostConnector(AbstractConnector):
         "__n_post",
         "__post_neurons",
         "__post_neurons_set",
-        "__with_replacement"]
+        "__with_replacement",
+        "__post_connector_seed"]
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
@@ -43,12 +61,13 @@ class FixedNumberPostConnector(AbstractConnector):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose, rng)
+        super(FixedNumberPostConnector, self).__init__(safe, verbose)
         self.__n_post = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
+        self.__post_connector_seed = dict()
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
@@ -199,9 +218,9 @@ class FixedNumberPostConnector(AbstractConnector):
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
         block["weight"] = self._generate_weights(
-            weights, n_connections, None)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
@@ -215,3 +234,39 @@ class FixedNumberPostConnector(AbstractConnector):
     @allow_self_connections.setter
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
+    def gen_connector_id(self):
+        return ConnectorIDs.FIXED_NUMBER_POST_CONNECTOR.value
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params)
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
+        # The same seed needs to be sent to each of the slices
+        key = (id(pre_vertex_slice), id(post_slices))
+        if key not in self.__post_connector_seed:
+            self.__post_connector_seed[key] = [
+                int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
+
+        # Only deal with self-connections if the two populations are the same
+        self_connections = True
+        if ((not self.__allow_self_connections) and (
+                self.pre_population is self.post_population)):
+            self_connections = False
+        params = [
+            self_connections,
+            self.__with_replacement,
+            self.__n_post,
+            self._n_post_neurons]
+        params.extend(self.__post_connector_seed[key])
+        return numpy.array(params, dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
+        return 16 + 16

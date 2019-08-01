@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import numpy.random
@@ -169,9 +184,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = pairs[chosen, 0]
         block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
-            weights, n_connections, [connection_slice])
+            weights, n_connections, [connection_slice], pre_vertex_slice,
+            post_vertex_slice)
         block["delay"] = self._generate_delays(
-            delays, n_connections, [connection_slice])
+            delays, n_connections, [connection_slice], pre_vertex_slice,
+            post_vertex_slice)
         block["synapse_type"] = synapse_type
         return block
 
