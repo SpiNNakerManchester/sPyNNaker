@@ -43,8 +43,10 @@ struct fixed_pre {
     rng_t rng;
 };
 
-// A global 2d array containing the indices for each column
-uint16_t** full_indices = NULL;
+// An array containing the indices for each column
+void *full_indices = NULL;
+uint32_t n_pre_neurons_done;
+uint32_t in_sdram = 0;
 
 void *connection_generator_fixed_pre_initialise(address_t *region) {
 
@@ -61,8 +63,7 @@ void *connection_generator_fixed_pre_initialise(address_t *region) {
     // Initialise the RNG
     params->rng = rng_init(&params_sdram);
     *region = params_sdram;
-//    log_debug(
-    log_info(
+    log_debug(
         "Fixed Total Number Connector, allow self connections = %u, "
         "with replacement = %u, n_pre = %u, "
         "n pre neurons = %u", params->params.allow_self_connections,
@@ -102,18 +103,32 @@ uint32_t connection_generator_fixed_pre_generate(
 
     // The number of columns is the number of post-slices to do the calculation for
     uint32_t n_columns = post_slice_count;
-    // If we're on the first row then do the calculations by looping over
-    // the post-slices available here
 
+    // If we haven't done so then do the calculations by looping over
+    // the post-slices available here
     if (pre_neuron_index == 0) {
-        // Allocate array for each column (i.e. post-slice on this slice)
-        full_indices = (uint16_t**) spin1_malloc(
-            n_columns * sizeof(uint16_t*));
-        for (uint32_t n = 0; n < n_columns; n++) {
-            // Allocate an array of size n_pre for each column
-            full_indices[n] = (uint16_t*) spin1_malloc(
-                n_conns * sizeof(uint16_t));
+        // Ensure the array was freed
+        if (full_indices != NULL) {
+            log_error("Created out of order!");
+            rt_error(RTE_SWERR);
         }
+
+        n_pre_neurons_done = 0;
+        // Allocate array for each column (i.e. post-slice on this slice)
+        uint16_t (*array)[n_columns][n_conns] = spin1_malloc(
+            n_columns * n_conns * sizeof(uint16_t));
+        in_sdram = 0;
+        if (array == NULL) {
+            log_warning("Could not allocate in DTCM, trying SDRAM");
+            array = sark_xalloc(sv->sdram_heap,
+                n_columns * n_conns * sizeof(uint16_t), 0, ALLOC_LOCK);
+            in_sdram = 1;
+        }
+        if (array == NULL) {
+            log_error("Could not allocate array for indices");
+            rt_error(RTE_SWERR);
+        }
+        full_indices = array;
 
         // Loop over the columns and fill the full_indices array accordingly
         for (uint32_t n = 0; n < n_columns; n++) {
@@ -125,7 +140,7 @@ uint32_t connection_generator_fixed_pre_generate(
                     for (unsigned int i = 0; i < n_conns; i++) {
                         uint32_t u01 = (rng_generator(params->rng) & 0x00007fff);
                         uint32_t j = (u01 * n_values) >> 15;
-                        full_indices[n][i] = j;
+                        (*array)[n][i] = j;
                     }
                 } else {
                     // self connections are not allowed (on this slice)
@@ -138,7 +153,7 @@ uint32_t connection_generator_fixed_pre_generate(
                             j = (u01 * n_values) >> 15;
                         } while (j == (n + post_slice_start));
 
-                        full_indices[n][i] = j;
+                        (*array)[n][i] = j;
                     }
                 }
             } else {
@@ -146,7 +161,7 @@ uint32_t connection_generator_fixed_pre_generate(
                 if (params->params.allow_self_connections) {
                     // Self-connections are allowed so do this normally
                     for (unsigned int i = 0; i < n_conns; i++) {
-                        full_indices[n][i] = i;
+                        (*array)[n][i] = i;
                     }
                     // And now replace values if chosen at random to be replaced
                     for (unsigned int i = n_conns; i < n_values; i++) {
@@ -154,7 +169,7 @@ uint32_t connection_generator_fixed_pre_generate(
                         const unsigned int u01 = (rng_generator(params->rng) & 0x00007fff);
                         const unsigned int j = (u01 * (i + 1)) >> 15;
                         if (j < n_conns) {
-                            full_indices[n][j] = i;
+                            (*array)[n][j] = i;
                         }
                     }
                 } else {
@@ -163,10 +178,10 @@ uint32_t connection_generator_fixed_pre_generate(
                     for (unsigned int i = 0; i < n_conns; i++) {
                         if (i == n + post_slice_start) {
                             // set to a value not equal to i for now
-                            full_indices[n][i] = n_conns;
+                            (*array)[n][i] = n_conns;
                             replace_start = n_conns + 1;
                         } else {
-                            full_indices[n][i] = i;
+                            (*array)[n][i] = i;
                         }
                     }
                     // And now "replace" values if chosen at random to be replaced
@@ -177,7 +192,7 @@ uint32_t connection_generator_fixed_pre_generate(
                             const unsigned int j = (u01 * (i + 1)) >> 15;
 
                             if (j < n_conns) {
-                                full_indices[n][j] = i;
+                                (*array)[n][j] = i;
                             }
                         }
                     }
@@ -186,11 +201,13 @@ uint32_t connection_generator_fixed_pre_generate(
         }
     }
 
-    // Loop over the full indices array, and only keep indices on this post-slice
+    uint16_t (*array)[n_columns][n_conns] = full_indices;
+
+    // Loop over the full indices array, and only use pre_neuron_index
     uint32_t count_indices = 0;
     for (unsigned int n = 0; n < n_columns; n++) {
         for (unsigned int i = 0; i < n_conns; i++) {
-            uint32_t j = full_indices[n][i];
+            uint32_t j = (*array)[n][i];
             if (j == pre_neuron_index) {
                 indices[count_indices] = n; // On this slice!
                 count_indices += 1;
@@ -198,11 +215,16 @@ uint32_t connection_generator_fixed_pre_generate(
         }
     }
 
-//    // Double-check for debug purposes
-//    for (unsigned int i = 0; i < count_indices; i++) {
-//    	log_info("Check: indices[%u] is %u", i, indices[i]);
-//    }
-//    log_info("pre_neuron_index is %u count_indices is %u", pre_neuron_index, count_indices);
+    // If all neurons in pre-slice have been done, free memory
+    n_pre_neurons_done += 1;
+    if (n_pre_neurons_done == params->params.n_pre_neurons) {
+        if (!in_sdram) {
+            sark_free(full_indices);
+        } else {
+            sark_xfree(sv->sdram_heap, full_indices, ALLOC_LOCK);
+        }
+        full_indices = NULL;
+    }
 
     return count_indices;
 }
