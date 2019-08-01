@@ -28,12 +28,14 @@
 #include "connection_generators/connection_generator_all_to_all.h"
 #include "connection_generators/connection_generator_fixed_prob.h"
 #include "connection_generators/connection_generator_fixed_total.h"
+#include "connection_generators/connection_generator_fixed_pre.h"
+#include "connection_generators/connection_generator_fixed_post.h"
 #include "connection_generators/connection_generator_kernel.h"
 
 /**
  *! \brief The number of known generators
  */
-#define N_CONNECTION_GENERATORS 5
+#define N_CONNECTION_GENERATORS 7
 
 /**
  *! \brief The data for a connection generator
@@ -138,13 +140,31 @@ void register_connection_generators() {
     connection_generators[3].free =
         connection_generator_fixed_total_free;
 
-    // Kernel Connector (tried to cheat, failed)
+    // Fixed Number Pre (fan-in) Connector
     connection_generators[4].hash = 4;
     connection_generators[4].initialize =
-        connection_generator_kernel_initialise;
+        connection_generator_fixed_pre_initialise;
     connection_generators[4].generate =
-        connection_generator_kernel_generate;
+        connection_generator_fixed_pre_generate;
     connection_generators[4].free =
+        connection_generator_fixed_pre_free;
+
+    // Fixed Number Post (fan-out) Connector
+    connection_generators[5].hash = 5;
+    connection_generators[5].initialize =
+        connection_generator_fixed_post_initialise;
+    connection_generators[5].generate =
+        connection_generator_fixed_post_generate;
+    connection_generators[5].free =
+        connection_generator_fixed_post_free;
+
+    // Kernel Connector
+    connection_generators[6].hash = 6;
+    connection_generators[6].initialize =
+        connection_generator_kernel_initialise;
+    connection_generators[6].generate =
+        connection_generator_kernel_generate;
+    connection_generators[6].free =
         connection_generator_kernel_free;
 }
 
