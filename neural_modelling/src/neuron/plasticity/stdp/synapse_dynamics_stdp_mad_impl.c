@@ -79,6 +79,8 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+/* PRIVATE FUNCTIONS */
+
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
@@ -161,6 +163,12 @@ static inline pre_event_history_t *_plastic_event_history(
     return (pre_event_history_t*) (&plastic_region_address[0]);
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
+static const char *_get_type_char(uint32_t synapse_type) {
+	return neuron_get_synapse_type_char(synapse_type);
+}
+#endif // LOG_LEVEL >= LOG_DEBUG
+
 void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
@@ -171,24 +179,28 @@ void synapse_dynamics_print_plastic_synapses(
 
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    weight_t *plastic_words = _plastic_synapses(plastic_region_address);
+    plastic_synapse_t *plastic_words = _plastic_synapses(plastic_region_address);
     const control_t *control_words = synapse_row_plastic_controls(
         fixed_region_address);
     size_t plastic_synapse = synapse_row_num_plastic_controls(
         fixed_region_address);
-    const pre_event_history_t *event_history = _plastic_event_history(
-        plastic_region_address);
 
     log_debug("Plastic region %u synapses\n", plastic_synapse);
 
     // Loop through plastic synapses
     for (uint32_t i = 0; i < plastic_synapse; i++) {
 
-        // Get next weight and control word (auto incrementing control word)
-        uint32_t weight = *plastic_words++;
+        // Get next control word (auto incrementing control word)
         uint32_t control_word = *control_words++;
         uint32_t synapse_type = synapse_row_sparse_type(
             control_word, synapse_index_bits, synapse_type_mask);
+
+        // Get weight
+        update_state_t update_state = synapse_structure_get_update_state(
+                *plastic_words++, synapse_type);
+        final_state_t final_state = synapse_structure_get_final_state(
+                update_state);
+        weight_t weight = synapse_structure_get_final_weight(final_state);
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
         synapses_print_weight(
@@ -196,7 +208,7 @@ void synapse_dynamics_print_plastic_synapses(
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                   synapse_row_sparse_delay(
                       control_word, synapse_type_index_bits),
-                  synapse_types_get_type_char(synapse_type),
+                  _get_type_char(synapse_type),
                   synapse_row_sparse_index(control_word, synapse_index_mask),
                   SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
