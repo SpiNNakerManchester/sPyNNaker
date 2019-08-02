@@ -250,5 +250,5 @@ void c_main(void) {
 
     // Start the time at "-1" so that the first tick will be 0
     time = UINT32_MAX;
-    simulation_run(timer_callback, TIMER);
+    simulation_run();
 }
