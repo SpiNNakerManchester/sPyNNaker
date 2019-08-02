@@ -340,12 +340,14 @@ bool neuron_do_timestep_update(
 			0.0k, //external_bias,
 			recorded_variable_values);
 
-//        // Write the recorded variable values
-//        for (uint32_t i = 0; i < n_recorded_vars; i++) {
-//            uint32_t index = var_recording_indexes[i][neuron_index];
-//            var_recording_values[i]->states[index] =
-//                recorded_variable_values[i];
-//        }
+        // ***********************
+        // Write the recorded variable values
+        for (uint32_t i = 0; i < n_recorded_vars; i++) {
+            uint32_t index = var_recording_indexes[i][neuron_index];
+            var_recording_values[i]->states[index] =
+                recorded_variable_values[i];
+        }
+        // **********************
 
         // If the neuron has spiked
         if (spike) {
@@ -386,19 +388,21 @@ bool neuron_do_timestep_update(
     uint cpsr = 0;
     cpsr = spin1_int_disable();
 
-//    // Record the recorded variables
-//    for (uint32_t i = 0; i < n_recorded_vars; i++) {
-//        if (var_recording_count[i] == var_recording_rate[i]) {
-//            var_recording_count[i] = 1;
-//            n_recordings_outstanding += 1;
-//            var_recording_values[i]->time = time;
-//            recording_record_and_notify(
-//                i + 1, var_recording_values[i], var_recording_size[i],
-//                recording_done_callback);
-//        } else {
-//            var_recording_count[i] += var_recording_increment[i];
-//        }
-//    }
+    // **********************
+    // Record the recorded variables
+    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+        if (var_recording_count[i] == var_recording_rate[i]) {
+            var_recording_count[i] = 1;
+            n_recordings_outstanding += 1;
+            var_recording_values[i]->time = time;
+            recording_record_and_notify(
+                i + 1, var_recording_values[i], var_recording_size[i],
+                recording_done_callback);
+        } else {
+            var_recording_count[i] += var_recording_increment[i];
+        }
+    }
+    // **********************
 
     // Record any spikes this timestep
     if (spike_recording_count == spike_recording_rate) {

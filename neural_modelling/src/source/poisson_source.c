@@ -37,6 +37,10 @@
 #include "spin1_api_params.h"
 
 
+uint32_t measurement_in[1000];
+uint32_t measurement_out[1000];
+uint32_t measurement_index = 0;
+
 // Declare spin1_wfi
 extern void spin1_wfi();
 
@@ -54,7 +58,7 @@ typedef struct poisson_source_t {
     uint32_t mean_isi_ticks;
     uint32_t time_to_source_ticks;
 
-	REAL poisson_weight;
+	uint16_t poisson_weight;
 } poisson_source_t;
 
 //! spike source array region IDs in human readable form
@@ -67,6 +71,8 @@ typedef enum region {
 #define BYTE_TO_WORD_CONVERTER 4
 //! A scale factor to allow the use of integers for "inter-spike intervals"
 #define ISI_SCALE_FACTOR 1000
+
+#define TIMER_PROFILING false
 
 // some of these callbacks are probably not necessary... ?
 typedef enum callback_priorities{
@@ -126,7 +132,7 @@ static uint32_t infinite_run;
 static uint32_t source_buffer_size; // is this needed?
 
 //! The source buffer itself
-static REAL* source_buffer;
+static uint16_t* source_buffer;
 
 //! The timer period
 static uint32_t timer_period;
@@ -204,7 +210,7 @@ void print_sources(){
         log_info(
             "time_to_source = %u", poisson_parameters[s].time_to_source_ticks);
         log_info(
-            "poisson_weight = %k", poisson_parameters[s].poisson_weight);
+            "poisson_weight = %u", poisson_parameters[s].poisson_weight);
     }
 }
 
@@ -356,8 +362,8 @@ static bool initialize() {
     }
 
     // Set up buffer for storage of stuff
-    source_buffer_size = global_parameters.n_sources * sizeof(REAL);
-    source_buffer = (REAL *) spin1_malloc(source_buffer_size);
+    source_buffer_size = global_parameters.n_sources * sizeof(uint16_t);
+    source_buffer = (uint16_t *) spin1_malloc(source_buffer_size);
 
     // Loop through spike sources and initialise
     // Loop through slow spike sources and initialise 1st time to spike
@@ -367,7 +373,9 @@ static bool initialize() {
                 slow_source_get_time_to_source(
                     poisson_parameters[s].mean_isi_ticks);
         }
-    	source_buffer[s] = REAL_CONST(0.0);
+    	source_buffer[s] = 0;
+    	io_printf(IO_BUF, "Source: %u, rate: %u, weight: %u\n",
+    			s, poisson_parameters[s].is_fast_source, poisson_parameters[s].poisson_weight );
     }
 
     // print spike sources for debug purposes
@@ -400,7 +408,7 @@ void resume_callback() {
                 slow_source_get_time_to_source(
                     poisson_parameters[s].mean_isi_ticks);
         }
-    	source_buffer[s] = REAL_CONST(0.0);
+    	source_buffer[s] = 0;
     }
 
     log_info("Successfully resumed Poisson spike source at time: %u", time);
@@ -463,6 +471,10 @@ void timer_callback(uint timer_count, uint unused) {
 	use(timer_count);
     use(unused);
 
+    if (TIMER_PROFILING){
+    	measurement_in[measurement_index] = tc[T1_COUNT];
+    }
+
     // Disable DMA_DONE interrupts for the simulation
     vic[VIC_DISABLE] = (1 << DMA_DONE_INT);
 
@@ -494,6 +506,16 @@ void timer_callback(uint timer_count, uint unused) {
         // run
         time -= 1;
         simulation_ready_to_read();
+
+        if (TIMER_PROFILING){
+                for (int i=0; i< 1000; i++){
+                	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
+                			measurement_in[i],
+        					measurement_out[i],
+        					(measurement_in[i] - measurement_out[i]));
+                }
+                io_printf(IO_BUF, " Job Done ");
+        }
         return;
     }
 
@@ -564,7 +586,12 @@ void timer_callback(uint timer_count, uint unused) {
     // at this point we have looped over all the sources, so we can write the array
     // to wherever it needs to go; for now I'm just printing it
     for (index_t s = 0; s < global_parameters.n_sources; s++) {
-    	source_buffer[s] = REAL_CONST(0.0);
+    	source_buffer[s] = 0;
+    }
+
+    if (TIMER_PROFILING){
+        measurement_out[measurement_index] = tc[T1_COUNT];
+        measurement_index++;
     }
 
 }

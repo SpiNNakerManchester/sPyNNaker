@@ -486,7 +486,7 @@ class PoissonSourceVertex(
             (sqrt_lambda * (2 ** 15)).astype("uint32"),
             isi_val.astype("uint32"),
             time_to_source.astype("uint32"),
-            (poisson_weight * (2 ** 15)).astype("uint32")
+            (poisson_weight * (2 ** (15-2))).astype("uint16") # 2 is prescribed left-shift
         ))[0]
 
         spec.write_array(data)
