@@ -29,6 +29,8 @@
 #include "connection_generators/connection_generator_all_to_all.h"
 #include "connection_generators/connection_generator_fixed_prob.h"
 #include "connection_generators/connection_generator_fixed_total.h"
+#include "connection_generators/connection_generator_fixed_pre.h"
+#include "connection_generators/connection_generator_fixed_post.h"
 #include "connection_generators/connection_generator_kernel.h"
 
 enum {
@@ -36,6 +38,8 @@ enum {
     ALL_TO_ALL,
     FIXED_PROBABILITY,
     FIXED_TOTAL,
+    FIXED_PRE,
+    FIXED_POST,
     KERNEL,
     /**
      *! \brief The number of known generators
@@ -118,6 +122,14 @@ static const connection_generator_info connection_generators[] = {
             connection_generator_fixed_total_initialise,
             connection_generator_fixed_total_generate,
             connection_generator_fixed_total_free},
+    {FIXED_PRE,
+            connection_generator_fixed_pre_initialise,
+            connection_generator_fixed_pre_generate,
+            connection_generator_fixed_pre_free},
+    {FIXED_POST,
+            connection_generator_fixed_post_initialise,
+            connection_generator_fixed_post_generate,
+            connection_generator_fixed_post_free},
     {KERNEL,
             connection_generator_kernel_initialise,
             connection_generator_kernel_generate,

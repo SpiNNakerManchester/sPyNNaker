@@ -68,6 +68,8 @@ static void *connection_generator_fixed_total_initialise(address_t *region) {
 }
 
 static void connection_generator_fixed_total_free(void *data) {
+    struct fixed_total *params = data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

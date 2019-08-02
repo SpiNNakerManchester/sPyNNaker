@@ -56,12 +56,15 @@ static void *connection_generator_fixed_prob_initialise(address_t *region) {
     // Initialise the RNG for the connector
     obj->rng = rng_init(region);
     log_debug("Fixed Probability Connector, allow self connections = %u, "
-            "probability = %k", obj->params.allow_self_connections,
+            "probability = %k",
+            obj->params.allow_self_connections,
             (accum) obj->params.probability);
     return obj;
 }
 
 static void connection_generator_fixed_prob_free(void *data) {
+    struct fixed_prob *params = data;
+    rng_free(params->rng);
     sark_free(data);
 }
 
