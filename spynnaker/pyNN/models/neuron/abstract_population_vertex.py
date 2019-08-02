@@ -16,6 +16,8 @@
 import logging
 import os
 import math
+
+from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -590,7 +592,8 @@ class AbstractPopulationVertex(
                 variable)
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, index, placements, graph_mapper,
-            self, variable, n_machine_time_steps)
+            self, variable, n_machine_time_steps,
+            DataType.S1615, DataType.INT32)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
