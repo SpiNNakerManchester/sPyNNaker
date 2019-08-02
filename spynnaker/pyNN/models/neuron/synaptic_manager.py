@@ -47,8 +47,9 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
-from spynnaker.pyNN.utilities.constants import POSSION_SIGMA_SUMMATION_LIMIT
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
@@ -217,6 +218,9 @@ class SynapticManager(object):
             self, connection_holder, edge, synapse_info):
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
+
+    def get_connection_holders(self):
+        return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
         # TODO: Calculate this correctly
@@ -687,11 +691,11 @@ class SynapticManager(object):
         self._host_generated_block_addr = block_addr
         # numpy.random.shuffle(order)
         for gen_data in generate_on_machine:
-            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_idx,
+            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_index,
                 app_edge, rinfo) = gen_data
             block_addr, index = self.__generate_on_chip_data(
                 spec, synapse_info,
-                pre_slices, pre_slice_idx, post_slices,
+                pre_slices, pre_slice_index, post_slices,
                 post_slice_index, pre_vertex_slice,
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
@@ -832,14 +836,14 @@ class SynapticManager(object):
 
     def __write_block(
             self, spec, synaptic_matrix_region, synapse_info, pre_slices,
-            pre_slice_idx, post_slices, post_slice_index, pre_vertex_slice,
+            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             master_pop_table_region, weight_scales, machine_time_step,
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
-             synapse_info, pre_slices, pre_slice_idx, post_slices,
+             synapse_info, pre_slices, pre_slice_index, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
              app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
              weight_scales, machine_time_step,
@@ -1024,8 +1028,8 @@ class SynapticManager(object):
                 graph_mapper=graph_mapper, routing_info=routing_info)
         else:
             self.__synapse_dynamics.write_parameters(
-                spec, synapse_dynamics_region,
-                machine_time_step, weight_scales)
+                spec, synapse_dynamics_region, machine_time_step,
+                weight_scales)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1116,11 +1120,13 @@ class SynapticManager(object):
             key, master_pop_table_address, transceiver,
             placement.x, placement.y)
 
-    def _read_synapses(self, info, pre_slice, post_slice, len1, len2, len3,
-                       weight_scales, data1, data2, n_delays, timestep):
+    def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
+                       delayed_max_row_length, n_synapse_types, weight_scales,
+                       data, delayed_data, n_delays, timestep):
         return self.__synapse_io.read_synapses(
-            info, pre_slice, post_slice, len1, len2, len3, weight_scales,
-            data1, data2, n_delays, timestep)
+            info, pre_slice, post_slice, max_row_length,
+            delayed_max_row_length, n_synapse_types, weight_scales, data,
+            delayed_data, n_delays, timestep)
 
     def _retrieve_synaptic_block(
             self, txrx, placement, master_pop_table_address,

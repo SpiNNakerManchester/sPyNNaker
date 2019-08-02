@@ -17,9 +17,10 @@ import logging
 import os
 import math
 
+from data_specification.enums import DataType
+from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.splitter_by_atoms import \
     SplitterByAtoms
-from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -55,6 +56,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from .synaptic_manager import SynapticManager
+from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
@@ -633,7 +636,8 @@ class AbstractPopulationVertex(
                 variable)
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, index, placements, graph_mapper,
-            self, variable, n_machine_time_steps)
+            self, variable, n_machine_time_steps,
+            DataType.S1615, DataType.INT32)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
@@ -792,6 +796,9 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
         self.__synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
+
+    def get_connection_holders(self):
+        return self.__synapse_manager.get_connection_holders()
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(

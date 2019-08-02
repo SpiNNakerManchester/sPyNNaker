@@ -104,9 +104,10 @@ class NeuronRecorder(object):
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, variable, n_machine_time_steps):
-        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
-            machine.
+            application_vertex, variable, n_machine_time_steps,
+            scale_data_type, output_data_type):
+        """ Reads raw data mapped to time and neuron IDs from the SpiNNaker\
+            machine and converts to required data types with scaling if needed.
 
         :param label: vertex label
         :param buffer_manager: the manager for buffered data
@@ -117,7 +118,12 @@ class NeuronRecorder(object):
         :param application_vertex:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
-        :param n_machine_time_steps:
+        :param n_machine_time_steps: how many time steps were run this resume \
+        cycle.
+        #TODO i dont think these names are exactly right for what they are 
+        doing. Maybe input type and output type????
+        :param scale_data_type: the datatype to scale from 
+        :param output_data_type: the datatype to get to once finished.
         :return:
         """
         if variable == SPIKES:
@@ -152,14 +158,17 @@ class NeuronRecorder(object):
             n_rows = record_length // row_length
             if record_length > 0:
                 # Converts bytes to ints and make a matrix
-                record = (numpy.asarray(record_raw, dtype="uint8").
-                          view(dtype="<i4")).reshape((n_rows, (n_neurons + 1)))
+                record = output_data_type.decode_array(record_raw).reshape(
+                    (n_rows, (n_neurons + 1)))
             else:
                 record = numpy.empty((0, n_neurons))
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
-                fragment = (record[:, 1:] / float(DataType.S1615.scale))
+                if output_data_type != scale_data_type:
+                    fragment = (record[:, 1:] / float(scale_data_type.scale))
+                else:
+                    fragment = record[:, 1:]
             else:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
@@ -170,8 +179,11 @@ class NeuronRecorder(object):
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
                     if len(local_indexes[0]) == 1:
-                        fragment[i] = (record[local_indexes[0], 1:] /
-                                       float(DataType.S1615.scale))
+                        if scale_data_type != output_data_type:
+                            fragment[i] = (record[local_indexes[0], 1:] /
+                                           float(scale_data_type.scale))
+                        else:
+                            fragment[i] = record[local_indexes[0], 1:]
                     elif len(local_indexes[0]) > 1:
                         logger.warning(
                             "Population {} on multiple recorded data for "
@@ -189,7 +201,7 @@ class NeuronRecorder(object):
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
         sampling_interval = self.get_neuron_sampling_interval(variable)
-        return (data, indexes, sampling_interval)
+        return data, indexes, sampling_interval
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
