@@ -36,7 +36,7 @@
 #include <utils.h>
 #include "spin1_api_params.h"
 
-
+#define TIMER_PROFILING false
 uint32_t measurement_in[1000];
 uint32_t measurement_out[1000];
 uint32_t measurement_index = 0;
@@ -58,7 +58,7 @@ typedef struct poisson_source_t {
     uint32_t mean_isi_ticks;
     uint32_t time_to_source_ticks;
 
-	uint16_t poisson_weight;
+	uint32_t poisson_weight;
 } poisson_source_t;
 
 //! spike source array region IDs in human readable form
@@ -72,7 +72,6 @@ typedef enum region {
 //! A scale factor to allow the use of integers for "inter-spike intervals"
 #define ISI_SCALE_FACTOR 1000
 
-#define TIMER_PROFILING false
 
 // some of these callbacks are probably not necessary... ?
 typedef enum callback_priorities{
@@ -169,14 +168,15 @@ static inline uint32_t fast_source_get_num_weight_multiples(
         UFRACT exp_minus_lambda) {
 	// If the value of exp_minus_lambda is very small then it's not worth
 	// using the algorithm, so just return 0
-    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
-        return 0;
-    }
-    else {
+//    if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
+//        return 0;
+//    }
+//    else {
         return poisson_dist_variate_exp_minus_lambda(
             mars_kiss64_seed,
+//            mars_kiss32,
             global_parameters.source_seed, exp_minus_lambda);
-    }
+//    }
 }
 
 //! \brief Determines the value to multiply the weight by on this timestep, for a faster source
@@ -374,8 +374,8 @@ static bool initialize() {
                     poisson_parameters[s].mean_isi_ticks);
         }
     	source_buffer[s] = 0;
-    	io_printf(IO_BUF, "Source: %u, rate: %u, weight: %u\n",
-    			s, poisson_parameters[s].is_fast_source, poisson_parameters[s].poisson_weight );
+    	io_printf(IO_BUF, "Source: %u, exp_minus_lambda: %u, weight: %u\n",
+    			s, poisson_parameters[s].exp_minus_lambda, poisson_parameters[s].poisson_weight );
     }
 
     // print spike sources for debug purposes
@@ -450,8 +450,12 @@ bool store_poisson_parameters() {
 //! \param[in] neuron_id: the neurons to store values from
 //! \param[in] n_spikes: the number of times to multiply weight by
 //!
+const uint32_t weight_const = 719;
+
 static inline void _add_weight(uint32_t neuron_id, uint32_t n) {
-	source_buffer[neuron_id] += n * poisson_parameters[neuron_id].poisson_weight;
+//	source_buffer[neuron_id] = n * weight_const; //poisson_parameters[neuron_id].poisson_weight;
+	source_buffer[neuron_id] = __smulbb(n, weight_const);
+
 }
 
 static inline void _set_contribution_region() {
@@ -520,7 +524,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+//    expected_time = sv->cpu_clk * timer_period;
 
     // Loop through spike sources
     for (index_t s = 0; s < global_parameters.n_sources; s++) {
@@ -530,52 +534,52 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Choose between fast or slow spike sources
         if (source->is_fast_source) {
-            if (time >= source->start_ticks
-                    && time < source->end_ticks) {
+//            if (time >= source->start_ticks
+//                    && time < source->end_ticks) {
 
                 // Get number of multiples to send this tick
             	uint32_t num_weight_multiples = 0;
             	// If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
-            	if (REAL_COMPARE(source->sqrt_lambda, >, REAL_CONST(0.0))) {
-            	    num_weight_multiples = faster_source_get_num_weight_multiples(
-            				source->sqrt_lambda);
-            	} else {
+//            	if (REAL_COMPARE(source->sqrt_lambda, >, REAL_CONST(0.0))) {
+//            	    num_weight_multiples = faster_source_get_num_weight_multiples(
+//            				source->sqrt_lambda);
+//            	} else {
             		// Call the fast source Poisson algorithm
-            		num_weight_multiples = fast_source_get_num_weight_multiples(
+            		num_weight_multiples = (uint16_t) fast_source_get_num_weight_multiples(
             				source->exp_minus_lambda);
-            	}
+//            	}
 
                 // If there are any
-                if (num_weight_multiples > 0) {
+//                if (num_weight_multiples > 0) {
 
                     // Write spikes to out spikes
                     _add_weight(s, num_weight_multiples);
 
-                }
+//                }
             }
-        } else {
-            // Handle slow sources
-            if ((time >= source->start_ticks)
-                    && (time < source->end_ticks)
-                    && (source->mean_isi_ticks != 0)) {
-
-                // Mark a spike while the "timer" is below the scale factor value
-                while (source->time_to_source_ticks < ISI_SCALE_FACTOR) {
-
-                    // Write weight value to this source
-                	_add_weight(s, 1);
-
-                    // Update time to spike (note, this might not get us back above
-                    // the scale factor, particularly if the mean_isi is smaller)
-                    source->time_to_source_ticks +=
-                        slow_source_get_time_to_source(
-                            source->mean_isi_ticks);
-                }
-
-                // Now we have finished for this tick, subtract the scale factor
-                source->time_to_source_ticks -= ISI_SCALE_FACTOR;
-            }
-        }
+//        } else {
+//            // Handle slow sources
+//            if ((time >= source->start_ticks)
+//                    && (time < source->end_ticks)
+//                    && (source->mean_isi_ticks != 0)) {
+//
+//                // Mark a spike while the "timer" is below the scale factor value
+//                while (source->time_to_source_ticks < ISI_SCALE_FACTOR) {
+//
+//                    // Write weight value to this source
+//                	_add_weight(s, 1);
+//
+//                    // Update time to spike (note, this might not get us back above
+//                    // the scale factor, particularly if the mean_isi is smaller)
+//                    source->time_to_source_ticks +=
+//                        slow_source_get_time_to_source(
+//                            source->mean_isi_ticks);
+//                }
+//
+//                // Now we have finished for this tick, subtract the scale factor
+//                source->time_to_source_ticks -= ISI_SCALE_FACTOR;
+//            }
+//        }
     }
 
     start_dma_transfer(poisson_region, source_buffer, DMA_WRITE, dma_size);
@@ -585,9 +589,9 @@ void timer_callback(uint timer_count, uint unused) {
 
     // at this point we have looped over all the sources, so we can write the array
     // to wherever it needs to go; for now I'm just printing it
-    for (index_t s = 0; s < global_parameters.n_sources; s++) {
-    	source_buffer[s] = 0;
-    }
+//    for (index_t s = 0; s < global_parameters.n_sources; s++) {
+//    	source_buffer[s] = 0;
+//    }
 
     if (TIMER_PROFILING){
         measurement_out[measurement_index] = tc[T1_COUNT];

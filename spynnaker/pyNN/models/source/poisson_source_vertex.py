@@ -78,7 +78,7 @@ _PoissonSourceStruct = Struct([
     DataType.S1615,   # sqrt(sources_per_tick)
     DataType.UINT32,   # inter-source-interval
     DataType.UINT32,  # timesteps to next source
-    DataType.S1615])  # weight value at this source
+    DataType.UINT32])  # weight value at this source
 
 
 class PoissonSourceVertex(
@@ -486,7 +486,7 @@ class PoissonSourceVertex(
             (sqrt_lambda * (2 ** 15)).astype("uint32"),
             isi_val.astype("uint32"),
             time_to_source.astype("uint32"),
-            (poisson_weight * (2 ** (15-2))).astype("uint16") # 2 is prescribed left-shift
+            (poisson_weight * (2 ** (15-2))).astype("uint32") # 2 is prescribed left-shift
         ))[0]
 
         spec.write_array(data)
