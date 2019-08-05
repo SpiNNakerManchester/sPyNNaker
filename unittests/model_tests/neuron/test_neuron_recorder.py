@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from data_specification.enums import DataType
 from unittests.mocks import MockSimulator
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
@@ -32,7 +32,21 @@ def test_simple_record():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100)
+    recordable_scalers = {
+        "v": DataType.S1615,
+        "gsyn_exc": DataType.S1615,
+        "gsyn_inh": DataType.S1615
+    }
+
+    recordable_outputs = {
+        "v": DataType.INT32,
+        "gsyn_exc": DataType.INT32,
+        "gsyn_inh": DataType.INT32
+    }
+
+    nr = NeuronRecorder(
+        ["spikes", "v", "gsyn_exc", "gsyn_inh"], recordable_scalers,
+        recordable_outputs, 100)
     assert(frozenset(["spikes", "v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
@@ -51,7 +65,21 @@ def test_recording_variables():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100)
+    recordable_scalers = {
+        "v": DataType.S1615,
+        "gsyn_exc": DataType.S1615,
+        "gsyn_inh": DataType.S1615
+    }
+
+    recordable_outputs = {
+        "v": DataType.INT32,
+        "gsyn_exc": DataType.INT32,
+        "gsyn_inh": DataType.INT32
+    }
+
+    nr = NeuronRecorder(
+        ["spikes", "v", "gsyn_exc", "gsyn_inh"], recordable_scalers,
+        recordable_outputs, 100)
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
