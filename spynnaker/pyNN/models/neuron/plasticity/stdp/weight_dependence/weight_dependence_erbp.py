@@ -39,8 +39,8 @@ class WeightDependenceERBP(
         return (
             (self._w_min == weight_dependence.w_min) and
             (self._w_max == weight_dependence.w_max) and
-            (self._a_plus == weight_dependence.A_plus) and
-            (self._a_minus == weight_dependence.A_minus))
+            (self.A_plus == weight_dependence.A_plus) and
+            (self.A_minus == weight_dependence.A_minus))
 
     @property
     def vertex_executable_suffix(self):
@@ -68,10 +68,10 @@ class WeightDependenceERBP(
 
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * (1 << 15))), # * self._w_max ),
+                data=int(round(self.A_plus * (1 << 15))), # * self._w_max ),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * (1 << 15))), # * self._w_max ,
+                data=int(round(self.A_minus * (1 << 15))), # * self._w_max ,
                 data_type=DataType.INT32)
 
             spec.write_value(self._reg_rate, data_type=DataType.S1615)
