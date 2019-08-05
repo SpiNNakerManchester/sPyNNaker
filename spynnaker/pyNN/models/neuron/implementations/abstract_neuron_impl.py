@@ -112,6 +112,18 @@ class AbstractNeuronImpl(object):
         """
 
     @abstractmethod
+    def get_scalar_data_types(self):
+        """ get the scalar type of the given variable that can be recorded
+        :return: dict of str and DataType
+        """
+
+    @abstractmethod
+    def get_output_data_types(self):
+        """ get the output type of the given variable that can be recorded
+        :return: dict of str and DataType
+        """
+
+    @abstractmethod
     def is_recordable(self, variable):
         """ Determine if the given variable can be recorded
 

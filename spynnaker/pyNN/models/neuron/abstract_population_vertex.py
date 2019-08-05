@@ -153,7 +153,10 @@ class AbstractPopulationVertex(
         # Set up for recording
         recordables = ["spikes"]
         recordables.extend(self.__neuron_impl.get_recordable_variables())
-        self.__neuron_recorder = NeuronRecorder(recordables, n_neurons)
+
+        self.__neuron_recorder = NeuronRecorder(
+            recordables, self.__neuron_impl.get_scalar_data_types(),
+            self.__neuron_impl.get_output_data_types(), n_neurons)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -223,16 +226,6 @@ class AbstractPopulationVertex(
     def mark_no_changes(self):
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
-
-    # CB: May be dead code
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        values = [self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                    variable, vertex_slice))
-        return values
 
     def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
         values = [self.__neuron_recorder.get_buffered_sdram(
@@ -592,8 +585,7 @@ class AbstractPopulationVertex(
                 variable)
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, index, placements, graph_mapper,
-            self, variable, n_machine_time_steps,
-            DataType.S1615, DataType.INT32)
+            self, variable, n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):

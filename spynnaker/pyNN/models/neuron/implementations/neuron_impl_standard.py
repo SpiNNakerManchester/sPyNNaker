@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+
+from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
@@ -35,6 +37,18 @@ class NeuronImplStandard(AbstractNeuronImpl):
     ]
 
     _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
+
+    _RECORDABLE_SCALAR_TYPES = {
+        "v": DataType.S1615,
+        "gsyn_exc": DataType.S1615,
+        "gsyn_inh": DataType.S1615
+    }
+
+    _RECORDABLE_OUTPUT_TYPES = {
+        "v": DataType.INT32,
+        "gsyn_exc": DataType.INT32,
+        "gsyn_inh": DataType.INT32
+    }
 
     _RECORDABLE_UNITS = {
         'spikes': 'spikes',
@@ -124,6 +138,14 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.get_recordable_units)
     def get_recordable_units(self, variable):
         return self._RECORDABLE_UNITS[variable]
+
+    @overrides(AbstractNeuronImpl.get_scalar_data_types)
+    def get_scalar_data_types(self):
+        return self._RECORDABLE_SCALAR_TYPES
+
+    @overrides(AbstractNeuronImpl.get_output_data_types)
+    def get_output_data_types(self):
+        return self._RECORDABLE_OUTPUT_TYPES
 
     @overrides(AbstractNeuronImpl.is_recordable)
     def is_recordable(self, variable):
