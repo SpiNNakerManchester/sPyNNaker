@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _NEURON_IMPL_STANDARD_H_
 #define _NEURON_IMPL_STANDARD_H_
 
@@ -14,6 +31,7 @@
 #include <common/out_spikes.h>
 #include <recording.h>
 #include <debug.h>
+#include <string.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -231,7 +249,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            external_bias, neuron, -50k);
 
     // determine if a spike should occur
     bool spike = threshold_type_is_above_threshold(result, threshold_type);

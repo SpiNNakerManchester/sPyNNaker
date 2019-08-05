@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from .eif_cond_alpha_isfa_ista import EIFConductanceAlphaPopulation
 from .hh_cond_exp import HHCondExp
 from .if_cond_alpha import IFCondAlpha
@@ -12,6 +27,7 @@ from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
+from .if_curr_delta_graz_adaptive import IFCurrDeltaGrazAdaptive
 from .if_curr_exp_erbp import IFCurrExpERBP
 from .poisson_neuron import PoissonNeuron
 from .readout_poisson_neuron import ReadoutPoissonNeuron
@@ -23,5 +39,6 @@ __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
+           "IFCurrDeltaGrazAdaptive",
            "IFCurrExpERBP", "PoissonNeuron", "ReadoutPoissonNeuron",
            "ErrorNeuron", "ReadoutPoissonNeuronNonSpike"]

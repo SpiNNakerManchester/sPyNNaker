@@ -1,5 +1,19 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
-import sys
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
@@ -40,8 +54,8 @@ class SpikeSourceArrayVertex(
             self, n_neurons, spike_times, constraints, label,
             max_atoms_per_core, model):
         # pylint: disable=too-many-arguments
-        self._model_name = "SpikeSourceArray"
-        self._model = model
+        self.__model_name = "SpikeSourceArray"
+        self.__model = model
 
         if spike_times is None:
             spike_times = []
@@ -55,19 +69,19 @@ class SpikeSourceArrayVertex(
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID)
 
         # handle recording
-        self._spike_recorder = EIEIOSpikeRecorder()
+        self.__spike_recorder = EIEIOSpikeRecorder()
 
         # used for reset and rerun
-        self._requires_mapping = True
+        self.__requires_mapping = True
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
-        return self._requires_mapping
+        return self.__requires_mapping
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
-        self._requires_mapping = False
+        self.__requires_mapping = False
 
     @property
     def spike_times(self):
@@ -87,7 +101,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
-        return self._spike_recorder.record
+        return self.__spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
@@ -99,8 +113,8 @@ class SpikeSourceArrayVertex(
             logger.warning("Indexes currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.enable_recording(new_state)
-        self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+        self.__requires_mapping = not self.__spike_recorder.record
+        self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
@@ -109,8 +123,7 @@ class SpikeSourceArrayVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
-
-        return self._spike_recorder.get_spikes(
+        return self.__spike_recorder.get_spikes(
             self.label, buffer_manager, 0,
             placements, graph_mapper, self,
             lambda vertex:
@@ -128,10 +141,6 @@ class SpikeSourceArrayVertex(
                 placement.x, placement.y, placement.p,
                 SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID)
 
-    @staticmethod
-    def set_model_max_atoms_per_core(new_value=sys.maxsize):
-        SpikeSourceArrayVertex._model_based_max_atoms_per_core = new_value
-
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
 
@@ -144,13 +153,13 @@ class SpikeSourceArrayVertex(
         """
 
         parameters = dict()
-        for parameter_name in self._model.default_parameters:
+        for parameter_name in self.__model.default_parameters:
             parameters[parameter_name] = self.get_value(parameter_name)
 
         context = {
-            "name": self._model_name,
-            "default_parameters": self._model.default_parameters,
-            "default_initial_values": self._model.default_parameters,
+            "name": self.__model_name,
+            "default_parameters": self.__model.default_parameters,
+            "default_initial_values": self.__model.default_parameters,
             "parameters": parameters,
         }
         return context

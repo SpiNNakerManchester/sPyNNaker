@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject, supports_injection
@@ -13,9 +28,9 @@ logger = logging.getLogger(__name__)
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
     __slots__ = [
-        "_graph_mapper",
-        "_new_key_command",
-        "_routing_infos"]
+        "__graph_mapper",
+        "__new_key_command",
+        "__routing_infos"]
 
     default_parameters = {'label': None, 'board_address': None}
 
@@ -31,20 +46,20 @@ class PushBotSpiNNakerLinkRetinaDevice(
             board_address=board_address, label=label)
 
         # stores for the injection aspects
-        self._graph_mapper = None
-        self._routing_infos = None
-        self._new_key_command = None
+        self.__graph_mapper = None
+        self.__routing_infos = None
+        self.__new_key_command = None
 
     @inject("MemoryGraphMapper")
     def graph_mapper(self, graph_mapper):
-        self._graph_mapper = graph_mapper
-        if self._routing_infos is not None:
+        self.__graph_mapper = graph_mapper
+        if self.__routing_infos is not None:
             self._update_new_key_payload()
 
     @inject("MemoryRoutingInfos")
     def routing_info(self, routing_info):
-        self._routing_infos = routing_info
-        if self._graph_mapper is not None:
+        self.__routing_infos = routing_info
+        if self.__graph_mapper is not None:
             self._update_new_key_payload()
 
     @property
@@ -60,13 +75,13 @@ class PushBotSpiNNakerLinkRetinaDevice(
         for command in commands:
             if command.key == self._protocol.disable_retina_key:
                 # This has to be stored so that the payload can be updated
-                self._new_key_command = self._protocol.set_retina_key(0)
-                new_commands.append(self._new_key_command)
+                self.__new_key_command = self._protocol.set_retina_key(0)
+                new_commands.append(self.__new_key_command)
             new_commands.append(command)
         return new_commands
 
     def _update_new_key_payload(self):
-        vertex = list(self._graph_mapper.get_machine_vertices(self))[0]
-        key = self._routing_infos.get_first_key_from_pre_vertex(
+        vertex = list(self.__graph_mapper.get_machine_vertices(self))[0]
+        key = self.__routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
-        self._new_key_command.payload = key
+        self.__new_key_command.payload = key

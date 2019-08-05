@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 try:
     from collections.abc import OrderedDict
 except ImportError:
@@ -26,6 +41,12 @@ class ExternalDeviceLifControlVertex(
         but without spikes, and using the voltage as the output to the various\
         devices
     """
+    __slots__ = [
+        "__dependent_vertices",
+        "__devices",
+        "__message_translator",
+        "__partition_id_to_atom",
+        "__partition_id_to_key"]
 
     # all commands will use this mask
     _DEFAULT_COMMAND_MASK = 0xFFFFFFFF
@@ -53,23 +74,23 @@ class ExternalDeviceLifControlVertex(
             raise ConfigurationException("No devices specified")
 
         # Create a partition to key map
-        self._partition_id_to_key = OrderedDict(
+        self.__partition_id_to_key = OrderedDict(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
 
         # Create a partition to atom map
-        self._partition_id_to_atom = {
+        self.__partition_id_to_atom = {
             partition: i
-            for (i, partition) in enumerate(self._partition_id_to_key.keys())
+            for (i, partition) in enumerate(self.__partition_id_to_key.keys())
         }
 
-        self._devices = devices
-        self._message_translator = translator
+        self.__devices = devices
+        self.__message_translator = translator
 
         # Add the edges to the devices if required
-        self._dependent_vertices = list()
+        self.__dependent_vertices = list()
         if create_edges:
-            self._dependent_vertices = devices
+            self.__dependent_vertices = devices
 
         super(ExternalDeviceLifControlVertex, self).__init__(
             len(devices), label, constraints, max_atoms_per_core,
@@ -78,20 +99,20 @@ class ExternalDeviceLifControlVertex(
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ
-        key = self._partition_id_to_key[partition.identifier]
-        atom = self._partition_id_to_atom[partition.identifier]
+        key = self.__partition_id_to_key[partition.identifier]
+        atom = self.__partition_id_to_atom[partition.identifier]
         return [(atom, key)]
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
         return [FixedKeyAndMaskConstraint([BaseKeyAndMask(
-            self._partition_id_to_key[partition.identifier],
+            self.__partition_id_to_key[partition.identifier],
             self._DEFAULT_COMMAND_MASK)])]
 
     @overrides(AbstractVertexWithEdgeToDependentVertices.dependent_vertices)
     def dependent_vertices(self):
-        return self._dependent_vertices
+        return self.__dependent_vertices
 
     @overrides(AbstractVertexWithEdgeToDependentVertices
                .edge_partition_identifiers_for_dependent_vertex)
@@ -100,17 +121,17 @@ class ExternalDeviceLifControlVertex(
 
     @overrides(AbstractEthernetController.get_external_devices)
     def get_external_devices(self):
-        return self._devices
+        return self.__devices
 
     @overrides(AbstractEthernetController.get_message_translator)
     def get_message_translator(self):
-        if self._message_translator is None:
+        if self.__message_translator is None:
             raise ConfigurationException(
                 "This population was not given a translator, and so cannot be"
                 "used for Ethernet communication.  Please provide a "
                 "translator for the population.")
-        return self._message_translator
+        return self.__message_translator
 
     @overrides(AbstractEthernetController.get_outgoing_partition_ids)
     def get_outgoing_partition_ids(self):
-        return self._partition_id_to_key.keys()
+        return self.__partition_id_to_key.keys()

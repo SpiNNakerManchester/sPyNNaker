@@ -1,5 +1,20 @@
 # See Notes in sPyNNaker/neural_modelling/CHANGES_April_2018
 
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # If SPINN_DIRS is not defined, this is an error!
 ifndef SPINN_DIRS
     $(error SPINN_DIRS is not set.  Please define SPINN_DIRS (possibly by running "source setup" in the spinnaker package folder))
@@ -192,34 +207,29 @@ SOURCES = common/out_spikes.c \
 
 include $(SPINN_DIRS)/make/local.mk
 
-FEC_OPT = $(OSPACE)
+FEC_OPT = $(OTIME)
 
 # Synapse build rules
 SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED)
 
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/synapses.o: $(MODIFIED_DIR)neuron/synapses.c
 	#synapses.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/spike_processing.o: $(MODIFIED_DIR)neuron/spike_processing.c
 	#spike_processing.c
-	-mkdir -p $(dir $@)
-	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
-
-$(BUILD_DIR)neuron/population_table/population_table_fixed_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_fixed_impl.c
-	#population_table/population_table_fixed_impln.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MODIFIED_DIR)neuron/population_table/population_table_binary_search_impl.c
-	#population_table/population_table_binary_search_impl
-	-mkdir -p $(dir $@)
+	#population_table/population_table_binary_search_impl.c
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 #STDP Build rules If and only if STDP used
@@ -229,49 +239,49 @@ ifeq ($(STDP_ENABLED), 1)
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O stdp
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# SYNAPTOGENESIS_DYNAMICS_O stdp
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
     $(BUILD_DIR)neuron/plasticity/common/post_events.o: $(MODIFIED_DIR)neuron/plasticity/common/post_events.c
 	# plasticity/common/post_events.c
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(STDP_COMPILE) -o $@ $<
 
 else
     $(SYNAPTOGENESIS_DYNAMICS_O): $(SYNAPTOGENESIS_DYNAMICS_C)
 	# $(SYNAPTOGENESIS_DYNAMICS) Synapese
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
 	# SYNAPSE_DYNAMICS_O Synapese
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 
 endif
 
 $(WEIGHT_DEPENDENCE_O): $(WEIGHT_DEPENDENCE_C) $(SYNAPSE_TYPE_H)
 	# WEIGHT_DEPENDENCE_O
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -o $@ $<
 
 $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
                         $(WEIGHT_DEPENDENCE_H)
 	# TIMING_DEPENDENCE_O
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(WEIGHT_DEPENDENCE_H) -o $@ $<
 
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	# neuron.o
-	-mkdir -p $(dir $@)
+	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
 .PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)

@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief Uniformly distributed random set to boundary parameter generator
@@ -46,6 +63,9 @@ void *param_generator_uniform_initialize(address_t *region) {
 }
 
 void param_generator_uniform_free(void *data) {
+    struct param_generator_uniform *params =
+            (struct param_generator_uniform *) data;
+    rng_free(params->rng);
     sark_free(data);
 }
 

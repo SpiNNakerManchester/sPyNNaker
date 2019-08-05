@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *  \brief a interface
@@ -7,6 +24,7 @@
 #define _NEURON_MODEL_H_
 
 #include <common/neuron-typedefs.h>
+//#include "../threshold_types/threshold_type.h"
 
 //! Forward declaration of neuron type (creates a definition for a pointer to a
 //   Neuron parameter struct
@@ -38,7 +56,8 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
         uint16_t num_excitatory_inputs, input_t* exc_input,
         uint16_t num_inhibitory_inputs, input_t* inh_input,
-        input_t external_bias, neuron_pointer_t neuron);
+        input_t external_bias, neuron_pointer_t neuron,
+		input_t B_t);
 
 //! \brief Indicates that the neuron has spiked
 //! \param[in] neuron pointer to a neuron parameter struct which contains all
