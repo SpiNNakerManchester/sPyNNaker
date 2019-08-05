@@ -700,9 +700,9 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
         uint32_t sub_id = id - global_parameters.first_source_id;
         log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        if (rate >= global_parameters.slow_rate_per_tick_cutoff) {
+        if (rate_per_tick >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
-            if (rate >= global_parameters.fast_rate_per_tick_cutoff) {
+            if (rate_per_tick >= global_parameters.fast_rate_per_tick_cutoff) {
                 poisson_parameters[sub_id].sqrt_lambda =
                         SQRT(rate_per_tick); // warning: sqrtk is untested...
             } else {
