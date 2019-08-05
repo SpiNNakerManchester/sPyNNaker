@@ -669,9 +669,9 @@ static inline void set_spike_source_rate(uint32_t id, REAL rate) {
     REAL rate_per_tick = rate * params.seconds_per_tick;
     spike_source_t *spike_source = &poisson_parameters[sub_id];
 
-    if (rate >= params.slow_rate_per_tick_cutoff) {
+    if (rate_per_tick >= params.slow_rate_per_tick_cutoff) {
         spike_source->is_fast_source = true;
-        if (rate >= params.fast_rate_per_tick_cutoff) {
+        if (rate_per_tick >= params.fast_rate_per_tick_cutoff) {
             spike_source->sqrt_lambda = SQRT(rate_per_tick);
             // warning: sqrtk is untested...
         } else {
