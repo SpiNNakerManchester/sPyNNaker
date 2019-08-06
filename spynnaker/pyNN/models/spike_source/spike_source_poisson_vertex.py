@@ -573,10 +573,11 @@ class SpikeSourcePoissonVertex(
 
         # Write the number of microseconds between sending spikes
         all_rates = numpy.fromiter(_flatten(self.__data["rates"]), numpy.float)
+        max_rates = numpy.max(self.__data["rates"], axis=1)
         total_mean_rate = numpy.sum(all_rates)
         if total_mean_rate > 0:
             max_spikes = numpy.sum(scipy.stats.poisson.ppf(
-                0.999, all_rates))
+                1.0 - (1.0 / max_rates), max_rates))
             spikes_per_timestep = (
                 max_spikes / (MICROSECONDS_PER_SECOND // machine_time_step))
             # avoid a possible division by zero / small number (which may
