@@ -24,11 +24,11 @@ class DistanceDependentFormation(AbstractFormation):
     """
 
     __slots__ = [
-        "_grid",
-        "_p_form_forward",
-        "_sigma_form_forward",
-        "_p_form_lateral",
-        "_sigma_form_lateral",
+        "__grid",
+        "__p_form_forward",
+        "__sigma_form_forward",
+        "__p_form_lateral",
+        "__sigma_form_lateral",
         "__ff_distance_probabilities",
         "__lat_distance_probabilities"
     ]
@@ -51,18 +51,18 @@ class DistanceDependentFormation(AbstractFormation):
             The spread of probability with distance of formation on\
             lateral connections
         """
-        self._grid = numpy.asarray(grid, dtype=int)
-        self._p_form_forward = p_form_forward
-        self._sigma_form_forward = sigma_form_forward
-        self._p_form_lateral = p_form_lateral
-        self._sigma_form_lateral = sigma_form_lateral
+        self.__grid = numpy.asarray(grid, dtype=int)
+        self.__p_form_forward = p_form_forward
+        self.__sigma_form_forward = sigma_form_forward
+        self.__p_form_lateral = p_form_lateral
+        self.__sigma_form_lateral = sigma_form_lateral
 
         self.__ff_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_forward, self._sigma_form_forward)
+                self.__p_form_forward, self.__sigma_form_forward)
         self.__lat_distance_probabilities = \
             self.generate_distance_probability_array(
-                self._p_form_lateral, self._sigma_form_lateral)
+                self.__p_form_lateral, self.__sigma_form_lateral)
 
     @property
     @overrides(AbstractFormation.vertex_executable_suffix)
@@ -84,14 +84,14 @@ class DistanceDependentFormation(AbstractFormation):
         :return: distance-dependent probabilities
         :rtype: numpy.ndarray(float)
         """
-        euclidian_distances = numpy.ones(self._grid ** 2) * numpy.nan
+        euclidian_distances = numpy.ones(self.__grid ** 2) * numpy.nan
         for row in range(euclidian_distances.shape[0]):
             for column in range(euclidian_distances.shape[1]):
-                if self._grid[0] > 1:
-                    pre = (row // self._grid[0], row % self._grid[1])
-                    post = (column // self._grid[0], column % self._grid[1])
+                if self.__grid[0] > 1:
+                    pre = (row // self.__grid[0], row % self._grid[1])
+                    post = (column // self.__grid[0], column % self._grid[1])
                 else:
-                    pre = (0, row % self._grid[1])
+                    pre = (0, row % self.__grid[1])
                     post = (0, column % self._grid[1])
 
                 # TODO Make distance metric "type" controllable
@@ -133,11 +133,11 @@ class DistanceDependentFormation(AbstractFormation):
         x0 = numpy.asarray(x0)
         x1 = numpy.asarray(x1)
         delta = numpy.abs(x0 - x1)
-        if (delta[0] > self._grid[0] * .5) and self._grid[0] > 0:
-            delta[0] -= self._grid[0]
+        if (delta[0] > self.__grid[0] * .5) and self.__grid[0] > 0:
+            delta[0] -= self.__grid[0]
 
-        if (delta[1] > self._grid[1] * .5) and self._grid[1] > 0:
-            delta[1] -= self._grid[1]
+        if (delta[1] > self.__grid[1] * .5) and self.__grid[1] > 0:
+            delta[1] -= self.__grid[1]
 
         if type == 'manhattan':
             return numpy.abs(delta).sum(axis=-1)
@@ -149,7 +149,7 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):
-        spec.write_array(self._grid)
+        spec.write_array(self.__grid)
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view(dtype="<u2"),

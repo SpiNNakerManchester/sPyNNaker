@@ -22,9 +22,9 @@ class RandomByWeightElimination(AbstractElimination):
     """
 
     __slots__ = [
-        "_prob_elim_depression",
-        "_prob_elim_potentiation",
-        "_mid_weight"
+        "__prob_elim_depression",
+        "__prob_elim_potentiation",
+        "__mid_weight"
     ]
 
     def __init__(
@@ -43,9 +43,9 @@ class RandomByWeightElimination(AbstractElimination):
             The probability of elimination of the weight has been potentiated\
             or has not changed (and also used on static weight connections)
         """
-        self._prob_elim_depression = prob_elim_depression
-        self._prob_elim_potentiation = prob_elim_potentiation
-        self._mid_weight = mid_weight
+        self.__prob_elim_depression = prob_elim_depression
+        self.__prob_elim_potentiation = prob_elim_potentiation
+        self.__mid_weight = mid_weight
 
     @property
     @overrides(AbstractElimination.vertex_executable_suffix)
@@ -58,9 +58,9 @@ class RandomByWeightElimination(AbstractElimination):
 
     @overrides(AbstractElimination.write_parameters)
     def write_parameters(self, spec):
-        spec.write_value(self._prob_elim_depression)
-        spec.write_value(self._prob_elim_potentiation)
-        spec.write_value(self._mid_weight)
+        spec.write_value(self.__prob_elim_depression)
+        spec.write_value(self.__prob_elim_potentiation)
+        spec.write_value(self.__mid_weight)
 
     @overrides(AbstractElimination.get_parameter_names)
     def get_parameter_names(self):
