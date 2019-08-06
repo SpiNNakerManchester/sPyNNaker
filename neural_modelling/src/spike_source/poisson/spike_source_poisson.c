@@ -776,8 +776,9 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
              global_parameters.n_spike_sources)) {
         rate_changed[id] = true;
         uint32_t sub_id = id - global_parameters.first_source_id;
-        log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
         REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
+        log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
+                id, sub_id, rate, rate_per_tick);
         if (rate_per_tick >= global_parameters.slow_rate_per_tick_cutoff) {
             poisson_parameters[sub_id].is_fast_source = true;
             if (rate_per_tick >= global_parameters.fast_rate_per_tick_cutoff) {
@@ -786,11 +787,15 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
             } else {
                 poisson_parameters[sub_id].exp_minus_lambda =
                         (UFRACT) EXP(-rate_per_tick);
+                poisson_parameters[sub_id].sqrt_lambda = REAL_CONST(0.0);
             }
         } else {
             poisson_parameters[sub_id].is_fast_source = false;
             poisson_parameters[sub_id].mean_isi_ticks =
-                (uint32_t) rate * global_parameters.ticks_per_second;
+                    (uint32_t) (REAL_CONST(1.0) / rate_per_tick);
+            poisson_parameters[sub_id].time_to_spike_ticks =
+                    slow_spike_source_get_time_to_spike(
+                        poisson_parameters[sub_id].mean_isi_ticks);
         }
     }
 }
