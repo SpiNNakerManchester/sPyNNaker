@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.neural_projections import (
     DelayedApplicationEdge, SynapseInformation,
     ProjectionApplicationEdge, DelayAfferentApplicationEdge)
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spinn_front_end_common.utilities.globals_variables import get_simulator

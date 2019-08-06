@@ -37,11 +37,9 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
-from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
-from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -49,6 +47,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from .synaptic_manager import SynapticManager
+from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
@@ -749,6 +749,9 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
         self.__synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
+
+    def get_connection_holders(self):
+        return self.__synapse_manager.get_connection_holders()
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
