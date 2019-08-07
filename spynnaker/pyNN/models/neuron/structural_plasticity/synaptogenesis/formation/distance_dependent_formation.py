@@ -88,11 +88,11 @@ class DistanceDependentFormation(AbstractFormation):
         for row in range(euclidian_distances.shape[0]):
             for column in range(euclidian_distances.shape[1]):
                 if self.__grid[0] > 1:
-                    pre = (row // self.__grid[0], row % self._grid[1])
-                    post = (column // self.__grid[0], column % self._grid[1])
+                    pre = (row // self.__grid[0], row % self.__grid[1])
+                    post = (column // self.__grid[0], column % self.__grid[1])
                 else:
                     pre = (0, row % self.__grid[1])
-                    post = (0, column % self._grid[1])
+                    post = (0, column % self.__grid[1])
 
                 # TODO Make distance metric "type" controllable
                 euclidian_distances[row, column] = self.distance(
