@@ -664,9 +664,10 @@ static inline void set_spike_source_rate(uint32_t id, REAL rate) {
         return;
     }
     uint32_t sub_id = id - params.first_source_id;
-    log_debug("Setting rate of %u (%u) to %kHz", id, sub_id, rate);
-
     REAL rate_per_tick = rate * params.seconds_per_tick;
+    log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
+            id, sub_id, rate, rate_per_tick);
+
     spike_source_t *spike_source = &poisson_parameters[sub_id];
 
     if (rate_per_tick >= params.slow_rate_per_tick_cutoff) {
@@ -676,10 +677,14 @@ static inline void set_spike_source_rate(uint32_t id, REAL rate) {
             // warning: sqrtk is untested...
         } else {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
+            spike_source->sqrt_lambda = REAL_CONST(0.0);
         }
     } else {
         spike_source->is_fast_source = false;
-        spike_source->mean_isi_ticks = (uint32_t) rate * params.ticks_per_second;
+        spike_source->mean_isi_ticks =
+                (uint32_t) (REAL_CONST(1.0) / rate_per_tick);
+        spike_source->time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
     }
 }
 
