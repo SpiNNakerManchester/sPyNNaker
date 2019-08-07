@@ -339,11 +339,14 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Make an array of all data required
         conn_data = numpy.dstack(
-            (pop_indices, subpop_indices, connections["target"]))[0]
+            (pop_indices, subpop_indices, connections["source"]))[0]
 
         # Break data into rows based on target and strip target out
-        rows = [conn_data[connections["source"] == i]
+        rows = [conn_data[connections["target"] == i]
                 for i in range(0, post_slice.n_atoms)]
+
+        if any(len(row) > self.__smax for row in rows):
+            raise Exception("Too many initial connections per incoming neuron")
 
         # Make each row the required length through padding with 0xFFFF
         padded_rows = [numpy.pad(row, [(self.__s_max - len(row), 0), (0, 0)],
