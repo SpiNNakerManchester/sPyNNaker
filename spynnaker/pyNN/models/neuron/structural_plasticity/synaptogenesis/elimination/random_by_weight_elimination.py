@@ -22,30 +22,30 @@ class RandomByWeightElimination(AbstractElimination):
     """
 
     __slots__ = [
-        "__prob_elim_depression",
-        "__prob_elim_potentiation",
-        "__mid_weight"
+        "__prob_elim_depressed",
+        "__prob_elim_potentiatiated",
+        "__threshold"
     ]
 
     def __init__(
-            self, mid_weight, prob_elim_depression=0.0245,
-            prob_elim_potentiation=1.36 * 10 ** -4):
+            self, threshold, prob_elim_depressed=0.0245,
+            prob_elim_potentiatiated=1.36 * 10 ** -4):
         """
 
-        :param mid_weight:\
+        :param threshold:\
             Below this weight is considered depression, above or equal to this\
             weight is considered potentiation (or the static weight of the\
             connection on static weight connections)
-        :param prob_elim_depression:\
+        :param prob_elim_depressed:\
             The probability of elimination if the weight has been depressed\
             (ignored on static weight connections)
-        :param prob_elim_potentiation:\
+        :param prob_elim_potentiatiated:\
             The probability of elimination of the weight has been potentiated\
             or has not changed (and also used on static weight connections)
         """
-        self.__prob_elim_depression = prob_elim_depression
-        self.__prob_elim_potentiation = prob_elim_potentiation
-        self.__mid_weight = mid_weight
+        self.__prob_elim_depressed = prob_elim_depressed
+        self.__prob_elim_potentiatiated = prob_elim_potentiatiated
+        self.__threshold = threshold
 
     @property
     @overrides(AbstractElimination.vertex_executable_suffix)
@@ -58,10 +58,10 @@ class RandomByWeightElimination(AbstractElimination):
 
     @overrides(AbstractElimination.write_parameters)
     def write_parameters(self, spec):
-        spec.write_value(self.__prob_elim_depression)
-        spec.write_value(self.__prob_elim_potentiation)
-        spec.write_value(self.__mid_weight)
+        spec.write_value(self.__prob_elim_depressed)
+        spec.write_value(self.__prob_elim_potentiatiated)
+        spec.write_value(self.__threshold)
 
     @overrides(AbstractElimination.get_parameter_names)
     def get_parameter_names(self):
-        return ["prob_elim_depression", "prob_elim_potentiation", "mid_weight"]
+        return ["prob_elim_depressed", "prob_elim_potentiatiated", "threshold"]
