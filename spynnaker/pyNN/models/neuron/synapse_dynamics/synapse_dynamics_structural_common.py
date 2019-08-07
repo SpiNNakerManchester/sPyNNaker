@@ -345,7 +345,7 @@ class SynapseDynamicsStructuralCommon(object):
         rows = [conn_data[connections["target"] == i]
                 for i in range(0, post_slice.n_atoms)]
 
-        if any(len(row) > self.__smax for row in rows):
+        if any(len(row) > self.__s_max for row in rows):
             raise Exception("Too many initial connections per incoming neuron")
 
         # Make each row the required length through padding with 0xFFFF
