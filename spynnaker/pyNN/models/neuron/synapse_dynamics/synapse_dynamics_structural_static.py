@@ -99,8 +99,6 @@ class SynapseDynamicsStructuralStatic(
 
     @overrides(SynapseDynamicsStatic.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        if not isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic):
-            return False
         return self.__common_sp.is_same_as(synapse_dynamics)
 
     @overrides(SynapseDynamicsStatic.get_vertex_executable_suffix)
@@ -151,6 +149,11 @@ class SynapseDynamicsStructuralStatic(
     @overrides(AbstractSynapseDynamicsStructural.f_rew)
     def f_rew(self):
         return self.__common_sp.f_rew
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.seed)
+    def seed(self):
+        return self.__common_sp.seed
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.s_max)

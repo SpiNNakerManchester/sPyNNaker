@@ -53,6 +53,11 @@ class AbstractSynapseDynamicsStructural(object):
         """
 
     @abstractproperty
+    def seed(self):
+        """ The seed to control the randomness
+        """
+
+    @abstractproperty
     def initial_weight(self):
         """ The weight of a formed connection
         """

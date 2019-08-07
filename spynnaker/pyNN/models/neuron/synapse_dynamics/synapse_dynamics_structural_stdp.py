@@ -105,12 +105,8 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        # Is the stdp_model that I wrap around (am) the same as a different one
-        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and not
-                isinstance(synapse_dynamics,
-                           AbstractSynapseDynamicsStructural)):
-            return synapse_dynamics.is_same_as(self)
-        if not isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP):
+        if not super(SynapseDynamicsStructuralSTDP, self).is_same_as(
+                synapse_dynamics):
             return False
         return self.__common_sp.is_same_as(synapse_dynamics)
 
@@ -162,6 +158,11 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.s_max)
     def s_max(self):
         return self.__common_sp.s_max
+
+    @property
+    @overrides(AbstractSynapseDynamicsStructural.seed)
+    def seed(self):
+        return self.__common_sp.seed
 
     @property
     @overrides(AbstractSynapseDynamicsStructural.initial_weight)

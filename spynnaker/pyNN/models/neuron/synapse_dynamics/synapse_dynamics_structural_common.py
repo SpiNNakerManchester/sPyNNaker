@@ -42,6 +42,8 @@ class SynapseDynamicsStructuralCommon(object):
         "__initial_delay",
         # Maximum fan-in per target layer neuron
         "__s_max",
+        # The seed
+        "__seed",
         # Holds initial connectivity as defined via connector
         "__connections",
         # Maximum synaptic row length for created synapses
@@ -114,6 +116,7 @@ class SynapseDynamicsStructuralCommon(object):
         self.__initial_weight = initial_weight
         self.__initial_delay = initial_delay
         self.__s_max = s_max
+        self.__seed = seed
         self.__connections = dict()
 
         self.__actual_row_max_length = self.__s_max
@@ -422,15 +425,18 @@ class SynapseDynamicsStructuralCommon(object):
         return name
 
     def is_same_as(self, synapse_dynamics):
-        if not isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-            return False
         # Note noqa because exact type comparison is required here
-        return ((type(self.__partner_selection) ==  # noqa
-                 type(synapse_dynamics.partner_selection)) and
-                (type(self.__formation) ==
-                 type(synapse_dynamics.formation)) and
-                (type(self.__elimination) ==
-                 type(synapse_dynamics.elimination)))
+        return (
+            self.__s_max == synapse_dynamics.s_max and
+            self.__f_rew == synapse_dynamics.f_rew and
+            self.__initial_weight == synapse_dynamics.initial_weight and
+            self.__initial_delay == synapse_dynamics.initial_delay and
+            (type(self.__partner_selection) ==  # noqa
+             type(synapse_dynamics.partner_selection)) and
+            (type(self.__formation) ==
+             type(synapse_dynamics.formation)) and
+            (type(self.__elimination) ==
+             type(synapse_dynamics.elimination)))
 
     @property
     def initial_weight(self):
@@ -447,6 +453,10 @@ class SynapseDynamicsStructuralCommon(object):
     @property
     def s_max(self):
         return self.__s_max
+
+    @property
+    def seed(self):
+        return self.__seed
 
     @property
     def partner_selection(self):

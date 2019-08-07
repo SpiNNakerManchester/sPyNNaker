@@ -35,7 +35,8 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP,
+    SynapseDynamicsStructuralStatic, SynapseDynamicsSTDP)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
@@ -148,19 +149,56 @@ class SynapticManager(object):
     def synapse_dynamics(self):
         return self.__synapse_dynamics
 
+    def __combine_structural_stdp_dynamics(self, structural, stdp):
+        return SynapseDynamicsStructuralSTDP(
+            structural.partner_selection, structural.formation,
+            structural.elimination,
+            stdp.timing_dependence, stdp.weight_dependence,
+            # voltage dependence is not supported
+            None, stdp.dendritic_delay_fraction,
+            structural.f_rew, structural.initial_weight,
+            structural.initial_delay, structural.s_max, structural.seed)
+
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
 
         # We can always override static dynamics or None
-        if isinstance(self.__synapse_dynamics, SynapseDynamicsStatic):
+        if (self.__synapse_dynamics is None or
+                type(self.__synapse_dynamics) == SynapseDynamicsStatic):
             self.__synapse_dynamics = synapse_dynamics
+            return
 
-        # We can ignore a static dynamics trying to overwrite a plastic one
-        elif isinstance(synapse_dynamics, SynapseDynamicsStatic):
-            pass
+        # We can ignore a static dynamics trying to overwrite anything else
+        if type(synapse_dynamics) == SynapseDynamicsStatic:
+            return
 
-        # Otherwise, the dynamics must be equal
-        elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
+        # If we have a static structural and an STDP non-structural, they need
+        # to be combined
+        if (type(synapse_dynamics) == SynapseDynamicsStructuralStatic and
+                type(self.__synapse_dynamics) == SynapseDynamicsSTDP):
+            self.__synapse_dynamics = self.__combine_structural_stdp_dynamics(
+                synapse_dynamics, self.__synapse_dynamics)
+            return
+        if (type(self.__synapse_dynamics) ==
+                SynapseDynamicsStructuralStatic and
+                type(synapse_dynamics) == SynapseDynamicsSTDP):
+            self.__synapse_dynamics = self.__combine_structural_stdp_dynamics(
+                self.__synapse_dynamics, synapse_dynamics)
+            return
+
+        # If we are currently STDP, we can override that with StructuralSTDP if
+        # they are the same
+        if (type(self.__synapse_dynamics) == SynapseDynamicsSTDP and
+                type(synapse_dynamics) == SynapseDynamicsStructuralSTDP):
+            if not self.__synapse_dynamics.is_same_as(synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "STDP rules must match exactly when using multiple edges"
+                    "to the same projection")
+            self.__synapse_dynamics = synapse_dynamics
+            return
+
+        # Otherwise, the dynamics must be generally equal
+        if not synapse_dynamics.is_same_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
                 "to the same population")
@@ -304,7 +342,7 @@ class SynapticManager(object):
         """
         # Does the size of the parameters area depend on presynaptic
         # connections in any way?
-        if isinstance(self.synapse_dynamics,
+        if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
