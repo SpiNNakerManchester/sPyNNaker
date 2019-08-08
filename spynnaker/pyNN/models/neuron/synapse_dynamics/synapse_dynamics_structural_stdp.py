@@ -105,8 +105,9 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):
-        if not super(SynapseDynamicsStructuralSTDP, self).is_same_as(
-                synapse_dynamics):
+        if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and
+                not super(SynapseDynamicsStructuralSTDP, self).is_same_as(
+                    synapse_dynamics)):
             return False
         return self.__common_sp.is_same_as(synapse_dynamics)
 

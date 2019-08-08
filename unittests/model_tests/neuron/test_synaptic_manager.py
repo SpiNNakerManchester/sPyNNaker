@@ -546,6 +546,13 @@ class TestSynapticManager(unittest.TestCase):
         with self.assertRaises(SynapticConfigurationException):
             synaptic_manager.synapse_dynamics = alt_stdp_struct_2
 
+        # OK, just one more, honest
+        synaptic_manager = SynapticManager(
+            n_synapse_types=2, ring_buffer_sigma=5.0,
+            spikes_per_second=100.0, config=config)
+        synaptic_manager.synapse_dynamics = static_struct
+        synaptic_manager.synapse_dynamics = stdp_struct
+
 
 if __name__ == "__main__":
     unittest.main()
