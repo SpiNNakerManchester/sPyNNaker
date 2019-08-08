@@ -25,11 +25,16 @@
 #include <stdfix-full-iso.h>
 #include <normal.h>
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_normal_clipped_boundary_initialize;
+static free_func param_generator_normal_clipped_boundary_free;
+static generate_param_func param_generator_normal_clipped_boundary_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
  */
-struct param_generator_normal_clipped_boundary_params {
+struct normal_clipped_boundary_params {
     accum mu;
     accum sigma;
     accum low;
@@ -41,41 +46,36 @@ struct param_generator_normal_clipped_boundary_params {
  *!        includes the parameters and an RNG.
  */
 struct param_generator_normal_clipped_boundary {
-    struct param_generator_normal_clipped_boundary_params params;
+    struct normal_clipped_boundary_params params;
     rng_t rng;
 };
 
-void *param_generator_normal_clipped_boundary_initialize(address_t *region) {
-
+static void *param_generator_normal_clipped_boundary_initialize(
+        address_t *region) {
     // Allocate memory for the data
-    struct param_generator_normal_clipped_boundary *params =
-        (struct param_generator_normal_clipped_boundary *) spin1_malloc(
-            sizeof(struct param_generator_normal_clipped_boundary));
+    struct param_generator_normal_clipped_boundary *obj =
+            spin1_malloc(sizeof(struct param_generator_normal_clipped_boundary));
+    struct normal_clipped_boundary_params *params_sdram = (void *) *region;
 
     // Copy the parameters in
-    spin1_memcpy(
-        &(params->params), *region,
-        sizeof(struct param_generator_normal_clipped_boundary_params));
-    *region +=
-        sizeof(struct param_generator_normal_clipped_boundary_params) >> 2;
-    log_debug(
-        "normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
-        params->params.mu, params->params.sigma, params->params.low,
-        params->params.high);
+    obj->params = *params_sdram++;
+    *region = (void *) params_sdram;
+
+    log_debug("normal clipped to boundary mu = %k, sigma = %k, low = %k, high = %k",
+            obj->params.mu, obj->params.sigma, obj->params.low, obj->params.high);
 
     // Initialise the RNG for this generator
-    params->rng = rng_init(region);
-    return params;
+    obj->rng = rng_init(region);
+    return obj;
 }
 
-void param_generator_normal_clipped_boundary_free(void *data) {
-    struct param_generator_normal_clipped_boundary *params =
-            (struct param_generator_normal_clipped_boundary *) data;
-    rng_free(params->rng);
+static void param_generator_normal_clipped_boundary_free(void *data) {
+    struct param_generator_normal_clipped_boundary *obj = data;
+    rng_free(obj->rng);
     sark_free(data);
 }
 
-void param_generator_normal_clipped_boundary_generate(
+static void param_generator_normal_clipped_boundary_generate(
         void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);
@@ -83,16 +83,15 @@ void param_generator_normal_clipped_boundary_generate(
 
     // For each index, generate a normally distributed value, clipping
     // it to the given boundary
-    struct param_generator_normal_clipped_boundary *params =
-        (struct param_generator_normal_clipped_boundary *) data;
+    struct param_generator_normal_clipped_boundary *obj = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
-        accum value = rng_normal(params->rng);
-        values[i] = params->params.mu + (value * params->params.sigma);
-        if (values[i] < params->params.low) {
-            values[i] = params->params.low;
+        accum value = rng_normal(obj->rng);
+        values[i] = obj->params.mu + (value * obj->params.sigma);
+        if (values[i] < obj->params.low) {
+            values[i] = obj->params.low;
         }
-        if (values[i] > params->params.high) {
-            values[i] = params->params.high;
+        if (values[i] > obj->params.high) {
+            values[i] = obj->params.high;
         }
     }
 }

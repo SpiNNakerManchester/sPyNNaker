@@ -54,7 +54,6 @@ typedef struct {
 static inline pre_event_window_t pre_events_get_window(
         uint32_t time, const pre_event_history_t *events, uint32_t delay,
         uint32_t begin_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -68,7 +67,6 @@ static inline pre_event_window_t pre_events_get_window(
     // Keep looping while event occured after start
     // Of window and we haven't hit beginning of array
     do {
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
@@ -99,9 +97,8 @@ static inline pre_event_window_t pre_events_get_window(
 }
 
 //---------------------------------------
-static inline pre_event_window_t pre_events_next(pre_event_window_t window,
-                                                 uint32_t delayed_time) {
-
+static inline pre_event_window_t pre_events_next(
+        pre_event_window_t window, uint32_t delayed_time) {
     // Update previous time
     window.prev_time = delayed_time;
     window.prev_trace = *window.next_trace++;
@@ -115,15 +112,14 @@ static inline pre_event_window_t pre_events_next(pre_event_window_t window,
 }
 
 //---------------------------------------
-static inline void pre_events_add(uint32_t time, pre_event_history_t *events,
-                                  pre_trace_t trace) {
-    if (events->count_minus_one < (MAX_PRE_SYNAPTIC_EVENTS - 1)) {
+static inline void pre_events_add(
+        uint32_t time, pre_event_history_t *events, pre_trace_t trace) {
+    if (events->count_minus_one < MAX_PRE_SYNAPTIC_EVENTS - 1) {
         const uint32_t new_index = ++events->count_minus_one;
 
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t i = 2; i < MAX_PRE_SYNAPTIC_EVENTS; i++) {
             events->times[i - 1] = events->times[i];
