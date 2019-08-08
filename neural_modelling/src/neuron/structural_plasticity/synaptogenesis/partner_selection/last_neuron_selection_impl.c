@@ -31,6 +31,7 @@ void partner_init(uint8_t **data) {
             log_error("Out of memory when creating last spikes buffer");
             rt_error(RTE_SWERR);
         }
+        n_spikes[i] = 0;
     }
     *data += sizeof(uint32_t);
 }

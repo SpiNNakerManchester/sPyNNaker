@@ -29,9 +29,9 @@ struct formation_params;
 #define IS_CONNECTION_LAT 1
 
 typedef struct post_to_pre_entry {
-    uint16_t neuron_index;
-    uint8_t sub_pop_index;
     uint8_t pop_index;
+    uint8_t sub_pop_index;
+    uint16_t neuron_index;
 } post_to_pre_entry;
 
 //! information per atom

@@ -358,7 +358,7 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Finally make the table and write it out
         post_to_pre = numpy.core.records.fromarrays(
-            numpy.concatenate(padded_rows).T, formats="u2, u1, u1").view("u4")
+            numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         spec.write_array(post_to_pre)
 
     def get_parameters_sdram_usage_in_bytes(
@@ -388,11 +388,11 @@ class SynapseDynamicsStructuralCommon(object):
             param_sizes += dynamics.elimination\
                 .get_parameters_sdram_usage_in_bytes()
 
-        return (self.REWIRING_DATA_SIZE +
+        return int((self.REWIRING_DATA_SIZE +
                 (self.PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
                 (self.KEY_ATOM_INFO_SIZE * n_sub_edges) +
                 (self.POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
-                param_sizes)
+                param_sizes)*2)
 
     def synaptic_data_update(
             self, connections, post_vertex_slice, app_edge, synapse_info,
