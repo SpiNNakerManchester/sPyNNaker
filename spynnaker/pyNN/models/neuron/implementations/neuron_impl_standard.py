@@ -36,15 +36,15 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__components"
     ]
 
-    _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
+    _RECORDABLES = ["spikes", "v", "gsyn_exc", "gsyn_inh"]
 
-    _RECORDABLE_SCALAR_TYPES = {
+    _MATRIX_RECORDABLE_SCALAR_TYPES = {
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    _RECORDABLE_OUTPUT_TYPES = {
+    _MATRIX_RECORDABLE_OUTPUT_TYPES = {
         "v": DataType.INT32,
         "gsyn_exc": DataType.INT32,
         "gsyn_inh": DataType.INT32
@@ -139,13 +139,13 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def get_recordable_units(self, variable):
         return self._RECORDABLE_UNITS[variable]
 
-    @overrides(AbstractNeuronImpl.get_scalar_data_types)
-    def get_scalar_data_types(self):
-        return self._RECORDABLE_SCALAR_TYPES
+    @overrides(AbstractNeuronImpl.get_matrix_scalar_data_types)
+    def get_matrix_scalar_data_types(self):
+        return self._MATRIX_RECORDABLE_SCALAR_TYPES
 
-    @overrides(AbstractNeuronImpl.get_output_data_types)
-    def get_output_data_types(self):
-        return self._RECORDABLE_OUTPUT_TYPES
+    @overrides(AbstractNeuronImpl.get_matrix_output_data_types)
+    def get_matrix_output_data_types(self):
+        return self._MATRIX_RECORDABLE_OUTPUT_TYPES
 
     @overrides(AbstractNeuronImpl.is_recordable)
     def is_recordable(self, variable):

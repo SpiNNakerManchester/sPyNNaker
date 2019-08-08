@@ -333,7 +333,9 @@ static bool initialise_recording(){
     address_t recording_region = data_specification_get_region(
             SPIKE_HISTORY_REGION, ds_regions);
 
-    bool success = recording_initialize(recording_region, &recording_flags);
+    uint32_t words_read = 0;
+    bool success = recording_initialize(
+        recording_region, &recording_flags, &words_read);
     log_info("Recording flags = 0x%08x", recording_flags);
 
     return success;
