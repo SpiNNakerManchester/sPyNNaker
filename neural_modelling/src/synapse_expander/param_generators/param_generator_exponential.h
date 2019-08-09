@@ -24,35 +24,37 @@
 #include <stdfix-full-iso.h>
 #include <random.h>
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func param_generator_exponential_initialize;
+static free_func param_generator_exponential_free;
+static generate_param_func param_generator_exponential_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
  */
-struct param_generator_exponential_params {
+typedef struct param_generator_exponential_params {
     accum beta;
-};
+} param_generator_exponential_params;
 
 /**
  *! \brief The data structure to be passed around for this generator.  This
  *!        includes the parameters and an RNG.
  */
 struct param_generator_exponential {
-    struct param_generator_exponential_params params;
+    param_generator_exponential_params params;
     rng_t rng;
 };
 
-void *param_generator_exponential_initialize(address_t *region) {
-
+static void *param_generator_exponential_initialize(address_t *region) {
     // Allocate memory for the data
     struct param_generator_exponential *params =
-        (struct param_generator_exponential *)
             spin1_malloc(sizeof(struct param_generator_exponential));
 
     // Copy the parameters in
-    spin1_memcpy(
-        (&params->params), *region,
-        sizeof(struct param_generator_exponential_params));
-    *region += sizeof(struct param_generator_exponential_params) >> 2;
+    param_generator_exponential_params *params_sdram = (void *) *region;
+    params->params = *params_sdram++;
+    *region = (void *) params_sdram;
     log_debug("exponential beta = %k", params->params.beta);
 
     // Initialise the RNG for this generator
@@ -60,22 +62,20 @@ void *param_generator_exponential_initialize(address_t *region) {
     return params;
 }
 
-void param_generator_exponential_free(void *data) {
-    struct param_generator_exponential *params =
-            (struct param_generator_exponential *) data;
+static void param_generator_exponential_free(void *data) {
+    struct param_generator_exponential *params = data;
     rng_free(params->rng);
     sark_free(data);
 }
 
-void param_generator_exponential_generate(
+static void param_generator_exponential_generate(
         void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);
     use(indices);
 
     // For each index, generate an exponentially distributed value
-    struct param_generator_exponential *params =
-        (struct param_generator_exponential *) data;
+    struct param_generator_exponential *params = data;
     for (uint32_t i = 0; i < n_synapses; i++) {
         accum value = rng_exponential(params->rng);
         values[i] = value * params->params.beta;

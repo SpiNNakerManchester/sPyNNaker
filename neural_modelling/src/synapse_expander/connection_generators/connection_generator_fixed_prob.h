@@ -21,6 +21,11 @@
  */
 
 #include <synapse_expander/rng.h>
+#include <synapse_expander/generator_types.h>
+
+static initialize_func connection_generator_fixed_prob_initialise;
+static free_func connection_generator_fixed_prob_free;
+static generate_connection_func connection_generator_fixed_prob_generate;
 
 /**
  *! \brief The parameters that can be copied in from SDRAM
@@ -39,40 +44,38 @@ struct fixed_prob {
     rng_t rng;
 };
 
-void *connection_generator_fixed_prob_initialise(address_t *region) {
-
+static void *connection_generator_fixed_prob_initialise(address_t *region) {
     // Allocate memory for the data
-    struct fixed_prob *params = (struct fixed_prob *)
-        spin1_malloc(sizeof(struct fixed_prob));
+    struct fixed_prob *obj = spin1_malloc(sizeof(struct fixed_prob));
 
     // Copy the parameters in
-    address_t params_sdram = *region;
-    spin1_memcpy(
-        &(params->params), params_sdram, sizeof(struct fixed_prob_params));
-    params_sdram = &(params_sdram[sizeof(struct fixed_prob_params) >> 2]);
+    struct fixed_prob_params *params_sdram = (void *) *region;
+    obj->params = *params_sdram++;
+    *region = (void *) params_sdram;
 
     // Initialise the RNG for the connector
-    params->rng = rng_init(&params_sdram);
-    *region = params_sdram;
-    log_debug(
-        "Fixed Probability Connector, allow self connections = %u, "
-        "probability = %k", params->params.allow_self_connections,
-        (accum) params->params.probability);
-    return params;
+    obj->rng = rng_init(region);
+    log_debug("Fixed Probability Connector, allow self connections = %u, "
+            "probability = %k",
+            obj->params.allow_self_connections,
+            (accum) obj->params.probability);
+    return obj;
 }
 
-void connection_generator_fixed_prob_free(void *data) {
+static void connection_generator_fixed_prob_free(void *data) {
+    struct fixed_prob *params = data;
+    rng_free(params->rng);
     sark_free(data);
 }
 
-uint32_t connection_generator_fixed_prob_generate(
-        void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
+static uint32_t connection_generator_fixed_prob_generate(
+        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
     use(pre_slice_count);
 
-    struct fixed_prob *params = (struct fixed_prob *) data;
+    struct fixed_prob *obj = data;
 
     // If no space, generate nothing
     if (max_row_length < 1) {
@@ -82,18 +85,17 @@ uint32_t connection_generator_fixed_prob_generate(
     // Randomly select connections between each post-neuron
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
-
         // Disallow self connections if configured
-        if (!params->params.allow_self_connections &&
-                (pre_neuron_index == (post_slice_start + i))) {
+        if (!obj->params.allow_self_connections &&
+                (pre_neuron_index == post_slice_start + i)) {
             continue;
         }
 
         // Generate a random number
-        unsigned long fract value = ulrbits(rng_generator(params->rng));
+        unsigned long fract value = ulrbits(rng_generator(obj->rng));
 
         // If less than our probability, generate a connection if possible
-        if ((value <= params->params.probability) &&
+        if ((value <= obj->params.probability) &&
                 (n_conns < max_row_length)) {
             indices[n_conns++] = i;
         } else if (n_conns >= max_row_length) {
