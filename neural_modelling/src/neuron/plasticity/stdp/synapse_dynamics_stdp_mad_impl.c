@@ -179,8 +179,6 @@ void synapse_dynamics_print_plastic_synapses(
             synapse_row_plastic_controls(fixed_region_address);
     size_t plastic_synapse =
             synapse_row_num_plastic_controls(fixed_region_address);
-    const pre_event_history_t *event_history =
-            plastic_event_history(plastic_region_address);
 
     log_debug("Plastic region %u synapses\n", plastic_synapse);
 
@@ -245,10 +243,10 @@ address_t synapse_dynamics_initialise(
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
-    	if (!is_power_of_2(n_neurons)) {
-    		n_neurons_power_2 = next_power_of_2(n_neurons);
-    	}
-    	log_n_neurons = ilog_2(n_neurons_power_2);
+        if (!is_power_of_2(n_neurons)) {
+            n_neurons_power_2 = next_power_of_2(n_neurons);
+        }
+        log_n_neurons = ilog_2(n_neurons_power_2);
     }
 
     uint32_t n_synapse_types_power_2 = n_synapse_types;
