@@ -60,7 +60,7 @@ class PyNNPopulationCommon(object):
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
-        size = self._roundsize(size)
+        size = self._roundsize(size, label)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -566,7 +566,7 @@ class PyNNPopulationCommon(object):
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _roundsize(self, size):
+    def _roundsize(self, size, label):
         if isinstance(size, int):
             return size
         # External device population can have a size of None so accept for now
@@ -577,8 +577,8 @@ class PyNNPopulationCommon(object):
         if abs(temp - size) < 0.001:
             logger.warning("Size of the population rounded "
                            "from {} to {}. Please use int values for size",
-                           self.label, size, temp)
+                           label, size, temp)
             return temp
         raise ConfigurationException(
             "Size of a population with label {} must be an int,"
-            " received {}".format(self.label, size))
+            " received {}".format(label, size))
