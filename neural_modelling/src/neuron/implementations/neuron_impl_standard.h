@@ -209,7 +209,7 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
     // **********************
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
     // **********************
 
     // Get the exc and inh values from the synapses
@@ -223,20 +223,20 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
             inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
     // **********************
-    // Sum g_syn contributions from all receptors for recording
-    REAL total_exc = 0;
-    REAL total_inh = 0;
-
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
-        total_exc += exc_input_values[i];
-    }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
-        total_inh += inh_input_values[i];
-    }
-
-    // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+//    // Sum g_syn contributions from all receptors for recording
+//    REAL total_exc = 0;
+//    REAL total_inh = 0;
+//
+//    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+//        total_exc += exc_input_values[i];
+//    }
+//    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
+//        total_inh += inh_input_values[i];
+//    }
+//
+//    // Call functions to get the input values to be recorded
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
     // **********************
 
     // Call functions to convert exc_input and inh_input to current
