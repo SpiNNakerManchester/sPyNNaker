@@ -41,7 +41,6 @@ class PyNNPopulationCommon(object):
         "__delay_vertex",
         "__first_id",
         "__has_read_neuron_parameters_this_run",
-        "__label",
         "__last_id",
         "_positions",
         "__record_gsyn_file",
@@ -61,7 +60,6 @@ class PyNNPopulationCommon(object):
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
-        self.__label = label
         size = self._roundsize(size)
 
         # Use a provided model to create a vertex
@@ -72,12 +70,6 @@ class PyNNPopulationCommon(object):
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
-            if label is None:
-                simulator = globals_variables.get_simulator()
-                label = "Population {}".format(
-                    simulator.none_labelled_vertex_count)
-                simulator.increment_none_labelled_vertex_count()
-                self.__label = label
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -93,8 +85,10 @@ class PyNNPopulationCommon(object):
             elif size != self.__vertex.n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
-            if label is None:
-                self.__label = self.__vertex.label
+            if label is not None:
+                # Exceptional use of an underscore param
+                # as this is a rare case where a change is allowed/ supported
+                self.__vertex._label = label
             if constraints is not None:
                 self.__vertex.add_constraints(constraints)
 
@@ -127,7 +121,8 @@ class PyNNPopulationCommon(object):
 
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
-        self.__spinnaker_control.add_application_vertex(self.__vertex)
+        self.__spinnaker_control.add_application_vertex(
+            self.__vertex, "Population ")
 
         # initialise common stuff
         self._size = size
@@ -337,11 +332,11 @@ class PyNNPopulationCommon(object):
     def label(self):
         """ The label of the population
         """
-        return self.__label
+        return self._vertex.label
 
     @label.setter
     def label(self, label):
-        self.__label = label
+        raise NotImplementedError
 
     @property
     def local_size(self):
