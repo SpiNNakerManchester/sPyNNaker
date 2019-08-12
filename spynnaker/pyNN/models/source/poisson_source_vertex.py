@@ -25,6 +25,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from pacman.model.constraints.placer_constraints\
     import SameChipAsConstraint
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractGeneratesDataSpecification,
     AbstractHasAssociatedBinary, AbstractRewritesDataSpecification)
@@ -421,14 +422,17 @@ class PoissonSourceVertex(
 
         spec.write_value(data=index)
 
+        tmp_slice = Slice(vertex_slice.lo_atom-self.atoms_offset,
+                          vertex_slice.hi_atom-self.atoms_offset)
+
         # Compute the start times in machine time steps
-        start = self.__start[vertex_slice.as_slice]
+        start = self.__start[tmp_slice.as_slice]
         start_scaled = self._convert_ms_to_n_timesteps(
             start, machine_time_step)
 
         # Compute the end times as start times + duration in machine time steps
         # (where duration is not None)
-        duration = self.__duration[vertex_slice.as_slice]
+        duration = self.__duration[tmp_slice.as_slice]
         end_scaled = numpy.zeros(len(duration), dtype="uint32")
         none_positions = numpy.isnan(duration)
         positions = numpy.invert(none_positions)
@@ -437,7 +441,7 @@ class PoissonSourceVertex(
             start[positions] + duration[positions], machine_time_step)
 
         # Get the rates for the atoms
-        rates = self.__rate[vertex_slice.as_slice].astype("float")
+        rates = self.__rate[tmp_slice.as_slice].astype("float")
 
         # Compute the spikes per tick for each atom
         sources_per_tick = (
@@ -469,13 +473,13 @@ class PoissonSourceVertex(
 
         # Get the time to spike value
         time_to_source = self.__time_to_source[
-            vertex_slice.as_slice].astype(int)
+            tmp_slice.as_slice].astype(int)
         changed_rates = (
-            self.__rate_change[vertex_slice.as_slice].astype("bool") &
+            self.__rate_change[tmp_slice.as_slice].astype("bool") &
             elements)
         time_to_source[changed_rates] = 0
 
-        poisson_weight = self.__poisson_weight[vertex_slice.as_slice]
+        poisson_weight = self.__poisson_weight[tmp_slice.as_slice]
 
         # Merge the arrays as parameters per atom
         data = numpy.dstack((

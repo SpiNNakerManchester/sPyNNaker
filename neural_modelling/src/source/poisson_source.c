@@ -312,6 +312,9 @@ static bool read_poisson_parameters(address_t address) {
 
         // store spike source data into DTCM
         uint32_t spikes_offset = (sizeof(global_parameters) / 4) + 1;
+
+        io_printf(IO_BUF, "poisson starting address %x\n", (poisson_parameters + spikes_offset));
+
         spin1_memcpy(
             poisson_parameters, &address[spikes_offset],
             global_parameters.n_sources * sizeof(poisson_source_t));
@@ -374,12 +377,12 @@ static bool initialize() {
                     poisson_parameters[s].mean_isi_ticks);
         }
     	source_buffer[s] = 0;
-    	io_printf(IO_BUF, "Source: %u, exp_minus_lambda: %u, weight: %u\n",
-    			s, poisson_parameters[s].exp_minus_lambda, poisson_parameters[s].poisson_weight );
+    	//io_printf(IO_BUF, "Source: %u, exp_minus_lambda: %u, weight: %u\n",
+    	//		s, poisson_parameters[s].start_ticks, poisson_parameters[s].poisson_weight );
     }
 
     // print spike sources for debug purposes
-    //print_sources();
+    print_sources();
 
     log_info("Initialize: completed successfully");
 
