@@ -86,9 +86,7 @@ class PyNNPopulationCommon(object):
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
             if label is not None:
-                # Exceptional use of an underscore param
-                # as this is a rare case where a change is allowed/ supported
-                self.__vertex._label = label
+                self.__vertex.set_label(label)
             if constraints is not None:
                 self.__vertex.add_constraints(constraints)
 
@@ -336,7 +334,8 @@ class PyNNPopulationCommon(object):
 
     @label.setter
     def label(self, label):
-        raise NotImplementedError
+        raise NotImplementedError(
+            "As label is used as an ID it can not be changed")
 
     @property
     def local_size(self):
