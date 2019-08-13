@@ -211,15 +211,18 @@ void timer_callback(uint timer_count, uint unused) {
        then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
-//        for (int i=0; i< 1000; i++){
-//        	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
-//        			measurement_in[i],
-//					measurement_out[i],
-//					(measurement_in[i] - measurement_out[i]));
-//        }
-//        io_printf(IO_BUF, " Job Done ");
+
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
+
+//                for (int i=0; i< 1000; i++){
+//                	io_printf(IO_BUF, "In: %u  Out: %u  Diff: %u\n",
+//                			measurement_in[i],
+//        					measurement_out[i],
+//        					(measurement_in[i] - measurement_out[i]));
+//                }
+//                io_printf(IO_BUF, " Job Done ");
+
 
         log_debug("Completed a run");
 
