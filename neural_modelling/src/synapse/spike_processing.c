@@ -106,23 +106,29 @@ static inline void _dma_complete() {
 
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
-        if (!synapses_process_synaptic_row(time, current_buffer->row,
-            !subsequent_spikes, current_buffer_index)) {
-            log_error(
-                "Error processing spike 0x%.8x for address 0x%.8x"
-                "(local=0x%.8x)",
-                current_buffer->originating_spike,
-                current_buffer->sdram_writeback_address,
-                current_buffer->row);
+        
+        
+//        if (!
+        		synapses_process_synaptic_row(time, current_buffer->row,
+            !subsequent_spikes, current_buffer_index);
+//			) {
+//            log_error(
+//                "Error processing spike 0x%.8x for address 0x%.8x"
+//                "(local=0x%.8x)",
+//                current_buffer->originating_spike,
+//                current_buffer->sdram_writeback_address,
+//                current_buffer->row);
+//
+//            // Print out the row for debugging
+//            for (uint32_t i = 0;
+//                    i < (current_buffer->n_bytes_transferred >> 2); i++) {
+//                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
+//            }
+//
+//            rt_error(RTE_SWERR);
+//        }
 
-            // Print out the row for debugging
-            for (uint32_t i = 0;
-                    i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
-            }
 
-            rt_error(RTE_SWERR);
-        }
 //    } while (subsequent_spikes);
 
       // Start the next DMA transfer, so it is complete when we are finished
@@ -176,7 +182,10 @@ void _setup_synaptic_dma_read(uint arg1, uint arg2) {
 
     use(arg1);
     use(arg2);
+    // ***********************************************************************
     kickstarts++;
+    // ***********************************************************************
+
     // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;

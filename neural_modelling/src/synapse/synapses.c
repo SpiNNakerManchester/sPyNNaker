@@ -248,10 +248,13 @@ static inline void _process_fixed_synapses(
 //    num_fixed_pre_synaptic_events += 1; // count processed spikes instead
     num_fixed_pre_synaptic_events_per_timestep++;
 
+    // ***********************************************************************
+
     if (!fixed_synapse){
     	// packet targets zero spikes
     	zero_target_spikes_per_dt++;
     } else {
+    // ***********************************************************************
     for (; fixed_synapse > 0; fixed_synapse--) {
 
         // Get the next 32 bit word from the synaptic_row
@@ -271,7 +274,8 @@ static inline void _process_fixed_synapses(
             synapse_index_bits);
 
         // Add weight to current ring buffer value
-        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+//        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+        ring_buffers[ring_buffer_index] += weight;
 
         // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
@@ -285,9 +289,10 @@ static inline void _process_fixed_synapses(
 
         // Store saturated value back in ring-buffer
 
-        ring_buffers[ring_buffer_index] = accumulation;
+//        ring_buffers[ring_buffer_index] = accumulation;
     }
     }
+    // ***********************************************************************
 }
 
 //! private method for doing output debug data on the synapses
@@ -550,7 +555,7 @@ void synapses_do_timestep_update(timer_t time) {
 bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
                                    bool write, uint32_t process_id) {
 
-    _print_synaptic_row(row);
+//    _print_synaptic_row(row);
 
     // Get address of non-plastic region from row
     address_t fixed_region_address = synapse_row_fixed_region(row);
@@ -559,27 +564,27 @@ bool synapses_process_synaptic_row(uint32_t time, synaptic_row_t row,
     //if (plastic_tag(row) == 0)
     //{
     // If this row has a plastic region
-    if (synapse_row_plastic_size(row) > 0) {
-
-        // Get region's address
-        address_t plastic_region_address = synapse_row_plastic_region(row);
-
-        // Process any plastic synapses
-        profiler_write_entry_disable_fiq(
-            PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
-            return false;
-        }
-        profiler_write_entry_disable_fiq(
-            PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
-
-
-        // Perform DMA write back
-        if (write) {
-            spike_processing_finish_write(process_id);
-        }
-    }
+//    if (synapse_row_plastic_size(row) > 0) {
+//
+//        // Get region's address
+//        address_t plastic_region_address = synapse_row_plastic_region(row);
+//
+//        // Process any plastic synapses
+//        profiler_write_entry_disable_fiq(
+//            PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+//        if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
+//                fixed_region_address, ring_buffers, time)) {
+//            return false;
+//        }
+//        profiler_write_entry_disable_fiq(
+//            PROFILER_EXIT | PROFILER_PROCESS_PLASTIC_SYNAPSES);
+//
+//
+//        // Perform DMA write back
+//        if (write) {
+//            spike_processing_finish_write(process_id);
+//        }
+//    }
 
     // Process any fixed synapses
     // **NOTE** this is done after initiating DMA in an attempt
