@@ -384,6 +384,16 @@ bool neuron_do_timestep_update(
          }
     }
 
+
+    // ********************************
+    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+    	neuron_impl_shape_synapses(neuron_index);
+    }
+
+
+
+
+
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;
     cpsr = spin1_int_disable();

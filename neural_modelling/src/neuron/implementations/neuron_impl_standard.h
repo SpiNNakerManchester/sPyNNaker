@@ -196,7 +196,7 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
     // Get the input_type parameters and voltage for this neuron
-    input_type_pointer_t input_type = &input_type_array[neuron_index];
+//    input_type_pointer_t input_type = &input_type_array[neuron_index];
 
     // Get threshold and additional input parameters for this neuron
     threshold_type_pointer_t threshold_type =
@@ -216,11 +216,11 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
     input_t* inh_value = synapse_types_get_inhibitory_input(synapse_type);
 
-    // Call functions to obtain exc_input and inh_input
-    input_t* exc_input_values = input_type_get_input_value(
-            exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
-    input_t* inh_input_values = input_type_get_input_value(
-            inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
+//    // Call functions to obtain exc_input and inh_input
+//    input_t* exc_input_values = input_type_get_input_value(
+//            exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
+//    input_t* inh_input_values = input_type_get_input_value(
+//            inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
     // **********************
 //    // Sum g_syn contributions from all receptors for recording
@@ -239,11 +239,11 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
     // **********************
 
-    // Call functions to convert exc_input and inh_input to current
-    input_type_convert_excitatory_input_to_current(
-            exc_input_values, input_type, voltage);
-    input_type_convert_inhibitory_input_to_current(
-            inh_input_values, input_type, voltage);
+//    // Call functions to convert exc_input and inh_input to current
+//    input_type_convert_excitatory_input_to_current(
+//            exc_input_values, input_type, voltage);
+//    input_type_convert_inhibitory_input_to_current(
+//            inh_input_values, input_type, voltage);
 
 //    external_bias += additional_input_get_input_value_as_current(
 //        additional_input, voltage);
@@ -251,9 +251,9 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     // update neuron parameters
     state_t result = neuron_model_state_update(
 //            NUM_EXCITATORY_RECEPTORS,
-			exc_input_values,
+			exc_value, //exc_input_values,
 //            NUM_INHIBITORY_RECEPTORS,
-			inh_input_values,
+			inh_value, //inh_input_values,
 //            external_bias,
 			neuron);
 
@@ -271,7 +271,7 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     }
 
     // Shape the existing input according to the included rule
-    synapse_types_shape_input(synapse_type);
+//    synapse_types_shape_input(synapse_type);
 
     #if LOG_LEVEL >= LOG_DEBUG
         neuron_model_print_state_variables(neuron);
@@ -279,6 +279,13 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Return the boolean to the model timestep update
     return spike;
+}
+
+
+static inline void neuron_impl_shape_synapses(index_t neuron_index){
+    synapse_param_pointer_t synapse_type =
+        &neuron_synapse_shaping_params[neuron_index];
+    synapse_types_shape_input(synapse_type);
 }
 
 //! \brief stores neuron parameter back into sdram
