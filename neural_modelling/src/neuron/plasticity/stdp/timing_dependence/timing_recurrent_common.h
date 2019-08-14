@@ -78,7 +78,7 @@ static inline post_trace_t timing_add_post_spike(
 
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
+        uint32_t time, uint32_t last_time, pre_trace_t last_trace, neuron_pointer_t neuron) {
     use(time);
     use(&last_time);
     use(&last_trace);

@@ -106,7 +106,7 @@ static inline final_state_t _plasticity_update_synapse(
 
     // print_event_history(post_event_history);
     // print_delayed_window_events(post_event_history, window_begin_time,
-    //		window_end_time, delay_dendritic);
+    //		window_end_time, delay_dendritic);dy
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
@@ -136,7 +136,7 @@ static inline final_state_t _plasticity_update_synapse(
         post_window.prev_time, post_window.prev_trace, current_state);
 
     // Return final synaptic word and weight
-    return synapse_structure_get_final_state(current_state);
+    return synapse_structure_get_final_state(current_state, 0k);
 }
 
 //---------------------------------------
@@ -284,7 +284,7 @@ bool synapse_dynamics_process_plastic_synapses(
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
+                                                     last_pre_trace, NULL);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -343,7 +343,7 @@ bool synapse_dynamics_process_plastic_synapses(
 }
 
 void synapse_dynamics_process_post_synaptic_event(
-        uint32_t time, index_t neuron_index) {
+        uint32_t time, index_t neuron_index, REAL error) {
     log_debug("Adding post-synaptic event to trace at time:%u", time);
 
     // Add post-event

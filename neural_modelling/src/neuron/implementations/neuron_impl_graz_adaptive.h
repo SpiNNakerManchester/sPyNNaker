@@ -204,8 +204,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     state_t B_t = threshold_type->B;
     state_t z_t = neuron->z;
 
-	io_printf(IO_BUF, "time: %u, old V: %k, old B: %k, z_t: %k\n",
-			time, voltage, B_t, z_t);
+//	io_printf(IO_BUF, "time: %u, old V: %k, old B: %k, z_t: %k\n",
+//			time, voltage, B_t, z_t);
     // *********************************************************
 
     // Get the exc and inh values from the synapses

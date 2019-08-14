@@ -49,7 +49,7 @@ typedef struct {
 // Externals
 //---------------------------------------
 extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-extern uint32_t *weight_multiply_right_shift;
+uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Weight dependance functions
@@ -96,7 +96,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
     return state;
 }
 //---------------------------------------
-static inline weight_t weight_get_final(weight_state_t new_state) {
+static inline weight_t weight_get_final(weight_state_t new_state, REAL diff_to_target) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
 
     return (weight_t) new_state.weight;

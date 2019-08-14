@@ -59,10 +59,10 @@ static inline update_state_t synapse_structure_get_update_state(
 
 //---------------------------------------
 static inline final_state_t synapse_structure_get_final_state(
-        update_state_t state) {
+        update_state_t state, REAL diff_to_target) {
 
     // Get weight from state
-    weight_t weight = weight_get_final(state.weight_state);
+    weight_t weight = weight_get_final(state.weight_state, 0);
 
     // Build this into synaptic word along with updated accumulator and state
     return (final_state_t) {

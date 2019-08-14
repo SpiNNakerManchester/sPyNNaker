@@ -76,7 +76,7 @@ static inline int16_t timing_add_spike(uint32_t time, uint32_t last_time, int16_
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
         DECAY_LOOKUP_TAU(delta_time));
 
-    // Add new spike to trace
+    // Add new spike to trace, neuron_pointer_t
     int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
 
     log_debug("\tdelta_time=%d, new_trace=%d\n", delta_time, new_trace);
@@ -98,7 +98,7 @@ static inline post_trace_t timing_add_post_spike(
 }
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace)
+        uint32_t time, uint32_t last_time, pre_trace_t last_trace, neuron_pointer_t neuron)
 {
     return timing_add_spike(time, last_time, last_trace);
 }

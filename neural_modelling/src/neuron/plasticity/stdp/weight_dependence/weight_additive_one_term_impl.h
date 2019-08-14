@@ -81,7 +81,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 }
 
 //---------------------------------------
-static inline weight_t weight_get_final(weight_state_t new_state) {
+static inline weight_t weight_get_final(weight_state_t new_state, REAL diff_to_target) {
 
     // Scale potentiation and depression
     // **NOTE** A2+ and A2- are pre-scaled into weight format
