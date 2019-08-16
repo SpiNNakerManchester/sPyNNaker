@@ -12,6 +12,7 @@ typedef int16_t pre_trace_t;
 #include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 #include <neuron/models/neuron_model_lif_erbp_impl.h>
 #include <neuron/synapses.h>
+#include <neuron/threshold_types/threshold_type_adaptive.h>
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -78,7 +79,7 @@ static inline post_trace_t timing_add_post_spike(uint32_t time,
 
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(uint32_t time,
-		uint32_t last_time, pre_trace_t last_trace, neuron_pointer_t neuron) {
+		uint32_t last_time, pre_trace_t last_trace, neuron_pointer_t neuron, threshold_type_pointer_t threshold) {
 
 	REAL mem_potential = neuron->V_membrane;
 	REAL threshold_potential = 30k;
@@ -116,6 +117,7 @@ static inline pre_trace_t timing_add_pre_spike(uint32_t time,
 	}
 
 	REAL to_add_to_trace = (p_j * STDP_FIXED_POINT_ONE);
+	to_add_to_trace *= -(threshold->B * last_trace);
 	int32_t bits_to_add = bitsk(to_add_to_trace) >> 15;
 
 	if (print_plasticity) {

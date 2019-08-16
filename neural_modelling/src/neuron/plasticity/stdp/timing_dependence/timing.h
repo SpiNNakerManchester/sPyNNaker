@@ -20,6 +20,7 @@
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure.h>
 #include <neuron/models/neuron_model.h>
+#include <neuron/threshold_types/threshold_type_adaptive.h>
 
 address_t timing_initialise(address_t address);
 
@@ -30,7 +31,8 @@ static post_trace_t timing_add_post_spike(uint32_t time, uint32_t last_time,
 
 static pre_trace_t timing_add_pre_spike(uint32_t time, uint32_t last_time,
                                         pre_trace_t last_trace,
-										neuron_pointer_t neuron);
+										neuron_pointer_t neuron,
+										threshold_type_pointer_t threshold);
 
 static update_state_t timing_apply_pre_spike(
     uint32_t time, pre_trace_t trace, uint32_t last_pre_time,

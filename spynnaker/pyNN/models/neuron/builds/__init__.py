@@ -29,6 +29,7 @@ from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .if_curr_delta_graz_adaptive import IFCurrDeltaGrazAdaptive
 from .if_curr_exp_erbp import IFCurrExpERBP
+from .if_curr_exp_erbp_ad import IFCurrExpERBPad
 from .poisson_neuron import PoissonNeuron
 from .readout_poisson_neuron import ReadoutPoissonNeuron
 from .readout_poisson_neuron_non_spike_learning import ReadoutPoissonNeuronNonSpike
@@ -40,5 +41,5 @@ __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
            "IFCurrDeltaGrazAdaptive",
-           "IFCurrExpERBP", "PoissonNeuron", "ReadoutPoissonNeuron",
+           "IFCurrExpERBP", "IFCurrExpERBPad", "PoissonNeuron", "ReadoutPoissonNeuron",
            "ErrorNeuron", "ReadoutPoissonNeuronNonSpike"]

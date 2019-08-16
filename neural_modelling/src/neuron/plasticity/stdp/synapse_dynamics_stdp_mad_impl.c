@@ -284,7 +284,7 @@ bool synapse_dynamics_process_plastic_synapses(
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace, NULL);
+                                                     last_pre_trace, NULL, NULL);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {

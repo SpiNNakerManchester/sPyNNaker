@@ -56,6 +56,7 @@ uint32_t plastic_saturation_count = 0;
 
 // Pointers to neuron data
 static neuron_pointer_t neuron_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
 //static additional_input_pointer_t additional_input_array_plasticity;
 //static threshold_type_pointer_t threshold_type_array_plasticity;
 
@@ -326,6 +327,8 @@ bool synapse_dynamics_process_plastic_synapses(
             control_word, synapse_type_index_mask);
 
         neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
+        //add pointer to threshold array and print to check
+        threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
 
         // Create update state from the plastic synaptic word
         update_state_t current_state = synapse_structure_get_update_state(
@@ -337,7 +340,7 @@ bool synapse_dynamics_process_plastic_synapses(
         // Update the per synapse trace using the neuron membrane potential
         // (although note that we use the old state in calculations)
         current_state.trace = timing_add_pre_spike(time, last_pre_time,
-        		last_pre_trace, post_synaptic_neuron);
+        		last_pre_trace, post_synaptic_neuron, post_synaptic_threshold);
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
@@ -410,9 +413,9 @@ void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 	neuron_array_plasticity = neuron_array;
 }
 
-//void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
-//	threshold_type_array_plasticity = threshold_type_array;
-//}
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_plasticity = threshold_type_array;
+}
 //
 //void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
 //	additional_input_array_plasticity = additional_input_array;

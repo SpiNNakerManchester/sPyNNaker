@@ -16,6 +16,7 @@
 MODELS = IF_curr_exp \
          IF_cond_exp \
          LIF_current_erbp_stdp_mad_timing_weight \
+         LIF_current_erbp_ad_stdp_mad_timing_weight \
 		 error_neuron \
 		 readout_poisson_neuron_stdp_mad_timing_weight \
 		 readout_poisson_neuron_continuous_readout_learning_stdp_mad_timing_weight \

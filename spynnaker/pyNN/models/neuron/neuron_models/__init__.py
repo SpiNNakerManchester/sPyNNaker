@@ -21,6 +21,8 @@ from .neuron_model_leaky_integrate_and_fire_graz_adaptive \
     import NeuronModelLeakyIntegrateAndFireGrazAdaptive
 from .neuron_model_leaky_integrate_and_fire_erbp \
     import NeuronModelLeakyIntegrateAndFireERBP
+from .neuron_model_leaky_integrate_and_fire_erbp_ad \
+    import NeuronModelLeakyIntegrateAndFireERBPad
 from .neuron_model_leaky_integrate_and_fire_erbp_error_neuron \
     import NeuronModelLeakyIntegrateAndFireERBPErrorNeuron
 from .neuron_model_leaky_integrate_and_fire_poisson import (
@@ -32,6 +34,7 @@ __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
            "NeuronModelLeakyIntegrateAndFire",
            "NeuronModelLeakyIntegrateAndFireGrazAdaptive",
            "NeuronModelLeakyIntegrateAndFireERBP",
+           "NeuronModelLeakyIntegrateAndFireERBPad",
            "NeuronModelLeakyIntegrateAndFireERBPErrorNeuron",
            "NeuronModelLeakyIntegrateAndFirePoisson"
            "NeuronModelLeakyIntegrateAndFirePoissonReadout"]

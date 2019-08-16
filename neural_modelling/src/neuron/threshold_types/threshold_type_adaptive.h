@@ -19,6 +19,8 @@ typedef struct threshold_type_t {
 
 static REAL var_scal = 1;
 
+typedef struct threshold_type_t* threshold_type_pointer_t;
+
 static void _print_threshold_params(threshold_type_pointer_t threshold_type){
 	io_printf(IO_BUF, "B: %k, "
 			"b: %k, "

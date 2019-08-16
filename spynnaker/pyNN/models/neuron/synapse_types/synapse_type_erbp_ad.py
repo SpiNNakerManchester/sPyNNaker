@@ -23,7 +23,7 @@ UNITS = {
 }
 
 
-class SynapseTypeERBP(AbstractSynapseType):
+class SynapseTypeERBPad(AbstractSynapseType):
     __slots__ = [
         "_tau_syn_E",
         "_tau_syn_E2",
@@ -38,7 +38,7 @@ class SynapseTypeERBP(AbstractSynapseType):
             self, tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2
             ):
-        super(SynapseTypeERBP, self).__init__(
+        super(SynapseTypeERBPad, self).__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
              DataType.U032,    # decay_E2

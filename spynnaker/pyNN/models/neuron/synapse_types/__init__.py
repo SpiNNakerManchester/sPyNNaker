@@ -20,7 +20,8 @@ from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
 from .synapse_type_erbp import SynapseTypeERBP
+from .synapse_type_erbp_ad import SynapseTypeERBPad
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
            "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha"
-           "SynapseTypeERBP"]
+           "SynapseTypeERBP", "SynapseTypeERBPad"]
