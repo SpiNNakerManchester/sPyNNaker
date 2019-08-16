@@ -26,9 +26,10 @@ class DelayAfferentMachineEdge(
         MachineEdge, AbstractFilterableEdge, AbstractWeightUpdatable):
     __slots__ = []
 
-    def __init__(self, pre_vertex, post_vertex, label, weight=1):
+    def __init__(self, pre_vertex, post_vertex, label, app_edge, weight=1):
         super(DelayAfferentMachineEdge, self).__init__(
-            pre_vertex, post_vertex, label=label, traffic_weight=weight)
+            pre_vertex, post_vertex, label=label, app_edge=app_edge,
+            traffic_weight=weight)
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):

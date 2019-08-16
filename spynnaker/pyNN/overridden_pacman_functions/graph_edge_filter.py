@@ -63,8 +63,7 @@ class GraphEdgeFilter(object):
                 logger.debug("this edge was not pruned %s", edge)
                 no_prune_count += 1
                 self._add_edge_to_new_graph(
-                    edge, partition, graph_mapper, new_machine_graph,
-                    new_graph_mapper)
+                    edge, partition, new_machine_graph, new_graph_mapper)
 
         # returned the pruned graph and graph_mapper
         logger.debug("prune_count:{} no_prune_count:{}".format(
@@ -81,10 +80,9 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _add_edge_to_new_graph(
-            edge, partition, old_mapper, new_graph, new_mapper):
+            edge, partition, new_graph, new_mapper):
         new_graph.add_edge(edge, partition.identifier)
-        new_mapper.add_edge_mapping(
-            edge, old_mapper.get_application_edge(edge))
+        new_mapper.add_edge_mapping(edge, edge.app_edge)
 
         # add partition constraints from the original graph to the new graph
         # add constraints from the application partition
@@ -95,17 +93,15 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _is_filterable(edge, graph_mapper):
-        app_edge = graph_mapper.get_application_edge(edge)
-
         # Don't filter edges which have structural synapse dynamics
-        if isinstance(app_edge, ProjectionApplicationEdge):
-            for syn_info in app_edge.synapse_information:
+        if isinstance(edge.app_edge, ProjectionApplicationEdge):
+            for syn_info in edge.app_edge.synapse_information:
                 if isinstance(syn_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
                     return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
-        elif isinstance(app_edge, ApplicationEdge):
+        elif isinstance(edge.app_edge, ApplicationEdge):
             return False
         raise FilterableException(
             "cannot figure out if edge {} is prunable or not".format(edge))

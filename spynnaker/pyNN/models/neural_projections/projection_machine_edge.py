@@ -32,11 +32,11 @@ class ProjectionMachineEdge(
         "__synapse_information"]
 
     def __init__(
-            self, synapse_information, pre_vertex, post_vertex,
+            self, synapse_information, pre_vertex, post_vertex, app_edge,
             label=None, traffic_weight=1):
         # pylint: disable=too-many-arguments
         super(ProjectionMachineEdge, self).__init__(
-            pre_vertex, post_vertex, label=label,
+            pre_vertex, post_vertex, label=label, app_edge=app_edge,
             traffic_weight=traffic_weight)
 
         self.__synapse_information = synapse_information

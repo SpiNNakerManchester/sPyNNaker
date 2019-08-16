@@ -605,7 +605,7 @@ class SynapticManager(object):
 
         # For each machine edge in the vertex, create a synaptic list
         for machine_edge in in_edges:
-            app_edge = graph_mapper.get_application_edge(machine_edge)
+            app_edge = machine_edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
                 spec.comment("\nWriting matrix for m_edge:{}\n".format(
                     machine_edge.label))
@@ -931,10 +931,9 @@ class SynapticManager(object):
             graph_mapper, weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
-            app_edge = graph_mapper.get_application_edge(m_edge)
+            app_edge = m_edge.app_edge
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
-                pre_vertex_slice = graph_mapper.get_slice(
-                    m_edge.pre_vertex)
+                pre_vertex_slice = graph_mapper.get_slice(m_edge.pre_vertex)
                 self.__delay_key_index[app_edge.pre_vertex.source_vertex,
                                        pre_vertex_slice.lo_atom,
                                        pre_vertex_slice.hi_atom] = \
@@ -997,7 +996,7 @@ class SynapticManager(object):
             using_extra_monitor_cores, placements=None, monitor_api=None,
             monitor_placement=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
-        app_edge = graph_mapper.get_application_edge(machine_edge)
+        app_edge = machine_edge.app_edge
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
 

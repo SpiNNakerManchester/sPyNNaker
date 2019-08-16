@@ -149,8 +149,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         n_entries = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionMachineEdge):
-                edge = graph_mapper.get_application_edge(in_edge)
-                n_entries += len(edge.synapse_information)
+                n_entries += len(in_edge.app_edge.synapse_information)
 
         # Multiply by 2 to get an upper bound
         return (

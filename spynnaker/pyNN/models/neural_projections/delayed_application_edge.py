@@ -38,4 +38,4 @@ class DelayedApplicationEdge(ApplicationEdge):
     @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayedMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, label)
+            self.__synapse_information, pre_vertex, post_vertex, self, label)
