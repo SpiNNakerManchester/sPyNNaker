@@ -61,10 +61,8 @@ class ProjectionMachineEdge(
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                pre_app_vertex = graph_mapper.get_application_vertex(
-                    self.pre_vertex)
-                post_app_vertex = graph_mapper.get_application_vertex(
-                    self.post_vertex)
+                pre_app_vertex = self.pre_vertex.app_vertex
+                post_app_vertex = self.post_vertex.app_vertex
                 pre_slices = graph_mapper.get_slices(pre_app_vertex)
                 post_slices = graph_mapper.get_slices(post_app_vertex)
                 # run through connection list and check for any connections
@@ -78,8 +76,7 @@ class ProjectionMachineEdge(
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
-        pre_vertex = graph_mapper.get_application_vertex(
-            self.pre_vertex)
+        pre_vertex = self.pre_vertex.app_vertex
         pre_vertex_slice = graph_mapper.get_slice(
             self.pre_vertex)
 

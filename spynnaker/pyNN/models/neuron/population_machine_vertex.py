@@ -57,15 +57,16 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
-            self, resources_required, recorded_region_ids, label, constraints):
+            self, resources_required, recorded_region_ids, label, constraints,
+            app_vertex):
         """
         :param resources_required:
         :param recorded_region_ids:
         :param label:
         :param constraints:
-        :type sampling: bool
+        :param app_vertex: The associated application vertex
         """
-        MachineVertex.__init__(self, label, constraints)
+        MachineVertex.__init__(self, label, constraints, app_vertex)
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required

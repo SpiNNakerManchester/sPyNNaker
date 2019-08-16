@@ -457,8 +457,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # For each presynaptic subvertex figure out the partition (?)
         # to retrieve the key and n_atoms
         for vertex in presynaptic_machine_vertices:
-            population_to_subpopulation_information[
-                graph_mapper.get_application_vertex(vertex)].append(
+            population_to_subpopulation_information[vertex.app_vertex].append(
                 (routing_info.get_routing_info_from_pre_vertex(
                     vertex, constants.SPIKE_PARTITION_ID).first_key,
                  graph_mapper.get_slice(vertex)[2],

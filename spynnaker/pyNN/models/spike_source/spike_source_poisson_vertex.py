@@ -236,7 +236,7 @@ class SpikeSourcePoissonVertex(
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self.__spike_recorder.record,
-            constraints, label)
+            constraints, label, self)
 
     @property
     def rate(self):

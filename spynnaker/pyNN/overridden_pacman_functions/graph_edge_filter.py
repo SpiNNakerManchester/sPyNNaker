@@ -77,7 +77,7 @@ class GraphEdgeFilter(object):
         new_mapper.add_vertex_mapping(
             machine_vertex=vertex,
             vertex_slice=old_mapper.get_slice(vertex),
-            application_vertex=old_mapper.get_application_vertex(vertex))
+            application_vertex=vertex.app_vertex)
 
     @staticmethod
     def _add_edge_to_new_graph(
