@@ -39,10 +39,10 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
         # Filter one-to-one connections that are out of range
         for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                pre_lo = self.pre_vertex.vertex_slice.lo_atom
+                pre_hi = self.pre_vertex.vertex_slice.hi_atom
+                post_lo = self.post_vertex.vertex_slice.lo_atom
+                post_hi = self.post_vertex.vertex_slice.hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     return True
         return False

@@ -58,15 +58,17 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, recorded_region_ids, label, constraints,
-            app_vertex):
+            app_vertex, vertex_slice):
         """
         :param resources_required:
         :param recorded_region_ids:
         :param label:
         :param constraints:
         :param app_vertex: The associated application vertex
+        :param vertex_slice: The slice of the population that this implements
         """
-        MachineVertex.__init__(self, label, constraints, app_vertex)
+        MachineVertex.__init__(
+            self, label, constraints, app_vertex, vertex_slice)
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required

@@ -33,13 +33,12 @@ class DelayAfferentMachineEdge(
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-        pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-        pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-        post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-        post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+        pre_lo = self.pre_vertex.vertex_slice.lo_atom
+        pre_hi = self.pre_vertex.vertex_slice.hi_atom
+        post_lo = self.post_vertex.vertex_slice.lo_atom
+        post_hi = self.post_vertex.vertex_slice.hi_atom
         return (pre_lo != post_lo) or (pre_hi != post_hi)
 
     @overrides(AbstractWeightUpdatable.update_weight)
-    def update_weight(self, graph_mapper):
-        pre_vertex_slice = graph_mapper.get_slice(self.pre_vertex)
-        self._traffic_weight = pre_vertex_slice.n_atoms
+    def update_weight(self):
+        self._traffic_weight = self.pre_vertex.vertex_slice.n_atoms

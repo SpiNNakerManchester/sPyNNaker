@@ -134,7 +134,7 @@ class NeuronRecorder(object):
         indexes = []
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
             neurons = self._neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
             if n_neurons == 0:
@@ -205,7 +205,7 @@ class NeuronRecorder(object):
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
 
             if self.__indexes[SPIKES] is None:
                 neurons_recording = vertex_slice.n_atoms
@@ -285,9 +285,9 @@ class NeuronRecorder(object):
     @property
     def recorded_region_ids(self):
         results = list()
-        for id, rate in enumerate(self.__sampling_rates.values()):
+        for _id, rate in enumerate(self.__sampling_rates.values()):
             if rate > 0:
-                results.append(id)
+                results.append(_id)
         return results
 
     def _compute_rate(self, sampling_interval):

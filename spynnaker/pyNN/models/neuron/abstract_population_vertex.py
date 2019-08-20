@@ -249,7 +249,7 @@ class AbstractPopulationVertex(
         self.__n_subvertices += 1
         return PopulationMachineVertex(
             resources_required, self.__neuron_recorder.recorded_region_ids,
-            label, constraints, self)
+            label, constraints, self, vertex_slice)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         return (
@@ -424,22 +424,20 @@ class AbstractPopulationVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "machine_time_step", "time_scale_factor",
             "routing_info"})
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info):
+            routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
-        vertex_slice = graph_mapper.get_slice(placement.vertex)
+        vertex_slice = placement.vertex.vertex_slice
 
         # reserve the neuron parameters data region
-        self._reserve_neuron_params_data_region(
-            spec, graph_mapper.get_slice(placement.vertex))
+        self._reserve_neuron_params_data_region(spec, vertex_slice)
 
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
@@ -486,7 +484,7 @@ class AbstractPopulationVertex(
 
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self.__neuron_impl.model_name))
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = vertex.vertex_slice
 
         # Reserve memory regions
         self._reserve_memory_regions(spec, vertex_slice, vertex)

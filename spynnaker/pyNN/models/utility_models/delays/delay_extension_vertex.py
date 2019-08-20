@@ -115,7 +115,7 @@ class DelayExtensionVertex(
             constraints=None):
         self.__n_subvertices += 1
         return DelayExtensionMachineVertex(
-            resources_required, label, constraints, self)
+            resources_required, label, constraints, self, vertex_slice)
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
@@ -197,7 +197,7 @@ class DelayExtensionVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = vertex.vertex_slice
         n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
         delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
                                (self.__n_delay_stages * n_words_per_stage))
@@ -228,8 +228,7 @@ class DelayExtensionVertex(
             vertex)
 
         for incoming_edge in incoming_edges:
-            incoming_slice = graph_mapper.get_slice(
-                incoming_edge.pre_vertex)
+            incoming_slice = incoming_edge.pre_vertex.vertex_slice
             if (incoming_slice.lo_atom == vertex_slice.lo_atom and
                     incoming_slice.hi_atom == vertex_slice.hi_atom):
                 r_info = routing_infos.get_routing_info_for_edge(incoming_edge)
@@ -392,7 +391,7 @@ class DelayExtensionVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     def get_n_keys_for_partition(self, partition, graph_mapper):
-        vertex_slice = graph_mapper.get_slice(partition.pre_vertex)
+        vertex_slice = partition.pre_vertex.vertex_slice
         if self.__n_delay_stages == 0:
             return 1
         return vertex_slice.n_atoms * self.__n_delay_stages

@@ -236,7 +236,7 @@ class SpikeSourcePoissonVertex(
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self.__spike_recorder.record,
-            constraints, label, self)
+            constraints, label, self, vertex_slice)
 
     @property
     def rate(self):
@@ -317,7 +317,7 @@ class SpikeSourcePoissonVertex(
             label='setup')
 
         # reserve poisson params dsg region
-        self._reserve_poisson_params_region(placement, graph_mapper, spec)
+        self._reserve_poisson_params_region(placement, spec)
 
         spec.reserve_memory_region(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
@@ -329,19 +329,18 @@ class SpikeSourcePoissonVertex(
 
         placement.vertex.reserve_provenance_data_region(spec)
 
-    def _reserve_poisson_params_region(self, placement, graph_mapper, spec):
+    def _reserve_poisson_params_region(self, placement, spec):
         """ does the allocation for the poisson params region itself, as\
             it can be reused for setters after an initial run
 
         :param placement: the location on machine for this vertex
-        :param graph_mapper: the mapping between machine and application graphs
         :param spec: the dsg writer
         :return:  None
         """
         spec.reserve_memory_region(
             region=_REGIONS.POISSON_PARAMS_REGION.value,
-            size=self.get_params_bytes(graph_mapper.get_slice(
-                placement.vertex)), label='PoissonParams')
+            size=self.get_params_bytes(placement.vertex.vertex_slice),
+            label='PoissonParams')
 
     def _write_poisson_parameters(
             self, spec, graph, placement, routing_info,
@@ -574,13 +573,13 @@ class SpikeSourcePoissonVertex(
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
-        self._reserve_poisson_params_region(placement, graph_mapper, spec)
+        self._reserve_poisson_params_region(placement, spec)
 
         # allocate parameters
         self._write_poisson_parameters(
             spec=spec, graph=graph, placement=placement,
             routing_info=routing_info,
-            vertex_slice=graph_mapper.get_slice(placement.vertex),
+            vertex_slice=placement.vertex.vertex_slice,
             machine_time_step=machine_time_step,
             time_scale_factor=time_scale_factor)
 
@@ -675,8 +674,7 @@ class SpikeSourcePoissonVertex(
             graph_mapper, routing_info, data_n_time_steps, graph):
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
-        vertex = placement.vertex
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = placement.vertex.vertex_slice
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 

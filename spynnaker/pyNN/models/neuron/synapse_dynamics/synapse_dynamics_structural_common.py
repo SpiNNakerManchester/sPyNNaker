@@ -390,7 +390,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             spec.write_value(data=np.random.randint(0x7FFFFFFF))
 
     def __compute_aux(self, application_graph, machine_graph,
-                      app_vertex, machine_vertex, graph_mapper, routing_info):
+                      app_vertex, machine_vertex, routing_info):
         """ Compute all of the relevant pre-synaptic population information,\
             as well as the key of the current vertex.
 
@@ -409,8 +409,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: :py:class:`MachineVertex`
-        :param graph_mapper: for looking up application vertices
-        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
         :type routing_info: :py:class:`RoutingInfo`
         :return: pop info, routing key for current vertex, number of pre pops
@@ -460,8 +458,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             population_to_subpopulation_information[vertex.app_vertex].append(
                 (routing_info.get_routing_info_from_pre_vertex(
                     vertex, constants.SPIKE_PARTITION_ID).first_key,
-                 graph_mapper.get_slice(vertex)[2],
-                 graph_mapper.get_slice(vertex)[0],
+                 vertex.vertex_slice.lo_atom, vertex.vertex_slice.n_atoms,
                  routing_info.get_routing_info_from_pre_vertex(
                      vertex, constants.SPIKE_PARTITION_ID).first_mask))
 
@@ -481,11 +478,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         return (population_to_subpopulation_information, current_key,
                 no_pre_populations)
 
-    def __write_presynaptic_information(self, spec, application_graph,
-                                        machine_graph,
-                                        app_vertex, post_slice, machine_vertex,
-                                        graph_mapper,
-                                        routing_info):
+    def __write_presynaptic_information(
+            self, spec, application_graph, machine_graph, app_vertex,
+            post_slice, machine_vertex, graph_mapper, routing_info):
         """ All cores which do synaptic rewiring have information about all\
             the relevant pre-synaptic populations.
 
@@ -516,7 +511,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Compute all the auxiliary stuff
         pop_to_subpop_info, current_key, no_prepops = self.__compute_aux(
             application_graph, machine_graph, app_vertex, machine_vertex,
-            graph_mapper, routing_info)
+            routing_info)
 
         # Table header
         spec.write_value(data=no_prepops)

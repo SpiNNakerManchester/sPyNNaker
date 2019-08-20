@@ -73,7 +73,7 @@ class MultiSpikeRecorder(object):
             vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
 
             # Read the spikes from the buffer manager
             neuron_param_data, data_missing = \

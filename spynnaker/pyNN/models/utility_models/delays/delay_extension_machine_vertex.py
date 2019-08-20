@@ -44,9 +44,10 @@ class DelayExtensionMachineVertex(
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(self, resources_required, label, constraints=None,
-                 app_vertex=None):
+                 app_vertex=None, vertex_slice=None):
         super(DelayExtensionMachineVertex, self).__init__(
-            label, constraints=constraints, app_vertex=app_vertex)
+            label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__resources = resources_required
 
     @property

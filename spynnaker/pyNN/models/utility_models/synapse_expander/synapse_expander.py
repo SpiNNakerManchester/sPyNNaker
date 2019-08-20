@@ -59,7 +59,7 @@ def synapse_expander(
             # that need synapse expansion
             gen_on_machine = False
             for m_vertex in graph_mapper.get_machine_vertices(vertex):
-                vertex_slice = graph_mapper.get_slice(m_vertex)
+                vertex_slice = m_vertex.vertex_slice
                 if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     if isinstance(vertex, AbstractPopulationVertex):

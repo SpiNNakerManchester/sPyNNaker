@@ -451,8 +451,7 @@ class PyNNPopulationCommon(object):
 
                 self.__vertex.read_parameters_from_machine(
                     globals_variables.get_simulator().transceiver, placement,
-                    globals_variables.get_simulator().graph_mapper.get_slice(
-                        machine_vertex))
+                    machine_vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 

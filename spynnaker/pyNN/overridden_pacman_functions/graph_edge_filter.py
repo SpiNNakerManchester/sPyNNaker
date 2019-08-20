@@ -49,7 +49,7 @@ class GraphEdgeFilter(object):
         # add the vertices directly, as they wont be pruned.
         for vertex in progress.over(machine_graph.vertices, False):
             self._add_vertex_to_new_graph(
-                vertex, graph_mapper, new_machine_graph, new_graph_mapper)
+                vertex, new_machine_graph, new_graph_mapper)
         prune_count = 0
         no_prune_count = 0
 
@@ -71,12 +71,9 @@ class GraphEdgeFilter(object):
         return new_machine_graph, new_graph_mapper
 
     @staticmethod
-    def _add_vertex_to_new_graph(vertex, old_mapper, new_graph, new_mapper):
+    def _add_vertex_to_new_graph(vertex, new_graph, new_mapper):
         new_graph.add_vertex(vertex)
-        new_mapper.add_vertex_mapping(
-            machine_vertex=vertex,
-            vertex_slice=old_mapper.get_slice(vertex),
-            application_vertex=vertex.app_vertex)
+        new_mapper.add_vertex_mapping(vertex, vertex.app_vertex)
 
     @staticmethod
     def _add_edge_to_new_graph(
@@ -99,6 +96,7 @@ class GraphEdgeFilter(object):
                 if isinstance(syn_info.synapse_dynamics,
                               AbstractSynapseDynamicsStructural):
                     return False
+            return True
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(edge.app_edge, ApplicationEdge):

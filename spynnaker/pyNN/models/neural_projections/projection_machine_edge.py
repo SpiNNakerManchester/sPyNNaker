@@ -52,15 +52,15 @@ class ProjectionMachineEdge(
         n_filtered = 0
         for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                pre_lo = self.pre_vertex.vertex_slice.lo_atom
+                pre_hi = self.pre_vertex.vertex_slice.hi_atom
+                post_lo = self.post_vertex.vertex_slice.lo_atom
+                post_hi = self.post_vertex.vertex_slice.hi_atom
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                pre_hi = self.pre_vertex.vertex_slice.hi_atom
+                post_hi = self.post_vertex.vertex_slice.hi_atom
                 pre_app_vertex = self.pre_vertex.app_vertex
                 post_app_vertex = self.post_vertex.app_vertex
                 pre_slices = graph_mapper.get_slices(pre_app_vertex)
@@ -75,10 +75,9 @@ class ProjectionMachineEdge(
         return (n_filtered == len(self.__synapse_information))
 
     @overrides(AbstractWeightUpdatable.update_weight)
-    def update_weight(self, graph_mapper):
+    def update_weight(self):
         pre_vertex = self.pre_vertex.app_vertex
-        pre_vertex_slice = graph_mapper.get_slice(
-            self.pre_vertex)
+        pre_vertex_slice = self.pre_vertex.vertex_slice
 
         weight = 0
         for synapse_info in self.__synapse_information:

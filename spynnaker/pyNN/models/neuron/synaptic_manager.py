@@ -610,11 +610,9 @@ class SynapticManager(object):
                 spec.comment("\nWriting matrix for m_edge:{}\n".format(
                     machine_edge.label))
 
-                pre_vertex_slice = graph_mapper.get_slice(
-                    machine_edge.pre_vertex)
+                pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
                 pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
-                pre_slice_index = graph_mapper.get_machine_vertex_index(
-                    machine_edge.pre_vertex)
+                pre_slice_index = machine_edge.pre_vertex.index
 
                 for synapse_info in app_edge.synapse_information:
                     rinfo = routing_info.get_routing_info_for_edge(
@@ -933,14 +931,14 @@ class SynapticManager(object):
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
-                pre_vertex_slice = graph_mapper.get_slice(m_edge.pre_vertex)
+                pre_vertex_slice = m_edge.pre_vertex.vertex_slice
                 self.__delay_key_index[app_edge.pre_vertex.source_vertex,
                                        pre_vertex_slice.lo_atom,
                                        pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
         post_slices = graph_mapper.get_slices(application_vertex)
-        post_slice_idx = graph_mapper.get_machine_vertex_index(machine_vertex)
+        post_slice_idx = machine_vertex.index
 
         # Reserve the memory
         in_edges = application_graph.get_edges_ending_at_vertex(
@@ -1001,8 +999,8 @@ class SynapticManager(object):
             return None
 
         # Get details for extraction
-        pre_vertex_slice = graph_mapper.get_slice(machine_edge.pre_vertex)
-        post_vertex_slice = graph_mapper.get_slice(machine_edge.post_vertex)
+        pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
+        post_vertex_slice = machine_edge.post_vertex.vertex_slice
 
         # Get the key for the pre_vertex
         key = routing_infos.get_first_key_for_edge(machine_edge)

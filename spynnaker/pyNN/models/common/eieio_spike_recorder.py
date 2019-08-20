@@ -71,7 +71,7 @@ class EIEIOSpikeRecorder(object):
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
 
             # Read the spikes
             raw_spike_data, data_missing = \
