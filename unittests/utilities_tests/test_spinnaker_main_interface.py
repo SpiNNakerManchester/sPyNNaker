@@ -93,7 +93,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
             graph_label="Test", database_socket_addresses=[],
             n_chips_required=None, timestep=1.0, max_delay=144.0,
             min_delay=1.0, hostname=None)
-        assert interface.machine_time_step == 1000
+        assert interface.default_machine_time_step == 1000
         assert interface.time_scale_factor == 1
 
         # Test auto time scale factor
@@ -101,7 +101,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
             graph_label="Test", database_socket_addresses=[],
             n_chips_required=None, timestep=0.1, max_delay=14.4,
             min_delay=1.0, hostname=None)
-        assert interface.machine_time_step == 100
+        assert interface.default_machine_time_step == 100
         assert interface.time_scale_factor == 10
 
         # Test delay out of bounds

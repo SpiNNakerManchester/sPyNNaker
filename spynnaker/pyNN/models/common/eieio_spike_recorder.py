@@ -16,6 +16,9 @@
 import logging
 import struct
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
@@ -61,16 +64,18 @@ class EIEIOSpikeRecorder(object):
 
     def get_spikes(self, label, buffer_manager, region,
                    placements, graph_mapper, application_vertex,
-                   base_key_function, machine_time_step):
+                   base_key_function, local_time_step_map):
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
-        ms_per_tick = machine_time_step / 1000.0
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
+            ms_per_tick = (
+                local_time_step_map[placement.vertex] /
+                MICRO_TO_MILLISECOND_CONVERSION)
             vertex_slice = graph_mapper.get_slice(vertex)
 
             # Read the spikes

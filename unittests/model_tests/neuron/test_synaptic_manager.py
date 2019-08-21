@@ -204,7 +204,7 @@ class TestSynapticManager(unittest.TestCase):
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
         config.set("Simulation", "one_to_one_connection_dtcm_max_bytes", 40)
 
-        machine_time_step = 1000.0
+        default_machine_time_step = 1000.0
 
         pre_app_vertex = SimpleApplicationVertex(10)
         pre_vertex = SimpleMachineVertex(resources=None)
@@ -215,13 +215,13 @@ class TestSynapticManager(unittest.TestCase):
         post_slice_index = 0
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, default_machine_time_step)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, default_machine_time_step)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, default_machine_time_step)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(
@@ -277,7 +277,7 @@ class TestSynapticManager(unittest.TestCase):
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_region, synapse_region, direct_region, routing_info,
-            graph_mapper, graph, machine_time_step)
+            graph_mapper, graph, default_machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -328,7 +328,7 @@ class TestSynapticManager(unittest.TestCase):
         connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
             row_len_1, 0, 2, weight_scales, data_1, None,
-            app_edge.n_delay_stages, machine_time_step)
+            app_edge.n_delay_stages, default_machine_time_step)
 
         # The first matrix is a 1-1 matrix, so row length is 1
         assert row_len_1 == 1
@@ -348,7 +348,7 @@ class TestSynapticManager(unittest.TestCase):
         connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
             row_len_2, 0, 2, weight_scales, data_2, None,
-            app_edge.n_delay_stages, machine_time_step)
+            app_edge.n_delay_stages, default_machine_time_step)
 
         # The second matrix is a 1-1 matrix, so row length is 1
         assert row_len_2 == 1
@@ -368,7 +368,7 @@ class TestSynapticManager(unittest.TestCase):
         connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
-            app_edge.n_delay_stages, machine_time_step)
+            app_edge.n_delay_stages, default_machine_time_step)
 
         # The third matrix is an all-to-all matrix, so length is n_atoms
         assert row_len_3 == post_vertex_slice.n_atoms

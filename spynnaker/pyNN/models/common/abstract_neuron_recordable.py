@@ -39,8 +39,9 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def set_recording(self, variable, new_state=True, sampling_interval=None,
-                      indexes=None):
+    def set_recording(
+            self, variable, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         """ Sets variable to being recorded
         """
 
@@ -56,24 +57,30 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, graph_mapper,
+            buffer_manager, local_time_period_map):
         """ Get the recorded data
 
-        :param variable:
-        :param n_machine_time_steps:
-        :param placements:
-        :param graph_mapper:
-        :param buffer_manager:
-        :param machine_time_step:
-        :return:
+        :param variable: the variable name to get data for
+        :param n_machine_time_steps: how mnay time steps ran
+        :param placements: placements
+        :param graph_mapper: mapping between app and machine graphs
+        :param buffer_manager: buffer manager
+        :param local_time_period_map: map between machine vertex and time /
+        period
+        :return: numpy array of the data
         """
         # pylint: disable=too-many-arguments
 
     @abstractmethod
-    def get_neuron_sampling_interval(self, variable):
+    def get_neuron_sampling_interval(
+            self, variable, graph_mapper, local_time_period_map):
         """ Returns the current sampling interval for this variable
 
         :param variable: PyNN name of the variable
+        :param graph_mapper: the map between app graph and machine graph
+        :param local_time_period_map: \
+            the map of machine vertex to local time period
         :return: Sampling interval in micro seconds
         """

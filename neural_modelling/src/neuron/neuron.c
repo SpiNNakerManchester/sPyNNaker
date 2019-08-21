@@ -207,7 +207,8 @@ void neuron_do_timestep_update(
     cpsr = spin1_int_disable();
 
     // Record the recorded variables
-    neuron_recording_record(time, SPIKE_RECORDING_CHANNEL);
+    neuron_recording_matrix_record(time);
+    neuron_recording_spike_record(time, SPIKE_RECORDING_CHANNEL);
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);

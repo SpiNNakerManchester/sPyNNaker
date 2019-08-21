@@ -111,5 +111,11 @@ typedef struct timed_state_t {
     state_t states[];
 } timed_state_t;
 
+//! \brief storage for doubles in recording
+typedef struct double_timed_state_t {
+    uint32_t time;
+    double states[];
+} double_timed_state_t;
+
 
 #endif /* __NEURON_TYPEDEFS_H__ */

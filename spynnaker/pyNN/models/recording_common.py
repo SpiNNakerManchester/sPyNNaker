@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 try:
     from collections.abc import defaultdict
@@ -82,50 +83,42 @@ class RecordingCommon(object):
         get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
-            if not isinstance(self.__population._vertex,
-                              AbstractSpikeRecordable):
+            if not isinstance(
+                    self.__population._vertex, AbstractSpikeRecordable):
                 raise Exception("This population does not support the "
                                 "recording of spikes!")
             self.__population._vertex.set_recording_spikes(
+                get_simulator().default_machine_time_step,
                 sampling_interval=sampling_interval, indexes=indexes)
         elif variable == "all":
             raise Exception("Illegal call with all")
         else:
-            if not isinstance(self.__population._vertex,
-                              AbstractNeuronRecordable):
+            if not isinstance(
+                    self.__population._vertex, AbstractNeuronRecordable):
                 raise Exception("This population does not support the "
                                 "recording of {}!".format(variable))
             self.__population._vertex.set_recording(
-                variable, sampling_interval=sampling_interval, indexes=indexes)
+                variable, get_simulator().default_machine_time_step,
+                sampling_interval=sampling_interval, indexes=indexes)
 
         # update file writer
         self.__write_to_files_indicators[variable] = to_file
 
-        if variable == "gsyn_exc":
-            if not self.__population._vertex.conductance_based:
-                logger_utils.warn_once(
-                    logger, "You are trying to record the excitatory "
-                    "conductance from a model which does not use conductance "
-                    "input. You will receive current measurements instead.")
-        elif variable == "gsyn_inh":
-            if not self.__population._vertex.conductance_based:
-                logger_utils.warn_once(
-                    logger, "You are trying to record the inhibitory "
-                    "conductance from a model which does not use conductance "
-                    "input. You will receive current measurements instead.")
-
-    def _set_v_recording(self):
-        """ Set the parameters etc that are used by the voltage recording.
-
-        :return: None
-        """
-        self.__population._vertex.set_recording("v")
-
-    def _set_spikes_recording(self, sampling_interval, indexes=None):
-        """ Set the parameters, etc., that are used by the spikes recording.
-
-        :return: None
-        """
+        if isinstance(self.__population._vertex, AbstractPopulationVertex):
+            if variable == "gsyn_exc":
+                if not self.__population._vertex.conductance_based:
+                    logger_utils.warn_once(
+                        logger, "You are trying to record the excitatory "
+                        "conductance from a model which does not use "
+                        "conductance input. You will receive current "
+                        "measurements instead.")
+            elif variable == "gsyn_inh":
+                if not self.__population._vertex.conductance_based:
+                    logger_utils.warn_once(
+                        logger, "You are trying to record the inhibitory "
+                        "conductance from a model which does not use "
+                        "conductance input. You will receive current "
+                        "measurements instead.")
 
     @staticmethod
     def pynn7_format(data, ids, sampling_interval, data2=None):
@@ -189,7 +182,8 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
             indexes = []
             sampling_interval = self.__population._vertex.\
-                get_neuron_sampling_interval(variable)
+                get_neuron_sampling_interval(
+                    variable, sim.graph_mapper, sim.local_timer_period_map)
         elif sim.use_virtual_board:
             logger.warning(
                 "The simulation is using a virtual machine and so has not"
@@ -197,18 +191,20 @@ class RecordingCommon(object):
             data = numpy.zeros((0, 3))
             indexes = []
             sampling_interval = self.__population._vertex.\
-                get_neuron_sampling_interval(variable)
+                get_neuron_sampling_interval(
+                    variable, sim.graph_mapper, sim.local_timer_period_map)
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
             results = self.__population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
-                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+                sim.graph_mapper, sim.buffer_manager,
+                sim.local_timer_period_map)
             (data, indexes, sampling_interval) = results
 
         get_simulator().add_extraction_timing(
             timer.take_sample())
-        return (data, indexes, sampling_interval)
+        return data, indexes, sampling_interval
 
     def _get_spikes(self):
         """ How to get spikes from a vertex.
@@ -241,7 +237,7 @@ class RecordingCommon(object):
         # spikes
         return self.__population._vertex.get_spikes(
             sim.placements, sim.graph_mapper, sim.buffer_manager,
-            sim.machine_time_step)
+            sim.default_machine_time_step)
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
@@ -254,9 +250,11 @@ class RecordingCommon(object):
             variables = self.__population._vertex.get_recordable_variables()
             for variable in variables:
                 self.__population._vertex.set_recording(
-                    variable, new_state=False, indexes=indexes)
+                    variable, get_simulator().default_machine_time_step,
+                    new_state=False, indexes=indexes)
 
         # check for spikes
         elif isinstance(self.__population._vertex, AbstractSpikeRecordable):
             self.__population._vertex.set_recording_spikes(
-                new_state=False, indexes=indexes)
+                get_simulator().default_machine_time_step, new_state=False,
+                indexes=indexes)

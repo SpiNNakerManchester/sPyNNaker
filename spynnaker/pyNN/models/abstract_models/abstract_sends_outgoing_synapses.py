@@ -13,5 +13,5 @@ class AbstractSendsOutgoingSynapses(object):
     def get_out_going_size(self):
         """ return how many atoms are to be considered in outgoing projections
 
-        :return: 
+        :return: the number of atoms are coming out of this projection
         """

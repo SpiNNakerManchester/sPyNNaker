@@ -16,9 +16,11 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.partitioner_interfaces.abstract_controls_destination_of_edges import \
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_destination_of_edges import \
     AbstractControlsDestinationOfEdges
-from pacman.model.partitioner_interfaces.abstract_controls_source_of_edges import \
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_source_of_edges import \
     AbstractControlsSourceOfEdges
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (

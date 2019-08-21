@@ -40,7 +40,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             placements, executable_finder, read_algorithm_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            machine_time_step, time_scale_factor,
             no_sync_changes, threshold_percentage,
             executable_targets, compress_only_when_needed=True,
             compress_as_much_as_possible=False,  provenance_data_objects=None):
@@ -80,8 +79,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 target_length=target_length, routing_infos=routing_infos,
                 time_to_try_for_each_iteration=time_to_try_for_each_iteration,
                 use_timer_cut_off=use_timer_cut_off,
-                machine_time_step=machine_time_step,
-                time_scale_factor=time_scale_factor,
                 no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
                 compress_only_when_needed=compress_only_when_needed,

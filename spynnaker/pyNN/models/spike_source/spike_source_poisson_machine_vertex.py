@@ -15,8 +15,9 @@
 
 from enum import Enum
 
-from spinn_front_end_common.abstract_models.impl.supports_auto_pause_and_resume import \
-    SupportsAutoPauseAndResume
+from spinn_front_end_common.abstract_models.impl.\
+    machine_supports_auto_pause_and_resume import \
+    MachineSupportsAutoPauseAndResume
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
@@ -40,7 +41,7 @@ class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData,
-        SupportsAutoPauseAndResume):
+        MachineSupportsAutoPauseAndResume):
 
     __slots__ = [
         "__buffered_sdram_per_timestep",

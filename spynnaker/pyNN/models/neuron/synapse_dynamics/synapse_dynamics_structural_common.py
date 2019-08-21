@@ -17,6 +17,8 @@ import collections
 import numpy as np
 from six import itervalues
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from .abstract_synapse_dynamics_structural import (
@@ -342,16 +344,19 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: None
         :rtype: None
         """
-        if self.__p_rew * 1000. < machine_time_step / 1000.:
+        if (self.__p_rew * MICRO_TO_MILLISECOND_CONVERSION <
+                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
-            spec.write_value(
-                data=int(machine_time_step / (self.__p_rew * 10 ** 6)))
+            spec.write_value(data=int(
+                machine_time_step / (
+                    self.__p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
-            spec.write_value(
-                data=int((self.__p_rew * 10 ** 6) / float(machine_time_step)))
+            spec.write_value(data=int((
+                self.__p_rew * MICRO_TO_SECOND_CONVERSION) /
+                float(machine_time_step)))
 
         # scale the excitatory weight appropriately
         spec.write_value(

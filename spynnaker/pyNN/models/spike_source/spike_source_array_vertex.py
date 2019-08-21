@@ -15,6 +15,10 @@
 
 import logging
 import numpy
+
+from spinn_front_end_common.abstract_models.impl.\
+    application_supports_auto_pause_and_resume import \
+    ApplicationSupportsAutoPauseAndResume
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -44,7 +48,7 @@ def _send_buffer_times(spike_times, time_step):
 class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractChangableAfterRun,
-        ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl, ApplicationSupportsAutoPauseAndResume):
     """ Model for play back of spikes
     """
 
@@ -60,7 +64,7 @@ class SpikeSourceArrayVertex(
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times
-        time_step = self.get_spikes_sampling_interval()
+        time_step = globals_variables.get_simulator().default_machine_time_step
 
         super(SpikeSourceArrayVertex, self).__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
@@ -105,7 +109,8 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
+            self, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
@@ -117,12 +122,15 @@ class SpikeSourceArrayVertex(
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+    def get_spikes_sampling_interval(
+            self, graph_mapper, local_time_period_map):
+        machine_verts = graph_mapper.get_machine_vertices(self)
+        return local_time_period_map[machine_verts[0]]
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager,
+            local_timer_period_map):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager, 0,
             placements, graph_mapper, self,
@@ -130,7 +138,7 @@ class SpikeSourceArrayVertex(
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            machine_time_step)
+            local_timer_period_map)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

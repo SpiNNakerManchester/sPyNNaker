@@ -73,10 +73,13 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         self.__pre_neurons = None
         self.__pre_connector_seed = dict()
 
+    @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step):
+            self, pre_population, post_population, rng,
+            default_machine_time_step):
         AbstractConnector.set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step)
+            self, pre_population, post_population, rng,
+            default_machine_time_step)
         if not self.__with_replacement and self.__n_pre > self._n_pre_neurons:
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "

@@ -34,14 +34,25 @@ void neuron_recording_wait_to_complete(void);
 void neuron_recording_set_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, state_t value);
 
+//! \brief stores a recording of a matrix based double value
+//! \param[in] recording_var_index: which recording variable to write this is
+//! \param[in] neuron_index: the neuron id for this recorded data
+//! \param[in] value: the results to record for this neuron.
+void neuron_recording_set_double_recorded_param(
+        uint32_t recording_var_index, uint32_t neuron_index, double value);
+
 //! \brief stores a recording of a bitfield based variable
 //! \param[in] neuron_index: which neuron to set the spike for
 void neuron_recording_set_spike(uint32_t neuron_index);
 
-//! \brief does the recording process of handing over to basic recording
+//! \brief does the recording matrix process of handing over to basic recording
 //! \param[in] time: the time stamp for this recording
-//! \param[in] channel The channel to record to
-void neuron_recording_record(uint32_t time, uint8_t spike_channel);
+void neuron_recording_matrix_record(uint32_t time);
+
+//! \brief does the recording spikes process of handing over to basic recording
+//! \param[in] time: the time stamp for this recording
+//! \param[in] channel The channel to record spikes to
+void neuron_recording_spike_record(uint32_t time, uint8_t spike_channel);
 
 //! \brief sets up state for next recording.
 void neuron_recording_setup_for_next_recording();
@@ -69,4 +80,4 @@ void neuron_recording_finalise(void);
 //! \param[in] time: the time
 void neuron_recording_do_timestep_update(uint32_t time);
 
-#endif // _NEURON_RECORDING_H_
+#endif //_NEURON_RECORDING_H_

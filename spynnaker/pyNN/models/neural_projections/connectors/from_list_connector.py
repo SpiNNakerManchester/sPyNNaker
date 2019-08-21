@@ -15,6 +15,9 @@
 
 import logging
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
@@ -310,11 +313,12 @@ class FromListConnector(AbstractConnector):
         self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = globals_variables.get_simulator(
-                ).machine_time_step
-            self.__delays = numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+            default_mac_time_step = (
+                globals_variables.get_simulator().default_machine_time_step)
+            self.__delays = (numpy.rint(numpy.array(
+                self.__conn_list[:, delay_column]) * (
+                    MICRO_TO_MILLISECOND_CONVERSION / default_mac_time_step)) *
+                    (default_mac_time_step / MICRO_TO_MILLISECOND_CONVERSION))
         except ValueError:
             pass
 

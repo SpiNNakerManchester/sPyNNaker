@@ -34,10 +34,13 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
+            self, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         """ Set spikes to being recorded. \
             If new_state is false all other parameters are ignored.
 
+        :param default_machine_time_step: the simulation machine time step
+        :type default_machine_time_step: int
         :param new_state: Set if the spikes are recording or not
         :type new_state: bool
         :param sampling_interval: The interval at which spikes are recorded.\
@@ -59,20 +62,24 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager,
+            local_timer_period_map):
         """ Get the recorded spikes from the object
 
         :param placements: the placements object
         :param graph_mapper: the graph mapper object
         :param buffer_manager: the buffer manager object
-        :param machine_time_step: the time step of the simulation
+        :param local_timer_period_map: the time step of the verts
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
             ordered by time
         """
 
     @abstractmethod
-    def get_spikes_sampling_interval(self):
+    def get_spikes_sampling_interval(
+            self, graph_mapper, local_time_period_map):
         """ Return the current sampling interval for spikes
 
+        :param graph_mapper: map between app graph and machine graph
+        :param local_time_period_map
         :return: Sampling interval in micro seconds
         """

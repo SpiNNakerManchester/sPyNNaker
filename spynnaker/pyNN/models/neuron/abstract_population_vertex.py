@@ -17,6 +17,9 @@ import logging
 import os
 import math
 
+from spinn_front_end_common.abstract_models.impl.\
+    application_supports_auto_pause_and_resume import \
+    ApplicationSupportsAutoPauseAndResume
 from spinn_utilities.overrides import overrides
 from pacman.model.partitioner_interfaces.splitter_by_atoms import \
     SplitterByAtoms
@@ -37,8 +40,6 @@ from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.abstract_models.\
     abstract_sends_outgoing_synapses import AbstractSendsOutgoingSynapses
@@ -83,7 +84,8 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun, AbstractRewritesDataSpecification,
         AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
         AbstractSendsOutgoingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset, SplitterByAtoms):
+        AbstractCanReset, SplitterByAtoms,
+        ApplicationSupportsAutoPauseAndResume):
     """ Underlying vertex model for Neural Populations.
     """
 
@@ -195,22 +197,22 @@ class AbstractPopulationVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
+        "default_machine_time_step": "DefaultMachineTimeStep"
     })
     @overrides(
         SplitterByAtoms.get_resources_used_by_atoms,
         additional_arguments={
-            "graph", "machine_time_step"
+            "graph", "default_machine_time_step"
         }
     )
     def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+            self, vertex_slice, graph, default_machine_time_step):
         # pylint: disable=arguments-differ
 
         variable_sdram = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constant_sdram = ConstantSDRAM(self._get_sdram_usage_for_atoms(
-            vertex_slice, graph, machine_time_step))
+            vertex_slice, graph, default_machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
@@ -273,7 +275,7 @@ class AbstractPopulationVertex(
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
     def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
+            self, vertex_slice, graph, default_machine_time_step):
         sdram_requirement = (
             common_constants.SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
@@ -282,7 +284,7 @@ class AbstractPopulationVertex(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
+                default_machine_time_step) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -359,7 +361,7 @@ class AbstractPopulationVertex(
         return target
 
     def _write_neuron_parameters(
-            self, spec, key, vertex_slice, machine_time_step,
+            self, spec, key, vertex_slice, vertex_time_step,
             time_scale_factor):
 
         # If resetting, reset any state variables that need to be reset
@@ -390,7 +392,7 @@ class AbstractPopulationVertex(
 
         # Write the random back off value
         max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+            vertex_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
             int(math.ceil(max_offset / self.__n_subvertices)) *
             self.__n_data_specs)
@@ -398,7 +400,7 @@ class AbstractPopulationVertex(
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
+            (vertex_time_step * time_scale_factor) / (n_atoms * 2.0))
         spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it
@@ -425,17 +427,17 @@ class AbstractPopulationVertex(
         spec.write_array(neuron_data)
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
+        "local_time_step_map": "MachineTimeStepMap",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "local_time_step_map", "time_scale_factor", "graph_mapper",
             "routing_info"})
     def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
+            self, spec, placement, local_time_step_map, time_scale_factor,
             graph_mapper, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = graph_mapper.get_slice(placement.vertex)
@@ -448,7 +450,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=machine_time_step, spec=spec,
+            vertex_time_step=local_time_step_map[self], spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
@@ -465,7 +467,7 @@ class AbstractPopulationVertex(
         self.__change_requires_neuron_parameters_reload = False
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
+        "local_time_step_map": "MachineTimeStepMap",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "application_graph": "MemoryApplicationGraph",
@@ -477,12 +479,12 @@ class AbstractPopulationVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "local_time_step_map", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
             "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
+            self, spec, placement, local_time_step_map, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
             data_n_time_steps, n_key_map):
         # pylint: disable=too-many-arguments, arguments-differ
@@ -503,7 +505,7 @@ class AbstractPopulationVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), local_time_step_map[vertex],
             time_scale_factor))
 
         # Write the neuron recording region
@@ -513,7 +515,8 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, key, vertex_slice, local_time_step_map[vertex],
+            time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -527,7 +530,7 @@ class AbstractPopulationVertex(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step,
+            weight_scale, local_time_step_map[vertex],
             POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
@@ -573,16 +576,19 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
+            self, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         self.set_recording(
-            NeuronRecorder.SPIKES, new_state, sampling_interval, indexes)
+            NeuronRecorder.SPIKES, default_machine_time_step, new_state,
+            sampling_interval, indexes)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager,
+            local_timer_period_map):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
+            placements, graph_mapper, self, local_timer_period_map)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -593,29 +599,38 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.is_recording(variable)
 
     @overrides(AbstractNeuronRecordable.set_recording)
-    def set_recording(self, variable, new_state=True, sampling_interval=None,
-                      indexes=None):
+    def set_recording(
+            self, variable, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         self.__change_requires_mapping = not self.is_recording(variable)
         self.__neuron_recorder.set_recording(
-            variable, new_state, sampling_interval, indexes)
+            variable, sampling_interval, indexes, self,
+            default_machine_time_step, new_state)
 
     @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+    def get_data(
+            self, variable, n_machine_time_steps, placements, graph_mapper,
+            buffer_manager, local_time_period_map):
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager,
             self.__neuron_impl.get_recordable_variable_index(variable),
-            placements, graph_mapper, self, variable, n_machine_time_steps)
+            placements, graph_mapper, self, variable, n_machine_time_steps,
+            local_time_period_map)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
-    def get_neuron_sampling_interval(self, variable):
-        return self.__neuron_recorder.get_neuron_sampling_interval(variable)
+    def get_neuron_sampling_interval(
+            self, variable, graph_mapper, local_time_period_map):
+        machine_verts = graph_mapper.get_machine_vertices(self)
+        return self.__neuron_recorder.get_neuron_sampling_interval(
+            variable, machine_verts[0], local_time_period_map)
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
+    def get_spikes_sampling_interval(
+            self, graph_mapper, local_time_period_map):
+        machine_verts = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_neuron_sampling_interval(
-            NeuronRecorder.SPIKES)
+            NeuronRecorder.SPIKES, machine_verts[0], local_time_period_map)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
@@ -773,14 +788,15 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_placement=None,
-            monitor_cores=None, handle_time_out_configuration=True,
-            fixed_routes=None):
+            synapse_information, local_time_step_map,
+            using_extra_monitor_cores, placements=None, monitor_api=None,
+            monitor_placement=None, monitor_cores=None,
+            handle_time_out_configuration=True, fixed_routes=None):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
+            synapse_information, local_time_step_map,
+            using_extra_monitor_cores,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
@@ -790,9 +806,9 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self, vertex_time_step):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            vertex_time_step)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
