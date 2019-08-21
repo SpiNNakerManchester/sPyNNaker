@@ -211,8 +211,7 @@ class NeuronRecorder(object):
                 neurons_recording = vertex_slice.n_atoms
             else:
                 neurons_recording = sum(
-                    (index >= vertex_slice.lo_atom and
-                     index <= vertex_slice.hi_atom)
+                    vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
                     for index in self.__indexes[SPIKES])
                 if neurons_recording == 0:
                     continue
@@ -511,7 +510,6 @@ class NeuronRecorder(object):
         return (8 + n_bytes_for_n_neurons) * len(self.__sampling_rates)
 
     def _get_fixed_sdram_usage(self, vertex_slice):
-        total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         fixed_sdram = 0
         # Recording rate for each neuron
         fixed_sdram += self.N_BYTES_PER_RATE
@@ -519,7 +517,7 @@ class NeuronRecorder(object):
         fixed_sdram += self.N_BYTES_PER_INDEX
         # index_parameters one per neuron
         # even if not recording as also act as a gate
-        fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
+        fixed_sdram += self.N_BYTES_PER_INDEX * vertex_slice.n_atoms
         return fixed_sdram
 
     def get_variable_sdram_usage(self, vertex_slice):

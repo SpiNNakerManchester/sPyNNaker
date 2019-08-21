@@ -52,11 +52,9 @@ class ProjectionMachineEdge(
         n_filtered = 0
         for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = self.pre_vertex.vertex_slice.lo_atom
-                pre_hi = self.pre_vertex.vertex_slice.hi_atom
-                post_lo = self.post_vertex.vertex_slice.lo_atom
-                post_hi = self.post_vertex.vertex_slice.hi_atom
-                if pre_hi < post_lo or pre_lo > post_hi:
+                pre = self.pre_vertex.vertex_slice
+                post = self.post_vertex.vertex_slice
+                if pre.hi_atom < post.lo_atom or pre.lo_atom > post.hi_atom:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_hi = self.pre_vertex.vertex_slice.hi_atom

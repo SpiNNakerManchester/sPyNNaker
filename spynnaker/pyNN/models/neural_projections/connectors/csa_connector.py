@@ -61,11 +61,6 @@ class CSAConnector(AbstractConnector):
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
         # do the work from self._cset in here
-        # get the values for this slice
-        pre_lo = pre_vertex_slice.lo_atom
-        pre_hi = pre_vertex_slice.hi_atom
-        post_lo = post_vertex_slice.lo_atom
-        post_hi = post_vertex_slice.hi_atom
 
         # this is where the magic needs to happen somehow
         if self.__full_cset is None:
@@ -75,16 +70,15 @@ class CSAConnector(AbstractConnector):
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
-            range(pre_lo, pre_hi+1),
-            range(post_lo, post_hi+1)) * self.__full_cset
+            range(pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom+1),
+            range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
+            * self.__full_cset
 
         if self.verbose:
             print('full cset: ', self.__full_cset)
             print('this vertex pair_list: ', pair_list)
-            print('this vertex pre_neurons: ',
-                  [x[0] for x in pair_list])
-            print('this vertex post_neurons: ',
-                  [x[1] for x in pair_list])
+            print('this vertex pre_neurons: ', [x[0] for x in pair_list])
+            print('this vertex post_neurons: ', [x[1] for x in pair_list])
 
         n_connections = len(pair_list)  # size of the array created
         return n_connections, pair_list

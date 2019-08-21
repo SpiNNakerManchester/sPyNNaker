@@ -441,14 +441,13 @@ class SpikeSourcePoissonVertex(
         spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the random seed (4 words), generated randomly!
-        kiss_key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        if kiss_key not in self.__kiss_seed:
+        if vertex_slice not in self.__kiss_seed:
             if self.__rng is None:
                 self.__rng = numpy.random.RandomState(self.__seed)
-            self.__kiss_seed[kiss_key] = [
+            self.__kiss_seed[vertex_slice] = [
                 self.__rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
                 for _ in range(4)]
-        for value in self.__kiss_seed[kiss_key]:
+        for value in self.__kiss_seed[vertex_slice]:
             spec.write_value(data=value)
 
         # Compute the start times in machine time steps

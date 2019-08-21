@@ -215,7 +215,7 @@ class FromListConnector(AbstractConnector):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
         indices = self.__split_conn_list[
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+            pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
@@ -252,7 +252,7 @@ class FromListConnector(AbstractConnector):
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
         self._split_connections(pre_slices, post_slices)
-        return len(self.__split_conn_list[(pre_hi, post_hi)])
+        return len(self.__split_conn_list[pre_hi, post_hi])
 
     @conn_list.setter
     def conn_list(self, conn_list):

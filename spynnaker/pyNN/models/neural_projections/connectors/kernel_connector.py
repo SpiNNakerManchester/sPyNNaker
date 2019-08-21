@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from pacman.model.decorators.overrides import overrides
 from data_specification.enums.data_type import DataType
 from .abstract_generate_connector_on_machine \
     import AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL
@@ -209,8 +209,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 # convert to common coord system
                 r = post_as_pre_r[post_idx - post_lo]
                 c = post_as_pre_c[post_idx - post_lo]
-                if r < 0 or r >= self._common_h or \
-                   c < 0 or c >= self._common_w:
+                if (r < 0 or r >= self._common_h or
+                        c < 0 or c >= self._common_w):
                     continue
 
                 r, c = self.pre_as_post((r, c))
@@ -221,9 +221,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 dc = c - pre_c
                 kc = hw - dc
 
-                if 0 <= kr and kr < self._kernel_h and \
-                   0 <= kc and kc < self._kernel_w:
-
+                if (0 <= kr and kr < self._kernel_h and \
+                        0 <= kc and kc < self._kernel_w):
                     if post_idx in coords[pre_idx]:
                         continue
 

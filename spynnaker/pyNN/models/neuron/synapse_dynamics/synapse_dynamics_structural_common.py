@@ -368,9 +368,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # write total number of atoms in the application vertex
         spec.write_value(data=app_vertex.n_atoms)
         # write local low, high and number of atoms
-        spec.write_value(data=post_slice[0])
-        spec.write_value(data=post_slice[1])
-        spec.write_value(data=post_slice[2])
+        spec.write_value(data=post_slice.lo_atom)
+        spec.write_value(data=post_slice.hi_atom)
+        spec.write_value(data=post_slice.n_atoms)
 
         # write the grid size for periodic boundary distance computation
         spec.write_value(data=self.__grid[0])

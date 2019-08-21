@@ -220,8 +220,7 @@ class SynapticManager(object):
             machine_time_step):
         """ Get the maximum size of each row for a given slice of the vertex
         """
-        key = (synapse_info, post_vertex_slice.lo_atom,
-               post_vertex_slice.hi_atom)
+        key = (synapse_info, post_vertex_slice)
         if key not in self.__max_row_info:
             self.__max_row_info[key] = self.__synapse_io.get_max_row_info(
                 synapse_info, post_vertex_slice,
@@ -262,46 +261,46 @@ class SynapticManager(object):
         gen_on_machine = False
         size = 0
         for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionApplicationEdge):
-                for synapse_info in in_edge.synapse_information:
+            if not isinstance(in_edge, ProjectionApplicationEdge):
+                continue
 
-                    # Get the number of likely vertices
-                    max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                    if in_edge.pre_vertex.n_atoms < max_atoms:
-                        max_atoms = in_edge.pre_vertex.n_atoms
-                    n_edge_vertices = int(math.ceil(
-                        float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+            for synapse_info in in_edge.synapse_information:
+                # Get the number of likely vertices
+                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
+                if in_edge.pre_vertex.n_atoms < max_atoms:
+                    max_atoms = in_edge.pre_vertex.n_atoms
+                n_edge_vertices = int(math.ceil(
+                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
 
-                    # Get the size
-                    connector = synapse_info.connector
-                    dynamics = synapse_info.synapse_dynamics
-#                    weights = synapse_info.weight
-#                    delays = synapse_info.delay
-                    connector_gen = isinstance(
-                        connector, AbstractGenerateConnectorOnMachine) and \
-                        connector.generate_on_machine(
-                            synapse_info.weight, synapse_info.delay)
-                    synapse_gen = isinstance(
-                        dynamics, AbstractGenerateOnMachine)
-                    if connector_gen and synapse_gen:
-                        gen_on_machine = True
-                        gen_size = sum((
-                            GeneratorData.BASE_SIZE,
-                            connector.gen_delay_params_size_in_bytes(
-                                synapse_info.delay),
-                            connector.gen_weight_params_size_in_bytes(
-                                synapse_info.weight),
-                            connector.gen_connector_params_size_in_bytes,
-                            dynamics.gen_matrix_params_size_in_bytes
-                        ))
-                        size += gen_size * n_edge_vertices
+                # Get the size
+                connector = synapse_info.connector
+                dynamics = synapse_info.synapse_dynamics
+#                weights = synapse_info.weight
+#                delays = synapse_info.delay
+                connector_gen = isinstance(
+                    connector, AbstractGenerateConnectorOnMachine) and \
+                    connector.generate_on_machine(
+                        synapse_info.weight, synapse_info.delay)
+                synapse_gen = isinstance(dynamics, AbstractGenerateOnMachine)
+                if connector_gen and synapse_gen:
+                    gen_on_machine = True
+                    gen_size = sum((
+                        GeneratorData.BASE_SIZE,
+                        connector.gen_delay_params_size_in_bytes(
+                            synapse_info.delay),
+                        connector.gen_weight_params_size_in_bytes(
+                            synapse_info.weight),
+                        connector.gen_connector_params_size_in_bytes,
+                        dynamics.gen_matrix_params_size_in_bytes
+                    ))
+                    size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
             size += self.__n_synapse_types * 4
         return size
 
-    def _get_synapse_dynamics_parameter_size(self, vertex_slice,
-                                             in_edges=None):
+    def _get_synapse_dynamics_parameter_size(
+            self, vertex_slice, in_edges=None):
         """ Get the size of the synapse dynamics region
         """
         # Does the size of the parameters area depend on presynaptic
@@ -319,8 +318,8 @@ class SynapticManager(object):
             self, vertex_slice, in_edges, machine_time_step):
         return (
             self._get_synapse_params_size() +
-            self._get_synapse_dynamics_parameter_size(vertex_slice,
-                                                      in_edges=in_edges) +
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, in_edges=in_edges) +
             self._get_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
             self.__poptable_type.get_master_population_table_size(
@@ -347,10 +346,9 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 size=all_syn_block_sz, label='SynBlocks')
 
-        synapse_dynamics_sz = \
-            self._get_synapse_dynamics_parameter_size(
-                vertex_slice,
-                machine_graph.get_edges_ending_at_vertex(machine_vertex))
+        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
+            vertex_slice,
+            machine_graph.get_edges_ending_at_vertex(machine_vertex))
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
@@ -645,9 +643,8 @@ class SynapticManager(object):
                             weight_scales, machine_time_step, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
-                        key = (synapse_info, pre_vertex_slice.lo_atom,
-                               post_vertex_slice.lo_atom)
-                        self.__synapse_indices[key] = index
+                        self.__synapse_indices[
+                            synapse_info, pre_vertex_slice] = index
 
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
@@ -662,9 +659,7 @@ class SynapticManager(object):
                 post_vertex_slice, master_pop_table_region, rinfo,
                 all_syn_block_sz, block_addr, machine_time_step, app_edge,
                 generator_data)
-            key = (synapse_info, pre_vertex_slice.lo_atom,
-                   post_vertex_slice.lo_atom)
-            self.__synapse_indices[key] = index
+            self.__synapse_indices[synapse_info, pre_vertex_slice] = index
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -742,12 +737,9 @@ class SynapticManager(object):
 
         # Skip over the delayed bytes but still write a master pop entry
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
-        delay_rinfo = None
         n_delay_stages = 0
-        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                     pre_vertex_slice.hi_atom)
-        if delay_key in self.__delay_key_index:
-            delay_rinfo = self.__delay_key_index[delay_key]
+        delay_rinfo = self.__delay_key_index.get(
+            (app_edge.pre_vertex, pre_vertex_slice), None)
         d_index = None
         if max_row_info.delayed_max_n_synapses:
             n_delay_stages = app_edge.n_delay_stages
@@ -786,8 +778,7 @@ class SynapticManager(object):
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_info, n_delay_stages + 1,
             machine_time_step))
-        key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
-        self.__gen_on_machine[key] = True
+        self.__gen_on_machine[post_vertex_slice] = True
 
         if index is not None and d_index is not None and index != d_index:
             raise Exception("Delay index {} and normal index {} do not match"
@@ -844,11 +835,8 @@ class SynapticManager(object):
                 "Too much synaptic memory has been written: {} of {} ".format(
                     block_addr, all_syn_block_sz))
 
-        delay_rinfo = None
-        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                     pre_vertex_slice.hi_atom)
-        if delay_key in self.__delay_key_index:
-            delay_rinfo = self.__delay_key_index[delay_key]
+        delay_rinfo = self.__delay_key_index.get(
+            (app_edge.pre_vertex, pre_vertex_slice), None)
         d_index = None
         if delayed_row_data.size:
             block_addr, single_addr, d_index = self.__write_row_data(
@@ -931,10 +919,8 @@ class SynapticManager(object):
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
-                pre_vertex_slice = m_edge.pre_vertex.vertex_slice
                 self.__delay_key_index[app_edge.pre_vertex.source_vertex,
-                                       pre_vertex_slice.lo_atom,
-                                       pre_vertex_slice.hi_atom] = \
+                                       m_edge.pre_vertex.vertex_slice] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
         post_slices = graph_mapper.get_slices(application_vertex)
@@ -989,7 +975,7 @@ class SynapticManager(object):
         self.__retrieved_blocks = dict()
 
     def get_connections_from_machine(
-            self, transceiver, placement, machine_edge, graph_mapper,
+            self, transceiver, placement, machine_edge,
             routing_infos, synapse_info, machine_time_step,
             using_extra_monitor_cores, placements=None, monitor_api=None,
             monitor_placement=None, monitor_cores=None,
@@ -1009,13 +995,10 @@ class SynapticManager(object):
         delayed_key = None
         if app_edge.delay_edge is not None:
             delayed_key = self.__delay_key_index[
-                app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                pre_vertex_slice.hi_atom].first_key
+                app_edge.pre_vertex, pre_vertex_slice].first_key
 
         # Get the block for the connections from the pre_vertex
-        synapse_key = (synapse_info, pre_vertex_slice.lo_atom,
-                       post_vertex_slice.lo_atom)
-        index = self.__synapse_indices[synapse_key]
+        index = self.__synapse_indices[synapse_info, pre_vertex_slice]
         master_pop_table, direct_synapses, indirect_synapses = \
             self.__compute_addresses(transceiver, placement)
         data, max_row_length = self._retrieve_synaptic_block(
@@ -1204,5 +1187,4 @@ class SynapticManager(object):
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
         """
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        return self.__gen_on_machine.get(key, False)
+        return self.__gen_on_machine.get(vertex_slice, False)

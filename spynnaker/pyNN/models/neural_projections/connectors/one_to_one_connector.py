@@ -71,7 +71,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights):
         return self._get_weight_maximum(
-            weights, max((self._n_pre_neurons, self._n_post_neurons)))
+            weights, max(self._n_pre_neurons, self._n_post_neurons))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -80,10 +80,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             synapse_type):
         # pylint: disable=too-many-arguments
         max_lo_atom = max(
-            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
+            pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom)
         min_hi_atom = min(
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
-        n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
+            pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)
+        n_connections = max(0, (min_hi_atom - max_lo_atom) + 1)
         if n_connections <= 0:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)

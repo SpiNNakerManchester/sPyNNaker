@@ -27,7 +27,6 @@ class GraphEdgeWeightUpdater(object):
     def __call__(self, machine_graph):
         """
         :param machine_graph: the machine_graph whose edges are to be updated
-        :param graph_mapper: the graph mapper between graphs
         """
 
         # create progress bar

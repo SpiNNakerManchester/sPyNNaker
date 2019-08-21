@@ -351,7 +351,7 @@ class PyNNProjectionCommon(object):
                 sender_monitor_place = None
 
             connections = post_vertex.get_connections_from_machine(
-                ctl.transceiver, placement, edge, ctl.graph_mapper,
+                ctl.transceiver, placement, edge,
                 ctl.routing_infos, self.__synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
                 ctl.placements, receiver, sender_monitor_place,
