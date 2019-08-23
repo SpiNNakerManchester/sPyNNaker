@@ -164,6 +164,9 @@ static bool initialise(void) {
             &infinite_run, &time, SDP, DMA)) {
         return false;
     }
+
+    log_info("timer period is %d", timer_period);
+
     simulation_set_provenance_function(
             c_main_store_provenance_data,
             data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));

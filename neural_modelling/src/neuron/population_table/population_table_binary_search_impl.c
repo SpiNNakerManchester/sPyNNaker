@@ -205,7 +205,7 @@ bool population_table_get_first_address(
         }
 
         log_debug("about to try to find neuron id");
-        last_neuron_id = _get_neuron_id(entry, spike);
+        last_neuron_id = get_neuron_id(entry, spike);
         log_debug("found neuron id of %d", last_neuron_id);
 
         // check we have a entry in the bit field for this (possible not to due

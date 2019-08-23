@@ -720,7 +720,7 @@ class NeuronRecorder(object):
     def _get_data(self, vertex_slice):
         data = list()
         n_words_for_n_neurons = int(math.ceil(
-            vertex_slice.n_atoms // constants.WORD_TO_BYTE_MULTIPLIER))
+            vertex_slice.n_atoms / constants.WORD_TO_BYTE_MULTIPLIER))
         n_bytes_for_n_neurons = (
             n_words_for_n_neurons * constants.WORD_TO_BYTE_MULTIPLIER)
         for variable in self.__sampling_rates:

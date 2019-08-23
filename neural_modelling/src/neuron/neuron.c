@@ -48,9 +48,6 @@ static uint32_t time_between_spikes;
 //! The expected current clock tick of timer_1 when the next spike can be sent
 static uint32_t expected_time;
 
-//! The number of recordings outstanding
-static uint32_t n_recordings_outstanding = 0;
-
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t timer_start_offset;
@@ -70,7 +67,7 @@ struct neuron_parameters {
 //! \param[in] address: the address where the neuron parameters are stored
 //! in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
-static bool _neuron_load_neuron_parameters(address_t address) {
+static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
     neuron_impl_load_neuron_parameters(
@@ -121,9 +118,6 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
 
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
-
-    // Read number of recorded variables
-    n_recorded_vars = params->n_recorded_variables;
 
     log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
             *incoming_spike_buffer_size);
@@ -184,7 +178,7 @@ void neuron_do_timestep_update( // EXPORTED
 
         // If the neuron has spiked
         if (spike) {
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
+            log_info("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
             neuron_recording_set_spike(neuron_index);

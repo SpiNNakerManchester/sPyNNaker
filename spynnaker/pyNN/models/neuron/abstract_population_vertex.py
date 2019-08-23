@@ -317,7 +317,8 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            size=self._neuron_recorder.get_static_sdram_usage(vertex_slice))
+            size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
+            label="neuron recording")
 
         profile_utils.reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
@@ -450,7 +451,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            vertex_time_step=local_time_step_map[self], spec=spec,
+            vertex_time_step=local_time_step_map[placement.vertex], spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
@@ -628,7 +629,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
-        machine_verts = graph_mapper.get_machine_vertices(self)
+        machine_verts = list(graph_mapper.get_machine_vertices(self))
         return self.__neuron_recorder.get_neuron_sampling_interval(
             NeuronRecorder.SPIKES, machine_verts[0], local_time_period_map)
 
