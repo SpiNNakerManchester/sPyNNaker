@@ -154,7 +154,6 @@ void neuron_recording_matrix_record(uint32_t time) {
 //! \brief does the recording process for spikes and handing over to basic
 //! recording.
 void neuron_recording_spike_record(uint32_t time, uint8_t spike_channel) {
-    log_info("time %d", time);
     // Record any spikes this time step
     if (spike_recording_count == spike_recording_rate) {
         spike_recording_count = 1;
@@ -230,16 +229,11 @@ bool _neuron_recording_read_in_elements(address_t address, uint32_t n_neurons) {
      // Load spike recording details
     uint32_t next = basic_recording_words_read;
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
-    log_info("words for n neurons = %d", n_words_for_n_neurons);
-
-    log_info("next is %d", next);
     spike_recording_rate = address[next++];
     uint32_t n_neurons_recording_spikes = address[next++];
 
     // bypass the matrix record point as worthless
     uint32_t spike_type = address[next++];
-    log_info("spike rate = %d, spike n neurons = %d, spike type = %d",
-             spike_recording_rate, n_neurons_recording_spikes, spike_type);
 
     n_spike_recording_words = get_bit_field_size(n_neurons_recording_spikes);
     spin1_memcpy(
@@ -248,13 +242,9 @@ bool _neuron_recording_read_in_elements(address_t address, uint32_t n_neurons) {
 
     // Load other variable recording details
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        log_info("next point is %d", next);
         var_recording_rate[i] = address[next++];
         uint32_t n_neurons_recording_var = address[next++];
         var_recording_type_index[i] = address[next++];
-        log_info("var %d rate = %d, n neurons = %d, type = %d",
-             i, var_recording_rate[i], n_neurons_recording_var,
-             var_recording_type_index[i]);
 
         if (var_recording_type_index[i] == INT32) {
             var_recording_size[i] =
@@ -273,6 +263,7 @@ bool _neuron_recording_read_in_elements(address_t address, uint32_t n_neurons) {
         spin1_memcpy(
             var_recording_indexes[i], &address[next],
             n_neurons * sizeof(uint8_t));
+
         next += n_words_for_n_neurons;
     }
     _reset_record_counter();
@@ -383,8 +374,6 @@ bool neuron_recording_initialise(
         return false;
     }
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        var_recording_indexes[i] = (uint8_t *) spin1_malloc(
-            n_neurons * sizeof(uint8_t));
         if (var_recording_type_index[i] == INT32) {
             var_recording_values[i] = (timed_state_t *) spin1_malloc(
                 sizeof(uint32_t) + (sizeof(state_t) * n_neurons));

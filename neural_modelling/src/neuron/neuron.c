@@ -57,7 +57,6 @@ struct neuron_parameters {
     uint32_t n_neurons_to_simulate;
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
-    uint32_t n_recorded_variables;
 };
 
 #define START_OF_GLOBAL_PARAMETERS \
