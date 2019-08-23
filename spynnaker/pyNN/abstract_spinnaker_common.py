@@ -205,8 +205,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         # Sort out the time scale factor if not user specified
         # (including config)
         if self.time_scale_factor is None:
-            self._config.set("Machine", "time_scale_factor", max(
-                1.0, math.ceil(1000.0 / machine_time_step)))
+            self.time_scale_factor = max(
+                1.0, math.ceil(1000.0 / machine_time_step))
             if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
