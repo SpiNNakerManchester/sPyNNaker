@@ -52,7 +52,7 @@ typedef uint64_t spike_t;
 //! \param[in] s: the spike to get the key from
 //! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
-    return ((key_t)(s >> 32));
+    return (key_t) (s >> 32);
 }
 
 //! \brief helper method to retrieve the pay-load from a spike
@@ -60,7 +60,7 @@ static inline key_t spike_key(spike_t s) {
 //! \return payload_t: the pay-load from the spike (only used if the model
 //! is compiled with SPIKES_WITH_PAYLOADS)
 static inline payload_t spike_payload (spike_t s) {
-    return ((payload_t)(s & UINT32_MAX));
+    return (payload_t) (s & UINT32_MAX);
 }
 
 #else  /*SPIKES_WITHOUT_PAYLOADS*/
@@ -71,7 +71,7 @@ typedef uint32_t spike_t;
 //! \param[in] s: the spike to get the key from
 //! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
-    return (s);
+    return s;
 }
 
 //! \brief helper method to retrieve the pay-load from a spike
@@ -93,7 +93,7 @@ typedef address_t synaptic_row_t;
 typedef REAL input_t;
 
 // Input structure for recording
-typedef struct input_struct_t{
+typedef struct input_struct_t {
     input_t input;
 } input_struct_t;
 

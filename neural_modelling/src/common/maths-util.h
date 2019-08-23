@@ -85,7 +85,7 @@ static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 #include <sqrt.h>
 
 typedef accum			REAL;
-typedef unsigned accum		UREAL;
+typedef unsigned accum	UREAL;
 typedef long fract		FRACT;
 typedef unsigned long fract	UFRACT;
 #define REAL_CONST(x)	x##k		// accum -> k
@@ -93,7 +93,7 @@ typedef unsigned long fract	UFRACT;
 #define FRACT_CONST(x)	x##lr
 #define UFRACT_CONST(x)	x##ulr
 
-#define ONE		REAL_CONST(1.0000)
+#define ONE 		REAL_CONST(1.0000)
 #define HALF		REAL_CONST(0.5000)
 #define ZERO		REAL_CONST(0.0000)
 #define ACS_DBL_TINY	REAL_CONST(0.000001)

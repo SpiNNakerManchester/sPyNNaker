@@ -43,7 +43,7 @@ static master_population_table_entry *master_population_table;
 static uint32_t master_population_table_length;
 static address_and_row_length *address_list;
 static address_t synaptic_rows_base_address;
-static address_t direct_rows_base_address;
+static uint32_t direct_rows_base_address;
 
 //! \brief the number of times a DMA resulted in 0 entries
 static uint32_t ghost_pop_table_searches = 0;
@@ -67,14 +67,13 @@ static uint32_t bit_field_filtered_packets = 0;
 //! \brief pointer for the bitfield map
 bit_field_t* connectivity_bit_field;
 
-static inline uint32_t _get_direct_address(address_and_row_length entry) {
+static inline uint32_t get_direct_address(address_and_row_length entry) {
 
     // Direct row address is just the direct address bit
     return (entry & 0x7FFFFF00) >> 8;
 }
 
-static inline uint32_t _get_address(address_and_row_length entry) {
-
+static inline uint32_t get_address(address_and_row_length entry) {
     // The address is in words and is the top 23-bits but 1, so this down
     // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift
     // by 4 with the given mask 0x7FFFFF00 to fully remove the row length
@@ -83,42 +82,42 @@ static inline uint32_t _get_address(address_and_row_length entry) {
     return (entry & 0x7FFFFF00) >> 4;
 }
 
-static inline uint32_t _get_row_length(address_and_row_length entry) {
+static inline uint32_t get_row_length(address_and_row_length entry) {
     return entry & 0xFF;
 }
 
-static inline uint32_t _is_single(address_and_row_length entry) {
+static inline uint32_t is_single(address_and_row_length entry) {
     return entry & 0x80000000;
 }
 
-static inline uint32_t _get_neuron_id(
+static inline uint32_t get_neuron_id(
         master_population_table_entry entry, spike_t spike) {
     return spike & ~entry.mask;
 }
 
-static inline void _print_master_population_table() {
+static inline void print_master_population_table(void) {
     log_info("master_population\n");
     log_info("------------------------------------------\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
-            if (!_is_single(address_list[j])) {
-                log_debug(
+            if (!is_single(address_list[j])) {
+                log_info(
                     "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                     " offset: 0x%.8x, address: 0x%.8x, row_length: %u\n",
                     i, j, entry.key, entry.mask,
-                    _get_address(address_list[j]),
-                    _get_address(address_list[j]) +
+                    get_address(address_list[j]),
+                    get_address(address_list[j]) +
                         (uint32_t) synaptic_rows_base_address,
-                    _get_row_length(address_list[j]));
+                    get_row_length(address_list[j]));
             } else {
-                log_debug(
+                log_info(
                     "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
                     " offset: 0x%.8x, address: 0x%.8x, single",
                     i, j, entry.key, entry.mask,
-                    _get_direct_address(address_list[j]),
-                    _get_direct_address(address_list[j]) +
-                        (uint32_t) direct_rows_base_address);
+                    get_direct_address(address_list[j]),
+                    get_direct_address(
+                        address_list[j]) + direct_rows_base_address);
             }
         }
     }
@@ -133,8 +132,7 @@ bool population_table_initialise(
     log_debug("master pop base address is %d", &table_address[0]);
 
     master_population_table_length = table_address[0];
-    log_debug("master pop table length is %d\n",
-              master_population_table_length);
+    log_debug("master pop table length is %d\n", master_population_table_length);
     log_debug("master pop table entry size is %d\n",
               sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
@@ -143,9 +141,8 @@ bool population_table_initialise(
     log_debug("pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
-    if (n_master_pop_bytes != 0){
-        master_population_table = (master_population_table_entry *)
-            spin1_malloc(n_master_pop_bytes);
+    if (n_master_pop_bytes != 0) {
+        master_population_table = spin1_malloc(n_master_pop_bytes);
         if (master_population_table == NULL) {
             log_error("Could not allocate master population table");
             return false;
@@ -154,45 +151,39 @@ bool population_table_initialise(
 
     uint32_t address_list_length = table_address[1];
     uint32_t n_address_list_bytes =
-        address_list_length * sizeof(address_and_row_length);
+            address_list_length * sizeof(address_and_row_length);
 
     // only try to malloc if there's stuff to malloc.
-    if (n_address_list_bytes != 0){
-        address_list = (address_and_row_length *)
-            spin1_malloc(n_address_list_bytes);
+    if (n_address_list_bytes != 0) {
+        address_list = spin1_malloc(n_address_list_bytes);
         if (address_list == NULL) {
             log_error("Could not allocate master population address list");
             return false;
         }
     }
 
-    log_debug(
-        "pop table size: %u (%u bytes)", master_population_table_length,
-        n_master_pop_bytes);
-    log_debug(
-        "address list size: %u (%u bytes)", address_list_length,
-        n_address_list_bytes);
+    log_debug("pop table size: %u (%u bytes)",
+            master_population_table_length, n_master_pop_bytes);
+    log_debug("address list size: %u (%u bytes)",
+            address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &(table_address[2]),
+    spin1_memcpy(master_population_table, &table_address[2],
             n_master_pop_bytes);
-    spin1_memcpy(
-        address_list, &(table_address[2 + n_master_pop_words]),
-        n_address_list_bytes);
+    spin1_memcpy(address_list, &table_address[2 + n_master_pop_words],
+            n_address_list_bytes);
 
     // Store the base address
-    log_info(
-        "the stored synaptic matrix base address is located at: 0x%08x",
-        synapse_rows_address);
-    log_info(
-        "the direct synaptic matrix base address is located at: 0x%08x",
-        direct_rows_address);
+    log_info("the stored synaptic matrix base address is located at: 0x%08x",
+            synapse_rows_address);
+    log_info("the direct synaptic matrix base address is located at: 0x%08x",
+            direct_rows_address);
     synaptic_rows_base_address = synapse_rows_address;
-    direct_rows_base_address = direct_rows_address;
+    direct_rows_base_address = (uint32_t) direct_rows_address;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
 
-    _print_master_population_table();
+    print_master_population_table();
     return true;
 }
 
@@ -300,8 +291,7 @@ int population_table_position_in_the_master_pop_array(spike_t spike){
 }
 
 bool population_table_get_next_address(
-        address_t* row_address, size_t* n_bytes_to_transfer) {
-
+        address_t *row_address, size_t *n_bytes_to_transfer) {
     // If there are no more items in the list, return false
     if (items_to_go <= 0) {
         return false;
@@ -313,23 +303,20 @@ bool population_table_get_next_address(
 
         // If the row is a direct row, indicate this by specifying the
         // n_bytes_to_transfer is 0
-        if (_is_single(item)) {
+        if (is_single(item)) {
             *row_address = (address_t) (
-                _get_direct_address(item) +
-                (uint32_t) direct_rows_base_address +
-                (last_neuron_id * sizeof(uint32_t)));
+                    get_direct_address(item) + direct_rows_base_address +
+                    (last_neuron_id * sizeof(uint32_t)));
             *n_bytes_to_transfer = 0;
             is_valid = true;
         } else {
-
-            uint32_t row_length = _get_row_length(item);
+            uint32_t row_length = get_row_length(item);
             if (row_length > 0) {
-
                 uint32_t block_address =
-                    _get_address(item) + (uint32_t) synaptic_rows_base_address;
+                        get_address(item) + (uint32_t) synaptic_rows_base_address;
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
                 uint32_t neuron_offset =
-                    last_neuron_id * stride * sizeof(uint32_t);
+                        last_neuron_id * stride * sizeof(uint32_t);
 
                 *row_address = (address_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
@@ -343,8 +330,8 @@ bool population_table_get_next_address(
             }
         }
 
-        next_item += 1;
-        items_to_go -= 1;
+        next_item++;
+        items_to_go--;
     } while (!is_valid && (items_to_go > 0));
 
     return is_valid;

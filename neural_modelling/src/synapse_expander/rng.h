@@ -24,7 +24,7 @@
 /**
  *! \brief Random number generator "object"
  */
-typedef struct rng* rng_t;
+typedef struct rng *rng_t;
 
 /**
  *! \brief Initialise the random number generator

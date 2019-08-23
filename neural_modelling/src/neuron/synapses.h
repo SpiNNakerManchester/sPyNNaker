@@ -28,11 +28,10 @@
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits){
-    return (((simuation_timestep & SYNAPSE_DELAY_MASK)
-             << synapse_type_index_bits)
+        uint32_t synapse_index_bits) {
+    return ((simuation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
-            | neuron_index);
+            | neuron_index;
 }
 
 // Get the index of the ring buffer for a given timestep and combined
@@ -41,9 +40,8 @@ static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
         uint32_t synapse_type_index_bits) {
-    return (((simulation_timestep & SYNAPSE_DELAY_MASK)
-             << synapse_type_index_bits)
-            | combined_synapse_neuron_index);
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+            | combined_synapse_neuron_index;
 }
 
 // Converts a weight stored in a synapse row to an input
@@ -62,8 +60,8 @@ static inline input_t synapses_convert_weight_to_input(
 static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
     if (weight != 0) {
-        io_printf(IO_BUF, "%12.6k", synapses_convert_weight_to_input(
-            weight, left_shift));
+        io_printf(IO_BUF, "%12.6k",
+                synapses_convert_weight_to_input(weight, left_shift));
     } else {
         io_printf(IO_BUF, "      ");
     }
@@ -77,9 +75,10 @@ static inline void synapses_print_weight(
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //! \return bool states true if successfully initialised. False otherwise.
 bool synapses_initialise(
-    address_t synapse_params_address,
-    uint32_t n_neurons, uint32_t n_synapse_types,
-    uint32_t **ring_buffer_to_input_buffer_left_shifts);
+        address_t synapse_params_address, address_t direct_matrix_address,
+        uint32_t n_neurons, uint32_t n_synapse_types,
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        address_t *direct_synapses_address);
 
 //! \brief updates synapses for a time step
 //! \param[in] time. the timer
@@ -93,18 +92,18 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] process_id: ??????????????????
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-    uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
 //! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count();
+uint32_t synapses_get_saturation_count(void);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
-uint32_t synapses_get_pre_synaptic_events();
+uint32_t synapses_get_pre_synaptic_events(void);
 
 //! \brief returns the number of DMA retrieved rows which were empty.
 //! \return the number of DMA retrieved rows which were empty.
@@ -121,8 +120,8 @@ uint32_t synapses_get_empty_row_count(void);
 //! \param[out] sp_data: the address of a struct through which to return
 //! weight, delay information
 //! \return bool: was the search successful?
-bool find_static_neuron_with_id(uint32_t id, address_t row,
-                                structural_plasticity_data_t *sp_data);
+bool find_static_neuron_with_id(
+        uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
@@ -137,8 +136,9 @@ bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
 //! \param[in] delay: the delay associated with the connection
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return bool: was the addition successful?
-bool add_static_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
-                               uint32_t delay, uint32_t type);
+bool add_static_neuron_with_id(
+        uint32_t id, address_t row, uint32_t weight, uint32_t delay,
+        uint32_t type);
 
 //! \brief allows clearing of dtcm used by synapses
 //! \return bool true if successful false otherwise

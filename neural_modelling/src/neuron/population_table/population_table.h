@@ -31,8 +31,8 @@
 //!                             the table in words
 //! \return True if the table was initialised successfully, False otherwise
 bool population_table_initialise(
-    address_t table_address, address_t synapse_rows_address,
-    address_t direct_rows_address, uint32_t *row_max_n_words);
+        address_t table_address, address_t synapse_rows_address,
+        address_t direct_rows_address, uint32_t *row_max_n_words);
 
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike The spike received
@@ -40,7 +40,7 @@ bool population_table_initialise(
 //! \param[out] n_bytes_to_transfer Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-    spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
 //! \brief get the position in the master pop table
 //! \param[in] spike: The spike received
@@ -53,7 +53,7 @@ int population_table_position_in_the_master_pop_array(spike_t spike);
 //! \param[out] n_bytes_to_transfer Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-    address_t* row_address, size_t* n_bytes_to_transfer);
+        address_t* row_address, size_t* n_bytes_to_transfer);
 
 //! \brief generates how many dma's were pointless
 //! \return uint of how many were done
