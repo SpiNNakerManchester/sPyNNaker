@@ -151,7 +151,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self.set_up_machine_specifics(hostname)
 
         logger.info("Setting time scale factor to {}.",
-                    self._time_scale_factor)
+                    self.time_scale_factor)
 
         # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds.",
@@ -202,19 +202,19 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # Sort out the time scale factor if not user specified
         # (including config)
-        if self._time_scale_factor is None:
-            self._time_scale_factor = max(
-                1.0, math.ceil(1000.0 / self._machine_time_step))
-            if self._time_scale_factor > 1:
+        if self.time_scale_factor is None:
+            self._config.set("Machine", "time_scale_factor", max(
+                1.0, math.ceil(1000.0 / self._machine_time_step)))
+            if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    self._time_scale_factor, self.CONFIG_FILE_NAME)
+                    self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if self._machine_time_step * self._time_scale_factor < 1000:
+        if self._machine_time_step * self.time_scale_factor < 1000:
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
@@ -329,15 +329,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for projection in self._projections:
             projection._clear_cache()
         super(AbstractSpiNNakerCommon, self).run(run_time)
-
-    @property
-    def time_scale_factor(self):
-        """ The multiplicative scaling from application time to real\
-            execution time.
-
-        :return: the time scale factor
-        """
-        return self._time_scale_factor
 
     @staticmethod
     def register_binary_search_path(search_path):
