@@ -148,6 +148,7 @@ void setup_synaptic_dma_read(void) { // EXPORTED
             setup_done = true;
         }
     }
+    spike_processing_count ++;
 }
 
 static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
