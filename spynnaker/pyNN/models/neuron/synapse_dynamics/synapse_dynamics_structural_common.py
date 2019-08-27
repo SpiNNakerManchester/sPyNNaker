@@ -275,7 +275,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
-            machine_vertex, graph_mapper, routing_info):
+            machine_vertex, routing_info):
         """ Write the synapse parameters to the spec.
 
         :param spec: the data spec
@@ -301,8 +301,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: :py:class:`MachineVertex`
-        :param graph_mapper: for looking up application vertices
-        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
         :type routing_info: :py:class:`RoutingInfo`
         :return: None
@@ -319,9 +317,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         # Write presynaptic (sub)population information
         self.__write_presynaptic_information(
-            spec, application_graph, machine_graph,
-            app_vertex, post_slice, machine_vertex, graph_mapper,
-            routing_info)
+            spec, application_graph, machine_graph, app_vertex, post_slice,
+            machine_vertex, routing_info)
 
     def __write_common_rewiring_data(self, spec, app_vertex, post_slice,
                                      weight_scales, machine_time_step):
@@ -419,7 +416,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         # Can figure out the presynaptic subvertices (machine vertices)
         # for the current machine vertex
-        # by calling graph_mapper.get_machine_edges for the relevant
+        # by calling edge.machine_edges for the relevant
         # application edges (i.e. the structural ones)
         # This allows me to find the partition (?) which then plugged
         # into routing_info can give me the keys
@@ -480,7 +477,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
     def __write_presynaptic_information(
             self, spec, application_graph, machine_graph, app_vertex,
-            post_slice, machine_vertex, graph_mapper, routing_info):
+            post_slice, machine_vertex, routing_info):
         """ All cores which do synaptic rewiring have information about all\
             the relevant pre-synaptic populations.
 
@@ -501,8 +498,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: :py:class:`MachineVertex`
-        :param graph_mapper: for looking up application vertices
-        :type graph_mapper: :py:class:`GraphMapper`
         :param routing_info: All of the routing information on the network
         :type routing_info: :py:class:`RoutingInfo`
         :return: None
@@ -570,14 +565,13 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         total_words_written += self.__lat_distance_probabilities.size // 2 + 1
 
         # Write post to pre table (inverse of synaptic matrix)
-        self.__write_post_to_pre_table(spec, app_vertex, post_slice,
-                                       machine_vertex, graph_mapper,
-                                       pop_to_subpop_info, total_words_written)
+        self.__write_post_to_pre_table(
+            spec, app_vertex, post_slice, machine_vertex, pop_to_subpop_info,
+            total_words_written)
 
-    def __write_post_to_pre_table(self, spec, app_vertex, post_slice,
-                                  machine_vertex, graph_mapper,
-                                  population_to_subpopulation_information,
-                                  total_words_written):
+    def __write_post_to_pre_table(
+            self, spec, app_vertex, post_slice, machine_vertex,
+            population_to_subpopulation_information, total_words_written):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix
 
@@ -592,8 +586,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param machine_vertex: \
             the lowest level object of the post-synaptic population
         :type machine_vertex: MachineVertex
-        :param graph_mapper: for looking up application vertices
-        :type graph_mapper: GraphMapper
         :param population_to_subpopulation_information: \
             generated relevant information
         :type population_to_subpopulation_information: dict
@@ -611,8 +603,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                 for source, target, _weight, _delay, _syn_type in row[0]:
 
                     # Select pre vertex
-                    pre_vertex_slice = graph_mapper._slice_by_machine_vertex[
-                        row[2].pre_vertex]
+                    pre_vertex_slice = row[2].pre_vertex.vertex_slice
                     pre_vertex_id = source - pre_vertex_slice.lo_atom
                     masked_pre_vertex_id = pre_vertex_id & (2 ** 17 - 1)
 
@@ -673,8 +664,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     relevant_edges.append(edge)
         return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
 
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
-                                            in_edges):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons, n_synapse_types, in_edges):
         """ Approximate SDRAM usage
 
         :param n_neurons: number of neurons
@@ -727,9 +718,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         return int(self.__fudge_factor * (total_size + pop_size))  # bytes
 
-    def synaptic_data_update(self, connections,
-                             post_vertex_slice,
-                             app_edge, machine_edge):
+    def synaptic_data_update(
+            self, connections, post_vertex_slice, app_edge, machine_edge):
         """ Get static synaptic data
         """
         if post_vertex_slice.lo_atom not in self.__connections.keys():

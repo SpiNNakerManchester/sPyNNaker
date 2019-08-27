@@ -27,10 +27,7 @@ logger = logging.getLogger(__name__)
 @supports_injection
 class PushBotSpiNNakerLinkRetinaDevice(
         AbstractPushBotRetinaDevice, ApplicationSpiNNakerLinkVertex):
-    __slots__ = [
-        "__graph_mapper",
-        "__new_key_command",
-        "__routing_infos"]
+    __slots__ = ["__new_key_command"]
 
     default_parameters = {'label': None, 'board_address': None}
 
@@ -46,21 +43,13 @@ class PushBotSpiNNakerLinkRetinaDevice(
             board_address=board_address, label=label)
 
         # stores for the injection aspects
-        self.__graph_mapper = None
-        self.__routing_infos = None
         self.__new_key_command = None
-
-    @inject("MemoryGraphMapper")
-    def graph_mapper(self, graph_mapper):
-        self.__graph_mapper = graph_mapper
-        if self.__routing_infos is not None:
-            self._update_new_key_payload()
 
     @inject("MemoryRoutingInfos")
     def routing_info(self, routing_info):
-        self.__routing_infos = routing_info
-        if self.__graph_mapper is not None:
-            self._update_new_key_payload()
+        key = routing_info.get_first_key_from_pre_vertex(
+            list(self.machine_vertices)[0], SPIKE_PARTITION_ID)
+        self.__new_key_command.payload = key
 
     @property
     @overrides(AbstractPushBotRetinaDevice.start_resume_commands)
@@ -79,9 +68,3 @@ class PushBotSpiNNakerLinkRetinaDevice(
                 new_commands.append(self.__new_key_command)
             new_commands.append(command)
         return new_commands
-
-    def _update_new_key_payload(self):
-        vertex = list(self.__graph_mapper.get_machine_vertices(self))[0]
-        key = self.__routing_infos.get_first_key_from_pre_vertex(
-            vertex, SPIKE_PARTITION_ID)
-        self.__new_key_command.payload = key

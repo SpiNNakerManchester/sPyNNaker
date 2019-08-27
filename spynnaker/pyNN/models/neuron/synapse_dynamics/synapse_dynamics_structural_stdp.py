@@ -130,17 +130,17 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
                additional_arguments={"application_graph", "machine_graph",
                                      "app_vertex",
                                      "post_slice", "machine_vertex",
-                                     "graph_mapper", "routing_info"})
+                                     "routing_info"})
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
-            machine_vertex, graph_mapper, routing_info):
+            machine_vertex, routing_info):
         super(SynapseDynamicsStructuralSTDP, self).write_parameters(
             spec, region, machine_time_step, weight_scales)
         self.__common_sp.write_parameters(
             spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
-            machine_vertex, graph_mapper, routing_info)
+            machine_vertex, routing_info)
 
     @overrides(SynapseDynamicsSTDP.is_same_as)
     def is_same_as(self, synapse_dynamics):

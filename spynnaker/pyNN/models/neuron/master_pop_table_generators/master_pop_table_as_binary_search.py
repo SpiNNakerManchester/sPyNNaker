@@ -139,7 +139,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             8)
 
     def get_exact_master_population_table_size(
-            self, vertex, machine_graph, graph_mapper):
+            self, vertex, machine_graph):
         """
         :return: the size the master pop table will take in SDRAM (in bytes)
         """

@@ -103,7 +103,7 @@ class NeuronRecorder(object):
         return self.__sampling_rates[variable] * step
 
     def get_matrix_data(
-            self, label, buffer_manager, region, placements, graph_mapper,
+            self, label, buffer_manager, region, placements,
             application_vertex, variable, n_machine_time_steps):
         """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
             machine.
@@ -112,8 +112,6 @@ class NeuronRecorder(object):
         :param buffer_manager: the manager for buffered data
         :param region: the DSG region ID used for this data
         :param placements: the placements object
-        :param graph_mapper: \
-            the mapping between application and machine vertices
         :param application_vertex:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
@@ -123,7 +121,7 @@ class NeuronRecorder(object):
         if variable == SPIKES:
             msg = "Variable {} is not supported use get_spikes".format(SPIKES)
             raise ConfigurationException(msg)
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.machine_vertices
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
@@ -192,14 +190,14 @@ class NeuronRecorder(object):
         return (data, indexes, sampling_interval)
 
     def get_spikes(
-            self, label, buffer_manager, region, placements, graph_mapper,
+            self, label, buffer_manager, region, placements,
             application_vertex, machine_time_step):
 
         spike_times = list()
         spike_ids = list()
         ms_per_tick = machine_time_step / 1000.0
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.machine_vertices
         missing_str = ""
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))

@@ -328,7 +328,7 @@ class PyNNProjectionCommon(object):
             receivers = None
             extra_monitor_placements = None
 
-        edges = ctl.graph_mapper.get_machine_edges(self.__projection_edge)
+        edges = self.__projection_edge.machine_edges
         progress = ProgressBar(
             edges, "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))

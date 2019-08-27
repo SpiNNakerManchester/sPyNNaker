@@ -59,14 +59,13 @@ class EIEIOSpikeRecorder(object):
             return 0
         return n_neurons * 4
 
-    def get_spikes(self, label, buffer_manager, region,
-                   placements, graph_mapper, application_vertex,
-                   base_key_function, machine_time_step):
+    def get_spikes(self, label, buffer_manager, region, placements,
+                   application_vertex, base_key_function, machine_time_step):
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
         ms_per_tick = machine_time_step / 1000.0
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):

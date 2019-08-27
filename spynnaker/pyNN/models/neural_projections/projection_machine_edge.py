@@ -46,7 +46,7 @@ class ProjectionMachineEdge(
         return self.__synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self, graph_mapper):
+    def filter_edge(self):
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
         n_filtered = 0
@@ -61,8 +61,8 @@ class ProjectionMachineEdge(
                 post_hi = self.post_vertex.vertex_slice.hi_atom
                 pre_app_vertex = self.pre_vertex.app_vertex
                 post_app_vertex = self.post_vertex.app_vertex
-                pre_slices = graph_mapper.get_slices(pre_app_vertex)
-                post_slices = graph_mapper.get_slices(post_app_vertex)
+                pre_slices = pre_app_vertex.vertex_slices
+                post_slices = post_app_vertex.vertex_slices
                 # run through connection list and check for any connections
                 # between the pre and post vertices that could be filtered
                 n_connections = synapse_info.connector.get_n_connections(

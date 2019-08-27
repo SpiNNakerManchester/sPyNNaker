@@ -299,13 +299,12 @@ class SpikeSourcePoissonVertex(
         return (PARAMS_BASE_WORDS +
                 (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON)) * 4
 
-    def reserve_memory_regions(self, spec, placement, graph_mapper):
+    def reserve_memory_regions(self, spec, placement):
         """ Reserve memory regions for poisson source parameters and output\
             buffer.
 
         :param spec: the data specification writer
         :param placement: the location this vertex resides on in the machine
-        :param graph_mapper: the mapping between app and machine graphs
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -558,17 +557,15 @@ class SpikeSourcePoissonVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "graph": "MemoryMachineGraph"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "graph"})
+            "machine_time_step", "time_scale_factor", "routing_info", "graph"})
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, graph):
+            routing_info, graph):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
@@ -656,7 +653,6 @@ class SpikeSourcePoissonVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
         "graph": "MemoryMachineGraph"
@@ -664,13 +660,13 @@ class SpikeSourcePoissonVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "machine_time_step", "time_scale_factor",
             "routing_info", "data_n_time_steps", "graph"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, data_n_time_steps, graph):
+            routing_info, data_n_time_steps, graph):
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
         vertex_slice = placement.vertex.vertex_slice
@@ -678,7 +674,7 @@ class SpikeSourcePoissonVertex(
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
         # Reserve SDRAM space for memory areas:
-        self.reserve_memory_regions(spec, placement, graph_mapper)
+        self.reserve_memory_regions(spec, placement)
 
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
@@ -716,12 +712,11 @@ class SpikeSourcePoissonVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, graph_mapper, self, machine_time_step)
+            placements, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -729,9 +724,8 @@ class SpikeSourcePoissonVertex(
         return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+    def clear_spike_recording(self, buffer_manager, placements):
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,

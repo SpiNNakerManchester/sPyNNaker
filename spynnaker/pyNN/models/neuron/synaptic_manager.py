@@ -328,7 +328,7 @@ class SynapticManager(object):
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
-            machine_graph, all_syn_block_sz, graph_mapper):
+            machine_graph, all_syn_block_sz):
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
@@ -336,7 +336,7 @@ class SynapticManager(object):
 
         master_pop_table_sz = \
             self.__poptable_type.get_exact_master_population_table_size(
-                machine_vertex, machine_graph, graph_mapper)
+                machine_vertex, machine_graph)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -575,8 +575,8 @@ class SynapticManager(object):
             self, spec, post_slices, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region,
-            direct_matrix_region, routing_info,
-            graph_mapper, machine_graph, machine_time_step):
+            direct_matrix_region, routing_info, machine_graph,
+            machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -609,7 +609,7 @@ class SynapticManager(object):
                     machine_edge.label))
 
                 pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
-                pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
+                pre_slices = app_edge.pre_vertex.vertex_slices
                 pre_slice_index = machine_edge.pre_vertex.index
 
                 for synapse_info in app_edge.synapse_information:
@@ -914,7 +914,7 @@ class SynapticManager(object):
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step):
+            weight_scale, machine_time_step):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
@@ -923,7 +923,7 @@ class SynapticManager(object):
                                        m_edge.pre_vertex.vertex_slice] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
-        post_slices = graph_mapper.get_slices(application_vertex)
+        post_slices = application_vertex.vertex_slices
         post_slice_idx = machine_vertex.index
 
         # Reserve the memory
@@ -933,7 +933,7 @@ class SynapticManager(object):
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, graph_mapper)
+            all_syn_block_sz)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_vertex, application_graph, machine_time_step,
@@ -947,7 +947,7 @@ class SynapticManager(object):
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            routing_info, graph_mapper, machine_graph, machine_time_step)
+            routing_info, machine_graph, machine_time_step)
 
         if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
@@ -958,8 +958,7 @@ class SynapticManager(object):
                 application_graph=application_graph,
                 machine_graph=machine_graph,
                 app_vertex=application_vertex, post_slice=post_vertex_slice,
-                machine_vertex=machine_vertex,
-                graph_mapper=graph_mapper, routing_info=routing_info)
+                machine_vertex=machine_vertex, routing_info=routing_info)
         else:
             self.__synapse_dynamics.write_parameters(
                 spec,

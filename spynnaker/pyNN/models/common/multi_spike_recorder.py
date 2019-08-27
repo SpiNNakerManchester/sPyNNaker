@@ -61,13 +61,13 @@ class MultiSpikeRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region,
-            placements, graph_mapper, application_vertex, machine_time_step):
+            placements, application_vertex, machine_time_step):
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
         ms_per_tick = machine_time_step / 1000.0
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.machine_vertices
         missing = []
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))

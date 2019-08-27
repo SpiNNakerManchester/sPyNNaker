@@ -462,7 +462,6 @@ class AbstractPopulationVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
@@ -471,14 +470,13 @@ class AbstractPopulationVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "machine_time_step", "time_scale_factor",
             "application_graph", "machine_graph", "routing_info",
             "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps):
+            application_graph, machine_graph, routing_info, data_n_time_steps):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -525,7 +523,7 @@ class AbstractPopulationVertex(
         # allow the synaptic matrix to write its data spec-able data
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info, graph_mapper,
+            application_graph, routing_info,
             weight_scale, machine_time_step)
 
         # End the writing of this specification:
@@ -558,10 +556,10 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
+            placements, self, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -580,14 +578,14 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+                 buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
         index = 0
         if variable != "spikes":
             index = 1 + self.__neuron_impl.get_recordable_variable_index(
                 variable)
         return self.__neuron_recorder.get_matrix_data(
-            self.label, buffer_manager, index, placements, graph_mapper,
+            self.label, buffer_manager, index, placements,
             self, variable, n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
@@ -795,34 +793,29 @@ class AbstractPopulationVertex(
 
     @overrides(
         AbstractNeuronRecordable.clear_recording)
-    def clear_recording(
-            self, variable, buffer_manager, placements, graph_mapper):
+    def clear_recording(self, variable, buffer_manager, placements):
         index = 0
         if variable != "spikes":
             index = 1 + self.__neuron_impl.get_recordable_variable_index(
                 variable)
-        self._clear_recording_region(
-            buffer_manager, placements, graph_mapper, index)
+        self._clear_recording_region(buffer_manager, placements, index)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+    def clear_spike_recording(self, buffer_manager, placements):
         self._clear_recording_region(
-            buffer_manager, placements, graph_mapper,
+            buffer_manager, placements,
             AbstractPopulationVertex.SPIKE_RECORDING_REGION)
 
     def _clear_recording_region(
-            self, buffer_manager, placements, graph_mapper,
-            recording_region_id):
+            self, buffer_manager, placements, recording_region_id):
         """ Clear a recorded data region from the buffer manager.
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
-        :param graph_mapper: the graph mapper object
         :param recording_region_id: the recorded region ID for clearing
         :rtype: None
         """
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p, recording_region_id)

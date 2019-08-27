@@ -436,14 +436,9 @@ class PyNNPopulationCommon(object):
                 and self._vertex_read_parameters_before_set \
                 and not self.__has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
-            # locate machine vertices from the application vertices
-            machine_vertices = globals_variables.get_simulator().graph_mapper\
-                .get_machine_vertices(self.__vertex)
-
             # go through each machine vertex and read the neuron parameters
             # it contains
-            for machine_vertex in machine_vertices:
-
+            for machine_vertex in self.__vertex.machine_vertices:
                 # tell the core to rewrite neuron params back to the
                 # SDRAM space.
                 placement = globals_variables.get_simulator().placements.\

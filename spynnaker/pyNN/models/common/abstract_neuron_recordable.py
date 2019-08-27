@@ -45,25 +45,22 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def clear_recording(self, variable, buffer_manager, placements,
-                        graph_mapper):
+    def clear_recording(self, variable, buffer_manager, placements):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
-        :param graph_mapper: the graph mapper object
         :rtype: None
         """
 
     @abstractmethod
     def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+                 buffer_manager, machine_time_step):
         """ Get the recorded data
 
         :param variable:
         :param n_machine_time_steps:
         :param placements:
-        :param graph_mapper:
         :param buffer_manager:
         :param machine_time_step:
         :return:

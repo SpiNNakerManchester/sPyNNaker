@@ -48,22 +48,19 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+    def clear_spike_recording(self, buffer_manager, placements):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
-        :param graph_mapper: the graph mapper object
         :rtype: None
         """
 
     @abstractmethod
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         """ Get the recorded spikes from the object
 
         :param placements: the placements object
-        :param graph_mapper: the graph mapper object
         :param buffer_manager: the buffer manager object
         :param machine_time_step: the time step of the simulation
         :return: A numpy array of 2-element arrays of (neuron_id, time)\

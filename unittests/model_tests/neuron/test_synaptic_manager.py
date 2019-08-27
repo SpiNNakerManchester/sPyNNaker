@@ -22,7 +22,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
@@ -244,10 +244,9 @@ class TestSynapticManager(unittest.TestCase):
         graph.add_vertex(post_vertex)
         graph.add_edge(machine_edge, partition_name)
 
-        graph_mapper = GraphMapper()
-        graph_mapper.add_vertex_mapping(pre_vertex, pre_app_vertex)
-        graph_mapper.add_vertex_mapping(post_vertex, post_app_vertex)
-        graph_mapper.add_edge_mapping(machine_edge, app_edge)
+        pre_app_vertex.remember_associated_machine_vertex(pre_vertex)
+        post_app_vertex.remember_associated_machine_vertex(post_vertex)
+        app_edge.remember_associated_machine_edge(machine_edge)
 
         weight_scales = [4096.0, 4096.0]
 
@@ -278,7 +277,7 @@ class TestSynapticManager(unittest.TestCase):
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_region, synapse_region, direct_region, routing_info,
-            graph_mapper, graph, machine_time_step)
+            graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 

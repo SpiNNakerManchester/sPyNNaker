@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
-from pacman.model.graphs.common import GraphMapper
+from pacman.model.graphs.common.graph_mapper import GraphMapper
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -31,14 +31,12 @@ class GraphEdgeFilter(object):
     """ Removes graph edges that aren't required
     """
 
-    def __call__(self, machine_graph, graph_mapper):
+    def __call__(self, machine_graph):
         """
         :param machine_graph: the machine_graph whose edges are to be filtered
-        :param graph_mapper: the graph mapper between graphs
         :return: a new graph mapper and machine graph
         """
         new_machine_graph = MachineGraph(label=machine_graph.label)
-        new_graph_mapper = GraphMapper()
 
         # create progress bar
         progress = ProgressBar(
@@ -48,38 +46,31 @@ class GraphEdgeFilter(object):
 
         # add the vertices directly, as they wont be pruned.
         for vertex in progress.over(machine_graph.vertices, False):
-            self._add_vertex_to_new_graph(
-                vertex, new_machine_graph, new_graph_mapper)
-        prune_count = 0
-        no_prune_count = 0
+            new_machine_graph.add_vertex(vertex)
+            vertex.app_vertex.forget_machine_edges()
 
         # start checking edges to decide which ones need pruning....
+        prune_count = 0
+        no_prune_count = 0
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
-                if self._is_filterable(edge, graph_mapper):
+                if self._is_filterable(edge):
                     logger.debug("this edge was pruned %s", edge)
                     prune_count += 1
                     continue
                 logger.debug("this edge was not pruned %s", edge)
                 no_prune_count += 1
-                self._add_edge_to_new_graph(
-                    edge, partition, new_machine_graph, new_graph_mapper)
+                self._add_edge_to_new_graph(edge, partition, new_machine_graph)
 
-        # returned the pruned graph and graph_mapper
+        # returned the pruned graph and (redundant) graph_mapper
         logger.debug("prune_count:{} no_prune_count:{}".format(
             prune_count, no_prune_count))
-        return new_machine_graph, new_graph_mapper
+        return new_machine_graph, GraphMapper()
 
     @staticmethod
-    def _add_vertex_to_new_graph(vertex, new_graph, new_mapper):
-        new_graph.add_vertex(vertex)
-        new_mapper.add_vertex_mapping(vertex, vertex.app_vertex)
-
-    @staticmethod
-    def _add_edge_to_new_graph(
-            edge, partition, new_graph, new_mapper):
+    def _add_edge_to_new_graph(edge, partition, new_graph):
         new_graph.add_edge(edge, partition.identifier)
-        new_mapper.add_edge_mapping(edge, edge.app_edge)
+        edge.app_edge.remember_associated_machine_edge(edge)
 
         # add partition constraints from the original graph to the new graph
         # add constraints from the application partition
@@ -89,7 +80,7 @@ class GraphEdgeFilter(object):
         new_partition.add_constraints(partition.constraints)
 
     @staticmethod
-    def _is_filterable(edge, graph_mapper):
+    def _is_filterable(edge):
         # Don't filter edges which have structural synapse dynamics
         if isinstance(edge.app_edge, ProjectionApplicationEdge):
             for syn_info in edge.app_edge.synapse_information:
@@ -98,7 +89,7 @@ class GraphEdgeFilter(object):
                     return False
             return True
         if isinstance(edge, AbstractFilterableEdge):
-            return edge.filter_edge(graph_mapper)
+            return edge.filter_edge()
         elif isinstance(edge.app_edge, ApplicationEdge):
             return False
         raise FilterableException(

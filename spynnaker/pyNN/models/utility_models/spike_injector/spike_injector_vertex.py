@@ -100,12 +100,10 @@ class SpikeInjectorVertex(
         return get_simulator().machine_time_step
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
-            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID,
-            placements, graph_mapper, self,
+            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, placements, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
@@ -113,9 +111,8 @@ class SpikeInjectorVertex(
             machine_time_step)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+    def clear_spike_recording(self, buffer_manager, placements):
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,

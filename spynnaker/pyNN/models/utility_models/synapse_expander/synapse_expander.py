@@ -36,8 +36,8 @@ DELAY_EXPANDER = "delay_expander.aplx"
 
 
 def synapse_expander(
-        app_graph, graph_mapper, placements, transceiver,
-        provenance_file_path, executable_finder):
+        app_graph, placements, transceiver, provenance_file_path,
+        executable_finder):
     """ Run the synapse expander - needs to be done after data has been loaded.
 
     Note that this is an algorithm.
@@ -50,8 +50,7 @@ def synapse_expander(
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        app_graph, graph_mapper, placements, synapse_expander, delay_expander,
-        progress)
+        app_graph, placements, synapse_expander, delay_expander, progress)
 
     # Launch the delay receivers
     expander_app_id = transceiver.app_id_tracker.get_new_id()
@@ -67,7 +66,7 @@ def synapse_expander(
         progress.update()
         finished = True
         _fill_in_connection_data(
-            expanded_pop_vertices, graph_mapper, placements, transceiver)
+            expanded_pop_vertices, placements, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
     except Exception:
@@ -83,8 +82,8 @@ def synapse_expander(
                 "The synapse expander failed to complete")
 
 
-def _plan_expansion(app_graph, graph_mapper, placements,
-                    synapse_expander_bin, delay_expander_bin, progress):
+def _plan_expansion(app_graph, placements, synapse_expander_bin,
+                    delay_expander_bin, progress):
     """ Works out exactly where we are going to be running expanders,\
         and exactly which expander to run in each of those places.
     """
@@ -97,7 +96,7 @@ def _plan_expansion(app_graph, graph_mapper, placements,
             # Add all machine vertices of the population vertex to ones
             # that need synapse expansion
             gen_on_machine = False
-            for m_vertex in graph_mapper.get_machine_vertices(vertex):
+            for m_vertex in vertex.machine_vertices:
                 vertex_slice = m_vertex.vertex_slice
                 if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
@@ -159,10 +158,8 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
 
 
 def _fill_in_connection_data(
-        expanded_pop_vertices, graph_mapper, placements, transceiver):
+        expanded_pop_vertices, placements, transceiver):
     """ Once expander has run, fill in the connection data
-    :param app_graph
-    :param graph_mapper
     :rtype: None
     """
     ctl = globals_variables.get_simulator()
@@ -180,7 +177,7 @@ def _fill_in_connection_data(
                     synapse_info.weight, synapse_info.delay)
             synapse_gen = isinstance(dynamics, AbstractGenerateOnMachine)
             if connector_gen and synapse_gen:
-                for machine_edge in graph_mapper.get_machine_edges(app_edge):
+                for machine_edge in app_edge.machine_edges:
                     placement = placements.get_placement_of_vertex(
                         machine_edge.post_vertex)
                     conns = vertex.get_connections_from_machine(

@@ -32,7 +32,7 @@ class DelayAfferentMachineEdge(
             traffic_weight=weight)
 
     @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self, graph_mapper):
+    def filter_edge(self):
         pre_lo = self.pre_vertex.vertex_slice.lo_atom
         pre_hi = self.pre_vertex.vertex_slice.hi_atom
         post_lo = self.post_vertex.vertex_slice.lo_atom
