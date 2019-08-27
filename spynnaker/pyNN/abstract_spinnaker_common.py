@@ -163,10 +163,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # Get the standard values
         if timestep is None:
-            self.set_up_timings(
-                math.ceil(timestep * 1000.0, time_scale_factor))
+            self.set_up_timings(timestep, time_scale_factor)
         else:
-            self.set_up_timings(None, time_scale_factor)
+            self.set_up_timings(
+                math.ceil(timestep * 1000.0), time_scale_factor)
 
         machine_time_step = self.machine_time_step
         # Sort out the minimum delay
