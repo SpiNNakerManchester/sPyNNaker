@@ -17,11 +17,14 @@ import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from .projection_machine_edge import ProjectionMachineEdge
+from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 logger = logging.getLogger(__name__)
 
 
-class ProjectionApplicationEdge(ApplicationEdge):
+class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -70,3 +73,10 @@ class ProjectionApplicationEdge(ApplicationEdge):
             self, pre_vertex, post_vertex, label):
         return ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+
+    @overrides(AbstractFilterableEdge.filter_edge)
+    def filter_edge(self):
+        return all(
+            not isinstance(syn_info.synapse_dynamics,
+                           AbstractSynapseDynamicsStructural)
+            for syn_info in self.app_edge.synapse_information)

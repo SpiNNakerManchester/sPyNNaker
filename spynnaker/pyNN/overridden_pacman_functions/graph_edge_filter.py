@@ -17,12 +17,8 @@ import logging
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
-from pacman.model.graphs.common.graph_mapper import GraphMapper
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +40,12 @@ class GraphEdgeFilter(object):
             machine_graph.n_outgoing_edge_partitions,
             "Filtering edges")
 
-        # add the vertices directly, as they wont be pruned.
+        # add the vertices directly, as they won't be pruned.
         for vertex in progress.over(machine_graph.vertices, False):
             new_machine_graph.add_vertex(vertex)
-            vertex.app_vertex.forget_machine_edges()
+
+        # purge the app graph of the old edges
+        machine_graph.application_graph.forget_machine_edges()
 
         # start checking edges to decide which ones need pruning....
         prune_count = 0
@@ -55,17 +53,20 @@ class GraphEdgeFilter(object):
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge):
-                    logger.debug("this edge was pruned %s", edge)
+                    logger.debug("this edge was pruned: %s", edge)
                     prune_count += 1
                     continue
-                logger.debug("this edge was not pruned %s", edge)
+                logger.debug("this edge was not pruned: %s", edge)
                 no_prune_count += 1
                 self._add_edge_to_new_graph(edge, partition, new_machine_graph)
 
-        # returned the pruned graph and (redundant) graph_mapper
-        logger.debug("prune_count:{} no_prune_count:{}".format(
-            prune_count, no_prune_count))
-        return new_machine_graph, GraphMapper()
+        logger.debug("prune_count:%d no_prune_count:%d",
+            prune_count, no_prune_count)
+
+        # returned the pruned graph after remembering that it is the graph that
+        # the application graph maps to now
+        machine_graph.application_graph.machine_graph = new_machine_graph
+        return new_machine_graph
 
     @staticmethod
     def _add_edge_to_new_graph(edge, partition, new_graph):
@@ -81,13 +82,6 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _is_filterable(edge):
-        # Don't filter edges which have structural synapse dynamics
-        if isinstance(edge.app_edge, ProjectionApplicationEdge):
-            for syn_info in edge.app_edge.synapse_information:
-                if isinstance(syn_info.synapse_dynamics,
-                              AbstractSynapseDynamicsStructural):
-                    return False
-            return True
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge()
         elif isinstance(edge.app_edge, ApplicationEdge):
