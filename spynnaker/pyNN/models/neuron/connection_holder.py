@@ -112,7 +112,6 @@ class ConnectionHolder(object):
     def _get_data_items(self):
         """ Merges the connections into the result data format
         """
-
         # If there are already merged connections cached, return those
         if self.__data_items is not None:
             return self.__data_items
@@ -140,7 +139,6 @@ class ConnectionHolder(object):
 
         # If there are additional fixed values, merge them in
         if self.__fixed_values is not None and self.__fixed_values:
-
             # Generate a numpy type for the fixed values
             fixed_dtypes = [
                 ('{}'.format(field[0]), None)
@@ -160,7 +158,6 @@ class ConnectionHolder(object):
 
         # If we are returning a list...
         if self.__as_list:
-
             # ...sort by source then target
             order = numpy.lexsort(
                 (connections["target"], connections["source"]))
@@ -170,26 +167,21 @@ class ConnectionHolder(object):
             if (self.__data_items_to_return is None or
                     not self.__data_items_to_return):
                 self.__data_items = connections[order]
-
             # There is more than one item to return, so let numpy do its magic
             elif len(self.__data_items_to_return) > 1:
                 self.__data_items = \
                     connections[order][self.__data_items_to_return]
-
             # There is 1 item to return, so make sure only one item exists
             else:
                 self.__data_items = \
                     connections[order][self.__data_items_to_return[0]]
-
         else:
-
             if self.__data_items_to_return is None:
                 return []
 
             # Keep track of the matrices
             merged_connections = list()
             for item in self.__data_items_to_return:
-
                 # Build an empty matrix and fill it with NAN
                 matrix = numpy.empty((self.__n_pre_atoms, self.__n_post_atoms))
                 matrix.fill(numpy.nan)
@@ -206,7 +198,6 @@ class ConnectionHolder(object):
             # If there is only one matrix, use it directly
             if len(merged_connections) == 1:
                 self.__data_items = merged_connections[0]
-
             # Otherwise use a tuple of the matrices
             else:
                 self.__data_items = tuple(merged_connections)

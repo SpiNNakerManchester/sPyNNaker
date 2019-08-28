@@ -97,8 +97,7 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
             # that need synapse expansion
             gen_on_machine = False
             for m_vertex in vertex.machine_vertices:
-                vertex_slice = m_vertex.vertex_slice
-                if vertex.gen_on_machine(vertex_slice):
+                if vertex.gen_on_machine(m_vertex.vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     if isinstance(vertex, AbstractPopulationVertex):
                         binary = synapse_expander_bin
@@ -157,9 +156,9 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
                    display=True)
 
 
-def _fill_in_connection_data(
-        expanded_pop_vertices, placements, transceiver):
+def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
     """ Once expander has run, fill in the connection data
+
     :rtype: None
     """
     ctl = globals_variables.get_simulator()

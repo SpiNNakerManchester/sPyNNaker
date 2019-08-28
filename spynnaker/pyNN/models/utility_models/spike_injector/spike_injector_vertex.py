@@ -28,15 +28,13 @@ logger = logging.getLogger(__name__)
 
 
 class SpikeInjectorVertex(
-        ReverseIpTagMultiCastSource,
-        AbstractProvidesOutgoingPartitionConstraints,
-        AbstractSpikeRecordable, SimplePopulationSettable):
+        ReverseIpTagMultiCastSource, SimplePopulationSettable,
+        AbstractProvidesOutgoingPartitionConstraints, AbstractSpikeRecordable):
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
         "__receive_port",
-        "__requires_mapping",
         "__spike_recorder",
         "__virtual_key"]
 
@@ -49,7 +47,6 @@ class SpikeInjectorVertex(
             self, n_neurons, label, constraints, port, virtual_key,
             reserve_reverse_ip_tag):
         # pylint: disable=too-many-arguments
-        self.__requires_mapping = True
         self.__receive_port = None
         self.__virtual_key = None
 
@@ -92,7 +89,6 @@ class SpikeInjectorVertex(
             logger.warning("Indexes currently not supported "
                            "so being ignored")
         self.enable_recording(new_state)
-        self.__requires_mapping = not self.__spike_recorder.record
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
