@@ -24,6 +24,7 @@ from spinn_front_end_common.interface.interface_functions import \
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -120,7 +121,10 @@ class OnChipBitFieldGenerator(object):
         # run app
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
-            provenance_file_path, executable_finder,
+            None, provenance_file_path, {
+                executable_finder.get_executable_path(
+                    self._BIT_FIELD_EXPANDER_APLX): ExecutableType.SYSTEM},
+            executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
             functools.partial(
                 self._handle_failure, transceiver=transceiver,
@@ -403,8 +407,9 @@ class OnChipBitFieldGenerator(object):
         return expander_cores
 
     def _check_for_success(
-            self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
+            self, executable_targets, transceiver, app_provenance_file_path,
+            system_provenance_file_path, executbale_types, compressor_app_id,
+            executable_finder):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
@@ -430,8 +435,9 @@ class OnChipBitFieldGenerator(object):
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:
                     self._handle_failure(
-                        executable_targets, transceiver, provenance_file_path,
-                        compressor_app_id, executable_finder)
+                        executable_targets, transceiver,
+                        app_provenance_file_path, system_provenance_file_path,
+                        executbale_types, compressor_app_id, executable_finder)
 
                     raise SpinnFrontEndException(
                         "The bit field expander on {}, {} failed to complete"
@@ -439,8 +445,9 @@ class OnChipBitFieldGenerator(object):
 
     @staticmethod
     def _handle_failure(
-            executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
+            executable_targets, transceiver, app_provenance_file_path,
+            system_provenance_file_path, binary_types, compressor_app_id,
+            executable_finder):
         """handles the state where some cores have failed.
 
         :param executable_targets: cores which are running the bitfield \
@@ -454,7 +461,8 @@ class OnChipBitFieldGenerator(object):
         iobuf_extractor = ChipIOBufExtractor()
         io_errors, io_warnings = iobuf_extractor(
             transceiver, executable_targets, executable_finder,
-            provenance_file_path)
+            app_provenance_file_path, system_provenance_file_path,
+            binary_types)
         for warning in io_warnings:
             logger.warning(warning)
         for error in io_errors:

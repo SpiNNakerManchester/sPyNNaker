@@ -15,17 +15,17 @@
 
 import logging
 
-from spinn_front_end_common.abstract_models.\
-    abstract_supports_bit_field_generation import \
-    AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.interface.interface_functions import \
     ChipIOBufExtractor
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import \
     MachineBitFieldRouterCompressor
 from spinn_front_end_common.utilities import system_control_logic
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spynnaker.pyNN.models.abstract_models import \
+    AbstractAcceptsIncomingSynapses
 from spynnaker.pyNN.models.utility_models.synapse_expander. \
     synapse_expander import SYNAPSE_EXPANDER
 
@@ -124,7 +124,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                     vertex = placements.get_vertex_on_processor(
                         core_subset.x, core_subset.y, processor_id)
                     app_vertex = graph_mapper.get_application_vertex(vertex)
-                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
+                    if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
                         if app_vertex.gen_on_machine(
                                 graph_mapper.get_slice(vertex)):
                             new_cores.add_processor(
@@ -150,12 +150,16 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             system_control_logic.run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, True, None,
+                None, provenance_file_path, {
+                    executable_finder.get_executable_path(SYNAPSE_EXPANDER):
+                        ExecutableType.SYSTEM},
+                executable_finder, True, None,
                 self._handle_failure_for_synaptic_expander_rerun,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes)
 
     def _handle_failure_for_synaptic_expander_rerun(
-            self, executable_targets, transceiver, provenance_file_path,
+            self, executable_targets, transceiver, app_provenance_file_path,
+            system_provenance_file_path, binary_types,
             compressor_app_id, executable_finder):
         """handles the state where some cores have failed.
 
@@ -168,12 +172,14 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         """
         logger.info("rerunning of the synaptic expander has failed")
         self._call_iobuf_and_clean_up(
-            executable_targets, transceiver, provenance_file_path,
+            executable_targets, transceiver, app_provenance_file_path,
+            system_provenance_file_path, binary_types,
             compressor_app_id, executable_finder)
 
     @staticmethod
     def _call_iobuf_and_clean_up(
-            executable_targets, transceiver, provenance_file_path,
+            executable_targets, transceiver, app_provenance_file_path,
+            system_provenance_file_path, binary_types,
             compressor_app_id, executable_finder):
         """handles the reading of iobuf and cleaning the cores off the machine
 
@@ -187,7 +193,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         iobuf_extractor = ChipIOBufExtractor()
         io_errors, io_warnings = iobuf_extractor(
             transceiver, executable_targets, executable_finder,
-            provenance_file_path)
+            app_provenance_file_path, system_provenance_file_path,
+            binary_types)
         for warning in io_warnings:
             logger.warning(warning)
         for error in io_errors:

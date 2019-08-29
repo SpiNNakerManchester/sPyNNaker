@@ -71,3 +71,9 @@ class AbstractAcceptsIncomingSynapses(object):
         """ returns how many atoms are to be considered in incoming projections
         :return: returns the number of neurons to receive spikes from
         """
+
+    @abstractmethod
+    def gen_on_machine(self, vertex_slice):
+        """returns a bool that states if the core has some synaptic data\
+        that's generated on the machine via the synaptic expander
+        :return: returns bool """

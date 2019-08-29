@@ -731,7 +731,6 @@ class NeuronRecorder(object):
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
                 variable, vertex_slice)
-            x = [rate, n_recording, enum_index]
             data.append(numpy.array(
                 [rate, n_recording, enum_index], dtype="uint32"))
             if rate == 0:
