@@ -13,13 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_synapse_type import AbstractSynapseType
-from .synapse_type_dual_exponential import SynapseTypeDualExponential
-from .synapse_type_exponential import SynapseTypeExponential
-from .synapse_type_delta import SynapseTypeDelta
-from .synapse_type_alpha import SynapseTypeAlpha
-from .synapse_type_exponential_two_comp import SynapseTypeExponentialTwoComp
+APP = $(notdir $(CURDIR))
 
-__all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeExponentialTwoComp"]
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_two_comp_impl.c
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_two_comp.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk
