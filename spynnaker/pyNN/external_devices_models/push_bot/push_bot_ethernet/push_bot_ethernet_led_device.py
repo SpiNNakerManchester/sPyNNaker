@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import (
     AbstractSendMeMulticastCommandsVertex)
@@ -44,14 +59,14 @@ class PushBotEthernetLEDDevice(
             protocol, led, True, timesteps_between_send)
 
         # protocol specific data items
-        self._command_protocol = protocol
-        self._start_active_time_front = start_active_time_front
-        self._start_active_time_back = start_active_time_back
-        self._start_total_period = start_total_period
-        self._start_frequency = start_frequency
+        self.__command_protocol = protocol
+        self.__start_active_time_front = start_active_time_front
+        self.__start_active_time_back = start_active_time_back
+        self.__start_total_period = start_total_period
+        self.__start_frequency = start_frequency
 
     def set_command_protocol(self, command_protocol):
-        self._command_protocol = command_protocol
+        self.__command_protocol = command_protocol
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -63,30 +78,30 @@ class PushBotEthernetLEDDevice(
             commands.append(self.protocol.set_mode())
 
         # device specific commands
-        if self._start_total_period is not None:
-            commands.append(self._command_protocol.push_bot_led_total_period(
-                self._start_total_period))
-        if self._start_active_time_front is not None:
+        if self.__start_total_period is not None:
+            commands.append(self.__command_protocol.push_bot_led_total_period(
+                self.__start_total_period))
+        if self.__start_active_time_front is not None:
             commands.append(
-                self._command_protocol.push_bot_led_front_active_time(
-                    self._start_active_time_front))
-        if self._start_active_time_back is not None:
+                self.__command_protocol.push_bot_led_front_active_time(
+                    self.__start_active_time_front))
+        if self.__start_active_time_back is not None:
             commands.append(
-                self._command_protocol.push_bot_led_back_active_time(
-                    self._start_active_time_back))
-        if self._start_frequency is not None:
-            commands.append(self._command_protocol.push_bot_led_set_frequency(
-                self._start_frequency))
+                self.__command_protocol.push_bot_led_back_active_time(
+                    self.__start_active_time_back))
+        if self.__start_frequency is not None:
+            commands.append(self.__command_protocol.push_bot_led_set_frequency(
+                self.__start_frequency))
         return commands
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         return [
-            self._command_protocol.push_bot_led_front_active_time(0),
-            self._command_protocol.push_bot_led_back_active_time(0),
-            self._command_protocol.push_bot_led_total_period(0),
-            self._command_protocol.push_bot_led_set_frequency(0)]
+            self.__command_protocol.push_bot_led_front_active_time(0),
+            self.__command_protocol.push_bot_led_back_active_time(0),
+            self.__command_protocol.push_bot_led_total_period(0),
+            self.__command_protocol.push_bot_led_set_frequency(0)]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.timed_commands)

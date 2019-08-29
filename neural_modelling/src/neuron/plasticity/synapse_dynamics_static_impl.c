@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  * SUMMARY
@@ -29,8 +46,9 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 //---------------------------------------
-bool synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
-        address_t fixed_region_address, weight_t *ring_buffer, uint32_t time) {
+bool synapse_dynamics_process_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        weight_t *ring_buffer, uint32_t time) {
     use(plastic_region_address);
     use(fixed_region_address);
     use(ring_buffer);
@@ -41,8 +59,8 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
 }
 
 //---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
-                                            index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(
+        uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
     return REAL_CONST(0.0);
@@ -56,11 +74,11 @@ void synapse_dynamics_print_plastic_synapses(
     use(ring_buffer_to_input_left_shifts);
 }
 
-uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
     return 0;
 }
 
-uint32_t synapse_dynamics_get_plastic_saturation_count(){
+uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
     return 0;
 }
 
@@ -72,8 +90,8 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(){
 //! \param[in] sp_data: the address of a struct through which to return
 //! weight, delay information
 //! \return bool: was the search successful?
-bool find_plastic_neuron_with_id(uint32_t id, address_t row,
-                                 structural_plasticity_data_t *sp_data){
+bool find_plastic_neuron_with_id(
+        uint32_t id, address_t row, structural_plasticity_data_t *sp_data) {
     use(id);
     use(row);
     use(sp_data);
@@ -85,7 +103,7 @@ bool find_plastic_neuron_with_id(uint32_t id, address_t row,
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return bool: was the removal successful?
-bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
+bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row) {
     use(offset);
     use(row);
     return false;
@@ -98,8 +116,8 @@ bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row){
 //! \param[in] delay: the delay associated with the connection
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return bool: was the addition successful?
-bool add_plastic_neuron_with_id(uint32_t id, address_t row, uint32_t weight,
-                                uint32_t delay, uint32_t type){
+bool add_plastic_neuron_with_id(
+        uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type) {
     use(id);
     use(row);
     use(weight);

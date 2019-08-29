@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from threading import Thread
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -26,16 +41,16 @@ class EthernetControlConnection(EIEIOConnection):
         thread = Thread(name="Ethernet Control Connection on {}:{}".format(
             self.local_ip_address, self.local_port), target=self.run)
         thread.daemon = True
-        self._translator = translator
-        self._running = True
+        self.__translator = translator
+        self.__running = True
         thread.start()
 
     def run(self):
         try:
-            while self._running:
+            while self.__running:
                 self._step()
         except Exception:
-            if self._running:
+            if self.__running:
                 logger.exception("failure processing EIEIO message")
 
     def _step(self):
@@ -46,14 +61,14 @@ class EthernetControlConnection(EIEIOConnection):
 
     def _translate(self, element):
         if isinstance(element, KeyDataElement):
-            self._translator.translate_control_packet(
+            self.__translator.translate_control_packet(
                 MultiCastCommand(element.key))
         elif isinstance(element, KeyPayloadDataElement):
-            self._translator.translate_control_packet(
+            self.__translator.translate_control_packet(
                 MultiCastCommand(element.key, element.payload))
 
     def close(self):
         """ Close the connection
         """
-        self._running = False
+        self.__running = False
         super(EthernetControlConnection, self).close()

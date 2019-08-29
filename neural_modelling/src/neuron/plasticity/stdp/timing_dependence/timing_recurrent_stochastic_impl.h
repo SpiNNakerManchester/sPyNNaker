@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _TIMING_RECURRENT_STOCHASTIC_IMPL_H_
 #define _TIMING_RECURRENT_STOCHASTIC_IMPL_H_
 
@@ -26,11 +43,10 @@ extern int16_t post_cdf_lookup[STDP_TRACE_POST_CDF_SIZE];
 #define PRE_CDF_SIZE 300
 #define POST_CDF_SIZE 300
 
-static inline bool _in_window(
+static inline bool in_window(
         uint32_t time_since_last_event, const uint32_t cdf_lut_size,
         const int16_t *cdf_lut) {
     if (time_since_last_event < cdf_lut_size) {
-
         // If time since last event is still within CDF LUT
 
         // Lookup distribution
@@ -43,7 +59,6 @@ static inline bool _in_window(
         // Return true if it's greater than CDF
         return (random > cdf);
     } else {
-
         // Otherwise, window has definitely closed
         return false;
     }
@@ -51,12 +66,12 @@ static inline bool _in_window(
 
 static inline bool timing_recurrent_in_pre_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return _in_window(time_since_last_event, PRE_CDF_SIZE, pre_cdf_lookup);
+    return in_window(time_since_last_event, PRE_CDF_SIZE, pre_cdf_lookup);
 }
 
 static inline bool timing_recurrent_in_post_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return _in_window(time_since_last_event, POST_CDF_SIZE, post_cdf_lookup);
+    return in_window(time_since_last_event, POST_CDF_SIZE, post_cdf_lookup);
 }
 
 static inline update_state_t timing_recurrent_calculate_pre_window(

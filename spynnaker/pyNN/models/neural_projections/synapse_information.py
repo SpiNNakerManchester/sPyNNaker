@@ -1,48 +1,54 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
         and synapse dynamics
     """
     __slots__ = [
-        "_connector",
-        "_index",
-        "_synapse_dynamics",
-        "_synapse_type",
-        "_weight",
-        "_delay"]
+        "__connector",
+        "__synapse_dynamics",
+        "__synapse_type",
+        "__weight",
+        "__delay"]
 
     def __init__(self, connector, synapse_dynamics, synapse_type,
                  weight=None, delay=None):
-        self._connector = connector
-        self._synapse_dynamics = synapse_dynamics
-        self._synapse_type = synapse_type
-        self._index = 0
-        self._weight = weight
-        self._delay = delay
+        self.__connector = connector
+        self.__synapse_dynamics = synapse_dynamics
+        self.__synapse_type = synapse_type
+        self.__weight = weight
+        self.__delay = delay
 
     @property
     def connector(self):
-        return self._connector
+        return self.__connector
 
     @property
     def synapse_dynamics(self):
-        return self._synapse_dynamics
+        return self.__synapse_dynamics
 
     @property
     def synapse_type(self):
-        return self._synapse_type
-
-    @property
-    def index(self):
-        return self._index
-
-    @index.setter
-    def index(self, index):
-        self._index = index
+        return self.__synapse_type
 
     @property
     def weight(self):
-        return self._weight
+        return self.__weight
 
     @property
     def delay(self):
-        return self._delay
+        return self.__delay

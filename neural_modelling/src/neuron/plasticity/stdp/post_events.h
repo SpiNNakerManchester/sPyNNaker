@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _POST_EVENTS_H_
 #define _POST_EVENTS_H_
 
@@ -50,7 +67,6 @@ static inline post_event_history_t *post_events_init_buffers(
 
     // Loop through neurons
     for (uint32_t n = 0; n < n_neurons; n++) {
-
         // Add initial placeholder entry to buffer
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
@@ -62,7 +78,6 @@ static inline post_event_history_t *post_events_init_buffers(
 
 static inline post_event_window_t post_events_get_window(
         const post_event_history_t *events, uint32_t begin_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -70,16 +85,13 @@ static inline post_event_window_t post_events_get_window(
     const uint32_t *event_time = end_event_time;
     post_event_window_t window;
     do {
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
-    }
-
     // Keep looping while event occurred after start
     // Of window and we haven't hit beginning of array
-    while (*event_time > begin_time && event_time != events->times);
+    } while (*event_time > begin_time && event_time != events->times);
 
     // Deference event to use as previous
     window.prev_time = *event_time;

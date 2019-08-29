@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief Interface for matrix generation
@@ -10,12 +27,7 @@
 /**
  *! \brief Data type for matrix generator
  */
-typedef struct matrix_generator* matrix_generator_t;
-
-/**
- *! \brief Register any matrix generators to be used in the remaining functions
- */
-void register_matrix_generators();
+typedef struct matrix_generator *matrix_generator_t;
 
 /**
  *! \brief Initialise a specific matrix generator
@@ -26,7 +38,7 @@ void register_matrix_generators();
  *!         functions, or NULL if it couldn't be initialised for any reason
  */
 matrix_generator_t matrix_generator_init(
-    uint32_t hash, address_t *region);
+        uint32_t hash, address_t *region);
 
 /**
  *! \brief Finish with a matrix generator
@@ -67,14 +79,14 @@ void matrix_generator_free(matrix_generator_t generator);
  *! \return The number of connections generated
  */
 bool matrix_generator_generate(
-    matrix_generator_t generator,
-    address_t synaptic_matrix, address_t delayed_synaptic_matrix,
-    uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
-    uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
-    uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
-    uint32_t synapse_type, uint32_t *weight_scales,
-    uint32_t post_slice_start, uint32_t post_slice_count,
-    uint32_t pre_slice_start, uint32_t pre_slice_count,
-    connection_generator_t connection_generator,
-    param_generator_t delay_generator, param_generator_t weight_generator,
-    uint32_t max_stage, accum timestep_per_delay);
+        matrix_generator_t generator,
+        address_t synaptic_matrix, address_t delayed_synaptic_matrix,
+        uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
+        uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses,
+        uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits,
+        uint32_t synapse_type, uint32_t *weight_scales,
+        uint32_t post_slice_start, uint32_t post_slice_count,
+        uint32_t pre_slice_start, uint32_t pre_slice_count,
+        connection_generator_t connection_generator,
+        param_generator_t delay_generator, param_generator_t weight_generator,
+        uint32_t max_stage, accum timestep_per_delay);

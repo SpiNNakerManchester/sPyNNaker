@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
@@ -7,32 +22,32 @@ from .abstract_weight_dependence import AbstractWeightDependence
 class WeightDependenceAdditive(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
-        "_w_max",
-        "_w_min"]
+        "__w_max",
+        "__w_min"]
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
         super(WeightDependenceAdditive, self).__init__()
-        self._w_min = w_min
-        self._w_max = w_max
+        self.__w_min = w_min
+        self.__w_max = w_max
 
     @property
     def w_min(self):
-        return self._w_min
+        return self.__w_min
 
     @property
     def w_max(self):
-        return self._w_max
+        return self.__w_max
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceAdditive):
             return False
         return (
-            (self._w_min == weight_dependence.w_min) and
-            (self._w_max == weight_dependence.w_max) and
-            (self._a_plus == weight_dependence.A_plus) and
-            (self._a_minus == weight_dependence.A_minus))
+            (self.__w_min == weight_dependence.w_min) and
+            (self.__w_max == weight_dependence.w_max) and
+            (self.A_plus == weight_dependence.A_plus) and
+            (self.A_minus == weight_dependence.A_minus))
 
     @property
     def vertex_executable_suffix(self):
@@ -54,23 +69,23 @@ class WeightDependenceAdditive(
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self._w_min * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._w_max * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
 
             # Based on http://data.andrewdavison.info/docs/PyNN/_modules/pyNN
             #                /standardmodels/synapses.html
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * self._w_max * w)),
+                data=int(round(self.A_plus * self.__w_max * w)),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * self._w_max * w)),
+                data=int(round(self.A_minus * self.__w_max * w)),
                 data_type=DataType.INT32)
 
     @property
     def weight_maximum(self):
-        return self._w_max
+        return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
