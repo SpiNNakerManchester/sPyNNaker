@@ -91,12 +91,12 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
                 ring_buffer_to_input_left_shifts[synapse_type]);
-        log_debug(
-                "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                synapse_row_sparse_delay(synapse, synapse_type_index_bits),
-                get_type_char(synapse_type),
-                synapse_row_sparse_index(synapse, synapse_index_mask),
-                SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+        //log_debug(
+        //        "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
+        //        synapse_row_sparse_delay(synapse, synapse_type_index_bits),
+        //        get_type_char(synapse_type),
+        //        synapse_row_sparse_index(synapse, synapse_index_mask),
+        //        SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
 
     // If there's a plastic region
