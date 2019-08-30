@@ -845,6 +845,14 @@ class AbstractPopulationVertex(
             buffer_manager, placements, graph_mapper,
             AbstractPopulationVertex.SPIKE_RECORDING_REGION)
 
+    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
+    def get_spike_machine_vertices(self, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
+
+    @overrides(AbstractNeuronRecordable.get_machine_vertices_for)
+    def get_machine_vertices_for(self, variable, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
+
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,
             recording_region_id):

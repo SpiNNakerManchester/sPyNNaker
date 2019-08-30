@@ -22,6 +22,8 @@ from spinn_front_end_common.abstract_models.\
     AbstractApplicationSupportsAutoPauseAndResume
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 
 try:
     from collections.abc import OrderedDict
@@ -176,7 +178,9 @@ class NeuronRecorder(object):
                 self.SPIKES)
             raise ConfigurationException(msg)
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.get_machine_vertices_for(
+            variable, graph_mapper)
+
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
@@ -279,7 +283,7 @@ class NeuronRecorder(object):
         spike_times = list()
         spike_ids = list()
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.get_spike_machine_vertices(graph_mapper)
         missing_str = ""
         progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
@@ -395,6 +399,7 @@ class NeuronRecorder(object):
                 default_machine_time_step, variable)
         else:
             step = default_machine_time_step
+        step = step / MICRO_TO_MILLISECOND_CONVERSION
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\

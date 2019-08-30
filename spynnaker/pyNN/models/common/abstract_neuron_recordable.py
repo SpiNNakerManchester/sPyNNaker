@@ -46,6 +46,16 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
+    def get_machine_vertices_for(self, variable, graph_mapper):
+        """ gives the machine vertices for a given variable from a given app \
+        vertex
+
+        :param variable: the variable to get
+        :param graph_mapper:  the mapping between graphs
+        :return: iterable of machine vertex
+        """
+
+    @abstractmethod
     def clear_recording(self, variable, buffer_manager, placements,
                         graph_mapper):
         """ Clear the recorded data from the object
