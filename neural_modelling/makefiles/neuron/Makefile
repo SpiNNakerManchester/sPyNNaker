@@ -41,7 +41,7 @@ MODELS = IF_cond_exp_cerebellum_stdp_mad_pfpc_pfpc \
          IF_curr_exp_structural \
          IF_cond_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_sEMD \
-         #IF_cond_exp_stoc
+         #IF_cond_exp_stoc \
          IF_curr_exp_sEMD \
          IZK_curr_exp_stdp_mad_pair_additive \
          IZK_cond_exp_stdp_mad_pair_additive

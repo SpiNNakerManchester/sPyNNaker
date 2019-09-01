@@ -36,10 +36,10 @@ class WeightDependencePFPC(
         if not isinstance(weight_dependence, WeightDependencePFPC):
             return False
         return (
-            (self._w_min == weight_dependence.w_min) and
-            (self._w_max == weight_dependence.w_max) and
-            (self._a_plus == weight_dependence.A_plus) and
-            (self._a_minus == weight_dependence.A_minus))
+            (self.__w_min == weight_dependence.w_min) and
+            (self.__w_max == weight_dependence.w_max) and
+            (self.A_plus == weight_dependence.A_plus) and
+            (self.A_minus == weight_dependence.A_minus))
 
     @property
     def vertex_executable_suffix(self):
@@ -72,7 +72,7 @@ class WeightDependencePFPC(
 
             # This parameter is actually currently unused
             spec.write_value(
-                data=int(round(self._a_minus * w)),
+                data=int(round(self.A_minus * w)),
                 data_type=DataType.INT32)
 
     @property
