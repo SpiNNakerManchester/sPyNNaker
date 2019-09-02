@@ -53,10 +53,3 @@ class EthernetControlConnection(LiveEventConnection):
         elif isinstance(element, KeyPayloadDataElement):
             self.__translator.translate_control_packet(
                 MultiCastCommand(element.key, element.payload))
-
-    def close(self):
-        """ Close the connection
-        """
-        self.__running = False
-        self.__receiver.close()
-        super(EthernetControlConnection, self).close()
