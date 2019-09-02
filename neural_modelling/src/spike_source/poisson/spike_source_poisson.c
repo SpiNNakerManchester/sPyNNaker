@@ -679,6 +679,10 @@ static inline void set_spike_source_rate(uint32_t id, REAL rate) {
             spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
             spike_source->sqrt_lambda = REAL_CONST(0.0);
         }
+    } else if (rate_per_tick == 0) {
+        spike_source->is_fast_source = false;
+        spike_source->mean_isi_ticks = 0;
+        spike_source->time_to_spike_ticks = 0;
     } else {
         spike_source->is_fast_source = false;
         spike_source->mean_isi_ticks =
