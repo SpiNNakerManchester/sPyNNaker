@@ -198,11 +198,6 @@ bool population_table_get_first_address(
     // check we don't have a complete miss
     if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
         master_population_table_entry entry = master_population_table[position];
-        if (entry.count == 0) {
-            log_debug(
-                "spike %u (= %x): population found in master population"
-                "table but count is 0");
-        }
 
         log_debug("about to try to find neuron id");
         last_neuron_id = get_neuron_id(entry, spike);
