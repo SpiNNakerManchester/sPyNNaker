@@ -57,7 +57,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
     def __init__(
             self, graph_label, database_socket_addresses, n_chips_required,
-            timestep, max_delay, min_delay, hostname,
+            n_boards_required, timestep, max_delay, min_delay, hostname,
             user_extra_algorithm_xml_path=None, user_extra_mapping_inputs=None,
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
@@ -108,6 +108,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             database_socket_addresses=database_socket_addresses,
             extra_algorithm_xml_paths=extra_algorithm_xml_path,
             n_chips_required=n_chips_required,
+            n_boards_required=n_boards_required,
             default_config_paths=[
                 os.path.join(os.path.dirname(__file__),
                              self.CONFIG_FILE_NAME)],
