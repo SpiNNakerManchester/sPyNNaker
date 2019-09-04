@@ -60,8 +60,8 @@ class GraphEdgeFilter(object):
                 no_prune_count += 1
                 self._add_edge_to_new_graph(edge, partition, new_machine_graph)
 
-        logger.debug("prune_count:%d no_prune_count:%d",
-            prune_count, no_prune_count)
+        logger.debug(
+            "prune_count:%d no_prune_count:%d", prune_count, no_prune_count)
 
         # returned the pruned graph after remembering that it is the graph that
         # the application graph maps to now

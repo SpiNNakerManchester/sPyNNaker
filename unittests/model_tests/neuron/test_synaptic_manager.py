@@ -37,7 +37,7 @@ import spynnaker.pyNN.models.neural_projections.connectors.\
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
+    ProjectionApplicationEdge, SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AllToAllConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -235,8 +235,8 @@ class TestSynapticManager(unittest.TestCase):
             pre_app_vertex, post_app_vertex, direct_synapse_information_1)
         app_edge.add_synapse_information(direct_synapse_information_2)
         app_edge.add_synapse_information(all_to_all_synapse_information)
-        machine_edge = ProjectionMachineEdge(
-            app_edge.synapse_information, pre_vertex, post_vertex)
+        machine_edge = app_edge.create_machine_edge(
+            pre_vertex, post_vertex, label=None)
         partition_name = "TestPartition"
 
         graph = MachineGraph("Test")

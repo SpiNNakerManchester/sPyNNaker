@@ -678,7 +678,8 @@ class SynapticManager(object):
             spec.write_array(single_data)
         else:
             spec.reserve_memory_region(
-                region=direct_matrix_region, size=_WORD_SIZE, label="DirectMatrix")
+                region=direct_matrix_region, size=_WORD_SIZE,
+                label="DirectMatrix")
             spec.switch_write_focus(direct_matrix_region)
             spec.write_value(0)
 

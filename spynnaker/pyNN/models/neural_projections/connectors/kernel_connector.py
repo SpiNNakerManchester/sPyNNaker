@@ -201,7 +201,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r = pre_idx // self._pre_w
             pre_c = pre_idx % self._pre_w
-            coords[pre_idx] = []
+            coords[pre_idx] = set()
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
@@ -221,11 +221,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 dc = c - pre_c
                 kc = hw - dc
 
-                if (0 <= kr and kr < self._kernel_h and \
-                        0 <= kc and kc < self._kernel_w):
-                    if post_idx in coords[pre_idx]:
-                        continue
-
+                if (0 <= kr < self._kernel_h and
+                        0 <= kc < self._kernel_w and
+                        post_idx not in coords[pre_idx]):
                     coords[pre_idx].append(post_idx)
 
                     # Store weights, delays and pre/post ids
