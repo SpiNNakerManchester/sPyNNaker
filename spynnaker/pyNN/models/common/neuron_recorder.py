@@ -103,7 +103,8 @@ class NeuronRecorder(object):
         value="DATA_TYPE",
         names=[("NOT_MATRIX", 0),
                ("INT32", 1),
-               ("FLOAT_64", 2)])
+               ("FLOAT_64", 2),
+               ("FLOAT_32", 3)])
 
     def __init__(
             self, allowed_variables, matrix_scalar_types,
@@ -151,6 +152,119 @@ class NeuronRecorder(object):
                 constants.MICRO_TO_MILLISECOND_CONVERSION)
         return self.__sampling_rates[variable] * step
 
+    def _convert_placement_matrix_data(
+            self, row_data, n_rows, data_row_length, variable, n_neurons,
+            needs_scaling):
+        data_byte = (
+            row_data[:, self.N_BYTES_FOR_TIMESTAMP:].reshape(
+                n_rows * data_row_length))
+        placement_data = self.__matrix_output_types[
+            variable].decode_array(data_byte).reshape(n_rows, n_neurons)
+        if needs_scaling:
+            placement_data = placement_data / float(
+                self.__matrix_scalar_types[variable].scale)
+        return placement_data
+
+    def _process_missing_data(
+            self, missing_str, placement, expected_rows, n_neurons, times,
+            n_rows, sampling_rate, needs_scaling, label, variable,
+            placement_data):
+        missing_str += "({}, {}, {}); ".format(
+            placement.x, placement.y, placement.p)
+        # Start the fragment for this slice empty
+        fragment = numpy.empty((expected_rows, n_neurons))
+        for i in xrange(0, expected_rows):
+            time = i * sampling_rate
+            # Check if there is data for this time step
+            local_indexes = numpy.where(times == time)
+            if len(local_indexes[0]) == 1:
+                if needs_scaling:
+                    fragment[i] = (
+                        placement_data[local_indexes[0]] /
+                        float(self.__matrix_scalar_types[
+                                  variable].scale))
+                else:
+                    fragment[i] = placement_data[local_indexes[0]]
+            elif len(local_indexes[0]) > 1:
+                logger.warning(
+                    "Population {} on multiple recorded data for "
+                    "time {}".format(label, time))
+            else:
+                # Set row to nan
+                fragment[i] = numpy.full(n_neurons, numpy.nan)
+        return fragment
+
+    def _get_placement_matrix_data(
+            self, variable, placements, vertex, sampling_interval,
+            local_time_period_map, graph_mapper, indexes, region,
+            buffer_manager, expected_rows, missing_str, sampling_rate, label):
+        """"""
+        needs_scaling = (
+            self.__matrix_output_types[variable] !=
+            self.__matrix_scalar_types[variable])
+
+        placement = placements.get_placement_of_vertex(vertex)
+
+        # get sampling interval
+        if sampling_interval is None:
+            sampling_interval = self.get_neuron_sampling_interval(
+                variable, placement.vertex, local_time_period_map)
+        elif sampling_interval != self.get_neuron_sampling_interval(
+                variable, placement.vertex, local_time_period_map):
+            raise Exception(
+                "conflicting sampling intervals within a given recording"
+                "variable.")
+
+        vertex_slice = graph_mapper.get_slice(vertex)
+        neurons = self._neurons_recording(variable, vertex_slice)
+        n_neurons = len(neurons)
+        if n_neurons == 0:
+            return None, sampling_interval
+
+        indexes.extend(neurons)
+        # for buffering output info is taken form the buffer manager
+        record_raw, missing_data = buffer_manager.get_data_by_placement(
+            placement, region)
+        record_length = len(record_raw)
+
+        # There is one column for time and one for each neuron recording
+        data_row_length = (
+            n_neurons * self.__matrix_output_types[variable].size)
+        full_row_length = data_row_length + self.N_BYTES_FOR_TIMESTAMP
+
+        n_rows = record_length // full_row_length
+        placement_data = None
+        row_data = None
+
+        if record_length > 0:
+            byte_size = numpy.asarray(record_raw, dtype="uint8")
+            row_data = byte_size.reshape(n_rows, full_row_length)
+            placement_data = self._convert_placement_matrix_data(
+                row_data, n_rows, data_row_length, variable, n_neurons,
+                needs_scaling)
+            if not missing_data and n_rows == expected_rows:
+                return placement_data, sampling_interval
+
+        # Check if you have the expected data
+        if missing_data or n_rows != expected_rows:
+
+            # if no data, make fake data and hand back
+            if record_length == 0:
+                return numpy.empty((0, n_neurons)), sampling_interval
+
+            # got data but its missing bits, so get times
+            time_bytes = (
+                row_data[:, 0: self.N_BYTES_FOR_TIMESTAMP].reshape(
+                    n_rows * self.N_BYTES_FOR_TIMESTAMP))
+            times = time_bytes.view("<i4").reshape(n_rows, 1)
+
+            # process data from core for missing data
+            placement_data = self._process_missing_data(
+                missing_str, placement, expected_rows, n_neurons, times,
+                n_rows, sampling_rate, needs_scaling, label, variable,
+                placement_data)
+            return placement_data, sampling_interval
+
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, n_machine_time_steps,
@@ -184,97 +298,36 @@ class NeuronRecorder(object):
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
-        expected_rows = int(math.ceil(
-            n_machine_time_steps / sampling_rate))
+        expected_rows = int(math.ceil(n_machine_time_steps / sampling_rate))
         missing_str = ""
-        data = None
+        pop_level_data = None
         sampling_interval = None
 
         indexes = []
         for vertex in progress.over(vertices):
-            needs_scaling = (
-                self.__matrix_output_types[variable] !=
-                self.__matrix_scalar_types[variable])
-
-            placement = placements.get_placement_of_vertex(vertex)
-
-            # get sampling interval
-            if sampling_interval is None:
-                sampling_interval = self.get_neuron_sampling_interval(
-                    variable, placement.vertex, local_time_period_map)
-            elif sampling_interval != self.get_neuron_sampling_interval(
-                    variable, placement.vertex, local_time_period_map):
-                raise Exception(
-                    "conflicting sampling intervals within a given recording"
-                    "variable.")
-
-            vertex_slice = graph_mapper.get_slice(vertex)
-            neurons = self._neurons_recording(variable, vertex_slice)
-            n_neurons = len(neurons)
-            if n_neurons == 0:
-                continue
-            indexes.extend(neurons)
-            # for buffering output info is taken form the buffer manager
-            record_raw, missing_data = buffer_manager.get_data_by_placement(
-                    placement, region)
-            record_length = len(record_raw)
-
-            row_length = (
-                self.N_BYTES_FOR_TIMESTAMP + n_neurons *
-                self.__matrix_output_types[variable].size)
-
-            # There is one column for time and one for each neuron recording
-            n_rows = record_length // row_length
-            if record_length > 0:
-                # Converts bytes to ints and make a matrix
-                record = self.__matrix_output_types[variable].decode_array(
-                    record_raw).reshape((n_rows, (n_neurons + 1)))
-            else:
-                record = numpy.empty((0, n_neurons))
-            # Check if you have the expected data
-            if not missing_data and n_rows == expected_rows:
-                # Just cut the timestamps off to get the fragment
-                if needs_scaling:
-                    fragment = (
-                        record[:, 1:] /
-                        float(self.__matrix_scalar_types[variable].scale))
+            placement_data, sampling_interval = \
+                self._get_placement_matrix_data(
+                    variable, placements, vertex, sampling_interval,
+                    local_time_period_map, graph_mapper, indexes, region,
+                    buffer_manager, expected_rows, missing_str, sampling_rate,
+                    label)
+            if placement_data is not None:
+                # append to the population data
+                if pop_level_data is None:
+                    pop_level_data = placement_data
                 else:
-                    fragment = record[:, 1:]
-            else:
-                missing_str += "({}, {}, {}); ".format(
-                    placement.x, placement.y, placement.p)
-                # Start the fragment for this slice empty
-                fragment = numpy.empty((expected_rows, n_neurons))
-                for i in xrange(0, expected_rows):
-                    time = i * sampling_rate
-                    # Check if there is data for this time step
-                    local_indexes = numpy.where(record[:, 0] == time)
-                    if len(local_indexes[0]) == 1:
-                        if needs_scaling:
-                            fragment[i] = (
-                                record[local_indexes[0], 1:] /
-                                float(self.__matrix_scalar_types[
-                                    variable].scale))
-                        else:
-                            fragment[i] = record[local_indexes[0], 1:]
-                    elif len(local_indexes[0]) > 1:
-                        logger.warning(
-                            "Population {} on multiple recorded data for "
-                            "time {}".format(label, time))
-                    else:
-                        # Set row to nan
-                        fragment[i] = numpy.full(n_neurons, numpy.nan)
-            if data is None:
-                data = fragment
-            else:
-                # Add the slice fragment on axis 1 which is IDs/channel_index
-                data = numpy.append(data, fragment, axis=1)
+                    # Add the slice fragment on axis 1
+                    # which is IDs/channel_index
+                    pop_level_data = numpy.append(
+                        pop_level_data, placement_data, axis=1)
+
+        # warn user of missing data
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
                 " following cores: {}".format(label, region, missing_str))
 
-        return data, indexes, sampling_interval
+        return pop_level_data, indexes, sampling_interval
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -717,10 +770,12 @@ class NeuronRecorder(object):
             return self.DATA_TYPE.INT32.value
         elif store_data_type == DataType.FLOAT_64:
             return self.DATA_TYPE.FLOAT_64.value
+        elif store_data_type == DataType.FLOAT_32:
+            return self.DATA_TYPE.FLOAT_32.value
         else:
             raise Exception(
-                "don't know this data type {}. Only Know INT32 and "
-                "FLOAT_64".format(store_data_type))
+                "don't know this data type {}. Only Know INT32, FLOAT_64 and "
+                "FLOAT32".format(store_data_type))
 
     def _get_data(self, vertex_slice):
         data = list()
