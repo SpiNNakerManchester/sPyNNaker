@@ -18,10 +18,19 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from .projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural)
 
 logger = logging.getLogger(__name__)
+_DynamicsStructural = None
+
+
+def _are_dynamics_structural(synapse_dynamics):
+    global _DynamicsStructural
+    if _DynamicsStructural is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            AbstractSynapseDynamicsStructural)
+        _DynamicsStructural = AbstractSynapseDynamicsStructural
+    return isinstance(synapse_dynamics, _DynamicsStructural)
 
 
 class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
@@ -77,6 +86,5 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self):
         return all(
-            not isinstance(syn_info.synapse_dynamics,
-                           AbstractSynapseDynamicsStructural)
+            not _are_dynamics_structural(syn_info.synapse_dynamics)
             for syn_info in self.app_edge.synapse_information)
