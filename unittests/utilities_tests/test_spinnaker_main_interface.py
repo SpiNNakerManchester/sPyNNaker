@@ -91,16 +91,16 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         # Test normal use
         interface = MainInterfaceImpl(
             graph_label="Test", database_socket_addresses=[],
-            n_chips_required=None, timestep=1.0, max_delay=144.0,
-            min_delay=1.0, hostname=None)
+            n_chips_required=None, n_boards_required=None, timestep=1.0,
+            max_delay=144.0, min_delay=1.0, hostname=None)
         assert interface.default_machine_time_step == 1000
         assert interface.time_scale_factor == 1
 
         # Test auto time scale factor
         interface = MainInterfaceImpl(
             graph_label="Test", database_socket_addresses=[],
-            n_chips_required=None, timestep=0.1, max_delay=14.4,
-            min_delay=1.0, hostname=None)
+            n_chips_required=None, n_boards_required=None, timestep=0.1,
+            max_delay=14.4, min_delay=1.0, hostname=None)
         assert interface.default_machine_time_step == 100
         assert interface.time_scale_factor == 10
 
@@ -108,13 +108,13 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         with self.assertRaises(ConfigurationException):
             interface = MainInterfaceImpl(
                 graph_label="Test", database_socket_addresses=[],
-                n_chips_required=None, timestep=1.0, max_delay=145.0,
-                min_delay=1.0, hostname=None)
+                n_chips_required=None, n_boards_required=None, timestep=1.0,
+                max_delay=145.0,  min_delay=1.0, hostname=None)
         with self.assertRaises(ConfigurationException):
             interface = MainInterfaceImpl(
                 graph_label="Test", database_socket_addresses=[],
-                n_chips_required=None, timestep=0.1, max_delay=145.0,
-                min_delay=1.0, hostname=None)
+                n_chips_required=None, n_boards_required=None, timestep=0.1,
+                max_delay=145.0, min_delay=1.0, hostname=None)
 
 
 if __name__ == "__main__":
