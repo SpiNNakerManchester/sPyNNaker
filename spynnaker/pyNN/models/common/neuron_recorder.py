@@ -173,8 +173,10 @@ class NeuronRecorder(object):
                         fragment[i] = (record[local_indexes[0], 1:] /
                                        float(DataType.S1615.scale))
                     elif len(local_indexes[0]) > 1:
+                        fragment[i] = (record[local_indexes[0], 1:] /
+                                       float(DataType.S1615.scale))
                         logger.warning(
-                            "Population {} on multiple recorded data for "
+                            "Population {} has multiple recorded data for "
                             "time {}".format(label, time))
                     else:
                         # Set row to nan
