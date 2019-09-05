@@ -30,7 +30,7 @@ class GraphEdgeFilter(object):
     def __call__(self, machine_graph):
         """
         :param machine_graph: the machine_graph whose edges are to be filtered
-        :return: a new graph mapper and machine graph
+        :return: a new, filtered machine graph
         """
         new_machine_graph = MachineGraph(label=machine_graph.label)
 
